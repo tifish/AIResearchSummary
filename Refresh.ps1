@@ -52,16 +52,13 @@ if ($newCount -eq 0) {
     exit 0
 }
 
-$conclusionLabel = ([string][char]0x7ED3) + ([string][char]0x8BBA) + ([string][char]0xFF1A)
-$keyDataLabel = ([string][char]0x5173) + ([string][char]0x952E) + ([string][char]0x6570) + ([string][char]0x636E) + ([string][char]0xFF1A)
-
 $prompt = @"
 Use `$economic-futures-summary to update the AI research summary site in this workspace.
 
 Read the discovery JSON file at:
 $DiscoveryJson
 
-Process only the new article candidates represented by new_count and the articles array. For each new article, run extract_article.py to fetch metadata and article text, then update site/articles.json without modifying existing records. Generate summary_zh and value_zh in Chinese. summary_zh must include the labels "$conclusionLabel" for the conclusion and "$keyDataLabel" for key data. value_zh should explain why the article is worth reading. Finally run render_site.py to regenerate site/index.html. Report the number of newly added articles when finished.
+Process only the new article candidates represented by new_count and the articles array. Follow the skill workflow and output rules exactly, including extracting article text, updating site/articles.json, creating any missing standalone summary HTML pages, and regenerating site/index.html. Report the number of newly added articles and standalone summary pages when finished.
 "@
 
 Write-Host ""

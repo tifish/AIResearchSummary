@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import html
 import json
+import urllib.parse
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -54,6 +55,22 @@ def esc(value: Any) -> str:
     return html.escape(str(value or ""), quote=True)
 
 
+def summary_slug(url: str) -> str:
+    path = urllib.parse.urlsplit(url).path.rstrip("/")
+    slug = path.rsplit("/", 1)[-1]
+    return slug
+
+
+def summary_href(record: dict[str, Any], site_dir: Path) -> str:
+    slug = summary_slug(str(record.get("url", "")))
+    if not slug:
+        return ""
+    summary_path = site_dir / "summaries" / f"{slug}.html"
+    if not summary_path.exists():
+        return ""
+    return f"summaries/{slug}.html"
+
+
 def render_summary(summary: str, value: str) -> str:
     combined = summary if not value else f"{summary} 价值：{value}"
     parts = []
@@ -73,7 +90,7 @@ def render_summary(summary: str, value: str) -> str:
     return f"<p>{esc(combined)}</p>"
 
 
-def render_article(record: dict[str, Any]) -> str:
+def render_article(record: dict[str, Any], site_dir: Path) -> str:
     summary = str(record.get("summary_zh", "")).strip()
     value = str(record.get("value_zh", "")).strip()
     source = str(record.get("source", "") or "unknown").strip().lower()
@@ -84,6 +101,12 @@ def render_article(record: dict[str, Any]) -> str:
         for key in ("source", "source_name", "title", "date", "category", "summary_zh", "value_zh")
     )
     summary_html = render_summary(summary, value)
+    local_summary_href = summary_href(record, site_dir)
+    summary_link = (
+        f'<a class="source-link summary-link" href="{esc(local_summary_href)}" target="_blank" rel="noopener noreferrer">阅读总结</a>'
+        if local_summary_href
+        else ""
+    )
     return f"""
       <article class="article-card source-{esc(source)}" data-search="{esc(search_text.lower())}" data-source="{esc(source)}">
         <div class="meta">
@@ -95,14 +118,18 @@ def render_article(record: dict[str, Any]) -> str:
         <div class="summary">
         {summary_html}
         </div>
-        <a class="source-link" href="{esc(record.get("url"))}" target="_blank" rel="noopener noreferrer">阅读原文</a>
+        <div class="article-actions">
+          {summary_link}
+          <a class="source-link" href="{esc(record.get("url"))}" target="_blank" rel="noopener noreferrer">阅读原文</a>
+        </div>
       </article>"""
 
 
-def render_page(articles: list[dict[str, Any]]) -> str:
+def render_page(articles: list[dict[str, Any]], site_dir: Path | None = None) -> str:
+    site_dir = site_dir or default_site_dir()
     sorted_articles = sorted(articles, key=lambda item: parse_date(str(item.get("date", ""))), reverse=True)
     updated_at = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M %Z")
-    cards = "\n".join(render_article(record) for record in sorted_articles)
+    cards = "\n".join(render_article(record, site_dir) for record in sorted_articles)
     empty = "" if cards else '<p class="empty">还没有文章。运行 skill 更新后会在这里显示摘要。</p>'
     source_counts: dict[str, int] = {}
     source_ids: dict[str, str] = {}
@@ -269,12 +296,21 @@ def render_page(articles: list[dict[str, Any]]) -> str:
       color: var(--accent-dark);
       font-weight: 700;
     }}
+    .article-actions {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      align-items: center;
+    }}
     .source-link {{
       width: fit-content;
       color: var(--accent-dark);
       font-weight: 650;
       text-decoration: none;
       border-bottom: 1px solid currentColor;
+    }}
+    .summary-link {{
+      color: #8a4b10;
     }}
     .source-link:hover {{
       color: var(--accent);
@@ -366,7 +402,7 @@ def main() -> int:
 
     articles = load_articles(args.state)
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(render_page(articles), encoding="utf-8")
+    args.output.write_text(render_page(articles, args.output.parent), encoding="utf-8")
     print(f"Rendered {len(articles)} articles to {args.output}")
     return 0
 
