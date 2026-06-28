@@ -5,15 +5,17 @@ returns HTTP 403 to plain HTTP clients). Drives the locally installed Google Chr
 via Playwright; a real browser with a persistent profile passes the Cloudflare/bot
 checks that block urllib.
 
-Configuration (all optional, via environment variables):
+Always runs headed (so Cloudflare / human checks can render) and reuses a fixed
+persistent profile (<repo>/.chrome-profile) so clearance cookies survive between runs.
+"Load more" pagination stops by article DATE (a caller-supplied stop_when), not a
+click count.
+
+Optional environment variables:
   AIRS_CHROME_CDP       Attach to an already-running Chrome instead of launching one.
                         Start Chrome with `chrome --remote-debugging-port=9222`, then
                         set AIRS_CHROME_CDP=http://localhost:9222. Best Cloudflare bypass.
   AIRS_CHROME_CHANNEL   Chrome channel to launch (default "chrome"; set empty to use
                         Playwright's bundled Chromium).
-  AIRS_CHROME_HEADLESS  "1" for headless (default "0" / headed, so human checks render).
-  AIRS_CHROME_PROFILE   Persistent user-data dir (default <repo>/.chrome-profile).
-                        Keeps Cloudflare clearance cookies between runs.
 """
 
 from __future__ import annotations
@@ -31,6 +33,7 @@ if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8")
 
 DEFAULT_TIMEOUT_MS = 45000
+SAFETY_MAX_LOADS = 100  # backstop only; the real stop is the date-based stop_when
 LOAD_MORE_RE = re.compile(r"load\s*more|show\s*more|see\s*more|view\s*more|加载更多|查看更多|显示更多|更多", re.I)
 
 
@@ -46,9 +49,6 @@ def _ensure_playwright():
 
 
 def _profile_dir() -> str:
-    custom = os.environ.get("AIRS_CHROME_PROFILE")
-    if custom:
-        return custom
     return str(Path(__file__).resolve().parents[1] / ".chrome-profile")
 
 
@@ -136,13 +136,10 @@ def fetch_rendered(
     """
     sync_playwright = _ensure_playwright()
     cdp = os.environ.get("AIRS_CHROME_CDP")
-    headless = os.environ.get("AIRS_CHROME_HEADLESS", "0") == "1"
+    headless = False  # always headed so Cloudflare / human checks can render
     channel = os.environ.get("AIRS_CHROME_CHANNEL", "chrome") or None
     if max_loads is None:
-        try:
-            max_loads = int(os.environ.get("AIRS_CHROME_MAX_LOADS", "100"))
-        except ValueError:
-            max_loads = 100
+        max_loads = SAFETY_MAX_LOADS
 
     with sync_playwright() as playwright:
         if cdp:

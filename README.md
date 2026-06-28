@@ -10,12 +10,11 @@
 python -m pip install -r requirements.txt
 ```
 
-发现与抽取走本地 Chrome，需要本机已安装 Google Chrome。可选环境变量：
+发现与抽取走本地 Chrome，需要本机已安装 Google Chrome。固定**有头**运行；用固定的持久化用户目录 `.chrome-profile/`（保留 Cloudflare 通行 cookie）。“Load more” 翻页**按文章日期自动停止**（翻到 2026-01-01 之前即停），不靠点击次数。
+
+可选环境变量：
 
 - `AIRS_CHROME_CDP`：挂到已运行的 Chrome（先 `chrome --remote-debugging-port=9222`），最能绕过 Cloudflare。
-- `AIRS_CHROME_HEADLESS=1`：无头模式（默认有头，便于通过人机校验）。
-- `AIRS_CHROME_PROFILE`：自定义 Chrome 用户数据目录（默认 `.chrome-profile/`，会保留 Cloudflare 通行 cookie）。
-- `AIRS_CHROME_MAX_LOADS`：“Load more” 最多点击次数（默认 25）。
 
 ## 摘要网页
 
