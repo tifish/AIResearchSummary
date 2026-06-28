@@ -11,7 +11,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-from agent_cli import extract_html, extract_json, load_prompt, run_agent
+from agent_cli import extract_html, load_prompt, run_agent
 from extract_article import normalize_url
 from render_site import load_articles
 
@@ -22,6 +22,7 @@ if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8")
 
 SUMMARY_MARK = "===SUMMARY==="
+VALUE_MARK = "===VALUE==="
 DIGEST_MARK = "===DIGEST==="
 
 
@@ -38,18 +39,22 @@ def build_prompt(meta: dict) -> str:
 
 
 def generate(meta: dict, agent: str) -> dict:
-    """One agent call -> {summary_zh, value_zh, html}."""
+    """One agent call -> {summary_zh, value_zh, html}.
+
+    Output is marker-delimited plain text (not JSON), so the model can write
+    Chinese with arbitrary quotes/punctuation without breaking a JSON parse.
+    """
     output = run_agent(build_prompt(meta), agent)
-    if DIGEST_MARK not in output:
-        raise ValueError("agent output is missing the ===DIGEST=== marker")
-    head, _, tail = output.partition(DIGEST_MARK)
-    summary_part = head.split(SUMMARY_MARK, 1)[-1]
-    data = json.loads(extract_json(summary_part))
-    summary_zh = str(data.get("summary_zh", "")).strip()
-    value_zh = str(data.get("value_zh", "")).strip()
+    if SUMMARY_MARK not in output or VALUE_MARK not in output or DIGEST_MARK not in output:
+        raise ValueError("agent output is missing a ===SUMMARY===/===VALUE===/===DIGEST=== marker")
+    after_summary = output.split(SUMMARY_MARK, 1)[1]
+    summary_zh, after_value = after_summary.split(VALUE_MARK, 1)
+    value_zh, digest_part = after_value.split(DIGEST_MARK, 1)
+    summary_zh = summary_zh.strip()
+    value_zh = value_zh.strip()
     if not summary_zh:
-        raise ValueError("agent did not return summary_zh")
-    html = extract_html(tail)
+        raise ValueError("agent did not return summary text")
+    html = extract_html(digest_part)
     if "<html" not in html.lower():
         raise ValueError("agent did not return an HTML digest")
     return {"summary_zh": summary_zh, "value_zh": value_zh, "html": html}
