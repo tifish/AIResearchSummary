@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import html
 import json
+import re
 import urllib.parse
 from datetime import datetime
 from pathlib import Path
@@ -14,6 +15,7 @@ from typing import Any
 SOURCE_HOME_URLS = {
     "anthropic": "https://www.anthropic.com/research",
     "openai": "https://openai.com/research/index/",
+    "cursor": "https://cursor.com/blog/topic/research",
 }
 
 
@@ -36,6 +38,7 @@ def load_articles(path: Path) -> list[dict[str, Any]]:
 
 
 def parse_date(value: str) -> datetime:
+    value = re.sub(r"\bSept\b", "Sep", value.strip())
     for fmt in ("%b %d, %Y", "%B %d, %Y", "%Y-%m-%d"):
         try:
             return datetime.strptime(value, fmt)
@@ -91,7 +94,10 @@ def summary_href(record: dict[str, Any], site_dir: Path) -> str:
 
 
 def render_summary(summary: str, value: str) -> str:
-    combined = summary if not value else f"{summary} 价值：{value}"
+    if value and "价值：" not in summary:
+        combined = f"{summary} 价值：{value}"
+    else:
+        combined = summary
     parts = []
     labels = ("结论：", "关键数据：", "价值：")
     for index, label in enumerate(labels):
@@ -341,6 +347,7 @@ def render_page(articles: list[dict[str, Any]], site_dir: Path | None = None) ->
     .source-badge:hover {{ border-color: var(--accent-dark); }}
     .source-openai .source-badge {{ background: #eef2ff; }}
     .source-anthropic .source-badge {{ background: #f7eadf; }}
+    .source-cursor .source-badge {{ background: #e9e7f3; }}
     h2 {{
       margin: 0;
       font-size: 20px;

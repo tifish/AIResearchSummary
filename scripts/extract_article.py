@@ -17,12 +17,19 @@ from html.parser import HTMLParser
 from typing import Any
 
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8")
+
+
 DATE_RE = re.compile(
     r"\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{1,2},\s+\d{4}\b"
 )
 DEFAULT_CATEGORIES = {
     "anthropic": "Research",
     "openai": "Research",
+    "cursor": "Research",
 }
 BROWSER_USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -63,9 +70,17 @@ def normalize_date_text(value: str) -> str:
     match = DATE_RE.search(value)
     if match:
         value = match.group(0).replace(".", "")
+    value = re.sub(r"\bSept\b", "Sep", value)
     for fmt in ("%b %d, %Y", "%B %d, %Y"):
         try:
             parsed = datetime.strptime(value, fmt)
+            return parsed.strftime("%b %#d, %Y") if sys.platform == "win32" else parsed.strftime("%b %-d, %Y")
+        except ValueError:
+            pass
+    iso_match = re.match(r"\d{4}-\d{2}-\d{2}", value)
+    if iso_match:
+        try:
+            parsed = datetime.strptime(iso_match.group(0), "%Y-%m-%d")
             return parsed.strftime("%b %#d, %Y") if sys.platform == "win32" else parsed.strftime("%b %-d, %Y")
         except ValueError:
             pass
@@ -104,6 +119,10 @@ def ensure_bs4() -> Any:
 class ArticleParser(HTMLParser):
     content_tags = {"h1", "h2", "h3", "h4", "p", "li", "blockquote"}
     skip_tags = {"script", "style", "svg", "noscript"}
+    void_tags = {
+        "area", "base", "br", "col", "embed", "hr", "img",
+        "input", "link", "meta", "param", "source", "track", "wbr",
+    }
 
     def __init__(self, url: str) -> None:
         super().__init__(convert_charrefs=True)
@@ -148,7 +167,8 @@ class ArticleParser(HTMLParser):
         if not self.in_article:
             return
 
-        self.article_depth += 1
+        if tag not in self.void_tags:
+            self.article_depth += 1
         if tag in self.content_tags or tag == "time":
             self.current_tag = tag
             self.buffer = []
@@ -178,6 +198,9 @@ class ArticleParser(HTMLParser):
             return
 
         if not self.in_article:
+            return
+
+        if tag in self.void_tags:
             return
 
         if self.current_tag == tag:
@@ -253,6 +276,8 @@ def source_for_url(url: str) -> dict[str, str]:
         return {"source": "openai", "source_name": "OpenAI"}
     if "anthropic.com" in host:
         return {"source": "anthropic", "source_name": "Anthropic"}
+    if "cursor.com" in host or "cursor.sh" in host:
+        return {"source": "cursor", "source_name": "Cursor"}
     return {"source": "unknown", "source_name": "Unknown"}
 
 
@@ -288,7 +313,11 @@ def extract_with_bs4(url: str, markup: str) -> dict[str, Any]:
     date_node = None if DATE_RE.search(title_context) else soup.find("time")
     raw_date = ""
     if date_node:
-        raw_date = clean_text(str(date_node.get("datetime") or date_node.get_text(" ", strip=True)))
+        time_text = clean_text(date_node.get_text(" ", strip=True))
+        if DATE_RE.search(time_text):
+            raw_date = time_text
+        else:
+            raw_date = clean_text(str(date_node.get("datetime") or time_text))
     if not raw_date:
         raw_date = meta_content(soup, "article:published_time", "date", "datePublished")
     date_match = DATE_RE.search(title_context) or DATE_RE.search(raw_date)

@@ -30,6 +30,10 @@ SOURCES = {
         "name": "OpenAI",
         "url": "https://openai.com/research/index",
     },
+    "cursor": {
+        "name": "Cursor",
+        "url": "https://cursor.com/blog/topic/research",
+    },
 }
 
 DEFAULT_SINCE = date(2026, 1, 1)
@@ -92,7 +96,7 @@ def parse_date(value: str) -> date | None:
 
     match = DATE_RE.search(value)
     if match:
-        text = match.group(0).replace(".", "")
+        text = re.sub(r"\bSept\b", "Sep", match.group(0).replace(".", ""))
         for fmt in ("%b %d, %Y", "%B %d, %Y"):
             try:
                 return datetime.strptime(text, fmt).date()
@@ -104,10 +108,6 @@ def parse_date(value: str) -> date | None:
         return datetime.fromisoformat(iso_value).date()
     except ValueError:
         return None
-
-
-def format_date(value: date) -> str:
-    return value.strftime("%b %#d, %Y") if sys.platform == "win32" else value.strftime("%b %-d, %Y")
 
 
 def parse_since(value: str) -> date:
@@ -330,9 +330,48 @@ def parse_anthropic_articles(markup: str) -> list[dict[str, str]]:
     return dedupe_articles(articles)
 
 
+def parse_cursor_articles(markup: str) -> list[dict[str, str]]:
+    BeautifulSoup = ensure_dependencies()
+    soup = BeautifulSoup(markup, "html.parser")
+    articles: list[dict[str, str]] = []
+    for anchor in soup.find_all("a", href=True):
+        href = str(anchor["href"])
+        url = normalize_url(urllib.parse.urljoin(str(SOURCES["cursor"]["url"]), href))
+        parsed = urllib.parse.urlsplit(url)
+        if parsed.netloc not in ("cursor.com", "www.cursor.com"):
+            continue
+        if "/topic/" in parsed.path or not re.match(r"^/blog/[^/]+$", parsed.path):
+            continue
+
+        time_node = anchor.find("time")
+        date_text = clean_text(time_node.get_text(" ", strip=True)) if time_node else ""
+        if not DATE_RE.search(date_text):
+            match = DATE_RE.search(clean_text(anchor.get_text(" ", strip=True)))
+            date_text = match.group(0) if match else ""
+        if not date_text:
+            continue
+
+        title_node = anchor.find("p") or anchor.find(["h1", "h2", "h3", "h4"])
+        title = clean_text(title_node.get_text(" ", strip=True)) if title_node else ""
+        if not title:
+            continue
+
+        articles.append(
+            {
+                **source_fields("cursor"),
+                "url": url,
+                "title": title,
+                "date": date_text,
+                "category": "Research",
+            }
+        )
+    return dedupe_articles(articles)
+
+
 PARSERS: dict[str, Callable[[str], list[dict[str, str]]]] = {
     "anthropic": parse_anthropic_articles,
     "openai": parse_openai_articles,
+    "cursor": parse_cursor_articles,
 }
 
 
@@ -349,7 +388,7 @@ def dedupe_articles(articles: list[dict[str, str]]) -> list[dict[str, str]]:
     return deduped
 
 
-def discover_source(source_id: str, since: date, _max_clicks: int) -> list[dict[str, str]]:
+def discover_source(source_id: str, since: date) -> list[dict[str, str]]:
     parser = PARSERS[source_id]
     markup = fetch_listing_html(source_id)
     articles = parser(markup)
@@ -369,12 +408,12 @@ def read_existing_urls(state_path: Path) -> set[str]:
     return urls
 
 
-def discover(source_ids: list[str], since: date, max_clicks: int) -> tuple[list[dict[str, str]], list[str]]:
+def discover(source_ids: list[str], since: date) -> tuple[list[dict[str, str]], list[str]]:
     articles: list[dict[str, str]] = []
     errors: list[str] = []
     for source_id in source_ids:
         try:
-            articles.extend(discover_source(source_id, since, max_clicks))
+            articles.extend(discover_source(source_id, since))
         except (RuntimeError, OSError, urllib.error.URLError, ValueError) as exc:
             errors.append(f"{source_id}: {exc}")
     return dedupe_articles(articles), errors
@@ -401,11 +440,10 @@ def main() -> int:
     arg_parser.add_argument("--state", type=Path, default=default_state_path(), help="Path to site/articles.json.")
     arg_parser.add_argument("--all", action="store_true", help="Print all discovered articles, not only new ones.")
     arg_parser.add_argument("--since", type=parse_since, default=DEFAULT_SINCE, help="Earliest article date, YYYY-MM-DD.")
-    arg_parser.add_argument("--max-clicks", type=int, default=20, help="Compatibility option; browser pagination is not handled by this script.")
     args = arg_parser.parse_args()
 
     try:
-        articles, source_errors = discover(args.sources, args.since, args.max_clicks)
+        articles, source_errors = discover(args.sources, args.since)
         existing_urls = read_existing_urls(args.state)
     except (json.JSONDecodeError, ValueError) as exc:
         print(f"discover_articles.py: {exc}", file=sys.stderr)
