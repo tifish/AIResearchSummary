@@ -68,6 +68,8 @@ def upsert_summary(state_path: Path, meta: dict, summary_zh: str, value_zh: str)
         if normalize_url(str(record.get("url", ""))) == url:
             record["summary_zh"] = summary_zh
             record["value_zh"] = value_zh
+            if meta.get("source_hash"):
+                record["source_hash"] = meta["source_hash"]
             break
     else:
         records.append({
