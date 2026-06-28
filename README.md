@@ -48,7 +48,7 @@ python -m pip install -r requirements.txt
 
 - [Anthropic Research](https://www.anthropic.com/research)
 - [OpenAI Research Index](https://openai.com/research/index)
-- [Blog · Cursor](https://cursor.com/en-US/blog)
+- [Cursor Blog · Research](https://cursor.com/blog/topic/research)
 
 ## 刷新
 
