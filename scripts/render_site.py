@@ -47,30 +47,14 @@ def parse_date(value: str) -> datetime:
     return datetime.min
 
 
-def month_key(record: dict[str, Any]) -> str:
+def year_key(record: dict[str, Any]) -> str:
     parsed = parse_date(str(record.get("date", "")))
-    if parsed == datetime.min:
-        return "unknown"
-    return parsed.strftime("%Y-%m")
+    return "unknown" if parsed == datetime.min else parsed.strftime("%Y")
 
 
-def month_label(key: str) -> str:
-    if key == "unknown":
-        return "未知月份"
-    try:
-        parsed = datetime.strptime(key, "%Y-%m")
-    except ValueError:
-        return key
-    return f"{parsed.year} 年 {parsed.month} 月"
-
-
-def month_sort_value(key: str) -> datetime:
-    if key == "unknown":
-        return datetime.min
-    try:
-        return datetime.strptime(key, "%Y-%m")
-    except ValueError:
-        return datetime.min
+def month_num(record: dict[str, Any]) -> str:
+    parsed = parse_date(str(record.get("date", "")))
+    return "unknown" if parsed == datetime.min else parsed.strftime("%m")
 
 
 def esc(value: Any) -> str:
@@ -115,14 +99,14 @@ def render_summary(summary: str, value: str) -> str:
     return f"<p>{esc(combined)}</p>"
 
 
-def render_article(record: dict[str, Any], site_dir: Path, active_month: str) -> str:
+def render_article(record: dict[str, Any], site_dir: Path) -> str:
     summary = str(record.get("summary_zh", "")).strip()
     value = str(record.get("value_zh", "")).strip()
     source = str(record.get("source", "") or "unknown").strip().lower()
     source_name = str(record.get("source_name", "") or source or "Unknown").strip()
     source_home_url = SOURCE_HOME_URLS.get(source, str(record.get("url", "")))
-    article_month = month_key(record)
-    hidden_attr = " hidden" if active_month and article_month != active_month else ""
+    art_year = year_key(record)
+    art_month = month_num(record)
     search_text = " ".join(
         str(record.get(key, ""))
         for key in ("source", "source_name", "title", "date", "category", "summary_zh", "value_zh")
@@ -135,7 +119,7 @@ def render_article(record: dict[str, Any], site_dir: Path, active_month: str) ->
         else ""
     )
     return f"""
-      <article class="article-card source-{esc(source)}" data-search="{esc(search_text.lower())}" data-source="{esc(source)}" data-month="{esc(article_month)}"{hidden_attr}>
+      <article class="article-card source-{esc(source)}" data-search="{esc(search_text.lower())}" data-source="{esc(source)}" data-year="{esc(art_year)}" data-month="{esc(art_month)}">
         <div class="meta">
           <a class="source-badge" href="{esc(source_home_url)}" target="_blank" rel="noopener noreferrer">{esc(source_name)}</a>
           <time>{esc(record.get("date"))}</time>
@@ -152,27 +136,44 @@ def render_article(record: dict[str, Any], site_dir: Path, active_month: str) ->
       </article>"""
 
 
+def _chip(filter_attr: str, value: str, label: str, count: int, pressed: bool) -> str:
+    return (
+        f'<button type="button" class="chip-button" data-{filter_attr}="{esc(value)}" '
+        f'aria-pressed="{str(pressed).lower()}">'
+        f'<span>{esc(label)}</span><strong>{count}</strong></button>'
+    )
+
+
 def render_page(articles: list[dict[str, Any]], site_dir: Path | None = None) -> str:
     site_dir = site_dir or default_site_dir()
     sorted_articles = sorted(articles, key=lambda item: parse_date(str(item.get("date", ""))), reverse=True)
     updated_at = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M %Z")
+    total = len(sorted_articles)
+
+    year_counts: dict[str, int] = {}
     month_counts: dict[str, int] = {}
     for article in sorted_articles:
-        key = month_key(article)
-        month_counts[key] = month_counts.get(key, 0) + 1
-    month_keys = sorted(month_counts, key=month_sort_value, reverse=True)
-    active_month = month_keys[0] if month_keys else ""
-    active_month_count = month_counts.get(active_month, 0)
-    cards = "\n".join(render_article(record, site_dir, active_month) for record in sorted_articles)
-    empty = "" if cards else '<p class="empty">还没有文章。运行 skill 更新后会在这里显示摘要。</p>'
-    month_buttons = "\n".join(
-        (
-            f'<button type="button" class="month-button" data-month-filter="{esc(key)}" '
-            f'aria-pressed="{str(key == active_month).lower()}">'
-            f'<span>{esc(month_label(key))}</span><strong>{month_counts[key]}</strong></button>'
-        )
-        for key in month_keys
+        year_counts[year_key(article)] = year_counts.get(year_key(article), 0) + 1
+        month_counts[month_num(article)] = month_counts.get(month_num(article), 0) + 1
+
+    year_keys = sorted(year_counts, key=lambda k: (-1 if k == "unknown" else int(k)), reverse=True)
+    month_keys = sorted(month_counts, key=lambda k: (99 if k == "unknown" else int(k)))
+
+    year_buttons = "\n".join(
+        [_chip("year-filter", "all", "全部年份", total, True)]
+        + [
+            _chip("year-filter", key, ("未知" if key == "unknown" else f"{key} 年"), year_counts[key], False)
+            for key in year_keys
+        ]
     )
+    month_buttons = "\n".join(
+        [_chip("month-filter", "all", "全部月份", total, True)]
+        + [
+            _chip("month-filter", key, ("未知" if key == "unknown" else f"{int(key)} 月"), month_counts[key], False)
+            for key in month_keys
+        ]
+    )
+
     source_counts: dict[str, int] = {}
     source_ids: dict[str, str] = {}
     for article in sorted_articles:
@@ -185,13 +186,22 @@ def render_page(articles: list[dict[str, Any]], site_dir: Path | None = None) ->
         f'<button type="button" class="filter-button" data-source-filter="{esc(source_ids[name])}">{esc(name)}</button>'
         for name in sorted(source_counts)
     )
-    active_month_label = month_label(active_month) if active_month else "无月份"
+
+    cards = "\n".join(render_article(record, site_dir) for record in sorted_articles)
+    empty = "" if cards else '<p class="empty">还没有文章。运行 refresh.py 更新后会在这里显示摘要。</p>'
+
     return f"""<!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AI Research 中文简介</title>
+  <script>
+    try {{
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    }} catch (e) {{}}
+  </script>
   <style>
     :root {{
       color-scheme: light;
@@ -202,6 +212,49 @@ def render_page(articles: list[dict[str, Any]], site_dir: Path | None = None) ->
       --panel: #fffdf8;
       --accent: #1f6f5b;
       --accent-dark: #164d40;
+      --emphasis: #164d40;
+      --chip-bg: #ece5d9;
+      --badge-bg: #eef4f1;
+      --badge-anthropic: #f7eadf;
+      --badge-openai: #eef2ff;
+      --badge-cursor: #e9e7f3;
+      --summary-link: #8a4b10;
+    }}
+    @media (prefers-color-scheme: dark) {{
+      :root:not([data-theme="light"]) {{
+        color-scheme: dark;
+        --ink: #ece7dc;
+        --muted: #9c9486;
+        --line: #38332b;
+        --paper: #15130f;
+        --panel: #211d17;
+        --accent: #5cc3a6;
+        --accent-dark: #2b8e76;
+        --emphasis: #8fd8c0;
+        --chip-bg: #2e2a22;
+        --badge-bg: #20302b;
+        --badge-anthropic: #33291d;
+        --badge-openai: #20243a;
+        --badge-cursor: #2a2740;
+        --summary-link: #e0a063;
+      }}
+    }}
+    :root[data-theme="dark"] {{
+      color-scheme: dark;
+      --ink: #ece7dc;
+      --muted: #9c9486;
+      --line: #38332b;
+      --paper: #15130f;
+      --panel: #211d17;
+      --accent: #5cc3a6;
+      --accent-dark: #2b8e76;
+      --emphasis: #8fd8c0;
+      --chip-bg: #2e2a22;
+      --badge-bg: #20302b;
+      --badge-anthropic: #33291d;
+      --badge-openai: #20243a;
+      --badge-cursor: #2a2740;
+      --summary-link: #e0a063;
     }}
     * {{ box-sizing: border-box; }}
     body {{
@@ -240,13 +293,36 @@ def render_page(articles: list[dict[str, Any]], site_dir: Path | None = None) ->
       display: grid;
       gap: 10px;
     }}
-    .month-nav {{
+    .theme-toggle {{
+      justify-self: end;
+      min-height: 30px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--panel);
+      color: var(--muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }}
+    .theme-toggle:hover {{ border-color: var(--accent-dark); color: var(--ink); }}
+    .facets {{
+      display: grid;
+      gap: 8px;
+      padding-top: 14px;
+      margin-top: 20px;
+      border-top: 1px solid var(--line);
+    }}
+    .chip-nav {{
       display: flex;
       flex-wrap: wrap;
+      align-items: center;
       gap: 8px;
-      padding: 16px 0 0;
-      border-top: 1px solid var(--line);
-      margin-top: 20px;
+    }}
+    .nav-label {{
+      color: var(--muted);
+      font-size: 12px;
+      min-width: 30px;
     }}
     .filters {{
       display: flex;
@@ -254,7 +330,7 @@ def render_page(articles: list[dict[str, Any]], site_dir: Path | None = None) ->
       gap: 8px;
     }}
     .filter-button,
-    .month-button {{
+    .chip-button {{
       min-height: 32px;
       border: 1px solid var(--line);
       border-radius: 999px;
@@ -265,31 +341,31 @@ def render_page(articles: list[dict[str, Any]], site_dir: Path | None = None) ->
       font-size: 13px;
       cursor: pointer;
     }}
-    .month-button {{
+    .chip-button {{
       display: inline-flex;
       align-items: center;
       gap: 8px;
       white-space: nowrap;
     }}
-    .month-button strong {{
+    .chip-button strong {{
       display: inline-flex;
       align-items: center;
       justify-content: center;
       min-width: 22px;
       min-height: 22px;
       border-radius: 999px;
-      background: #ece5d9;
+      background: var(--chip-bg);
       color: var(--ink);
       font-size: 12px;
       line-height: 1;
     }}
     .filter-button[aria-pressed="true"],
-    .month-button[aria-pressed="true"] {{
+    .chip-button[aria-pressed="true"] {{
       border-color: var(--accent-dark);
       background: var(--accent-dark);
       color: #fff;
     }}
-    .month-button[aria-pressed="true"] strong {{
+    .chip-button[aria-pressed="true"] strong {{
       background: rgba(255, 255, 255, 0.2);
       color: #fff;
     }}
@@ -340,14 +416,14 @@ def render_page(articles: list[dict[str, Any]], site_dir: Path | None = None) ->
       border-radius: 999px;
       padding: 1px 9px;
       color: var(--ink);
-      background: #eef4f1;
+      background: var(--badge-bg);
       font-weight: 650;
       text-decoration: none;
     }}
     .source-badge:hover {{ border-color: var(--accent-dark); }}
-    .source-openai .source-badge {{ background: #eef2ff; }}
-    .source-anthropic .source-badge {{ background: #f7eadf; }}
-    .source-cursor .source-badge {{ background: #e9e7f3; }}
+    .source-openai .source-badge {{ background: var(--badge-openai); }}
+    .source-anthropic .source-badge {{ background: var(--badge-anthropic); }}
+    .source-cursor .source-badge {{ background: var(--badge-cursor); }}
     h2 {{
       margin: 0;
       font-size: 20px;
@@ -368,7 +444,7 @@ def render_page(articles: list[dict[str, Any]], site_dir: Path | None = None) ->
       margin: 0;
     }}
     .summary-line strong {{
-      color: var(--accent-dark);
+      color: var(--emphasis);
       font-weight: 700;
     }}
     .article-actions {{
@@ -379,13 +455,13 @@ def render_page(articles: list[dict[str, Any]], site_dir: Path | None = None) ->
     }}
     .source-link {{
       width: fit-content;
-      color: var(--accent-dark);
+      color: var(--emphasis);
       font-weight: 650;
       text-decoration: none;
       border-bottom: 1px solid currentColor;
     }}
     .summary-link {{
-      color: #8a4b10;
+      color: var(--summary-link);
     }}
     .source-link:hover {{
       color: var(--accent);
@@ -406,15 +482,6 @@ def render_page(articles: list[dict[str, Any]], site_dir: Path | None = None) ->
       .article-card {{
         padding: 16px;
       }}
-      .month-nav {{
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        padding-bottom: 8px;
-        scrollbar-width: thin;
-      }}
-      .month-button {{
-        flex: 0 0 auto;
-      }}
       .summary-line {{
         grid-template-columns: 1fr;
         gap: 2px;
@@ -428,9 +495,10 @@ def render_page(articles: list[dict[str, Any]], site_dir: Path | None = None) ->
       <div>
         <h1>AI Research 中文简介</h1>
         <p class="lede">每篇文章保留一段中文简介，包含结论、关键数据和阅读价值；点击“阅读原文”可打开对应来源原文。</p>
-        <p class="stats">当前 <span id="active-month-label">{esc(active_month_label)}</span>：<span id="visible-count">{active_month_count}</span> / <span id="month-count">{active_month_count}</span> 篇可见 · 共 {len(sorted_articles)} 篇文章 · {source_summary} · 更新于 {esc(updated_at)}</p>
+        <p class="stats">共 {total} 篇文章 · 可见 <span id="visible-count">{total}</span> 篇 · {source_summary} · 更新于 {esc(updated_at)}</p>
       </div>
       <div class="tools">
+        <button type="button" id="theme-toggle" class="theme-toggle">主题 · 跟随系统</button>
         <label for="search">搜索来源、标题、分类或简介</label>
         <input id="search" type="search" autocomplete="off" placeholder="输入关键词">
         <div class="filters" aria-label="来源筛选">
@@ -439,64 +507,83 @@ def render_page(articles: list[dict[str, Any]], site_dir: Path | None = None) ->
         </div>
       </div>
     </header>
-    <nav class="month-nav" aria-label="月份导航">
-      {month_buttons}
-    </nav>
+    <div class="facets">
+      <nav class="chip-nav" aria-label="年份筛选">
+        <span class="nav-label">年份</span>
+        {year_buttons}
+      </nav>
+      <nav class="chip-nav" aria-label="月份筛选">
+        <span class="nav-label">月份</span>
+        {month_buttons}
+      </nav>
+    </div>
     <section class="list" id="article-list" aria-label="文章列表">
       {cards}
     </section>
     {empty}
-    <p class="empty" id="empty-state" hidden>当前月份和筛选条件下没有文章。</p>
+    <p class="empty" id="empty-state" hidden>当前筛选条件下没有文章。</p>
   </main>
   <script>
-    const search = document.querySelector("#search");
-    const cards = Array.from(document.querySelectorAll(".article-card"));
-    const filterButtons = Array.from(document.querySelectorAll(".filter-button"));
-    const monthButtons = Array.from(document.querySelectorAll(".month-button"));
-    const visibleCount = document.querySelector("#visible-count");
-    const monthCount = document.querySelector("#month-count");
-    const activeMonthLabel = document.querySelector("#active-month-label");
-    const emptyState = document.querySelector("#empty-state");
+    const q = (sel) => document.querySelector(sel);
+    const all = (sel) => Array.from(document.querySelectorAll(sel));
+    const search = q("#search");
+    const cards = all(".article-card");
+    const sourceButtons = all(".filter-button");
+    const yearButtons = all("[data-year-filter]");
+    const monthButtons = all("[data-month-filter]");
+    const visibleCount = q("#visible-count");
+    const emptyState = q("#empty-state");
     let activeSource = "all";
-    let activeMonth = monthButtons.find((button) => button.getAttribute("aria-pressed") === "true")?.dataset.monthFilter || "";
+    let activeYear = "all";
+    let activeMonth = "all";
+
     function applyFilters() {{
       const query = search.value.trim().toLowerCase();
       let visible = 0;
-      let monthTotal = 0;
       for (const card of cards) {{
-        const monthMatch = !activeMonth || card.dataset.month === activeMonth;
+        const yearMatch = activeYear === "all" || card.dataset.year === activeYear;
+        const monthMatch = activeMonth === "all" || card.dataset.month === activeMonth;
         const sourceMatch = activeSource === "all" || card.dataset.source === activeSource;
         const textMatch = !query || card.dataset.search.includes(query);
-        if (monthMatch) monthTotal += 1;
-        const match = monthMatch && sourceMatch && textMatch;
+        const match = yearMatch && monthMatch && sourceMatch && textMatch;
         card.hidden = !match;
         if (match) visible += 1;
       }}
       visibleCount.textContent = visible;
-      monthCount.textContent = monthTotal;
-      const currentMonthButton = monthButtons.find((button) => button.dataset.monthFilter === activeMonth);
-      activeMonthLabel.textContent = currentMonthButton?.querySelector("span")?.textContent || "无月份";
       if (emptyState) emptyState.hidden = visible !== 0 || cards.length === 0;
     }}
+
+    function wire(buttons, setActive) {{
+      for (const button of buttons) {{
+        button.addEventListener("click", () => {{
+          setActive(button);
+          for (const item of buttons) item.setAttribute("aria-pressed", String(item === button));
+          applyFilters();
+        }});
+      }}
+    }}
+    wire(sourceButtons, (b) => {{ activeSource = b.dataset.sourceFilter || "all"; }});
+    wire(yearButtons, (b) => {{ activeYear = b.dataset.yearFilter || "all"; }});
+    wire(monthButtons, (b) => {{ activeMonth = b.dataset.monthFilter || "all"; }});
     search?.addEventListener("input", applyFilters);
-    for (const button of filterButtons) {{
-      button.addEventListener("click", () => {{
-        activeSource = button.dataset.sourceFilter || "all";
-        for (const item of filterButtons) {{
-          item.setAttribute("aria-pressed", String(item === button));
-        }}
-        applyFilters();
-      }});
+
+    const themeToggle = q("#theme-toggle");
+    const themeModes = ["auto", "light", "dark"];
+    const themeLabels = {{ auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" }};
+    function applyTheme(mode) {{
+      if (mode === "auto") document.documentElement.removeAttribute("data-theme");
+      else document.documentElement.dataset.theme = mode;
+      if (themeToggle) themeToggle.textContent = themeLabels[mode];
     }}
-    for (const button of monthButtons) {{
-      button.addEventListener("click", () => {{
-        activeMonth = button.dataset.monthFilter || "";
-        for (const item of monthButtons) {{
-          item.setAttribute("aria-pressed", String(item === button));
-        }}
-        applyFilters();
-      }});
-    }}
+    let themeMode = "auto";
+    try {{ themeMode = localStorage.getItem("theme") || "auto"; }} catch (e) {{}}
+    applyTheme(themeMode);
+    themeToggle?.addEventListener("click", () => {{
+      themeMode = themeModes[(themeModes.indexOf(themeMode) + 1) % themeModes.length];
+      try {{ localStorage.setItem("theme", themeMode); }} catch (e) {{}}
+      applyTheme(themeMode);
+    }});
+
     applyFilters();
   </script>
 </body>
