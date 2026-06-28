@@ -2,7 +2,8 @@
 setlocal
 
 cd /d "%~dp0"
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0Refresh.ps1" -Agent codex
+set PYTHONUTF8=1
+python "%~dp0refresh.py" --agent codex
 set "EXITCODE=%ERRORLEVEL%"
 
 endlocal & exit /b %EXITCODE%
