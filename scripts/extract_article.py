@@ -394,11 +394,22 @@ def extract(url: str) -> dict[str, Any]:
     except (OSError, urllib.error.URLError) as exc:
         errors.append(str(exc))
 
+    # Static fetch failed or yielded no text: fall back to a local Chrome render
+    # (handles JS-rendered / bot-protected pages such as OpenAI's 403-guarded site).
+    try:
+        from browser_fetch import fetch_rendered
+
+        result = extract_from_markup(url, fetch_rendered(url))
+        if result["article_text"]:
+            return result
+        errors.append("rendered page did not expose readable article text")
+    except RuntimeError as exc:
+        errors.append(str(exc))
+    except Exception as exc:  # browser launch / navigation failure
+        errors.append(f"browser render failed: {exc}")
+
     reason = "; ".join(errors) if errors else "static page did not expose readable article text"
-    raise ValueError(
-        f"Could not extract article text from {url}: {reason}. "
-        "Use the Codex or Claude browser plugin to inspect browser-rendered pages when needed."
-    )
+    raise ValueError(f"Could not extract article text from {url}: {reason}.")
 
 
 def main() -> int:

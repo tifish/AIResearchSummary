@@ -29,6 +29,7 @@ SOURCES = {
     "openai": {
         "name": "OpenAI",
         "url": "https://openai.com/research/index",
+        "render": True,
     },
     "cursor": {
         "name": "Cursor",
@@ -138,6 +139,10 @@ def https_context() -> ssl.SSLContext | None:
 
 def fetch_listing_html(source_id: str) -> str:
     source = SOURCES[source_id]
+    if source.get("render"):
+        from browser_fetch import fetch_rendered
+
+        return fetch_rendered(str(source["url"]))
     request = urllib.request.Request(
         str(source["url"]),
         headers={

@@ -28,7 +28,7 @@ python scripts\discover_articles.py
 python scripts\extract_article.py "https://www.anthropic.com/research/example"
 ```
 
-使用脚本返回的来源、来源名称、标题、日期、分类、URL、正文哈希和正文文本。普通请求无法抓取正文或元数据时，直接使用 Codex / Claude 的浏览器插件检查页面并抽取正文；不要在项目里引入浏览器自动化依赖，也不要重新总结已经存在于 `site/articles.json` 的文章。
+使用脚本返回的来源、来源名称、标题、日期、分类、URL、正文哈希和正文文本。OpenAI 等需要浏览器渲染或有反爬的来源，脚本会自动通过本地 Chrome（Playwright）渲染抓取：发现阶段走本地 Chrome，`extract_article.py` 在静态抓取失败时也会自动回退到本地 Chrome。只有脚本仍然失败时，才需要手动用 Codex / Claude 的浏览器插件检查页面。不要重新总结已经存在于 `site/articles.json` 的文章。
 
 3. 为每篇新文章写入一条中文记录到 `site/articles.json`：
 

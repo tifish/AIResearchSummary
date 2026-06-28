@@ -4,11 +4,17 @@
 
 ## 依赖
 
-刷新脚本只使用静态 HTTP 抓取、BeautifulSoup 解析和 certifi 证书包。首次运行前安装依赖：
+Anthropic、Cursor 用静态 HTTP 抓取 + BeautifulSoup 解析；OpenAI 有反爬/JS 渲染，改用本地 Chrome 渲染抓取（Playwright 驱动本机已安装的 Google Chrome）。首次运行前安装依赖：
 
 ```bat
 python -m pip install -r requirements.txt
 ```
+
+OpenAI 走本地 Chrome，需要本机已安装 Google Chrome。可选环境变量：
+
+- `AIRS_CHROME_CDP`：挂到已运行的 Chrome（先 `chrome --remote-debugging-port=9222`），最能绕过 Cloudflare。
+- `AIRS_CHROME_HEADLESS=1`：无头模式（默认有头，便于通过人机校验）。
+- `AIRS_CHROME_PROFILE`：自定义 Chrome 用户数据目录（默认 `.chrome-profile/`，会保留 Cloudflare 通行 cookie）。
 
 ## 摘要网页
 
