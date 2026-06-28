@@ -25,15 +25,20 @@ SOURCES = {
     "anthropic": {
         "name": "Anthropic",
         "url": "https://www.anthropic.com/research",
+        "render": True,
+        "load_more": True,
     },
     "openai": {
         "name": "OpenAI",
         "url": "https://openai.com/research/index",
         "render": True,
+        "load_more": True,
     },
     "cursor": {
         "name": "Cursor",
         "url": "https://cursor.com/blog/topic/research",
+        "render": True,
+        "load_more": True,
     },
 }
 
@@ -137,12 +142,7 @@ def https_context() -> ssl.SSLContext | None:
     return ssl.create_default_context(cafile=certifi.where())
 
 
-def fetch_listing_html(source_id: str) -> str:
-    source = SOURCES[source_id]
-    if source.get("render"):
-        from browser_fetch import fetch_rendered
-
-        return fetch_rendered(str(source["url"]))
+def _fetch_static(source: dict[str, Any]) -> str:
     request = urllib.request.Request(
         str(source["url"]),
         headers={
@@ -153,6 +153,35 @@ def fetch_listing_html(source_id: str) -> str:
     with urllib.request.urlopen(request, timeout=30, context=https_context()) as response:
         charset = response.headers.get_content_charset() or "utf-8"
         return response.read().decode(charset, errors="replace")
+
+
+def fetch_listing_html(source_id: str, since: date | None = None) -> str:
+    source = SOURCES[source_id]
+    if source.get("render"):
+        try:
+            from browser_fetch import fetch_rendered
+
+            stop_when = None
+            if since is not None and source.get("load_more"):
+                parser = PARSERS[source_id]
+
+                def stop_when(markup: str) -> bool:
+                    # Stop paginating once the loaded list reaches back past `since`.
+                    try:
+                        parsed = parser(markup)
+                    except Exception:
+                        return False
+                    dates = [d for d in (parse_date(a.get("date", "")) for a in parsed) if d is not None]
+                    return bool(dates) and min(dates) < since
+
+            return fetch_rendered(
+                str(source["url"]),
+                load_more=bool(source.get("load_more")),
+                stop_when=stop_when,
+            )
+        except Exception as exc:  # Chrome unavailable -> fall back to a static first-page fetch
+            print(f"discover: {source_id} browser render failed ({exc}); using static fetch.", file=sys.stderr)
+    return _fetch_static(source)
 
 
 def article_in_range(article: dict[str, str], since: date) -> bool:
@@ -316,6 +345,10 @@ def parse_anthropic_articles(markup: str) -> list[dict[str, str]]:
             match = DATE_RE.search(clean_text(anchor.get_text(" ", strip=True)))
             date_text = match.group(0) if match else ""
         if not date_text:
+            # Some rows keep the date just outside the <a>; look up the tree.
+            match = DATE_RE.search(nearest_text_with_date(anchor))
+            date_text = match.group(0) if match else ""
+        if not date_text:
             continue
 
         title, category, description = parse_anthropic_title_category(anchor, date_text)
@@ -395,7 +428,7 @@ def dedupe_articles(articles: list[dict[str, str]]) -> list[dict[str, str]]:
 
 def discover_source(source_id: str, since: date) -> list[dict[str, str]]:
     parser = PARSERS[source_id]
-    markup = fetch_listing_html(source_id)
+    markup = fetch_listing_html(source_id, since)
     articles = parser(markup)
     return [article for article in articles if article_in_range(article, since)]
 
