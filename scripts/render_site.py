@@ -77,6 +77,27 @@ def summary_href(record: dict[str, Any], site_dir: Path) -> str:
     return f"summaries/{slug}.html"
 
 
+def inject_nav(html: str, url: str) -> str:
+    """Insert a standard nav bar (back to index + original article) at the top of a
+    digest page. Idempotent (marked with the airs-digest-nav class)."""
+    if "airs-digest-nav" in html:
+        return html
+    nav = (
+        '<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;'
+        "align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);"
+        "border-bottom:1px solid rgba(127,127,127,.25);"
+        "font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;\">"
+        '<a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a>'
+        f'<a href="{esc(url)}" target="_blank" rel="noopener noreferrer" '
+        'style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a>'
+        "</nav>"
+    )
+    match = re.search(r"<body[^>]*>", html, re.IGNORECASE)
+    if match:
+        return html[: match.end()] + "\n" + nav + html[match.end() :]
+    return nav + html
+
+
 def render_summary(summary: str, value: str) -> str:
     if value and "价值：" not in summary:
         combined = f"{summary} 价值：{value}"

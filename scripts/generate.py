@@ -13,7 +13,7 @@ from pathlib import Path
 
 from agent_cli import extract_html, load_prompt, run_agent
 from extract_article import normalize_url
-from render_site import load_articles
+from render_site import inject_nav, load_articles
 
 
 if hasattr(sys.stdout, "reconfigure"):
@@ -57,6 +57,7 @@ def generate(meta: dict, agent: str) -> dict:
     html = extract_html(digest_part)
     if "<html" not in html.lower():
         raise ValueError("agent did not return an HTML digest")
+    html = inject_nav(html, meta["url"])
     return {"summary_zh": summary_zh, "value_zh": value_zh, "html": html}
 
 
