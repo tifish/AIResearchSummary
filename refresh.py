@@ -47,12 +47,27 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Discover -> generate (summary + digest) -> render the site.")
     parser.add_argument("--agent", choices=["codex", "claude"], default="codex")
     parser.add_argument("--sources", default=None, help="逗号分隔的来源 id，默认全部。")
-    parser.add_argument("--url", default=None, help="只处理这一篇文章（测试用，覆盖已有总结页）。")
+    parser.add_argument("--discover-only", action="store_true", help="只做发现（步骤一），列出发现到的文章，不生成、不渲染。")
+    parser.add_argument("--url", default=None, help="只对这一篇文章生成摘要和总结（步骤二，单篇测试，覆盖已有总结页）。")
     parser.add_argument("--dry-run", action="store_true", help="不调用 Agent、不写文件。")
     args = parser.parse_args()
 
     state = default_state_path()
     site = default_site_dir()
+    sources = [s.strip() for s in args.sources.split(",") if s.strip()] if args.sources else list(SOURCES)
+
+    if args.discover_only:
+        articles, source_errors = discover(sources, DEFAULT_SINCE)
+        existing = read_existing_urls(state)
+        for err in source_errors:
+            print(f"  source error: {err}")
+        new = 0
+        for art in articles:
+            is_new = normalize_url(art["url"]) not in existing
+            new += 1 if is_new else 0
+            print(f"  [{'NEW' if is_new else '   '}] {art.get('date', '')} | {art.get('source', '')} | {art.get('title', '')}")
+        print(f"Total discovered {len(articles)}, {new} new.")
+        return 0
 
     if args.url:
         try:
@@ -75,7 +90,6 @@ def main() -> int:
         print(f"Done: {meta['title']} (digest {'written' if wrote else 'skipped'}). Open site/index.html.")
         return 0
 
-    sources = [s.strip() for s in args.sources.split(",") if s.strip()] if args.sources else list(SOURCES)
     print("Discovering new AI research articles...")
     articles, source_errors = discover(sources, DEFAULT_SINCE)
     for err in source_errors:

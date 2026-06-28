@@ -60,8 +60,9 @@ Refresh-Claude.cmd     :: 使用 Claude Code CLI（claude --print）
 ```bat
 python refresh.py --agent codex
 python refresh.py --agent claude
+python refresh.py --discover-only      :: 只做发现，列出文章（步骤一，不生成）
+python refresh.py --url <文章URL>      :: 只对单篇生成摘要和总结（步骤二，测试用）
 python refresh.py --dry-run            :: 只列出将处理的新文章，不调用 Agent、不写文件
-python refresh.py --url <文章URL>      :: 只处理某一篇（测试用）
 ```
 
 `refresh.py` 串联各脚本执行同一套流程：
@@ -72,13 +73,24 @@ python refresh.py --url <文章URL>      :: 只处理某一篇（测试用）
 
 确定性的抓取/渲染由脚本完成；只有摘要和总结这类需要判断力的步骤才调用 Codex/Claude CLI（提示词见 `prompts/article.md`）。
 
-## 单篇生成（方便测试）
+## 分步测试
 
-只想对某一篇文章迭代摘要和总结时，用 `refresh.py --url`（一次 Agent 调用同时生成两者，并覆盖该文已有的总结页）：
+可以把流程的两步分开测试。
+
+**步骤一 · 获取文章列表（发现）**
 
 ```bat
-python refresh.py --url "https://www.anthropic.com/research/<slug>"
-:: 加 --dry-run 只打印将发送的 prompt（仍会抓取正文）；--agent codex/claude 切换 Agent
+python refresh.py --discover-only                  :: 列出各来源发现到的文章（[NEW] 标记未收录的）
+python refresh.py --discover-only --sources cursor :: 只看某个来源
+python scripts\discover_articles.py --all          :: 看完整的发现 JSON（含 source_errors）
+```
+
+**步骤二 · 生成摘要和总结（支持单篇）**
+
+```bat
+python refresh.py --url "https://www.anthropic.com/research/<slug>"   :: 对单篇生成摘要+总结
+python refresh.py --url "<URL>" --dry-run                             :: 只打印将发送的 prompt（仍会抓取正文）
+:: --agent codex/claude 切换 Agent
 ```
 
 摘要与总结的写作标准在 `prompts/article.md`。
