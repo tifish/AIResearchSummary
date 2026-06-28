@@ -49,6 +49,7 @@ def main() -> int:
     parser.add_argument("--sources", default=None, help="逗号分隔的来源 id，默认全部。")
     parser.add_argument("--discover-only", action="store_true", help="只做发现（步骤一），列出发现到的文章，不生成、不渲染。")
     parser.add_argument("--url", default=None, help="只对这一篇文章生成摘要和总结（步骤二，单篇测试，覆盖已有总结页）。")
+    parser.add_argument("--jobs", type=int, default=4, help="批量生成的并发数（并行调用 claude/codex CLI，默认 4；1=串行）。")
     parser.add_argument("--dry-run", action="store_true", help="不调用 Agent、不写文件。")
     args = parser.parse_args()
 
@@ -108,18 +109,44 @@ def main() -> int:
         print("No new articles. Rendered site/index.html.")
         return 0
 
-    done = 0
+    # Extract serially (OpenAI uses local Chrome, which must not run concurrently),
+    # then generate summaries + digests in parallel — the slow LLM step.
+    prepared = []
     for art in new_articles:
-        print(f"- {art.get('title', art['url'])}")
         try:
             extracted = extract(art["url"])
-            meta = {**art, "article_text": extracted["article_text"], "source_hash": extracted["source_hash"]}
-            process(meta, args.agent, site, state, force=False)
-            done += 1
-        except Exception as exc:  # keep the batch going on a single bad article
-            print(f"    skipped: {exc}")
+            prepared.append({**art, "article_text": extracted["article_text"], "source_hash": extracted["source_hash"]})
+        except Exception as exc:
+            print(f"  extract skipped {art.get('url')}: {exc}")
+
+    def _generate(meta):
+        try:
+            return meta, generate.generate(meta, args.agent)
+        except Exception as exc:  # noqa: BLE001 - report per-article and keep going
+            return meta, exc
+
+    jobs = max(1, args.jobs)
+    print(f"Generating {len(prepared)} article(s) with {jobs} parallel job(s)...")
+    if jobs == 1:
+        pairs = [_generate(meta) for meta in prepared]
+    else:
+        from concurrent.futures import ThreadPoolExecutor
+
+        with ThreadPoolExecutor(max_workers=jobs) as pool:
+            pairs = list(pool.map(_generate, prepared))
+
+    done = 0
+    for meta, res in pairs:
+        title = meta.get("title", meta["url"])
+        if not isinstance(res, dict):
+            print(f"  skipped {title}: {res}")
+            continue
+        generate.upsert_summary(state, meta, res["summary_zh"], res["value_zh"])
+        generate.write_digest(site, summary_slug(meta["url"]), res["html"], force=False)
+        done += 1
+        print(f"  done: {title}")
     render(site, state)
-    print(f"Done. {done} articles processed. Open site/index.html.")
+    print(f"Done. {done}/{len(prepared)} generated (jobs={jobs}). Open site/index.html.")
     return 0
 
 
