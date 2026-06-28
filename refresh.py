@@ -49,7 +49,7 @@ def main() -> int:
     parser.add_argument("--sources", default=None, help="逗号分隔的来源 id，默认全部。")
     parser.add_argument("--discover-only", action="store_true", help="只做发现（步骤一），列出发现到的文章，不生成、不渲染。")
     parser.add_argument("--url", default=None, help="只对这一篇文章生成摘要和总结（步骤二，单篇测试，覆盖已有总结页）。")
-    parser.add_argument("--jobs", type=int, default=4, help="批量生成的并发数（并行调用 claude/codex CLI，默认 4；1=串行）。")
+    parser.add_argument("--jobs", type=int, default=8, help="批量生成的并发数（并行调用 claude/codex CLI，默认 8；1=串行；受 API 速率限制约束，瞬时错误会自动重试）。")
     parser.add_argument("--dry-run", action="store_true", help="不调用 Agent、不写文件。")
     args = parser.parse_args()
 

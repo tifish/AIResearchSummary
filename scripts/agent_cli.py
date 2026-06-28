@@ -10,6 +10,7 @@ import json
 import re
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 
@@ -27,8 +28,20 @@ def load_prompt(name: str) -> str:
     return (prompts_dir() / name).read_text(encoding="utf-8")
 
 
-def run_agent(prompt: str, agent: str = "codex") -> str:
-    """Pipe prompt to the agent CLI via stdin and return its stdout."""
+_TRANSIENT_RE = re.compile(
+    r"rate.?limit|overloaded|too many requests|\b429\b|\b500\b|\b502\b|\b503\b|\b529\b|"
+    r"internal server error|bad gateway|service unavailable|timeout|timed out|temporarily",
+    re.I,
+)
+
+
+def run_agent(prompt: str, agent: str = "codex", retries: int = 3) -> str:
+    """Pipe prompt to the agent CLI via stdin and return its stdout.
+
+    Transient errors (rate limit / overload / 5xx / timeout) are retried with
+    exponential backoff, so higher --jobs concurrency doesn't drop articles on a
+    momentary API hiccup. Non-transient errors (e.g. auth) fail immediately.
+    """
     if agent == "codex":
         cmd = ["codex", "exec", "--skip-git-repo-check",
                "--dangerously-bypass-approvals-and-sandbox", "-"]
@@ -36,17 +49,25 @@ def run_agent(prompt: str, agent: str = "codex") -> str:
         cmd = ["claude", "--print", "--dangerously-skip-permissions"]
     else:
         raise ValueError(f"Unknown agent '{agent}'. Use 'codex' or 'claude'.")
-    try:
-        proc = subprocess.run(cmd, input=prompt, capture_output=True, text=True, encoding="utf-8")
-    except FileNotFoundError as exc:
-        raise RuntimeError(
-            f"Agent CLI '{agent}' not found on PATH. Install and log in to it first."
-        ) from exc
-    if proc.returncode != 0:
+
+    detail, code = "", None
+    for attempt in range(1, retries + 1):
+        try:
+            proc = subprocess.run(cmd, input=prompt, capture_output=True, text=True, encoding="utf-8")
+        except FileNotFoundError as exc:
+            raise RuntimeError(
+                f"Agent CLI '{agent}' not found on PATH. Install and log in to it first."
+            ) from exc
+        if proc.returncode == 0:
+            return proc.stdout
         # Some CLIs (e.g. claude) print the real error to stdout, not stderr.
         detail = "\n".join(s for s in ((proc.stderr or "").strip(), (proc.stdout or "").strip()) if s)
-        raise RuntimeError(f"{agent} CLI failed (exit {proc.returncode}): {detail[:800]}")
-    return proc.stdout
+        code = proc.returncode
+        if attempt < retries and _TRANSIENT_RE.search(detail):
+            time.sleep(min(2 ** attempt, 20))
+            continue
+        break
+    raise RuntimeError(f"{agent} CLI failed (exit {code}): {detail[:800]}")
 
 
 def extract_json(text: str) -> str:
