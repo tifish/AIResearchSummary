@@ -1,3 +1,9 @@
+param(
+    [Parameter(Position = 0)]
+    [ValidateSet('codex', 'claude')]
+    [string] $Agent = 'codex'
+)
+
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version 2.0
 
@@ -6,10 +12,14 @@ Set-Location -LiteralPath $WorkspaceRoot
 
 $env:PYTHONIOENCODING = "utf-8"
 $env:PYTHONUTF8 = "1"
+# Pipe UTF-8 to the agent (Windows PowerShell 5.x defaults to ASCII, which would
+# mangle the Chinese prompt body read from refresh-prompt.md).
+$OutputEncoding = New-Object System.Text.UTF8Encoding($false)
 
-$SkillRoot = Join-Path $WorkspaceRoot ".agents\skills\economic-futures-summary"
-$DiscoverScript = Join-Path $SkillRoot "scripts\discover_articles.py"
-$RenderScript = Join-Path $SkillRoot "scripts\render_site.py"
+$ScriptsDir = Join-Path $WorkspaceRoot "scripts"
+$PromptFile = Join-Path $WorkspaceRoot "refresh-prompt.md"
+$DiscoverScript = Join-Path $ScriptsDir "discover_articles.py"
+$RenderScript = Join-Path $ScriptsDir "render_site.py"
 $DiscoveryJson = Join-Path ([System.IO.Path]::GetTempPath()) "ai-research-summary-discovery.json"
 
 function Invoke-CheckedNative {
@@ -42,8 +52,20 @@ Write-Host $discoverText
 
 $discovery = Get-Content -LiteralPath $DiscoveryJson -Raw -Encoding UTF8 | ConvertFrom-Json
 $newCount = [int] $discovery.new_count
+$sourceErrors = @()
+if ($discovery.PSObject.Properties.Name -contains "source_errors" -and $null -ne $discovery.source_errors) {
+    $sourceErrors = @($discovery.source_errors)
+}
 
-if ($newCount -eq 0) {
+if ($sourceErrors.Count -gt 0) {
+    Write-Host ""
+    Write-Host "Static discovery had source errors:"
+    foreach ($sourceError in $sourceErrors) {
+        Write-Host "  $sourceError"
+    }
+}
+
+if ($newCount -eq 0 -and $sourceErrors.Count -eq 0) {
     Write-Host ""
     Write-Host "No new articles. Rendering summary site..."
     Invoke-CheckedNative python $RenderScript
@@ -52,22 +74,69 @@ if ($newCount -eq 0) {
     exit 0
 }
 
-$prompt = @"
-Use `$economic-futures-summary to update the AI research summary site in this workspace.
+if (-not (Test-Path -LiteralPath $PromptFile)) {
+    throw "Prompt file not found: $PromptFile"
+}
+$promptBody = Get-Content -LiteralPath $PromptFile -Raw -Encoding UTF8
 
-Read the discovery JSON file at:
+if ($sourceErrors.Count -gt 0) {
+    $sourceErrorText = ($sourceErrors -join "; ")
+} else {
+    $sourceErrorText = "(none)"
+}
+
+$runtimeContext = @"
+
+---
+
+## Run context for this refresh
+
+Follow the workflow and output rules above exactly.
+
+The discovery script output has been written to:
 $DiscoveryJson
 
-Process only the new article candidates represented by new_count and the articles array. Follow the skill workflow and output rules exactly, including extracting article text, updating site/articles.json, creating any missing standalone summary HTML pages, and regenerating site/index.html. Report the number of newly added articles and standalone summary pages when finished.
+- new_count: $newCount
+- source_errors: $sourceErrorText
+
+Process only the new article candidates represented by new_count and the articles array in that JSON.
+
+If source_errors is not empty, inspect the affected Anthropic/OpenAI source pages with the Codex or Claude browser plugin, compare against site/articles.json, and process only genuinely new articles. Browser rendering happens in the agent environment; do not add browser automation dependencies to this project.
+
+Report the number of newly added articles and standalone summary pages when finished.
 "@
 
+$prompt = $promptBody + $runtimeContext
+
 Write-Host ""
-Write-Host "Found $newCount new articles. Running Codex to extract, summarize, update data, and render the site..."
-$prompt | & codex exec --cd $WorkspaceRoot --skip-git-repo-check --sandbox danger-full-access --ask-for-approval never -
-$codexExitCode = $LASTEXITCODE
-if ($codexExitCode -ne 0) {
-    throw "Codex update failed with exit code $codexExitCode."
+if ($newCount -gt 0) {
+    Write-Host "Found $newCount new articles. Running '$Agent' to extract, summarize, update data, and render the site..."
+} else {
+    Write-Host "Running '$Agent' to inspect sources with browser plugin support and render the site..."
+}
+
+switch ($Agent) {
+    'codex' {
+        $prompt | & codex exec `
+            --cd $WorkspaceRoot `
+            --skip-git-repo-check `
+            --dangerously-bypass-approvals-and-sandbox `
+            -
+    }
+    'claude' {
+        $prompt | & claude `
+            --print `
+            --dangerously-skip-permissions
+    }
+    default {
+        throw "Unknown agent '$Agent'."
+    }
+}
+
+$agentExitCode = $LASTEXITCODE
+if ($agentExitCode -ne 0) {
+    throw "$Agent update failed with exit code $agentExitCode."
 }
 
 Write-Host ""
-Write-Host "Codex update completed."
+Write-Host "$Agent update completed."
