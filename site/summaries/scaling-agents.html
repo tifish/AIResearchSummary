@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>扩展长时间自主编码 · 中文总结</title>
+<style>
+  :root{
+    --bg:#0f1117; --card:#171a23; --card2:#1d2130; --ink:#e8eaf0; --muted:#9aa3b8;
+    --accent:#6ea8fe; --accent2:#7ee0c0; --warn:#ffcf6e; --line:#2a2f3e; --good:#8ce99a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.75;font-size:17px}
+  .wrap{max-width:860px;margin:0 auto;padding:40px 22px 64px}
+  .kicker{font-size:13px;letter-spacing:.12em;color:var(--accent);text-transform:uppercase;font-weight:600}
+  h1{font-size:30px;line-height:1.25;margin:8px 0 4px}
+  .meta{color:var(--muted);font-size:14px;margin-bottom:24px}
+  .meta a{color:var(--accent);text-decoration:none}
+  .tldr{background:linear-gradient(135deg,#1c2740,#172033);border:1px solid var(--line);
+    border-left:4px solid var(--accent);border-radius:12px;padding:18px 20px;margin:0 0 30px;font-size:18px}
+  .tldr b{color:var(--accent2)}
+  h2{font-size:21px;margin:34px 0 6px;line-height:1.35}
+  h2 .num{color:var(--accent);font-variant-numeric:tabular-nums;margin-right:10px;opacity:.7;font-size:16px}
+  .insight{color:var(--accent2);font-weight:600}
+  section{border-top:1px solid var(--line);padding-top:6px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .stat .big{font-size:24px;font-weight:700;color:var(--warn);font-variant-numeric:tabular-nums}
+  .stat .lbl{font-size:13px;color:var(--muted);margin-top:2px}
+  .take{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:18px 22px;margin-top:22px}
+  .take h2{margin-top:0;border:0}
+  ol.take-list{margin:8px 0 0;padding-left:20px}
+  ol.take-list li{margin:10px 0}
+  ol.take-list li b{color:var(--good)}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:15px}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-weight:600}
+  td .n{color:var(--warn);font-variant-numeric:tabular-nums}
+  .concl{margin-top:8px;font-style:normal}
+  .concl::before{content:"洞见 · ";color:var(--accent);font-weight:600}
+  .pill{display:inline-block;background:#22283a;color:var(--muted);border:1px solid var(--line);
+    border-radius:999px;padding:2px 10px;font-size:12px;margin-right:6px}
+</style>
+</head>
+<body>
+<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://cursor.com/blog/scaling-agents" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
+<div class="wrap">
+
+  <div class="kicker">Cursor · Research</div>
+  <h1>百个 agent、百万行代码：自主编码能不能靠"堆数量"扩展？</h1>
+  <div class="meta">来源 Cursor · 2026-01-14 · 作者 Wilson Lin · <a href="https://cursor.com/blog/scaling-agents">原文</a></div>
+
+  <div class="tldr">
+    <b>一句话总括：</b>这篇文章真正的贡献不是"多 agent 很厉害"，而是用百万行级的真实实验，记录了把上百个编码 agent 协调到一起所必经的失败路径——并得出一个反直觉结论：让 agent 协作好的关键既不是模仿分布式系统、也不是堆更多角色，而是<b>恰到好处的中等结构加上比模型和工具更重要的 prompt 工程</b>。
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="big">100+</div><div class="lbl">单项目并发 agent 数量级</div></div>
+    <div class="stat"><div class="big">1M+ 行</div><div class="lbl">单项目累计写出的代码</div></div>
+    <div class="stat"><div class="big">trillions</div><div class="lbl">投入的 token 量级（数万亿）</div></div>
+    <div class="stat"><div class="big">数周</div><div class="lbl">agent 连续自主运行时长</div></div>
+  </div>
+
+  <section>
+    <h2><span class="num">01</span>单个 agent 不是不行，是太慢——而并行的真正难题是"协调"</h2>
+    <p>当下的 agent 擅长聚焦的小任务，但面对人类团队要花数月的复杂项目就显得很慢。直觉的下一步是并行跑多个 agent，可一旦并行，怎么协调它们就成了核心障碍。作者一开始判断"提前规划太僵硬"，因为大项目的路径本就模糊、分工也不明显，于是先选了动态协调。</p>
+    <p class="concl">把多个 agent 凑在一起容易，让它们不互相踩脚才是真问题——这决定了后面所有的架构演进。</p>
+  </section>
+
+  <section>
+    <h2><span class="num">02</span>"平权 + 加锁"失败了：20 个 agent 跑出 2-3 个的吞吐</h2>
+    <p>最初让所有 agent 地位平等、通过一个共享文件自协调：各自查看别人在做什么、认领任务、更新状态，再用锁防止两个 agent 抢同一任务。结果锁成了瓶颈——agent 长期持锁甚至忘记释放，系统脆弱（持锁时崩溃、重复获取已持有的锁、不加锁就改协调文件）。</p>
+    <div class="stat" style="margin:14px 0"><div class="big">20 → 2~3</div><div class="lbl">加锁后有效吞吐塌缩：大部分时间都在等待</div></div>
+    <p>换成乐观并发控制（自由读、若状态已变则写入失败）后更简单稳健，但更深的问题暴露出来：<b>没有层级，agent 变得规避风险</b>——专挑安全的小改动，没人对硬问题或端到端实现负责，工作长时间空转。</p>
+    <p class="concl">协调机制的 bug 只是表象，真正的病根是"扁平结构让没人愿意扛难题"。</p>
+  </section>
+
+  <section>
+    <h2><span class="num">03</span>解法是分层流水线：规划者出活、工作者埋头、裁判把关</h2>
+    <p>放弃"人人都做所有事"，改成职责分明的管线：</p>
+    <ul>
+      <li><b>规划者（Planners）</b>：持续探索代码库、生成任务，并可针对特定领域<b>递归派生子规划者</b>，让规划本身也并行。</li>
+      <li><b>工作者（Workers）</b>：只认领并死磕单个任务，不和别人协调、不操心全局，完成即推送。</li>
+      <li><b>裁判（Judge）</b>：每轮结束判断是否继续，然后<b>下一轮全新开始</b>，避免 agent 钻牛角尖（tunnel vision）。</li>
+    </ul>
+    <p class="concl">用"分工 + 周期性重启"替代"加锁 + 共识"，绕开了几乎全部协调难题，才得以扩展到超大项目。</p>
+  </section>
+
+  <section>
+    <h2><span class="num">04</span>真实战绩：从零造浏览器、三周迁移框架、渲染提速 25 倍</h2>
+    <p>这套系统被指向一系列雄心勃勃的目标，关键数据如下：</p>
+    <table>
+      <tr><th>实验</th><th>规模 / 结果</th></tr>
+      <tr><td>从零造 Web 浏览器</td><td>跑近 <span class="n">1 周</span>，<span class="n">100 万+</span> 行代码 / <span class="n">1000</span> 文件，上百工作者同推一分支、冲突极少</td></tr>
+      <tr><td>Cursor 代码库 Solid → React 原地迁移</td><td>耗时超 <span class="n">3 周</span>，改动 <span class="n">+266K / -193K</span>，通过 CI 与早期检查（仍需人工复核）</td></tr>
+      <tr><td>视频渲染优化</td><td>Rust 重写提速 <span class="n">25×</span>，加入弹性平滑缩放/平移与动态模糊，<b>已合并即将上线</b></td></tr>
+      <tr><td>Java LSP（进行中）</td><td><span class="n">7.4K</span> 提交 / <span class="n">550K</span> 行</td></tr>
+      <tr><td>Windows 7 模拟器（进行中）</td><td><span class="n">14.6K</span> 提交 / <span class="n">1.2M</span> 行</td></tr>
+      <tr><td>Excel（进行中）</td><td><span class="n">12K</span> 提交 / <span class="n">1.6M</span> 行</td></tr>
+    </table>
+    <p class="concl">"造浏览器"那张看似普通的截图背后是极难的工程——这些数字说明长跑多 agent 不只是 demo，而是能在真实大项目上持续产出。</p>
+  </section>
+
+  <section>
+    <h2><span class="num">05</span>模型不是越"会写代码"越好：GPT-5.2 守得住，Opus 4.5 易走捷径</h2>
+    <p>在极长任务上模型差异显著：<b>GPT-5.2</b> 更擅长守指令、保持专注、避免漂移、把事做完整；而 <b>Opus 4.5</b> 倾向于提前停下、在方便时走捷径、快速交还控制权。更反直觉的是，<b>GPT-5.2 作为"规划者"竟优于专为编码训练的 GPT-5.1-Codex</b>。因此团队改为"每个角色用最适合的模型"，而非一个万能模型。</p>
+    <p class="concl">"训练目标是编码"不等于"擅长长程自主工作"；角色化选模比追求单一最强模型更实际。</p>
+  </section>
+
+  <section>
+    <h2><span class="num">06</span>最大的杠杆是 prompt，最好的优化常是"做减法"</h2>
+    <p>很多改进来自<b>移除复杂性</b>而非增加：他们曾建一个专门的 integrator 角色做质检与冲突解决，结果它制造的瓶颈比解决的还多——工作者自己就能处理冲突。试图照搬分布式计算和组织设计的模型，也不是都适用于 agent。结构要"中等"：太少则冲突、重复、漂移；太多则脆弱。而系统行为<b>很大程度取决于 prompt</b>——作者直言"harness 和模型重要，但 prompt 更重要"。</p>
+    <p class="concl">在 agent 系统里，prompt 工程往往是比换模型、加角色更高的杠杆。</p>
+  </section>
+
+  <section>
+    <h2><span class="num">07</span>仍未最优：漂移、跑过头与"定期重启"的取舍</h2>
+    <p>多 agent 协调仍是难题：规划者应在任务完成时被唤醒去规划下一步，agent 偶尔会跑太久，仍需周期性的全新开始来对抗漂移与钻牛角尖。但对于核心问题——"靠堆更多 agent 能否扩展自主编码"——答案比预期更乐观：<span class="insight">上百个 agent 可以在单一代码库上协作数周，在雄心勃勃的项目上取得真实进展。</span></p>
+    <p class="concl">现状"能用但远非最优"，恰恰说明这是一个仍有巨大上升空间的工程方向。</p>
+  </section>
+
+  <div class="take">
+    <h2>最值得带走的 5 条洞见</h2>
+    <ol class="take-list">
+      <li><b>协调比智能更稀缺：</b>百万行实验里，决定成败的不是单个 agent 多聪明，而是上百个 agent 如何分工不打架——加锁会把 20 个 agent 的吞吐压成 2-3 个。</li>
+      <li><b>层级化（规划者/工作者/裁判）打败扁平自协调：</b>扁平结构让 agent 集体规避难题，分层 + 周期性重启才让规模化成为可能。</li>
+      <li><b>"会写代码"≠"能长跑"：</b>GPT-5.2 在长程自主任务（守指令、不漂移、做完整）上胜过更早停手的 Opus 4.5，甚至当规划者也优于专训编码的 GPT-5.1-Codex，应按角色选模。</li>
+      <li><b>做减法常优于做加法：</b>删掉专门的 integrator 角色反而更顺；照搬分布式/组织理论不一定适用，结构取"中等"为佳。</li>
+      <li><b>prompt 是最高杠杆：</b>团队的明确判断是"harness 和模型重要，但 prompt 更重要"——多 agent 系统的可靠性主要靠 prompt 调出来。</li>
+    </ol>
+  </div>
+
+  <p style="margin-top:26px;color:var(--muted);font-size:13px">
+    <span class="pill">多 agent</span><span class="pill">自主编码</span><span class="pill">编排架构</span><span class="pill">模型选型</span><span class="pill">prompt 工程</span>
+  </p>
+
+</div>
+</body>
+</html>

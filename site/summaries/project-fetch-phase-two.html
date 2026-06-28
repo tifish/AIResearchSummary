@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project Fetch 第二阶段：模型独立操控机器狗 · 总结</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#171a21; --card2:#1d2129;
+    --text:#e7eaf0; --muted:#9aa3b2; --line:#2a2f3a;
+    --accent:#6ea8fe; --warn:#ff7a7a; --good:#5dd1a0; --gold:#f2c14e;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Microsoft YaHei",sans-serif;
+    line-height:1.75; font-size:17px;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding:40px 22px 80px}
+  header.hd{border-bottom:1px solid var(--line); padding-bottom:22px; margin-bottom:30px}
+  .kicker{color:var(--accent); font-size:13px; letter-spacing:.08em; text-transform:uppercase; margin:0 0 10px}
+  h1{font-size:30px; line-height:1.3; margin:0 0 14px}
+  .meta{color:var(--muted); font-size:14px}
+  .lede{
+    background:linear-gradient(135deg,#1c2533,#191d26);
+    border:1px solid var(--line); border-left:4px solid var(--accent);
+    border-radius:12px; padding:18px 20px; margin:26px 0 36px; font-size:18px;
+  }
+  .lede b{color:var(--accent)}
+  section{margin:30px 0}
+  h2{font-size:21px; margin:0 0 6px; line-height:1.4}
+  h2 .tag{display:inline-block; font-size:12px; color:var(--gold); border:1px solid var(--line); border-radius:999px; padding:2px 10px; margin-right:10px; vertical-align:middle}
+  .body{color:#d6dbe6}
+  .take{color:var(--muted); font-style:italic; border-left:2px solid var(--line); padding-left:12px; margin-top:12px}
+  .stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0}
+  .stat{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px}
+  .stat .big{font-size:26px; font-weight:700; color:var(--good)}
+  .stat .lbl{color:var(--muted); font-size:13px; margin-top:4px}
+  .speed{display:flex; align-items:baseline; gap:8px; flex-wrap:wrap}
+  .speed .x{font-size:30px; font-weight:700; color:var(--gold)}
+  .speed .who{color:var(--muted)}
+  table{width:100%; border-collapse:collapse; margin:16px 0; font-size:15px; background:var(--card); border-radius:12px; overflow:hidden}
+  th,td{padding:10px 12px; text-align:left; border-bottom:1px solid var(--line)}
+  th{background:var(--card2); color:var(--muted); font-weight:600}
+  td.num{font-variant-numeric:tabular-nums; text-align:right}
+  .hi{color:var(--gold); font-weight:700}
+  .step{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin:12px 0}
+  .step b{color:var(--accent)}
+  .arc{display:flex; gap:10px; flex-wrap:wrap; margin:16px 0}
+  .arc .phase{flex:1; min-width:160px; background:var(--card2); border:1px solid var(--line); border-radius:12px; padding:14px 16px}
+  .arc .phase .n{color:var(--gold); font-size:13px; letter-spacing:.05em}
+  .arc .phase.now{border-color:#3a5a4a}
+  .arc .phase.now .n{color:var(--good)}
+  .insights{background:linear-gradient(135deg,#15211b,#171a21); border:1px solid #244235; border-radius:14px; padding:22px 24px; margin-top:40px}
+  .insights h2{color:var(--good)}
+  .insights ol{margin:14px 0 0; padding-left:22px}
+  .insights li{margin:10px 0}
+  .note{color:var(--muted); font-size:13px; border-top:1px solid var(--line); margin-top:40px; padding-top:16px}
+  b.k{color:var(--gold)}
+</style>
+</head>
+<body>
+<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/project-fetch-phase-two" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
+<div class="wrap">
+
+  <header class="hd">
+    <p class="kicker">Anthropic · Frontier Red Team</p>
+    <h1>Project Fetch 第二阶段：模型自己拿起了机器狗的"遥控器"</h1>
+    <p class="meta">来源 Anthropic ｜ 作者 Michael Ilie、C. Daniel Freeman、Kevin K. Troy ｜ 2026-06-18</p>
+  </header>
+
+  <div class="lede">
+    一句话总括：把同一套"操控机器狗"的任务交给新一代模型，<b>不到一年前还需要人机配对编程才能完成的工作，如今 Claude Opus 4.7 能在无人协助下独立做完，而且比最快的人类队伍还快约 20 倍</b>。这不是"机器人学被攻克"，而是一个清晰信号：AI 正从"帮人用工具"迈向"自己用现成物理工具"——物理智能体的早期阶段开始了。
+  </div>
+
+  <section>
+    <h2><span class="tag">实验是什么</span>同一场比赛，把人类换成模型</h2>
+    <p class="body">2025 年 8 月的初代 Project Fetch，让一群<b>非机器人专家</b>的 Anthropic 员工分成两队（随机决定能否用 Claude），去操控一台市售四足机器人（"机器狗"）：用手柄操作、连接视频与激光雷达传感器、写程序手动控制、监测机器狗在空间中的路径、写程序识别沙滩球，最后把这些拼起来自动捡球。当时单靠模型（Opus 4.1）连"如何连上机器人"都卡住，根本做不了。</p>
+    <p class="body">第二阶段把同样的子任务交给新模型：用 <b>Claude Opus 4.7</b>、在 Claude Code 里开启自适应思考、effort 拉到最大，跑 <b class="k">3</b> 次试验，记录每个目标的耗时并人工评估成败。研究者只做四件事：把笔记本插上机器狗、输入初始提示、批准命令、批准进入下一任务。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">快了多少</span>不是快一点，是快一个数量级</h2>
+    <p class="body">在所有"至少有一支人类队伍在 8 月完成过"的任务上，Opus 4.7 <b>每一项都至少快 10 倍</b>。聚焦两队都完成的那 4 项任务，差距更夸张：</p>
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="speed"><span class="x">37×+</span></div>
+        <div class="lbl">比"无 Claude 队"平均快（4 项任务均值）</div>
+      </div>
+      <div class="stat">
+        <div class="speed"><span class="x">18×+</span></div>
+        <div class="lbl">比"有 Claude 队"平均快（4 项任务均值）</div>
+      </div>
+    </div>
+    <p class="body">不仅快，还更"省"：在成功率相当甚至更高的前提下，Opus 4.7 写出的代码量比当初的 Team Claude <b class="k">少了近 10 倍</b>。人类在多种连接传感器的方案间纠结时，模型往往一眼挑出最优路径，很多代码<b>一次跑通</b>——这在初代实验里两支人类队伍都做不到。</p>
+    <p class="take">结论：模型已经能把过去"人机配对"的那段活儿独自快速做完，人因此能更早接手去真正"使用"机器人。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">哪里仍失败</span>"踢球归位"这种闭环控制还不行</h2>
+    <p class="body">真正的"Fetch"——用机器狗把沙滩球精准推回起点的草坪——需要持续感知球是否偏离、把误差和上一条指令对应起来、再微调下一步。这是人类擅长的闭环（吃几次亏就学会了）。Claude 能把机器人移到球后方、摆好姿势准备击球，但控制<b>粗糙、不成功</b>——和当年走到这一步的人类队伍一样。</p>
+    <p class="body">一位机器人经验更丰富的研究者后来成功写出了自动捡球程序；作者认为只要给更多时间和脚手架，现有 Claude 很可能也能做到。他们接下来要盯的，是模型能否以在其他任务上展现的<b>同样速度与可靠性</b>拿下这最后一环。另外，模型并非毫无瑕疵：它默认选了一个<b>过时的目标检测算法</b>（这大概率是某次找球试验明显变慢的原因），但仍绕过问题找到了可行解。</p>
+    <p class="take">结论：能力边界之内，Claude 已相当可靠；边界之外的精细物理闭环，仍是下一道坎。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">为什么重要</span>一条在网络安全见过、如今在物理世界重演的曲线</h2>
+    <p class="body">作者反复点出同一个三段式规律——而机器人这件事正沿着它走：</p>
+    <div class="arc">
+      <div class="phase"><div class="n">第一步</div>模型给人提供"增益"，帮非专家把工具用起来</div>
+      <div class="phase"><div class="n">第二步</div>人帮模型补位，人机配对完成任务</div>
+      <div class="phase now"><div class="n">第三步 · 正在发生</div>模型基本能自己把事情做完</div>
+    </div>
+    <p class="body">关键的新意是：我们似乎正逼近一个<b>模型能相对轻松地使用市售物理工具</b>（至少在有限用途上）的世界。这就像当年模型学会用 string-replace 这类现成软件编辑工具，从而迈入更具能动性的编程一样。值得强调的是，这些进步<b>并非</b>来自针对机器人能力的专门优化，而是更通用的规模化扩展自然涌现的副产品。</p>
+    <p class="take">结论：把"模型能自造软件工具"曾经的"天方夜谭"放到硬件上，同样的轨迹不该被轻易排除。</p>
+  </section>
+
+  <div class="insights">
+    <h2>最值得带走的洞见</h2>
+    <ol>
+      <li><b>跨代差距是数量级，不是百分点。</b>一年前需要人机配对的任务，Opus 4.7 已能独立完成，且比最快人类队快约 20 倍、单项至少快 10 倍、对比两队均快 18–37 倍。</li>
+      <li><b>"更少代码、更高成功率"同时出现。</b>代码量比初代 Team Claude 少近 10 倍却同等或更成功，说明提升的是判断力而非堆量。</li>
+      <li><b>这是规模化的副产品。</b>没有针对机器人做专门优化，能力却涌现——延续了 LLM 发展史上反复出现的模式。</li>
+      <li><b>瓶颈转移到精细闭环控制。</b>"把球准确推回家"这类实时感知—纠错—再控制的任务，模型仍失败，是下一个观察重点。</li>
+      <li><b>物理智能体的早期阶段已开启。</b>模型开始能用现成物理工具，正如它当年学会用现成软件工具；硬件可能复刻软件的同一条上升曲线。</li>
+    </ol>
+  </div>
+
+  <p class="note">注：本次用 Opus 4.7 是因其为实验当时最先进的非 Mythos 级模型；Claude Mythos Preview 因实验设置与服务方式无法做同口径对比，故未采用。自动捡球的"用手柄取回"环节因无法让模型操作物理手柄而未计时，但已确认 Claude 编写的控制器可正常工作。原文于 2026-06-18 更正了第一阶段的日期。</p>
+
+</div>
+</body>
+</html>
+</html>

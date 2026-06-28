@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>用旧模型自举新模型：Cursor 的 Composer autoinstall</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#171a21; --card2:#1d2230;
+    --text:#e7eaf0; --muted:#9aa3b2; --line:#2a3040;
+    --accent:#6ea8fe; --accent2:#7ee0c0; --warn:#ffcf6e;
+    --good:#5ad19a;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.75; font-size:17px;
+  }
+  .wrap{max-width:820px; margin:0 auto; padding:48px 22px 80px}
+  .kicker{color:var(--accent); font-weight:700; letter-spacing:.08em; font-size:13px; text-transform:uppercase}
+  h1{font-size:30px; line-height:1.3; margin:10px 0 14px}
+  .meta{color:var(--muted); font-size:14px; margin-bottom:28px}
+  .meta a{color:var(--accent); text-decoration:none}
+  .lead{
+    background:linear-gradient(135deg,#1b2740,#171a21);
+    border:1px solid var(--line); border-left:4px solid var(--accent);
+    border-radius:12px; padding:20px 22px; font-size:18px; margin:0 0 34px;
+  }
+  .lead b{color:var(--accent2)}
+  section{
+    background:var(--card); border:1px solid var(--line);
+    border-radius:12px; padding:22px 24px; margin:0 0 22px;
+  }
+  section h2{
+    font-size:20px; margin:0 0 12px; color:#fff; line-height:1.4;
+  }
+  section h2 .tag{
+    display:inline-block; font-size:12px; font-weight:700; color:var(--bg);
+    background:var(--accent2); border-radius:6px; padding:2px 8px; margin-right:10px; vertical-align:middle;
+  }
+  p{margin:10px 0}
+  .takeaway{
+    margin-top:12px; padding:12px 14px; background:var(--card2);
+    border-radius:8px; font-size:15.5px; color:#dfe5f0;
+  }
+  .takeaway::before{content:"结论 · "; color:var(--good); font-weight:700}
+  .stat-row{display:flex; gap:14px; flex-wrap:wrap; margin:18px 0 6px}
+  .stat{
+    flex:1 1 200px; background:var(--card2); border:1px solid var(--line);
+    border-radius:10px; padding:16px 18px;
+  }
+  .stat .num{font-size:30px; font-weight:800; color:var(--accent)}
+  .stat .num small{font-size:15px; color:var(--muted); font-weight:600}
+  .stat .lab{font-size:14px; color:var(--muted); margin-top:4px}
+  .flow{counter-reset:step; margin:8px 0}
+  .flow li{
+    list-style:none; position:relative; padding:10px 0 10px 44px; border-bottom:1px dashed var(--line);
+  }
+  .flow li:last-child{border-bottom:none}
+  .flow li::before{
+    counter-increment:step; content:counter(step);
+    position:absolute; left:0; top:10px; width:28px; height:28px; border-radius:50%;
+    background:var(--accent); color:var(--bg); font-weight:800; text-align:center; line-height:28px;
+  }
+  .pills{display:flex; flex-wrap:wrap; gap:8px; margin-top:6px}
+  .pill{background:var(--card2); border:1px solid var(--line); border-radius:999px; padding:5px 12px; font-size:13.5px; color:var(--muted)}
+  .final{
+    background:linear-gradient(135deg,#102219,#171a21);
+    border:1px solid var(--line); border-left:4px solid var(--good);
+  }
+  .final h2{color:var(--good)}
+  .final ol{margin:6px 0 0; padding-left:22px}
+  .final li{margin:10px 0}
+  .hl{color:var(--warn); font-weight:700}
+  .hl2{color:var(--accent2); font-weight:700}
+</style>
+</head>
+<body>
+<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://cursor.com/blog/bootstrapping-composer-with-autoinstall" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
+<div class="wrap">
+
+  <div class="kicker">Cursor · Research · 2026-05-06</div>
+  <h1>用旧模型自举新模型：Composer autoinstall 如何把"烂环境"变成训练燃料</h1>
+  <div class="meta">
+    作者：Shomil Jain、Joshua Warner、Andrew Zhai ·
+    <a href="https://cursor.com/blog/bootstrapping-composer-with-autoinstall">原文链接</a>
+  </div>
+
+  <div class="lead">
+    一句话总括：Cursor 让<b>上一代 Composer 模型自动为下一代的 RL 训练搭建可运行环境</b>——这不是"把仓库 clone 下来"那么简单，而是模型主动安装依赖、mock 缺失组件、反复测试直到环境真能跑通，从而把"环境配置"这道训练瓶颈变成了一条会自我增强的复利链路。
+  </div>
+
+  <section>
+    <h2><span class="tag">为什么重要</span>坏环境不只是慢，而是直接烧掉算力</h2>
+    <p>RL 训练需要"能跑起来"的环境。如果环境一开始就是坏的，模型只会把 token 浪费在调试配置上，而不是学习解决问题；最糟的情况下，一个坏环境会让问题<strong>根本无解</strong>，于是这一整段算力拿不到任何奖励信号、彻底白烧。</p>
+    <p>所以环境质量不是工程细节，而是直接决定训练信号好坏的关键变量。autoinstall 正是为了把这个变量稳定下来。</p>
+    <div class="takeaway">把"搭环境"自动化做扎实，等于直接提高了每一份训练算力的有效产出。</div>
+  </section>
+
+  <section>
+    <h2><span class="tag">怎么做</span>一个 agent 定义"成功"，另一个 agent 去实现它</h2>
+    <p>autoinstall 分两个阶段，分工明确：</p>
+    <ol class="flow">
+      <li><b>目标设定</b>：第一个 agent 拿到固定 checkout 的代码库，探索 readme/makefile，尝试 uv、clippy 等语言工具，提出 <span class="hl">10 条命令</span>以及"环境配好后应该输出什么"的描述。</li>
+      <li><b>实际搭建</b>：第二个 agent 从这 10 条里拿到选出的 <span class="hl">3 条目标命令</span>，反复调用工具把环境搭起来，直到三条都能跑通且输出匹配第一阶段的预期。</li>
+      <li><b>失败即重试</b>：不达标就重启第二阶段，<span class="hl">最多 5 次</span>仍搭不好，就直接丢弃这个环境。</li>
+    </ol>
+    <div class="takeaway">用"先定义验收标准、再让另一个模型去满足"的双 agent 结构，把模糊的"配好环境"变成了可自动判定的闭环。</div>
+  </section>
+
+  <section>
+    <h2><span class="tag">关键能力</span>配不通就自己造：mock 一切缺失的东西</h2>
+    <p>为了让命令真正跑起来，Composer 不会停在"装不上就放弃"。它会主动 mock 缺失文件、生成占位图片、甚至建假的数据库表；遇到测试需要的外部组件，它会用 <span class="hl2">MinIO 配置</span>替代 S3、用 <span class="hl2">Docker 容器</span>补上缺失的 sidecar，并生成启动脚本来在 RL 使用前拉起这些长驻进程。</p>
+    <div class="pills">
+      <span class="pill">mock 缺失文件</span>
+      <span class="pill">占位图片</span>
+      <span class="pill">假数据库表</span>
+      <span class="pill">MinIO 代替 S3</span>
+      <span class="pill">Docker sidecar</span>
+      <span class="pill">启动脚本</span>
+    </div>
+    <div class="takeaway">现代编码模型愿意"为了把环境跑通而想尽办法"，这种主动性是 autoinstall 能处理真实复杂项目的前提。</div>
+  </section>
+
+  <section>
+    <h2><span class="tag">真实案例</span>给区块链项目 Celo 配环境：上网查文档、补依赖、绕过认证</h2>
+    <p>团队用 autoinstall 处理了大型区块链项目 <strong>Celo（celo-org/celo-monorepo）</strong>。它的挑战在于依赖庞杂、测试还需要 mock 一套认证流程。</p>
+    <p>第一阶段，由于项目自带文档稀疏，agent 自己<strong>用 web 搜索</strong>去项目文档站找配置命令，还从文档里挑出一个最小可运行应用作为验证目标。第二阶段，agent 事先并不知道会遇到什么坑——它发现必须额外安装相关仓库 <span class="hl2">Foundry</span>，于是又上网读 Foundry 的文档；最小应用第一轮没跑起来，第二轮它想到<strong>创建一个 mock 用户</strong>在本地启动应用，从而满足了要求。</p>
+    <div class="takeaway">真实项目的难点往往是"事先不可知的依赖与认证",而模型靠探索+网络搜索+造假数据,把这些坑一个个填平。</div>
+  </section>
+
+  <section>
+    <h2><span class="tag">复利效应</span>新模型更会搭环境，于是成为更强的"搭环境工具"</h2>
+    <p>训练 Composer 2 时,管理 autoinstall 的正是它的前代 <strong>Composer 1.5</strong>。而 Composer 2 在专门考察"搭建开发环境能力"的 Terminal-Bench 上的得分大幅提升:</p>
+    <div class="stat-row">
+      <div class="stat">
+        <div class="num">61.7<small>%</small></div>
+        <div class="lab">Composer 2 · Terminal-Bench</div>
+      </div>
+      <div class="stat">
+        <div class="num">47.9<small>%</small></div>
+        <div class="lab">Composer 1.5 · Terminal-Bench</div>
+      </div>
+      <div class="stat">
+        <div class="num">+13.8<small> 个百分点</small></div>
+        <div class="lab">下一轮 autoinstall 的更强基座</div>
+      </div>
+    </div>
+    <p>这意味着 Composer 2 将为未来的 autoinstall 提供更好的基础——更会搭环境的模型,能搭出更好的训练环境,进而训练出更强的模型。团队预期未来旧模型还会介入<strong>运行管理、数据预处理、架构调参</strong>等更多训练环节。</p>
+    <div class="takeaway">这是一条自我增强的链路:模型的进步会回流到训练流程本身,使下一轮起点更高。</div>
+  </section>
+
+  <section class="final">
+    <h2>最值得带走的洞见</h2>
+    <ol>
+      <li><b>环境配置是 RL 训练的隐形瓶颈。</b>坏环境不只是变慢,而是会让问题无解、让算力拿不到奖励信号白烧。</li>
+      <li><b>"先定义成功、再实现成功"的双 agent 结构很关键。</b>一个 agent 提出 10 条命令并描述预期输出,另一个选 3 条去实现,最多重试 5 次——把模糊任务变成可自动判定的闭环。</li>
+      <li><b>真正的难点是事先不可知的依赖与状态。</b>模型靠主动 mock(假文件、假数据库、MinIO、Docker、mock 用户)和网络搜索,才搭得通 Celo 这类真实复杂项目。</li>
+      <li><b>"用旧模型自举新模型"已被数据验证有效。</b>Terminal-Bench 从 47.9% 升到 61.7%,新模型反过来成为更强的环境搭建工具。</li>
+      <li><b>这预示训练流程本身正在被模型接管。</b>从搭环境开始,未来运行管理、数据预处理、架构调参都可能交给上一代模型,形成持续复利。</li>
+    </ol>
+  </section>
+
+</div>
+</body>
+</html>

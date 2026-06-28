@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Composer 2 技术报告：从开源基座到大规模 RL 的完整配方 · 总结</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#171a21; --card2:#1d2129;
+    --text:#e7eaf0; --muted:#9aa3b2; --line:#2a2f3a;
+    --accent:#6ea8fe; --warn:#ff7a7a; --good:#5dd1a0; --gold:#f2c14e;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Microsoft YaHei",sans-serif;
+    line-height:1.75; font-size:17px;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding:40px 22px 80px}
+  header.hd{border-bottom:1px solid var(--line); padding-bottom:22px; margin-bottom:30px}
+  .kicker{color:var(--accent); font-size:13px; letter-spacing:.08em; text-transform:uppercase; margin:0 0 10px}
+  h1{font-size:30px; line-height:1.3; margin:0 0 14px}
+  .meta{color:var(--muted); font-size:14px}
+  .lede{
+    background:linear-gradient(135deg,#1c2533,#191d26);
+    border:1px solid var(--line); border-left:4px solid var(--accent);
+    border-radius:12px; padding:18px 20px; margin:26px 0 36px; font-size:18px;
+  }
+  .lede b{color:var(--accent)}
+  section{margin:30px 0}
+  h2{font-size:21px; margin:0 0 6px; line-height:1.4}
+  h2 .tag{display:inline-block; font-size:12px; color:var(--gold); border:1px solid var(--line); border-radius:999px; padding:2px 10px; margin-right:10px; vertical-align:middle}
+  .body{color:#d6dbe6}
+  .take{color:var(--muted); font-style:italic; border-left:2px solid var(--line); padding-left:12px; margin-top:12px}
+  .stat-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin:18px 0}
+  .stat{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px}
+  .stat .big{font-size:26px; font-weight:700; color:var(--accent)}
+  .stat .lbl{color:var(--muted); font-size:13px; margin-top:4px}
+  .flow{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px 18px; margin:16px 0}
+  .flow .step{display:flex; gap:12px; align-items:flex-start; margin:8px 0}
+  .flow .n{flex:0 0 24px; height:24px; border-radius:50%; background:var(--card2); color:var(--gold); font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center}
+  table{width:100%; border-collapse:collapse; margin:16px 0; font-size:15px; background:var(--card); border-radius:12px; overflow:hidden}
+  th,td{padding:10px 12px; text-align:left; border-bottom:1px solid var(--line)}
+  th{background:var(--card2); color:var(--muted); font-weight:600}
+  td.num{font-variant-numeric:tabular-nums; text-align:right}
+  .hi{color:var(--gold); font-weight:700}
+  .insights{background:linear-gradient(135deg,#15211b,#171a21); border:1px solid #244235; border-radius:14px; padding:22px 24px; margin-top:40px}
+  .insights h2{color:var(--good)}
+  .insights ol{margin:14px 0 0; padding-left:22px}
+  .insights li{margin:10px 0}
+  .note{color:var(--muted); font-size:13px; border-top:1px solid var(--line); margin-top:40px; padding-top:16px}
+  b.k{color:var(--gold)}
+</style>
+</head>
+<body>
+<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://cursor.com/blog/composer-2-technical-report" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
+<div class="wrap">
+
+  <header class="hd">
+    <p class="kicker">Cursor · Research</p>
+    <h1>Composer 2 技术报告：从开源基座到大规模 RL 的完整配方</h1>
+    <p class="meta">来源 Cursor ｜ 作者 Sasha Rush ｜ 2026-03-27</p>
+  </header>
+
+  <div class="lede">
+    一句话总括：这份技术报告真正的价值，不在于又一个高分，而在于<b>把一个前沿 agentic 编码模型从头训出来的全流程摊开了</b>——在开源基座 Kimi K2.5 上做以代码为主的继续预训练，再在<b>与线上完全一致的 Cursor 环境里</b>做大规模 RL，并用真实工程会话构成的私有评测来对齐"开发者实际要的东西"。结果是用<b>显著更低的推理成本</b>换来前沿级别的能力。
+  </div>
+
+  <section>
+    <h2><span class="tag">训练方法</span>两阶段：先把代码知识喂厚，再用 RL 练成 agent</h2>
+    <p class="body">Composer 2 分两步走。第一步是<b>继续预训练</b>：在偏重代码的数据混合上，加深基座模型的编码知识。第二步是<b>大规模强化学习</b>，端到端提升 agent 表现。报告给出一个可靠的传导关系——<b>降低预训练 loss，下游 RL 表现就更好</b>，更扎实的基础知识能稳定地转化为更强的 agent。</p>
+    <div class="flow">
+      <div class="step"><div class="n">1</div><div>在开源基座 <b>Kimi K2.5</b> 上做继续预训练，强化代码知识。</div></div>
+      <div class="step"><div class="n">2</div><div>在<b>真实 Cursor 会话</b>里做 RL：用与线上部署完全相同的工具和 harness，问题分布覆盖开发者交给 Composer 的全部任务类型。</div></div>
+    </div>
+    <p class="body">关键观察：RL <b>同时</b>抬高了平均表现和 best-of-K 表现。后者尤其重要——它说明模型是在<b>学到新的解题路径</b>，而不是把概率单纯压向已知答案。</p>
+    <p class="take">结论：把训练环境做到和部署环境一模一样，是让 RL 学到"真本事"而非"刷分技巧"的前提。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">评测</span>公开榜单不够真，就自己造 CursorBench</h2>
+    <p class="body">做编码模型的一个核心难题是：<b>公开 benchmark 往往不像开发者真正做的活</b>——任务被过度规定、解法狭窄、代码库还很小。Cursor 的应对是从工程团队的<b>真实编码会话</b>里构建 CursorBench，刻意保留两个真实特征：</p>
+    <ul class="body">
+      <li>提示<b>简短而含糊</b>，不会把要求喂到嘴边；</li>
+      <li>解法需要<b>跨多个文件改动数百行</b>，而非一个小函数。</li>
+    </ul>
+    <p class="body">这套 benchmark 贯穿训练与评测全程，用来持续把模型拉回到"真实问题"这条线上。</p>
+    <p class="take">结论：评测集本身就是产品的一部分——它决定了模型被优化去解决"什么问题"。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">性能</span>61.3 分、提升 37%，且成本明显更低</h2>
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="big">61.3</div>
+        <div class="lbl">CursorBench（较 Composer 1.5 提升 <b class="k">37%</b>）</div>
+      </div>
+      <div class="stat">
+        <div class="big">73.7</div>
+        <div class="lbl">SWE-bench Multilingual</div>
+      </div>
+      <div class="stat">
+        <div class="big">61.7</div>
+        <div class="lbl">Terminal-Bench</div>
+      </div>
+    </div>
+    <p class="body">在 CursorBench 上 61.3 分，与最强前沿模型相当；公开榜单同样站得住。但报告强调的重点不是单一分数，而是<b>成本/精度的帕累托最优</b>：它在<b>显著更低的推理成本</b>下达到这些成绩，对需要频繁交互的开发者工作流尤其划算——快、便宜、还够强，才是交互式编码真正在乎的指标。</p>
+    <p class="take">结论：对 agent 模型而言，"在什么成本下达到什么精度"比孤立的榜单分数更有说服力。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">基建</span>支撑大规模 RL 的全栈：Blackwell 核、跨地异步流水线、Anyrun</h2>
+    <p class="body">训练 Composer 2 需要大量底层工程，报告把这套全栈也讲透了：</p>
+    <table>
+      <thead><tr><th>组件</th><th>作用</th></tr></thead>
+      <tbody>
+        <tr><td><b>自定义低精度核</b></td><td>在 Blackwell GPU 上做高效的 MoE 训练</td></tr>
+        <tr><td><b>全异步 RL 流水线</b></td><td>跨<b>多个地域</b>运行，覆盖权重同步与容错</td></tr>
+        <tr><td><b>Anyrun</b></td><td>内部算力平台，运行<b class="k">数十万个</b>沙箱化编码环境</td></tr>
+      </tbody>
+    </table>
+    <p class="body">报告还覆盖了权重同步、容错和<b>环境保真度</b>的具体做法——后者正是前面"在真实 Cursor 会话里做 RL"能成立的工程地基。此外还包含训练配方的消融实验、agent 行为塑造方法，以及评测套件的设计。</p>
+    <p class="take">结论：agentic 模型的能力上限，越来越被"能否大规模、高保真地复现真实运行环境"这件基建活儿决定。</p>
+  </section>
+
+  <div class="insights">
+    <h2>最值得带走的洞见</h2>
+    <ol>
+      <li><b>更好的基础知识可靠地换来更强的 agent。</b>"降低预训练 loss → RL 下游更好"是一条被验证的传导链，意味着预训练阶段的投入不会在 RL 里白费。</li>
+      <li><b>RL 在学新解法，而非收敛旧解。</b>平均和 best-of-K 同时提升，是判断 RL "真的扩展了能力边界"而非单纯刷分的关键信号。</li>
+      <li><b>评测集决定优化方向。</b>CursorBench 用真实、含糊、跨文件的任务替代过度规定的公开题，把模型持续对齐到开发者实际工作。</li>
+      <li><b>成本/精度的帕累托才是交互式工作流的真指标。</b>用更低推理成本达到前沿水平，比孤立的高分更有商业意义。</li>
+      <li><b>能力越来越是基建的函数。</b>Blackwell 低精度核、跨地异步流水线、Anyrun 的数十万沙箱环境——高保真复现真实环境的工程能力，正成为模型质量的隐形决定项。</li>
+    </ol>
+  </div>
+
+  <p class="note">注：本文据 Cursor 官方博客的 Composer 2 技术报告概览整理，完整方法、消融与设计细节见其 arXiv 技术报告原文。基座模型 Kimi K2.5 由 Moonshot 开源。</p>
+
+</div>
+</body>
+</html>

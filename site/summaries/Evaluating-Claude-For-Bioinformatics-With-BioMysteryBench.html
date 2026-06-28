@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>用 BioMysteryBench 评测 Claude 的生物信息学研究能力 · 总结</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#171a21; --card2:#1d2129;
+    --text:#e7eaf0; --muted:#9aa3b2; --line:#2a2f3a;
+    --accent:#6ea8fe; --warn:#ff7a7a; --good:#5dd1a0; --gold:#f2c14e;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Microsoft YaHei",sans-serif;
+    line-height:1.75; font-size:17px;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding:40px 22px 80px}
+  header.hd{border-bottom:1px solid var(--line); padding-bottom:22px; margin-bottom:30px}
+  .kicker{color:var(--accent); font-size:13px; letter-spacing:.08em; text-transform:uppercase; margin:0 0 10px}
+  h1{font-size:30px; line-height:1.3; margin:0 0 14px}
+  .meta{color:var(--muted); font-size:14px}
+  .lede{
+    background:linear-gradient(135deg,#1c2533,#191d26);
+    border:1px solid var(--line); border-left:4px solid var(--accent);
+    border-radius:12px; padding:18px 20px; margin:26px 0 36px; font-size:18px;
+  }
+  .lede b{color:var(--accent)}
+  section{margin:34px 0}
+  h2{font-size:21px; margin:0 0 6px; line-height:1.4}
+  h2 .tag{display:inline-block; font-size:12px; color:var(--gold); border:1px solid var(--line); border-radius:999px; padding:2px 10px; margin-right:10px; vertical-align:middle}
+  .body{color:#d6dbe6}
+  .take{color:var(--muted); font-style:italic; border-left:2px solid var(--line); padding-left:12px; margin-top:12px}
+  .stat-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin:18px 0}
+  .stat{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px}
+  .stat .big{font-size:24px; font-weight:700}
+  .stat .lbl{color:var(--muted); font-size:13px; margin-top:4px}
+  table{width:100%; border-collapse:collapse; margin:16px 0; font-size:15px; background:var(--card); border-radius:12px; overflow:hidden}
+  th,td{padding:10px 12px; text-align:left; border-bottom:1px solid var(--line)}
+  th{background:var(--card2); color:var(--muted); font-weight:600}
+  td.num{font-variant-numeric:tabular-nums; text-align:right}
+  .hi{color:var(--warn); font-weight:700}
+  .lo{color:var(--good); font-weight:700}
+  .pillars{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0}
+  .pillar{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px}
+  .pillar .h{color:var(--gold); font-weight:700; margin-bottom:4px}
+  .quote{background:var(--card2); border-left:3px solid var(--gold); border-radius:0 10px 10px 0; padding:12px 16px; margin:16px 0; color:#dfe4ee; font-size:15px}
+  .insights{background:linear-gradient(135deg,#15211b,#171a21); border:1px solid #244235; border-radius:14px; padding:22px 24px; margin-top:42px}
+  .insights h2{color:var(--good)}
+  .insights ol{margin:14px 0 0; padding-left:22px}
+  .insights li{margin:10px 0}
+  .note{color:var(--muted); font-size:13px; border-top:1px solid var(--line); margin-top:40px; padding-top:16px}
+  b.k{color:var(--gold)}
+</style>
+</head>
+<body>
+<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/Evaluating-Claude-For-Bioinformatics-With-BioMysteryBench" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
+<div class="wrap">
+
+  <header class="hd">
+    <p class="kicker">Anthropic · Science</p>
+    <h1>用 BioMysteryBench 评测 Claude 的生物信息学研究能力</h1>
+    <p class="meta">来源 Anthropic ｜ 作者 Brianna（discovery 团队）｜ 2026-04-29</p>
+  </header>
+
+  <div class="lede">
+    一句话总括：Anthropic 造了一个能给"人类都解不出"的真实生物数据出题的基准，并用它给出可验证的结论——<b>最新几代 Claude 不再只是追平受训科学家，在一部分生物信息学任务上已经反超五人专家组</b>。真正的贡献不是又一个排行榜，而是<b>一套绕开"科学难以评测"三大陷阱的出题方法</b>。
+  </div>
+
+  <section>
+    <h2><span class="tag">出发点</span>科学没有"标准考试"，所以也难被基准量化</h2>
+    <p class="body">医生有执业考、律师有司考，但当科学家没有标准化测试——AI 在科学上同样如此，至今没有哪个 Agent 科学基准能像 SWE-bench 之于软件工程那样成为公认标尺。原因在于生物研究有三条特性让它格外难评测：<b>同一问题有多种"正确"做法</b>（如预测二甲双胍疗效，既可做 GWAS 也可测肠道菌群）；<b>个别研究决策高度主观，在嘈杂数据里会导出截然不同的结论</b>（2011 年一篇论文报告的二甲双胍疗效变异位点，一年后被 Diabetes Prevention Program 复现为零，2012 年荟萃分析又判定效应真实但更弱）；<b>很多生物学问题人类至今无解</b>（二甲双胍问世三十年，主要靶点仍不确定）。</p>
+    <p class="take">结论：恰恰是那些人类还没解开的问题，才最值得拿来评测模型——可传统基准做不到。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">怎么做</span>不让"脏数据"污染"评测质量"</h2>
+    <p class="body">BioMysteryBench 用真实、嘈杂的生物信息学数据出题，却不让数据的复杂与噪声败坏评测本身。Claude 被放进一个容器，配有<b>最小化的标准生物信息学工具</b>，可用 <b>pip / conda</b> 自行安装更多工具，并获授权访问 NCBI、Ensembl 等权威数据库下载参考基因组等资源。题目多取自原始或轻处理的 DNA/RNA 测序数据（WGS、scRNA-seq、甲基化、ChIP-seq、宏基因组、Hi-C），另含蛋白质组与代谢组。</p>
+    <div class="quote">示例题：这套单细胞 RNA-seq 来自人体哪个器官？实验组相对对照敲除了哪个基因？从 WGS 序列里，样本 X 的父本、母本各是谁？哪些 bigWig 文件是 ChIP、哪些是 input 对照？给定未知细胞类型的 H3K27ac ChIP-seq 峰，判断它是什么细胞。</div>
+    <div class="pillars">
+      <div class="pillar"><div class="h">方法无关</div>只按<b>最终答案</b>打分，不看路径，给模型自由选策略，也摆脱了任何单一研究者的主观选择。</div>
+      <div class="pillar"><div class="h">客观真值</div>答案取自数据的可控属性或经正交验证的元数据（如病毒种类由 <b>PCR</b> 验证），而非科学家的主观结论。</div>
+      <div class="pillar"><div class="h">可"超人类"出题</div>因答案来自数据属性，不依赖人能解出——基准里就含若干人类难解甚至解不出的题。</div>
+      <div class="pillar"><div class="h">可验证</div>每位出题人须提交<b>验证 notebook</b>，证明信号确实存在于数据中（验证答案远比从零推导容易）。</div>
+    </div>
+    <p class="take">结论：把"主观结论"换成"数据的客观属性"，既保留了真实研究的味道，又获得了可靠真值。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">核心数据</span>99 道题、人类基线、与一条 30% 的天花板</h2>
+    <p class="body">基准含 <b>99 道</b>领域专家撰写的题。每题最多请 <b>5 名</b>专家从零作答，只要有一人答对即记为"人类可解"——这样的题共 <b class="k">76 道</b>。QC 后剔除 4 道残缺题，剩下 <b class="k">23 道</b>"人类难解"题（五人专家组无人解出）。</p>
+    <div class="stat-grid">
+      <div class="stat"><div class="big">99</div><div class="lbl">专家撰写的题目总数</div></div>
+      <div class="stat"><div class="big lo">76</div><div class="lbl">人类可解（≥1 名专家答对）</div></div>
+      <div class="stat"><div class="big hi">23</div><div class="lbl">人类难解（专家组无人解出）</div></div>
+    </div>
+    <p class="body">关键发现：在人类难解题上，<b>Claude Sonnet 4.6 及更强模型</b>能解出相当比例，<b>Claude Mythos Preview 峰值解出率达 30%</b>。也就是说，模型解出了一整组五人专家都攻不下的题。</p>
+    <p class="take">结论：这不是"略好于人"，而是在专家失败的地方取得突破——基准的"超人类"设计第一次被真实兑现。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">为何能赢</span>Claude 用了两套与人不同的打法</h2>
+    <p class="body">分析 Opus 4.6 的轨迹，研究者识别出两种主要策略：</p>
+    <div class="pillars">
+      <div class="pillar"><div class="h">全知（AI 专属）</div>它内化了来自<b>数十万篇论文</b>的结构生物学、分子图谱与荟萃分析知识。人类需要现做荟萃分析或拼接多个数据库的任务，Opus 把内部的机制与本体知识同实时分析结合，<b>直接</b>给出答案。</div>
+      <div class="pillar"><div class="h">知道自己不知道（人也该学）</div>当 Opus 4.6 对答案没把握时，会<b>叠加多种方法</b>、综合多条证据，挑出多条路径共同收敛的那个答案。</div>
+    </div>
+    <p class="body">还有一类"直觉式"打法：人类专家靠算法或数据库去标注数据属性，Claude 却能直接识别某些模式或序列——正如当年科学家因注意到基因上游反复出现"TATA"而发现首个真核启动子。这种直觉历来难以塞进传统生物 ML 模型，而 LLM 也许能以前所未有的规模把它挖出来。文章也诚实记录了一个反例：在人类可解题里，过强的先验知识曾一次成为 Claude 的"绊脚石"。</p>
+    <p class="take">结论：模型的优势既来自不可复制的海量知识，也来自一种人类可借鉴的"多证据收敛"研究纪律。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">交叉印证</span>另一支独立团队得出了同样的结论</h2>
+    <p class="body">就在本文定稿时，<b>Genentech 与 Roche</b> 发布了 <b class="k">CompBioBench</b>：100 道计算生物学任务，基于合成/增强数据与元数据打乱，构造出有唯一真值、需多步推理、工具使用、定制代码与外部资源交互的难题——思路与 BioMysteryBench 高度相似，结果也彼此呼应。</p>
+    <table>
+      <thead><tr><th>CompBioBench（Claude Opus 4.6）</th><th class="num">解出率</th></tr></thead>
+      <tbody>
+        <tr><td>总体</td><td class="num lo">81%</td></tr>
+        <tr><td>最难题</td><td class="num lo">69%</td></tr>
+      </tbody>
+    </table>
+    <p class="take">结论：两个独立基准给出一致信号——前沿模型已是生物信息学研究里真正有用的协作者，而非玩具。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">边界</span>解不出的题，无法证明是"太难"还是"不可能"</h2>
+    <p class="body">基准也有自身局限：对于人和模型都没解出的题，我们无法确定它是真的无解，还是只是极难。验证 notebook 能保证信号在、数据规范，却不保证有人或模型能从零找到答案。所以作者请模型和人类基线作答者都别太沮丧——哪怕一年后人类难解集仍无人攻克也属正常；而这份不确定恰是基准的魅力所在：更强的下一代模型，也许会成为第一个解开它的存在。文章还让 Claude Mythos Preview 自己分析了一轮性能数据，结论"站得住脚"但略显"无聊"——模型开始萌发研究品味的种子，但离深刻洞见尚远。</p>
+    <p class="take">结论：这个基准刻意留下了一片"无人区"，把它当成科学进步的活靶子，而非已被攻克的过去式。</p>
+  </section>
+
+  <div class="insights">
+    <h2>最值得带走的洞见</h2>
+    <ol>
+      <li><b>评测科学难，难在三处。</b>同一问题有多种正确解法、个别决策在噪声数据里会改写结论、许多问题人类至今无解——BioMysteryBench 用"方法无关 + 客观真值 + 超人类出题 + 验证 notebook"四项设计逐一绕开。</li>
+      <li><b>关键数字：99 / 76 / 23。</b>99 道专家题中，76 道人类可解、23 道人类难解（另剔 4 道残缺题）；最多 5 名专家从零作答定基线。</li>
+      <li><b>模型已在专家失败处突破。</b>人类难解题上 Sonnet 4.6 及更强模型解出相当比例，Mythos Preview 峰值达 30%——解出了五人专家组攻不下的题。</li>
+      <li><b>赢法可拆解。</b>一靠数十万篇论文的内化知识"全知"作答，二靠不确定时叠加多方法、让多条证据收敛——后者是人类科学家也能学的纪律。</li>
+      <li><b>独立验证已经到来。</b>Genentech / Roche 的 CompBioBench 上 Opus 4.6 总体 81%、最难题 69%，与本文结论相互印证：前沿模型正成为生物信息学研究的真实协作者。</li>
+    </ol>
+  </div>
+
+  <p class="note">注：文中二甲双胍、埃博拉等病例仅为说明评测难点，不构成医疗建议。BioMysteryBench 已开放获取，更多信息见 claude.com/lifesciences；反馈邮箱 scienceblog@anthropic.com。</p>
+
+</div>
+</body>
+</html>

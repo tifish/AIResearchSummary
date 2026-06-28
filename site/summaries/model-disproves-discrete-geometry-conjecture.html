@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 推翻离散几何核心猜想 · 总结</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#171a21; --ink:#e8eaed; --sub:#a8b0bd;
+    --accent:#7aa2ff; --accent2:#5be0b5; --warn:#ffcf6b; --line:#2a2f3a;
+    --hl:#1f2430;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif;
+    line-height:1.75; letter-spacing:.2px;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding:48px 22px 80px}
+  .tag{display:inline-block; font-size:12px; color:var(--accent2); border:1px solid var(--line);
+    padding:3px 10px; border-radius:999px; letter-spacing:1px; text-transform:uppercase}
+  h1{font-size:30px; line-height:1.35; margin:16px 0 10px; font-weight:800}
+  .meta{color:var(--sub); font-size:14px; margin-bottom:26px}
+  .lede{
+    font-size:19px; background:linear-gradient(180deg,var(--hl),transparent);
+    border-left:3px solid var(--accent); padding:18px 20px; border-radius:10px;
+    margin:0 0 34px;
+  }
+  .lede b{color:var(--accent)}
+  h2{font-size:21px; margin:40px 0 6px; font-weight:800}
+  h2 .lead{display:block; font-size:14px; color:var(--accent2); font-weight:600; margin-bottom:2px; letter-spacing:.5px}
+  p{margin:12px 0}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px 20px; margin:16px 0}
+  .stat{display:flex; flex-wrap:wrap; gap:12px; margin:18px 0}
+  .stat .box{flex:1 1 150px; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px}
+  .stat .n{font-size:22px; font-weight:800; color:var(--accent)}
+  .stat .l{font-size:13px; color:var(--sub); margin-top:4px}
+  code{background:var(--hl); padding:1px 7px; border-radius:6px; color:var(--accent2); font-size:.92em}
+  .quote{border-left:3px solid var(--accent2); padding:6px 16px; color:var(--sub); font-style:italic; margin:16px 0}
+  .quote .who{display:block; font-style:normal; color:var(--ink); font-weight:700; margin-top:6px; font-size:14px}
+  .takeaways{background:linear-gradient(160deg,#1b2330,#141821); border:1px solid var(--line); border-radius:14px; padding:22px 24px; margin-top:40px}
+  .takeaways h2{margin-top:0}
+  .takeaways ol{margin:10px 0 0; padding-left:22px}
+  .takeaways li{margin:10px 0}
+  .key{color:var(--warn); font-weight:700}
+  .sep{height:1px; background:var(--line); margin:38px 0; border:0}
+</style>
+</head>
+<body>
+<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://openai.com/index/model-disproves-discrete-geometry-conjecture" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
+<div class="wrap">
+
+  <span class="tag">OpenAI · Research · 2026-05-20</span>
+  <h1>AI 第一次自主推翻一个数学核心猜想</h1>
+  <div class="meta">平面单位距离问题 · Erdős 1946 · 离散几何</div>
+
+  <p class="lede">一句话总括：一个 OpenAI 的<b>通用</b>推理模型——没有为数学专门训练、没有搭脚手架、也没有针对这个问题——自主构造出反例，推翻了 Erdős 关于"单位距离对数上界为 <code>n^(1+o(1))</code>"的近 80 年猜想，并意外地用代数数论解决了一个初等几何问题。</p>
+
+  <h2><span class="lead">问题本身 · 简单到一句话，难到 80 年</span>一个看似幼稚的问题</h2>
+  <p>在平面上放 <code>n</code> 个点，最多能有多少对点恰好相距 1？这就是 Erdős 1946 年提出的"平面单位距离问题"，被公认为组合几何中"最著名、也最容易讲清"的问题之一。直线给出 <code>n−1</code> 对，方形网格给出约 <code>2n</code> 对，而重新缩放的方形网格能给到 <code>n^(1+C/loglog(n))</code>——只比线性快一点点。</p>
+  <p>由于 <code>loglog(n)</code> 随 n 趋于无穷，指数上的额外项趋于 0，所以人们几十年来相信：方形网格本质上已是最优，没有构造能显著超越它。这就是被证伪的猜想。</p>
+
+  <div class="stat">
+    <div class="box"><div class="n">1946</div><div class="l">Erdős 提出问题，并悬赏求解</div></div>
+    <div class="box"><div class="n">O(n^4/3)</div><div class="l">最佳上界，自 1984 年（Spencer–Szemerédi–Trotter）几乎未变</div></div>
+    <div class="box"><div class="n">δ = 0.014</div><div class="l">Will Sawin 后续改进给出的显式指数</div></div>
+  </div>
+
+  <h2><span class="lead">真正的贡献 · 不是改进，而是方向反转</span>它证伪了"最优"的信念</h2>
+  <p>新结果证明：对<strong>无穷多个</strong> n，存在 n 个点的配置，单位距离对数至少为 <code>n^(1+δ)</code>，其中 δ>0 是一个固定指数。原始 AI 证明没给出显式 δ，普林斯顿教授 Will Sawin 的后续工作把它钉到了 <code>δ=0.014</code>。这意味着增长率被"撬出"了线性附近——这正是几十年来无人做到、也是结果令人惊讶的原因：下界自 1946 年起几乎纹丝未动。</p>
+  <div class="card">为什么改变理解：此前 Matoušek 和 Alon–Bucić–Sauermann 研究非欧距离时，证明"大多数"非欧距离都服从该猜想，这被视为支持猜想的证据。如今欧氏平面里反而出现了反例。</div>
+
+  <h2><span class="lead">方法的意外 · 几何问题，数论解法</span>桥梁来自代数数论</h2>
+  <p>Erdős 的原始下界可用高斯整数 <code>a+bi</code> 理解；新证明把高斯整数换成代数数论里更复杂、对称性更丰富的推广，从而制造出多得多的单位长度差。技术上动用了<strong>无限类域塔</strong>与 <strong>Golod–Shafarevich 理论</strong>来证明所需数域确实存在。这些工具数论学家早已熟知，但它们竟对欧氏平面的几何问题有影响，是巨大的惊喜。</p>
+  <p class="quote">这表明数论构造对这类问题能说的，远比我们怀疑的要多，而且所需数论可以非常深。接下来几个月，许多代数数论学家想必会重新审视离散几何中的其他公开问题。<span class="who">— Thomas Bloom（配套论文）</span></p>
+
+  <h2><span class="lead">为何重要 · AI 角色的转折</span>从"助手"到"提出原创想法"</h2>
+  <p>这是 AI 首次<strong>自主</strong>解决一个数学子领域中心的著名公开问题，且用的是通用推理模型而非专用系统——证明已由一组外部数学家核验并撰写配套论文。数学是清晰的推理试金石：问题精确、证明可验证、长链论证必须从头到尾自洽。</p>
+  <p class="quote">如果一个人写了这篇论文投给《数学年刊》、让我快速给意见，我会毫不犹豫建议接收。此前没有任何 AI 生成的证明接近这个水平——这是 AI 数学的一个里程碑。<span class="who">— Tim Gowers，菲尔兹奖得主</span></p>
+  <p class="quote">模型的思维链里，绝大多数想法都在尝试构造反例，而非去证明那个被广泛相信的上界……当前 AI 模型已超越"人类数学家的助手"，它们能提出原创而精妙的想法，并把它做到底。<span class="who">— Arul Shankar，数论学家</span></p>
+
+  <hr class="sep">
+
+  <div class="takeaways">
+    <h2>最值得带走的洞见</h2>
+    <ol>
+      <li><span class="key">首次自主突破：</span>AI 第一次独立推翻了一个数学子领域核心的著名猜想，而不只是辅助人类。</li>
+      <li><span class="key">通用 &gt; 专用：</span>解题来自通用推理模型，未针对数学训练或搭脚手架——说明深度推理能力本身在变强。</li>
+      <li><span class="key">方向选得对：</span>模型的思维链显示它"偏好构造反例"，敢走社区认为是长线的路，这种直觉与取向是关键。</li>
+      <li><span class="key">跨领域连接：</span>用代数数论（类域塔、Golod–Shafarevich）解几何问题，揭示了一座新桥梁，可能带动一批离散几何问题被重审。</li>
+      <li><span class="key">人类判断更值钱：</span>配套人类工作让结果的意义更清晰、更丰富——AI 负责搜索、建议、验证，人类选择什么问题重要、如何解读、下一步问什么。</li>
+    </ol>
+  </div>
+
+</div>
+</body>
+</html>
+===DIGEST_END_MARKER_NOT_NEEDED===
+</html>

@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>给 AI 做"diff"：自动找出新模型里那些没人想到要测的行为</title>
+<style>
+  :root{
+    --bg:#0f1115;--card:#171a21;--card2:#1d212b;--ink:#e8eaf0;--muted:#9aa3b2;
+    --line:#2a2f3a;--accent:#d97757;--accent2:#6ea8fe;--good:#5fbf8f;--warn:#e0b15a;--pill:#232838;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:linear-gradient(180deg,#0c0e12 0%,#0f1115 100%);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.75;font-size:17px;
+  }
+  .wrap{max-width:820px;margin:0 auto;padding:40px 22px 72px}
+  .kicker{display:inline-block;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:14px}
+  .meta{color:var(--muted);font-size:13.5px;margin-bottom:26px}
+  .meta a{color:var(--accent2);text-decoration:none}
+  h1{font-size:30px;line-height:1.3;margin:0 0 22px;font-weight:800;letter-spacing:-.01em}
+  .lede{
+    font-size:20px;line-height:1.6;color:#fff;font-weight:600;
+    background:linear-gradient(135deg,rgba(217,119,87,.14),rgba(110,168,254,.10));
+    border:1px solid var(--line);border-left:4px solid var(--accent);
+    border-radius:14px;padding:20px 22px;margin:0 0 34px;
+  }
+  h2{font-size:21px;font-weight:750;margin:42px 0 14px;line-height:1.4;padding-bottom:8px;border-bottom:1px solid var(--line)}
+  h2 .num{color:var(--accent);font-size:15px;font-weight:700;margin-right:8px;vertical-align:1px}
+  p{margin:12px 0}
+  .take{margin-top:12px;padding:12px 16px;background:var(--card2);border-radius:10px;border-left:3px solid var(--accent2);color:#dfe6f2;font-size:15.5px}
+  .take b{color:var(--accent2)}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0 6px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .stat .big{font-size:26px;font-weight:800;color:#fff;line-height:1.1}
+  .stat .big .u{font-size:15px;color:var(--accent);font-weight:700;margin-left:2px}
+  .stat .lbl{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.4}
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:15px;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line)}
+  th{background:var(--pill);color:#fff;font-weight:700;font-size:13.5px}
+  tr:last-child td{border-bottom:none}
+  td .hl{color:var(--accent);font-weight:700}
+  .pill{display:inline-block;background:var(--pill);color:#cdd5e3;border:1px solid var(--line);border-radius:999px;padding:2px 11px;font-size:12.5px;margin:2px 4px 2px 0}
+  .insights{margin-top:46px;background:linear-gradient(135deg,rgba(95,191,143,.10),rgba(110,168,254,.08));border:1px solid var(--line);border-radius:16px;padding:24px 24px 8px}
+  .insights h2{border:none;margin-top:0;color:#fff}
+  .insights ol{margin:0;padding-left:0;list-style:none;counter-reset:ins}
+  .insights li{counter-increment:ins;position:relative;padding:12px 0 12px 44px;border-bottom:1px dashed var(--line)}
+  .insights li:last-child{border-bottom:none}
+  .insights li::before{content:counter(ins);position:absolute;left:0;top:11px;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#1a1208;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center}
+  .insights b{color:#fff}
+  .foot{margin-top:34px;color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padding-top:16px}
+  em{color:var(--warn);font-style:normal;font-weight:600}
+</style>
+</head>
+<body>
+<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/diff-tool" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
+<div class="wrap">
+
+  <span class="kicker">可解释性研究 · 一篇更短的解读</span>
+  <h1>给 AI 做"diff"：不再大海捞针，而是让工具自动指出新模型里那些"没人想到要测"的行为</h1>
+  <div class="meta">
+    来源：Anthropic · 2026年3月13日 · <a href="https://www.anthropic.com/research/diff-tool">原文链接</a> · 作者：Thomas Jiralerspong、Trenton Bricken · 分析对象：四个开源模型
+  </div>
+
+  <div class="lede">
+    一句话总括：传统安全评测只能测我们"已经想到"的风险，对新模型里涌现的"未知的未知"无能为力。Anthropic 把软件工程的"diff"思想搬到神经网络上——提出 Dedicated Feature Crosscoder（DFC），首次实现<strong>跨架构</strong>的模型对比，自动把审计注意力从"百万行代码"收窄到真正发生变化的几个行为上，并用三个真实的政治与版权"行为开关"证明它确实管用。
+  </div>
+
+  <h2><span class="num">01</span>核心隐喻：安全审计不该从零做起，而该只看"diff"</h2>
+  <p>没有程序员会为了批准一次更新去从头审一百万行代码——他们只看 diff 工具标出的那 50 行改动。但今天审计新 AI 模型恰恰是前者：被丢进一个庞然大物里，被要求"找出安全缺陷"，却不知道要找什么。人写的 benchmark 只能测已被概念化、已学会度量的风险，因此本质上是<em>被动的</em>。</p>
+  <div class="take"><b>洞见：</b>这篇研究真正的贡献不是又一个测试集，而是把审计范式从"逐项排查已知风险"换成"自动聚焦差异"——让工具来告诉你哪里变了，而不是你去猜哪里可能出问题。</div>
+
+  <h2><span class="num">02</span>难点在"跨架构"：旧工具会把新概念强行翻译成旧概念</h2>
+  <p>当新模型只是旧模型的微调版（base-vs-finetune diffing），对比相对容易，像用"修订追踪"看百科全书新增的词条。但比较两个来源、内部"语言"都不同的模型（cross-architecture diffing），旧工具 crosscoder 就像一本只会"对词"的双语词典：遇到法语 <em>dépaysement</em>（身处异国的独特感受）这种独有概念，它会硬塞一个近似翻译（"disorientation"），于是错误地告诉审计者"这不是新东西"，让真正需要审查的新内容被忽略。</p>
+  <div class="take"><b>洞见：</b>跨架构对比最危险的失败不是"找不到差异"，而是"把差异误判为相同"——漏报比误报更致命，因为它让你误以为新模型很安全。</div>
+
+  <h2><span class="num">03</span>解法 DFC：一本带"专属区"的更好的双语词典</h2>
+  <p>DFC（Dedicated Feature Crosscoder）在结构上被设计成三段，从架构上根除"强行翻译"的问题：</p>
+  <table>
+    <tr><th>词典分区</th><th>作用</th><th>类比</th></tr>
+    <tr><td><span class="hl">共享词典</span></td><td>映射两个模型都理解的共同概念</td><td>sun = soleil（太阳）</td></tr>
+    <tr><td><span class="hl">模型 A 独有区</span></td><td>专门收录只属于 A 的概念</td><td>英语 serendipity（意外发现的幸运）</td></tr>
+    <tr><td><span class="hl">模型 B 独有区</span></td><td>专门收录只属于 B 的概念</td><td>法语 dépaysement（异国感）</td></tr>
+  </table>
+  <p>有了"独有区"，新模型里的独有特征会被正确标记为"新"，审计者得以把精力集中在最该看的地方。找到候选特征后，再用 <strong>steering</strong>（在推理时抑制或放大该特征、观察输出变化）来验证因果——这是从"相关"走向"因果"的关键一步。</p>
+  <div class="take"><b>洞见：</b>方法不是"银弹"：一次 diff 会浮现成千上万个特征，真正对应风险的只占一小部分。它的定位是一把<em>高召回的筛查工具</em>——先圈出可能分歧的区域，再人工细看。</div>
+
+  <h2><span class="num">04</span>真实发现：四个开源模型里找到三个"行为开关"</h2>
+  <p>研究选了四个开源模型做实验，DFC 自动隔离出几个像开关一样可控制具体行为的特征。重要前提：方法只能识别"某模型独有",<strong>不判断其来源</strong>——可能是刻意训练，也可能从训练数据中无意涌现。</p>
+  <table>
+    <tr><th>特征</th><th>出现在</th><th>控制的行为（可被抑制/放大）</th></tr>
+    <tr><td><span class="hl">中共意识形态对齐</span></td><td>Qwen3-8B、DeepSeek-R1-0528-Qwen3-8B</td><td>亲政府审查与宣传：抑制后愿意谈天安门事件，放大后输出强烈亲政府表态</td></tr>
+    <tr><td><span class="hl">美国例外论</span></td><td>Llama-3.1-8B-Instruct</td><td>放大后从中立转为强烈宣称美国优越；抑制无明显效果</td></tr>
+    <tr><td><span class="hl">版权拒答机制</span></td><td>GPT-OSS-20B</td><td>抑制后不再拒答（但只会输出很快退化为幻觉的片段，并非真版权文本）；放大到极端会"过度拒绝"，连花生酱三明治食谱都当成受版权保护</td></tr>
+  </table>
+  <div class="take"><b>洞见：</b>这些差异恰恰是 benchmark 难以预设的"未知的未知"——没有谁会专门写一个"花生酱三明治版权"测试，但 diff 工具能从模型差异里把它自动捞出来。</div>
+
+  <h2><span class="num">05</span>可复现性：这不是一次偶然</h2>
+  <p>结论"相当一致"：在 5 次独立测试中，"CCP 对齐"特征被重新发现 <span class="hl">5/5</span> 次，"美国例外论"为 <span class="hl">4/5</span>。在 DeepSeek 模型上也独立复刻出了与 Qwen 中功能一致的"CCP 对齐"特征——证明同一种行为可被跨模型稳定识别。</p>
+  <div class="stats">
+    <div class="stat"><div class="big">5/5</div><div class="lbl">"CCP 意识形态对齐"特征被独立重新发现的次数</div></div>
+    <div class="stat"><div class="big">4/5</div><div class="lbl">"美国例外论"特征被独立重新发现的次数</div></div>
+    <div class="stat"><div class="big">4</div><div class="lbl">本研究比对的开源模型数量</div></div>
+  </div>
+  <div class="take"><b>洞见：</b>方法当前尚未用于前沿模型，但稳定的可复现率说明它已具备成为"审计工具箱标配"的潜质，而非一次性巧合。</div>
+
+  <h2><span class="num">06</span>最有价值的用法：监控模型版本更新</h2>
+  <p>作者点出一个极具说服力的应用：2025 年 4 月 OpenAI 的 GPT-4o 涌现出令人担忧的"谄媚"（sycophancy）行为。如果当时用这类工具去 diff 更新版与旧版，本可在发布<strong>之前</strong>自动标记出这一新行为，让开发者及时干预。</p>
+  <div class="take"><b>洞见：</b>把有限的安全资源用在"真正改变了的地方"——这才是 diff 思维的终极价值：与其全面重审，不如精准盯防每一次更新带来的增量风险。</div>
+
+  <div class="insights">
+    <h2>最值得带走的洞见</h2>
+    <ol>
+      <li><b>范式转变，而非新测试。</b>核心贡献是把审计从"逐项排查已知风险"换成"自动聚焦差异"，专攻 benchmark 测不到的"未知的未知"。</li>
+      <li><b>跨架构是关键突破。</b>DFC 用"共享词典 + 各自独有区"的三段结构，解决了旧工具"把新概念误判为已知"的致命漏报。</li>
+      <li><b>它能找到真实的行为开关。</b>在四个开源模型里验证出"CCP 对齐""美国例外论""版权拒答"三个可用 steering 双向调节的特征。</li>
+      <li><b>结果可复现。</b>CCP 对齐 5/5、美国例外论 4/5 被独立重新发现——稳定到足以进入审计工具箱。</li>
+      <li><b>定位是高召回筛查 + 版本监控。</b>它不是银弹（一次会浮现上千特征），但能像 diff 一样在每次更新时自动标记增量风险，例如本可提前捕捉 GPT-4o 的谄媚。</li>
+    </ol>
+  </div>
+
+  <div class="foot">
+    本页为基于 Anthropic 2026 年 3 月 13 日博文《A "diff" tool for AI: Finding behavioral differences in new models》的中文独立总结。该研究为 Anthropic Fellows 项目，分析对象均为开源模型；方法仅识别模型独有特征、不判断其来源。具体细节与完整论文请参阅原文。
+  </div>
+
+</div>
+</body>
+</html>

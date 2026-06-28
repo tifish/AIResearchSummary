@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>测量真实世界中的 AI 代理自主权 · 总结</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#171a21; --card2:#1d2129;
+    --text:#e7eaf0; --muted:#9aa3b2; --line:#2a2f3a;
+    --accent:#6ea8fe; --warn:#ff7a7a; --good:#5dd1a0; --gold:#f2c14e;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Microsoft YaHei",sans-serif;
+    line-height:1.75; font-size:17px;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding:40px 22px 80px}
+  header.hd{border-bottom:1px solid var(--line); padding-bottom:22px; margin-bottom:30px}
+  .kicker{color:var(--accent); font-size:13px; letter-spacing:.08em; text-transform:uppercase; margin:0 0 10px}
+  h1{font-size:30px; line-height:1.3; margin:0 0 14px}
+  .meta{color:var(--muted); font-size:14px}
+  .lede{
+    background:linear-gradient(135deg,#1c2533,#191d26);
+    border:1px solid var(--line); border-left:4px solid var(--accent);
+    border-radius:12px; padding:18px 20px; margin:26px 0 36px; font-size:18px;
+  }
+  .lede b{color:var(--accent)}
+  section{margin:30px 0}
+  h2{font-size:21px; margin:0 0 6px; line-height:1.4}
+  h2 .tag{display:inline-block; font-size:12px; color:var(--gold); border:1px solid var(--line); border-radius:999px; padding:2px 10px; margin-right:10px; vertical-align:middle}
+  .body{color:#d6dbe6}
+  .take{color:var(--muted); font-style:italic; border-left:2px solid var(--line); padding-left:12px; margin-top:12px}
+  .stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0}
+  .stat{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px}
+  .stat .big{font-size:26px; font-weight:700; color:var(--accent)}
+  .stat .lbl{color:var(--muted); font-size:13px; margin-top:4px}
+  .barrow{display:grid; grid-template-columns:120px 1fr 70px; align-items:center; gap:10px; margin:10px 0}
+  .barrow .name{color:var(--muted); font-size:14px}
+  .barrow .track{background:#0b0d12; border:1px solid var(--line); border-radius:999px; height:18px; overflow:hidden}
+  .barrow .fill{height:100%; background:linear-gradient(90deg,#6ea8fe,#5dd1a0)}
+  .barrow .val{text-align:right; font-weight:700; font-size:14px; color:var(--gold)}
+  .twocol{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0}
+  .twocol .col{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px}
+  .twocol .col h4{margin:0 0 8px; font-size:15px}
+  .twocol .col.h h4{color:var(--accent)}
+  .twocol .col.r h4{color:var(--warn)}
+  .insights{background:linear-gradient(135deg,#15211b,#171a21); border:1px solid #244235; border-radius:14px; padding:22px 24px; margin-top:40px}
+  .insights h2{color:var(--good)}
+  .insights ol{margin:14px 0 0; padding-left:22px}
+  .insights li{margin:10px 0}
+  .note{color:var(--muted); font-size:13px; border-top:1px solid var(--line); margin-top:40px; padding-top:16px}
+  b.k{color:var(--gold)}
+  code{background:#0b0d12; border:1px solid var(--line); border-radius:6px; padding:1px 6px; font-size:14px}
+</style>
+</head>
+<body>
+<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/measuring-agent-autonomy" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
+<div class="wrap">
+
+  <header class="hd">
+    <p class="kicker">Anthropic · Societal Impacts</p>
+    <h1>测量真实世界中的 AI 代理自主权</h1>
+    <p class="meta">来源 Anthropic ｜ 2026-02-18</p>
+  </header>
+
+  <div class="lede">
+    一句话总括：这是 Anthropic 首次<b>不靠实验室基准、而靠数百万次真实人机交互</b>去回答"人们到底给了 AI 代理多少自主权"。真正的贡献不是某个新模型，而是一个核心发现——<b>模型能做的，远多于它在实践中被放手去做的</b>（"部署过剩"），而实际自主权是<b>由模型、用户、产品三方共同塑造</b>的，因此无法靠上线前评测就看清。
+  </div>
+
+  <section>
+    <h2><span class="tag">怎么研究</span>用工具调用当"代理行为的最小单元"</h2>
+    <p class="body">代理难以实证研究：定义不统一、形态演化快、模型方对客户的代理架构几乎没有可见性（甚至无法把 API 上的独立请求拼回一个"会话"）。Anthropic 的取巧定义是：<b>代理 = 配了工具、能采取行动的 AI 系统</b>。于是研究落到<b>单次工具调用</b>这一可观测、可一致比较的颗粒度上，再结合两类数据：公开 API（覆盖数千客户、广但只能孤立看单次调用）与 Claude Code（自家产品、能贯通整个会话、深但只代表软件工程一个场景）。</p>
+    <p class="take">结论：在看不见客户架构的前提下，"以工具调用为单位"是把模糊问题变成可测量问题的关键妥协。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">趋势一</span>Claude Code 单次自主工作时长三个月内翻倍</h2>
+    <p class="body">绝大多数回合很短——中位单次约 <b>45 秒</b>，长期稳定在 40–55 秒。真正的信号在长尾：从 2025 年 10 月到 2026 年 1 月，<b>99.9 分位</b>单次连续工作时长从不足 25 分钟<b>近乎翻倍到 45 分钟以上</b>。关键在于这个增长<b>随模型发布平滑</b>，而非每次发新模型就跳一下——说明它并非纯能力驱动，更像是资深用户在建立信任、交付更宏大的任务、加上产品本身持续提速的合力。</p>
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="big">~45 秒</div>
+        <div class="lbl">单次回合时长中位数（长期稳定）</div>
+      </div>
+      <div class="stat">
+        <div class="big">25→45+ 分钟</div>
+        <div class="lbl">99.9 分位单次时长，三个月内近乎翻倍</div>
+      </div>
+    </div>
+    <p class="body">内部数据更直接：8 月到 12 月，Claude Code 在最难任务上的成功率<b>翻倍</b>，同时每会话人工干预从 <b>5.4 次降到 3.3 次</b>——干预更少、成果更好。对照 METR"Claude Opus 4.5 能以 50% 成功率完成约 5 小时人类任务"的能力评测，二者口径不同（一个测理想环境下的能力、一个测真实约束下的实况），但共同指向：<b>实践中授予的自主空间，落后于模型的真实能力</b>。</p>
+    <p class="take">结论：存在显著的"部署过剩"——现有模型已能承担比它们实际被允许的更多自主权。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">趋势二</span>越有经验，越爱自动批准——但也越爱打断</h2>
+    <p class="body">用户随经验增长把更多自主权交给 Claude：新用户（&lt;50 次会话）约 <b>20%</b> 的会话用完全自动批准，到约 750 次会话升至 <b>40% 以上</b>。看似矛盾的是，打断率也同步上升——约 10 次会话的新用户在 5% 的回合打断，资深用户约 9%。这不是放弃监督，而是<b>监督策略的转变</b>：从"逐条事前审批"转向"放手让它跑、出问题再介入"，打断率上升恰恰反映资深用户在主动盯着、对"何时该出手"更有直觉。</p>
+    <div class="barrow"><div class="name">完全自动批准</div><div class="track"><div class="fill" style="width:40%"></div></div><div class="val">20%→40%+</div></div>
+    <div class="barrow"><div class="name">回合打断率</div><div class="track"><div class="fill" style="width:18%"></div></div><div class="val">5%→9%</div></div>
+    <p class="body">公开 API 上有呼应的模式：<b>最简单任务（如改一行代码）87% 的工具调用有人参与，最复杂任务（如自主找 0-day、写编译器）只有 67%</b>。原因有二：步骤一多，逐条审批结构上就不现实；复杂任务也更可能来自资深用户。</p>
+    <p class="take">结论：有效监督不等于批准每一步，而是"在关键时刻有能力介入"。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">趋势三</span>任务越难，Claude 越主动停下来问</h2>
+    <p class="body">人类不是唯一塑造自主权的角色——Claude 也会在没把握时<b>主动停下来求澄清</b>。随任务复杂度上升，它问得更频繁：在<b>最复杂任务上，Claude Code 主动求澄清的频率是人类打断它的两倍多</b>，说明它对自身的不确定性有一定校准。下表对比了两类停顿的常见原因：</p>
+    <div class="twocol">
+      <div class="col h"><h4>Claude 主动停下</h4><div class="body" style="font-size:14px">遇到歧义/缺信息、面临高风险或不可逆操作、需要人来做关键决策时，停下来请求澄清或确认。</div></div>
+      <div class="col r"><h4>人类打断</h4><div class="body" style="font-size:14px">发现走偏需要纠偏、要补充上下文或改变方向、对某步骤不放心时，中途介入提供反馈。</div></div>
+    </div>
+    <p class="body">需要注意别过度解读：Claude 可能停错时机、问多余的问题，行为也受 Plan Mode 等产品特性影响。但方向是清晰的——<b>训练模型识别并表达自身不确定性，是一种与权限系统、人类监督互补的安全属性</b>，Anthropic 据此训练 Claude 主动发问，并呼吁其他厂商照做。</p>
+    <p class="take">结论：代理主动停顿（agent-initiated stop）本身就是部署系统中一种重要的监督形式。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">趋势四</span>高风险领域已现身，但尚未规模化</h2>
+    <p class="body">用 Claude 给每次工具调用的风险与自主权各打 1–10 分后发现：<b>绝大多数 API 操作是低风险、可逆的</b>。<b>80%</b> 的工具调用来自至少有一种安全保障（受限权限或需人批准）的代理，<b>73%</b> 似乎有人在环，仅 <b>0.8%</b> 的操作不可逆（如给客户发邮件）。风险集中在低端，但自主权分布更宽：低自主（3–4 分）是订餐、改小段代码这类受限小任务；高自主（&gt;6 分）已出现自主向数据科学竞赛提交模型、分流客服工单等。最高风险簇（涉及安全、金融交易、医疗信息）<b>很多很可能是评测/红队演练而非真实生产</b>——这也暴露了"只看单次调用"的可见性边界。</p>
+    <div class="barrow"><div class="name">软件工程</div><div class="track"><div class="fill" style="width:50%"></div></div><div class="val">~50%</div></div>
+    <div class="barrow"><div class="name">有安全保障</div><div class="track"><div class="fill" style="width:80%"></div></div><div class="val">80%</div></div>
+    <div class="barrow"><div class="name">有人在环</div><div class="track"><div class="fill" style="width:73%"></div></div><div class="val">73%</div></div>
+    <div class="barrow"><div class="name">不可逆操作</div><div class="track"><div class="fill" style="width:1%"></div></div><div class="val">0.8%</div></div>
+    <p class="body">代理高度集中在单一行业：<b>软件工程占 API 工具调用近 50%</b>，其余商业智能、客服、销售、金融、电商均不足几个百分点。这意味着我们仍处<b>代理采纳的早期</b>——软件因"能跑代码、易测试验证"而最先建立信任；当代理扩展到法律、医疗、金融等核验更难、风险更高的领域，风险与自主权的前沿将随之扩张。</p>
+    <p class="take">结论：平均数令人安心，但平均会掩盖前沿——真正要监测的是使用是否在向"更自主、更高风险"漂移。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">给谁的建议</span>别急着规定"每步都批"，去投资部署后监测</h2>
+    <p class="body">作者刻意不下强结论，但给出三类对象的方向：<b>模型与产品方应投资"部署后监测"</b>——上线前评测测不出真实使用方式，而这些数据"之所以存在，是因为我们选择建了收集它的基础设施"；行业还缺把 API 独立请求拼回会话的隐私保护方法。<b>模型方应训练模型识别自身不确定性</b>。<b>产品方应为"用户监督"而设计</b>——给用户可信的可见性 + 简单的介入机制（如实时引导、OpenTelemetry），而非只把人塞进审批链。最有把握的一条是反向建议：<b>现在不该强制规定具体交互范式</b>，因为数据显示资深用户会自然从"逐条审批"转向"监测+介入"，强制"每步都批"只会制造摩擦而不必然带来安全。</p>
+    <p class="take">结论：监管的焦点应是"人是否处在能有效监测与介入的位置"，而非规定某种固定的参与形式。</p>
+  </section>
+
+  <div class="insights">
+    <h2>最值得带走的洞见</h2>
+    <ol>
+      <li><b>"部署过剩"是核心结论。</b>最长会话单次工作时长三个月内从 25 分钟翻倍到 45+ 分钟、内部干预从 5.4 降到 3.3 次——模型已能承担比实践中被允许的更多自主权，且增长随模型发布平滑、并非纯能力驱动。</li>
+      <li><b>自动批准与打断同时上升不矛盾。</b>资深用户自动批准从 20% 升到 40%+、打断率从 5% 升到 9%，是监督策略从"逐条审批"转向"放手+主动盯着、需要时介入"，印证"有效监督≠批准每一步"。</li>
+      <li><b>代理会自我设限。</b>最复杂任务上 Claude 主动求澄清是人类打断它的两倍多——训练模型识别并表达不确定性，是与权限系统、人类监督互补的安全属性。</li>
+      <li><b>风险低但前沿在扩张。</b>80% 有保障、73% 有人在环、仅 0.8% 不可逆，且软件工程占近 50%；最高风险簇多是评测。真正要盯的是使用是否向"更自主、更高风险"漂移。</li>
+      <li><b>别用规则锁死交互方式。</b>真实自主权由模型、用户、产品三方共同塑造，无法靠上线前评测看清——监管该确保"人能有效介入"，而非强制"每步都批"，否则只增摩擦不增安全。</li>
+    </ol>
+  </div>
+
+  <p class="note">注：本文为 Anthropic 研究博客《Measuring AI agent autonomy in practice》（2026-02-18，Societal Impacts，作者 Miles McCain、Saffron Huang、Jack Clark、Deep Ganguli 等）的中文总结；45 秒中位、99.9 分位 25→45+ 分钟、20%→40%+ 自动批准、5%→9% 打断、87%/67% 人参与、5.4→3.3 次干预、软件工程近 50%、80%/73%/0.8% 等均为原文数据。METR"约 5 小时任务、50% 成功率"为原文引用的外部能力评测，与本文实况测量口径不同。</p>
+
+</div>
+</body>
+</html>

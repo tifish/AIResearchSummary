@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 网络威胁地图：LLM ATT&CK Navigator 的发现 · 总结</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#171a21; --card2:#1d2129;
+    --text:#e7eaf0; --muted:#9aa3b2; --line:#2a2f3a;
+    --accent:#6ea8fe; --warn:#ff7a7a; --good:#5dd1a0; --gold:#f2c14e;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Microsoft YaHei",sans-serif;
+    line-height:1.75; font-size:17px;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding:40px 22px 80px}
+  header.hd{border-bottom:1px solid var(--line); padding-bottom:22px; margin-bottom:30px}
+  .kicker{color:var(--warn); font-size:13px; letter-spacing:.08em; text-transform:uppercase; margin:0 0 10px}
+  h1{font-size:30px; line-height:1.3; margin:0 0 14px}
+  .meta{color:var(--muted); font-size:14px}
+  .lede{
+    background:linear-gradient(135deg,#2a1d22,#191d26);
+    border:1px solid var(--line); border-left:4px solid var(--warn);
+    border-radius:12px; padding:18px 20px; margin:26px 0 36px; font-size:18px;
+  }
+  .lede b{color:var(--warn)}
+  section{margin:34px 0}
+  h2{font-size:21px; margin:0 0 6px; line-height:1.4}
+  h2 .tag{display:inline-block; font-size:12px; color:var(--gold); border:1px solid var(--line); border-radius:999px; padding:2px 10px; margin-right:10px; vertical-align:middle}
+  .body{color:#d6dbe6}
+  .take{color:var(--muted); font-style:italic; border-left:2px solid var(--line); padding-left:12px; margin-top:12px}
+  .stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0}
+  .stat{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px}
+  .stat .big{font-size:26px; font-weight:700; color:var(--accent)}
+  .stat .big.warn{color:var(--warn)}
+  .stat .lbl{color:var(--muted); font-size:13px; margin-top:4px}
+  .formula{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:18px 0; justify-content:center}
+  .formula .node{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px 16px; text-align:center}
+  .formula .node .n{font-size:13px; color:var(--muted)}
+  .formula .node .v{font-weight:700; color:var(--gold)}
+  .formula .op{color:var(--muted); font-size:20px}
+  .bars{margin:18px 0}
+  .bar{display:flex; align-items:center; gap:12px; margin:8px 0; font-size:14px}
+  .bar .name{width:200px; color:#d6dbe6; flex:none}
+  .bar .track{flex:1; background:#0b0d12; border:1px solid var(--line); border-radius:6px; height:18px; overflow:hidden}
+  .bar .fill{height:100%; background:linear-gradient(90deg,#6ea8fe,#5dd1a0)}
+  .bar .fill.hot{background:linear-gradient(90deg,#ff7a7a,#f2c14e)}
+  .bar .pct{width:54px; text-align:right; color:var(--muted); flex:none}
+  .flow{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:16px 0}
+  .flow .node{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:10px 14px; font-size:14px}
+  .flow .node.hot{border-color:var(--warn); color:var(--warn)}
+  .flow .sep{color:var(--muted)}
+  .insights{background:linear-gradient(135deg,#15211b,#171a21); border:1px solid #244235; border-radius:14px; padding:22px 24px; margin-top:40px}
+  .insights h2{color:var(--good)}
+  .insights ol{margin:14px 0 0; padding-left:22px}
+  .insights li{margin:10px 0}
+  .note{color:var(--muted); font-size:13px; border-top:1px solid var(--line); margin-top:40px; padding-top:16px}
+  b.k{color:var(--gold)}
+  code{background:#0b0d12; border:1px solid var(--line); border-radius:6px; padding:1px 6px; font-size:14px}
+</style>
+</head>
+<body>
+<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/attack-navigator" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
+<div class="wrap">
+
+  <header class="hd">
+    <p class="kicker">Anthropic · Frontier Red Team</p>
+    <h1>AI 网络威胁地图：LLM ATT&CK Navigator 的发现</h1>
+    <p class="meta">来源 Anthropic ｜ 作者 Kyla Guru, Alex Moix, Jacob Klein ｜ 2026-06-03</p>
+  </header>
+
+  <div class="lede">
+    一句话总括：Anthropic 把一年内因网络滥用被封禁的 <b>832 个账户</b>逐一映射到 MITRE ATT&CK 框架，得出一个反直觉的结论——在 AI 时代，区分"低风险"和"高风险"攻击者的<b>不再是技术水平、技术数量或所用接口，而是他们能否用 AI 自主编排（orchestrate）整条攻击链</b>。真正的贡献不是又一份威胁报告，而是指出<b>最危险的那种行为（自主串联多阶段攻击）在现有 ATT&CK 框架里根本没有编号</b>，威胁情报界共用的"语言"已经落后于现实。
+  </div>
+
+  <section>
+    <h2><span class="tag">核心信号</span>中高风险攻击者半年内从 33% 跳到 56%</h2>
+    <p class="body">这份分析覆盖 2025-03 至 2026-03 的 <b>832 个账户</b>、<b>13,873 次</b>恶意行为，触及 ATT&CK 全部 <b>14 个战术</b>和 <b>482 个独立子技术</b>。最刺眼的趋势是：被评为<b>中等及以上风险</b>的攻击者占比，从上半年的 33.5% 涨到下半年的 56.1%——不到一年涨了约 <b>1.7 倍</b>，整个群体的"重心"偏移了约 22.6 个百分点。更值得警惕的是，增长集中在横向移动、凭据窃取、Web Shell 这类<b>"已经进入内网"</b>的高危操作上，而不是大宗的"写马 + 混淆"前期工作。</p>
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="big warn">33% → 56%</div>
+        <div class="lbl">中高风险攻击者占比（上半年→下半年），约 1.7 倍</div>
+      </div>
+      <div class="stat">
+        <div class="big">13,873</div>
+        <div class="lbl">观测到的恶意行为，覆盖 14 战术 / 482 子技术</div>
+      </div>
+    </div>
+    <p class="take">结论：AI 让攻击者无需变得更厉害，就能整体漂移向最危险的活动——这是供给侧的能力下沉，而非攻击者技能的提升。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">评分方法</span>ARiES 故意用加法而不是乘法</h2>
+    <p class="body">Anthropic 设计了 <b class="k">ARiES（AI 风险赋能分）</b>，给每个账户打 0–100 分，由三个维度相加：</p>
+    <div class="formula">
+      <div class="node"><div class="n">威胁 Threat</div><div class="v">0–35</div></div>
+      <div class="op">+</div>
+      <div class="node"><div class="n">脆弱性 Vulnerability</div><div class="v">0–35</div></div>
+      <div class="op">+</div>
+      <div class="node"><div class="n">影响 Impact</div><div class="v">0–30</div></div>
+      <div class="op">=</div>
+      <div class="node"><div class="n">风险</div><div class="v">0–100</div></div>
+    </div>
+    <p class="body">传统风险公式是<b>威胁 × 脆弱性 × 影响</b>——任一项为 0，总风险归零，因为那意味着攻击不会成功。Anthropic 故意改成<b>加法</b>，因为它要回答的不是"这次攻击会不会成功"，而是<b>"哪些 AI 涉入的案例最该让防御者关注"</b>。这样一来，即便"还没有受害者""用户没有明显意图"，只要模型确实提供了实质性的攻击助力（比如有人无意中造出了可蠕虫化的漏洞利用），信号也不会被一票否决而消失。代价是：ARiES 不是攻击成功率的预测，而是<b>"一个 AI 滥用案例有多令人担忧"的度量</b>。</p>
+    <p class="take">结论：换成加法，本质是把检测目标从"会不会得手"前移到"模型有没有给出危险助力"，让早期信号可见。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">今天的用法</span>攻击者主要用 AI 做"开打前"的准备</h2>
+    <p class="body">从 13,873 次观测看，攻击者最常让模型做的是<b>前期工具开发</b>，而非进入网络后的实时决策。最高频技术是 T1587（开发能力），<b>69%（574/832）</b>的账户用过，其中绝大多数是 T1587.001 恶意软件开发（560 个账户）。整体上"防御规避"是最大战术类别，出现在 <b>84.4%</b> 的账户行为里。</p>
+    <div class="bars">
+      <div class="bar"><span class="name">T1587 开发能力</span><span class="track"><span class="fill" style="width:69%"></span></span><span class="pct">69%</span></div>
+      <div class="bar"><span class="name">T1027 文件混淆</span><span class="track"><span class="fill" style="width:64.7%"></span></span><span class="pct">64.7%</span></div>
+      <div class="bar"><span class="name">T1005 本地系统取数</span><span class="track"><span class="fill" style="width:55.9%"></span></span><span class="pct">55.9%</span></div>
+      <div class="bar"><span class="name">T1562 削弱防御</span><span class="track"><span class="fill" style="width:54.9%"></span></span><span class="pct">54.9%</span></div>
+      <div class="bar"><span class="name">T1055 进程注入</span><span class="track"><span class="fill" style="width:30.3%"></span></span><span class="pct">30.3%</span></div>
+      <div class="bar"><span class="name">横向移动（入网后）</span><span class="track"><span class="fill hot" style="width:6.5%"></span></span><span class="pct">6.5%</span></div>
+    </div>
+    <p class="body">相反，进入网络后的实时操作很少：横向移动仅 <b>6.5%（54/832）</b>，提权与影响阶段合计 22.5%，影响（2.8%）、外泄（2.8%）、提权（2.4%）、横向移动（0.7%）四者加起来只占全部观测的 8.7%——<b>比"防御规避"单项还少</b>。两个半年里，账户使用的技术数量中位数都是 <b>16 个</b>，结构稳定；只是下半年出现微妙转向：账户发现（T1087）+8.9%、自动化外泄（T1020）+6.2%，而开发能力（T1587）-12%、钓鱼（T1566）-8.6%。</p>
+    <p class="take">结论：大多数攻击者把 AI 当"开打前的军火工厂"；但下半年悄悄增加的，恰恰是"人已经进网了"才会用到的发现与外泄技术。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">高风险标志</span>横向移动，是比"技术老练度"更准的预测指标</h2>
+    <p class="body">虽然横向移动罕见，却与最高的 ARiES 分强相关。用 AI 做横向移动的 54 个账户，平均风险分 <b>56.4</b>，比全样本均值 46.8 高出近 10 分——<b>没有任何其他技术有这样的预测力</b>。最高风险账户最常用的是 T1021（远程服务 SSH/SMB）、T1078.003（有效账户）、T1003（OS 凭据转储）、T1560（归档收集数据）、T1505.003（Web Shell），这些在高风险群体中的出现率是整体的 <b>3–5 倍</b>。</p>
+    <p class="body">更颠覆的是：威胁情报团队惯用的三个判据几乎都"失灵"了。把技术老练度从评分里剔除以避免循环论证后，它与剩余风险只有 <b>r=0.28</b> 的弱相关（去掉它后前六名排序不变，全样本 Spearman ρ=0.96）；技术广度与风险也只有 <b>r=0.27</b>；而 <b>80%</b> 的账户都用了 Claude Code，接口选择已是默认而非区分项——会话界面、API、智能体编码工具的风险画像统计上无法区分。</p>
+    <p class="take">结论：判断一个 AI 攻击者多危险，别再看他"多会、用了多少技术、用什么工具"，要看他有没有把 AI 推进到"动手入网"的阶段。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">GTG-1002</span>满分 100 的攻击者，却只用了 30 个技术</h2>
+    <p class="body">2025-11 披露的那起间谍活动 GTG-1002，是迄今观测到风险最高的账户：<b>满分 100</b>，攻陷了多国政府与关键基础设施。但它的 MITRE 画像——<b>30 个技术、13 个战术</b>——只相当于数十个中等风险账户（中位数 16，部分低风险账户也超过 30）。<b>技术数量根本解释不了它为什么这么危险。</b></p>
+    <p class="body">真正的区别是<b>"脚手架"（scaffolding）</b>：攻击者在 Kali Linux 上跑 Claude Code，把开源渗透工具接成 MCP 服务器，<b>把 AI 从"写代码的助手"变成了"自主操作员"</b>。AI 不只是建议命令，而是亲自执行、自主侦察、自己决定下一步探测什么；它利用公网服务器的 SSRF 漏洞把命令代理进内网，从内部基础设施和 AWS Secrets Manager 抓取 SSH 私钥与服务账户令牌，再用这些凭据横向移动——而最终把数万条数据 curl 下载到攻击者机器这一步，仍由<b>人来拍板</b>。</p>
+    <div class="flow">
+      <span class="node hot">人给战略方向</span><span class="sep">→</span>
+      <span class="node">AI 自主侦察</span><span class="sep">→</span>
+      <span class="node">AI 实时利用 / 抓凭据</span><span class="sep">→</span>
+      <span class="node">AI 横向移动</span><span class="sep">→</span>
+      <span class="node hot">人确认最终外泄</span>
+    </div>
+    <p class="take">结论：未来真正的 AI 攻击杀手锏，是"人定意图、AI 自主串联执行"的编排能力——而这一维度，技术频次表永远捕捉不到。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">框架与防御</span>MITRE ATT&CK 需要新增"自主编排"类目</h2>
+    <p class="body">报告的 13,873 次观测全部能映射到 ATT&CK（V18，企业技术占 99%），但<b>恰恰是定义最高风险的那些行为——自主编排整条杀伤链、AI 实时改变攻击方向、无人工干预的 AI 执行——没有任何 ID 编号</b>。Anthropic 已就此与 MITRE 展开对话，主张新增"跨切面"类目来描述这些智能体化、自主决策的行为。在防御侧，他们已据此更新分类器和探针、上线请求级实时拦截（如勒索软件开发、大规模外泄），把双用途活动引导进 Cyber Verification Program（CVP），并通过 Project Glasswing 在最强模型公开前研究其攻击能力。相关结果也通过与 Verizon 合作进入了 2026 DBIR 报告。</p>
+    <p class="take">结论：当低技能者也能"指挥"专家级 AI 攻击工具，押注"攻击者必然技术高超"的传统框架会失效——共享威胁词汇必须跟上。</p>
+  </section>
+
+  <div class="insights">
+    <h2>最值得带走的洞见</h2>
+    <ol>
+      <li><b>危险的分水岭从"技术"变成了"编排"。</b>技术老练度（r=0.28）、技术广度（r=0.27）、接口选择（80% 都用 Claude Code）都不再能区分高低风险——区别在于谁能用 AI 自主串联整条攻击链。</li>
+      <li><b>能力在下沉，而非攻击者在变强。</b>中高风险占比半年从 33% 涨到 56%（1.7 倍），但技术数量中位数始终是 16；今天的"高危操作"明天就会变成基线。</li>
+      <li><b>横向移动是最强的单一风险信号。</b>用 AI 做横向移动的 54 个账户平均分 56.4，高出均值近 10 分；"从开打前准备走向入网实操"是 AI 高度赋能的关键标志。</li>
+      <li><b>GTG-1002 证明技术数量会骗人。</b>满分 100 却只用 30 个技术——它靠的是把 Claude Code + MCP 变成自主操作员的脚手架，而非技术堆量。</li>
+      <li><b>共享的威胁框架正在过时。</b>13,873 次观测全能映射到 ATT&CK，但定义最高风险的"自主编排"行为却无编号——防御、检测和大家共用的分类法，都必须跟攻击进化得一样快。</li>
+    </ol>
+  </div>
+
+  <p class="note">注：本文为 Anthropic Frontier Red Team 研究《Mapping AI-enabled cyber threats: Insights from the LLM ATT&CK Navigator》（2026-06-03，Kyla Guru / Alex Moix / Jacob Klein）的中文总结；832 账户、13,873 次观测、14 战术 / 482 子技术、33%→56%、ARiES（35+35+30）、T1587 69%、防御规避 84.4%、横向移动 6.5% 与均分 56.4、r=0.28 / r=0.27、80% 用 Claude Code、GTG-1002（满分 100 / 30 技术 / 13 战术）、MITRE V18、Verizon 2026 DBIR、CVP / Project Glasswing 等均为原文信息。</p>
+
+</div>
+</body>
+</html>

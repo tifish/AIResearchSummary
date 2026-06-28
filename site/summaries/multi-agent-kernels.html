@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>多智能体系统把 GPU kernel 提速 38% · 总结</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#171a21; --card2:#1d2129;
+    --text:#e7eaf0; --muted:#9aa3b2; --line:#2a2f3a;
+    --accent:#6ea8fe; --warn:#ff7a7a; --good:#5dd1a0; --gold:#f2c14e;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Microsoft YaHei",sans-serif;
+    line-height:1.75; font-size:17px;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding:40px 22px 80px}
+  header.hd{border-bottom:1px solid var(--line); padding-bottom:22px; margin-bottom:30px}
+  .kicker{color:var(--accent); font-size:13px; letter-spacing:.08em; text-transform:uppercase; margin:0 0 10px}
+  h1{font-size:30px; line-height:1.3; margin:0 0 14px}
+  .meta{color:var(--muted); font-size:14px}
+  .lede{
+    background:linear-gradient(135deg,#1c2533,#191d26);
+    border:1px solid var(--line); border-left:4px solid var(--accent);
+    border-radius:12px; padding:18px 20px; margin:26px 0 36px; font-size:18px;
+  }
+  .lede b{color:var(--accent)}
+  section{margin:30px 0}
+  h2{font-size:21px; margin:0 0 6px; line-height:1.4}
+  h2 .tag{display:inline-block; font-size:12px; color:var(--gold); border:1px solid var(--line); border-radius:999px; padding:2px 10px; margin-right:10px; vertical-align:middle}
+  .body{color:#d6dbe6}
+  .take{color:var(--muted); font-style:italic; border-left:2px solid var(--line); padding-left:12px; margin-top:12px}
+  .stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0}
+  .stat{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px}
+  .stat .big{font-size:26px; font-weight:700; color:var(--accent)}
+  .stat .lbl{color:var(--muted); font-size:13px; margin-top:4px}
+  table{width:100%; border-collapse:collapse; margin:16px 0; font-size:15px; background:var(--card); border-radius:12px; overflow:hidden}
+  th,td{padding:10px 12px; text-align:left; border-bottom:1px solid var(--line)}
+  th{background:var(--card2); color:var(--muted); font-weight:600}
+  td.num{font-variant-numeric:tabular-nums; text-align:right}
+  .hi{color:var(--gold); font-weight:700}
+  .insights{background:linear-gradient(135deg,#15211b,#171a21); border:1px solid #244235; border-radius:14px; padding:22px 24px; margin-top:40px}
+  .insights h2{color:var(--good)}
+  .insights ol{margin:14px 0 0; padding-left:22px}
+  .insights li{margin:10px 0}
+  .note{color:var(--muted); font-size:13px; border-top:1px solid var(--line); margin-top:40px; padding-top:16px}
+  b.k{color:var(--gold)}
+</style>
+</head>
+<body>
+<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://cursor.com/blog/multi-agent-kernels" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
+<div class="wrap">
+
+  <header class="hd">
+    <p class="kicker">Cursor · Research</p>
+    <h1>多智能体系统把 GPU kernel 提速 38%</h1>
+    <p class="meta">来源 Cursor ｜ 作者 Wilson Lin, Sahil Modi, Yuan Zhang & Edward Lin ｜ 2026-04-14</p>
+  </header>
+
+  <div class="lede">
+    一句话总括：这篇文章真正的贡献，不是又快了 38% 这个数字，而是<b>用一个无人知道标准答案的硬核任务（CUDA kernel 优化）当试金石</b>——证明多智能体系统能在"训练分布之外、没有现成 diff 可抄"的开放式难题上，自主跑出过去需要资深工程师数月到数年才能达到的性能水平。
+  </div>
+
+  <section>
+    <h2><span class="tag">为什么是 kernel</span>选一个"连出题人都不知道答案"的问题</h2>
+    <p class="body">评测长程多智能体系统，最好的题目是<b>开放式优化问题</b>：它有可量化的目标可以反复迭代，而不是去命中一个已知的标准修改。kernel 优化恰好满足——CUDA kernel 是 GPU 上训练和推理的核心软件，更快的 kernel 直接意味着更高利用率、更低能耗与时延、更低的每 token 成本。</p>
+    <p class="body">今天工程师的做法是把模型拆成一个个数学算子<b>逐个调优</b>，这让问题可控，却把"跨整个系统联合优化"的收益留在了桌上。这次实验想看的，正是智能体能否跳出这种人工简化，去探索更大的解空间。</p>
+    <p class="take">结论：用开放式、可度量的难题来考多智能体，比让它复现一个已知答案更能暴露真实能力。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">怎么跑的</span>235 道真实题，全靠一个 markdown 协议</h2>
+    <p class="body">NVIDIA 用 <b>SOL-ExecBench</b> 从 <b class="k">124+</b> 个开源生产模型（DeepSeek、Qwen、Gemma、Kimi、Stable Diffusion 等）生成 <b class="k">235</b> 道题——全是 LLM、扩散、视觉、音频、视频、多模态等真实训练/推理负载的约束，不是玩具 kernel。评测在 <b class="k">27 张 B200</b> 上进行，并会对比理论硬件极限；若智能体靠缓存等作弊跑出超过 B200 物理上限的成绩，结果会被判无效。</p>
+    <p class="body">整套系统在<b>一次运行</b>里解完全部 235 题：一个 planner 智能体按性能指标把任务分发并动态再平衡给自主 worker。<b>全部协调协议只写在一个 markdown 文件</b>里（规定输出格式、规则和测试），系统自己学会调用基准管线，形成"测试→调试→优化"的闭环，全程无人干预。它还分两次、用 GPU 抽象谱系两端的语言各跑一遍：</p>
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="big">CUDA C + PTX</div>
+        <div class="lbl">直达寄存器与 ISA 级指令，考"能否在最底层推理硬件"</div>
+      </div>
+      <div class="stat">
+        <div class="big">CuTe DSL</div>
+        <div class="lbl">公开训练数据极少的高层抽象，考"能否纯靠文档学新 API"</div>
+      </div>
+    </div>
+    <p class="take">结论：把复杂协调压进一个 markdown 文件就能驱动，说明能力瓶颈正在从"框架"转向"模型自身的自主性"。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">结果</span>63% 跑赢基线，近五分之一翻倍</h2>
+    <p class="body">性能用两种口径报告：相对"单智能体优化过的 PyTorch 代码"的<b>几何平均加速比</b>；以及 <b>SOL 分数</b>（0.5 = 优化后的 PyTorch 基线，1.0 = 理论硬件极限，对数曲线）。</p>
+    <table>
+      <thead><tr><th>指标</th><th class="num">数值</th></tr></thead>
+      <tbody>
+        <tr><td>跑赢基线的题目</td><td class="num hi">149 / 235（63%）</td></tr>
+        <tr><td>几何平均加速</td><td class="num hi">1.38×（+38%）</td></tr>
+        <tr><td>提速超过 2× 的题目</td><td class="num">45 / 235（19%）</td></tr>
+        <tr><td>中位 SOL 分数</td><td class="num">0.56</td></tr>
+      </tbody>
+    </table>
+    <p class="take">结论：38% 是几何平均，背后是近两成题目直接翻倍——长尾上的大幅提速正是过去人工方法难以覆盖的部分。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">三个案例</span>同一系统，长出三套不同的优化策略</h2>
+    <p class="body"><b>BF16 分组查询注意力（分页 prefill）</b>：从 SGLang 为 Llama 3.1 8B 的推理中抽取。智能体用 CUDA C++ 动用特定访存/计算指令、用 persistent kernel 改进调度并针对输入尺寸超调，做出 <b class="k">SOL 0.9722</b>、比 FlashInfer 人工基线快 <b class="k">84%</b> 的方案；替换进 SGLang 后，TTFT 端到端提速 <b>3%</b>（该算子占 prefill 的 2–5%，算非平凡收益）。</p>
+    <p class="body"><b>NVFP4 MoE 线性层 + 门控</b>：MoE 模型（如 Qwen3）常见的两 kernel 模式，输入与中间结果量化到 4-bit 浮点。智能体准确识别<b>量化是主瓶颈</b>，把缩放与舍入融合——利用 NVFP4 只有 16 个可能值，用预算好的阈值桶把 FP32 直接映射成 FP4 码，最终比 PyTorch 基线快 <b class="k">39%</b>，SOL 0.58。</p>
+    <p class="body"><b>BF16 矩阵乘（GEMM）</b>：历来是 kernel 专家的禁脔（需要内联 PTX、流水线、kernel 内分级）。系统从零写出专用 CUDA C++ GEMM，自学 Blackwell 专属指令并按精确形状超调，达到 cuBLAS 人工基线的 <b class="k">86%</b>；在对解码尤为关键的 <b>small-M</b> 情形，甚至最高反超库 <b class="k">9%</b>。</p>
+    <p class="take">结论：面对量化、注意力、矩阵乘三类截然不同的瓶颈，系统不是套模板，而是各自"想"出对路的策略——这正是泛化能力的证据。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">边界</span>中位 0.56，且只跑在 27 张卡上</h2>
+    <p class="body">作者坦承：38% 之外，中位 SOL 仅 <b>0.56</b>，仍有巨大优化空间；而且数百道题、众多智能体却只共享 <b class="k">27 张 GPU</b>，严重限制了系统的探索深度。他们认为<b>给更多算力，多智能体方案还能大幅提升</b>，去挖更深、更新颖的解。</p>
+    <p class="body">更大的论点是：最有野心的软件任务都是开放式、没有明确解的；单智能体在这里吃力，因为模型最擅长训练里见过的窄任务。这次实验被视为又一次佐证——<b>多智能体架构会很快成为构建软件的默认方式</b>，因为它能啃下落在训练分布之外的新问题。</p>
+    <p class="take">结论：38% 是"算力受限下的下限"而非上限；真正值得关注的是趋势——系统在最难的 GEMM 上已能局部超越专家。</p>
+  </section>
+
+  <div class="insights">
+    <h2>最值得带走的洞见</h2>
+    <ol>
+      <li><b>它在量、而不只是在说。</b>235 道真实题、27 张 B200、防作弊的 SOL 评测，把"多智能体很强"变成了可复核的数字：63% 跑赢、38% 几何提速、19% 翻倍。</li>
+      <li><b>价值在长尾，不在峰值。</b>真正难得的是系统覆盖了一大批"人工优化不划算"的 kernel——这正是过去被留在桌上的性能。</li>
+      <li><b>泛化的证据是策略多样性。</b>对量化、注意力、矩阵乘各自长出不同打法，且能自学 CuTe DSL 这种几乎没进过训练数据的 API，说明它不是在背答案。</li>
+      <li><b>端到端收益才算数。</b>注意力 kernel 提速 84% 听着夸张，但替换进 SGLang 后 TTFT 只快 3%——文章诚实地把"算子级"和"系统级"分开，这种克制值得借鉴。</li>
+      <li><b>瓶颈是算力，不是方法。</b>中位 SOL 0.56、仅 27 张卡，意味着这是"受限下的成绩"；它给出的不是终点，而是"多智能体即将在最硬的问题上超越专家"的方向标。</li>
+    </ol>
+  </div>
+
+  <p class="note">注：文中数据均来自 Cursor 官方博客（与 NVIDIA 合作）。SOL 分数为对数曲线，0.5 对应优化后 PyTorch 基线、1.0 对应理论硬件极限；加速比均以"单智能体优化的 PyTorch 代码"为基线。</p>
+
+</div>
+</body>
+</html>

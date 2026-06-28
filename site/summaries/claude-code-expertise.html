@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>智能体编程与专业度的持久回报</title>
+<style>
+  :root{
+    --ink:#1a1d21; --muted:#5b6470; --line:#e6e8ec;
+    --accent:#c8472b; --accent-soft:#fbeae5;
+    --blue:#1f6f8b; --blue-soft:#e8f1f4;
+    --paper:#fbfaf8; --card:#ffffff;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.75; font-size:17px;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding:48px 22px 96px}
+  header{border-bottom:3px solid var(--accent); padding-bottom:22px; margin-bottom:32px}
+  .kicker{font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); font-weight:700; margin-bottom:10px}
+  h1{font-size:30px; line-height:1.25; margin:0 0 14px; font-weight:800}
+  .meta{font-size:14px; color:var(--muted)}
+  .meta a{color:var(--blue); text-decoration:none}
+  .tldr{
+    background:var(--accent-soft); border-radius:14px; padding:20px 22px; margin:28px 0 8px;
+    font-size:18px; font-weight:600; border-left:5px solid var(--accent);
+  }
+  .tldr span{color:var(--accent); font-weight:800}
+  h2{
+    font-size:21px; margin:46px 0 6px; font-weight:800; line-height:1.35;
+  }
+  h2 .lead{display:block; font-size:14px; font-weight:700; color:var(--accent); letter-spacing:.04em; margin-bottom:4px}
+  p{margin:12px 0}
+  .insight{
+    margin:10px 0 0; padding-left:14px; border-left:3px solid var(--blue);
+    color:#33414d; font-size:15.5px;
+  }
+  .insight b{color:var(--blue)}
+  .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin:22px 0}
+  .stat{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px}
+  .stat .num{font-size:26px; font-weight:800; color:var(--accent); line-height:1.1}
+  .stat .lbl{font-size:13.5px; color:var(--muted); margin-top:6px}
+  .split{display:flex; border-radius:12px; overflow:hidden; margin:20px 0 6px; height:42px; font-size:14px; font-weight:700}
+  .split .h{display:flex; align-items:center; justify-content:center; color:#fff; background:var(--blue)}
+  .split .c{display:flex; align-items:center; justify-content:center; color:#fff; background:var(--accent)}
+  .splitlbl{display:flex; justify-content:space-between; font-size:13px; color:var(--muted); margin-bottom:18px}
+  .bar{margin:18px 0}
+  .bar .row{display:flex; align-items:center; gap:10px; margin:8px 0; font-size:14px}
+  .bar .name{width:140px; flex:none; color:#33414d}
+  .bar .track{flex:1; background:#eef0f3; border-radius:6px; height:18px; position:relative; overflow:hidden}
+  .bar .fill{height:100%; border-radius:6px; background:var(--accent)}
+  .bar .fill.blue{background:var(--blue); opacity:.55}
+  .bar .val{width:46px; flex:none; text-align:right; font-variant-numeric:tabular-nums; color:#33414d}
+  .legend{font-size:12.5px; color:var(--muted); margin-top:4px}
+  .legend i{display:inline-block; width:11px; height:11px; border-radius:3px; vertical-align:middle; margin:0 4px 0 12px}
+  .takeaways{background:#1a1d21; color:#f3f4f6; border-radius:16px; padding:26px 26px 22px; margin:48px 0 0}
+  .takeaways h2{color:#fff; margin-top:0}
+  .takeaways h2 .lead{color:#ff9b7a}
+  .takeaways ol{margin:14px 0 0; padding-left:20px}
+  .takeaways li{margin:12px 0; font-size:16px}
+  .takeaways li b{color:#ffd9cc}
+  .note{font-size:13px; color:var(--muted); margin-top:34px; border-top:1px solid var(--line); padding-top:14px}
+</style>
+</head>
+<body>
+<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/claude-code-expertise" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
+<div class="wrap">
+
+<header>
+  <div class="kicker">Anthropic · 经济研究</div>
+  <h1>智能体编程与专业度的持久回报</h1>
+  <div class="meta">2026 年 6 月 16 日 · <a href="https://www.anthropic.com/research/claude-code-expertise">anthropic.com</a></div>
+</header>
+
+<div class="tldr">
+  <span>一句话总括：</span>对约 40 万次 Claude Code 会话的分析显示，决定智能体编程成败的是使用者对<b>问题本身</b>的理解，而不是会不会写代码——编程背景正在"贬值"，领域专业度正在"升值"，而且只要达到"够用"水平就能拿走大部分收益。
+</div>
+
+<h2><span class="lead">这篇研究在做什么</span>把"智能体怎么被真实使用"变成可测量的框架</h2>
+<p>这不是能力评测，而是一份使用观测报告：通过隐私保护工具分析 2025 年 10 月至 2026 年 4 月、约 235,000 人产生的约 400,000 次交互会话（仅含 CLI、Claude.ai 和桌面端，排除第三方 IDE 与 headless 模式；所有分类器用 Claude Sonnet 4.6）。它要回答三件事：在做什么样的工作、谁在做、做成了没有。背景是智能体编程正在爆发——带编程智能体活动的 GitHub 项目自 2025 年底以来翻了一倍多，Claude Code 用户平均每周让工具运行 20 小时。</p>
+<p class="insight"><b>洞见：</b>作者把编程会话当成"知识工作未来的预演"——智能体一旦嵌入非编程工作，这里观察到的分工与回报规律很可能会重演。</p>
+
+<h2><span class="lead">核心分工</span>人决定"做什么"，智能体决定"怎么做"</h2>
+<p>研究用决策归因分类器把每次会话的决策拆成"规划"（做什么、用哪种方案、怎样算完成）和"执行"（改哪些文件、写什么代码、跑什么命令），再分别归给人或 Claude。结果非常一致：人平均做出约 <b>70% 的规划决策</b>，却只做约 <b>20% 的执行决策</b>。</p>
+<div class="split">
+  <div class="h" style="width:70%">人 · 规划 70%</div>
+  <div class="c" style="width:30%">Claude 30%</div>
+</div>
+<div class="splitlbl"><span>规划决策（做什么）</span></div>
+<div class="split">
+  <div class="h" style="width:20%">人 20%</div>
+  <div class="c" style="width:80%">Claude · 执行 80%</div>
+</div>
+<div class="splitlbl"><span>执行决策（怎么做）</span></div>
+<p>典型会话约 4 个来回，用户每发一条指令平均触发 Claude 约 10 个动作（少数会话超过 100），每个来回 Claude 平均产出约 2,400 词。谁掌握规划权，谁就决定智能体一次跑多远：当用户牢牢攥住执行权（占 80% 以上），Claude 每回合只做约 8 个动作；当 Claude 主导规划，它做的动作最多，约 16 个。</p>
+<p class="insight"><b>洞见：</b>"自主性"不是一个开关，而是一种由人主动让渡的连续量——你交出多少规划权，智能体就替你跑多远。</p>
+
+<h2><span class="lead">专业度的杠杆</span>同一条指令，专家撬动的产出是新手的五倍</h2>
+<p>分类器从转录中按五级（新手→专家）评估使用者在该任务上的专业度，看三个信号：指令有多精确、要求验证什么、是用户纠正 Claude 还是 Claude 纠正用户。关键在于它是<b>任务特定</b>的——资深工程师第一次问 Rust 就是新手；一个从没用过 Python、却能准确说出对账规则并抓出月末边界错误的会计，在那项任务上就是专家。</p>
+<div class="bar">
+  <div class="row"><span class="name">新手 · 动作数</span><span class="track"><span class="fill blue" style="width:42%"></span></span><span class="val">~5</span></div>
+  <div class="row"><span class="name">专家 · 动作数</span><span class="track"><span class="fill blue" style="width:100%"></span></span><span class="val">~12</span></div>
+  <div class="row"><span class="name">新手 · 产出词数</span><span class="track"><span class="fill" style="width:19%"></span></span><span class="val">~600</span></div>
+  <div class="row"><span class="name">专家 · 产出词数</span><span class="track"><span class="fill" style="width:100%"></span></span><span class="val">3,200</span></div>
+  <div class="legend"><i style="background:#1f6f8b;opacity:.55"></i>每条指令触发的动作数<i style="background:#c8472b"></i>每条指令产出的词数</div>
+</div>
+<p class="insight"><b>洞见：</b>专业度不是让你少用工具，而是让你"用得更重"——这个差距在每一类工作、每一档任务价值里都成立。</p>
+
+<h2><span class="lead">工作构成在迁移</span>七个月里，"修 bug"几乎腰斩，"用代码做事"在崛起</h2>
+<p>把会话归入九种工作模式后可以看到结构性变化：调试（修复破损代码）的占比从 <b>33% 降到 19%</b>，几乎砍半；取而代之的是围绕代码的工作——运维软件（部署、配置、跑流水线、监控）从 14% 升到 21%，写作与数据分析则从约 10% 翻倍到 20%。整体上约 56% 的会话仍是写、修、测/编排代码，但天平正快速向端到端的智能体用法倾斜。</p>
+<div class="bar">
+  <div class="row"><span class="name">修复代码</span><span class="track"><span class="fill blue" style="width:79%"></span><span class="fill" style="width:45%;position:absolute;top:0;left:0;opacity:1"></span></span><span class="val">33→19</span></div>
+  <div class="row"><span class="name">运维软件</span><span class="track"><span class="fill blue" style="width:33%"></span><span class="fill" style="width:50%;position:absolute;top:0;left:0"></span></span><span class="val">14→21</span></div>
+  <div class="row"><span class="name">写作 / 数据分析</span><span class="track"><span class="fill blue" style="width:24%"></span><span class="fill" style="width:48%;position:absolute;top:0;left:0"></span></span><span class="val">10→20</span></div>
+  <div class="legend"><i style="background:#1f6f8b;opacity:.55"></i>2025 年 10 月占比<i style="background:#c8472b"></i>2026 年 4 月占比（%）</div>
+</div>
+<p class="insight"><b>洞见：</b>调试占比下降，往往意味着模型把"出错—返工"的循环吞掉了，人因此被释放去做更靠前、更端到端的工作。</p>
+
+<h2><span class="lead">任务在变值钱</span>对标自由职业市场，平均会话价值七个月涨约四分之一</h2>
+<p>研究用一个对照真实自由职业岗位的估价器近似每次会话的经济价值。按此衡量，平均会话价值在七个月里上涨约 <b>27%</b>，且几乎在每类工作上都成立：建造 +43%、运维 +34%、修复 +32%。作者强调这些价格很粗糙，只宜用于横向、纵向比较，不应当作可逐字解读的美元金额。</p>
+<div class="stats">
+  <div class="stat"><div class="num">+43%</div><div class="lbl">建造类任务估值增幅</div></div>
+  <div class="stat"><div class="num">+34%</div><div class="lbl">运维类任务估值增幅</div></div>
+  <div class="stat"><div class="num">+32%</div><div class="lbl">修复类任务估值增幅</div></div>
+</div>
+<p class="insight"><b>洞见：</b>智能体不只是替人做更多事，而是在帮人做更<b>值钱</b>的事——价值上移本身就是能力上移的经济学投影。</p>
+
+<h2><span class="lead">核心发现</span>成功率随专业度上升，但收益主要在"新手→中级"这一跳</h2>
+<p>研究用两套互补的转录指标衡量成功：判定成功（分类器读完全程判断是否达成目标）与已验证成功（最严格，必须同时被判定成功并有至少一个硬信号，如提交、PR、测试通过或用户明确确认）。在同类工作、同等估值、同月、同主题、同职业大类的控制下比较，结论稳定：专业度越高越易成功，但斜率在中级之后明显放缓。</p>
+<div class="bar">
+  <div class="row"><span class="name">新手 · 已验证成功</span><span class="track"><span class="fill" style="width:45%"></span></span><span class="val">15%</span></div>
+  <div class="row"><span class="name">中级以上 · 已验证</span><span class="track"><span class="fill" style="width:90%"></span></span><span class="val">28–33%</span></div>
+  <div class="row"><span class="name">新手 · 至少部分成功</span><span class="track"><span class="fill blue" style="width:84%"></span></span><span class="val">77%</span></div>
+  <div class="row"><span class="name">中级以上 · 部分成功</span><span class="track"><span class="fill blue" style="width:100%"></span></span><span class="val">91–92%</span></div>
+  <div class="legend"><i style="background:#c8472b"></i>已验证成功（最严格）<i style="background:#1f6f8b;opacity:.55"></i>至少部分成功（宽松）</div>
+</div>
+<p class="insight"><b>洞见：</b>这意味着"够用"就能拿走大部分好处——你不需要成为领域大师，只要对问题有扎实的把握，就能几乎用满这把工具。</p>
+
+<h2><span class="lead">遇到麻烦时</span>专家更会"脱困"，新手更容易直接放弃</h2>
+<p>当会话出现硬性失败信号（报错、测试失败、反复重试、用户表达不满）时，差距更明显：在这些"遇到麻烦"的会话里，已验证成功率从新手的 <b>4%</b> 升到专家的 <b>15%</b>，至少部分成功率从 60% 升到 80–81%。更刺眼的是放弃率——被判失败且一行代码都没写的"被放弃"会话，在新手中占 <b>19%</b>，而其他人只有 5–7%。</p>
+<p class="insight"><b>洞见：</b>专业度的一大价值正是"纠偏能力"：把跑偏的智能体拉回正轨。新手不是更常出错，而是卡住时更容易放手不干。</p>
+
+<h2><span class="lead">职业 vs 专业度</span>是不是程序员，比想象中重要得多地——不重要</h2>
+<p>研究从转录推断职业（约 70% 会话可推断，映射到 23 个 BLS 大类，并明确规定"写代码"本身不算编程职业的证据）。结果：软件类职业整体已验证成功率约 <b>30%</b>，其他职业约 <b>26%</b>；在产出代码的会话里是 34% vs 29%，宽松口径下两者部分成功率几乎持平（89% vs 88%）。这约 5 个百分点的差距很小，且七个月里既没扩大也没缩小。在产出代码的会话中，数据集里最大的十个职业全部落在软件工程师 7 个百分点以内——管理类的已验证成功率甚至略高于软件工程师。</p>
+<p class="insight"><b>洞见：</b>编程背景正在变得与"成功编程"无关；管理类的微弱领先，可能恰恰说明"会指挥"这件事比"会实现"更能迁移到智能体协作上。</p>
+
+<div class="takeaways">
+  <h2><span class="lead">Takeaways</span>最值得带走的 5 条洞见</h2>
+  <ol>
+    <li><b>专业度，而非编程能力，才是杠杆。</b>专家会话已验证成功率是新手的两倍多；决定成败的是你多懂这个问题，不是你会不会写代码。</li>
+    <li><b>"够用"就能拿走大部分收益。</b>成功率的提升集中在"新手→中级"，中级到专家只多一点点——一个领域的working grasp 就近乎用满工具。</li>
+    <li><b>清晰分工：人定方向，智能体干活。</b>人做约 70% 的规划决策、仅约 20% 的执行决策；越愿意让渡规划权，智能体一次跑得越远。</li>
+    <li><b>用法在端到端化、在变值钱。</b>调试占比从 33% 砍到 19%，运维与写作/分析占比翻倍，平均任务估值七个月涨约 27%。</li>
+    <li><b>职业背景几乎不重要。</b>软件类与其他职业的成功率差距仅约 5 个百分点且七个月未变——软件生产正在变成各行各业的普通工作。</li>
+  </ol>
+</div>
+
+<p class="note">作者强调这些结论是初步的：研究无法观测真实世界结果（代码是否真被使用、是否产生经济价值），也排除了占比可观的非交互式用法；所有分类都依赖模型对转录的阅读，难以大规模验证。其真正的前瞻价值在于一句假设——如果未来"专业度的回报"开始下降，就意味着模型开始供给用户如今带来的判断力，AI 的收益正从领域专家向更广人群扩散。</p>
+
+</div>
+</body>
+</html>

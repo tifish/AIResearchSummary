@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude Mythos Preview 的网络安全能力评估 · 总结</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#181b22; --card2:#1f232c; --ink:#e8eaed; --sub:#a9b0bb;
+    --line:#2c313c; --accent:#d97757; --accent2:#6ea8fe; --good:#5fd38d; --warn:#f0c674; --bad:#ff7a7a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.78;font-size:16px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:40px 22px 72px}
+  .tag{display:inline-block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:3px 12px;margin-bottom:16px}
+  .meta{color:var(--sub);font-size:13px;margin-bottom:26px}
+  .meta a{color:var(--accent2);text-decoration:none}
+  h1{font-size:30px;line-height:1.3;margin:0 0 22px;font-weight:700}
+  .lede{font-size:18.5px;line-height:1.7;background:linear-gradient(135deg,#22262f,#181b22);
+    border-left:4px solid var(--accent);border-radius:10px;padding:20px 22px;margin:0 0 38px;color:#f3f4f6}
+  .lede b{color:var(--accent)}
+  h2{font-size:21px;margin:44px 0 6px;line-height:1.4;font-weight:700}
+  h2 .num{color:var(--accent);font-size:15px;font-weight:600;margin-right:8px}
+  .insight{color:var(--good);font-weight:600;margin-top:12px;
+    border-top:1px dashed var(--line);padding-top:10px;display:block}
+  .insight::before{content:"结论 → ";color:var(--sub);font-weight:600}
+  p{margin:12px 0}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:20px 0}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .stat .big{font-size:25px;font-weight:800;color:var(--accent2);line-height:1.1}
+  .stat .lbl{font-size:12.5px;color:var(--sub);margin-top:6px;line-height:1.45}
+  table{width:100%;border-collapse:collapse;margin:18px 0;font-size:14.5px;
+    background:var(--card);border-radius:10px;overflow:hidden}
+  th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--card2);color:var(--sub);font-weight:600;font-size:13px}
+  td b{color:var(--accent2)}
+  td .hot{color:var(--bad);font-weight:700}
+  tr:last-child td{border-bottom:none}
+  .case{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0}
+  .case .h{font-weight:700;color:var(--accent);margin-bottom:4px;font-size:16px}
+  .case .age{display:inline-block;background:#2a2230;color:var(--warn);border-radius:6px;
+    padding:1px 8px;font-size:12.5px;font-weight:600;margin-left:8px;vertical-align:middle}
+  .case .body{color:#d6dbe6;font-size:15px}
+  code{background:#0b0d12;border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:13.5px}
+  .pill{display:inline-block;background:#21282f;color:var(--good);border-radius:6px;padding:1px 8px;font-size:13px;font-weight:600}
+  .takeaways{margin-top:48px;background:linear-gradient(135deg,#15211b,#181b22);border:1px solid #244235;
+    border-radius:14px;padding:24px 26px}
+  .takeaways h2{margin-top:0;color:var(--good)}
+  .takeaways ol{margin:14px 0 0;padding-left:22px}
+  .takeaways li{margin:14px 0;padding-left:6px}
+  .takeaways li b{color:var(--accent)}
+  .foot{color:var(--sub);font-size:12.5px;margin-top:36px;border-top:1px solid var(--line);padding-top:16px}
+  em{color:var(--warn);font-style:normal}
+</style>
+</head>
+<body>
+<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/mythos-preview" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
+<div class="wrap">
+
+  <span class="tag">Frontier Red Team · Anthropic</span>
+  <div class="meta">来源：Anthropic · 2026 年 4 月 7 日 · <a href="https://www.anthropic.com/research/mythos-preview">原文链接</a></div>
+
+  <h1>Claude Mythos Preview：模型第一次能"自己"挖洞并写出可用 exploit</h1>
+
+  <p class="lede">这篇评估的真正贡献，不是又测了一遍模型会不会找 bug，而是用大量真实零日漏洞证明了一个质变：<b>一句"请在这个程序里找一个安全漏洞"的提示之后，模型能几乎全程无人工干预地在每一个主流操作系统和浏览器里发现并利用零日漏洞</b>。把"发现漏洞"和"写出可用 exploit"——历史上只有顶尖专家才做得到的两件事——变成了可大规模并行、单次成本几十到几千美元的流水线。这些能力<b>不是专门训练出来的</b>，而是代码、推理、自主性整体提升的副产物；Anthropic 称之为安全的"分水岭"，并据此启动 Project Glasswing，抢在同等能力模型普及前先加固关键系统。</p>
+
+  <h2><span class="num">01</span>不是渐进，是换了一个量级</h2>
+  <p>一个月前 Anthropic 还写道"Opus 4.6 找漏洞远强于利用漏洞"，其自主写 exploit 的成功率接近 0。Mythos Preview 把同一组基准直接打穿。两个可对比的硬数字最能说明落差：</p>
+  <table>
+    <tr><th>Firefox 147 JS 引擎漏洞（已在 148 修复）</th><th>写出可用 exploit</th><th>取得寄存器控制</th></tr>
+    <tr><td>Opus 4.6</td><td>2 次（数百次尝试）</td><td>—</td></tr>
+    <tr><td>Mythos Preview</td><td><span class="hot">181 次</span></td><td>+29 次</td></tr>
+  </table>
+  <table>
+    <tr><th>OSS-Fuzz 内部基准（约 7000 个入口，五级严重度）</th><th>tier 1–2</th><th>tier 3–4</th><th>tier 5：完整控制流劫持</th></tr>
+    <tr><td>Sonnet 4.6 / Opus 4.6</td><td>tier1 各 150–175，tier2 约 100；tier3 仅 <b>1</b></td><td>—</td><td>0</td></tr>
+    <tr><td>Mythos Preview</td><td><span class="hot">595</span></td><td>少数若干</td><td><span class="hot">10 个</span>（均已完全打补丁的目标）</td></tr>
+  </table>
+  <p>这种攻击力对非专家同样开放：Anthropic 内部没有受过安全训练的工程师，让模型"过夜"找远程代码执行漏洞，第二天早上就拿到了完整可用的 exploit。</p>
+  <span class="insight">能力跃迁是阶跃式的，而且来自通用能力提升的"溢出"——同样让模型更会补洞的进步，也让它更会破洞。</span>
+
+  <h2><span class="num">02</span>零日发现：连 27 年的老洞都能翻出来</h2>
+  <p>为避免"模型只是背下了已知答案"，团队专门转向<b>零日</b>（此前无人知晓的漏洞）——能找到，就一定是真本事。三个可披露的案例（绝大多数漏洞因尚未修复而无法公开）：</p>
+
+  <div class="case">
+    <div class="h">OpenBSD 的 SACK 缺陷<span class="age">27 岁</span></div>
+    <div class="body">以安全著称的 OpenBSD，被发现一处可远程让任何 OpenBSD 主机崩溃的漏洞：两个 bug 叠加——SACK 起点未校验下界，加上 TCP 32 位序列号的有符号整数溢出，使一个"本不可能同时成立"的条件成真，最终内核写入空指针而崩溃。<b>上千次运行总成本不到 2 万美元</b>，另带出数十个发现；命中那一次的单次运行成本不到 50 美元——但这只有事后才知道。</div>
+  </div>
+  <div class="case">
+    <div class="h">FFmpeg H.264 解码器越界写<span class="age">16 岁</span></div>
+    <div class="body">全球被 fuzzing 测得最多的项目之一。<code>memset(...,-1,...)</code> 把哨兵值设成 65535，攻击者构造含 65536 个 slice 的单帧让编号撞上哨兵，越界写堆。根因可追到 2003 年引入 H.264 的提交、2010 年重构时变成漏洞——此后每个 fuzzer 和人都漏过了它。数百次运行约 1 万美元，3 个已在 FFmpeg 8.1 修复。</div>
+  </div>
+  <div class="case">
+    <div class="h">内存安全 VMM 的 guest→host 越界写</div>
+    <div class="body">在一个用"内存安全语言"写的生产级虚拟机监视器里找到内存破坏漏洞——证明<b>内存安全语言也不总是内存安全的</b>（Rust 的 <code>unsafe</code>、Java 的 JNI、Python 的 <code>ctypes</code> 都能直接碰裸指针，而 VMM 与硬件打交道时绕不开）。</div>
+  </div>
+  <p>更关键的是规模与质量校验：因为有 AddressSanitizer 这种"完美崩溃判定器"，至今<b>未遇到误报</b>；人工复核 198 份报告时，专家 <b style="color:var(--accent2)">89% 完全认同</b>模型给出的严重度、<b style="color:var(--accent2)">98% 误差在一级以内</b>。按此外推，还有上千个critical、数千个high 级漏洞待披露。</p>
+  <span class="insight">规模化让模型能扫"每一个重要文件"，包括那些人类会想当然地认为"肯定早被人查过"的地方——而老洞恰恰藏在那里。</span>
+
+  <h2><span class="num">03</span>从漏洞到 exploit：会把多个洞链起来</h2>
+  <p>漏洞只是"潜在弱点"，能写出 exploit 才是真正的威胁。专家说要几周的活，Mythos Preview 几小时就给出。</p>
+  <div class="case">
+    <div class="h">FreeBSD NFS 远程 root（CVE-2026-4747）<span class="age">17 岁</span></div>
+    <div class="body">完全自主完成发现与利用：未认证用户即可拿到完整 root。栈缓冲区因声明为 <code>int32_t[32]</code> 而<b>没有栈金丝雀</b>、内核又不随机化加载地址，所有本应拦住攻击的缓解措施恰好都不生效；模型还用一次未认证的 <code>EXCHANGE_ID</code> 泄露主机 UUID 绕过握手，并把超 1000 字节的 ROP 链<b>拆成 6 个连续 RPC 请求</b>送达。一个对照：独立安全公司此前用 Opus 4.6 也利用了它，但需要人工引导；Mythos 不需要。</div>
+  </div>
+  <p>在 Linux 内核上，单个漏洞往往只给"读"或"写"其一，不足以提权；但模型展示了独立地<b>把 2、3 乃至 4 个漏洞链起来</b>（如先用读漏洞绕过 KASLR、再用写漏洞改提权结构）的能力，近十例成功本地提权。在浏览器里，它自主发现读写原语并拼成 <em>JIT 堆喷射</em>，把 PoC 升级成跨域读取、甚至串联沙箱逃逸+本地提权，做到"访问一个网页即可写内核"。</p>
+  <span class="insight">写 exploit 本质是把成熟原语（ROP、堆喷射）机械地链起来——这正是模型擅长的；靠"增加麻烦"而非"硬屏障"取胜的防御（如纯粹拖时间的纵深防御）会明显变弱，而 KASLR、W^X 这类硬屏障仍然关键。</span>
+
+  <h2><span class="num">04</span>N-day 才是更现实的危险</h2>
+  <p>真实世界的大量危害来自 N-day：已公开且打过补丁、但很多系统还没更新的漏洞——补丁本身就是指向 bug 的"路线图"。团队给模型 100 个 2024–2025 年的 Linux 内核 CVE，它筛出 40 个、<b>半数以上成功</b>写出提权 exploit。两个被详细记录的链子复杂到要用页表毒化、跨 cache 回收、绕过 <code>HARDENED_USERCOPY</code> 等技巧，但成本惊人地低：</p>
+  <div class="stats">
+    <div class="stat"><div class="big">&lt; $1000</div><div class="lbl">ipset 一比特越界写 → root，半天完成（从 syzkaller 报告起）</div></div>
+    <div class="stat"><div class="big">&lt; $2000</div><div class="lbl">链两个 UAF（CVE-2024-47711）一字节读 → root，一天内完成</div></div>
+  </div>
+  <p>含义很直接：把公开的 CVE+补丁变成可用 exploit，过去要熟练研究者几天到几周，现在更快、更便宜、且无需人工。</p>
+  <span class="insight">最危险的不是新洞，而是"已知洞 + 未及时打补丁"的窗口被自动化大幅压缩——防御方的时间余量正在消失。</span>
+
+  <h2><span class="num">05</span>防御方今天就该做的事</h2>
+  <p>Anthropic 不会公开发布 Mythos Preview，但强调没有它的人也能立刻行动：</p>
+  <p>· <b>现在就用现有前沿模型强化防御</b>：Opus 4.6 找漏洞依然极强（虽不擅长写 exploit），到处都能挖出高危/critical 漏洞；早建脚手架、早练手是为未来做准备。<br>
+  · <b>缩短打补丁周期</b>：收紧补丁强制窗口、尽量开自动更新、把带 CVE 修复的依赖升级当紧急事项。<br>
+  · <b>超越"找漏洞"</b>：让模型做报告三级分诊、去重、写复现步骤、出补丁草案、审 PR、加速向更安全系统迁移。<br>
+  · <b>自动化事件响应</b>：披露变多→攻击尝试变多，靠加人扛不住，让模型承担告警分诊、事件汇总、优先级排序与主动狩猎。</p>
+  <p>历史类比：SHA-3 竞赛在 2006 年就启动（SHA-2 至今未破）、NIST 2016 年就上后量子密码（量子机还要十年以上）。<b>这一次威胁不是假设，先进语言模型已经到场。</b></p>
+  <span class="insight">长期看防御方会胜出、软件会更安全（很大程度上靠模型写的代码加固）；但过渡期会很动荡，所以必须现在就行动。</span>
+
+  <div class="takeaways">
+    <h2>最值得带走的洞见</h2>
+    <ol>
+      <li><b>这是一次阶跃，不是渐进。</b>同一基准上 Opus 4.6 写出 2 个 exploit、Mythos 写出 181 个；OSS-Fuzz 上前者 tier3 仅 1 次崩溃、后者在 10 个已修复目标上做到完整控制流劫持。差距是量级的。</li>
+      <li><b>能力是"溢出"出来的，没专门训练。</b>让模型更会补洞的通用进步，同时让它更会破洞——这意味着只要模型继续变强，攻防能力都会一起涨，没有理由指望它在此处停步。</li>
+      <li><b>规模 + 零误报 = 可信。</b>有 ASan 当完美判定器，至今无误报；人工复核 198 份报告 89% 严重度完全一致、98% 误差一级以内。这不是"看起来吓人"，而是可验证的结论。</li>
+      <li><b>成本低到改变威胁模型。</b>OpenBSD 上千次运行不到 2 万美元、单个 N-day 利用链千美元级——攻防的经济门槛被打掉，"先扫每一个文件"成了可行策略。</li>
+      <li><b>N-day 窗口是当下最现实的风险。</b>补丁即路线图，把 CVE 变 exploit 从"几天到几周"压成"几小时、无需人工"——防御方唯一的对策是把打补丁、披露、响应流程整体提速。</li>
+    </ol>
+  </div>
+
+  <p class="foot">注：本文为 Anthropic 前沿红队《Assessing Claude Mythos Preview's cybersecurity capabilities》（2026-04-07）的中文总结。181/29、595/10、89%/98%/198、27 年 OpenBSD、16 年 FFmpeg、17 年 FreeBSD（CVE-2026-4747）、&lt;2 万/&lt;1 千/&lt;2 千美元、100→40 CVE 半数以上成功等均为原文数据；Project Glasswing 与"不公开发布该模型"亦为原文表述。</p>
+
+</div>
+</body>
+</html>
+</html>

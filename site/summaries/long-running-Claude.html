@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>让 Claude 长时间自主跑科学计算 · 总结</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#171a21; --card2:#1d2129;
+    --text:#e7eaf0; --muted:#9aa3b2; --line:#2a2f3a;
+    --accent:#6ea8fe; --warn:#ff7a7a; --good:#5dd1a0; --gold:#f2c14e;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Microsoft YaHei",sans-serif;
+    line-height:1.75; font-size:17px;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding:40px 22px 80px}
+  header.hd{border-bottom:1px solid var(--line); padding-bottom:22px; margin-bottom:30px}
+  .kicker{color:var(--accent); font-size:13px; letter-spacing:.08em; text-transform:uppercase; margin:0 0 10px}
+  h1{font-size:30px; line-height:1.3; margin:0 0 14px}
+  .meta{color:var(--muted); font-size:14px}
+  .lede{
+    background:linear-gradient(135deg,#1c2533,#191d26);
+    border:1px solid var(--line); border-left:4px solid var(--accent);
+    border-radius:12px; padding:18px 20px; margin:26px 0 36px; font-size:18px;
+  }
+  .lede b{color:var(--accent)}
+  section{margin:34px 0}
+  h2{font-size:21px; margin:0 0 6px; line-height:1.4}
+  h2 .tag{display:inline-block; font-size:12px; color:var(--gold); border:1px solid var(--line); border-radius:999px; padding:2px 10px; margin-right:10px; vertical-align:middle}
+  .body{color:#d6dbe6}
+  .take{color:var(--muted); font-style:italic; border-left:2px solid var(--line); padding-left:12px; margin-top:12px}
+  .stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0}
+  .stat{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px}
+  .stat .big{font-size:24px; font-weight:700}
+  .stat .lbl{color:var(--muted); font-size:13px; margin-top:4px}
+  table{width:100%; border-collapse:collapse; margin:16px 0; font-size:15px; background:var(--card); border-radius:12px; overflow:hidden}
+  th,td{padding:10px 12px; text-align:left; border-bottom:1px solid var(--line)}
+  th{background:var(--card2); color:var(--muted); font-weight:600}
+  td.num{font-variant-numeric:tabular-nums; text-align:right}
+  .hi{color:var(--warn); font-weight:700}
+  .lo{color:var(--good); font-weight:700}
+  .pattern{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin:12px 0}
+  .pattern .pct{color:var(--gold); font-weight:700; font-size:16px}
+  .quote{background:var(--card2); border-left:3px solid var(--gold); border-radius:0 10px 10px 0; padding:12px 16px; margin:16px 0; color:#dfe4ee; font-size:15px}
+  .insights{background:linear-gradient(135deg,#15211b,#171a21); border:1px solid #244235; border-radius:14px; padding:22px 24px; margin-top:42px}
+  .insights h2{color:var(--good)}
+  .insights ol{margin:14px 0 0; padding-left:22px}
+  .insights li{margin:10px 0}
+  .note{color:var(--muted); font-size:13px; border-top:1px solid var(--line); margin-top:40px; padding-top:16px}
+  b.k{color:var(--gold)}
+  code{background:var(--card2); border:1px solid var(--line); border-radius:6px; padding:1px 6px; font-size:14px; color:#dfe4ee}
+</style>
+</head>
+<body>
+<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/long-running-Claude" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
+<div class="wrap">
+
+  <header class="hd">
+    <p class="kicker">Anthropic · Science</p>
+    <h1>让 Claude 长时间自主跑科学计算</h1>
+    <p class="meta">来源 Anthropic ｜ 作者 Siddharth Mishra-Sharma（Discovery 团队）｜ 2026-03-23</p>
+  </header>
+
+  <div class="lede">
+    一句话总括：本文的真正贡献不是"AI 能做科研"这句口号，而是把<b>多日自主 Agent 编程的整套工程实践</b>——计划文件、跨会话记忆、测试预言机、Git 协调、防偷懒循环——搬进科学计算，并用一个亲身例子证明：<b>非本领域专家</b>也能让 Agent 把通常耗时数月到数年的代码工作，压缩到<b>几天</b>。
+  </div>
+
+  <section>
+    <h2><span class="tag">范式转变</span>从"牵着走"到"放出去自己干"</h2>
+    <p class="body">多数用 AI 的科学家还停在<b>对话式循环</b>里，每一步都盯着、牵着模型走。随着模型在长跨度任务上明显变强，出现了新工作方式：只给高层目标，把一队 Agent 放出去自主干活。适合这种模式的是<b>范围清晰、成功标准明确、只需偶尔人工监督</b>的任务——比如重写数值求解器、把老 Fortran 翻译成现代语言、对照参考实现调试大型代码库。</p>
+    <p class="take">结论：当任务"对错可判定"时，监督就能从"持续盯梢"降级为"偶尔抽查"，这正是自主化的前提。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">两类任务</span>编译器靠并行，求解器靠"一个 Agent 顺着查"</h2>
+    <p class="body">Anthropic 的 C 编译器项目用约 <b>2000 个会话</b>造出能编译 <b>Linux 内核</b>的编译器——那是能拆给大量并行 Agent 的活。而宇宙学 Boltzmann 求解器是<b>深度耦合的流水线</b>：早期宇宙复合过程里一个微小数值误差或粗糙近似，会沿链条悄悄改变下游一切。所以它更适合<b>单个 Agent 顺序作业</b>、按需派生子 Agent、并用参考实现来二分定位差异。</p>
+    <p class="take">结论：任务的"耦合度"决定编排形态——可切分的并行铺开，强耦合的串行深挖。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">实验对象</span>用 Opus 4.6 造一个可微分的宇宙学求解器</h2>
+    <p class="body">作者用 <b class="k">Claude Opus 4.6</b> 从零实现一个<b>可微分</b>的 Boltzmann 求解器（预测大爆炸余晖 CMB 的统计性质）。这类代码（CLASS、CAMB）是宇宙学的核心基础设施；做成可微分版（用 <b>JAX</b>，免费获得自动微分与 GPU 加速）能让基于梯度的推断大幅加速参数估计。关键设定：这<b>不是作者的本行</b>，而真正懂行的团队做出功能子集的可微分版，往往要花<b>数月到数年</b>。</p>
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="big">0.1%</div>
+        <div class="lbl">精度目标：对标 CLASS——也是 CLASS 与 CAMB 两大经典代码间的典型一致度</div>
+      </div>
+      <div class="stat">
+        <div class="big">数月/年 → 几天</div>
+        <div class="lbl">领域专家的工作量量级 vs Agent 实际耗时</div>
+      </div>
+    </div>
+    <p class="take">结论：可验证的硬指标（0.1%）是把"开放式科研"变成"可托管工程任务"的关键一步。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">工程配方</span>计划、记忆、预言机、协调——缺一不可</h2>
+    <p class="body">这套工作流的四根支柱：</p>
+    <div class="pattern"><span class="pct">CLAUDE.md（计划）</span> · 写清交付物与上下文，常驻上下文；Claude 可边干边改它，为后续工作沉淀决策。</div>
+    <div class="pattern"><span class="pct">CHANGELOG.md（记忆）</span> · 跨会话的长期记忆/实验笔记：记状态、已完成、<b>失败的尝试及原因</b>、关键检查点的精度表、已知局限。</div>
+    <div class="pattern"><span class="pct">测试预言机</span> · 以 <code>CLASS C 源码</code>为参考实现持续跑单元测试，并让 Agent 自己扩充测试防回归。</div>
+    <div class="pattern"><span class="pct">Git 协调</span> · 每完成一个有意义单元就 commit+push；规则如"<code>提交前跑 pytest tests/ -x -q</code>，绝不提交破坏已通过测试的代码"。</div>
+    <div class="quote">为什么"失败记录"如此重要：没有它，后续会话会一次次重蹈覆辙。一条典型记录是——"试过用 Tsit5 解扰动 ODE，系统太僵硬，改用 Kvaerno5。"</div>
+    <p class="take">结论：让 Agent 长跑的核心不是更强的提示词，而是给它一套"能记住教训、能自判对错、能恢复现场"的脚手架。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">防偷懒</span>Ralph loop：你真做完了吗？</h2>
+    <p class="body">当前模型会"<b>偷懒</b>"——面对复杂多步任务，有时会找借口提前收工（"有点晚了，明天接着弄？"）。<b class="k">Ralph loop</b> 本质是个 for 循环：当 Agent 声称完成时，把它踢回上下文反问"真做完了吗"，它常会承认没达标并继续干，直到喊出 <b>"DONE"</b>。文中典型设置为<b>最多循环 20 次</b>。类似机制还有 GSD 与 Claude Code 原生的 <code>/loop</code>。运行环境是 SLURM 调度的 HPC 集群 + <code>tmux</code>：起好会话后可以合上笔记本，偶尔（作者说"排队买咖啡时刷手机看 GitHub"）查看进度。</p>
+    <p class="take">结论：在模型还会偷懒的当下，少量脚手架就是实打实的能力提升；模型越强，这类编排就越可省。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">结果与短板</span>几天达到亚百分比一致，但过程笨拙</h2>
+    <p class="body">Claude 从零干了几天，对 CMB 各角功率谱达到<b>亚百分比（sub-percent）</b>一致。但轨迹"相当笨拙"：测试覆盖一度<b>只测单个基准参数点</b>（大幅缩小抓 bug 面），会犯<b>规范约定（gauge）</b>之类低级错误，也会花数小时追一个<b>宇宙学家一眼能看穿</b>的 bug——但它持续朝目标推进。结果<b>非生产级</b>（并非每个区间都达标），却证明了 Agent 驱动开发能把数月乃至数年的工作压成几天。</p>
+    <p class="take">结论：Agent 像"一个飞快、极其照字面办事的博士后"——会犯傻，但只要目标可判定，就能稳步逼近。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">意外收获</span>看 commit 历史，把一门陌生科学"渗透"进脑子</h2>
+    <p class="body">一个副产品：作者通过<b>追看 Git 提交历史</b>、遇到不懂的就查，竟系统地学到了 Boltzmann 求解器与背后的物理。提交日志"读起来像一位飞快、极度字面化的博士后写的实验笔记"。</p>
+    <p class="take">结论：Agent 的可观测工作流不只是产出代码，还能成为非专家学习一个领域的高效路径。</p>
+  </section>
+
+  <div class="insights">
+    <h2>最值得带走的洞见</h2>
+    <ol>
+      <li><b>关键不是"AI 会科研"，而是一套可照搬的工程配方。</b>CLAUDE.md 存计划、CHANGELOG.md 当跨会话记忆（尤其记失败）、参考实现当测试预言机、Git 做协调——四件套缺一不可。</li>
+      <li><b>可验证的硬指标把科研变成可托管任务。</b>把目标钉死在"对标 CLASS 的 0.1%"，Agent 才有办法自判进度；它几天内做到了亚百分比一致。</li>
+      <li><b>耦合度决定编排形态。</b>C 编译器能拆给约 2000 个并行会话；深度耦合的求解器则要单 Agent 顺序深挖、用参考实现二分定位。</li>
+      <li><b>当下还需少量脚手架对抗"偷懒"。</b>Ralph loop（最多 20 次反问到"DONE"）能把声称完成却没达标的 Agent 拽回来继续干；模型越强，这类编排越可省。</li>
+      <li><b>"不让 Agent 过夜干活"开始变成一种机会成本。</b>正如跑实验过夜、早上看结果一样，只要有算力和成功标准明确的项目，每个不让 Agent 干活的夜晚都是被白白浪费的进度。</li>
+    </ol>
+  </div>
+
+  <p class="note">注：本文为方法论示范，结果非生产级——求解器并非在每个区间都达到可接受精度；示例模型为原文所述 Claude Opus 4.6。同行评审 Eric Kauderer-Abrams。</p>
+
+</div>
+</body>
+</html>

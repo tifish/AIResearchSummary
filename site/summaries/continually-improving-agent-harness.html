@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cursor：我们如何持续打磨 Agent Harness</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#171a21; --card2:#1d212b; --ink:#e8ebf0; --soft:#a8b0bd;
+    --accent:#7aa2ff; --accent2:#5ee0b8; --warn:#ffcc66; --line:#272c38; --hi:#2a3550;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.75; font-size:17px;
+  }
+  .wrap{max-width:820px; margin:0 auto; padding:40px 22px 80px;}
+  header{border-bottom:1px solid var(--line); padding-bottom:24px; margin-bottom:8px;}
+  .kicker{font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); font-weight:700;}
+  h1{font-size:30px; line-height:1.25; margin:.4em 0 .3em;}
+  .meta{color:var(--soft); font-size:14px;}
+  .meta a{color:var(--soft);}
+  .tldr{
+    background:linear-gradient(135deg,#1b2440,#161b28); border:1px solid var(--hi);
+    border-radius:14px; padding:20px 22px; margin:28px 0 36px;
+  }
+  .tldr .lbl{font-size:13px; font-weight:700; color:var(--accent2); letter-spacing:.08em; text-transform:uppercase;}
+  .tldr p{margin:.5em 0 0; font-size:18.5px;}
+  section{
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:22px 24px; margin:18px 0;
+  }
+  section h2{font-size:21px; margin:.1em 0 .2em; line-height:1.35;}
+  section h2 .num{color:var(--accent); font-weight:800; margin-right:8px;}
+  .body{color:var(--ink);}
+  .insight{
+    margin-top:14px; padding:12px 16px; border-left:3px solid var(--accent2);
+    background:var(--card2); border-radius:0 10px 10px 0; color:#d7f3e8; font-size:15.5px;
+  }
+  .insight b{color:var(--accent2);}
+  .stats{display:flex; flex-wrap:wrap; gap:12px; margin:30px 0;}
+  .stat{
+    flex:1 1 150px; background:var(--card2); border:1px solid var(--line);
+    border-radius:12px; padding:16px 18px;
+  }
+  .stat .n{font-size:26px; font-weight:800; color:var(--accent);}
+  .stat .n.g{color:var(--accent2);}
+  .stat .t{font-size:13.5px; color:var(--soft); margin-top:4px;}
+  .takeaways{background:linear-gradient(135deg,#16221c,#161b28); border:1px solid #2c4438;}
+  .takeaways h2{color:var(--accent2);}
+  .takeaways ol{margin:.6em 0 0; padding-left:22px;}
+  .takeaways li{margin:.55em 0;}
+  em.k{color:var(--warn); font-style:normal; font-weight:600;}
+  code{background:#0b0d12; padding:1px 6px; border-radius:6px; font-size:14.5px; color:#cfe0ff;}
+  footer{color:var(--soft); font-size:13px; text-align:center; margin-top:34px;}
+</style>
+</head>
+<body>
+<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://cursor.com/blog/continually-improving-agent-harness" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
+<div class="wrap">
+  <header>
+    <div class="kicker">Cursor · Research</div>
+    <h1>持续打磨 Agent Harness：一家 Agent 公司到底在优化什么</h1>
+    <div class="meta">来源：Cursor ｜ 作者：Stefan Heule & Jediah Katz ｜ 2026-04-30 ｜ <a href="https://cursor.com/blog/continually-improving-agent-harness">原文</a></div>
+  </header>
+
+  <div class="tldr">
+    <div class="lbl">一句话总括</div>
+    <p>Agent 的能力 = <strong>模型 × harness（运行框架）</strong>。这篇文章把「harness 工程」拆开给你看：它不是靠灵感突变，而是<em class="k">把大量小优化反复叠加</em>，并用一整套线上线下指标来回答那个最难量化的问题——「这个 agent 到底做得好不好」。</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">~10×</div><div class="t">一次集中冲刺把「非预期工具调用错误」降低一个数量级</div></div>
+    <div class="stat"><div class="n g">2 类</div><div class="t">真实质量信号：Keep Rate + 语言模型判读用户回复</div></div>
+    <div class="stat"><div class="n">每工具 / 每模型</div><div class="t">错误基线分别计算，再做异常检测告警</div></div>
+    <div class="stat"><div class="n g">每周 1 次</div><div class="t">自动化扫日志、建 ticket，并用 Cloud Agents 批量修</div></div>
+  </div>
+
+  <section>
+    <h2><span class="num">01</span>上下文窗口：从「加护栏」到「让模型自取」</h2>
+    <div class="body">
+      上下文窗口是和大模型交互的核心：系统提示 + 工具描述 → 对话状态 → 用户请求。2024 年底刚做 coding agent 时，模型还很弱，Cursor 砌了大量<em class="k">护栏</em>——每次编辑后把 lint/类型错误喂回去、模型读文件读太少就替它改写、甚至限制一轮能调用的工具数；同时塞入大量始终在场的静态上下文（目录结构、语义匹配的代码片段、压缩后的附件文件）。如今这些<strong>大多已被拆掉</strong>：只留少量有用的静态信息（操作系统、git 状态、当前与最近浏览的文件），其余改为让 agent 在干活时<em class="k">自己动态拉取</em>。
+    </div>
+    <div class="insight"><b>洞见：</b>模型越强，harness 的活就越是「做减法」——少喂、少管，多给 agent 自取上下文与影响世界的能力。</div>
+  </section>
+
+  <section>
+    <h2><span class="num">02</span>怎么判断一次 harness 改动是变好了</h2>
+    <div class="body">
+      代理质量很难定义，Cursor 用多层测量来逼近它。离线有公开 benchmark + 自建套件 <code>CursorBench</code>，给出快速、标准化、可跨时间对比的读数；但 benchmark 终究只是近似，所以还要<em class="k">线上 A/B</em>：同时部署两套以上 harness 变体跑真实流量。延迟、token 效率、工具调用数、缓存命中率这些好测但不触及「做得好不好」，于是用两个更硬的信号——<strong>Keep Rate</strong>（agent 提出的改动在固定时间后仍留在用户代码库里的比例，留不住说明用户在返工）和<strong>用语言模型判读用户回复</strong>（用户转去做下一个功能=满意；粘贴 stack trace=失败）。有时线上测试会反过来劝退看似不错的想法：他们曾试更贵的模型做上下文摘要，结果质量提升微乎其微、不值这笔成本。
+    </div>
+    <div class="insight"><b>洞见：</b>「用户没再抱怨、改动留了下来」比任何 benchmark 分数都更接近真实质量——把人类的真实反应变成可测指标，是评测体系的关键一跳。</div>
+  </section>
+
+  <section>
+    <h2><span class="num">03</span>把工具错误当 bug：分类、基线、自动修</h2>
+    <div class="body">
+      模型和能力越加越多，harness 状态空间越大，bug 面也越大，很多只能在规模上才暴露。工具是最广的出错面，而工具错误特别伤——即便 agent 能自纠，错误仍留在上下文里浪费 token、造成<em class="k">「context rot」</em>（累积的错误拖垮后续决策质量），严重时直接让 agent 卡死或跑偏。Cursor 把错误分两类处理：任何 <strong>unknown 错误一律视为 harness 的 bug</strong>，超过固定阈值即告警；而<strong>预期错误</strong>（如模型提了个错的编辑、读了个不存在的文件）按成因分类——<code>InvalidArguments</code>、<code>UnexpectedEnvironment</code>、<code>ProviderError</code>、<code>UserAborted</code>、<code>Timeout</code> 等——并按「每工具、每模型」分别算基线再做<em class="k">异常检测告警</em>（因为不同模型搞砸工具调用的概率不同）。配合每周一次、带 skill 的 Automation 扫日志、建/更新 ticket，并用 Cloud Agents（甚至直接从 Linear 触发）批量修。
+    </div>
+    <div class="insight"><b>洞见：</b>把「修 agent」做成一座<em class="k">自动化软件工厂</em>——正是这套机制让他们在一次冲刺里把非预期工具错误压低了约 10 倍。</div>
+  </section>
+
+  <section>
+    <h2><span class="num">04</span>一套 harness，按每个模型量身定制</h2>
+    <div class="body">
+      所有 harness 抽象都是<em class="k">模型无关</em>的，但可为每个模型深度定制。最典型的是工具格式：OpenAI 的模型训练时用 patch 式编辑，Anthropic 的模型训练时用字符串替换——两者其实都能用对方的格式，但给它不熟的那种会多耗推理 token、出更多错，所以 Cursor <strong>按模型训练时的格式发工具</strong>。定制还深入到不同厂商、不同版本的提示词：OpenAI 的模型更字面、更精确地遵循指令，Claude 更凭直觉、对不精确的指令更宽容。拿到新模型早期访问权时，他们从最接近的现有 harness 出发，用离线评测 + 团队试用找出模型犯迷糊的地方再逐步调。有时还会撞上真实的<em class="k">模型怪癖</em>——比如某个模型出现「context anxiety」：上下文越满越爱拒活、说任务太大——这类问题可用提示词调整缓解。
+    </div>
+    <div class="insight"><b>洞见：</b>同一个模型放进「为它专门调过」的 harness 里，会明显更快、更聪明、更省——harness 的价值，很大一部分藏在这些按模型抠出来的细节里。</div>
+  </section>
+
+  <section>
+    <h2><span class="num">05</span>对话中途换模型，与多 Agent 的未来</h2>
+    <div class="body">
+      中途换模型很棘手：不同模型有不同行为、提示和工具形状。Cursor 会在切换时自动换上对应模型的 harness，但模型仍要面对一段<em class="k">由别的模型生成、对它而言 out-of-distribution 的对话历史</em>。对策是加自定义指令，告诉它「你是中途接手的」，并引导它别去调那些只在历史里出现、却不属于自己工具集的工具。另一个代价是缓存按厂商/模型隔离，切换=缓存未命中→首轮更慢更贵；他们试过在切换时做摘要来减小惩罚，但用户若深陷复杂任务，摘要会丢细节——所以<strong>一般建议一条对话只用一个模型</strong>。更干净的绕法是用<em class="k">子 agent</em>（从全新上下文起步），现在用户可以直接指定用某个模型跑子 agent。文章最后给出判断：软件工程的未来是<strong>多 agent</strong>——规划、快速编辑、调试各由擅长的 agent 承担，而「派谁、怎么交代、如何拼接结果」这套编排能力，恰恰住在 harness 里。
+    </div>
+    <div class="insight"><b>洞见：</b>当系统从「单 agent」走向「多 agent 协作」，harness 不再只是模型的外壳，而成了<em class="k">调度与编排的大脑</em>——harness 工程只会越来越重要。</div>
+  </section>
+
+  <section class="takeaways">
+    <h2>最值得带走的 5 条洞见</h2>
+    <ol>
+      <li><b>能力 = 模型 × harness。</b>同一模型放进专门调过的 harness，会明显更快、更聪明、更省；进步主要靠小优化的持续叠加，而非偶发的突变。</li>
+      <li><b>方向是做减法。</b>模型越强，越要拆护栏、砍静态上下文，把「自取上下文、影响世界」的权力交还给 agent。</li>
+      <li><b>把真实质量变成可测指标。</b>Keep Rate（改动留存率）+ 语言模型判读用户回复，比任何 benchmark 更接近「它到底做得好不好」。</li>
+      <li><b>把修 agent 做成软件工厂。</b>错误分类 + 每工具/每模型基线 + 异常告警 + Cloud Agents 批量修，一次冲刺把非预期工具错误压低约 10 倍。</li>
+      <li><b>未来是多 agent，编排住在 harness 里。</b>换模型、子 agent、派谁干什么——协调能力不属于任何单个 agent，而属于 harness，因此它只会更关键。</li>
+    </ol>
+  </section>
+
+  <footer>本页为基于 Cursor 原文《Continually improving our agent harness》的中文总结，数据与表述均引自原文。</footer>
+</div>
+</body>
+</html>

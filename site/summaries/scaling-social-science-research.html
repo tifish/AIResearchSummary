@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GABRIEL：用 GPT 把"说不清的定性数据"批量变成可分析的数字</title>
+<style>
+  :root{
+    --bg:#0f1115;
+    --card:#171a21;
+    --card2:#1d212b;
+    --ink:#e8eaf0;
+    --muted:#9aa3b2;
+    --line:#2a2f3a;
+    --accent:#10a37f;
+    --accent2:#6ea8fe;
+    --good:#5fbf8f;
+    --warn:#e0b15a;
+    --pill:#232838;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:linear-gradient(180deg,#0c0e12 0%,#0f1115 100%);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.75;
+    font-size:17px;
+  }
+  .wrap{max-width:820px;margin:0 auto;padding:40px 22px 72px}
+  .kicker{
+    display:inline-block;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--accent);font-weight:700;margin-bottom:14px;
+  }
+  .meta{color:var(--muted);font-size:13.5px;margin-bottom:26px}
+  .meta a{color:var(--accent2);text-decoration:none}
+  h1{font-size:30px;line-height:1.3;margin:0 0 22px;font-weight:800;letter-spacing:-.01em}
+  .lede{
+    font-size:20px;line-height:1.6;color:#fff;font-weight:600;
+    background:linear-gradient(135deg,rgba(16,163,127,.16),rgba(110,168,254,.10));
+    border:1px solid var(--line);border-left:4px solid var(--accent);
+    border-radius:14px;padding:20px 22px;margin:0 0 34px;
+  }
+  h2{
+    font-size:21px;font-weight:750;margin:42px 0 14px;line-height:1.4;
+    padding-bottom:8px;border-bottom:1px solid var(--line);
+  }
+  h2 .num{color:var(--accent);font-size:15px;font-weight:700;margin-right:8px;vertical-align:1px}
+  p{margin:12px 0}
+  .take{
+    margin-top:12px;padding:12px 16px;background:var(--card2);border-radius:10px;
+    border-left:3px solid var(--accent2);color:#dfe6f2;font-size:15.5px;
+  }
+  .take b{color:var(--accent2)}
+  .stats{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:12px;margin:18px 0 6px;
+  }
+  .stat{
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:14px 16px;
+  }
+  .stat .big{font-size:24px;font-weight:800;color:#fff;line-height:1.15}
+  .stat .big .u{font-size:14px;color:var(--accent);font-weight:700;margin-left:2px}
+  .stat .lbl{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.4}
+  table{
+    width:100%;border-collapse:collapse;margin:16px 0;font-size:15px;
+    background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;
+  }
+  th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line)}
+  th{background:var(--pill);color:#fff;font-weight:700;font-size:13.5px}
+  tr:last-child td{border-bottom:none}
+  td .hl{color:var(--accent);font-weight:700}
+  .pill{
+    display:inline-block;background:var(--pill);color:#cdd5e3;border:1px solid var(--line);
+    border-radius:999px;padding:2px 11px;font-size:12.5px;margin:2px 4px 2px 0;
+  }
+  .insights{
+    margin-top:46px;background:linear-gradient(135deg,rgba(95,191,143,.10),rgba(110,168,254,.08));
+    border:1px solid var(--line);border-radius:16px;padding:24px 24px 8px;
+  }
+  .insights h2{border:none;margin-top:0;color:#fff}
+  .insights ol{margin:0;padding-left:0;list-style:none;counter-reset:ins}
+  .insights li{
+    counter-increment:ins;position:relative;padding:12px 0 12px 44px;
+    border-bottom:1px dashed var(--line);
+  }
+  .insights li:last-child{border-bottom:none}
+  .insights li::before{
+    content:counter(ins);position:absolute;left:0;top:11px;
+    width:28px;height:28px;border-radius:50%;
+    background:var(--accent);color:#04140f;font-weight:800;font-size:14px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .insights b{color:#fff}
+  .foot{margin-top:34px;color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padding-top:16px}
+  em{color:var(--warn);font-style:normal;font-weight:600}
+</style>
+</head>
+<body>
+<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://openai.com/index/scaling-social-science-research" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
+<div class="wrap">
+
+  <span class="kicker">OpenAI 经济研究 · 一篇更短的解读</span>
+  <h1>GABRIEL：把"说不清楚的定性数据"批量变成可以做回归的数字</h1>
+  <div class="meta">
+    来源：OpenAI（Economic Research Team） · 2026年2月13日 · 分类：Global Affairs · <a href="https://openai.com/index/scaling-social-science-research">原文链接</a>
+  </div>
+
+  <div class="lede">
+    一句话总括：OpenAI 开源了 GABRIEL——一个用 GPT 把文本和图像批量"打分"为量化指标的 Python 工具包。它真正的贡献不是又一个模型，而是把社会科学里最昂贵的一步——大规模人工编码定性资料——自动化，让研究者用一句大白话定义测量标准，就能一致地应用到几百万份文档上。换句话说，它瞄准的是过去因人力成本而被迫"放弃研究"的那些问题。
+  </div>
+
+  <h2><span class="num">01</span>它解决的真问题：最丰富的数据，过去最难被分析</h2>
+  <p>课程大纲、访谈、社交媒体、照片——人类"说、写、教、争论、经历"的定性记录，蕴含关于世界最丰富的故事，而且数量巨大。但把它们变成严谨证据极其耗时，很多时候根本不可行。结果是：社会科学家常常被迫放弃重要的研究方向，<em>不是因为数据不存在，而是因为没法分析</em>。</p>
+  <div class="take"><b>洞见：</b>这是一篇"工具改变研究边界"的文章。瓶颈一直不在创意，而在标注成本；GABRIEL 攻击的正是这个瓶颈。</div>
+
+  <h2><span class="num">02</span>核心用法：用大白话定义"要测什么"，机器一致地给每份文档打分</h2>
+  <p>研究者只需用日常语言描述测量目标，例如"<span class="hl">这份招聘启事对家庭有多友好？</span>"，GABRIEL 就把同一个问题<strong>一致地</strong>应用到 thousands 乃至 millions 份文档，为每一份返回一个分数。一致性是关键——它把"人工编码会因人、因疲劳而漂移"的老问题，换成了可复现的统一标尺。</p>
+  <div class="stats">
+    <div class="stat"><div class="big">10³–10⁶<span class="u">份</span></div><div class="lbl">单次可一致处理的文档量级（数千到数百万）</div></div>
+    <div class="stat"><div class="big">1<span class="u">句话</span></div><div class="lbl">定义一个测量维度所需的输入：一句自然语言提问</div></div>
+  </div>
+  <div class="take"><b>洞见：</b>价值不在"AI 能标注"，而在"把专家的时间从重复劳动里赎回来"——研究者得以专注于选题、验证与审慎下结论这些真正需要判断力的环节。</div>
+
+  <h2><span class="num">03</span>能做什么：四类示范用例，横跨学科</h2>
+  <p>原文给出的用例展示了它的通用性——同一套方法可以套到完全不同的领域：</p>
+  <table>
+    <tr><th>领域</th><th>GABRIEL 能做的事</th></tr>
+    <tr><td>科学计量</td><td>分析大批论文用了哪些<span class="hl">具体方法</span>，以及它们如何随时间演变</td></tr>
+    <tr><td>教育</td><td>从课程大纲中衡量对不同<span class="hl">学科 / 技能</span>的关注度</td></tr>
+    <tr><td>历史 / 地理</td><td>为全欧洲<span class="hl">每一个小镇</span>抽取结构化历史细节</td></tr>
+    <tr><td>商业</td><td>从海量用户评论中发现人们<span class="hl">最看重什么</span>的模式</td></tr>
+  </table>
+  <div class="take"><b>洞见：</b>这些例子的共同点是"数据早就在那儿，只是没人有精力逐份读"。工具一旦把读取成本压到接近零，可问的研究问题就会成倍增加。</div>
+
+  <h2><span class="num">04</span>不只是打分：一组研究者真正需要的"杂活"工具</h2>
+  <p>除了测量，GABRIEL 还内置了一批实用功能，恰好对应数据清洗中最磨人的环节：</p>
+  <div class="pill">列名不一致也能合并数据集</div><div class="pill">智能去重</div><div class="pill">段落编码 passage coding</div><div class="pill">构思新科学理论</div><div class="pill">个人信息去标识化（隐私保护）</div>
+  <div class="take"><b>洞见：</b>把"模糊匹配合并 + 去重 + 去隐私"这些跨项目通用的脏活集成进来，意味着它的定位是研究工作流的基础设施，而不是一个孤立的标注脚本。</div>
+
+  <h2><span class="num">05</span>可信度与门槛：基准测试 + 开源 + 低技术要求</h2>
+  <p>OpenAI 配套发表了论文，在多种用例上对 GPT 标注定性数据做了基准测试，结论是"<span class="hl">高度准确</span>（highly accurate）"——但本篇公告未给出具体的准确率数字，严谨的验证仍需查阅论文原文。工具以开源 Python 库形式发布，附带入门教程 notebook，并刻意设计为"只需极少技术背景"即可使用。</p>
+  <div class="stats">
+    <div class="stat"><div class="big">开源<span class="u">Python</span></div><div class="lbl">已作为开源库发布，含教程 notebook</div></div>
+    <div class="stat"><div class="big">低门槛</div><div class="lbl">面向非技术研究者设计，将随学界反馈持续改进</div></div>
+  </div>
+  <div class="take"><b>洞见：</b>"开源 + 低门槛"是它能否真正改变研究实践的关键。准确性由论文背书，但<em>普及度</em>取决于经济学家、社会科学家这些非工程背景的人能否轻松上手。</div>
+
+  <div class="insights">
+    <h2>最值得带走的洞见</h2>
+    <ol>
+      <li><b>瓶颈是分析成本，不是数据。</b>大量重要研究过去被放弃，仅仅因为定性数据"无法规模化分析"；GABRIEL 直接攻击这一瓶颈。</li>
+      <li><b>"一句话 → 百万份打分"是核心机制。</b>用自然语言定义测量维度，再一致地施加到海量文档，把易漂移的人工编码换成可复现的统一标尺。</li>
+      <li><b>通用性强于单一用例。</b>从论文方法演变、课程关注度，到欧洲小镇史、用户评论偏好，同一套方法横跨学科。</li>
+      <li><b>它是工作流基础设施。</b>模糊合并、去重、段落编码、去隐私等"杂活"被集成进来，定位远超一个标注脚本。</li>
+      <li><b>准确性有论文背书，但本文未给数字。</b>"highly accurate" 是结论性表述；具体指标与适用边界需回到论文核验，避免据标题/公告过度推断。</li>
+    </ol>
+  </div>
+
+  <div class="foot">
+    本页为基于 OpenAI 公开公告《Scaling social science research》（2026年2月13日）的中文独立总结。文中"高度准确"等评价来自其配套论文的概述，公告本身未提供具体基准数值；涉及方法学细节与定量结果请以论文原文为准。
+  </div>
+
+</div>
+</body>
+</html>

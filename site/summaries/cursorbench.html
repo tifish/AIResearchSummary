@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cursor 如何评估模型质量：CursorBench 与线上-线下双闭环</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#171a21; --card2:#1e222b; --ink:#e7ebf2; --muted:#9aa4b2;
+    --accent:#6ea8fe; --accent2:#9d7bff; --good:#48d597; --warn:#ffb454; --line:#2a2f3a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+    line-height:1.75;font-size:17px}
+  .wrap{max-width:820px;margin:0 auto;padding:40px 22px 80px}
+  .kicker{color:var(--accent);font-weight:700;letter-spacing:.08em;font-size:13px;text-transform:uppercase}
+  h1{font-size:30px;line-height:1.3;margin:.4em 0 .2em}
+  .meta{color:var(--muted);font-size:14px;margin-bottom:28px}
+  .lede{background:linear-gradient(135deg,rgba(110,168,254,.14),rgba(157,123,255,.12));
+    border:1px solid var(--line);border-radius:14px;padding:20px 22px;font-size:18px;margin:0 0 34px}
+  .lede b{color:var(--accent)}
+  h2{font-size:21px;margin:38px 0 6px;padding-left:12px;border-left:4px solid var(--accent2)}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 12px;padding-left:12px}
+  p{margin:.6em 0}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:18px 0}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+  .stat .n{font-size:26px;font-weight:800;color:var(--good)}
+  .stat .n.warn{color:var(--warn)}
+  .stat .l{color:var(--muted);font-size:13px;margin-top:4px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0}
+  .take{font-weight:600;color:var(--accent)}
+  ul{margin:.5em 0;padding-left:1.2em}
+  li{margin:.35em 0}
+  .insights{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-top:34px}
+  .insights h2{border:0;padding:0;margin:0 0 12px}
+  .insights ol{margin:0;padding-left:1.3em}
+  .insights li{margin:.55em 0}
+  .tag{display:inline-block;background:rgba(110,168,254,.15);color:var(--accent);
+    border-radius:999px;padding:2px 10px;font-size:12px;margin-right:6px}
+  .foot{color:var(--muted);font-size:13px;margin-top:30px;border-top:1px solid var(--line);padding-top:14px}
+  b.hot{color:var(--warn)}
+</style>
+</head>
+<body>
+<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://cursor.com/blog/cursorbench" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
+<div class="wrap">
+
+  <div class="kicker">Research · Cursor</div>
+  <h1>Cursor 如何评估模型质量：当公共榜单失效，就自己造一把尺</h1>
+  <div class="meta">来源 Cursor ｜ 作者 Naman Jain ｜ 2026 年 3 月 11 日 ｜ <span class="tag">评测方法论</span><span class="tag">编码 Agent</span></div>
+
+  <div class="lede">
+    <b>一句话总括：</b>当前沿模型已把公共编码 benchmark 刷到饱和、无法再区分优劣时，Cursor 用<strong>真实开发会话</strong>构建了内部评测套件 <b>CursorBench</b>，并用线上实验交叉验证——核心贡献不是"又一个榜单"，而是一套<strong>让评测重新对齐真实开发体验</strong>的线上-线下闭环方法。
+  </div>
+
+  <h2>公共 benchmark 在前沿模型上已经"测不出区别"</h2>
+  <div class="sub">问题不在分数高低，而在它衡量的东西错了</div>
+  <p>Cursor 指出公共离线评测有三个根本缺陷：</p>
+  <div class="card">
+    <p><span class="take">① 对齐度差</span>——多数 SWE benchmark 仍只考"修 bug"，Terminal-Bench 偏向"从棋盘找最佳一步"这类谜题，与开发者真正交给 agent 的工作不符。</p>
+    <p><span class="take">② 评分僵化</span>——任务默认答案唯一，但开发者的请求大多<strong>欠定义、允许多种正确解</strong>；benchmark 要么惩罚其他正确写法，要么硬加合成约束，两者都失真。</p>
+    <p><span class="take">③ 数据污染</span>——SWE-bench Verified / Pro / Multilingual 的题目都来自公共仓库，已进入训练数据，分数被虚高。</p>
+  </div>
+  <p>为什么重要：这意味着在前沿水平上，<strong>榜单已无法分辨对开发者效用截然不同的模型</strong>，靠它选型会被误导。</p>
+
+  <div class="grid">
+    <div class="stat"><div class="n warn">≈60%</div><div class="l">SWE-bench Verified 中未解问题被发现"测试本身有缺陷"</div></div>
+    <div class="stat"><div class="n warn">已停报</div><div class="l">OpenAI 因模型能凭记忆复现 gold patch，停止报告该榜单成绩</div></div>
+  </div>
+
+  <h2>CursorBench：用"提交代码"反向追溯出真实任务</h2>
+  <div class="sub">数据从真实使用来，而不是从公共仓库来</div>
+  <p>Cursor 用 <b>Cursor Blame</b> 把已提交的代码追溯回"产生它的 agent 请求"，天然得到一对"开发者查询 ↔ 标准答案"。任务多取自内部代码库和受控来源，<strong>降低被模型在训练中见过的风险</strong>，并每隔几个月刷新一次以跟上使用方式的变化。</p>
+  <p>它的任务描述<strong>故意写得很短</strong>，刻意模拟开发者对 agent 那种含糊、欠定义的说话方式，再用 agentic grader（智能评分器）来稳定打分。评测维度也不止"对不对"，还包括代码质量、效率和交互行为。</p>
+
+  <div class="grid">
+    <div class="stat"><div class="n">×2</div><div class="l">从初版到 CursorBench-3，问题规模（代码行数 + 平均文件数）大约翻倍</div></div>
+    <div class="stat"><div class="n">更长</div><div class="l">单任务行数明显超过 SWE-bench Verified / Pro / Multilingual</div></div>
+  </div>
+  <p>规模增长背后，是纳入了<strong>更接近真实工程</strong>的难题：monorepo 多工作区、排查生产日志、跑长时间实验等。结论：行数虽是粗糙的难度指标，但它反映了 CursorBench 在主动加入更硬的任务。</p>
+
+  <h2>更难的题，才能把模型重新拉开档次</h2>
+  <div class="sub">饱和的榜单看不出差距，CursorBench 能</div>
+  <p>正因为任务更复杂、规格更模糊，CursorBench 在前沿水平上<strong>重新制造出模型间的区分度</strong>。一个反直觉的例子：在某些场景下，<b class="hot">Haiku 可以追平甚至超过 GPT-5</b>——说明"大模型一定更强"在具体开发场景里并不成立。结论：能区分开发者真实感知差异的评测，才有选型价值。</p>
+
+  <h2>线上实验兜底：离线高分 ≠ 用着好用</h2>
+  <div class="sub">用受控实验把"改进"归因到真实效果</div>
+  <p>Cursor 同时在真实流量上做受控分析，跟踪一组"交互质量 + 输出质量"的高层代理指标，看它们是否一致变好，而不是只优化单一分数。这能抓住一类离线评测漏掉的退化：<strong>评分器看着对、开发者用着更差</strong>。</p>
+  <p>例如在迭代语义搜索时，他们做了一次"完全移除语义搜索工具"的消融实验，从而精确定位它最关键的场景——比如<strong>在大型代码库上做基于仓库的问答</strong>。结论：CursorBench 的排名也更贴合线上指标里开发者的真实体验。</p>
+
+  <h2>下一步：为"长时运行、自带电脑的 agent"重做评测</h2>
+  <div class="sub">现在的题仍局限在一次会话内</div>
+  <p>CursorBench-3 虽比公共题更长，但仍在单次会话内完成。Cursor 预判未来一年大部分开发将转向<strong>在自己机器上长时间自主运行的 agent</strong>，并据此改造评测。难点有三：让评分更便宜、解决"会调用外部服务"任务的可复现性、缩小离线评估与真实体验的差距。<br><span class="take">注：</span>2026 年 5 月套件已升级到含更难问题的 <b>CursorBench 3.1</b>，因题目分布改变，分数只能在<strong>同一版本内</strong>横向比较。</p>
+
+  <div class="insights">
+    <h2>最值得带走的 5 条洞见</h2>
+    <ol>
+      <li><b>公共编码榜单在前沿模型时代已系统性失效</b>——对齐、评分、污染三重缺陷叠加，OpenAI 弃用 SWE-bench Verified（近 60% 未解题测试有缺陷）就是信号。</li>
+      <li><b>好评测的关键是"数据来自真实使用"</b>——Cursor Blame 把提交代码追溯到原始请求，既保证答案真实，又规避训练污染。</li>
+      <li><b>故意欠定义、任务更大，反而更真实</b>——短描述 + 翻倍的代码/文件规模，让评测贴近开发者真正的工作方式，并重新拉开模型差距。</li>
+      <li><b>"更大的模型不一定更好"</b>——Haiku 在某些场景追平/超过 GPT-5，提醒选型必须按真实任务而非参数规模。</li>
+      <li><b>离线分数必须用线上实验校验</b>——单靠评分器会奖励"看着对、用着差"的输出；线上-线下闭环才是可靠地基。</li>
+    </ol>
+  </div>
+
+  <div class="foot">原文：How we compare model quality in Cursor · Cursor Blog（cursor.com/blog/cursorbench）· 本页为中文总结，数据以原文为准；分数请在同一 CursorBench 版本内比较。</div>
+
+</div>
+</body>
+</html>

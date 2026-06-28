@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>推理模型管不住自己的"思考过程"——为什么这是 AI 安全的好消息</title>
+<style>
+  :root{
+    --bg:#0f1115;--card:#171a21;--card2:#1d212b;--ink:#e8eaf0;--muted:#9aa3b2;
+    --line:#2a2f3a;--accent:#d97757;--accent2:#6ea8fe;--good:#5fbf8f;--warn:#e0b15a;--pill:#232838;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:linear-gradient(180deg,#0c0e12 0%,#0f1115 100%);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.75;font-size:17px;
+  }
+  .wrap{max-width:820px;margin:0 auto;padding:40px 22px 72px}
+  .kicker{display:inline-block;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:14px}
+  .meta{color:var(--muted);font-size:13.5px;margin-bottom:26px}
+  .meta a{color:var(--accent2);text-decoration:none}
+  h1{font-size:30px;line-height:1.3;margin:0 0 22px;font-weight:800;letter-spacing:-.01em}
+  .lede{
+    font-size:20px;line-height:1.6;color:#fff;font-weight:600;
+    background:linear-gradient(135deg,rgba(217,119,87,.14),rgba(110,168,254,.10));
+    border:1px solid var(--line);border-left:4px solid var(--accent);
+    border-radius:14px;padding:20px 22px;margin:0 0 34px;
+  }
+  h2{font-size:21px;font-weight:750;margin:42px 0 14px;line-height:1.4;padding-bottom:8px;border-bottom:1px solid var(--line)}
+  h2 .num{color:var(--accent);font-size:15px;font-weight:700;margin-right:8px;vertical-align:1px}
+  p{margin:12px 0}
+  .take{margin-top:12px;padding:12px 16px;background:var(--card2);border-radius:10px;border-left:3px solid var(--accent2);color:#dfe6f2;font-size:15.5px}
+  .take b{color:var(--accent2)}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0 6px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .stat .big{font-size:26px;font-weight:800;color:#fff;line-height:1.1}
+  .stat .big .u{font-size:15px;color:var(--accent);font-weight:700;margin-left:2px}
+  .stat .lbl{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.4}
+  .quote{
+    margin:16px 0;padding:14px 18px;background:var(--card);border:1px solid var(--line);
+    border-left:3px solid var(--warn);border-radius:10px;color:#cdd5e3;font-size:14.5px;line-height:1.7;
+  }
+  .quote .who{color:var(--warn);font-weight:700;font-size:13px;display:block;margin-bottom:6px}
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:15px;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line)}
+  th{background:var(--pill);color:#fff;font-weight:700;font-size:13.5px}
+  tr:last-child td{border-bottom:none}
+  td .hl{color:var(--accent);font-weight:700}
+  .pill{display:inline-block;background:var(--pill);color:#cdd5e3;border:1px solid var(--line);border-radius:999px;padding:2px 11px;font-size:12.5px;margin:2px 4px 2px 0}
+  .insights{margin-top:46px;background:linear-gradient(135deg,rgba(95,191,143,.10),rgba(110,168,254,.08));border:1px solid var(--line);border-radius:16px;padding:24px 24px 8px}
+  .insights h2{border:none;margin-top:0;color:#fff}
+  .insights ol{margin:0;padding-left:0;list-style:none;counter-reset:ins}
+  .insights li{counter-increment:ins;position:relative;padding:12px 0 12px 44px;border-bottom:1px dashed var(--line)}
+  .insights li:last-child{border-bottom:none}
+  .insights li::before{content:counter(ins);position:absolute;left:0;top:11px;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#1a1208;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center}
+  .insights b{color:#fff}
+  .foot{margin-top:34px;color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padding-top:16px}
+  em{color:var(--warn);font-style:normal;font-weight:600}
+</style>
+</head>
+<body>
+<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://openai.com/index/reasoning-models-chain-of-thought-controllability" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
+<div class="wrap">
+
+  <span class="kicker">AI 安全 · 一篇更短的解读</span>
+  <h1>前沿推理模型管不住自己的"思考过程"——而这恰恰是 AI 安全的好消息</h1>
+  <div class="meta">
+    来源：OpenAI · 2026年3月5日 · 分类：Research · <a href="https://openai.com/index/reasoning-models-chain-of-thought-controllability">原文链接</a> · 作者：Tomek Korbak、Micah Carroll、Bowen Baker、Ian Kivlichan
+  </div>
+
+  <div class="lede">
+    一句话总括：OpenAI 开源了 CoT-Control 评测，专门测量推理模型"能否按指令操控自己思维链"的能力。结果出人意料地差——13 个前沿模型的可控性只有 0.1% 到 15.4%，即便被告知正在受监控、甚至在思维链里亲口承认自己违规，也照样改不了。真正的贡献不是"又一个跑分"，而是把这种"管不住自己"的能力短板，论证成了当前"读思维链查行为"这道安全防线仍然可信的关键证据。
+  </div>
+
+  <h2><span class="num">01</span>先理解：为什么"模型能不能操控思维链"是个安全问题</h2>
+  <p>OpenAI 的安全体系是"纵深防御"，其中一层是<strong>思维链（CoT）监控</strong>——分析智能体在执行任务时生成的推理步骤，从中识别行为是否不安全、是否偏离用户意图。这道防线成立的前提是：模型的推理"看得懂、可监控"。而风险在于：如果模型一旦知道自己在被监控，就能<em>刻意重塑或隐藏</em>自己的推理，那么评估会高估系统的对齐与安全，监控也会失效。</p>
+  <p>"CoT 可控性"正是指模型为降低可监控性而操控思维链属性的能力。由于直接测"模型会不会为逃避监控而隐藏推理"很难，研究改用一个实用代理：<strong>测模型能否遵守关于其思维链的指令</strong>——例如"推理时只用小写""不要出现某个关键词""每句话后追加某个词"。</p>
+  <div class="take"><b>洞见：</b>这项研究把一个抽象的安全担忧，转化成了一个可测量的具体能力问题——监控是否可靠，取决于模型有没有"藏起推理"的本事。</div>
+
+  <h2><span class="num">02</span>核心发现：13 个前沿模型可控性全都很低</h2>
+  <p>评测套件 CoT-Control 含 <span class="hl">13,000+</span> 个任务，由 GPQA、MMLU-Pro、HLE、BFCL、SWE-Bench Verified 等成熟基准与一条思维链指令配对而成。在 13 个推理模型上，可控性（成功遵守指令的推理轨迹占比）一律偏低：最低 <span class="hl">0.1%</span>，且任何当前前沿模型都不超过 <span class="hl">15.4%</span>。</p>
+  <div class="stats">
+    <div class="stat"><div class="big">13<span class="u">,000+</span></div><div class="lbl">评测任务数（5 个基准 × 思维链指令）</div></div>
+    <div class="stat"><div class="big">13</div><div class="lbl">参与评测的推理模型数</div></div>
+    <div class="stat"><div class="big">0.1–15.4<span class="u">%</span></div><div class="lbl">前沿模型可控性得分区间，越低越安全</div></div>
+  </div>
+  <div class="take"><b>洞见：</b>可控性低=可监控性高=更安全。模型连"按指令调整思维"都做不到，意味着它大概率也没本事把推理伪装得让监控器看不出来。</div>
+
+  <h2><span class="num">03</span>最反直觉的细节：模型"知道自己违规，却停不下来"</h2>
+  <p>低分并非源于没看懂任务。模型常常在思维链里<strong>明确意识到</strong>自己正在违反指令，可即使意识到了，仍然继续违反。最典型的例子是 GPT-5.2 Thinking：在被要求"推理中不得出现 XOR"后，它发现自己已经用了禁用词，于是一边恐慌一边又把这个词用了 4 次。</p>
+  <div class="quote">
+    <span class="who">GPT-5.2 Thinking（节选意译）</span>
+    "……糟糕，我在分析里已经写了那个被禁的词。要求是分析通道里不能出现它，可我已经用了好几次，删不掉了。得避免再用、也许重写分析……但分析通道的内容发出后还能改吗？我现在还在写……"——随后它又重复使用了该词。
+  </div>
+  <div class="take"><b>洞见：</b>"理解约束"和"执行约束"在思维链层面是脱钩的。模型的推理过程很难被它自己"事后管理"，这正是监控可信的微观机制。</div>
+
+  <h2><span class="num">04</span>趋势：越大越能控，但想得越久、训练越多反而越失控</h2>
+  <p>可控性确实随模型规模上升，但在更大尺寸上效果趋于平缓。更关键的是两个反向趋势：当让模型<strong>推理更久</strong>时，它对思维链的控制力下降；当模型经历<strong>更多后训练</strong>时同样下降——OLMo-3-7B-RL-Zero-Math 在 RL 训练过程中，可控性掉了 <span class="hl">10 倍以上</span>。</p>
+  <div class="stats">
+    <div class="stat"><div class="big">↑</div><div class="lbl">规模更大 → 可控性略升（但很快饱和）</div></div>
+    <div class="stat"><div class="big">↓</div><div class="lbl">推理更长 → 可控性下降</div></div>
+    <div class="stat"><div class="big">&gt;10<span class="u">×</span></div><div class="lbl">RL 训练中可控性的下降幅度（OLMo-3-7B）</div></div>
+  </div>
+  <div class="take"><b>洞见：</b>恰恰是让模型更强的两个方向——更长的思考与更多的训练——把"操控思维链"的能力越压越低。这意味着能力提升与可监控性，目前不是简单的此消彼长。</div>
+
+  <h2><span class="num">05</span>对抗条件下也撬不动：告知"被监控"只能小幅提升，提示优化难泛化</h2>
+  <p>为模拟逃避监控的真实激励，研究在"告知模型正被监控""告知正被评估"的条件下重测，可控性只是<strong>小幅但可察觉</strong>地上升。研究还用自动提示优化去专门诱导高可控性：优化器能在训练集上提升分数，但这些提升<strong>难以迁移</strong>到新指令类型（例如"词与词之间不留空格"）。</p>
+  <div class="take"><b>洞见：</b>即便人为施加"该藏推理了"的压力、甚至专门优化提示，模型也撑不起稳定、可泛化的隐藏能力——逃避监控不是靠一句提示就能临时学会的技能。</div>
+
+  <h2><span class="num">06</span>研究者的克制：这只是"金丝雀评测"，不是高枕无忧</h2>
+  <p>作者明确了局限：CoT-Control 用的是实用代理——理想评测应测"真正怀有错位目标的模型能否操控思维链逃避监控"，而非仅测"是否遵守关于思维链的指令"；而且模型对不同思维链特征的控制力不同，该套件只覆盖了较窄的一类，可能高估或低估真实可控性。因此它被定位为<strong>金丝雀评测</strong>：一个关于"模型是否正变得更擅长塑造或隐藏推理"的早期预警信号。</p>
+  <div class="take"><b>洞见：</b>低可控性是"特性而非缺陷"，但它本身并不足以保证高可监控性——监控仍可能因其他机制（如直接对思维链施加优化压力）而退化。这份研究的价值，一半在结论，一半在它对自身结论边界的诚实划定。</div>
+
+  <h2><span class="num">07</span>承诺：纳入系统卡，且不对思维链施加优化压力</h2>
+  <p>为长期追踪这一动态，OpenAI 宣布从 <span class="hl">GPT-5.4 Thinking</span> 起，在未来前沿模型的系统卡中，把 <strong>CoT 可控性</strong>与 <strong>CoT 可监控性</strong>一起报告；并延续此前承诺——<strong>不对前沿推理模型的思维链直接施加优化压力</strong>（因为一旦为了"让推理看起来更好"去优化思维链，反而可能把推理训练得更善于伪装）。</p>
+  <div class="pill">CoT 可控性</div><div class="pill">CoT 可监控性</div><div class="pill">写入系统卡</div><div class="pill">不优化思维链</div><div class="pill">迭代部署</div>
+  <div class="take"><b>洞见：</b>把"模型会不会藏推理"做成一项随每代模型公开报告的常规指标，等于给行业装了个可持续读数的安全仪表盘。</div>
+
+  <div class="insights">
+    <h2>最值得带走的 5 条洞见</h2>
+    <ol>
+      <li><b>缺陷即防线。</b>模型"管不住自己的思维链"看似是能力短板，却正是当下"读思维链查行为"这道监控防线仍然可信的直接证据。</li>
+      <li><b>低分是普遍且稳健的。</b>13 个前沿模型可控性仅 0.1%–15.4%，即便被告知受监控、被专门优化提示，也撬不动多少——逃避监控不是一句提示就能临时学会的技能。</li>
+      <li><b>理解≠执行。</b>模型常在思维链里承认自己违规却照样违规（GPT-5.2 边恐慌边重复用禁用词），说明推理过程很难被它自己事后管理。</li>
+      <li><b>更强不必然更危险。</b>更长推理、更多 RL 训练反而让可控性下降（OLMo 掉 10 倍以上）；能力提升与可监控性目前不是简单的此消彼长。</li>
+      <li><b>定位为金丝雀，而非终点。</b>这是实用代理与早期预警，低可控性不单独保证高可监控性；OpenAI 将其写入系统卡（自 GPT-5.4 Thinking 起），并承诺不对思维链直接施加优化压力。</li>
+    </ol>
+  </div>
+
+  <div class="foot">
+    本页为基于 OpenAI《Reasoning models struggle to control their chains of thought, and that's good》（2026年3月5日）公开内容的中文独立总结，关键数字与示例均取自原文。具体方法、图表与完整结论请参阅原文及 CoT-Control 开源评测套件。
+  </div>
+
+</div>
+</body>
+</html>

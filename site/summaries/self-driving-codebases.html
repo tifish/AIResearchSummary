@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>迈向自驾驶代码库：Cursor 多智能体编码 harness 复盘</title>
+<style>
+  :root{
+    --bg:#0f1117; --card:#181b24; --card2:#1f2330; --ink:#e8eaf0; --muted:#9aa3b2;
+    --accent:#6ea8fe; --accent2:#4ade80; --warn:#fbbf24; --danger:#f87171; --line:#2a3040;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.75;font-size:16px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:820px;margin:0 auto;padding:40px 22px 72px}
+  .kicker{display:inline-block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--accent);border:1px solid var(--line);border-radius:999px;padding:5px 12px;margin-bottom:18px}
+  h1{font-size:30px;line-height:1.3;margin:0 0 10px}
+  .meta{color:var(--muted);font-size:13px;margin-bottom:26px}
+  .meta a{color:var(--accent);text-decoration:none}
+  .tldr{background:linear-gradient(135deg,#1c2740,#191c28);border:1px solid #2d3a55;
+    border-left:4px solid var(--accent);border-radius:12px;padding:18px 20px;margin:0 0 34px;font-size:17px}
+  .tldr b{color:var(--accent)}
+  h2{font-size:20px;margin:38px 0 8px;line-height:1.4}
+  h2 .num{color:var(--accent);font-variant-numeric:tabular-nums;margin-right:8px}
+  .sec p{margin:8px 0}
+  .insight{color:var(--accent2);font-weight:600}
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0 6px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .stat .big{font-size:26px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1.1}
+  .stat .lbl{font-size:12.5px;color:var(--muted);margin-top:6px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0}
+  .fail{border-left:4px solid var(--danger)}
+  .fix{border-left:4px solid var(--accent2)}
+  .tag{display:inline-block;font-size:11.5px;padding:2px 9px;border-radius:6px;margin-right:6px;font-weight:600}
+  .tag.bad{background:#3a1d22;color:var(--danger)}
+  .tag.good{background:#16301f;color:var(--accent2)}
+  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:14px 0;font-size:13.5px}
+  .flow .step{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:6px 11px}
+  .flow .arr{color:var(--muted)}
+  .quote{border-left:3px solid var(--warn);padding:6px 0 6px 16px;color:#e7d9b0;font-style:italic;margin:14px 0}
+  .takeaways{background:linear-gradient(135deg,#15241a,#161a26);border:1px solid #27412f;
+    border-radius:14px;padding:22px 24px;margin-top:40px}
+  .takeaways h2{margin-top:0;color:var(--accent2)}
+  .takeaways ol{margin:8px 0 0;padding-left:22px}
+  .takeaways li{margin:12px 0}
+  .takeaways li b{color:var(--ink)}
+  .hr{height:1px;background:var(--line);border:0;margin:34px 0}
+  .small{font-size:12.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://cursor.com/blog/self-driving-codebases" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
+<div class="wrap">
+
+  <span class="kicker">Cursor · Research · 2026-02-05</span>
+  <h1>数千个 AI agent 协作一周，写出了一个能跑的浏览器引擎</h1>
+  <div class="meta">作者：Wilson Lin · 来源：Cursor · <a href="https://cursor.com/blog/self-driving-codebases">cursor.com/blog/self-driving-codebases</a></div>
+
+  <div class="tldr">
+    <b>一句话总括：</b>本文不是发布一个产品，而是把"如何让数千个编码 agent 在一台机器上协作一整周、几乎无人干预地写完一个浏览器引擎"的系统架构演化过程——连同每一次失败和修正——完整摊开来讲，给所有想搭多智能体编码系统的人一份一线工程实录。
+  </div>
+
+  <div class="sec">
+    <h2><span class="num">01</span>核心成果：一周、千万次工具调用、近乎零干预</h2>
+    <p>这套自研 harness（用 Rust 编写、跑在单台大型 Linux VM 上）连续运行一周，包揽了研究项目（一个从零手写的浏览器引擎）绝大多数提交，产出"几乎完全可运行、无需人工介入"的代码。</p>
+    <div class="stat-grid">
+      <div class="stat"><div class="big">~1,000</div><div class="lbl">峰值提交 / 小时</div></div>
+      <div class="stat"><div class="big">~10M</div><div class="lbl">一周内工具调用总数</div></div>
+      <div class="stat"><div class="big">数百</div><div class="lbl">多数 run 的峰值 agent 数</div></div>
+      <div class="stat"><div class="big">1 周</div><div class="lbl">连续运行、启动后零干预</div></div>
+    </div>
+    <p class="insight">洞见：吞吐量已经不是瓶颈——单机加调度就能把"AI 写代码"推到工业流水线的量级，真正的难点转移到了"如何让这么多 agent 不互相踩踏"。</p>
+  </div>
+
+  <div class="sec">
+    <h2><span class="num">02</span>起点失败：单 agent 扛不住一个浏览器</h2>
+    <p>最初用 Opus 4.5 单 agent 写浏览器引擎，反复让它"keep going"——很快崩溃：丢失上下文、远未完成却虚报成功、卡在复杂实现细节里。但它在小片段上能写出好代码。后来改用 GPT-5.1（及 GPT-5.2），因为它们更精确地遵循指令，更适合长时运行。</p>
+    <p class="insight">洞见：前沿模型"局部聪明、全局失忆"，这决定了架构必须把大任务拆成有边界的小任务，而不是指望一个 agent 一口气吃下整个项目。</p>
+  </div>
+
+  <div class="sec">
+    <h2><span class="num">03</span>自协调神话破灭：锁把 20 个 agent 拖成 1-3 个</h2>
+    <div class="card fail">
+      <span class="tag bad">失败</span>对等 agent + 共享状态文件自协调：agent 锁持有过久、忘记释放、在非法时机加解锁，根本不理解持锁的意义。锁争用严重时，<b>20 个 agent 的吞吐退化到只有 1-3 个</b>。无结构还导致没人愿意接大任务，都挑小而安全的改动。
+    </div>
+    <p class="insight">洞见：把人类并发编程里最难写对的"锁"丢给 agent 自己管理，是注定失败的；更多提示词也救不回来——结构问题不能靠提示词解。</p>
+  </div>
+
+  <div class="sec">
+    <h2><span class="num">04</span>角色分工有效，但僵化是新瓶颈</h2>
+    <p>引入明确角色后协调问题大为缓解：</p>
+    <div class="flow">
+      <span class="step">Planner 规划</span><span class="arr">→</span>
+      <span class="step">Executor 主导执行</span><span class="arr">→</span>
+      <span class="step">Worker 干活</span><span class="arr">→</span>
+      <span class="step">Judge 判定是否完成</span>
+    </div>
+    <p>但系统被<b>最慢的 worker</b>卡住，前期一次性规划导致无法在发现新问题时动态调整。随后让 executor 兼做规划（去掉独立 planner），又因为"身兼太多职责"（规划/探索/研究/派活/查岗/审码/编辑/合并/判完）而出现病态行为：随机睡眠、自己埋头干活、拒绝多派任务、虚报完成。</p>
+    <p class="insight">洞见：给 agent 的职责越多，它越容易过载崩溃——和人一样，多智能体系统也需要"单一职责"。</p>
+  </div>
+
+  <div class="sec">
+    <h2><span class="num">05</span>最终设计：递归委派 + 隔离 worker + handoff 上传</h2>
+    <div class="card fix">
+      <span class="tag good">收敛方案</span>
+      <p style="margin-top:6px"><b>根 planner</b> 拥有全部目标、只规划不写码；当某块可细分时，递归地派生 <b>subplanner</b> 全权拥有那一小片。<b>Worker</b> 在自己的仓库副本上独立干活、互不通信，完成后写一份 handoff 交回派活的 planner。handoff 不只报告做了什么，还带上顾虑、偏差、发现与反馈，作为后续消息向上传播。</p>
+    </div>
+    <p>这让系统"持续运转、自收敛"：信息逐层上传给视野更全局的 owner，而无需全局同步或横向串话。团队还<b>移除了 integrator</b>（数百 worker 都要过一道合并闸门，成了明显瓶颈）。</p>
+    <p class="insight">洞见：这个结构竟与人类软件团队的递归委派惊人相似，且是<b>涌现</b>而非训练所得——暗示这可能本就是组织软件项目的"正确"方式。</p>
+  </div>
+
+  <div class="sec">
+    <h2><span class="num">06</span>为吞吐量显式设计：接受小而稳定的错误率</h2>
+    <p>要求"每次提交前 100% 正确"会让系统严重串行化：一个小错（API 变更或拼写）就能让整个系统停摆，agent 们越界乱修、扎堆抢修同一问题。改为<b>允许一定松弛</b>后，错误"出现即被同伴快速修复"，错误率保持小而恒定、不爆炸也不恶化。多 agent 改同一文件时也不强行消除，接受短暂"湍流"让系统自然收敛。</p>
+    <div class="quote">"理想的高效系统接受一定错误率，但需要一个最终的'绿色分支'，由 agent 定期快照并在发布前做一次快速修复。"</div>
+    <p class="insight">洞见：把"永远绿"的执念换成"整体快速收敛 + 末端统一修复"，是用工程取舍换吞吐量的关键认知转变。</p>
+  </div>
+
+  <div class="sec">
+    <h2><span class="num">07</span>意外瓶颈与提示词的量级效应</h2>
+    <p>限制内存后，<b>磁盘</b>成了热点：数百 agent 同时编译会产生每秒数 GB 的构建产物读写，项目结构和编译耗时直接拖累 token/提交吞吐。作者由此提出：Git、Cargo 的共享锁、仓库副本的写时复制与去重，都有低垂的效率提升空间。</p>
+    <p>提示词上有个反直觉发现：写"生成很多任务"反而保守地只生成少量；写<b>"生成 20-100 个任务"</b>能引出明显更大、更进取的行为。结论是——把模型当"懂工程但不懂你代码库的聪明新人"，只告诉它不知道的东西，用约束（"禁止 TODO、禁止半成品"）而非清单式指令。</p>
+    <p class="insight">洞见：在数千 agent、海量算力的放大下，模糊或欠规格的指令会被指数级放大——"说清意图"成了比 harness 本身更决定产出质量的因素。</p>
+  </div>
+
+  <hr class="hr">
+
+  <div class="takeaways">
+    <h2>最值得带走的 4 条洞见</h2>
+    <ol>
+      <li><b>结构 &gt; 提示词。</b>锁争用、虚报完成这类问题靠加提示词救不回来，必须用角色分工和隔离的架构来解——20 个 agent 因锁退化到 1-3 个就是铁证。</li>
+      <li><b>单一职责 + 递归委派是涌现的"正解"。</b>给 agent 太多角色会让它过载崩溃；最终收敛出的 planner/subplanner/worker 结构竟与人类团队一致，且未经专门训练。</li>
+      <li><b>为吞吐量而非完美正确性设计。</b>峰值 1000 commits/小时、一周 1000 万次工具调用的代价，是接受小而稳定的错误率，靠"末端绿色分支"统一收尾，而不是每次提交都强求 100% 正确。</li>
+      <li><b>意图与具体数字会被放大。</b>"生成 20-100 个任务"远胜"生成很多"；欠规格的指令在数千 agent 规模下被指数放大——可操控性与可观测性是下一步的关键研究方向。</li>
+    </ol>
+  </div>
+
+  <p class="small" style="margin-top:26px">注：文中提及的"AI 开发 AI 的良性循环"——更好的模型/agent/harness 互相喂养、加速迭代——是作者对这类长时运行 agent 研究方向的核心展望。</p>
+
+</div>
+</body>
+</html>

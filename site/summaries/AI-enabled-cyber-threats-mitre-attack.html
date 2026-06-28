@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>映射一年 AI 网络威胁的发现 · 总结</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#171a21; --card2:#1d2129;
+    --text:#e7eaf0; --muted:#9aa3b2; --line:#2a2f3a;
+    --accent:#6ea8fe; --warn:#ff7a7a; --good:#5dd1a0; --gold:#f2c14e;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Microsoft YaHei",sans-serif;
+    line-height:1.75; font-size:17px;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding:40px 22px 80px}
+  header.hd{border-bottom:1px solid var(--line); padding-bottom:22px; margin-bottom:30px}
+  .kicker{color:var(--warn); font-size:13px; letter-spacing:.08em; text-transform:uppercase; margin:0 0 10px}
+  h1{font-size:30px; line-height:1.3; margin:0 0 14px}
+  .meta{color:var(--muted); font-size:14px}
+  .lede{
+    background:linear-gradient(135deg,#1c2533,#191d26);
+    border:1px solid var(--line); border-left:4px solid var(--accent);
+    border-radius:12px; padding:18px 20px; margin:26px 0 36px; font-size:18px;
+  }
+  .lede b{color:var(--accent)}
+  section{margin:30px 0}
+  h2{font-size:21px; margin:0 0 6px; line-height:1.4}
+  h2 .tag{display:inline-block; font-size:12px; color:var(--gold); border:1px solid var(--line); border-radius:999px; padding:2px 10px; margin-right:10px; vertical-align:middle}
+  .body{color:#d6dbe6}
+  .take{color:var(--muted); font-style:italic; border-left:2px solid var(--line); padding-left:12px; margin-top:12px}
+  .stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0}
+  .stat{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px}
+  .stat .big{font-size:26px; font-weight:700; color:var(--good)}
+  .stat .big.warn{color:var(--warn)}
+  .stat .lbl{color:var(--muted); font-size:13px; margin-top:4px}
+  .flow{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:16px 0}
+  .flow .node{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:10px 14px; font-size:14px}
+  .flow .node.hot{border-color:var(--warn); color:var(--warn)}
+  .flow .sep{color:var(--muted)}
+  .bars{margin:18px 0}
+  .bar{display:flex; align-items:center; gap:12px; margin:10px 0}
+  .bar .name{flex:0 0 150px; font-size:14px; color:var(--muted)}
+  .bar .track{flex:1; background:#0b0d12; border:1px solid var(--line); border-radius:8px; height:26px; position:relative; overflow:hidden}
+  .bar .fill{height:100%; display:flex; align-items:center; padding-left:10px; font-size:13px; font-weight:700; color:#0b0d12}
+  .insights{background:linear-gradient(135deg,#15211b,#171a21); border:1px solid #244235; border-radius:14px; padding:22px 24px; margin-top:40px}
+  .insights h2{color:var(--good)}
+  .insights ol{margin:14px 0 0; padding-left:22px}
+  .insights li{margin:10px 0}
+  .note{color:var(--muted); font-size:13px; border-top:1px solid var(--line); margin-top:40px; padding-top:16px}
+  b.k{color:var(--gold)}
+  code{background:#0b0d12; border:1px solid var(--line); border-radius:6px; padding:1px 6px; font-size:14px}
+</style>
+</head>
+<body>
+<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://www.anthropic.com/news/AI-enabled-cyber-threats-mitre-attack" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
+<div class="wrap">
+
+  <header class="hd">
+    <p class="kicker">Anthropic · Policy / Frontier Red Team</p>
+    <h1>映射一年 AI 网络威胁后，我们学到了什么</h1>
+    <p class="meta">来源 Anthropic ｜ Policy ｜ 2026-06-03</p>
+  </header>
+
+  <div class="lede">
+    一句话总括：这不是又一篇"AI 会被用来攻击"的预警，而是一份<b>实证测绘</b>——Anthropic 把一年内（2025-03 至 2026-03）<b>832 个被封恶意账户</b>逐一映射到业界标准的 MITRE ATT&CK 框架，得出一个令人不安的结论：AI 正把攻击者推向攻击链<b>更深、更自主</b>的阶段，而安全界用来分辨"高危 vs 低危"的老办法，以及 ATT&CK 框架本身，<b>都已经跟不上了</b>。
+  </div>
+
+  <section>
+    <h2><span class="tag">数据基础</span>832 个真实账户，映射到攻防"字典"</h2>
+    <p class="body">分析对象是一年内因恶意网络活动被封、且细节足够做深入评估的 <b>832 个账户</b>（仅为同期被封总量的一个子集）。它们被逐一对照 <b>MITRE ATT&CK</b>——一个长期维护的攻击者战术与技术数据库。部分结果已发表在 <b>Verizon《2026 数据泄露调查报告（DBIR）》</b>，本文给出更细的拆解。</p>
+    <p class="take">结论：用一个公认的框架去量化真实滥用，才能客观看出"AI 改变了攻击的哪一部分"。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">发现一</span>AI 正把攻击者推向攻击链的"深水区"</h2>
+    <p class="body">最常见的 AI 用途仍是攻击<b>准备阶段</b>，比如写恶意软件（<b>560/832，67.3%</b>）；用于复杂操作的人少得多，例如<b>横向移动</b>（在被攻陷网络内部纵深移动）只有 <b>54/832，6.5%</b>。但趋势在变：AI 用于<b>账户发现</b>（在已攻陷环境中找有效账户）上升 <b>8.9%</b>，而 AI 辅助<b>钓鱼</b>（一种获取初始访问的手段）下降 <b>8.6%</b>。换句话说，AI 正从"破门而入"转向"进门之后"。</p>
+    <div class="bars">
+      <div class="bar"><div class="name">写恶意软件</div><div class="track"><div class="fill" style="width:100%;background:linear-gradient(90deg,#ff7a7a,#ffb37a)">67.3% · 560/832</div></div></div>
+      <div class="bar"><div class="name">横向移动</div><div class="track"><div class="fill" style="width:9.6%;background:#6ea8fe">6.5%</div></div></div>
+    </div>
+    <div class="flow">
+      <span class="node">钓鱼/初始访问 <b style="color:var(--good)">↓8.6%</b></span>
+      <span class="sep">→</span>
+      <span class="node hot">账户发现/后渗透 <b>↑8.9%</b></span>
+    </div>
+    <p class="take">结论：过去这些"后渗透"动作只有有技术功底的人才能做，如今 AI 替低技能者把它们也跑了起来——危险下沉到更广的人群。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">发现二</span>老的风险评估信号正在失效</h2>
+    <p class="body">传统上，安全团队靠"用了多少种技术、用什么工具/接口"来判断威胁等级。但当 AI 能代劳高技术任务后，<b>技能与技术数量之间几乎不再相关</b>：技能最低的攻击者平均用约 <b>16</b> 种技术，最高的也只用约 <b>20</b> 种。所用平台（Claude Code、API 还是聊天界面）同样<b>与风险无关</b>。整体风险也在上移——中风险及以上账户占比从前半年的 <b>33%</b> 跳到后半年的 <b>56%</b>，约 <b>1.7 倍</b>。</p>
+    <div class="stat-grid">
+      <div class="stat"><div class="big">16 → 20</div><div class="lbl">最低技能 vs 最高技能者平均使用的技术数（差距极小）</div></div>
+      <div class="stat"><div class="big warn">33% → 56%</div><div class="lbl">中风险及以上账户占比（半年内 ~1.7 倍）</div></div>
+    </div>
+    <p class="take">结论：更耐用的区分信号不是"用了多少技术"，而是攻击者<b>围绕模型搭的脚手架</b>——能否让模型把攻击各阶段自动串起来、几乎无需人工。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">发现三</span>ATT&CK 框架没覆盖最危险的那部分</h2>
+    <p class="body">让最高危攻击者真正可怕的行为——用 AI <b>按顺序编排攻击步骤、实时决定下一步、无人值守执行</b>——目前还不在 MITRE ATT&CK 的技术清单里。看 <b>2025 年 11 月</b>被挫败的那次国家级网络间谍行动：按 ATT&CK 映射，它仅用 <b>30 种技术、横跨 13 类战术</b>，看上去和很多<b>中风险</b>账户差不多；但用 Anthropic 自己的风险评分法，它拿到了<b>满分 100</b>。在那次行动里，模型作为<b>自主智能体</b>执行命令、利用漏洞、窃取凭证、做战术决策，只在少数关键节点需要人介入——而 ATT&CK 里<b>根本没有对应这种"智能体编排"的 ID</b>。</p>
+    <div class="stat-grid">
+      <div class="stat"><div class="big">30 / 13</div><div class="lbl">该行动的技术数 / 战术数（按 ATT&CK 仅算中风险）</div></div>
+      <div class="stat"><div class="big warn">100</div><div class="lbl">同一行动按 Anthropic 风险评分（满分）</div></div>
+    </div>
+    <p class="take">结论：只数"用了多少技术"会严重低估自主智能体的真实威胁——框架需要为"agentic orchestration"补上新条目。</p>
+  </section>
+
+  <section>
+    <h2><span class="tag">行动</span>从测绘到防御：把工具先交给防御方</h2>
+    <p class="body">这份分析直接反哺了模型的安全护栏：Anthropic 已在最强模型上部署<b>网络安全防护</b>，用于检测并拦截本文揭示的部分行为（如开发恶意软件、大规模数据外泄）。延续与 Verizon 的合作，他们也正与 <b>MITRE</b> 讨论 ATT&CK 框架如何演进以纳入这些 AI 使能行为。更多结果与攻击技术的<b>交互式可视化</b>发布在 Frontier Red Team 博客，并将持续通过 <b>Project Glasswing</b> 等渠道公开。</p>
+    <p class="take">结论：防御要"抢在前面"，既要修补框架的盲区，也要把最强工具优先放到防御者手里。</p>
+  </section>
+
+  <div class="insights">
+    <h2>最值得带走的洞见</h2>
+    <ol>
+      <li><b>这是实证，不是预测。</b>结论来自一年、832 个真实被封账户与 ATT&CK 的逐一映射，并已部分进入 Verizon 2026 DBIR。</li>
+      <li><b>AI 的重心在下移到攻击链深处。</b>写恶意软件仍是主流（67.3%），但账户发现 ↑8.9%、钓鱼 ↓8.6%，"后渗透"能力正下放给低技能者。</li>
+      <li><b>"用了多少技术"已不再可靠。</b>最低与最高技能者只差 16 vs 20 种，平台也与风险无关；真正的区分点是攻击者给模型搭的<b>自动化脚手架</b>。</li>
+      <li><b>自主编排是新的最高危特征。</b>11 月那次行动按 ATT&CK 只算中风险（30 技术/13 战术），按风险评分却满分 100——框架缺了"agentic orchestration"。</li>
+      <li><b>整体威胁水位在快速抬升。</b>中风险及以上账户半年内从 33% 升到 56%，意味着护栏与框架升级的紧迫性都在上升。</li>
+    </ol>
+  </div>
+
+  <p class="note">注：本文为 Anthropic 政策博客《What we learned mapping a year's worth of AI-enabled cyber threats》（2026-06-03）的中文总结。832 个账户、2025-03 至 2026-03、67.3%（560/832）、6.5%（54/832）、33%→56%（~1.7 倍）、账户发现 ↑8.9% / 钓鱼 ↓8.6%、16 vs 20 种技术、2025-11 行动 30 技术/13 战术 vs 风险评分 100、Verizon 2026 DBIR、MITRE ATT&CK、Project Glasswing 等均为原文信息。</p>
+
+</div>
+</body>
+</html>

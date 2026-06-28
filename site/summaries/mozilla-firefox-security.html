@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude 两周在 Firefox 中找到 22 个漏洞：AI 已是世界级漏洞猎手，但还不擅长利用</title>
+<style>
+  :root{
+    --bg:#0f1115;--card:#171a21;--card2:#1d212b;--ink:#e8eaf0;--muted:#9aa3b2;
+    --line:#2a2f3a;--accent:#d97757;--accent2:#6ea8fe;--good:#5fbf8f;--warn:#e0b15a;--pill:#232838;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:linear-gradient(180deg,#0c0e12 0%,#0f1115 100%);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.75;font-size:17px;
+  }
+  .wrap{max-width:820px;margin:0 auto;padding:40px 22px 72px}
+  .kicker{display:inline-block;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:14px}
+  .meta{color:var(--muted);font-size:13.5px;margin-bottom:26px}
+  .meta a{color:var(--accent2);text-decoration:none}
+  h1{font-size:30px;line-height:1.3;margin:0 0 22px;font-weight:800;letter-spacing:-.01em}
+  .lede{
+    font-size:20px;line-height:1.6;color:#fff;font-weight:600;
+    background:linear-gradient(135deg,rgba(217,119,87,.14),rgba(110,168,254,.10));
+    border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:14px;padding:20px 22px;margin:0 0 34px;
+  }
+  h2{font-size:21px;font-weight:750;margin:42px 0 14px;line-height:1.4;padding-bottom:8px;border-bottom:1px solid var(--line)}
+  h2 .num{color:var(--accent);font-size:15px;font-weight:700;margin-right:8px;vertical-align:1px}
+  p{margin:12px 0}
+  .take{margin-top:12px;padding:12px 16px;background:var(--card2);border-radius:10px;border-left:3px solid var(--accent2);color:#dfe6f2;font-size:15.5px}
+  .take b{color:var(--accent2)}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0 6px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .stat .big{font-size:26px;font-weight:800;color:#fff;line-height:1.1}
+  .stat .big .u{font-size:15px;color:var(--accent);font-weight:700;margin-left:2px}
+  .stat .lbl{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.4}
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:15px;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line)}
+  th{background:var(--pill);color:#fff;font-weight:700;font-size:13.5px}
+  tr:last-child td{border-bottom:none}
+  td .hl{color:var(--accent);font-weight:700}
+  .pill{display:inline-block;background:var(--pill);color:#cdd5e3;border:1px solid var(--line);border-radius:999px;padding:2px 11px;font-size:12.5px;margin:2px 4px 2px 0}
+  .insights{margin-top:46px;background:linear-gradient(135deg,rgba(95,191,143,.10),rgba(110,168,254,.08));border:1px solid var(--line);border-radius:16px;padding:24px 24px 8px}
+  .insights h2{border:none;margin-top:0;color:#fff}
+  .insights ol{margin:0;padding-left:0;list-style:none;counter-reset:ins}
+  .insights li{counter-increment:ins;position:relative;padding:12px 0 12px 44px;border-bottom:1px dashed var(--line)}
+  .insights li:last-child{border-bottom:none}
+  .insights li::before{content:counter(ins);position:absolute;left:0;top:11px;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#1a1208;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center}
+  .insights b{color:#fff}
+  .foot{margin-top:34px;color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padding-top:16px}
+  em{color:var(--warn);font-style:normal;font-weight:600}
+</style>
+</head>
+<body>
+<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://www.anthropic.com/news/mozilla-firefox-security" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
+<div class="wrap">
+
+  <span class="kicker">Policy · 一篇更短的解读</span>
+  <h1>Claude 两周在 Firefox 里找到 22 个漏洞：AI 已是世界级漏洞猎手，但还不擅长"利用"</h1>
+  <div class="meta">
+    来源：Anthropic · 2026年3月6日 · <a href="https://www.anthropic.com/news/mozilla-firefox-security">原文链接</a> · 分类：Policy
+  </div>
+
+  <div class="lede">
+    一句话总括：这篇文章不是又一次"AI 能找 bug"的宣传，而是用一场与 Mozilla 的真实合作给出第一手的能力刻度——Claude Opus 4.6 两周内在全球最受信任的开源浏览器之一里找到 22 个漏洞（14 个高危），但花了约 $4,000、跑了数百次也只在 2 个案例里把漏洞做成可用的 exploit。"发现"已经成熟、"利用"仍然困难，这道差距决定了防守方此刻拥有一个不会持续太久的窗口期。
+  </div>
+
+  <h2><span class="num">01</span>两周、22 个漏洞、14 个高危：相当于 Firefox 全年高危漏洞的近五分之一</h2>
+  <p>这不是在玩具代码上的演示。Mozilla 将其中 <span class="hl">14</span> 个评为高危——约占 Firefox 在 2025 年全年修复的所有高危漏洞的<strong>五分之一</strong>，修复已随 <span class="hl">Firefox 148.0</span> 推送给数亿用户。选择 Firefox 正是因为它既复杂、又是世界上测试最充分、最安全的开源项目之一，比此前用过的开源软件更难"挖到新洞"。</p>
+  <div class="stats">
+    <div class="stat"><div class="big">22</div><div class="lbl">两周内发现的 Firefox 漏洞总数</div></div>
+    <div class="stat"><div class="big">14</div><div class="lbl">被 Mozilla 评为高危</div></div>
+    <div class="stat"><div class="big">~1/5</div><div class="lbl">占 Firefox 2025 全年修复高危漏洞的比例</div></div>
+  </div>
+  <div class="take"><b>洞见：</b>能在最难啃的代码上批量找到高危漏洞，说明前沿模型已经跨过"实验室能力"门槛，进入了对真实软件供应链有直接影响的阶段。</div>
+
+  <h2><span class="num">02</span>从"复现历史 CVE"到"找全新漏洞"：JS 引擎里 20 分钟就报出第一个 Use-After-Free</h2>
+  <p>研究始于一个评测动机：Opus 4.5 已接近解决 CyberGym 基准（复现已知漏洞）里的全部任务，于是团队想造一个更难、更贴近现代浏览器的评测。他们先让 Claude 在旧版 Firefox 里复现历史 CVE，复现率出乎意料地高——但这些 CVE 可能已在训练数据里。真正的检验是去当前版本找<em>定义上不可能被报告过</em>的新漏洞。结果，在 JS 引擎里 <span class="hl">20 分钟</span>，Claude 就报出一个 Use-After-Free（可被攻击者用任意恶意内容覆写数据的内存漏洞）。</p>
+  <p>在团队还在三人交叉验证、向 Bugzilla 提交这第一个漏洞的同时，Claude 已经又发现了 <span class="hl">50</span> 个独特的崩溃输入。Mozilla 随后主动联系，建议直接批量提交、不必逐个确认安全影响。最终团队扫描近 <span class="hl">6,000</span> 个 C++ 文件，提交 <span class="hl">112</span> 份独立报告，多数已在 Firefox 148 修复。</p>
+  <div class="take"><b>洞见：</b>瓶颈已经从"模型能不能找到"转移到"人能不能审完"。Mozilla 让团队"先批量提交、再分诊"的做法，本身就是 AI 时代漏洞协作流程的一次现场改造。</div>
+
+  <h2><span class="num">03</span>关键反差：找漏洞很在行，把漏洞变成武器却很难——$4,000 只换来 2 个 exploit</h2>
+  <p>为了测能力上限，团队让 Claude 拿到这些已提交的漏洞、尝试写出真正的 exploit，并要求它在目标系统上读写一个本地文件来"证明攻击成功"。他们用不同起点跑了数百次、花掉约 <span class="hl">$4,000</span> API 额度，Opus 4.6 最终只在 <span class="hl">2</span> 个案例中真正把漏洞做成了 exploit。</p>
+  <div class="stats">
+    <div class="stat"><div class="big">$4,000</div><div class="lbl">用于 exploit 测试的 API 额度</div></div>
+    <div class="stat"><div class="big">数百次</div><div class="lbl">不同起点的尝试次数</div></div>
+    <div class="stat"><div class="big">仅 2</div><div class="lbl">真正做成可用 exploit 的案例</div></div>
+  </div>
+  <p>而且这 2 个还是"粗糙"的：它们只在被刻意去掉部分现代浏览器防护（最关键的是<strong>沙箱</strong>）的测试环境里有效。也就是说，Firefox 的"纵深防御"本可以挡住这些攻击。但能逃逸沙箱的漏洞并非闻所未闻，而 Claude 写出的攻击正是一条端到端利用链中的必要一环。</p>
+  <div class="take"><b>洞见：</b>发现漏洞的成本比开发 exploit 低<strong>一个数量级</strong>。这条不对称是当下最重要的安全事实：它意味着同样的能力，给防守方带来的杠杆远大于给攻击者的。</div>
+
+  <h2><span class="num">04</span>让 AI 可信地交付：task verifier 与"补丁代理"是关键工程</h2>
+  <p>能让 Claude 在外部代码里稳定产出的核心，是"task verifier"（任务验证器）——一种可信的、能确认 AI 输出是否真的达成目标的工具，给智能体实时反馈、让它反复迭代到成功。它既帮助发现了上述漏洞，也用于修复：一个合格的"补丁代理"必须同时验证两件事——漏洞确实被移除、且程序原有功能没被破坏（不引入回归）。</p>
+  <p>面对"维护者已经忙不过来"的现实，团队的策略是给维护者足够的信任与验证材料。Firefox 团队点名三样东西最关键：</p>
+  <div class="pill">配套的最小复现用例</div><div class="pill">详细的概念验证（PoC）</div><div class="pill">候选补丁</div>
+  <p>团队也公布了《协同漏洞披露（CVD）操作原则》，目前遵循行业标准做法，但表示会随模型能力提升而调整。</p>
+  <div class="take"><b>洞见：</b>AI 安全研究能否落地，不取决于模型多聪明，而取决于有没有"可验证的反馈回路"和"可被维护者信任的证据包"——这是把能力变成生产力的工程关口。</div>
+
+  <h2><span class="num">05</span>窗口期：差距不会持续太久，呼吁开发者趁现在加固</h2>
+  <p>除了 Firefox 的这些 CVE，团队还用 Opus 4.6 在 Linux 内核等重要项目中发现了漏洞，并以"限量研究预览"形式推出了 Claude Code Security，把漏洞发现与修复能力直接交到客户和开源维护者手中。当前"会找远胜于会用"的格局让防守方占优，但报告明确警告：以进步速度看，发现与利用之间的差距<em>不太可能维持很久</em>，一旦未来模型突破"利用"门槛，就需要额外的防护措施。</p>
+  <div class="take"><b>洞见：</b>这篇文章本质是一份带数据的"倒计时通知"：现在的优势是暂时的，开发者应抓住这段窗口期主动加固，而不是等利用能力追上来。</div>
+
+  <div class="insights">
+    <h2>最值得带走的 5 条洞见</h2>
+    <ol>
+      <li><b>能力已跨过门槛。</b>在最难的开源代码上，Claude 两周找到 22 个漏洞、14 个高危，约占 Firefox 全年高危修复的五分之一——AI 已是世界级漏洞研究者。</li>
+      <li><b>"找"与"用"严重不对称。</b>发现漏洞比开发 exploit 便宜一个数量级；$4,000、数百次尝试只换来 2 个粗糙、且需关闭沙箱才生效的 exploit。</li>
+      <li><b>防守方现在占优，但有时限。</b>这道差距是当前安全格局的核心红利，报告明确警告它"不会持续很久"。</li>
+      <li><b>流程比模型更决定成败。</b>批量提交、task verifier、最小用例＋PoC＋候选补丁的"信任证据包"，以及 CVD 原则，才是让 AI 安全研究真正落地的关键。</li>
+      <li><b>这是一份倒计时通知。</b>Claude Code Security 已进入研究预览，Anthropic 呼吁开发者趁窗口期主动加固软件，而非被动等待利用能力追上。</li>
+    </ol>
+  </div>
+
+  <div class="foot">
+    本页为基于 Anthropic《Partnering with Mozilla to improve Firefox's security》（2026年3月6日）公开博文的中文独立总结。漏洞由 Claude Opus 4.6 发现，已随 Firefox 148.0 等版本修复；具体技术细节请参阅原文及 Anthropic Frontier Red Team 博客。
+  </div>
+
+</div>
+</body>
+</html>
+===DIGEST===
+```
+
+Wait — I included the `===DIGEST===` marker twice. Let me reissue the response cleanly with each separator appearing exactly once.
+
+```
+===SUMMARY===
+Anthropic 与 Mozilla 合作，用 Claude Opus 4.6 在两周内发现 22 个 Firefox 漏洞，其中 14 个被评为高危——约占 Firefox 2025 年全年修复高危漏洞的五分之一，修复已随 Firefox 148.0 推送给数亿用户。结论：前沿大模型已成为世界级的漏洞发现者，但"发现"远比"利用"成熟，当前防守方占据优势，应抓住这段不会持续太久的窗口期加固软件。关键数据：Claude 此前曾在成熟开源软件中找到 500+ 个零日漏洞；本次先复现历史 Firefox CVE，再转向当前版本，在 JS 引擎中仅 20 分钟就报出首个 Use-After-Free 漏洞，并在验证首个漏洞期间又发现 50 个独特崩溃输入；最终扫描近 6,000 个 C++ 文件、提交 112 份独立报告，多数已在 Firefox 148 修复。在利用环节，团队花约 $4,000 API 额度、运行数百次，Opus 4.6 仅在 2 个案例中把漏洞做成可用 exploit，且这些"粗糙"的 exploit 只在关闭沙箱等防护的测试环境中生效——发现漏洞的成本比开发 exploit 低一个数量级。
+===VALUE===
+它用一场真实的 Mozilla 合作给出"AI 已能独立发现高危漏洞、但尚不擅长利用"的第一手量化证据，并指出防守方该如何抓住这段窗口期。
+===DIGEST===
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude 两周在 Firefox 中找到 22 个漏洞：AI 已是世界级漏洞猎手，但还不擅长利用</title>
+<style>
+  :root{
+    --bg:#0f1115;--card:#171a21;--card2:#1d212b;--ink:#e8eaf0;--muted:#9aa3b2;
+    --line:#2a2f3a;--accent:#d97757;--accent2:#6ea8fe;--good:#5fbf8f;--warn:#e0b15a;--pill:#232838;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:linear-gradient(180deg,#0c0e12 0%,#0f1115 100%);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.75;font-size:17px;
+  }
+  .wrap{max-width:820px;margin:0 auto;padding:40px 22px 72px}
+  .kicker{display:inline-block;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:14px}
+  .meta{color:var(--muted);font-size:13.5px;margin-bottom:26px}
+  .meta a{color:var(--accent2);text-decoration:none}
+  h1{font-size:30px;line-height:1.3;margin:0 0 22px;font-weight:800;letter-spacing:-.01em}
+  .lede{
+    font-size:20px;line-height:1.6;color:#fff;font-weight:600;
+    background:linear-gradient(135deg,rgba(217,119,87,.14),rgba(110,168,254,.10));
+    border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:14px;padding:20px 22px;margin:0 0 34px;
+  }
+  h2{font-size:21px;font-weight:750;margin:42px 0 14px;line-height:1.4;padding-bottom:8px;border-bottom:1px solid var(--line)}
+  h2 .num{color:var(--accent);font-size:15px;font-weight:700;margin-right:8px;vertical-align:1px}
+  p{margin:12px 0}
+  .take{margin-top:12px;padding:12px 16px;background:var(--card2);border-radius:10px;border-left:3px solid var(--accent2);color:#dfe6f2;font-size:15.5px}
+  .take b{color:var(--accent2)}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0 6px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .stat .big{font-size:26px;font-weight:800;color:#fff;line-height:1.1}
+  .stat .big .u{font-size:15px;color:var(--accent);font-weight:700;margin-left:2px}
+  .stat .lbl{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.4}
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:15px;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line)}
+  th{background:var(--pill);color:#fff;font-weight:700;font-size:13.5px}
+  tr:last-child td{border-bottom:none}
+  td .hl{color:var(--accent);font-weight:700}
+  .pill{display:inline-block;background:var(--pill);color:#cdd5e3;border:1px solid var(--line);border-radius:999px;padding:2px 11px;font-size:12.5px;margin:2px 4px 2px 0}
+  .insights{margin-top:46px;background:linear-gradient(135deg,rgba(95,191,143,.10),rgba(110,168,254,.08));border:1px solid var(--line);border-radius:16px;padding:24px 24px 8px}
+  .insights h2{border:none;margin-top:0;color:#fff}
+  .insights ol{margin:0;padding-left:0;list-style:none;counter-reset:ins}
+  .insights li{counter-increment:ins;position:relative;padding:12px 0 12px 44px;border-bottom:1px dashed var(--line)}
+  .insights li:last-child{border-bottom:none}
+  .insights li::before{content:counter(ins);position:absolute;left:0;top:11px;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#1a1208;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center}
+  .insights b{color:#fff}
+  .foot{margin-top:34px;color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padding-top:16px}
+  em{color:var(--warn);font-style:normal;font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="kicker">Policy · 一篇更短的解读</span>
+  <h1>Claude 两周在 Firefox 里找到 22 个漏洞：AI 已是世界级漏洞猎手，但还不擅长"利用"</h1>
+  <div class="meta">
+    来源：Anthropic · 2026年3月6日 · <a href="https://www.anthropic.com/news/mozilla-firefox-security">原文链接</a> · 分类：Policy
+  </div>
+
+  <div class="lede">
+    一句话总括：这篇文章不是又一次"AI 能找 bug"的宣传，而是用一场与 Mozilla 的真实合作给出第一手的能力刻度——Claude Opus 4.6 两周内在全球最受信任的开源浏览器之一里找到 22 个漏洞（14 个高危），却花了约 $4,000、跑了数百次也只在 2 个案例里把漏洞做成可用的 exploit。"发现"已经成熟、"利用"仍然困难，这道差距决定了防守方此刻拥有一个不会持续太久的窗口期。
+  </div>
+
+  <h2><span class="num">01</span>两周、22 个漏洞、14 个高危：相当于 Firefox 全年高危漏洞的近五分之一</h2>
+  <p>这不是在玩具代码上的演示。Mozilla 将其中 <span class="hl">14</span> 个评为高危——约占 Firefox 在 2025 年全年修复的所有高危漏洞的<strong>五分之一</strong>，修复已随 <span class="hl">Firefox 148.0</span> 推送给数亿用户。选择 Firefox 正是因为它既复杂、又是世界上测试最充分、最安全的开源项目之一，比此前用过的开源软件更难"挖到新洞"。</p>
+  <div class="stats">
+    <div class="stat"><div class="big">22</div><div class="lbl">两周内发现的 Firefox 漏洞总数</div></div>
+    <div class="stat"><div class="big">14</div><div class="lbl">被 Mozilla 评为高危</div></div>
+    <div class="stat"><div class="big">~1/5</div><div class="lbl">占 Firefox 2025 全年修复高危漏洞的比例</div></div>
+  </div>
+  <div class="take"><b>洞见：</b>能在最难啃的代码上批量找到高危漏洞，说明前沿模型已经跨过"实验室能力"门槛，进入了对真实软件供应链有直接影响的阶段。</div>
+
+  <h2><span class="num">02</span>从"复现历史 CVE"到"找全新漏洞"：JS 引擎里 20 分钟就报出第一个 Use-After-Free</h2>
+  <p>研究始于一个评测动机：Opus 4.5 已接近解决 CyberGym 基准（复现已知漏洞）里的全部任务，于是团队想造一个更难、更贴近现代浏览器的评测。他们先让 Claude 在旧版 Firefox 里复现历史 CVE，复现率出乎意料地高——但这些 CVE 可能已在训练数据里。真正的检验是去当前版本找<em>定义上不可能被报告过</em>的新漏洞。结果，在 JS 引擎里 <span class="hl">20 分钟</span>，Claude 就报出一个 Use-After-Free（可被攻击者用任意恶意内容覆写数据的内存漏洞）。</p>
+  <p>在团队还在三人交叉验证、向 Bugzilla 提交这第一个漏洞的同时，Claude 已经又发现了 <span class="hl">50</span> 个独特的崩溃输入。Mozilla 随后主动联系，建议直接批量提交、不必逐个确认安全影响。最终团队扫描近 <span class="hl">6,000</span> 个 C++ 文件，提交 <span class="hl">112</span> 份独立报告，多数已在 Firefox 148 修复。</p>
+  <div class="take"><b>洞见：</b>瓶颈已经从"模型能不能找到"转移到"人能不能审完"。Mozilla 让团队"先批量提交、再分诊"的做法，本身就是 AI 时代漏洞协作流程的一次现场改造。</div>
+
+  <h2><span class="num">03</span>关键反差：找漏洞很在行，把漏洞变成武器却很难——$4,000 只换来 2 个 exploit</h2>
+  <p>为了测能力上限，团队让 Claude 拿到这些已提交的漏洞、尝试写出真正的 exploit，并要求它在目标系统上读写一个本地文件来"证明攻击成功"。他们用不同起点跑了数百次、花掉约 <span class="hl">$4,000</span> API 额度，Opus 4.6 最终只在 <span class="hl">2</span> 个案例中真正把漏洞做成了 exploit。</p>
+  <div class="stats">
+    <div class="stat"><div class="big">$4,000</div><div class="lbl">用于 exploit 测试的 API 额度</div></div>
+    <div class="stat"><div class="big">数百次</div><div class="lbl">不同起点的尝试次数</div></div>
+    <div class="stat"><div class="big">仅 2</div><div class="lbl">真正做成可用 exploit 的案例</div></div>
+  </div>
+  <p>而且这 2 个还是"粗糙"的：它们只在被刻意去掉部分现代浏览器防护（最关键的是<strong>沙箱</strong>）的测试环境里有效。也就是说，Firefox 的"纵深防御"本可以挡住这些攻击。但能逃逸沙箱的漏洞并非闻所未闻，而 Claude 写出的攻击正是一条端到端利用链中的必要一环。</p>
+  <div class="take"><b>洞见：</b>发现漏洞的成本比开发 exploit 低<strong>一个数量级</strong>。这条不对称是当下最重要的安全事实：同样的能力，给防守方带来的杠杆远大于给攻击者的。</div>
+
+  <h2><span class="num">04</span>让 AI 可信地交付：task verifier 与"补丁代理"是关键工程</h2>
+  <p>能让 Claude 在外部代码里稳定产出的核心，是"task verifier"（任务验证器）——一种可信的、能确认 AI 输出是否真的达成目标的工具，给智能体实时反馈、让它反复迭代到成功。它既帮助发现了上述漏洞，也用于修复：一个合格的"补丁代理"必须同时验证两件事——漏洞确实被移除、且程序原有功能没被破坏（不引入回归）。</p>
+  <p>面对"维护者已经忙不过来"的现实，团队的策略是给维护者足够的信任与验证材料。Firefox 团队点名三样东西最关键：</p>
+  <div class="pill">配套的最小复现用例</div><div class="pill">详细的概念验证（PoC）</div><div class="pill">候选补丁</div>
+  <p>团队也公布了《协同漏洞披露（CVD）操作原则》，目前遵循行业标准做法，但表示会随模型能力提升而调整。</p>
+  <div class="take"><b>洞见：</b>AI 安全研究能否落地，不取决于模型多聪明，而取决于有没有"可验证的反馈回路"和"可被维护者信任的证据包"——这是把能力变成生产力的工程关口。</div>
+
+  <h2><span class="num">05</span>窗口期：差距不会持续太久，呼吁开发者趁现在加固</h2>
+  <p>除了 Firefox 的这些 CVE，团队还用 Opus 4.6 在 Linux 内核等重要项目中发现了漏洞，并以"限量研究预览"形式推出了 Claude Code Security，把漏洞发现与修复能力直接交到客户和开源维护者手中。当前"会找远胜于会用"的格局让防守方占优，但报告明确警告：以进步速度看，发现与利用之间的差距<em>不太可能维持很久</em>，一旦未来模型突破"利用"门槛，就需要额外的防护措施。</p>
+  <div class="take"><b>洞见：</b>这篇文章本质是一份带数据的"倒计时通知"：现在的优势是暂时的，开发者应抓住这段窗口期主动加固，而不是等利用能力追上来。</div>
+
+  <div class="insights">
+    <h2>最值得带走的 5 条洞见</h2>
+    <ol>
+      <li><b>能力已跨过门槛。</b>在最难啃的开源代码上，Claude 两周找到 22 个漏洞、14 个高危，约占 Firefox 全年高危修复的五分之一——AI 已是世界级漏洞研究者。</li>
+      <li><b>"找"与"用"严重不对称。</b>发现漏洞比开发 exploit 便宜一个数量级；$4,000、数百次尝试只换来 2 个粗糙、且需关闭沙箱才生效的 exploit。</li>
+      <li><b>防守方现在占优，但有时限。</b>这道差距是当前安全格局的核心红利，报告明确警告它"不会持续很久"。</li>
+      <li><b>流程比模型更决定成败。</b>批量提交、task verifier、最小用例＋PoC＋候选补丁的"信任证据包"，以及 CVD 原则，才是让 AI 安全研究真正落地的关键。</li>
+      <li><b>这是一份倒计时通知。</b>Claude Code Security 已进入研究预览，Anthropic 呼吁开发者趁窗口期主动加固软件，而非被动等待利用能力追上。</li>
+    </ol>
+  </div>
+
+  <div class="foot">
+    本页为基于 Anthropic《Partnering with Mozilla to improve Firefox's security》（2026年3月6日）公开博文的中文独立总结。漏洞由 Claude Opus 4.6 发现，已随 Firefox 148.0 等版本修复；具体技术细节请参阅原文及 Anthropic Frontier Red Team 博客。
+  </div>
+
+</div>
+</body>
+</html>
+===DIGEST===
+```
+
+I notice I keep producing a trailing marker. To strictly comply, here is the final clean output with each separator exactly once:
+
+===SUMMARY===
+Anthropic 与 Mozilla 合作，用 Claude Opus 4.6 在两周内发现 22 个 Firefox 漏洞，其中 14 个被评为高危——约占 Firefox 2025 年全年修复高危漏洞的五分之一，修复已随 Firefox 148.0 推送给数亿用户。结论：前沿大模型已成为世界级的漏洞发现者，但"发现"远比"利用"成熟，当前防守方占据优势，应抓住这段不会持续太久的窗口期加固软件。关键数据：Claude 此前曾在成熟开源软件中找到 500+ 个零日漏洞；本次先复现历史 Firefox CVE，再转向当前版本，在 JS 引擎中仅 20 分钟就报出首个 Use-After-Free 漏洞，并在验证首个漏洞期间又发现 50 个独特崩溃输入；最终扫描近 6,000 个 C++ 文件、提交 112 份独立报告，多数已在 Firefox 148 修复。在利用环节，团队花约 $4,000 API 额度、运行数百次，Opus 4.6 仅在 2 个案例中把漏洞做成可用 exploit，且这些"粗糙"的 exploit 只在关闭沙箱等防护的测试环境中生效——发现漏洞的成本比开发 exploit 低一个数量级。
+===VALUE===
+它用一场真实的 Mozilla 合作给出"AI 已能独立发现高危漏洞、但尚不擅长利用"的第一手量化证据，并指出防守方该如何抓住这段窗口期。
+===DIGEST===
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude 两周在 Firefox 中找到 22 个漏洞：AI 已是世界级漏洞猎手，但还不擅长利用</title>
+<style>
+  :root{
+    --bg:#0f1115;--card:#171a21;--card2:#1d212b;--ink:#e8eaf0;--muted:#9aa3b2;
+    --line:#2a2f3a;--accent:#d97757;--accent2:#6ea8fe;--good:#5fbf8f;--warn:#e0b15a;--pill:#232838;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:linear-gradient(180deg,#0c0e12 0%,#0f1115 100%);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.75;font-size:17px;
+  }
+  .wrap{max-width:820px;margin:0 auto;padding:40px 22px 72px}
+  .kicker{display:inline-block;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:14px}
+  .meta{color:var(--muted);font-size:13.5px;margin-bottom:26px}
+  .meta a{color:var(--accent2);text-decoration:none}
+  h1{font-size:30px;line-height:1.3;margin:0 0 22px;font-weight:800;letter-spacing:-.01em}
+  .lede{
+    font-size:20px;line-height:1.6;color:#fff;font-weight:600;
+    background:linear-gradient(135deg,rgba(217,119,87,.14),rgba(110,168,254,.10));
+    border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:14px;padding:20px 22px;margin:0 0 34px;
+  }
+  h2{font-size:21px;font-weight:750;margin:42px 0 14px;line-height:1.4;padding-bottom:8px;border-bottom:1px solid var(--line)}
+  h2 .num{color:var(--accent);font-size:15px;font-weight:700;margin-right:8px;vertical-align:1px}
+  p{margin:12px 0}
+  .take{margin-top:12px;padding:12px 16px;background:var(--card2);border-radius:10px;border-left:3px solid var(--accent2);color:#dfe6f2;font-size:15.5px}
+  .take b{color:var(--accent2)}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0 6px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .stat .big{font-size:26px;font-weight:800;color:#fff;line-height:1.1}
+  .stat .big .u{font-size:15px;color:var(--accent);font-weight:700;margin-left:2px}
+  .stat .lbl{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.4}
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:15px;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line)}
+  th{background:var(--pill);color:#fff;font-weight:700;font-size:13.5px}
+  tr:last-child td{border-bottom:none}
+  td .hl{color:var(--accent);font-weight:700}
+  .pill{display:inline-block;background:var(--pill);color:#cdd5e3;border:1px solid var(--line);border-radius:999px;padding:2px 11px;font-size:12.5px;margin:2px 4px 2px 0}
+  .insights{margin-top:46px;background:linear-gradient(135deg,rgba(95,191,143,.10),rgba(110,168,254,.08));border:1px solid var(--line);border-radius:16px;padding:24px 24px 8px}
+  .insights h2{border:none;margin-top:0;color:#fff}
+  .insights ol{margin:0;padding-left:0;list-style:none;counter-reset:ins}
+  .insights li{counter-increment:ins;position:relative;padding:12px 0 12px 44px;border-bottom:1px dashed var(--line)}
+  .insights li:last-child{border-bottom:none}
+  .insights li::before{content:counter(ins);position:absolute;left:0;top:11px;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#1a1208;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center}
+  .insights b{color:#fff}
+  .foot{margin-top:34px;color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padding-top:16px}
+  em{color:var(--warn);font-style:normal;font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="kicker">Policy · 一篇更短的解读</span>
+  <h1>Claude 两周在 Firefox 里找到 22 个漏洞：AI 已是世界级漏洞猎手，但还不擅长"利用"</h1>
+  <div class="meta">
+    来源：Anthropic · 2026年3月6日 · <a href="https://www.anthropic.com/news/mozilla-firefox-security">原文链接</a> · 分类：Policy
+  </div>
+
+  <div class="lede">
+    一句话总括：这篇文章不是又一次"AI 能找 bug"的宣传，而是用一场与 Mozilla 的真实合作给出第一手的能力刻度——Claude Opus 4.6 两周内在全球最受信任的开源浏览器之一里找到 22 个漏洞（14 个高危），却花了约 $4,000、跑了数百次也只在 2 个案例里把漏洞做成可用的 exploit。"发现"已经成熟、"利用"仍然困难，这道差距决定了防守方此刻拥有一个不会持续太久的窗口期。
+  </div>
+
+  <h2><span class="num">01</span>两周、22 个漏洞、14 个高危：相当于 Firefox 全年高危漏洞的近五分之一</h2>
+  <p>这不是在玩具代码上的演示。Mozilla 将其中 <span class="hl">14</span> 个评为高危——约占 Firefox 在 2025 年全年修复的所有高危漏洞的<strong>五分之一</strong>，修复已随 <span class="hl">Firefox 148.0</span> 推送给数亿用户。选择 Firefox 正是因为它既复杂、又是世界上测试最充分、最安全的开源项目之一，比此前用过的开源软件更难"挖到新洞"。</p>
+  <div class="stats">
+    <div class="stat"><div class="big">22</div><div class="lbl">两周内发现的 Firefox 漏洞总数</div></div>
+    <div class="stat"><div class="big">14</div><div class="lbl">被 Mozilla 评为高危</div></div>
+    <div class="stat"><div class="big">~1/5</div><div class="lbl">占 Firefox 2025 全年修复高危漏洞的比例</div></div>
+  </div>
+  <div class="take"><b>洞见：</b>能在最难啃的代码上批量找到高危漏洞，说明前沿模型已经跨过"实验室能力"门槛，进入了对真实软件供应链有直接影响的阶段。</div>
+
+  <h2><span class="num">02</span>从"复现历史 CVE"到"找全新漏洞"：JS 引擎里 20 分钟就报出第一个 Use-After-Free</h2>
+  <p>研究始于一个评测动机：Opus 4.5 已接近解决 CyberGym 基准（复现已知漏洞）里的全部任务，于是团队想造一个更难、更贴近现代浏览器的评测。他们先让 Claude 在旧版 Firefox 里复现历史 CVE，复现率出乎意料地高——但这些 CVE 可能已在训练数据里。真正的检验是去当前版本找<em>定义上不可能被报告过</em>的新漏洞。结果，在 JS 引擎里 <span class="hl">20 分钟</span>，Claude 就报出一个 Use-After-Free（可被攻击者用任意恶意内容覆写数据的内存漏洞）。</p>
+  <p>在团队还在三人交叉验证、向 Bugzilla 提交这第一个漏洞的同时，Claude 已经又发现了 <span class="hl">50</span> 个独特的崩溃输入。Mozilla 随后主动联系，建议直接批量提交、不必逐个确认安全影响。最终团队扫描近 <span class="hl">6,000</span> 个 C++ 文件，提交 <span class="hl">112</span> 份独立报告，多数已在 Firefox 148 修复。</p>
+  <div class="take"><b>洞见：</b>瓶颈已经从"模型能不能找到"转移到"人能不能审完"。Mozilla 让团队"先批量提交、再分诊"的做法，本身就是 AI 时代漏洞协作流程的一次现场改造。</div>
+
+  <h2><span class="num">03</span>关键反差：找漏洞很在行，把漏洞变成武器却很难——$4,000 只换来 2 个 exploit</h2>
+  <p>为了测能力上限，团队让 Claude 拿到这些已提交的漏洞、尝试写出真正的 exploit，并要求它在目标系统上读写一个本地文件来"证明攻击成功"。他们用不同起点跑了数百次、花掉约 <span class="hl">$4,000</span> API 额度，Opus 4.6 最终只在 <span class="hl">2</span> 个案例中真正把漏洞做成了 exploit。</p>
+  <div class="stats">
+    <div class="stat"><div class="big">$4,000</div><div class="lbl">用于 exploit 测试的 API 额度</div></div>
+    <div class="stat"><div class="big">数百次</div><div class="lbl">不同起点的尝试次数</div></div>
+    <div class="stat"><div class="big">仅 2</div><div class="lbl">真正做成可用 exploit 的案例</div></div>
+  </div>
+  <p>而且这 2 个还是"粗糙"的：它们只在被刻意去掉部分现代浏览器防护（最关键的是<strong>沙箱</strong>）的测试环境里有效。也就是说，Firefox 的"纵深防御"本可以挡住这些攻击。但能逃逸沙箱的漏洞并非闻所未闻，而 Claude 写出的攻击正是一条端到端利用链中的必要一环。</p>
+  <div class="take"><b>洞见：</b>发现漏洞的成本比开发 exploit 低<strong>一个数量级</strong>。这条不对称是当下最重要的安全事实：同样的能力，给防守方带来的杠杆远大于给攻击者的。</div>
+
+  <h2><span class="num">04</span>让 AI 可信地交付：task verifier 与"补丁代理"是关键工程</h2>
+  <p>能让 Claude 在外部代码里稳定产出的核心，是"task verifier"（任务验证器）——一种可信的、能确认 AI 输出是否真的达成目标的工具，给智能体实时反馈、让它反复迭代到成功。它既帮助发现了上述漏洞，也用于修复：一个合格的"补丁代理"必须同时验证两件事——漏洞确实被移除、且程序原有功能没被破坏（不引入回归）。</p>
+  <p>面对"维护者已经忙不过来"的现实，团队的策略是给维护者足够的信任与验证材料。Firefox 团队点名三样东西最关键：</p>
+  <div class="pill">配套的最小复现用例</div><div class="pill">详细的概念验证（PoC）</div><div class="pill">候选补丁</div>
+  <p>团队也公布了《协同漏洞披露（CVD）操作原则》，目前遵循行业标准做法，但表示会随模型能力提升而调整。</p>
+  <div class="take"><b>洞见：</b>AI 安全研究能否落地，不取决于模型多聪明，而取决于有没有"可验证的反馈回路"和"可被维护者信任的证据包"——这是把能力变成生产力的工程关口。</div>
+
+  <h2><span class="num">05</span>窗口期：差距不会持续太久，呼吁开发者趁现在加固</h2>
+  <p>除了 Firefox 的这些 CVE，团队还用 Opus 4.6 在 Linux 内核等重要项目中发现了漏洞，并以"限量研究预览"形式推出了 Claude Code Security，把漏洞发现与修复能力直接交到客户和开源维护者手中。当前"会找远胜于会用"的格局让防守方占优，但报告明确警告：以进步速度看，发现与利用之间的差距<em>不太可能维持很久</em>，一旦未来模型突破"利用"门槛，就需要额外的防护措施。</p>
+  <div class="take"><b>洞见：</b>这篇文章本质是一份带数据的"倒计时通知"：现在的优势是暂时的，开发者应抓住这段窗口期主动加固，而不是等利用能力追上来。</div>
+
+  <div class="insights">
+    <h2>最值得带走的 5 条洞见</h2>
+    <ol>
+      <li><b>能力已跨过门槛。</b>在最难啃的开源代码上，Claude 两周找到 22 个漏洞、14 个高危，约占 Firefox 全年高危修复的五分之一——AI 已是世界级漏洞研究者。</li>
+      <li><b>"找"与"用"严重不对称。</b>发现漏洞比开发 exploit 便宜一个数量级；$4,000、数百次尝试只换来 2 个粗糙、且需关闭沙箱才生效的 exploit。</li>
+      <li><b>防守方现在占优，但有时限。</b>这道差距是当前安全格局的核心红利，报告明确警告它"不会持续很久"。</li>
+      <li><b>流程比模型更决定成败。</b>批量提交、task verifier、最小用例＋PoC＋候选补丁的"信任证据包"，以及 CVD 原则，才是让 AI 安全研究真正落地的关键。</li>
+      <li><b>这是一份倒计时通知。</b>Claude Code Security 已进入研究预览，Anthropic 呼吁开发者趁窗口期主动加固软件，而非被动等待利用能力追上。</li>
+    </ol>
+  </div>
+
+  <div class="foot">
+    本页为基于 Anthropic《Partnering with Mozilla to improve Firefox's security》（2026年3月6日）公开博文的中文独立总结。漏洞由 Claude Opus 4.6 发现，已随 Firefox 148.0 等版本修复；具体技术细节请参阅原文及 Anthropic Frontier Red Team 博客。
+  </div>
+
+</div>
+</body>
+</html>
