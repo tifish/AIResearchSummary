@@ -14,6 +14,7 @@ import argparse
 import json
 import sys
 import tempfile
+import time
 from pathlib import Path
 
 from discover_articles import (
@@ -39,6 +40,7 @@ def main() -> int:
     parser.add_argument("--sources", default=None, help="逗号分隔来源 id，默认全部。")
     parser.add_argument("--limit", type=int, default=None, help="最多准备多少篇（测试用）。")
     parser.add_argument("--out", default=None, help="批次目录（默认临时目录）。")
+    parser.add_argument("--fetch-delay", type=float, default=1.5, help="抓取文章正文之间的间隔秒数（默认 1.5，对来源站点友好）。")
     args = parser.parse_args()
 
     sources = [s.strip() for s in args.sources.split(",") if s.strip()] if args.sources else list(SOURCES)
@@ -60,6 +62,8 @@ def main() -> int:
 
     items = []
     for i, art in enumerate(new):
+        if i and args.fetch_delay > 0:
+            time.sleep(args.fetch_delay)
         try:
             extracted = extract(art["url"])
         except Exception as exc:

@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import os
 import sys
+import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "scripts"))
 
@@ -49,7 +50,8 @@ def main() -> int:
     parser.add_argument("--sources", default=None, help="逗号分隔的来源 id，默认全部。")
     parser.add_argument("--discover-only", action="store_true", help="只做发现（步骤一），列出发现到的文章，不生成、不渲染。")
     parser.add_argument("--url", default=None, help="只对这一篇文章生成摘要和总结（步骤二，单篇测试，覆盖已有总结页）。")
-    parser.add_argument("--jobs", type=int, default=8, help="批量生成的并发数（并行调用 claude/codex CLI，默认 8；1=串行；受 API 速率限制约束，瞬时错误会自动重试）。")
+    parser.add_argument("--jobs", type=int, default=12, help="生成摘要+总结的并发数（并行调用 claude/codex CLI，默认 12；1=串行；只受 API 速率限制约束，瞬时错误自动重试）。")
+    parser.add_argument("--fetch-delay", type=float, default=1.5, help="抓取文章正文之间的间隔秒数（默认 1.5，对来源站点友好；抓网页是串行的）。")
     parser.add_argument("--dry-run", action="store_true", help="不调用 Agent、不写文件。")
     args = parser.parse_args()
 
@@ -112,7 +114,9 @@ def main() -> int:
     # Extract serially (OpenAI uses local Chrome, which must not run concurrently),
     # then generate summaries + digests in parallel — the slow LLM step.
     prepared = []
-    for art in new_articles:
+    for idx, art in enumerate(new_articles):
+        if idx and args.fetch_delay > 0:
+            time.sleep(args.fetch_delay)
         try:
             extracted = extract(art["url"])
             prepared.append({**art, "article_text": extracted["article_text"], "source_hash": extracted["source_hash"]})
