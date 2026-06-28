@@ -131,24 +131,31 @@ def main() -> int:
 
     jobs = max(1, args.jobs)
     print(f"Generating {len(prepared)} article(s) with {jobs} parallel job(s)...")
-    if jobs == 1:
-        pairs = [_generate(meta) for meta in prepared]
-    else:
-        from concurrent.futures import ThreadPoolExecutor
 
-        with ThreadPoolExecutor(max_workers=jobs) as pool:
-            pairs = list(pool.map(_generate, prepared))
-
-    done = 0
-    for meta, res in pairs:
+    def _apply(meta, res) -> bool:
+        # Runs in the main thread, so articles.json writes stay serialized.
         title = meta.get("title", meta["url"])
         if not isinstance(res, dict):
             print(f"  skipped {title}: {res}")
-            continue
+            return False
         generate.upsert_summary(state, meta, res["summary_zh"], res["value_zh"])
         generate.write_digest(site, summary_slug(meta["url"]), res["html"], force=False)
-        done += 1
         print(f"  done: {title}")
+        return True
+
+    done = 0
+    if jobs == 1:
+        for meta in prepared:
+            if _apply(*_generate(meta)):
+                done += 1
+    else:
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+
+        with ThreadPoolExecutor(max_workers=jobs) as pool:
+            futures = [pool.submit(_generate, meta) for meta in prepared]
+            for fut in as_completed(futures):  # write each as it finishes (resilient)
+                if _apply(*fut.result()):
+                    done += 1
     render(site, state)
     print(f"Done. {done}/{len(prepared)} generated (jobs={jobs}). Open site/index.html.")
     return 0
