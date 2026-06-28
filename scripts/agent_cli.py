@@ -43,7 +43,9 @@ def run_agent(prompt: str, agent: str = "codex") -> str:
             f"Agent CLI '{agent}' not found on PATH. Install and log in to it first."
         ) from exc
     if proc.returncode != 0:
-        raise RuntimeError(f"{agent} CLI failed (exit {proc.returncode}): {(proc.stderr or '').strip()[:500]}")
+        # Some CLIs (e.g. claude) print the real error to stdout, not stderr.
+        detail = "\n".join(s for s in ((proc.stderr or "").strip(), (proc.stdout or "").strip()) if s)
+        raise RuntimeError(f"{agent} CLI failed (exit {proc.returncode}): {detail[:800]}")
     return proc.stdout
 
 
