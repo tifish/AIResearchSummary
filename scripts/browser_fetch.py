@@ -24,6 +24,7 @@ import argparse
 import os
 import re
 import sys
+import time
 from pathlib import Path
 
 
@@ -34,6 +35,10 @@ if hasattr(sys.stderr, "reconfigure"):
 
 DEFAULT_TIMEOUT_MS = 45000
 SAFETY_MAX_LOADS = 100  # backstop only; the real stop is the date-based stop_when
+LOAD_MORE_POLL_MS = 150
+LOAD_MORE_SETTLE_MS = 500
+LOAD_MORE_MAX_WAIT_MS = 8000
+LOAD_MORE_MIN_GROWTH = 500
 LOAD_MORE_RE = re.compile(r"load\s*more|show\s*more|see\s*more|view\s*more|加载更多|查看更多|显示更多|更多", re.I)
 
 
@@ -67,6 +72,58 @@ def _find_load_more(page):
     return None
 
 
+def _count_links(page) -> int:
+    try:
+        return page.locator("a[href]").count()
+    except Exception:
+        return 0
+
+
+def _wait_for_load_more_target(page, timeout_ms: int):
+    deadline = time.monotonic() + min(timeout_ms, LOAD_MORE_MAX_WAIT_MS) / 1000
+    while time.monotonic() < deadline:
+        target = _find_load_more(page)
+        if target is not None:
+            return target
+        page.wait_for_timeout(LOAD_MORE_POLL_MS)
+    return _find_load_more(page)
+
+
+def _wait_for_load_more_update(page, before_len: int, before_links: int, timeout_ms: int, stop_when=None) -> bool:
+    wait_ms = min(timeout_ms, LOAD_MORE_MAX_WAIT_MS)
+    deadline = time.monotonic() + wait_ms / 1000
+    last_len = before_len
+    last_links = before_links
+    last_change = time.monotonic()
+    saw_new_content = False
+
+    while time.monotonic() < deadline:
+        page.wait_for_timeout(LOAD_MORE_POLL_MS)
+        markup = page.content()
+        current_len = len(markup)
+        current_links = _count_links(page)
+        now = time.monotonic()
+
+        if stop_when is not None:
+            try:
+                if stop_when(markup):
+                    return True
+            except Exception:
+                pass
+
+        if current_len != last_len or current_links != last_links:
+            last_len = current_len
+            last_links = current_links
+            last_change = now
+            if current_links > before_links or current_len - before_len >= LOAD_MORE_MIN_GROWTH:
+                saw_new_content = True
+
+        if saw_new_content and (now - last_change) * 1000 >= LOAD_MORE_SETTLE_MS:
+            return True
+
+    return _count_links(page) > before_links or len(page.content()) - before_len >= LOAD_MORE_MIN_GROWTH
+
+
 def _click_load_more(page, max_loads: int, timeout_ms: int, stop_when=None) -> int:
     """Click 'Load more' until the caller's stop_when(html) is true (e.g. the loaded
     articles reach back past the date cutoff), the button is gone, no new content
@@ -81,22 +138,18 @@ def _click_load_more(page, max_loads: int, timeout_ms: int, stop_when=None) -> i
                     break
             except Exception:
                 pass
-        target = _find_load_more(page)
+        target = _wait_for_load_more_target(page, timeout_ms) if clicks == 0 else _find_load_more(page)
         if target is None:
             break
         before = len(page.content())
+        before_links = _count_links(page)
         try:
             target.scroll_into_view_if_needed(timeout=4000)
             target.click(timeout=4000)
         except Exception:
             break
         clicks += 1
-        try:
-            page.wait_for_load_state("networkidle", timeout=timeout_ms)
-        except Exception:
-            pass
-        page.wait_for_timeout(700)
-        if len(page.content()) <= before:
+        if not _wait_for_load_more_update(page, before, before_links, timeout_ms, stop_when):
             break
     return clicks
 
@@ -104,10 +157,11 @@ def _click_load_more(page, max_loads: int, timeout_ms: int, stop_when=None) -> i
 def _load(page, url: str, wait_selector: str | None, timeout_ms: int,
           load_more: bool = False, max_loads: int = 100, stop_when=None) -> str:
     page.goto(url, wait_until="domcontentloaded", timeout=timeout_ms)
-    try:
-        page.wait_for_load_state("networkidle", timeout=timeout_ms)
-    except Exception:
-        pass
+    if not load_more:
+        try:
+            page.wait_for_load_state("networkidle", timeout=timeout_ms)
+        except Exception:
+            pass
     if wait_selector:
         try:
             page.wait_for_selector(wait_selector, timeout=timeout_ms)

@@ -29,6 +29,7 @@ from discover_articles import (  # noqa: E402
     default_state_path,
     discover,
     normalize_url,
+    read_existing_urls,
 )
 from extract_article import extract  # noqa: E402
 from render_site import default_site_dir, load_articles, render_page, summary_slug  # noqa: E402
@@ -119,7 +120,7 @@ def main() -> int:
     sources = [s.strip() for s in args.sources.split(",") if s.strip()] if args.sources else list(SOURCES)
 
     if args.discover_only:
-        articles, source_errors = discover(sources, DEFAULT_SINCE)
+        articles, source_errors = discover(sources, DEFAULT_SINCE, state)
         existing = read_existing_urls(state)
         for err in source_errors:
             print(f"  source error: {err}")
@@ -183,7 +184,7 @@ def main() -> int:
         return 0
 
     print("Discovering new AI research articles...")
-    articles, source_errors = discover(sources, DEFAULT_SINCE)
+    articles, source_errors = discover(sources, DEFAULT_SINCE, state)
     for err in source_errors:
         print(f"  source error: {err}")
     records = load_articles(state)

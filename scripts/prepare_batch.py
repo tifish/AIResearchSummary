@@ -48,7 +48,7 @@ def main() -> int:
     site = default_site_dir()
 
     print("Discovering...", file=sys.stderr)
-    articles, errors = discover(sources, DEFAULT_SINCE)
+    articles, errors = discover(sources, DEFAULT_SINCE, state)
     for err in errors:
         print(f"  source error: {err}", file=sys.stderr)
     existing = read_existing_urls(state)

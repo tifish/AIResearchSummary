@@ -155,24 +155,25 @@ def _fetch_static(source: dict[str, Any]) -> str:
         return response.read().decode(charset, errors="replace")
 
 
-def fetch_listing_html(source_id: str, since: date | None = None) -> str:
+def fetch_listing_html(source_id: str, stop_cutoff: date | None = None) -> str:
     source = SOURCES[source_id]
     if source.get("render"):
         try:
             from browser_fetch import fetch_rendered
 
             stop_when = None
-            if since is not None and source.get("load_more"):
+            if stop_cutoff is not None and source.get("load_more"):
                 parser = PARSERS[source_id]
 
                 def stop_when(markup: str) -> bool:
-                    # Stop paginating once the loaded list reaches back past `since`.
+                    # Stop paginating once the loaded list reaches back before the
+                    # newest already-known month for this source.
                     try:
                         parsed = parser(markup)
                     except Exception:
                         return False
                     dates = [d for d in (parse_date(a.get("date", "")) for a in parsed) if d is not None]
-                    return bool(dates) and min(dates) < since
+                    return bool(dates) and min(dates) < stop_cutoff
 
             return fetch_rendered(
                 str(source["url"]),
@@ -426,32 +427,64 @@ def dedupe_articles(articles: list[dict[str, str]]) -> list[dict[str, str]]:
     return deduped
 
 
-def discover_source(source_id: str, since: date) -> list[dict[str, str]]:
+def discover_source(source_id: str, since: date, stop_cutoff: date | None = None) -> list[dict[str, str]]:
     parser = PARSERS[source_id]
-    markup = fetch_listing_html(source_id, since)
+    markup = fetch_listing_html(source_id, stop_cutoff or since)
     articles = parser(markup)
     return [article for article in articles if article_in_range(article, since)]
 
 
-def read_existing_urls(state_path: Path) -> set[str]:
+def read_existing_records(state_path: Path) -> list[dict[str, Any]]:
     if not state_path.exists():
-        return set()
+        return []
     data = json.loads(state_path.read_text(encoding="utf-8"))
     records = data.get("articles", data) if isinstance(data, dict) else data
+    if not isinstance(records, list):
+        return []
+    return [record for record in records if isinstance(record, dict)]
+
+
+def read_existing_urls(state_path: Path) -> set[str]:
+    records = read_existing_records(state_path)
     urls: set[str] = set()
-    if isinstance(records, list):
-        for record in records:
-            if isinstance(record, dict) and record.get("url"):
-                urls.add(normalize_url(str(record["url"])))
+    for record in records:
+        if record.get("url"):
+            urls.add(normalize_url(str(record["url"])))
     return urls
 
 
-def discover(source_ids: list[str], since: date) -> tuple[list[dict[str, str]], list[str]]:
+def month_start(value: date) -> date:
+    return date(value.year, value.month, 1)
+
+
+def discover_stop_cutoffs(source_ids: list[str], since: date, state_path: Path | None = None) -> dict[str, date]:
+    cutoffs = {source_id: since for source_id in source_ids}
+    if state_path is None:
+        return cutoffs
+
+    latest_by_source: dict[str, date] = {}
+    for record in read_existing_records(state_path):
+        source_id = str(record.get("source", ""))
+        if source_id not in cutoffs:
+            continue
+        parsed = parse_date(str(record.get("date", "")))
+        if parsed is None:
+            continue
+        if parsed > latest_by_source.get(source_id, date.min):
+            latest_by_source[source_id] = parsed
+
+    for source_id, latest in latest_by_source.items():
+        cutoffs[source_id] = max(month_start(latest), since)
+    return cutoffs
+
+
+def discover(source_ids: list[str], since: date, state_path: Path | None = None) -> tuple[list[dict[str, str]], list[str]]:
     articles: list[dict[str, str]] = []
     errors: list[str] = []
+    stop_cutoffs = discover_stop_cutoffs(source_ids, since, state_path)
     for source_id in source_ids:
         try:
-            articles.extend(discover_source(source_id, since))
+            articles.extend(discover_source(source_id, since, stop_cutoffs[source_id]))
         except (RuntimeError, OSError, urllib.error.URLError, ValueError) as exc:
             errors.append(f"{source_id}: {exc}")
     return dedupe_articles(articles), errors
@@ -481,7 +514,7 @@ def main() -> int:
     args = arg_parser.parse_args()
 
     try:
-        articles, source_errors = discover(args.sources, args.since)
+        articles, source_errors = discover(args.sources, args.since, args.state)
         existing_urls = read_existing_urls(args.state)
     except (json.JSONDecodeError, ValueError) as exc:
         print(f"discover_articles.py: {exc}", file=sys.stderr)
