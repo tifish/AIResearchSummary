@@ -38,6 +38,11 @@ if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8")
 
 DEFAULT_TIMEOUT_MS = 45000
+CONTENT_READY_MAX_WAIT_MS = 8000
+CONTENT_READY_POLL_MS = 150
+CONTENT_READY_STABLE_MS = 500
+CONTENT_READY_MIN_ARTICLE_TEXT = 300
+CONTENT_READY_MIN_HEADING_TEXT = 120
 SAFETY_MAX_LOADS = 100  # backstop only; the real stop is the date-based stop_when
 LOAD_MORE_POLL_MS = 150
 LOAD_MORE_SETTLE_MS = 500
@@ -216,6 +221,51 @@ def _count_links(page) -> int:
         return 0
 
 
+def _content_snapshot(page) -> dict:
+    return page.evaluate(
+        """() => {
+            const root = document.querySelector("article, main") || document.body;
+            const text = root ? (root.innerText || "").trim() : "";
+            return {
+                textLength: text.length,
+                hasArticle: Boolean(document.querySelector("article, main")),
+                hasHeading: Boolean(document.querySelector("h1"))
+            };
+        }"""
+    )
+
+
+def _wait_for_content_ready(page, timeout_ms: int) -> None:
+    wait_ms = min(timeout_ms, CONTENT_READY_MAX_WAIT_MS)
+    deadline = time.monotonic() + wait_ms / 1000
+    last_len = -1
+    stable_since = time.monotonic()
+
+    while time.monotonic() < deadline:
+        try:
+            snapshot = _content_snapshot(page)
+        except Exception:
+            page.wait_for_timeout(CONTENT_READY_POLL_MS)
+            continue
+
+        text_len = int(snapshot.get("textLength") or 0)
+        has_article = bool(snapshot.get("hasArticle"))
+        has_heading = bool(snapshot.get("hasHeading"))
+        ready = (
+            (has_article and text_len >= CONTENT_READY_MIN_ARTICLE_TEXT)
+            or (has_heading and text_len >= CONTENT_READY_MIN_HEADING_TEXT)
+            or text_len >= 1000
+        )
+        if text_len != last_len:
+            last_len = text_len
+            stable_since = time.monotonic()
+        elif ready:
+            if (time.monotonic() - stable_since) * 1000 >= CONTENT_READY_STABLE_MS:
+                return
+
+        page.wait_for_timeout(CONTENT_READY_POLL_MS)
+
+
 def _wait_for_load_more_target(page, timeout_ms: int):
     deadline = time.monotonic() + min(timeout_ms, LOAD_MORE_MAX_WAIT_MS) / 1000
     while time.monotonic() < deadline:
@@ -294,18 +344,15 @@ def _click_load_more(page, max_loads: int, timeout_ms: int, stop_when=None) -> i
 def _load(page, url: str, wait_selector: str | None, timeout_ms: int,
           load_more: bool = False, max_loads: int = 100, stop_when=None) -> str:
     page.goto(url, wait_until="domcontentloaded", timeout=timeout_ms)
-    if not load_more:
-        try:
-            page.wait_for_load_state("networkidle", timeout=timeout_ms)
-        except Exception:
-            pass
     if wait_selector:
         try:
-            page.wait_for_selector(wait_selector, timeout=timeout_ms)
+            page.wait_for_selector(wait_selector, timeout=min(timeout_ms, CONTENT_READY_MAX_WAIT_MS))
         except Exception:
             pass
     if load_more:
         _click_load_more(page, max_loads, timeout_ms, stop_when)
+    else:
+        _wait_for_content_ready(page, timeout_ms)
     return page.content()
 
 

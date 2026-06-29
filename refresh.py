@@ -51,21 +51,32 @@ def process_batch(work, args, state, site, force_digest=False) -> int:
     total = len(work)
     jobs = max(1, args.jobs)
 
+    def _pool_status(futures) -> str:
+        running = sum(1 for fut in futures if fut.running())
+        completed_waiting = sum(1 for fut in futures if fut.done())
+        queued = len(futures) - running - completed_waiting
+        return (
+            f"pool running={running}/{jobs}, queued={queued}, "
+            f"completed_waiting={completed_waiting}, submitted={submitted}, done={done}"
+        )
+
     def _generate(meta):
         try:
             return meta, generate.generate(meta, args.agent)
         except Exception as exc:  # noqa: BLE001 - report per-article and keep going
             return meta, exc
 
-    def _apply(meta, res) -> bool:
+    def _apply(meta, res, futures) -> bool:
+        nonlocal done
         # Runs in the main thread, so articles.json writes stay serialized.
         title = meta.get("title", meta["url"])
         if not isinstance(res, dict):
-            print(f"  skipped {title}: {res}")
+            print(f"  skipped {title}: {res} ({_pool_status(futures)})", flush=True)
             return False
         generate.upsert_summary(state, meta, res["summary_zh"], res["value_zh"])
         generate.write_digest(site, summary_slug(meta["url"]), res["html"], force_digest)
-        print(f"  generated: {title}", flush=True)
+        done += 1
+        print(f"  generated: {title} ({_pool_status(futures)})", flush=True)
         return True
 
     def _drain_completed(futures, *, wait_for_next=False):
@@ -80,8 +91,7 @@ def process_batch(work, args, state, site, force_digest=False) -> int:
             completed = {fut for fut in futures if fut.done()}
             pending = futures - completed
         for fut in completed:
-            if _apply(*fut.result()):
-                done += 1
+            _apply(*fut.result(), pending)
         return pending
 
     print(
@@ -107,9 +117,9 @@ def process_batch(work, args, state, site, force_digest=False) -> int:
                 meta = {**art, "article_text": extracted["article_text"], "source_hash": extracted["source_hash"]}
                 futures.add(pool.submit(_generate, meta))
                 submitted += 1
-                print(f"  queued {idx}/{total}: {title}", flush=True)
+                print(f"  queued {idx}/{total}: {title} ({_pool_status(futures)})", flush=True)
             except Exception as exc:
-                print(f"  extract skipped {idx}/{total} {art.get('url')}: {exc}", flush=True)
+                print(f"  extract skipped {idx}/{total} {art.get('url')}: {exc} ({_pool_status(futures)})", flush=True)
             futures = _drain_completed(futures)
 
         while futures:
