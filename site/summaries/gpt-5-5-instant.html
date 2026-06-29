@@ -1,126 +1,363 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GPT-5.5 Instant 总结：更准、更简洁、更懂你的默认模型</title>
-<style>
-  :root{
-    --bg:#0f1115; --card:#181b22; --card2:#1f232c;
-    --text:#e7e9ee; --muted:#a6adbb; --accent:#10a37f;
-    --accent2:#6ea8fe; --warn:#f0a93b; --line:#2a2f3a;
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0; background:var(--bg); color:var(--text);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-    line-height:1.75; font-size:17px;
-  }
-  .wrap{max-width:820px; margin:0 auto; padding:40px 20px 80px}
-  header{border-bottom:2px solid var(--accent); padding-bottom:22px; margin-bottom:30px}
-  .meta{color:var(--muted); font-size:13px; letter-spacing:.04em; text-transform:uppercase; margin-bottom:10px}
-  h1{font-size:30px; line-height:1.3; margin:0 0 16px}
-  .lead{
-    background:linear-gradient(135deg,#10a37f22,#6ea8fe18);
-    border:1px solid var(--line); border-left:4px solid var(--accent);
-    padding:18px 20px; border-radius:10px; font-size:18px; color:#f3f5f9;
-  }
-  .lead b{color:var(--accent2)}
-  section{
-    background:var(--card); border:1px solid var(--line);
-    border-radius:12px; padding:22px 24px; margin:22px 0;
-  }
-  h2{font-size:21px; margin:0 0 6px; color:#fff}
-  h2 .tag{font-size:13px; color:var(--accent); font-weight:600; display:block; margin-bottom:4px; letter-spacing:.03em}
-  .stat-row{display:flex; flex-wrap:wrap; gap:14px; margin:18px 0}
-  .stat{
-    flex:1 1 160px; background:var(--card2); border:1px solid var(--line);
-    border-radius:10px; padding:14px 16px; text-align:center;
-  }
-  .stat .num{font-size:28px; font-weight:800; color:var(--accent)}
-  .stat .num.blue{color:var(--accent2)}
-  .stat .lbl{font-size:13px; color:var(--muted); margin-top:4px}
-  .takeaway{font-weight:600; color:#fff; background:#10a37f1f; border-radius:8px; padding:8px 12px; margin-top:14px; display:block}
-  ul{margin:10px 0 0; padding-left:20px}
-  li{margin:7px 0}
-  .insights{background:linear-gradient(135deg,#1f232c,#181b22); border:1px solid var(--accent)}
-  .insights ol{padding-left:22px; margin:10px 0 0}
-  .insights li{margin:12px 0}
-  .insights b{color:var(--accent2)}
-  .note{color:var(--muted); font-size:14px; margin-top:8px}
-  .pill{display:inline-block; background:#6ea8fe22; color:var(--accent2); border-radius:20px; padding:2px 12px; font-size:13px; margin-right:6px}
-  footer{color:var(--muted); font-size:13px; margin-top:30px; text-align:center}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GPT-5.5 Instant 更新总结</title>
+  <style>
+    :root {
+      --bg: #f7f8fb;
+      --card: #ffffff;
+      --ink: #172033;
+      --muted: #657084;
+      --line: #dfe4ee;
+      --accent: #2563eb;
+      --accent2: #0f766e;
+      --accent3: #a855f7;
+      --hl: #eaf2ff;
+      --hl2: #edfdf8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      line-height: 1.72;
+    }
+    main {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 40px 20px 56px;
+    }
+    header {
+      padding: 28px 0 22px;
+      border-bottom: 1px solid var(--line);
+    }
+    .kicker {
+      color: var(--accent2);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .04em;
+    }
+    h1 {
+      margin: 10px 0 12px;
+      font-size: clamp(30px, 5vw, 52px);
+      line-height: 1.12;
+    }
+    .lede {
+      max-width: 760px;
+      font-size: 19px;
+      color: var(--muted);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 26px 0;
+    }
+    .metric {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+    }
+    .metric strong {
+      display: block;
+      color: var(--accent);
+      font-size: 30px;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    section {
+      margin-top: 22px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 24px;
+    }
+    h2 {
+      margin: 0 0 12px;
+      font-size: 22px;
+      line-height: 1.35;
+    }
+    p { margin: 0 0 12px; }
+    .tag {
+      display: inline-block;
+      margin-bottom: 10px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: var(--hl);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .note {
+      background: var(--hl2);
+      border-left: 4px solid var(--accent2);
+      padding: 12px 14px;
+      border-radius: 6px;
+      color: var(--ink);
+    }
+    ul {
+      margin: 10px 0 0;
+      padding-left: 22px;
+    }
+    li { margin: 8px 0; }
+    footer {
+      margin-top: 24px;
+      padding: 24px;
+      border-radius: 8px;
+      background: var(--ink);
+      color: white;
+    }
+    footer h2 { color: white; }
+    footer li { color: rgba(255,255,255,.88); }
+    @media (max-width: 760px) {
+      main { padding: 28px 14px 42px; }
+      .grid { grid-template-columns: 1fr; }
+      section, footer { padding: 18px; }
+    }
+  </style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
+      background: var(--airs-digest-panel) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
 </head>
 <body>
-<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://openai.com/index/gpt-5-5-instant" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
-<div class="wrap">
-  <header>
-    <div class="meta">OpenAI · Product · 2026-05-05</div>
-    <h1>GPT-5.5 Instant：把"默认模型"做得更准、更短、更懂你</h1>
-    <p class="lead">一句话总括：<b>OpenAI 没有发布一个更强的旗舰，而是悄悄升级了数亿人每天都在用的那个"默认模型"</b>——主要砍幻觉、压字数、强化对你个人历史的调用，并第一次让你看见 AI 到底用了你哪些信息。</p>
-  </header>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/gpt-5-5-instant" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+  <main>
+    <header>
+      <div class="kicker">一句话总括</div>
+      <h1>GPT-5.5 Instant 的贡献，是把默认助手做成更可靠、更简洁、更会利用个人上下文的日常工具。</h1>
+      <p class="lede">这次更新并不只是在模型名称上前进一档，而是在普通用户每天最常遇到的问题上降低错误、减少冗余，并让个性化来源变得更透明。</p>
+    </header>
 
-  <section>
-    <h2><span class="tag">为什么这事重要</span>它是"日常主力"，所以小改动被放大</h2>
-    <p>Instant 是 ChatGPT 的默认入口，被"数亿人"当成每天的主力。正因如此，OpenAI 的逻辑是：在这个量级上，哪怕只是把答案变得更准、更短一点，累计起来就是巨大的体验差异。这次更新的重点不是炫技，而是<strong>把高频日常交互打磨得更可靠、更省心</strong>。</p>
-    <span class="takeaway">结论：判断一个模型的价值，不只看天花板有多高，更要看它被用得最多的那一档做得多扎实。</span>
-  </section>
-
-  <section>
-    <h2><span class="tag">核心数据</span>幻觉大幅下降，高风险领域降得最狠</h2>
-    <p>事实性是这次升级的主线。在内部评测中，越是医学、法律、金融这类"答错要命"的领域，准确率提升越明显。</p>
-    <div class="stat-row">
-      <div class="stat"><div class="num">52.5%</div><div class="lbl">高风险提示中幻觉性论断的减少（对比 5.3）</div></div>
-      <div class="stat"><div class="num">37.3%</div><div class="lbl">用户标记过的高难度对话中，不准确论断的减少</div></div>
+    <div class="grid" aria-label="关键数据">
+      <div class="metric">
+        <strong>52.5%</strong>
+        高风险提示中的幻觉式主张减少，覆盖医学、法律、金融等场景。
+      </div>
+      <div class="metric">
+        <strong>37.3%</strong>
+        用户标记过事实错误的困难对话中，不准确主张减少。
+      </div>
+      <div class="metric">
+        <strong>30.2%</strong>
+        示例回复字数减少，同时行数减少 29.2%，但保留可执行建议。
+      </div>
     </div>
-    <p>同时，模型在视觉推理、数学、科学等评测上均有提升，并改进了图片分析、STEM 问答和"何时该联网搜索"的判断。</p>
-    <span class="takeaway">结论：与其全面均匀提升，不如把准确率优先投到错误代价最高的场景——这是更务实的可靠性策略。</span>
-  </section>
 
-  <section>
-    <h2><span class="tag">体验变化</span>更短不等于更弱：会改错、少废话</h2>
-    <p>官方用两个真实例子说明"更短更好"：一道含增根的根式方程里，5.5 先认可了错误答案，但随即发现 x=3 代回原方程不成立，进而揪出用户真正的移项错误，用求根公式得到正确解 (3+√33)/2；而 5.3 虽也发现 x=3 不对，却过早收尾、误判"无实数解"。在一条职场建议里，5.5 用词减少 <span style="color:var(--accent2);font-weight:700">30.2%</span>、行数减少 <span style="color:var(--accent2);font-weight:700">29.2%</span>，语气更口语、更实用。</p>
-    <p>整体上，回复更紧凑、少冗长与过度排版，减少不必要的追问，避免无谓的 emoji 和杂乱格式，但保留了让 ChatGPT 好用的温度感。</p>
-    <span class="takeaway">结论：真正的进步是"用更少的字给出同样甚至更多的有效信息"，并且能在出错后自我纠正。</span>
-  </section>
+    <section>
+      <span class="tag">准确性</span>
+      <h2>更少幻觉让默认模型更适合严肃问题</h2>
+      <p>OpenAI 称，GPT-5.5 Instant 在高风险提示上比 GPT-5.3 Instant 少产生 52.5% 幻觉式主张，在用户曾标记事实错误的困难对话中不准确主张减少 37.3%。这改变了读者对 AI 助手的预期：默认模型的价值不只是回答得快，而是能在医学、法律、金融等不容含糊的领域更少误导用户。</p>
+      <p class="note">结论是，日常入口模型的可靠性提升会放大到数亿次普通交互中，影响远大于只在专业模式里提高能力。</p>
+    </section>
 
-  <section>
-    <h2><span class="tag">个性化</span>更会调用你的历史，而不是让你重复自己</h2>
-    <p>Instant 现在更善于利用过往对话、文件，以及（若已连接）Gmail 的上下文，并能<strong>智能判断何时该加入个性化</strong>、更快检索历史对话。文中"找新茶店"的例子里，5.5 能引用用户偏好（爱清淡高山茶、常去某店）给出贴身推荐，而 5.3 只能基于"在旧金山"给出泛泛建议。</p>
-    <p class="note">适用场景：定制化的建议与计划、接续之前未完成的长期工作。</p>
-    <span class="takeaway">结论：个性化的关键不是"记得多"，而是"在合适的时候用对上下文"。</span>
-  </section>
+    <section>
+      <span class="tag">推理与纠错</span>
+      <h2>真正的进步是能回到错误步骤重新求解</h2>
+      <p>文章用一道根式方程示例说明：GPT-5.3 Instant 发现代入 x=3 不成立后直接得出“无实数解”，而 GPT-5.5 Instant 继续追查代数移项错误，重新得到二次方程并给出有效解。这个例子强调，AI 对数学题的改进不只是算得更快，而是能在发现矛盾后修正解题路径。</p>
+      <p class="note">洞见是，可靠 AI 需要的不只是检查答案，还要能定位错误来自哪一步。</p>
+    </section>
 
-  <section>
-    <h2><span class="tag">透明与控制</span>新增"记忆来源"，让个性化看得见、改得动</h2>
-    <p>跨所有 ChatGPT 模型推出的 <strong>memory sources（记忆来源）</strong>：当回复被个性化时，你能看到它用了哪些上下文（如保存的记忆、过往对话），并可删除或更正过时信息。分享聊天时记忆来源不会展示给他人；你也能删除被引用的聊天、修改设置里的记忆，或用临时聊天避免读写记忆。</p>
-    <p class="note">局限：该视图可能不展示影响答案的每一个因素，例如只显示最相关的部分历史对话，OpenAI 称会持续完善。</p>
-    <span class="takeaway">结论：当 AI 越来越依赖你的个人数据，"可见、可删、可纠正"正在成为产品标配，而非附加项。</span>
-  </section>
+    <section>
+      <span class="tag">表达质量</span>
+      <h2>更短的回答不等于信息更少</h2>
+      <p>在职场沟通示例中，GPT-5.5 Instant 比 GPT-5.3 Instant 少 30.2% 字数、少 29.2% 行数，却仍给出多个可直接使用的表达方式。它减少过度格式化、无必要追问和表情符号，让回答更贴近用户的实际意图。</p>
+      <p class="note">结论是，AI 体验的关键指标正在从“回答得完整”转向“用最少认知负担解决问题”。</p>
+    </section>
 
-  <section>
-    <h2><span class="tag">可用性</span>谁、何时能用上</h2>
-    <ul>
-      <li><span class="pill">默认替换</span>即日起向所有用户推送，替代 5.3 成为默认模型，API 以 <code>chat-latest</code> 提供。</li>
-      <li><span class="pill">过渡期</span>付费用户可在模型配置中继续使用 5.3 Instant，为期三个月后退役。</li>
-      <li><span class="pill">个性化</span>增强版个性化先到 Plus/Pro 网页端，移动端将至，并扩展到 Free、Go、Business、Enterprise。</li>
-      <li><span class="pill">6/9 更新</span>个性化已开始向 Go 与 Free 推送；Free 层仅引用<strong>部分</strong>历史对话。</li>
-    </ul>
-  </section>
+    <section>
+      <span class="tag">个性化</span>
+      <h2>上下文能力让建议从泛泛推荐变成个人化决策</h2>
+      <p>GPT-5.5 Instant 能更有效使用历史聊天、文件和已连接的 Gmail，在合适时调用这些上下文。例如茶馆推荐不再只是基于城市，而是结合用户过去偏好，推断其可能喜欢更清爽、茶质更强的店。这样的个性化会减少用户重复解释背景的成本。</p>
+      <p class="note">洞见是，AI 的“聪明”越来越体现在是否记得相关背景，并知道什么时候该用、什么时候不该用。</p>
+    </section>
 
-  <section class="insights">
-    <h2>最值得带走的洞见</h2>
-    <ol>
-      <li><b>默认模型才是真正的主战场。</b>面向数亿日活的"无声升级"，对整体 AI 体验的影响可能超过一次旗舰发布。</li>
-      <li><b>可靠性优先级被重新排序。</b>52.5% 的高风险幻觉降幅说明：错误代价越高的领域，越值得集中投入准确率。</li>
-      <li><b>"会改错"是新的能力门槛。</b>能否在认可错误答案后自我纠正（如那道方程题），开始成为区分模型强弱的关键，而非单次作答是否完美。</li>
-      <li><b>更短=更强的产品哲学。</b>约 30% 的篇幅压缩、更少追问、更少 emoji，标志着"信息密度"取代"看起来很全"成为衡量标准。</li>
-      <li><b>个性化进入"可审计"时代。</b>memory sources 把"AI 用了你哪些信息"从黑箱变成可查、可删、可改——透明度本身正在成为功能。</li>
-    </ol>
-  </section>
+    <section>
+      <span class="tag">控制权</span>
+      <h2>记忆来源把个性化从黑箱变成可管理功能</h2>
+      <p>文章介绍了 memory sources：当回答被个性化时，用户可以看到使用了哪些上下文来源，例如保存的记忆或过去聊天，并能删除、修改或用临时聊天避免记忆被使用和更新。不过 OpenAI 也说明，这个视图可能不会展示所有影响回答的因素。</p>
+      <p class="note">结论是，个性化要被广泛接受，必须同时提供透明度、删除权和纠错入口。</p>
+    </section>
 
-  <footer>基于 OpenAI 官方文章整理 · 仅作中文阅读总结 · 原文：openai.com/index/gpt-5-5-instant</footer>
-</div>
+    <section>
+      <span class="tag">发布节奏</span>
+      <h2>默认替换说明 OpenAI 把这次更新视为基础体验升级</h2>
+      <p>GPT-5.5 Instant 自 2026 年 5 月 5 日起向所有 ChatGPT 用户推出，替代 GPT-5.3 Instant 成为默认模型，并在 API 中作为 chat-latest。付费用户仍可在三个月内通过模型配置继续使用 GPT-5.3 Instant；2026 年 6 月 9 日更新称，个性化改进开始向 ChatGPT Go 和 Free 推出，Free 层会使用较少的历史聊天上下文。</p>
+      <p class="note">这表明 OpenAI 不是把改进限定在高端用户，而是在逐步重塑所有用户接触 AI 的默认体验。</p>
+    </section>
+
+    <footer>
+      <h2>最值得带走的洞见</h2>
+      <ul>
+        <li>GPT-5.5 Instant 的核心价值是降低事实错误，而不是单纯增加功能。</li>
+        <li>更好的 AI 回答应该更短、更直接，但不能牺牲判断和可执行性。</li>
+        <li>个性化的竞争重点正在变成“用对上下文”，而不是无限记住用户信息。</li>
+        <li>记忆来源和删除控制说明，AI 产品必须把透明度做进体验本身。</li>
+        <li>当默认模型升级时，影响的是大规模日常决策，而不只是少数专业任务。</li>
+      </ul>
+    </footer>
+  </main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

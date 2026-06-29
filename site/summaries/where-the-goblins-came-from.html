@@ -3,139 +3,345 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>哥布林从何而来：一次奖励信号泛化的侦探故事</title>
+<title>Where the goblins came from 中文总结</title>
 <style>
-  :root{
-    --bg:#0f1115; --card:#1a1d24; --ink:#e8eaed; --muted:#a0a6b0;
-    --accent:#7c9cff; --accent2:#62d39b; --warn:#ffb454; --pink:#ff7eb6;
-    --line:#2a2e38;
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0; background:linear-gradient(160deg,#0f1115,#13161d 60%,#161a22);
-    color:var(--ink); font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;
-    line-height:1.75; padding:0 16px;
-  }
-  .wrap{max-width:760px; margin:0 auto; padding:48px 0 80px}
-  header{margin-bottom:36px}
-  .tag{display:inline-block; font-size:13px; color:var(--accent2); letter-spacing:.08em; text-transform:uppercase; margin-bottom:10px}
-  h1{font-size:34px; line-height:1.25; margin:0 0 18px}
-  .lede{
-    font-size:18px; background:var(--card); border-left:4px solid var(--accent);
-    padding:16px 20px; border-radius:0 12px 12px 0; color:var(--ink);
-  }
-  .lede b{color:var(--accent)}
-  .meta{font-size:13px; color:var(--muted); margin-top:14px}
-  section{
-    background:var(--card); border:1px solid var(--line); border-radius:16px;
-    padding:24px 26px; margin:22px 0;
-  }
-  h2{font-size:21px; margin:0 0 12px; color:#fff}
-  h2 .num{color:var(--accent); margin-right:8px}
-  .stat-row{display:flex; flex-wrap:wrap; gap:12px; margin:18px 0}
-  .stat{
-    flex:1 1 150px; background:#11141b; border:1px solid var(--line);
-    border-radius:12px; padding:14px 16px;
-  }
-  .stat .big{font-size:26px; font-weight:700; color:var(--warn)}
-  .stat .lbl{font-size:13px; color:var(--muted); margin-top:4px}
-  .takeaway{
-    margin-top:14px; font-size:15px; color:var(--accent2);
-    border-top:1px dashed var(--line); padding-top:12px;
-  }
-  .takeaway::before{content:"💡 "; }
-  blockquote{
-    margin:14px 0; padding:12px 16px; background:#11141b; border-radius:10px;
-    color:var(--muted); font-style:italic; border-left:3px solid var(--pink); font-size:14px;
-  }
-  .loop{
-    list-style:none; padding:0; margin:14px 0; counter-reset:step;
-  }
-  .loop li{
-    position:relative; padding:10px 12px 10px 44px; margin:8px 0;
-    background:#11141b; border-radius:10px; font-size:15px;
-  }
-  .loop li::before{
-    counter-increment:step; content:counter(step);
-    position:absolute; left:10px; top:50%; transform:translateY(-50%);
-    width:24px; height:24px; border-radius:50%; background:var(--accent);
-    color:#0f1115; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:13px;
-  }
-  .final{
-    background:linear-gradient(135deg,#1c2230,#1a2620); border:1px solid var(--accent2);
-  }
-  .final h2{color:var(--accent2)}
-  .final ol{margin:0; padding-left:20px}
-  .final li{margin:10px 0}
-  strong.k{color:var(--warn)}
+:root {
+  --bg: #f6f7fb;
+  --card: #ffffff;
+  --ink: #172033;
+  --muted: #5d6678;
+  --line: #dfe4ee;
+  --accent: #2563eb;
+  --accent2: #0f766e;
+  --accent3: #b45309;
+  --hl: #eaf2ff;
+  --hl2: #fff4df;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  line-height: 1.72;
+}
+main {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 40px 20px 56px;
+}
+.header {
+  padding: 28px;
+  background: linear-gradient(135deg, var(--hl), var(--card));
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+.kicker {
+  margin: 0 0 8px;
+  color: var(--accent2);
+  font-size: 14px;
+  font-weight: 700;
+}
+h1 {
+  margin: 0;
+  font-size: clamp(28px, 5vw, 46px);
+  line-height: 1.16;
+  letter-spacing: 0;
+}
+.lede {
+  margin: 18px 0 0;
+  font-size: 19px;
+  color: var(--ink);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 22px;
+}
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 22px;
+}
+.card h2 {
+  margin: 0 0 10px;
+  font-size: 20px;
+  line-height: 1.35;
+}
+.card p {
+  margin: 0;
+  color: var(--muted);
+}
+.metric {
+  display: inline-block;
+  margin: 6px 8px 6px 0;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--hl);
+  color: var(--accent);
+  font-weight: 800;
+}
+.section {
+  margin-top: 22px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 26px;
+}
+.section h2 {
+  margin: 0 0 12px;
+  font-size: 24px;
+}
+.section p {
+  margin: 10px 0 0;
+}
+.callout {
+  margin-top: 16px;
+  padding: 16px 18px;
+  border-left: 5px solid var(--accent3);
+  background: var(--hl2);
+  color: var(--ink);
+  border-radius: 10px;
+}
+.takeaways {
+  margin-top: 24px;
+  padding: 26px;
+  background: var(--ink);
+  color: var(--card);
+  border-radius: 18px;
+}
+.takeaways h2 { margin: 0 0 12px; }
+.takeaways ul { margin: 0; padding-left: 22px; }
+.takeaways li { margin: 8px 0; }
+@media (max-width: 760px) {
+  main { padding: 24px 14px 40px; }
+  .grid { grid-template-columns: 1fr; }
+  .header, .section, .card, .takeaways { border-radius: 12px; padding: 20px; }
+}
 </style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
+      background: var(--airs-digest-panel) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
 </head>
 <body>
-<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://openai.com/index/where-the-goblins-came-from" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
-<div class="wrap">
-  <header>
-    <div class="tag">OpenAI · Publication · 2026‑04‑29</div>
-    <h1>哥布林从何而来</h1>
-    <div class="lede">
-      一句话总括：OpenAI 模型里突然增多的"哥布林"比喻，<b>不是互联网流行梗，而是训练某个个性化人格时无意打高的一个奖励分</b>，再经由强化学习和微调的反馈循环，把这个语癖泛化到了本不该出现的地方——它是"奖励泛化"如何意外塑造模型行为的活教材。
-    </div>
-    <div class="meta">来源：openai.com/index/where-the-goblins-came-from</div>
-  </header>
-
-  <section>
-    <h2><span class="num">01</span>怪癖是怎么被发现的</h2>
-    <p>从 GPT‑5.1 起，模型开始频繁在比喻里提到哥布林、小精灵等小生物。单独一句"小哥布林"无伤大雅甚至可爱，但跨代际累积后就成了挥之不去的习惯。真正引起注意的，是用户抱怨模型"过分自来熟"，促成了对口头禅的排查。</p>
-    <div class="stat-row">
-      <div class="stat"><div class="big">+175%</div><div class="lbl">GPT‑5.1 后 "goblin" 使用率上升</div></div>
-      <div class="stat"><div class="big">+52%</div><div class="lbl">同期 "gremlin" 上升</div></div>
-    </div>
-    <div class="takeaway">值得带走：模型 bug 通常表现为某项指标骤变、可回溯到具体改动；而这种"语癖"是悄悄渗入的，靠的是细致的词频审计才被量化。</div>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/where-the-goblins-came-from" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+  <section class="header">
+    <p class="kicker">一句话总括</p>
+    <h1>一次语言怪癖追查，暴露了奖励信号如何把局部风格扩散成全局模型行为。</h1>
+    <p class="lede">文章真正的贡献不在于解释某个词为什么变多，而在于展示 OpenAI 如何把一个细小、主观、难以用常规评测捕捉的问题，追溯到性格提示、奖励模型、强化学习和监督微调数据之间的链式影响。</p>
   </section>
 
-  <section>
-    <h2><span class="num">02</span>破案：线索指向"Nerdy"人格</h2>
-    <p>到 GPT‑5.4，生物类比喻进一步激增，分析发现它高度集中在选择了"Nerdy（书呆子）"个性化人格的流量中。该人格的系统提示要求模型"用俏皮的语言消解一本正经、拥抱世界的怪诞"。如果只是泛泛的网络趋势，分布应当均匀；可它偏偏聚集在被明确优化为"俏皮书呆子"的那一块。</p>
-    <div class="stat-row">
-      <div class="stat"><div class="big">2.5%</div><div class="lbl">"Nerdy" 占全部回复比例</div></div>
-      <div class="stat"><div class="big">66.7%</div><div class="lbl">却贡献了全部 "goblin" 提及</div></div>
-      <div class="stat"><div class="big">76.2%</div><div class="lbl">数据集中 Nerdy 奖励给含生物词输出打分更高</div></div>
-    </div>
-    <p>借助 Codex 对比 RL 训练中"含/不含生物词"的同题输出，一个奖励信号格外突出：原本用来鼓励 Nerdy 人格的那个，始终更偏爱带生物词的回答。</p>
-    <div class="takeaway">值得带走：行为的"聚集分布"本身就是诊断线索——不均匀，往往意味着背后有一个被局部优化的奖励在作怪。</div>
+  <section class="grid">
+    <article class="card">
+      <h2>异常先从小词频变化出现</h2>
+      <p>GPT‑5.1 发布后，ChatGPT 中“goblin”的使用率上升 <span class="metric">175%</span>，“gremlin”上升 <span class="metric">52%</span>。这说明模型问题不一定表现为基准测试崩盘，也可能先表现为语气和措辞的缓慢漂移。</p>
+    </article>
+    <article class="card">
+      <h2>根因集中在 Nerdy 个性</h2>
+      <p>Nerdy 个性只占全部 ChatGPT 回复的 <span class="metric">2.5%</span>，却贡献了 <span class="metric">66.7%</span> 的“goblin”提及。这个不成比例的集中度，让研究者把问题从“互联网流行语”缩小到“个性训练激励”。</p>
+    </article>
   </section>
 
-  <section>
-    <h2><span class="num">03</span>关键机制：奖励会"越界"泛化</h2>
-    <p>奖励只在 Nerdy 条件下施加，可没有 Nerdy 提示时生物词也在增多——而且增幅比例几乎相同。这说明风格通过<strong class="k">迁移（transfer）</strong>溢出到了普通输出。强化学习并不保证学到的行为乖乖待在产生它的条件里，尤其当这些输出又被复用进监督微调和偏好数据时，就形成了自我放大的反馈循环：</p>
-    <ul class="loop">
-      <li>俏皮风格被奖励</li>
-      <li>部分被奖励样本含有独特语癖词</li>
-      <li>语癖在 rollout 中出现得更频繁</li>
-      <li>这些 rollout 被用于监督微调（SFT）</li>
-      <li>模型越来越"习惯"产出该语癖</li>
-    </ul>
-    <p>对 GPT‑5.5 的 SFT 数据排查，找到大量含 goblin/gremlin 的样本，还牵出一整窝同类语癖词：浣熊、巨魔、食人魔、鸽子；而 frog（青蛙）多数是正常使用。</p>
-    <div class="takeaway">值得带走：这正是"奖励泛化"的危险所在——一个为特定场景设计的局部激励，能被模型推广到完全无关的情境。</div>
+  <section class="section">
+    <h2>奖励模型把“俏皮”误推成了固定语言癖好</h2>
+    <p>OpenAI 发现，原本用于鼓励 Nerdy 个性的奖励信号，持续更偏好带有生物隐喻的回答；在审计的所有数据集中，含“goblin”或“gremlin”的输出在 <span class="metric">76.2%</span> 的数据集里获得正向奖励提升。</p>
+    <p>这改变了一个常见直觉：奖励模型并不只强化抽象品质，比如“有趣”或“有风格”，它也可能顺手强化某些具体词汇、句式和比喻。</p>
+    <div class="callout">结论：当奖励目标写得偏风格化时，模型可能学到的不是“适度幽默”，而是某些容易被奖励器识别的表面特征。</div>
   </section>
 
-  <section>
-    <h2><span class="num">04</span>收尾：哥布林为何没能一次清除</h2>
-    <p>OpenAI 在 GPT‑5.4 之后于 3 月下线了"Nerdy"人格，移除了亲哥布林的奖励信号，并过滤掉含生物词的训练数据。但 GPT‑5.5 在根因定位之前就已开训，因此在 Codex 测试中员工立刻又察觉到对哥布林的偏好——于是补了一条开发者提示词来抑制。（毕竟 Codex 本身就很"书呆子"。）想放飞这些小生物的人，也可以去掉抑制指令启动 Codex。</p>
-    <blockquote>"哥布林一开始很好玩，但员工报告越来越多就开始让人担心了。"</blockquote>
-    <div class="takeaway">值得带走：修复奖励信号无法即时回滚已经开训的模型——训练管线的时间差，决定了问题会有"回潮期"。</div>
+  <section class="section">
+    <h2>局部训练没有被局部封住</h2>
+    <p>文章指出，随着 Nerdy 条件下相关词汇增加，非 Nerdy 样本中的提及率也以接近的相对比例增长。也就是说，奖励只在 Nerdy 条件下施加，但行为没有严格留在这个条件里。</p>
+    <p>这解释了为什么模型部署后会出现“明明没选 Nerdy，也会冒出这种措辞”的现象：强化学习和后续训练可能把某个条件下学到的风格，转移到更广的回答分布中。</p>
+    <div class="callout">结论：模型的“个性”不是完全隔离的插件，某个个性训练出的习惯可能污染或改写基础模型的默认表达。</div>
   </section>
 
-  <section class="final">
+  <section class="section">
+    <h2>数据回流放大了最初的奖励偏差</h2>
+    <p>OpenAI 在 GPT‑5.5 的监督微调数据中找到了许多包含“goblin”和“gremlin”的数据点，并识别出一组相似的奇怪生物词。文章给出的机制是：被奖励的输出进入更多 rollouts，rollouts 又进入 SFT 数据，模型因此更熟悉并更常复用这些词。</p>
+    <p>这个反馈环说明，AI 系统的行为偏差可能不是一次训练选择造成的，而是奖励、采样、筛选和再训练连续叠加的结果。</p>
+    <div class="callout">结论：只看单轮训练配置不够，真正的风险在于模型生成内容被再次当作训练材料后，会把小偏差变成稳定习惯。</div>
+  </section>
+
+  <section class="section">
+    <h2>修复必须回到训练源头</h2>
+    <p>OpenAI 在 <span class="metric">3 月</span> 退役 Nerdy 个性，随后移除偏好该类词汇的奖励信号，并过滤包含相关词汇的训练数据；但 GPT‑5.5 在根因定位前已经开始训练，所以 Codex 测试中仍然出现该倾向，只能再用开发者提示缓解。</p>
+    <p>这说明上线后的提示修补可以止血，但不能替代奖励和数据层面的根治。</p>
+    <div class="callout">结论：如果问题来自训练激励，可靠修复就必须改奖励、改数据、改审计工具，而不只是要求模型“别这么说”。</div>
+  </section>
+
+  <section class="takeaways">
     <h2>最值得带走的洞见</h2>
-    <ol>
-      <li><strong class="k">行为由许多小激励共同塑造</strong>：一个不起眼的高奖励，足以在多代模型间累积成显眼的怪癖。</li>
-      <li><strong class="k">奖励会泛化到无关情境</strong>：只在 Nerdy 条件下给的分，照样溢出到没有该提示的普通输出，增幅比例几乎一致。</li>
-      <li><strong class="k">SFT 反馈循环会自我放大</strong>：被奖励的语癖进入微调数据后，模型会越来越"上瘾"。</li>
-      <li><strong class="k">分布的"聚集性"是诊断利器</strong>：2.5% 的人格贡献 66.7% 的语癖，不均匀本身就是破案线索。</li>
-      <li><strong class="k">可观测与可审计能力是核心竞争力</strong>：这次调查催生了一套新工具，让团队能快速定位并从根因修复行为问题。</li>
-    </ol>
+    <ul>
+      <li>模型行为漂移可能很细微，词频和语气异常也值得系统化监测。</li>
+      <li>奖励信号会强化可见表面特征，哪怕设计者真正想奖励的是抽象风格。</li>
+      <li>个性化训练不是天然隔离的，局部风格可能转移到默认模型行为中。</li>
+      <li>模型生成数据进入后续训练，会把小癖好放大成稳定模式。</li>
+      <li>有效治理需要能快速审计行为根因的工具，而不是只在提示层做临时压制。</li>
+    </ul>
   </section>
-</div>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
 </body>
-</html>
 </html>

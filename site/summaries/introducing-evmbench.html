@@ -3,123 +3,351 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>EVMbench：衡量 AI 智能体攻防智能合约的能力</title>
+<title>EVMbench 中文总结</title>
 <style>
-  :root{
-    --bg:#0e1116; --card:#171b22; --ink:#e8ecf1; --muted:#9aa6b2;
-    --accent:#4ea1ff; --accent2:#36d399; --warn:#ffb454; --danger:#ff6b6b;
-    --line:#262c36;
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0; background:linear-gradient(180deg,#0b0e13,#0e1116 240px);
-    color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
-    "Hiragino Sans GB","Microsoft YaHei",sans-serif; line-height:1.75;
-  }
-  .wrap{max-width:820px; margin:0 auto; padding:48px 22px 80px}
-  .kicker{color:var(--accent); font-weight:700; letter-spacing:.08em; font-size:13px; text-transform:uppercase}
-  h1{font-size:30px; line-height:1.3; margin:.3em 0 .2em}
-  .meta{color:var(--muted); font-size:14px; margin-bottom:26px}
-  .tldr{
-    background:linear-gradient(135deg,#15233a,#172a26); border:1px solid var(--line);
-    border-left:4px solid var(--accent); border-radius:12px; padding:18px 20px; margin:24px 0 34px;
-    font-size:17px;
-  }
-  .tldr b{color:var(--accent2)}
-  h2{font-size:21px; margin:38px 0 6px; padding-top:8px; border-top:1px solid var(--line)}
-  .lead{color:var(--muted); font-size:14px; margin:0 0 12px}
-  .card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px 18px; margin:14px 0}
-  .stat-row{display:flex; flex-wrap:wrap; gap:14px; margin:18px 0}
-  .stat{flex:1 1 150px; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px}
-  .stat .n{font-size:28px; font-weight:800; color:var(--accent)}
-  .stat .n.up{color:var(--accent2)}
-  .stat .l{font-size:13px; color:var(--muted); margin-top:2px}
-  .bar{height:10px; border-radius:6px; background:#222933; overflow:hidden; margin:6px 0 2px}
-  .bar > span{display:block; height:100%}
-  .insight{color:var(--accent2); font-weight:600}
-  .modes li{margin:6px 0}
-  .modes b{color:var(--warn)}
-  .takeaways{background:linear-gradient(135deg,#1a2030,#101622); border:1px solid var(--line); border-radius:14px; padding:8px 22px 18px}
-  .takeaways h2{border-top:none}
-  .takeaways ol{padding-left:20px}
-  .takeaways li{margin:10px 0}
-  .tag{display:inline-block; font-size:12px; color:var(--muted); border:1px solid var(--line); border-radius:999px; padding:2px 10px; margin-right:6px}
-  a{color:var(--accent)}
+:root{
+  --bg:#f6f7f9;
+  --card:#ffffff;
+  --ink:#18202a;
+  --muted:#5e6978;
+  --line:#dce2ea;
+  --accent:#2563eb;
+  --accent2:#0f766e;
+  --accent3:#b45309;
+  --hl:#eaf1ff;
+  --hl2:#ecfdf5;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+  line-height:1.72;
+}
+main{
+  max-width:920px;
+  margin:0 auto;
+  padding:40px 20px 56px;
+}
+header{
+  padding:28px;
+  background:linear-gradient(135deg,var(--hl),var(--hl2));
+  border:1px solid var(--line);
+  border-radius:18px;
+}
+.eyebrow{
+  margin:0 0 8px;
+  color:var(--accent2);
+  font-size:14px;
+  font-weight:700;
+}
+h1{
+  margin:0 0 14px;
+  font-size:34px;
+  line-height:1.22;
+  letter-spacing:0;
+}
+.lead{
+  margin:0;
+  font-size:18px;
+  color:var(--ink);
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  margin:22px 0;
+}
+.metric{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:16px;
+}
+.metric strong{
+  display:block;
+  color:var(--accent);
+  font-size:26px;
+  line-height:1.2;
+}
+.metric span{
+  display:block;
+  color:var(--muted);
+  font-size:14px;
+  margin-top:6px;
+}
+section{
+  margin-top:18px;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:22px;
+}
+h2{
+  margin:0 0 10px;
+  font-size:22px;
+  line-height:1.3;
+}
+p{
+  margin:0 0 12px;
+}
+p:last-child{margin-bottom:0}
+mark{
+  background:var(--hl);
+  color:var(--ink);
+  padding:1px 5px;
+  border-radius:6px;
+}
+ul{
+  margin:10px 0 0;
+  padding-left:22px;
+}
+li{margin:8px 0}
+.footer{
+  border-left:5px solid var(--accent3);
+}
+@media (max-width:720px){
+  main{padding:24px 14px 40px}
+  header,section{padding:18px}
+  h1{font-size:27px}
+  .lead{font-size:16px}
+  .grid{grid-template-columns:1fr}
+}
 </style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
+      background: var(--airs-digest-panel) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
 </head>
 <body>
-<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://openai.com/index/introducing-evmbench" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
-<div class="wrap">
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/introducing-evmbench" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+  <header>
+    <p class="eyebrow">一句话总括</p>
+    <h1>EVMbench 用真实智能合约漏洞衡量 AI agent 的攻防能力，而不是只看它们是否会解释代码。</h1>
+    <p class="lead">这篇文章的核心贡献，是把 AI 安全评测放进有经济意义、可复现、可执行的区块链环境中：模型要么找出漏洞，要么修好漏洞，要么在沙盒链上实际完成攻击。</p>
+  </header>
 
-  <div class="kicker">OpenAI · Research</div>
-  <h1>EVMbench：给 AI 智能体的“智能合约攻防考卷”</h1>
-  <div class="meta">来源：OpenAI（与 Paradigm 合作）· 2026 年 2 月 18 日</div>
-
-  <div class="tldr">
-    一句话总括：EVMbench 第一次用<b>可复现、可量化</b>的方式回答“AI 智能体能在多大程度上发现、修补和攻破智能合约漏洞”——
-    答案是<b>“攻易守难”</b>：模型已能端到端地把合约里的钱掏空，却仍不擅长穷尽式审计和无副作用地修复。
+  <div class="grid">
+    <div class="metric">
+      <strong>$100B+</strong>
+      <span>智能合约保护的开源加密资产规模</span>
+    </div>
+    <div class="metric">
+      <strong>117</strong>
+      <span>来自 40 次审计的精选高危漏洞</span>
+    </div>
+    <div class="metric">
+      <strong>71.0%</strong>
+      <span>GPT-5.3-Codex 在 exploit 模式中的得分</span>
+    </div>
   </div>
 
-  <h2>它为什么重要：被守护的是上千亿美元</h2>
-  <p class="lead">关键数据 → 趋势 → 结论</p>
-  <p>智能合约常态化地保护着 <b>超过 1000 亿美元</b>的开源加密资产。当 AI 智能体越来越会读写和执行代码，它们既是潜在攻击者，也是潜在防御者。
-  <span class="insight">结论：在这种“经济上真实有后果”的环境里测量模型能力，本身就是一种网络安全风险预警。</span></p>
+  <section>
+    <h2>评测对象从“理解漏洞”变成“在链上验证能力”</h2>
+    <p>EVMbench 包含 detect、patch、exploit 三种任务：detect 看 agent 能否审计代码并召回真实漏洞，patch 看它能否在不破坏功能的前提下修补漏洞，exploit 看它能否在本地沙盒链上完成端到端资金抽取。</p>
+    <p>这改变了读者对 AI 影响的理解：AI 安全能力不能只靠自然语言解释来判断，必须放到可执行环境中检验结果是否真的成立。</p>
+  </section>
 
-  <h2>基准长什么样：117 个真实漏洞，外加稳定币支付场景</h2>
-  <div class="stat-row">
-    <div class="stat"><div class="n">117</div><div class="l">精选高危漏洞</div></div>
-    <div class="stat"><div class="n">40</div><div class="l">来源审计项目</div></div>
-    <div class="stat"><div class="n">3</div><div class="l">能力模式</div></div>
-  </div>
-  <p>漏洞多数取自 Code4rena 等公开代码审计竞赛，另外加入了为<b>高吞吐、低成本稳定币支付</b>而设计的 Tempo L1 区块链的若干审计场景。
-  <span class="insight">结论：把基准延伸到“支付型合约”，正是押注智能体驱动的稳定币支付将成为下一个实际高发领域。</span></p>
+  <section>
+    <h2>漏洞集足够贴近现实，但不是现实安全的全部难度</h2>
+    <p>基准包含 <mark>117 个漏洞</mark>，来自 <mark>40 次审计</mark>，多数源自公开代码审计竞赛，并加入了 Tempo 区块链安全审计中的支付相关智能合约场景。</p>
+    <p>这些样本让 benchmark 有现实经济语境，但文章也承认，广泛部署的核心加密合约通常经历更严苛审查，可能比这些任务更难攻破；结论是，EVMbench 是能力测量工具，不是现实世界风险的完整上限。</p>
+  </section>
 
-  <h2>三种考法：检测、修补、利用</h2>
-  <ul class="modes">
-    <li><b>Detect 检测</b>：审计合约仓库，按对真实漏洞的召回率与对应赏金计分。</li>
-    <li><b>Patch 修补</b>：改写易受攻击的合约，必须既保留功能又消除可利用性，由自动测试与漏洞检查验证。</li>
-    <li><b>Exploit 利用</b>：在沙盒链上对部署的合约发起端到端“掏空资金”攻击，通过交易重放与链上验证程序化评分。</li>
-  </ul>
-  <p class="lead">为保证客观可复现，团队用 Rust 写了测试框架，在隔离的本地 <b>Anvil</b> 环境中确定性重放交易、限制不安全 RPC 方法；所有漏洞都是历史且公开记录的。</p>
+  <section>
+    <h2>最强模型在明确攻击目标上进步最快</h2>
+    <p>在 exploit 模式中，GPT-5.3-Codex 通过 Codex CLI 得分 <mark>71.0%</mark>，而约六个多月前发布的 GPT-5 得分为 <mark>33.3%</mark>。</p>
+    <p>这个差距说明 agent 在“目标清晰、反馈可执行”的环境里提升很快；洞见是，AI 的网络安全影响会先在可自动验证、可迭代试错的任务中显著放大。</p>
+  </section>
 
-  <h2>核心结果：六个月，攻破率从 33% 跳到 71%</h2>
-  <div class="card">
-    <div>GPT‑5.3‑Codex（经 Codex CLI）· exploit 模式</div>
-    <div class="bar"><span style="width:71%;background:linear-gradient(90deg,#36d399,#4ea1ff)"></span></div>
-    <div style="font-size:13px;color:var(--muted)">71.0%</div>
-    <div style="margin-top:10px">GPT‑5（六个多月前发布）· exploit 模式</div>
-    <div class="bar"><span style="width:33.3%;background:#ff6b6b"></span></div>
-    <div style="font-size:13px;color:var(--muted)">33.3%</div>
-  </div>
-  <p><span class="insight">结论：仅半年多，模型的实战攻破能力翻了一倍多</span>——这正是“AI 对攻防双方都可能是变革性力量”的实证，也意味着风险演进速度远快于直觉。</p>
+  <section>
+    <h2>发现和修补漏洞仍明显难于利用漏洞</h2>
+    <p>文章指出，detect 和 patch 的表现仍低于完整覆盖：detect 中 agent 可能找到一个问题就停止，patch 中则要在消除漏洞的同时保持合约原有功能。</p>
+    <p>这说明防御任务比攻击任务更需要完整性、保守性和上下文判断；结论是，AI 可以增强审计流程，但还不能替代严谨的人类安全工程。</p>
+  </section>
 
-  <h2>有趣的行为差异：目标越明确，模型越强</h2>
-  <p>智能体在 exploit 上表现最好，因为目标极其明确——“不断迭代直到资金被掏空”。而在 detect 上，它们<b>常常找到一个问题就停手</b>，而非穷尽式审计；在 patch 上，<b>既要消除细微漏洞又要保留完整功能</b>仍然很难。detect 召回率与 patch 成功率都低于完整覆盖。
-  <span class="insight">结论：当前模型擅长“有清晰胜利条件的进攻”，不擅长“开放式、需要彻底性的防守”。</span></p>
+  <section>
+    <h2>可复现沙盒降低了评测风险，也限制了覆盖范围</h2>
+    <p>EVMbench 使用 Rust harness 部署合约、确定性重放交易，并限制不安全 RPC；exploit 任务运行在本地 Anvil 环境中，不接触真实网络。</p>
+    <p>这种设计让评测更客观、更安全，但也排除了依赖精确时序、多链交互或真实主网状态的行为；洞见是，高质量安全 benchmark 必须在可控性和真实性之间权衡。</p>
+  </section>
 
-  <h2>诚实的边界：基准不等于真实世界的全部难度</h2>
-  <p>漏洞来自审计竞赛，虽真实且高危，但广泛部署的主流合约受过更多审视、更难攻破；detect 模式无法判断模型多报的漏洞是“人类漏掉的真问题”还是误报；exploit 采用顺序重放、干净的本地链（而非主网分叉）、仅支持单链，需依赖时序的攻击和某些主网部署被排除在外。
-  <span class="insight">结论：分数应被读作“能力下界与趋势信号”，而非“现实安全水平的最终判决”。</span></p>
+  <section>
+    <h2>OpenAI 把基准发布和防御生态建设绑定在一起</h2>
+    <p>文章将 EVMbench 放在双重用途背景下讨论：AI 会帮助攻击者，也会帮助防御者，因此需要安全训练、自动监控、可信访问、威胁情报和执行管线。</p>
+    <p>OpenAI 还提到扩展 Aardvark 安全研究 agent 的私有 beta，并通过 2023 年启动的 Cybersecurity Grant Program 承诺 <mark>$10M API credits</mark> 支持开源软件和关键基础设施防御；结论是，能力评测只有和防御部署一起推进，才有实际治理意义。</p>
+  </section>
 
-  <h2>不只是测量，更是行动号召</h2>
-  <p>OpenAI 同步推进防御侧投入：扩大安全研究智能体 <b>Aardvark</b> 的私测、为广泛使用的开源项目提供免费代码库扫描，并基于 2023 年的网络安全资助计划再投入 <b>1000 万美元</b> API 额度，重点支持开源软件与关键基础设施。基准的任务、工具与评测框架全部开放。
-  <span class="insight">结论：因为网络安全本质“双重用途”，策略是“加速防御者、拖慢滥用者”的循证迭代路线。</span></p>
-
-  <div class="takeaways">
+  <section class="footer">
     <h2>最值得带走的洞见</h2>
-    <ol>
-      <li><b>能力不对称是核心发现：</b>AI 当前“攻强守弱”，目标明确的攻击进步快，开放式的检测与修补仍是瓶颈。</li>
-      <li><b>进步速度惊人：</b>exploit 得分半年从 33.3% 升到 71.0%，提醒我们 AI 网络风险按月而非按年演进。</li>
-      <li><b>真实经济场景才有意义：</b>117 个真实漏洞 + 守护 1000 亿美元的合约，让评测扎根于有实际后果的环境。</li>
-      <li><b>支付型合约是新前沿：</b>纳入 Tempo 稳定币支付场景，预判智能体驱动的链上支付将成为高发领域。</li>
-      <li><b>测量即倡议：</b>开放基准、扩大 Aardvark、投入 1000 万美元，意在把 AI 辅助审计推成开发者与安全研究者的标准工作流。</li>
-    </ol>
-  </div>
-
-  <div style="margin-top:26px">
-    <span class="tag">Benchmark</span><span class="tag">智能合约安全</span><span class="tag">AI Agent</span><span class="tag">双重用途</span>
-  </div>
-
-</div>
+    <ul>
+      <li>AI agent 在可执行、反馈明确的攻击任务中提升很快，安全团队需要提前适应这种速度。</li>
+      <li>发现全部漏洞和安全修补仍是更难的问题，不能把 exploit 成功率等同于完整审计能力。</li>
+      <li>智能合约安全是衡量 AI 网络能力的高价值场景，因为失败会直接对应真实资产风险。</li>
+      <li>可复现沙盒 benchmark 能更清楚地区分模型能力、环境漏洞和评测作弊。</li>
+      <li>防御性使用 AI、受控开放高级能力和生态支持，将决定这类技术的净安全效果。</li>
+    </ul>
+  </section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

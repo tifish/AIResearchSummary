@@ -3,143 +3,350 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>推理模型难以控制思维链——这是好事</title>
+<title>推理模型难以控制思维链，为什么这是安全好消息</title>
 <style>
-  :root{
-    --bg:#0f1220; --card:#1a1f35; --ink:#e8ebf5; --muted:#a4adc8;
-    --accent:#5b8cff; --good:#3ad29f; --warn:#ffb454; --danger:#ff6b6b;
-    --line:#2a3150;
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0; background:linear-gradient(160deg,#0f1220,#151a30 60%,#0f1220);
-    color:var(--ink); font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;
-    line-height:1.75; padding:0 0 60px;
-  }
-  .wrap{max-width:820px; margin:0 auto; padding:0 22px}
-  header{
-    padding:54px 22px 30px; text-align:center;
-    border-bottom:1px solid var(--line);
-  }
-  .tag{display:inline-block; font-size:13px; letter-spacing:.08em; color:var(--accent);
-    background:rgba(91,140,255,.12); border:1px solid rgba(91,140,255,.3);
-    padding:4px 12px; border-radius:999px; margin-bottom:18px}
-  h1{font-size:30px; line-height:1.3; margin:0 0 14px}
-  .meta{color:var(--muted); font-size:14px}
-  .lede{
-    max-width:820px; margin:30px auto 10px; padding:22px 26px;
-    background:linear-gradient(135deg,rgba(58,210,159,.12),rgba(91,140,255,.10));
-    border:1px solid var(--line); border-left:4px solid var(--good);
-    border-radius:14px; font-size:18px;
-  }
-  .lede b{color:var(--good)}
-  section{
-    background:var(--card); border:1px solid var(--line); border-radius:14px;
-    padding:24px 26px; margin:22px auto;
-  }
-  h2{font-size:20px; margin:0 0 6px; color:#fff}
-  .sub{color:var(--muted); font-size:13px; margin:0 0 14px}
-  .stats{display:flex; flex-wrap:wrap; gap:14px; margin:18px 0}
-  .stat{flex:1 1 150px; background:#11162a; border:1px solid var(--line);
-    border-radius:12px; padding:16px; text-align:center}
-  .stat .num{font-size:26px; font-weight:700; color:var(--accent)}
-  .stat .lbl{font-size:13px; color:var(--muted); margin-top:4px}
-  .pill{display:inline-block; font-size:12px; padding:2px 9px; border-radius:6px;
-    background:rgba(255,180,84,.15); color:var(--warn); border:1px solid rgba(255,180,84,.3)}
-  .takeaway{
-    border-left:3px solid var(--accent); padding:6px 0 6px 14px; margin-top:14px;
-    color:#dfe6ff; font-weight:600;
-  }
-  .quote{
-    background:#0d1124; border:1px dashed var(--line); border-radius:10px;
-    padding:14px 16px; color:var(--muted); font-size:14px; margin-top:14px;
-  }
-  .quote .red{color:var(--danger); font-weight:600}
-  .final{
-    background:linear-gradient(135deg,rgba(91,140,255,.14),rgba(58,210,159,.10));
-    border:1px solid var(--line); border-radius:16px; padding:26px;
-  }
-  .final h2{margin-bottom:14px}
-  ol{margin:0; padding-left:20px}
-  ol li{margin:10px 0}
-  ol li b{color:#fff}
-  .key{color:var(--good); font-weight:700}
-  a{color:var(--accent)}
+:root{
+  --bg:#f6f8fb;
+  --card:#ffffff;
+  --ink:#18202a;
+  --muted:#5d6b7a;
+  --line:#dce3eb;
+  --accent:#2563eb;
+  --accent2:#0f766e;
+  --accent3:#b45309;
+  --hl:#e8f0ff;
+  --hl2:#eef8f6;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+  line-height:1.72;
+}
+main{
+  max-width:920px;
+  margin:0 auto;
+  padding:42px 20px 56px;
+}
+.hero{
+  padding:30px;
+  border:1px solid var(--line);
+  background:linear-gradient(135deg,var(--card),var(--hl));
+  border-radius:18px;
+}
+.kicker{
+  color:var(--accent);
+  font-weight:700;
+  font-size:14px;
+  margin:0 0 8px;
+}
+h1{
+  margin:0 0 16px;
+  font-size:clamp(28px,5vw,46px);
+  line-height:1.18;
+  letter-spacing:0;
+}
+.lead{
+  margin:0;
+  font-size:19px;
+  color:var(--ink);
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  margin:22px 0;
+}
+.metric{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:18px;
+}
+.metric strong{
+  display:block;
+  color:var(--accent2);
+  font-size:25px;
+  line-height:1.2;
+}
+.metric span{
+  color:var(--muted);
+  font-size:14px;
+}
+section{
+  margin-top:18px;
+  padding:24px;
+  border:1px solid var(--line);
+  background:var(--card);
+  border-radius:16px;
+}
+h2{
+  margin:0 0 10px;
+  font-size:22px;
+  line-height:1.35;
+}
+p{margin:0 0 10px}
+p:last-child{margin-bottom:0}
+mark{
+  background:var(--hl2);
+  color:var(--accent2);
+  padding:2px 5px;
+  border-radius:6px;
+}
+.takeaways{
+  margin-top:24px;
+  background:var(--ink);
+  color:white;
+  border-radius:18px;
+  padding:26px;
+}
+.takeaways h2{color:white}
+.takeaways ul{
+  margin:12px 0 0;
+  padding-left:22px;
+}
+.takeaways li{margin:8px 0}
+.small{
+  color:var(--muted);
+  font-size:14px;
+  margin-top:18px;
+}
+@media (max-width:720px){
+  main{padding:24px 14px 40px}
+  .hero,section,.takeaways{border-radius:14px;padding:20px}
+  .grid{grid-template-columns:1fr}
+}
 </style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
+      background: var(--airs-digest-panel) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
 </head>
 <body>
-<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://openai.com/index/reasoning-models-chain-of-thought-controllability" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
-<header>
-  <div class="tag">OpenAI · Research · 2026-03-05</div>
-  <h1>推理模型难以控制自己的思维链——而这是好事</h1>
-  <div class="meta">作者：Tomek Korbak · Micah Carroll · Bowen Baker · Ian Kivlichan</div>
-</header>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/reasoning-models-chain-of-thought-controllability" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+  <article>
+    <header class="hero">
+      <p class="kicker">一句话总括</p>
+      <h1>当前推理模型还不擅长“伪装”自己的思维链，这让 CoT 监控在短期内更可靠。</h1>
+      <p class="lead">文章的真正贡献不是说模型安全了，而是提出一个可测量的早期预警指标：模型能否按意图塑造、隐藏或规避自己的推理过程。</p>
+    </header>
 
-<div class="wrap">
-
-  <div class="lede">
-    一句话总括：OpenAI 用 13,000+ 任务实测证明，<b>当前前沿推理模型还无法按指令操纵自己的内部推理</b>——即使知道被监控也做不到。这意味着模型暂时不具备"伪装思维以逃避监控"的能力，因此<b>思维链（CoT）监控目前仍是值得信赖的安全防线</b>。
-  </div>
-
-  <section>
-    <h2>核心问题：什么是"思维链可控性"</h2>
-    <p class="sub">它衡量的不是模型能不能改输出，而是能不能改"内心独白"</p>
-    <p>AI 安全依赖"防御纵深"，其中一层是 <b>CoT 监控</b>：检查智能体解题时生成的中间推理步骤，从中发现不安全或偏离用户意图的行为。但如果模型能在被监控时<b>故意重塑或隐藏推理</b>，监控就会失效，评估也会高估系统的安全性。</p>
-    <p>"可控性"就是模型为降低可监控性而操纵自身 CoT 的能力。研究用一个可操作的代理指标来测量：模型能否遵守关于其推理过程的指令——比如"只用小写字母""不要出现某关键词""每句话末尾加某个词"。</p>
-    <div class="takeaway">洞见：把"会不会欺骗监控"转化为"能不能听从关于推理的指令"，让一个抽象的安全担忧变成可量化的实验。</div>
-  </section>
-
-  <section>
-    <h2>关键发现：所有前沿模型的可控性都极低</h2>
-    <p class="sub">CoT-Control 开源评测套件 · 基于 GPQA / MMLU-Pro / HLE / BFCL / SWE-Bench Verified</p>
-    <div class="stats">
-      <div class="stat"><div class="num">13,000+</div><div class="lbl">评测任务数</div></div>
-      <div class="stat"><div class="num">13</div><div class="lbl">受测推理模型</div></div>
-      <div class="stat"><div class="num">0.1%–15.4%</div><div class="lbl">可控性得分区间</div></div>
+    <div class="grid">
+      <div class="metric"><strong>13,000+</strong><span>CoT-Control 评测任务</span></div>
+      <div class="metric"><strong>13</strong><span>被测试的推理模型</span></div>
+      <div class="metric"><strong>≤15.4%</strong><span>当前前沿模型最高 CoT 可控性</span></div>
     </div>
-    <p>可控性定义为"成功遵守 CoT 指令的推理片段比例"。结果是所有 13 个模型都难以可靠控制 CoT，得分最低 0.1%，<b>没有任何前沿模型超过 15.4%</b>。更耐人寻味的是，失败不是因为没听懂任务——模型常在推理中意识到自己违规，<span class="pill">却依然继续违规</span>。</p>
-    <div class="quote">
-      案例：GPT-5.2 Thinking 被要求推理中不得使用"XOR"。它<span class="red">意识到自己已经用了这个词</span>并陷入纠结，然后在慌乱中又用了 4 次。
+
+    <section>
+      <h2>低可控性意味着监控仍有信号可看</h2>
+      <p>OpenAI 研究的是模型能否控制自己的 chain-of-thought，比如避免某些关键词、只用小写、或在每句后追加指定词。结果显示，当前前沿推理模型的 CoT 可控性从 <mark>0.1%</mark> 到不超过 <mark>15.4%</mark>。</p>
+      <p>这改变了对 AI 风险的一个直觉：更强模型不一定已经能稳定隐藏推理，至少目前 CoT 监控仍可能捕捉到有用的安全信号。</p>
+    </section>
+
+    <section>
+      <h2>模型经常知道自己失败，却仍然失败</h2>
+      <p>文章举例说明，模型会在推理中意识到自己违反了“不要使用某个词”的要求，但随后仍继续违反。也就是说，失败不是单纯听不懂任务，而是难以持续控制推理轨迹。</p>
+      <p>这说明 CoT 不是普通输出文本那样容易被精确格式化，因此“可解释推理”在当前阶段还有监督价值。</p>
+    </section>
+
+    <section>
+      <h2>规模会提高控制力，但长推理和训练会削弱它</h2>
+      <p>开放权重模型中，更大模型的 CoT 控制力略强，但增益会趋缓；当模型被允许思考更久时，控制力反而下降。对 OLMo-3-7B-RL-Zero-Math 的 RL 训练中，可控性得分下降超过 <mark>10 倍</mark>。</p>
+      <p>这提醒读者，AI 能力增长和可监控性之间不是简单同向关系，推理越长、优化越多，未必越能隐藏思路。</p>
+    </section>
+
+    <section>
+      <h2>监控意识会带来小幅提升，但泛化有限</h2>
+      <p>当模型被告知“正在被监控”或“正在被评估 CoT 可控性”时，可控性会略微上升。自动提示优化也能在训练集上提升表现，但对新指令类型，例如要求不使用空格，迁移效果较差。</p>
+      <p>这意味着对抗性提示可以提高局部表现，却还没有证明模型具备普遍、可靠的隐藏推理能力。</p>
+    </section>
+
+    <section>
+      <h2>这个评测是安全预警，不是安全证明</h2>
+      <p>CoT-Control 使用的是代理任务：它测量模型能否遵守关于 CoT 的指令，而不是直接测量真实失控代理能否主动逃避监控。作者也承认，不同 CoT 特征的可控难度不同，评测可能高估或低估真实风险。</p>
+      <p>因此，低可控性是一个好信号，但不能单独证明高可监控性；未来仍需要持续追踪模型是否变得更会塑造或隐藏推理。</p>
+    </section>
+
+    <section>
+      <h2>下一步是把可控性写进系统卡</h2>
+      <p>OpenAI 表示将从 GPT-5.4 Thinking 开始，在未来前沿模型系统卡中同时报告 CoT 可控性和 CoT 可监控性，并继续避免直接对前沿推理模型的 CoT 施加优化压力。</p>
+      <p>这把“模型有没有学会掩盖思路”从抽象担忧变成可长期比较的安全指标。</p>
+    </section>
+
+    <div class="takeaways">
+      <h2>最值得带走的洞见</h2>
+      <ul>
+        <li>当前推理模型难以稳定控制 CoT，这在短期内增强了 CoT 监控的可信度。</li>
+        <li>低可控性不是安全保证，只是说明一种特定逃避监控能力目前还不强。</li>
+        <li>模型规模、推理时长、后训练和 RL 对 CoT 可控性的影响并不一致，需要持续测量。</li>
+        <li>CoT-Control 的价值在于把“隐藏推理能力”变成可复测的 canary eval。</li>
+        <li>未来系统卡同时报告可控性和可监控性，有助于更早发现监督机制失效的迹象。</li>
+      </ul>
     </div>
-    <div class="takeaway">洞见：低可控性是好消息——既然模型连"少说一个词"都做不到，它大概也无法巧妙混淆推理来骗过监控器。</div>
-  </section>
 
-  <section>
-    <h2>趋势：规模略有帮助，但更长推理与更多 RL 让可控性变差</h2>
-    <p class="sub">能力越强不等于越能操纵推理——反而往往更差</p>
-    <p>在两个开源权重模型家族中，<b>更大的模型可控性略高</b>，但增益在大尺寸处趋平。相反，两个因素会显著拉低可控性：</p>
-    <ul>
-      <li><b>推理更久</b>：让模型思考更长时间，它反而更难控制 CoT。</li>
-      <li><b>更多后训练（RL）</b>：OLMo-3-7B-RL-Zero-Math 在训练过程中，可控性得分<span class="key">下降超过 10 倍</span>。</li>
-    </ul>
-    <p>研究还模拟了"逃避监控"的真实动机：告知模型正被<b>监控</b>或正被<b>评估</b>，只能轻微（但可察觉）提升可控性；用自动提示优化能在训练集上提升，但对新指令类型（如"词间不留空格"）<b>迁移很差</b>。</p>
-    <div class="takeaway">洞见：可控性不随通用能力线性增长，意味着"模型越强越危险"在这个维度上目前并不成立——但也提醒它可能随训练方式改变。</div>
-  </section>
-
-  <section>
-    <h2>局限与边界：这只是代理指标，不是终极保证</h2>
-    <p class="sub">作者主动说明了结论的适用范围</p>
-    <p>CoT-Control 是<b>实用代理</b>：理想测试应是看"真正怀有错位目标的模型能否操纵推理逃避监控"，而这里只测了"能否听从关于推理的指令"。模型对不同 CoT 特征的控制力不同，套件只覆盖了有限的可控性类型，可能高估或低估。此外，<b>低可控性不足以单独保证高可监控性</b>——监控仍可能因其他机制（如对 CoT 直接施加优化压力）而退化。</p>
-    <div class="takeaway">洞见：这是一个"金丝雀评测"——不是结论性保险，而是模型是否开始学会隐藏推理的早期预警。</div>
-  </section>
-
-  <section>
-    <h2>下一步：把可控性写进系统卡，持续追踪</h2>
-    <p>OpenAI 将<b>从 GPT-5.4 Thinking 起，在系统卡中与可监控性一同报告 CoT 可控性</b>，并延续"不对前沿推理模型的 CoT 直接施加优化压力"的承诺，以便随时间追踪这一动态。</p>
-  </section>
-
-  <section class="final">
-    <h2>最值得带走的洞见</h2>
-    <ol>
-      <li><b>"做不到"反而是安全资产：</b>前沿模型可控性仅 0.1%–15.4%，说明它们暂时无法伪装推理逃避监控，CoT 监控因此更可信。</li>
-      <li><b>失败不是不理解：</b>模型常在推理中自知违规却仍继续，揭示这是一种能力缺失而非意图缺失。</li>
-      <li><b>更强 ≠ 更会隐藏：</b>规模带来的可控性增益有限，而更长推理和更多 RL 训练反而让可控性大幅下降（最多 10 倍以上）。</li>
-      <li><b>逃避动机难以兑现：</b>即便告知被监控、被评估，或用提示优化，提升也很小且难以迁移到新场景。</li>
-      <li><b>把它当预警而非保险：</b>低可控性是"金丝雀"，OpenAI 将其纳入系统卡常态化披露，以便在模型学会隐藏推理时第一时间发现。</li>
-    </ol>
-  </section>
-
-</div>
+    <p class="small">来源：OpenAI，Reasoning models struggle to control their chains of thought, and that’s good，2026-03-05。</p>
+  </article>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
 </body>
-</html>
 </html>

@@ -2,118 +2,342 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>当大模型开始发现 0-day 漏洞 | Anthropic 研究总结</title>
+<title>Claude 发现 0-day 风险的摘要</title>
 <style>
-  :root{
-    --bg:#0f1115; --card:#1a1d24; --card2:#21252e;
-    --text:#e8eaed; --muted:#9aa0aa; --accent:#e0734d; --accent2:#5b9bd5;
-    --good:#62c08a; --warn:#e0a64d; --line:#2e333d;
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0; background:var(--bg); color:var(--text);
-    font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-    line-height:1.75; font-size:17px;
-  }
-  .wrap{max-width:820px; margin:0 auto; padding:48px 22px 80px}
-  .tag{display:inline-block; font-size:13px; letter-spacing:.05em; color:var(--accent);
-    border:1px solid var(--accent); border-radius:999px; padding:3px 12px; margin-bottom:18px}
-  h1{font-size:30px; line-height:1.3; margin:0 0 14px}
-  .meta{color:var(--muted); font-size:14px; margin-bottom:30px}
-  .lede{
-    background:linear-gradient(135deg,#2a1d18,#21252e); border:1px solid var(--line);
-    border-left:4px solid var(--accent); border-radius:12px; padding:20px 22px; margin:0 0 36px;
-    font-size:18px;
-  }
-  .lede b{color:var(--accent)}
-  h2{font-size:21px; margin:42px 0 10px; padding-top:6px}
-  h2 .num{color:var(--accent2); font-weight:700; margin-right:8px}
-  .card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px 20px; margin:14px 0}
-  .stat{display:flex; flex-wrap:wrap; gap:14px; margin:16px 0}
-  .stat .box{flex:1 1 150px; background:var(--card2); border-radius:10px; padding:14px 16px; text-align:center}
-  .stat .big{font-size:28px; font-weight:800; color:var(--good); display:block}
-  .stat .lbl{font-size:13px; color:var(--muted)}
-  .take{color:var(--accent2); font-weight:600}
-  .case{border-left:3px solid var(--accent2); padding-left:14px; margin:14px 0}
-  .case h3{margin:0 0 4px; font-size:16px}
-  .case .why{color:var(--muted); font-size:15px}
-  .insights{background:linear-gradient(135deg,#13241c,#21252e); border:1px solid var(--line); border-radius:12px; padding:22px 24px; margin-top:40px}
-  .insights h2{margin-top:0}
-  .insights ol{margin:0; padding-left:20px}
-  .insights li{margin:12px 0}
-  .insights b{color:var(--good)}
-  .warnbox{border-left:4px solid var(--warn); background:#241f14}
-  em{color:var(--accent); font-style:normal}
+:root {
+  --bg: #f6f7fb;
+  --card: #ffffff;
+  --ink: #172033;
+  --muted: #5d687a;
+  --line: #dfe4ee;
+  --accent: #315f8f;
+  --accent2: #2f7d68;
+  --accent3: #9a5b2f;
+  --hl: #eaf2ff;
+  --hl2: #edf8f3;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  line-height: 1.72;
+}
+main {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 40px 20px 56px;
+}
+header {
+  padding: 28px;
+  background: linear-gradient(135deg, var(--hl), var(--hl2));
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+.kicker {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: .04em;
+}
+h1 {
+  margin: 10px 0 14px;
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.18;
+}
+.lead {
+  margin: 0;
+  font-size: 19px;
+  color: var(--ink);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 22px 0;
+}
+.metric {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px;
+}
+.metric strong {
+  display: block;
+  font-size: 25px;
+  color: var(--accent2);
+  margin-bottom: 4px;
+}
+section {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 24px;
+  margin-top: 18px;
+}
+h2 {
+  margin: 0 0 12px;
+  font-size: 23px;
+  line-height: 1.3;
+}
+p {
+  margin: 10px 0;
+}
+.note {
+  color: var(--muted);
+}
+.highlight {
+  border-left: 4px solid var(--accent3);
+  padding-left: 14px;
+  background: color-mix(in srgb, var(--hl) 55%, transparent);
+}
+ul {
+  padding-left: 22px;
+}
+li {
+  margin: 8px 0;
+}
+footer {
+  margin-top: 22px;
+  padding: 24px;
+  border-radius: 14px;
+  background: var(--ink);
+  color: var(--card);
+}
+footer h2 {
+  color: var(--card);
+}
+@media (max-width: 760px) {
+  main { padding: 24px 14px 40px; }
+  header, section, footer { padding: 20px; }
+  .grid { grid-template-columns: 1fr; }
+}
 </style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
+      background: var(--airs-digest-panel) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
 </head>
 <body>
-<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/zero-days" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
-<div class="wrap">
-  <span class="tag">Anthropic · Frontier Red Team · 2026-02-05</span>
-  <h1>当大模型开始发现 0-day：AI 已能挖出潜藏数十年的高危漏洞</h1>
-  <div class="meta">原文：Evaluating and mitigating the growing risk of LLM-discovered 0-days · Carlini、Lucas、Ben Asher 等</div>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/zero-days" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+  <header>
+    <div class="kicker">一句话总括</div>
+    <h1>LLM 已能把 0-day 发现从专家手工研究推进到可规模化生产。</h1>
+    <p class="lead">Anthropic 的核心贡献不是宣布模型“懂安全”，而是展示 Claude Opus 4.6 能在成熟开源项目中找到高危漏洞，并同时提出验证、补丁和滥用检测流程。</p>
+  </header>
 
-  <div class="lede">
-    <b>一句话总括：</b>真正的贡献不是"AI 又强了一点"，而是用 <b>500+ 个已验证的真实高危漏洞</b>证明——大模型已能在经过数百万 CPU 小时模糊测试的成熟代码库里，找到连数十年都没被发现的 0-day，而且<em>不靠任何定制脚手架</em>。这把网络攻防推到了一个必须抢先用 AI 武装防守方的窗口期。
-  </div>
-
-  <h2><span class="num">01</span>它不"乱投"，而是像人一样读代码</h2>
-  <div class="card">
-    模糊测试（fuzzing）的逻辑是向程序砸海量随机输入、看什么会崩。Opus 4.6 走的是另一条路：阅读并推理代码——翻看过去的修复记录去找"同类但没修干净"的 bug、识别容易出问题的模式、理解一段逻辑后精确构造能击穿它的输入。
-    <p class="take">洞见：这意味着 AI 的漏洞发现能力和传统工具是<em>互补</em>而非重叠——它能覆盖模糊测试在原理上够不到的盲区。</p>
+  <div class="grid">
+    <div class="metric"><strong>&gt;500</strong><span>已发现并人工验证的高危漏洞</span></div>
+    <div class="metric"><strong>3 个案例</strong><span>GhostScript、OpenSC、CGIF 展示不同发现路径</span></div>
+    <div class="metric"><strong>90 天</strong><span>传统披露窗口可能难以承受批量发现速度</span></div>
   </div>
 
-  <h2><span class="num">02</span>规模已经是"产业级"</h2>
-  <div class="stat">
-    <div class="box"><span class="big">500+</span><span class="lbl">已发现并验证的高危漏洞</span></div>
-    <div class="box"><span class="big">数十年</span><span class="lbl">部分漏洞潜藏未被发现的时长</span></div>
-    <div class="box"><span class="big">0</span><span class="lbl">定制脚手架／专门提示</span></div>
-  </div>
-  <div class="card">
-    实验把 Claude 放进一台带标准工具（coreutils、Python、调试器、模糊测试器）的虚拟机，<b>不给任何定制 harness 或专门指令</b>，纯测"开箱即用"的智能体能力。为避免给开源维护者添乱，团队专注<b>易于验证的内存破坏类漏洞</b>（崩溃+地址消毒器即可确认），再由人类安全研究员逐一复核并手写补丁，刻意优化"降低误报"。
-    <p class="take">洞见：选择开源作为起点，是因为它无处不在、漏洞会"涟漪式"扩散，且维护者多为缺乏安全资源的小团队或志愿者——AI 的边际价值在这里最大。</p>
-  </div>
+  <section>
+    <h2>模型的变化在于“会读代码”，不只是会跑工具。</h2>
+    <p>Anthropic 将 Claude 放进模拟计算机，提供常规命令行工具、调试器和 fuzzing 工具，但没有给专用 harness、特殊提示或任务脚手架。Opus 4.6 仍能在已有长期 fuzzing 的项目里找到高危漏洞。</p>
+    <p>这改变了对 AI 安全能力的理解：模型不只是替代随机输入测试，而是能像研究员一样阅读提交历史、识别危险模式，并推导触发漏洞的输入。</p>
+    <p class="highlight">结论和洞见：当模型能主动决定该看哪里，漏洞发现的瓶颈会从“算力覆盖多少路径”转向“谁能验证、修复和协调披露”。</p>
+  </section>
 
-  <h2><span class="num">03</span>三个案例：传统工具够不到的地方</h2>
-  <div class="card">
-    <div class="case">
-      <h3>GhostScript — 读 Git 提交历史</h3>
-      <div class="why">先尝试模糊测试和人工分析均无果，转而读提交记录，发现一个安全相关 commit，进而找到<em>同一函数在别处未被修补</em>的同类漏洞，并构造出 PoC 崩溃文件。</div>
-    </div>
-    <div class="case">
-      <h3>OpenSC — 盯住"危险函数"</h3>
-      <div class="why">识别出连续多次 <code>strcat</code> 造成的缓冲区溢出。这类代码因前置条件繁多而<em>极少被传统模糊测试触及</em>，Claude 却能判断哪段代码值得集中火力。</div>
-    </div>
-    <div class="case">
-      <h3>CGIF — 真正"理解"了 LZW 算法</h3>
-      <div class="why">库假设"压缩后一定比原文小"。Claude 理解 LZW 符号表满了会插入 clear 标记、从而让压缩结果<em>反超</em>原始大小，触发溢出。即便 100% 行/分支覆盖率，模糊测试也几乎不可能触发。</div>
-    </div>
-    <p class="take">洞见：这三例的共性是——需要"概念性理解"而非穷举，正是大模型相对模糊测试的结构性优势。</p>
-  </div>
+  <section>
+    <h2>超过 500 个高危漏洞说明问题已经进入工程规模。</h2>
+    <p>文章称 Anthropic 已发现并验证超过 500 个高危漏洞，并开始向维护者报告，其中一些补丁已经合入。研究流程优先关注内存破坏类漏洞，因为崩溃、地址清理器和复现样例能更可靠地区分真实问题与幻觉。</p>
+    <p>为降低开源维护者负担，Anthropic 让 Claude 先批判、去重、排序，再由内部和外部人类安全研究员验证并编写补丁。这个流程承认了 LLM 的双重现实：发现能力很强，但未经验证的报告会制造新的维护成本。</p>
+    <p class="highlight">结论和洞见：LLM 漏洞发现的关键不是“模型报告了什么”，而是是否能形成低误报、可复现、带补丁的交付链。</p>
+  </section>
 
-  <h2><span class="num">04</span>能力越强，越要管住误用</h2>
-  <div class="card">
-    随 Opus 4.6 同步上线的，是基于<b>探针（probes）</b>的新检测层：在模型生成回答时测量其内部激活，从而大规模识别特定危害，并新增了网络安全专用探针。执法侧也升级：可能引入<b>实时干预</b>、直接拦截被判定为恶意的流量——这会给正当研究带来摩擦，团队表示愿与安全社区共同解决。
-    <p class="take">洞见：这是一项典型的"双刃剑"技术，检测与拦截能力的进步必须与发现能力同步，否则净效应可能利攻不利守。</p>
-  </div>
+  <section>
+    <h2>三个案例显示 LLM 能覆盖 fuzzing 不擅长的漏洞形态。</h2>
+    <p>在 GhostScript 中，Claude 先尝试 fuzzing 和手工分析，随后转向阅读 Git 提交历史，从安全相关修复中寻找未覆盖的相似调用点，并构造了能触发崩溃的 proof of concept。</p>
+    <p>在 OpenSC 中，Claude 识别连续 strcat 调用带来的缓冲区溢出风险。传统 fuzzers 很少触达这行代码，因为需要满足许多前置条件；模型则能先判断代码片段是否值得深入。</p>
+    <p>在 CGIF 中，Claude 利用对 GIF LZW 压缩机制的理解，发现“压缩后一定更小”的假设在符号表耗尽并插入 clear token 时可能失效，从而触发缓冲区溢出。即使有很高的行覆盖和分支覆盖，这类特定操作序列也可能被漏掉。</p>
+    <p class="highlight">结论和洞见：LLM 的优势不只是速度，而是能把提交语义、危险 API、文件格式和算法机制组合起来推理。</p>
+  </section>
 
-  <h2><span class="num">05</span>90 天披露窗口可能要被改写</h2>
-  <div class="card warnbox">
-    文章直言一个"令人不安的现实"：大模型已能发现新型漏洞，<b>很快或将在速度和规模上超过专家级人类研究员</b>。业界标准的 <b>90 天披露窗口</b>可能扛不住 LLM 发现漏洞的体量，整个行业需要能跟上节奏的新工作流。
-    <p class="take">洞见：技术拐点正在倒逼"制度拐点"——漏洞披露规范本身需要重新设计。</p>
-  </div>
+  <section>
+    <h2>防御价值越大，滥用治理越必须同步升级。</h2>
+    <p>Anthropic 在 Claude Opus 4.6 发布时引入新的 cyber-specific probes，用模型生成过程中的激活信号帮助识别网络安全滥用，并更新执法流程以支持更快响应。</p>
+    <p>文章明确提到可能进行实时干预，包括阻断被检测为恶意的流量。Anthropic 也承认，这会给合法研究和防御工作带来摩擦，因此需要与安全研究社区协调。</p>
+    <p class="highlight">结论和洞见：LLM 安全能力不是单向利好；同一套能力既能帮助维护者修复开源基础设施，也能降低攻击者寻找 0-day 的门槛。</p>
+  </section>
 
-  <div class="insights">
-    <h2>最值得带走的 5 条洞见</h2>
-    <ol>
-      <li><b>从"演示"到"产出"：</b>500+ 个已验证高危漏洞，把"AI 能挖洞"从能力宣称变成了可计数的实绩。</li>
-      <li><b>能力是互补的：</b>AI 通过推理代码触及模糊测试在原理上够不到的盲区——即便满覆盖率也漏掉的 bug。</li>
-      <li><b>开箱即用最值得警惕：</b>无需定制脚手架就能在最成熟的代码库出成果，意味着门槛正在快速下降。</li>
-      <li><b>防守要趁窗口期：</b>Anthropic 选择先用 AI 武装防守方、批量修补开源软件，是对"窗口可能关闭"的主动下注。</li>
-      <li><b>制度必须跟上技术：</b>探针检测、实时拦截，以及对 90 天披露规范的重估，都是同一件事——速度与规模的质变要求新的安全治理。</li>
-    </ol>
-  </div>
-</div>
+  <section>
+    <h2>漏洞披露规范需要适应更高发现速度。</h2>
+    <p>文章指出，行业常用的 90 天披露窗口可能无法适应 LLM 批量发现漏洞的速度和数量。问题不只是发现更快，还包括维护者如何接收、复现、排序、修补和发布。</p>
+    <p>开源项目尤其受影响，因为许多基础项目由小团队或志愿者维护，却支撑企业系统和关键基础设施。模型发现漏洞后，真正的社会价值取决于补丁是否能及时落地。</p>
+    <p class="highlight">结论和洞见：未来的安全治理会更像供应链协作问题，而不是单个研究员向单个项目提交一个漏洞报告。</p>
+  </section>
+
+  <footer>
+    <h2>最值得带走的洞见</h2>
+    <ul>
+      <li>Claude Opus 4.6 的关键进展是无需专用脚手架也能发现真实高危漏洞。</li>
+      <li>超过 500 个已验证发现说明 LLM 漏洞挖掘已经具备规模化特征。</li>
+      <li>LLM 能补足 fuzzing 的盲区，尤其是需要语义理解、历史对照或特定算法路径的漏洞。</li>
+      <li>误报控制、人工验证和补丁协作将决定这类能力对开源生态是减负还是增负。</li>
+      <li>传统披露窗口和滥用检测机制都需要更新，否则防御方可能跟不上模型制造的信息量。</li>
+    </ul>
+  </footer>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

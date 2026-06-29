@@ -3,122 +3,326 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>用 Claude + 属性测试在 Python 生态里找 bug</title>
+<title>Claude 与属性测试如何在 Python 生态中发现真实 bug</title>
 <style>
-  :root{
-    --ink:#1a1a1a; --muted:#5c6470; --line:#e3e6ea;
-    --accent:#c2410c; --accent2:#0e7490; --bg:#fafaf8;
-    --card:#ffffff; --good:#15803d; --bad:#b91c1c;
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0; background:var(--bg); color:var(--ink);
-    font:16px/1.75 -apple-system,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans CJK SC","Microsoft YaHei",sans-serif;
-  }
-  .wrap{max-width:780px; margin:0 auto; padding:40px 22px 72px}
-  header{border-bottom:3px solid var(--accent); padding-bottom:18px; margin-bottom:8px}
-  .kicker{font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); font-weight:700}
-  h1{font-size:29px; line-height:1.35; margin:.35em 0 .25em}
-  .meta{font-size:13px; color:var(--muted)}
-  .lede{
-    background:linear-gradient(180deg,#fff7ed,#fff);
-    border:1px solid #fed7aa; border-left:5px solid var(--accent);
-    border-radius:10px; padding:18px 20px; margin:26px 0; font-size:17px;
-  }
-  .lede b{color:var(--accent)}
-  h2{font-size:20px; margin:38px 0 6px; line-height:1.4}
-  h2 .num{color:var(--accent2); font-weight:800; margin-right:.4em}
-  .sub{color:var(--muted); font-size:14px; margin:0 0 12px}
-  p{margin:.6em 0}
-  .insight{
-    margin:12px 0 0; padding:10px 14px; background:#ecfdf5;
-    border-left:4px solid var(--good); border-radius:0 8px 8px 0; font-size:15px;
-  }
-  .insight b{color:var(--good)}
-  .stats{display:flex; flex-wrap:wrap; gap:12px; margin:22px 0}
-  .stat{
-    flex:1 1 140px; background:var(--card); border:1px solid var(--line);
-    border-radius:12px; padding:14px 16px; text-align:center;
-  }
-  .stat .big{font-size:27px; font-weight:800; color:var(--accent2); line-height:1.1}
-  .stat .lab{font-size:12.5px; color:var(--muted); margin-top:4px}
-  table{width:100%; border-collapse:collapse; margin:16px 0; font-size:14.5px}
-  th,td{text-align:left; padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:top}
-  th{background:#f1f5f9; font-size:13px; color:#334155}
-  .tag{display:inline-block; font-size:12px; font-weight:700; padding:2px 8px; border-radius:20px}
-  .ok{background:#dcfce7; color:var(--good)}
-  .pend{background:#fef9c3; color:#a16207}
-  .no{background:#fee2e2; color:var(--bad)}
-  code{background:#f3f4f6; padding:1px 5px; border-radius:4px; font-size:13.5px; font-family:"SFMono-Regular",Consolas,monospace}
-  .takeaways{
-    margin-top:40px; background:#0f172a; color:#e2e8f0;
-    border-radius:14px; padding:24px 26px;
-  }
-  .takeaways h2{color:#fff; margin-top:0}
-  .takeaways ol{margin:.5em 0 0; padding-left:1.2em}
-  .takeaways li{margin:.7em 0; line-height:1.7}
-  .takeaways b{color:#fdba74}
-  footer{margin-top:34px; font-size:12.5px; color:var(--muted); text-align:center}
+:root{
+  --bg:#f6f8fb;
+  --card:#ffffff;
+  --ink:#18202a;
+  --muted:#607086;
+  --line:#dce3ec;
+  --accent:#1769aa;
+  --accent2:#0f8b6f;
+  --accent3:#9b5de5;
+  --hl:#e8f3ff;
+  --hl2:#edf9f4;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+  line-height:1.72;
+}
+main{
+  max-width:960px;
+  margin:0 auto;
+  padding:40px 20px 56px;
+}
+header{
+  padding:28px;
+  background:linear-gradient(135deg,var(--hl),var(--hl2));
+  border:1px solid var(--line);
+  border-radius:16px;
+}
+h1{
+  margin:0 0 14px;
+  font-size:30px;
+  line-height:1.25;
+}
+.lead{
+  margin:0;
+  font-size:18px;
+  color:var(--ink);
+}
+.meta{
+  margin-top:16px;
+  color:var(--muted);
+  font-size:14px;
+}
+section{
+  margin-top:18px;
+  padding:24px;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+}
+h2{
+  margin:0 0 12px;
+  font-size:21px;
+  line-height:1.35;
+  color:var(--accent);
+}
+p{margin:0 0 12px}
+p:last-child{margin-bottom:0}
+.data{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:12px;
+  margin:16px 0;
+}
+.stat{
+  padding:14px;
+  border-radius:12px;
+  background:var(--hl);
+  border:1px solid var(--line);
+}
+.stat b{
+  display:block;
+  font-size:24px;
+  color:var(--accent2);
+}
+.stat span{
+  display:block;
+  color:var(--muted);
+  font-size:14px;
+}
+.callout{
+  padding:14px 16px;
+  border-left:4px solid var(--accent3);
+  background:var(--hl2);
+  border-radius:10px;
+}
+ul{
+  margin:10px 0 0;
+  padding-left:22px;
+}
+li{margin:8px 0}
 </style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
+      background: var(--airs-digest-panel) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
 </head>
 <body>
-<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/property-based-testing" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
-<div class="wrap">
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/property-based-testing" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
   <header>
-    <div class="kicker">Anthropic · Frontier Red Team</div>
-    <h1>用 Claude + 属性测试，在整个 Python 生态里找 bug</h1>
-    <div class="meta">来源：Anthropic（与 MATS、东北大学合作） · 2026-01-14 · NeurIPS 2025 DL4Code Workshop</div>
+    <h1>Claude 与属性测试把自动查错推向真实开源项目</h1>
+    <p class="lead">一句话总括：这项工作真正的贡献，是让 LLM 不只是写测试样例，而是从代码语义中推断不变量，再用属性测试系统性寻找反例，并用人工与维护者反馈验证哪些发现是真的。</p>
+    <p class="meta">Anthropic，2026 年 1 月 14 日；研究来自 2025 NeurIPS Deep Learning for Code Workshop 相关项目。</p>
   </header>
 
-  <div class="lede">
-    一句话总括：研究者让一个 AI agent 不去猜"哪个输入会出错"，而是<b>推断代码本该恒成立的通用属性</b>（如"Wald 分布采样必为正"），再用 Hypothesis 自动搜反例——结果在 NumPy、SciPy、Pandas 等顶级库里挖出数百个真实 bug，多个已被上游合并修复。
-  </div>
+  <section>
+    <h2>核心方法不是“多写测试”，而是让模型找出应当永远成立的性质</h2>
+    <p>传统单元测试依赖开发者提前想到具体输入，而属性测试要求写出更一般的规则，例如“序列化再反序列化应还原对象”或“Wald 分布采样应为正数”。Claude 代理会阅读代码、文档、类型标注和调用关系，提出这些规则，再用 Hypothesis 自动生成大量输入寻找反例。</p>
+    <p class="callout">这改变了 AI 测试的角色：模型不只是补充边角测试，而是在帮助开发者把隐含语义转成可执行的检查。</p>
+  </section>
 
-  <h2><span class="num">①</span>方法的关键不是"测试用例"，而是"属性"</h2>
-  <p class="sub">从"我能想到的边界"升级到"代码该满足的规律"</p>
-  <p>传统的<strong>示例测试</strong>要求开发者手写"输入→预期输出"，但开发者想不到的边界，往往也正是实现里漏掉的边界。<strong>属性测试</strong>反过来：只描述一条普适规律（如"反序列化是序列化的逆运算"）和输入域，框架像 fuzz 一样自动生成大量输入去找反例。agent 通过读类型注解、docstring、函数名、注释来<strong>推断</strong>这些属性，写成 Hypothesis 测试，再用<strong>自我反思循环</strong>判断失败到底是真 bug 还是测试写错了。</p>
-  <div class="insight"><b>洞见：</b>LLM 真正的强项不是生成输入，而是从上下文"读懂代码应该遵守什么规律"——这正是属性测试最难的人工环节。</div>
+  <section>
+    <h2>大规模运行显示，LLM 生成的 bug 报告已有相当比例可用</h2>
+    <p>研究团队在超过 100 个流行 Python 包上运行代理，覆盖数值计算、解析、数据库等场景。第一阶段产生 984 份 bug 报告，并从中人工抽样审查 50 份。</p>
+    <div class="data">
+      <div class="stat"><b>984</b><span>第一阶段生成的 bug 报告</span></div>
+      <div class="stat"><b>56%</b><span>抽样报告被判定为有效 bug</span></div>
+      <div class="stat"><b>32%</b><span>既有效又值得向维护者报告</span></div>
+    </div>
+    <p>这些数字说明，自动化发现还不能直接无审查地灌给维护者，但它已经能提供高密度候选问题，值得进入人工筛选流程。</p>
+  </section>
 
-  <h2><span class="num">②</span>规模化评测：排序排名让有效率从一半飙到八成以上</h2>
-  <p class="sub">先用 Opus 4.1 海量产出，再用打分排序筛精华</p>
-  <div class="stats">
-    <div class="stat"><div class="big">100+</div><div class="lab">覆盖的流行 Python 包</div></div>
-    <div class="stat"><div class="big">984</div><div class="lab">第一阶段生成的 bug 报告</div></div>
-    <div class="stat"><div class="big">56%</div><div class="lab">抽查 50 份中的有效 bug</div></div>
-    <div class="stat"><div class="big">32%</div><div class="lab">有效且值得上报</div></div>
-  </div>
-  <p>关键转折在<strong>排序</strong>：团队据人工复核建立 15 分制评分表，让 Opus 4.1 给全部报告打分。在高分报告中，有效率升到 <strong>86%</strong>，"既有效又值得上报"升到 <strong>81%</strong>。第二阶段改用 <strong>Sonnet 4.5</strong> 在 10 个重点包上多次运行，并引入更精细的评测 agent，外加 <strong>3 名付费专家</strong>复核高危 bug。</p>
-  <div class="insight"><b>洞见：</b>原始产出噪声大不要紧——一个便宜的"LLM 排序层"就能把信噪比从"掷硬币"提升到"五份里四份靠谱"，这是让此类工具真正可用的关键工程一招。</div>
+  <section>
+    <h2>排序和自我反思显著提升了报告质量</h2>
+    <p>为了减少误报，代理会在测试失败后反思：失败是真 bug，还是测试假设写错了；测试通过后也会检查测试是否过于平凡。团队还用 Opus 4.1 按 15 分规则给报告排序，优先审查高分报告。</p>
+    <div class="data">
+      <div class="stat"><b>86%</b><span>最高分报告中的有效比例</span></div>
+      <div class="stat"><b>81%</b><span>最高分报告中既有效又可报告的比例</span></div>
+      <div class="stat"><b>3 人</b><span>专家人工审查高严重性问题</span></div>
+    </div>
+    <p>关键趋势是，LLM 不仅能生成测试，还能参与筛选和解释；真正有价值的系统会把生成、运行、反思、排序和人工确认连成闭环。</p>
+  </section>
 
-  <h2><span class="num">③</span>五个真实战果：真 bug，且维护者认账</h2>
-  <p class="sub">维护者才是最终裁判，agent 的发现经得起这一关</p>
-  <table>
-    <tr><th>项目</th><th>bug</th><th>状态</th></tr>
-    <tr><td><code>numpy</code></td><td><code>random.wald</code> 因灾难性抵消偶返负数；重写后相对误差降低近 <b>10 个数量级</b></td><td><span class="tag ok">已合并</span></td></tr>
-    <tr><td><code>aws-lambda-powertools</code></td><td><code>slice_dictionary()</code> 迭代器未自增，重复返回首块</td><td><span class="tag ok">已合并</span></td></tr>
-    <tr><td><code>tokenizers</code></td><td>缺右括号生成非法 HSL CSS（用正则匹配 HSL 颜色码查出）</td><td><span class="tag ok">已合并</span></td></tr>
-    <tr><td><code>cloudformation-cli</code></td><td><code>item_hash()</code> 用 <code>.sort()</code> 返回 None，所有列表哈希相同</td><td><span class="tag pend">已提交</span></td></tr>
-    <tr><td><code>python-dateutil</code></td><td><code>easter()</code> 儒略历下返回非周日，维护者判为预期行为</td><td><span class="tag no">无效</span></td></tr>
-  </table>
-  <div class="insight"><b>洞见：</b>这些不是玩具 bug——一个被全球数百万项目依赖的 NumPy 随机数函数都存在数值缺陷，说明属性测试能触及人类测试长期忽视的角落。</div>
+  <section>
+    <h2>维护者验证把演示结果变成真实工程成果</h2>
+    <p>团队手动上报了多个具体问题：NumPy 的 <code>numpy.random.wald</code> 有时返回负数，aws-lambda-powertools 的字典切片会重复返回第一块，tokenizers 的颜色字符串缺少右括号导致无效 HSL CSS。部分补丁已经合并。</p>
+    <p>NumPy 案例尤其说明问题的深度：代理发现的是“分布采样不应为负”的性质，团队随后追踪到数值不稳定，并提交更稳定的公式；维护者显示新算法相对误差降低近 10 个数量级。</p>
+    <p>这说明 AI 查错最有价值的地方不只是报错，而是把维护者引向可复现、可解释、可修复的边界条件。</p>
+  </section>
 
-  <h2><span class="num">④</span>诚实的局限：语义微妙处，agent 会"误判属性"</h2>
-  <p class="sub">代码的隐式假设，只有维护者能定夺</p>
-  <p>dateutil 的案例暴露了边界：当代码涉及不同日历系统这类<strong>微妙/隐式语义</strong>时，agent 推断出的"属性"可能根本不是开发者的本意。换言之，"什么才是正确属性"有时只有维护者能回答。这也是团队<strong>不惜成本压低误报</strong>的原因——三名专家各审约一小时、任一人存疑即丢弃，作者再逐一复核才上报。</p>
-  <div class="insight"><b>洞见：</b>这类工具的瓶颈正从"能不能找到反例"转向"推断的属性是否真的成立"——后者本质是规约（specification）问题，仍需人类把关。</div>
+  <section>
+    <h2>复杂语义仍是边界，维护者仍是最终裁判</h2>
+    <p>python-dateutil 的 <code>easter()</code> 案例被维护者判定为无效问题，因为 Julian calendar 下的语义比“复活节应为星期日”更微妙。代理能从常识或文档中推断性质，但当代码背后有历史、标准或隐含约定时，它可能选错要验证的规则。</p>
+    <p class="callout">因此，这类工具短期内更适合作为高质量 bug 候选生成器，而不是完全自动的维护者替代品。</p>
+  </section>
 
-  <div class="takeaways">
+  <section>
     <h2>最值得带走的洞见</h2>
-    <ol>
-      <li><b>范式转变：</b>让 AI 推断"代码该满足的属性"，比让它猜"哪个输入会崩"更契合 LLM 的语义理解强项。</li>
-      <li><b>排序即放大器：</b>984 份原始报告靠 LLM 打分排序，高分有效率从 56% 提到 86%——筛选层比生成层更决定可用性。</li>
-      <li><b>真刀真枪有效：</b>NumPy、tokenizers、aws-powertools 等顶级库的 bug 已被上游合并，其中 wald 修复把数值误差降了近 10 个数量级。</li>
-      <li><b>误报是头号敌人：</b>多层人工 + 专家复核的严苛流程，体现了"开发者工具的价值取决于少打扰开发者"这一信条。</li>
-      <li><b>下一步是补丁：</b>一旦属性能近乎完整地刻画正确性，自动生成高质量补丁就在不远处——这也是 AI 找 bug 必须跑在攻击者前面的原因。</li>
-    </ol>
-  </div>
-
-  <footer>原文：anthropic.com/research/property-based-testing · 数据与 bug 列表见 agentic-pbt-site</footer>
-</div>
+    <ul>
+      <li>LLM 与属性测试互补：LLM 擅长从上下文提出语义性质，Hypothesis 擅长系统性寻找反例。</li>
+      <li>可用性来自筛选闭环：自我反思、排序、人类审查和维护者反馈，比单次生成更重要。</li>
+      <li>真实开源项目已经出现收益：多个主流包的问题被确认或修复，说明这不是玩具 benchmark。</li>
+      <li>误报不会消失：复杂日历、标准兼容和领域语义仍需要维护者判断。</li>
+      <li>未来方向是从“发现 bug”走向“提出可信补丁”，但前提是先把正确性性质描述清楚。</li>
+    </ul>
+  </section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

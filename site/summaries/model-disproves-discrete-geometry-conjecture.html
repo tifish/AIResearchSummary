@@ -2,138 +2,329 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI 推翻离散几何核心猜想 · 总结</title>
+<title>AI 推翻单位距离问题旧猜想的意义</title>
 <style>
-  :root{
-    --bg:#0f1220; --card:#1a1f35; --ink:#e8ecf6; --muted:#a4adc8;
-    --accent:#6ea8fe; --accent2:#9b8cff; --good:#4ade80; --warn:#fbbf24;
-    --line:#2b3252;
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0; background:linear-gradient(160deg,#0c0f1c,#141a30 60%,#0c0f1c);
-    color:var(--ink); font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;
-    line-height:1.75; padding:32px 16px;
-  }
-  .wrap{max-width:820px; margin:0 auto}
-  header{
-    border:1px solid var(--line); border-radius:18px; padding:28px 26px;
-    background:radial-gradient(120% 140% at 0% 0%, rgba(110,168,254,.18), transparent 55%), var(--card);
-    margin-bottom:24px;
-  }
-  .kicker{font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); font-weight:700}
-  h1{font-size:27px; line-height:1.35; margin:10px 0 14px}
-  .lead{
-    font-size:18px; color:var(--ink); background:rgba(110,168,254,.10);
-    border-left:4px solid var(--accent); padding:14px 16px; border-radius:0 10px 10px 0;
-  }
-  .meta{margin-top:14px; color:var(--muted); font-size:13px}
-  section{
-    border:1px solid var(--line); border-radius:16px; padding:22px 24px;
-    background:var(--card); margin:18px 0;
-  }
-  h2{font-size:19px; margin:0 0 6px; color:#fff}
-  h2 .num{color:var(--accent2); font-weight:800; margin-right:8px}
-  .data{
-    display:flex; flex-wrap:wrap; gap:10px; margin:14px 0;
-  }
-  .chip{
-    background:#11friable; background:rgba(155,140,255,.14); border:1px solid var(--line);
-    color:var(--ink); padding:7px 12px; border-radius:999px; font-size:13.5px;
-  }
-  .chip b{color:var(--accent)}
-  .take{
-    margin-top:12px; padding:11px 14px; border-radius:10px;
-    background:rgba(74,222,128,.10); border-left:4px solid var(--good); color:#d6ffe4;
-    font-weight:600;
-  }
-  .formula{
-    font-family:"SFMono-Regular",Consolas,monospace; background:#0c1024;
-    padding:2px 7px; border-radius:6px; color:#cdd7ff; border:1px solid var(--line);
-  }
-  blockquote{
-    margin:14px 0 0; padding:12px 16px; border-left:4px solid var(--accent2);
-    background:rgba(155,140,255,.08); border-radius:0 10px 10px 0; color:var(--muted); font-style:italic;
-  }
-  .insights{
-    border:1px solid var(--accent); border-radius:16px; padding:24px;
-    background:linear-gradient(150deg, rgba(110,168,254,.14), rgba(155,140,255,.10));
-  }
-  .insights h2{color:#fff}
-  .insights ol{margin:8px 0 0; padding-left:20px}
-  .insights li{margin:10px 0; padding-left:4px}
-  .insights li b{color:var(--warn)}
-  footer{color:var(--muted); font-size:12.5px; text-align:center; margin-top:18px}
-  a{color:var(--accent)}
+:root{
+  --bg:#f6f7f4;
+  --card:#ffffff;
+  --ink:#17201b;
+  --muted:#5d6a63;
+  --line:#dfe5df;
+  --accent:#2f6f5e;
+  --accent2:#8b4e2f;
+  --accent3:#315f8a;
+  --hl:#eef7f2;
+  --hl2:#fff1e8;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+  line-height:1.75;
+}
+main{
+  max-width:920px;
+  margin:0 auto;
+  padding:42px 22px 56px;
+}
+header{
+  border-bottom:1px solid var(--line);
+  padding-bottom:24px;
+  margin-bottom:28px;
+}
+.kicker{
+  color:var(--accent);
+  font-size:14px;
+  font-weight:700;
+  letter-spacing:0;
+}
+h1{
+  font-size:34px;
+  line-height:1.25;
+  margin:10px 0 14px;
+}
+.lead{
+  font-size:20px;
+  background:var(--hl);
+  border-left:5px solid var(--accent);
+  padding:16px 18px;
+  margin:18px 0 0;
+}
+.meta{
+  color:var(--muted);
+  font-size:14px;
+}
+section{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:22px;
+  margin:18px 0;
+}
+h2{
+  font-size:22px;
+  line-height:1.35;
+  margin:0 0 10px;
+  color:var(--accent);
+}
+p{margin:10px 0}
+.data{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:12px;
+  margin:16px 0 4px;
+}
+.metric{
+  background:var(--hl2);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:14px;
+}
+.metric strong{
+  display:block;
+  font-size:22px;
+  color:var(--accent2);
+}
+.note{
+  color:var(--muted);
+}
+.takeaways{
+  background:linear-gradient(180deg,var(--card),var(--hl));
+}
+ul{
+  padding-left:22px;
+  margin:10px 0 0;
+}
+li{margin:8px 0}
+code{
+  background:var(--hl);
+  padding:1px 5px;
+  border-radius:4px;
+}
 </style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
+      background: var(--airs-digest-panel) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
 </head>
 <body>
-<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://openai.com/index/model-disproves-discrete-geometry-conjecture" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
-<div class="wrap">
-
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/model-disproves-discrete-geometry-conjecture" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
 <header>
-  <div class="kicker">OpenAI · Research · 2026-05-20</div>
-  <h1>一个 OpenAI 模型推翻了离散几何中悬置近 80 年的核心猜想</h1>
-  <div class="lead">
-    一句话总括：一个<strong>通用推理模型</strong>（而非为数学专门训练的系统）自主完成了一项原创证明，
-    推翻了 Erdős 单位距离问题中"上界为 <span class="formula">n<sup>1+o(1)</sup></span>"的长期猜想，
-    并意外地用<strong>代数数论</strong>的深刻工具解决了一个初等几何问题——这是 AI 首次独立攻克某数学子领域的中心公开难题。
-  </div>
-  <div class="meta">来源：OpenAI ｜ 配套论文由外部数学家撰写并验证，证明已被独立检查</div>
+  <div class="kicker">一句话总括</div>
+  <h1>AI 不只是加速证明检查，而是在一个经典几何问题上给出了改变下界格局的新构造。</h1>
+  <div class="meta">来源：OpenAI；文章日期：2026 年 5 月 20 日；主题：离散几何、代数数论、AI 数学推理</div>
+  <p class="lead">这篇文章的核心贡献不是“AI 写出了一篇数学证明”这么简单，而是它让一个被长期相信的结构性猜想失效，并暴露出离散几何和深层代数数论之间此前未被充分利用的连接。</p>
 </header>
 
 <section>
-  <h2><span class="num">01</span>问题简单到一句话，却难了 80 年</h2>
-  <p>平面单位距离问题：在平面上放 <span class="formula">n</span> 个点，最多能有多少对点恰好相距 1？由 Paul Erdős 于 <b>1946 年</b>首次提出，被《离散几何研究问题》一书称为"组合几何中最著名、最易解释"的问题，Erdős 本人甚至为它悬赏。</p>
+  <h2>旧直觉：平方网格几乎最优</h2>
+  <p>单位距离问题问的是：在平面上放置 <code>n</code> 个点，最多能有多少对点的距离正好等于 1。直线排布只能给出 <code>n-1</code> 对，平方网格约给出 <code>2n</code> 对，而重缩放平方网格长期提供最强的已知下界。</p>
+  <p>关键趋势是，旧构造的增长率约为 <code>n^(1+C/log log n)</code>，指数中多出来的部分会随 <code>n</code> 变大而趋近 0。因此数学界长期相信真正答案可能只有略高于线性，也就是 <code>n^(1+o(1))</code>。</p>
+  <p class="note">这个背景很重要：AI 的结果不是在小常数上改进，而是挑战了几十年来关于“什么样的几何结构能产生最多单位距离”的主导判断。</p>
+</section>
+
+<section>
+  <h2>新结果：存在多项式级改进</h2>
+  <p>OpenAI 称其内部模型构造出无穷多组 <code>n</code> 点配置，使单位距离对至少达到 <code>n^(1+δ)</code>，其中 <code>δ&gt;0</code> 是固定常数。后续由 Will Sawin 给出的改进显示可以取 <code>δ=0.014</code>。</p>
   <div class="data">
-    <span class="chip">提出时间：<b>1946 年</b></span>
-    <span class="chip">下界自 <b>1946 年</b>起基本未变</span>
-    <span class="chip">最佳上界 <b>O(n<sup>4/3</sup>)</b> 自 <b>1984 年</b>未变</span>
+    <div class="metric"><strong>1946</strong>Paul Erdős 提出平面单位距离问题</div>
+    <div class="metric"><strong>1984</strong>已知上界 <code>O(n^(4/3))</code> 的来源年份</div>
+    <div class="metric"><strong>δ=0.014</strong>后续改进给出的具体指数增益</div>
   </div>
-  <div class="take">结论：一个表述极简的问题，长期成为衡量组合几何乃至数学推理深度的标尺——正因为它"看上去简单却久攻不下"，AI 在此取得突破才格外有分量。</div>
+  <p>这改变读者对 AI 影响的理解：模型不是只在已有路径上补全细节，而是选择了构造反例这条高风险路线，并找到了足以推翻旧猜想的结构。</p>
 </section>
 
 <section>
-  <h2><span class="num">02</span>被推翻的"共识"：方格网格并非最优</h2>
-  <p>过去人们相信，由"缩放方格网格"构造给出的增长率 <span class="formula">n<sup>1+C/loglog(n)</sup></span> 基本就是最优——由于 loglog(n) 随 n 趋于无穷，指数中多出的项趋于 0，意味着增长只比线性<em>略快</em>。Erdős 据此猜测上界为 <span class="formula">n<sup>1+o(1)</sup></span>。</p>
-  <p>新证明给出一个<strong>无穷构造族</strong>：对无穷多个 n，构造出至少 <span class="formula">n<sup>1+δ</sup></span> 个单位距离对，其中 <b>δ&gt;0</b> 为固定指数——这是一个<strong>多项式级别</strong>的提升，直接否定了上述猜想。</p>
-  <div class="data">
-    <span class="chip">旧构造增长：<b>n<sup>1+C/loglog(n)</sup></b>（仅略快于线性）</span>
-    <span class="chip">新结果：<b>n<sup>1+δ</sup></b>，δ 为固定正指数</span>
-    <span class="chip">Will Sawin 改进可取 <b>δ=0.014</b></span>
-  </div>
-  <div class="take">结论：原始 AI 证明未给出显式 δ，普林斯顿教授 Will Sawin 的后续工作把它钉到了 0.014——这把"略快于线性"的认知改写成"实打实的多项式改进"，颠覆了几十年的主流判断。</div>
+  <h2>方法新意：从代数数论借力</h2>
+  <p>Erdős 的旧构造可以通过高斯整数来理解，也就是形如 <code>a+bi</code> 的数。新证明沿着这个方向继续推进，但不再停留在高斯整数，而是使用更复杂的代数数域来制造更多单位长度差。</p>
+  <p>文章提到的关键工具包括无限类域塔和 Golod-Shafarevich 理论。它们原本属于代数数论中的深层技术，却在这里被用来回答欧氏平面中的几何计数问题。</p>
+  <p class="note">真正的洞见在于：单位距离问题并不只是“平面点怎么摆”的问题，它可能依赖于数域中因子分解、对称性和结构增长的性质。</p>
 </section>
 
 <section>
-  <h2><span class="num">03</span>意外的桥梁：用代数数论解几何题</h2>
-  <p>证明从一个熟悉的几何想法出发——Erdős 原始下界可借助<strong>高斯整数</strong>（<span class="formula">a+bi</span>）理解——但随后转向了出人意料的方向：用代数数论中具有更丰富对称性的数域替换高斯整数，从而制造出更多单位长度的差。</p>
-  <p>具体论证动用了<strong>无限类域塔</strong>与 <strong>Golod–Shafarevich 理论</strong>来证明所需数域确实存在。这些概念对数论学家早已熟知，但它们竟对欧氏平面中的几何问题有影响，令人震惊。</p>
-  <div class="take">结论：真正的价值不只是"解决一个猜想"，而是揭示了数论构造与离散几何之间一座此前未被察觉的桥梁——许多代数数论学家很可能因此转而审视其他离散几何难题。</div>
+  <h2>AI 意义：可核验的原创数学想法</h2>
+  <p>文章强调，这个证明来自一个通用推理模型，而不是专门为单位距离问题训练或脚手架化搜索的数学系统。证明随后由外部数学家检查，并由他们撰写伴随论文解释背景和意义。</p>
+  <p>Tim Gowers、Noga Alon、Arul Shankar、Jacob Tsimerman 等数学家的评论共同指向一点：如果这项工作由人类提交，它会被视为重要的数学论文，而不只是一次 AI 演示。</p>
+  <p>这改变了“AI 作为研究助手”的边界。它显示模型可能提出专家未优先尝试的路径，并把跨领域工具执行到足以经受同行审查的程度。</p>
 </section>
 
 <section>
-  <h2><span class="num">04</span>为什么这次"怎么找到的"同样重要</h2>
-  <p>证明来自一个<strong>通用推理模型</strong>，而非专为数学训练、专门搭建去搜索证明策略、或针对此问题定制的系统。它是在一组 Erdős 问题的评测中产出这一证明的。专家指出，模型思维链中<strong>绝大多数</strong>尝试都在<em>构造反例</em>，而非证明上界——显示出良好直觉与尝试"冷门长线"思路的倾向。</p>
-  <blockquote>"若这是人类写的论文投给《数学年刊》，我会毫不犹豫推荐接收。此前没有任何 AI 生成的证明能接近这一水平。" —— 菲尔兹奖得主 Tim Gowers</blockquote>
-  <blockquote>"这篇论文表明当前 AI 模型已超越人类数学家的助手——它们能产生原创而巧妙的想法，并将其贯彻到底。" —— 数论学家 Arul Shankar</blockquote>
-  <div class="take">结论：这是首次有 AI <strong>自主</strong>解决某子领域中心的著名公开问题；它证明的不仅是"会算"，而是能把一条长论证从头到尾连贯地撑住——这正是推理深度的标志。</div>
+  <h2>更大的影响：人类判断仍是中心</h2>
+  <p>文章把这个案例放到更广的科研图景中：如果模型能维持长链条推理、连接遥远领域并产出可检查结果，那么类似能力也可能影响生物、物理、材料、工程和医学研究。</p>
+  <p>但结论并不是人类数学家变得不重要。相反，外部数学家的验证、解释和扩展让原始证明的价值变得更清楚，说明专家判断仍然决定问题选择、意义解释和后续方向。</p>
 </section>
 
-<section class="insights">
-  <h2>最值得带走的 5 条洞见</h2>
-  <ol>
-    <li><b>首次自主突破：</b>AI 第一次独立解决了一个处于数学子领域中心、悬置近 80 年的著名公开问题，而非仅做辅助。</li>
-    <li><b>从"略快于线性"到"多项式改进"：</b>推翻了 <span class="formula">n<sup>1+o(1)</sup></span> 上界猜想，给出 <span class="formula">n<sup>1+δ</sup></span>（Sawin 改进后 δ=0.014），改写了几十年的主流认知。</li>
-    <li><b>跨领域连接才是真正的贡献：</b>用代数数论（类域塔、Golod–Shafarevich）解几何问题，开辟了一条研究其他离散几何难题的新通道。</li>
-    <li><b>通用模型 + 反直觉策略：</b>突破来自通用推理模型，且其思维链偏好"构造反例"这一被社区视为长线的方向——体现出原创直觉而非套路化求解。</li>
-    <li><b>人机协作的新范式：</b>外部数学家的配套论文让结果的意义比原始证明更丰富——AI 负责搜索、建议与验证，人类负责选择问题、解读意义、决定下一步。专业判断因此更值钱，而非更廉价。</li>
-  </ol>
+<section class="takeaways">
+  <h2>最值得带走的洞见</h2>
+  <ul>
+    <li>单位距离问题的旧下界直觉被推翻：平方网格不是本质最优。</li>
+    <li>新构造给出 <code>n^(1+δ)</code> 级别增长，后续改进给出 <code>δ=0.014</code>。</li>
+    <li>离散几何中的一个初等问题，可能需要深层代数数论工具才能看清。</li>
+    <li>AI 的角色正在从“辅助计算和检查”扩展到“提出原创研究路径”。</li>
+    <li>最有价值的模式不是 AI 替代专家，而是 AI 发现连接，专家验证、解释并扩展这些连接。</li>
+  </ul>
 </section>
-
-<footer>基于 OpenAI 文章《An OpenAI model has disproved a central conjecture in discrete geometry》（2026-05-20）整理 · 证明与配套论文见原文链接</footer>
-
-</div>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

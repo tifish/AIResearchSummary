@@ -3,102 +3,341 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cursor 如何让应用保持稳定</title>
+<title>Cursor 如何把 OOM 崩溃降下来</title>
 <style>
-  :root{
-    --bg:#0f1115; --card:#181b22; --ink:#e8eaed; --muted:#a3a8b3;
-    --accent:#6ea8fe; --accent2:#4ade80; --warn:#fbbf24; --line:#272b34;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-    line-height:1.75;padding:0 16px}
-  .wrap{max-width:780px;margin:0 auto;padding:48px 0 80px}
-  .kicker{color:var(--accent);font-size:13px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
-  h1{font-size:30px;line-height:1.25;margin:0 0 18px}
-  .meta{color:var(--muted);font-size:13px;margin-bottom:28px}
-  .lead{font-size:19px;background:linear-gradient(135deg,#1d2230,#171a21);
-    border-left:4px solid var(--accent);border-radius:10px;padding:18px 20px;margin:0 0 34px}
-  .lead b{color:var(--accent2)}
-  .stats{display:flex;gap:14px;flex-wrap:wrap;margin:0 0 34px}
-  .stat{flex:1 1 220px;background:var(--card);border:1px solid var(--line);
-    border-radius:12px;padding:18px 20px}
-  .stat .num{font-size:34px;font-weight:800;color:var(--accent2);line-height:1}
-  .stat .lab{color:var(--muted);font-size:14px;margin-top:8px}
-  h2{font-size:20px;margin:38px 0 6px;padding-top:8px;border-top:1px solid var(--line)}
-  .sub{color:var(--muted);font-size:14px;margin:0 0 10px}
-  p{margin:10px 0}
-  .take{color:var(--warn);font-weight:600}
-  .tag{display:inline-block;background:#222633;color:var(--accent);
-    font-size:12px;padding:2px 10px;border-radius:20px;margin-right:6px}
-  .insights{background:linear-gradient(135deg,#13241a,#15181f);
-    border:1px solid #1f3b2a;border-radius:14px;padding:22px 24px;margin-top:40px}
-  .insights h2{border:0;margin:0 0 12px;color:var(--accent2)}
-  .insights ol{margin:0;padding-left:20px}
-  .insights li{margin:10px 0}
-  code{background:#222633;padding:1px 6px;border-radius:5px;font-size:13px;color:#cdd3df}
+:root{
+  --bg:#f6f7f9;
+  --card:#ffffff;
+  --ink:#17202a;
+  --muted:#5e6b78;
+  --line:#dfe5ec;
+  --accent:#2563eb;
+  --accent2:#0f766e;
+  --accent3:#b45309;
+  --hl:#e8f0ff;
+  --hl2:#ecfdf5;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  line-height:1.72;
+}
+main{
+  max-width:920px;
+  margin:0 auto;
+  padding:40px 20px 56px;
+}
+header{
+  padding:28px 0 22px;
+  border-bottom:1px solid var(--line);
+}
+.kicker{
+  color:var(--accent2);
+  font-weight:700;
+  font-size:14px;
+  margin-bottom:8px;
+}
+h1{
+  margin:0;
+  font-size:32px;
+  line-height:1.25;
+  letter-spacing:0;
+}
+.lead{
+  margin:18px 0 0;
+  font-size:18px;
+  color:var(--muted);
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+  margin:24px 0;
+}
+.metric{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-left:5px solid var(--accent);
+  border-radius:8px;
+  padding:16px;
+}
+.metric strong{
+  display:block;
+  font-size:30px;
+  line-height:1.1;
+  color:var(--accent);
+}
+.metric span{
+  color:var(--muted);
+  font-size:14px;
+}
+section{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:22px;
+  margin-top:16px;
+}
+h2{
+  margin:0 0 10px;
+  font-size:21px;
+  line-height:1.35;
+}
+p{margin:0 0 12px}
+p:last-child{margin-bottom:0}
+mark{
+  background:var(--hl);
+  color:var(--ink);
+  padding:2px 5px;
+  border-radius:4px;
+}
+.note{
+  background:var(--hl2);
+  border-color:#b7ead2;
+}
+ul{
+  margin:10px 0 0;
+  padding-left:22px;
+}
+li{margin:8px 0}
+@media (max-width:720px){
+  main{padding:28px 14px 42px}
+  h1{font-size:26px}
+  .grid{grid-template-columns:1fr}
+  section{padding:18px}
+}
 </style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
+      background: var(--airs-digest-panel) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
 </head>
 <body>
-<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://cursor.com/blog/app-stability" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
-<div class="wrap">
-  <div class="kicker">Cursor · Research</div>
-  <h1>Cursor 如何让应用保持稳定</h1>
-  <div class="meta">来源：Cursor ｜ 2026-04-21 ｜ 作者：Andrew Chan & Kevin Nguyen</div>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/app-stability" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header>
+  <div class="kicker">一句话总括</div>
+  <h1>Cursor 的贡献不是某个单点优化，而是把 AI 编程工具的内存崩溃治理变成了从发现、定位到防回归的闭环系统。</h1>
+  <p class="lead">文章说明了一个现实问题：当编辑器开始承载 agent、搜索、浏览器使用和大量工作区数据时，稳定性不再只是传统桌面软件问题，而是 AI 工具能否被用户整天依赖的基础能力。</p>
+</header>
 
-  <div class="lead">
-    一句话总括：Cursor 没有靠零散打补丁，而是把“崩溃”当成一个<b>可测量、可归因、可防回归的工程问题</b>来治理——结果是内存溢出崩溃率成倍下降。文章真正的贡献，是一套适用于大型 Electron/VS Code 类应用的稳定性方法论。
+<div class="grid">
+  <div class="metric">
+    <strong>80%</strong>
+    <span>OOM-per-session 较 2 月下旬峰值下降</span>
   </div>
-
-  <div class="stats">
-    <div class="stat">
-      <div class="num">↓80%</div>
-      <div class="lab">OOM 每会话崩溃率，相比 2 月底峰值</div>
-    </div>
-    <div class="stat">
-      <div class="num">↓73%</div>
-      <div class="lab">OOM 每请求崩溃率，相比 3 月 1 日</div>
-    </div>
-  </div>
-
-  <h2>崩溃的根因几乎都是内存溢出（OOM）</h2>
-  <p class="sub">多进程架构下，渲染进程崩溃最致命</p>
-  <p>Cursor 基于 VS Code 与 Electron 的多进程架构，崩溃可能发生在<strong>渲染进程</strong>（编辑器与新的 agents 窗口）或<strong>工具进程</strong>（扩展、存储、agent 功能）。渲染进程崩溃最严重，会完全阻断编辑器使用，且多由命中 V8 内存上限引起；扩展进程崩溃通常能自动恢复。这改变了一个直觉：随着 subagents、即时 grep、浏览器调用等“更野心勃勃”的功能上线，稳定性不是越做越简单，而是越来越难。</p>
-  <p class="take">结论：把崩溃按进程类型分级，让团队能把精力集中在最伤用户的渲染进程 OOM 上。</p>
-
-  <h2>先有“仪表盘”，才谈得上修复</h2>
-  <p class="sub">每次崩溃都带上下文，按版本拆分、分钟级更新</p>
-  <p>每个致命崩溃都由遥测上报，附带受影响进程、崩溃类型、设备/应用元数据、minidump 与栈轨迹。团队据此构建可按 app 版本拆分的指标，分别按<strong>每会话</strong>（有多少会话遇崩溃）和<strong>每请求</strong>（崩溃有多严重）计算，仪表盘在崩溃事件后几分钟内更新。</p>
-  <p class="take">结论：可观测性是前提——能在分钟级发现新版本的回归，才敢快速发布。</p>
-
-  <h2>双路调试：自上而下归因，自下而上溯源</h2>
-  <p class="sub"><span class="tag">Top-down</span><span class="tag">Bottom-up</span></p>
-  <p><strong>自上而下</strong>：把崩溃指标关联到 Statsig 里的功能开关，用 A/B 测试量化某功能对崩溃率的贡献；同时监控<strong>超大消息负载</strong>这类代理指标（与内存问题强相关），并附上调用栈追溯到源码；再用<strong>面包屑</strong>记录崩溃前的活动（并行 agent、工具调用、终端）。</p>
-  <p><strong>自下而上</strong>：主进程跑一个崩溃监视服务，用 Chrome DevTools Protocol（CDP）实时捕获 OOM 崩溃栈，并向上游 Electron 提交补丁以摆脱笨重的 CDP 机制；这些崩溃栈喂给一个<strong>每日自动化</strong>，逐栈分析、为高置信度问题自动提 PR 并逐版本验证修复。配合用户自愿提交的<strong>堆快照</strong>与全量用户的<strong>低采样率堆分配剖析</strong>，团队甚至能对两个版本做内存分配路径的 diff。</p>
-  <p class="take">结论：归因解决“是哪个功能的锅”，溯源解决“具体是哪行代码泄漏”，两者缺一不可。</p>
-
-  <h2>两类 OOM，两套打法</h2>
-  <p class="sub">突发型 vs 缓慢累积型</p>
-  <p><strong>突发型 OOM</strong>：内存瞬间飙升导致进程死亡，常因一次性加载过大数据（应用大量读取用户工作区文件，遇到超大文件就会噎住）。靠 <code>killswitch</code> 或把大数据块分批处理来缓解，多见于崩溃栈、少见于堆快照。</p>
-  <p><strong>缓慢累积型 OOM</strong>：内存在一次会话中缓慢爬升，源于状态未正确释放或强引用泄漏；在堆快照中可靠出现，靠追踪 retainer、清理长生命周期对象修复——团队已向 VSCode 上游提交多个泄漏修复。扩展崩溃则通过<strong>进程隔离</strong>（类似 Chrome 隔离标签页）缓解，代价是略多的系统内存。</p>
-  <p class="take">结论：对症下药——突发型靠栈与限流，累积型靠堆快照与生命周期管理。</p>
-
-  <h2>修复容易，防止复发难</h2>
-  <p class="sub">用流程与工具在不牺牲 agent 速度的前提下守住稳定性</p>
-  <p>团队认为修复是定点的、相对简单，难的是让每个开发者都意识到自己对稳定性的影响。手段包括：为每类已知 OOM/崩溃建立 <strong>Bugbot 规则</strong>、用能做“agentic 计算机操作”的 Skills 做压力测试、用<strong>垃圾回收替代手工管理资源</strong>以消除泄漏隐患、每次代码改动后跑自动性能测试、以及在指标回归时<strong>自动回滚</strong>。</p>
-  <p class="take">结论：在 agent 让发功能和发 bug 都更快的时代，防回归必须工程化、自动化。</p>
-
-  <div class="insights">
-    <h2>最值得带走的洞见</h2>
-    <ol>
-      <li><strong>数字会说话</strong>：OOM 每会话降 80%、每请求降 73%，证明系统化方法比逐个救火更有效。</li>
-      <li><strong>先测量再修复</strong>：分钟级、可按版本拆分的崩溃仪表盘，是一切优化的地基。</li>
-      <li><strong>归因 + 溯源是一对</strong>：A/B 测试告诉你“哪个功能”，崩溃栈与堆快照告诉你“哪行代码”。</li>
-      <li><strong>OOM 分两类、各有解法</strong>：突发型靠限流分块，累积型靠追踪 retainer 与生命周期管理。</li>
-      <li><strong>稳定性是新世代的老功夫</strong>：agent 加速了发布也加速了 bug，软件工程的基本功反而比以往更重要。</li>
-    </ol>
+  <div class="metric">
+    <strong>73%</strong>
+    <span>OOM-per-request 较 3 月 1 日下降</span>
   </div>
 </div>
+
+<section>
+  <h2>先把崩溃变成分钟级可观测指标</h2>
+  <p>Cursor 基于 VS Code 和 Electron，天然是多进程架构：renderer 负责编辑器和 agents 窗口，utility 负责扩展、存储和 agent 功能。最严重的是 renderer 崩溃，因为它会直接让用户无法继续使用编辑器，而这类问题多数来自 V8 内存限制。</p>
+  <p>他们把每次 fatal crash 记录为带上下文的遥测事件，包括进程、崩溃类型、设备与应用元数据，以及可用的 minidump 和 stack trace；再按版本计算 per-session 与 per-request 指标，并让仪表盘在崩溃后数分钟内更新。</p>
+  <p>结论是：稳定性治理的第一步不是猜哪个功能有问题，而是让每个版本的崩溃变化足够快、足够细地暴露出来。</p>
+</section>
+
+<section>
+  <h2>从功能归因和单次崩溃两头夹击 OOM</h2>
+  <p>自上而下的方法关注高内存功能：把崩溃指标和 Statsig 功能开关联动，通过 A/B 测试判断某个功能对崩溃率的贡献。它还跟踪超大消息 payload，因为 Cursor 的编辑器、扩展和 agents 会通过 IPC 与持久化层不断传递数据，超大消息与内存问题高度相关。</p>
+  <p>自下而上的方法从单个崩溃事件追根因：主进程里的 crash watcher 通过 Chrome DevTools Protocol 捕获 OOM 和崩溃栈，团队还 patch 了 Electron，让获取栈信息不再依赖笨重的 CDP 机制。每天的自动化流程会分析栈、为高置信修复生成 PR，并跨版本验证问题是否消失。</p>
+  <p>结论是：AI 工具的复杂交互太多，既要知道“哪个功能群体上更危险”，也要能还原“某一次崩溃到底死在哪里”。</p>
+</section>
+
+<section>
+  <h2>堆快照和低采样 profiling 解释内存如何累积</h2>
+  <p>当 Cursor 检测到内存使用过高时，会提示用户选择是否发送 heap snapshot。因为快照可能包含打开的编辑器或聊天内容，所以它是完全 opt-in 的；但它能把内存压力追溯到具体对象和 retainer。</p>
+  <p>为了观察全量用户的趋势，Cursor 还以低采样率持续做 heap allocation profiling，并按应用版本聚合成 callstack 维度的内存压力分解。这样不仅能看到哪个路径分配多，还能比较新旧版本中某条分配路径是改善还是退化。</p>
+  <p>结论是：AI 应用的稳定性不能只靠本地复现，必须把个案证据和全局趋势放在同一套分析框架里。</p>
+</section>
+
+<section>
+  <h2>两类 OOM 需要完全不同的处理方式</h2>
+  <p>急性 OOM 是内存突然尖峰后进程死亡，通常出现在崩溃栈里，却不一定能在 heap dump 或连续 profiling 里稳定出现。常见原因是一次性加载过多数据，例如从用户工作区或 IPC 中读取巨大文件内容；对应措施是 killswitch，或把大块数据拆成多个 chunk 处理。</p>
+  <p>慢性 OOM 则是会话过程中内存逐步爬升，最终超过限制。它通常来自手动管理状态未释放、生命周期不完整或强引用泄漏，在 heap dump 中更容易被定位；Cursor 已经把一些泄漏修复 upstream 到 VS Code。</p>
+  <p>结论是：同样叫 OOM，尖峰型问题要限制输入规模，泄漏型问题要修正对象生命周期，混用手段会降低排查效率。</p>
+</section>
+
+<section>
+  <h2>防回归比修一次崩溃更难</h2>
+  <p>文章强调，修崩溃通常是定点动作，而防止新崩溃进入产品需要改变开发流程。Cursor 的做法包括为主要 OOM 和崩溃类型编写 Bugbot 规则，用 agentic computer use 做压力测试，消除容易泄漏的手动资源管理方式，在每次代码变更后跑传统性能测试，并在指标退化时自动回滚。</p>
+  <p>这些措施指向一个更大的趋势：agentic software development 让团队更快发布功能，也更容易引入性能和稳定性问题。因此，AI 时代的软件质量并不是降低工程要求，而是要求工程防线也更自动化、更贴近真实用户行为。</p>
+  <p>结论是：AI 能加速编码，但稳定性仍要靠度量、工具、流程和回归控制共同支撑。</p>
+</section>
+
+<section class="note">
+  <h2>最值得带走的洞见</h2>
+  <ul>
+    <li>Cursor 的 OOM 改善来自系统化治理：per-session 下降 80%，per-request 下降 73%，不是一次性优化的结果。</li>
+    <li>对 AI 编程工具来说，renderer 崩溃尤其关键，因为它会直接中断编辑器主体验。</li>
+    <li>超大 payload、并行 agent、工具调用和终端活动都需要成为崩溃上下文的一部分，否则很难解释真实用户场景。</li>
+    <li>急性 OOM 要控制数据峰值，慢性 OOM 要清理生命周期和引用关系，两者的证据来源不同。</li>
+    <li>AI 提升交付速度的同时，也要求稳定性工程更自动化：自动栈分析、自动 PR、压力测试、性能测试和自动回滚都会变得更重要。</li>
+  </ul>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
 </body>
-</html>
 </html>

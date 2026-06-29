@@ -1,122 +1,331 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GPT-5 降低无细胞蛋白合成成本 · 总结</title>
-<style>
-  :root{
-    --bg:#0f1117; --card:#1a1d27; --card2:#222633;
-    --text:#e8eaf0; --muted:#a3a9bd; --accent:#5ad1a8; --accent2:#7aa2ff;
-    --warn:#ffb454; --line:#2c313f;
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0; background:var(--bg); color:var(--text);
-    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;
-    line-height:1.75; font-size:17px;
-  }
-  .wrap{max-width:820px; margin:0 auto; padding:48px 22px 80px}
-  .eyebrow{color:var(--accent2); font-size:13px; letter-spacing:.12em; text-transform:uppercase; margin-bottom:10px}
-  h1{font-size:30px; line-height:1.3; margin:0 0 18px}
-  .lede{
-    background:linear-gradient(135deg,#1e2a3f,#1a2433);
-    border-left:4px solid var(--accent); border-radius:12px;
-    padding:20px 22px; font-size:18px; margin:24px 0 36px;
-  }
-  .lede b{color:var(--accent)}
-  .stats{display:flex; flex-wrap:wrap; gap:14px; margin:28px 0 40px}
-  .stat{
-    flex:1 1 150px; background:var(--card); border:1px solid var(--line);
-    border-radius:12px; padding:18px 16px; text-align:center;
-  }
-  .stat .num{font-size:30px; font-weight:700; color:var(--accent); line-height:1}
-  .stat .lbl{font-size:13px; color:var(--muted); margin-top:8px}
-  section{
-    background:var(--card); border:1px solid var(--line); border-radius:14px;
-    padding:22px 24px; margin:18px 0;
-  }
-  section h2{font-size:20px; margin:0 0 12px; color:var(--text)}
-  section h2 .tag{font-size:12px; color:var(--accent2); display:block; font-weight:500; margin-bottom:4px}
-  .insight{
-    border-top:1px dashed var(--line); margin-top:14px; padding-top:12px;
-    color:var(--accent); font-size:15px;
-  }
-  .insight::before{content:"洞见 · "; color:var(--muted)}
-  .takeaways{
-    background:linear-gradient(135deg,#16241f,#1a2630);
-    border:1px solid #2c4a3c; border-radius:14px; padding:24px 26px; margin-top:36px;
-  }
-  .takeaways h2{color:var(--accent); margin-top:0}
-  .takeaways ol{margin:0; padding-left:22px}
-  .takeaways li{margin:12px 0}
-  .takeaways b{color:var(--accent2)}
-  .warn{color:var(--warn)}
-  .meta{color:var(--muted); font-size:13px; margin-top:40px; text-align:center}
-  em{color:var(--accent2); font-style:normal}
-</style>
+  <meta charset="utf-8">
+  <title>GPT-5 降低无细胞蛋白合成成本</title>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --card: #ffffff;
+      --ink: #162033;
+      --muted: #62708a;
+      --line: #dfe6f0;
+      --accent: #2563eb;
+      --accent2: #0f9f6e;
+      --accent3: #b45309;
+      --hl: #eaf2ff;
+      --hl2: #ecfdf5;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      line-height: 1.72;
+    }
+    main {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 42px 20px 56px;
+    }
+    header {
+      margin-bottom: 24px;
+      padding: 30px;
+      background: linear-gradient(135deg, var(--hl), var(--hl2));
+      border: 1px solid var(--line);
+      border-radius: 18px;
+    }
+    h1 {
+      margin: 0 0 14px;
+      font-size: 30px;
+      line-height: 1.25;
+    }
+    .lede {
+      margin: 0;
+      font-size: 18px;
+      color: var(--ink);
+    }
+    .label {
+      display: inline-block;
+      margin-bottom: 8px;
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin: 22px 0;
+    }
+    .metric, section, .takeaways {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 10px 28px rgba(22, 32, 51, 0.05);
+    }
+    .metric {
+      padding: 18px;
+    }
+    .metric strong {
+      display: block;
+      font-size: 26px;
+      color: var(--accent);
+      line-height: 1.2;
+    }
+    .metric span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+    section {
+      padding: 24px 26px;
+      margin-top: 16px;
+    }
+    h2 {
+      margin: 0 0 10px;
+      font-size: 21px;
+      line-height: 1.35;
+    }
+    p {
+      margin: 8px 0 0;
+    }
+    .note {
+      color: var(--muted);
+    }
+    .accent2 { color: var(--accent2); font-weight: 700; }
+    .accent3 { color: var(--accent3); font-weight: 700; }
+    .takeaways {
+      margin-top: 18px;
+      padding: 24px 26px;
+    }
+    ul {
+      margin: 10px 0 0;
+      padding-left: 22px;
+    }
+    li {
+      margin: 8px 0;
+    }
+    @media (max-width: 760px) {
+      main { padding: 28px 14px 42px; }
+      header, section, .takeaways { padding: 22px; border-radius: 14px; }
+      h1 { font-size: 25px; }
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+  </style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
+      background: var(--airs-digest-panel) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
 </head>
 <body>
-<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://openai.com/index/gpt-5-lowers-protein-synthesis-cost" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
-<div class="wrap">
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/gpt-5-lowers-protein-synthesis-cost" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+  <main>
+    <header>
+      <span class="label">一句话总括</span>
+      <h1>GPT-5 被接入真实自动化实验室后，通过闭环设计、执行和学习，把无细胞蛋白合成的成本降到了新的水平。</h1>
+      <p class="lede">这篇文章的核心贡献不是“AI 也能做生物学建议”，而是展示 AI 可以在湿实验中反复提出配方、接受机器人实验反馈，并把实验结果转化成下一轮更低成本的设计。</p>
+    </header>
 
-  <div class="eyebrow">OpenAI · Research · 2026-02-05</div>
-  <h1>GPT-5 把无细胞蛋白合成的成本压低了 40%</h1>
+    <div class="grid">
+      <div class="metric"><strong>6 轮</strong><span>闭环自动化实验</span></div>
+      <div class="metric"><strong>36,000+</strong><span>独特 CFPS 反应配方</span></div>
+      <div class="metric"><strong>580</strong><span>块自动化实验板</span></div>
+      <div class="metric"><strong>40%</strong><span>蛋白生产成本下降</span></div>
+    </div>
 
-  <div class="lede">
-    一句话总括：这项工作真正的贡献不是又训练了一个更强的模型，而是<b>把 GPT-5 接入云端自动化湿实验室、形成"设计—执行—学习—再设计"的闭环</b>，让 AI 在真实生物实验里自主迭代，把无细胞蛋白合成（CFPS）的生产成本降低 40%——证明 AI 的影响正从"可纯计算评估的数学物理"延伸到"必须动手做实验的生物学"。
-  </div>
+    <section>
+      <h2>自主实验让生物优化从经验试错变成高通量搜索</h2>
+      <p>无细胞蛋白合成把蛋白制造从活细胞中拿出来，在受控混合物里完成，因此适合快速原型和当天读数。但它依赖 DNA 模板、细胞裂解液、能量体系、盐、缓冲液等多种成分，变量之间相互影响，很难靠直觉找到最优组合。</p>
+      <p>GPT-5 与 Ginkgo Bioworks 的云实验室形成闭环：模型设计实验，机器人执行，数据回传给模型，模型再生成下一轮假设。关键变化是，AI 不再停留在“提出想法”，而是进入了能用数据纠错的实验循环。</p>
+    </section>
 
-  <div class="stats">
-    <div class="stat"><div class="num">40%</div><div class="lbl">蛋白生产成本下降</div></div>
-    <div class="stat"><div class="num">57%</div><div class="lbl">试剂成本下降</div></div>
-    <div class="stat"><div class="num">36,000+</div><div class="lbl">测试的反应配方</div></div>
-    <div class="stat"><div class="num">580</div><div class="lbl">块自动化实验板</div></div>
-  </div>
+    <section>
+      <h2>规模化实验暴露了人工流程很难看见的配方区域</h2>
+      <p>系统总共测试超过 <span class="accent2">36,000</span> 种独特反应组成，覆盖 <span class="accent2">580</span> 块自动化 384 孔板。这样的规模让模型能在噪声很高的生物实验中寻找稳定信号，而不是依赖少量人工实验的局部观察。</p>
+      <p>在获得计算机、浏览器和相关论文后，GPT-5 用 <span class="accent2">3 轮实验</span> 和约 <span class="accent2">2 个月</span> 达到新的低成本基准。它说明 AI 对科学的影响可能首先体现在“更快找到可实验验证的组合”，而不是单次推理给出完美答案。</p>
+    </section>
 
-  <section>
-    <h2><span class="tag">为什么这件事重要</span>生物学的瓶颈是"迭代慢"，自主实验室就是为消除它而生</h2>
-    <p>数学和物理的进展常能在不接触物理世界的情况下被评估，而生物学不行——每个想法都得在实验室里花时间和金钱去验证。CFPS 是一种<em>不依赖活细胞</em>来制造蛋白的方法，能当天出结果，特别适合快速原型测试；而蛋白本身又是众多药物、诊断试剂、工业酶乃至洗衣粉的核心。当前沿模型能直接连接实验自动化、提出并大规模执行实验时，"迭代"这个长期瓶颈第一次有了被自动化拆除的可能。</p>
-    <div class="insight">让 AI 接管"提出假设—跑实验—读结果"的循环，等于把生命科学最贵的资源——实验迭代次数——变成可大规模并行的算力。</div>
-  </section>
+    <section>
+      <h2>成本下降来自产量提升，也来自对自动化实验条件的适配</h2>
+      <p>最终结果是蛋白生产成本下降 <span class="accent3">40%</span>，试剂成本改善 <span class="accent3">57%</span>。文章强调，CFPS 的成本现在主要受裂解液和 DNA 影响，因此提高单位昂贵输入的蛋白产出，是比微调廉价成分更高杠杆的策略。</p>
+      <p>GPT-5 还找到了一些更适合高通量板式实验的组合，尤其是在低氧、混合和几何条件不同于试管实验的情况下更稳健。这改变了一个重要判断：实验室自动化不是简单复制人工台面实验，而需要专门为自动化环境重新优化。</p>
+    </section>
 
-  <section>
-    <h2><span class="tag">问题的难点</span>CFPS 组分多、相互作用复杂，靠直觉根本调不动</h2>
-    <p>一个 CFPS 反应混合了 DNA 模板、细胞裂解液和大量从能量源到盐类的生化组分，整体行为极难推理：小改动可能很关键，但效果方向往往不直观，最优组合需要海量实验才能找到。更现实的问题是，标准配方和商业试剂盒是按"人类节奏"定价的；而自主实验室能在人类跑几十个反应的时间里跑上千个，此时<em>试剂成本反而成了限制因素</em>。以往机器学习方法虽能降本，但因探索空间靠人力，进展只能是渐进式的。</p>
-    <div class="insight">当吞吐量提升上千倍，成本结构本身被重写——优化目标从"省人力"变成"省试剂"，这才是 AI 介入的真正切口。</div>
-  </section>
+    <section>
+      <h2>真正的边界在泛化、安全和人工监督</h2>
+      <p>这些结果只在一种蛋白 sfGFP 和一个 CFPS 系统上展示，不能直接推断到所有蛋白、所有无细胞体系或更大生产尺度。氧气供给、反应体积和几何形状都会影响产量，部分改进可能依赖具体平台条件。</p>
+      <p>实验仍需要人类监督，尤其是协议改进、试剂处理和实际实验细节。结论是，AI 已经能加速湿实验优化，但它目前更像是强大的闭环实验设计者，而不是完全无人值守的生物制造系统。</p>
+    </section>
 
-  <section>
-    <h2><span class="tag">方法</span>GPT-5 设计实验、机器人执行、数据回流，循环六轮</h2>
-    <p>GPT-5 以标准 384 孔板格式批量设计实验，Ginkgo Bioworks 的云实验室由机器人执行，结果再推回模型用于生成新假设、设计下一轮，如此重复六次。关键工程细节是<em>实验前的严格程序化校验</em>：强制每个 AI 设计的实验在自动化平台上物理可执行，杜绝那种"文字上看似合理、机器人却做不出来"的"纸面实验"。整轮共执行超过 36,000 个反应、跨 580 块板——这种规模本身才是让信号从噪声中浮现的前提，因为单个生物实验天然嘈杂。</p>
-    <div class="insight">"可执行性校验"是把语言模型的想象力锚定到真实机器人工作流的关键护栏，否则吞吐量越大、无效实验越多。</div>
-  </section>
-
-  <section>
-    <h2><span class="tag">结果与发现</span>三轮、两个月就刷新了低成本 CFPS 的最优纪录</h2>
-    <p>在拿到电脑、浏览器和相关论文访问权后，GPT-5 仅用三轮实验、约两个月就超越了此前最佳基线（Olsen et al., 2025），成本降低 40%。它找到了人类此前未在该配置下尝试过的低成本配方；还发现高通量板式实验与人工试管实验差异显著（氧合更低、混合与几何不同），并提出许多<em>在低氧自动化环境下更稳健</em>的组合。更微妙的是，缓冲体系、能量再生组分、多胺这些"不起眼又便宜"的参数被证明影响巨大；而由于成本如今由裂解液和 DNA 主导，<em>提高产率（yield）成了最高杠杆的降本策略</em>。</p>
-    <div class="insight">真正的增益不是单点配方更优，而是 AI 能在"高通量自动化的现实约束"下找到既便宜又稳健、且人类容易忽略的参数组合。</div>
-  </section>
-
-  <section>
-    <h2><span class="tag">局限与下一步</span><span class="warn">单一蛋白验证，仍需人工监督</span></h2>
-    <p>结果只在一种蛋白（sfGFP）和一套 CFPS 体系上得到验证，能否泛化到其他蛋白和体系尚待证明；氧合与反应几何会随规模变化、可能影响部分改进的稳定性；协议改进和试剂操作仍离不开有经验的操作员。OpenAI 表示将把这种"实验室在环"优化推广到更多生物工作流，并强调模型能在湿实验室里推理这一能力<em>对生物安全有潜在含义</em>，需通过其 Preparedness Framework 评估和缓解风险。</p>
-    <div class="insight">"AI 能动手做实验"是双刃剑——加速科研的同时，也把生物安全从政策议题变成了必须配套的技术工程问题。</div>
-  </section>
-
-  <div class="takeaways">
-    <h2>最值得带走的洞见</h2>
-    <ol>
-      <li><b>范式转移：</b>AI 的能力边界正从"可纯计算评估的领域"扩展到"必须动手实验的生物学"，靠的是把模型接入自主实验室、闭环消除迭代瓶颈。</li>
-      <li><b>规模才出信号：</b>36,000+ 反应、580 块板的吞吐量不是炫技，而是把嘈杂的单次生物实验变成可统计的模式识别的前提。</li>
-      <li><b>护栏决定成败：</b>实验前的"物理可执行性校验"是让语言模型创造力落地为真实结果的关键，否则高通量只会放大无效实验。</li>
-      <li><b>降本逻辑被重写：</b>当成本由裂解液和 DNA 主导，"提高产率"而非"省边角料"才是最高杠杆；AI 还揪出了缓冲、能量再生、多胺这些被低估的廉价高影响参数。</li>
-      <li><b>双刃剑提醒：</b>单一蛋白验证、仍需人工监督说明它远未通用；而"模型能在湿实验室推理"也意味着生物安全必须被同步评估和加固。</li>
-    </ol>
-  </div>
-
-  <div class="meta">来源：OpenAI · 与 Ginkgo Bioworks 合作 · 2026 年 2 月 5 日</div>
-
-</div>
+    <div class="takeaways">
+      <h2>最值得带走的洞见</h2>
+      <ul>
+        <li>AI 对生物学的价值正在从“读论文和写方案”走向“连接机器人实验并用结果迭代”。</li>
+        <li>高通量实验让模型能发现人工流程容易错过的低成本配方组合。</li>
+        <li>在 CFPS 中，降低成本的关键不只是少用试剂，而是提高昂贵输入带来的蛋白产出。</li>
+        <li>自动化实验有自己的物理条件，最佳配方可能不同于人工台面实验的最佳配方。</li>
+        <li>这项工作很有潜力，但仍需要跨蛋白、跨体系验证，并持续处理生物安全和人类监督问题。</li>
+      </ul>
+    </div>
+  </main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

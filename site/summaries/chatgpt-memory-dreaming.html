@@ -3,106 +3,336 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dreaming：让 ChatGPT 拥有更好的记忆</title>
+<title>Dreaming：让 ChatGPT 记忆更有用的后台综合系统</title>
 <style>
-  :root{
-    --bg:#0f1220; --card:#1a1f35; --ink:#e8ebf5; --muted:#a4abc7;
-    --accent:#7c9cff; --accent2:#5be0c0; --warn:#ff9b6a; --line:#2b3252;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:linear-gradient(160deg,#0c0f1c,#12162a);color:var(--ink);
-    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;
-    line-height:1.75;padding:32px 16px}
-  .wrap{max-width:820px;margin:0 auto}
-  .tag{display:inline-block;font-size:13px;letter-spacing:.08em;color:var(--accent2);
-    border:1px solid var(--line);border-radius:999px;padding:4px 12px;margin-bottom:14px}
-  h1{font-size:30px;line-height:1.3;margin:.2em 0 .1em}
-  .meta{color:var(--muted);font-size:14px;margin-bottom:24px}
-  .lead{background:linear-gradient(135deg,#23305c,#1c2746);border:1px solid var(--line);
-    border-left:4px solid var(--accent);border-radius:14px;padding:20px 22px;font-size:18px;margin:18px 0 28px}
-  .lead b{color:#fff}
-  section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:16px 0}
-  h2{font-size:20px;margin:.1em 0 .5em;color:#fff}
-  h2 .num{color:var(--accent);font-weight:700;margin-right:8px}
-  .data{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
-  .pill{background:#10162e;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:14px}
-  .pill b{color:var(--accent2);font-size:16px}
-  .take{margin-top:10px;padding:10px 14px;background:#10162e;border-radius:10px;
-    border-left:3px solid var(--accent2);color:#dfe5ff}
-  .take::before{content:"洞见 · ";color:var(--accent2);font-weight:700}
-  .timeline{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
-  .step{background:#10162e;border:1px solid var(--line);border-radius:10px;padding:12px}
-  .step .y{color:var(--accent);font-weight:700;font-size:18px}
-  .step .s{color:var(--muted);font-size:13px}
-  .final{background:linear-gradient(135deg,#1f3a32,#1a2746);border:1px solid #2f5a4d;border-radius:14px;padding:22px}
-  .final h2{color:#bff7e6}
-  ol{margin:10px 0 0;padding-left:22px}
-  ol li{margin:8px 0}
-  ol li b{color:#fff}
-  @media(max-width:560px){.timeline{grid-template-columns:1fr}}
+:root{
+  --bg:#f6f7fb;
+  --card:#ffffff;
+  --ink:#172033;
+  --muted:#5d6678;
+  --line:#dfe3ec;
+  --accent:#2458d3;
+  --accent2:#0f8b72;
+  --accent3:#a85518;
+  --hl:#eaf0ff;
+  --hl2:#ecfdf6;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.72;
+}
+main{
+  max-width:920px;
+  margin:0 auto;
+  padding:40px 20px 56px;
+}
+.hero{
+  padding:28px;
+  background:linear-gradient(135deg,var(--hl),var(--hl2));
+  border:1px solid var(--line);
+  border-radius:18px;
+}
+.kicker{
+  color:var(--accent);
+  font-weight:700;
+  font-size:14px;
+  margin:0 0 8px;
+}
+h1{
+  font-size:30px;
+  line-height:1.25;
+  margin:0 0 14px;
+}
+.lead{
+  font-size:18px;
+  margin:0;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  margin:22px 0;
+}
+.stat{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:16px;
+}
+.stat strong{
+  display:block;
+  font-size:24px;
+  color:var(--accent);
+}
+.stat span{
+  color:var(--muted);
+  font-size:14px;
+}
+section{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:22px;
+  margin-top:18px;
+}
+h2{
+  font-size:21px;
+  line-height:1.35;
+  margin:0 0 10px;
+}
+p{margin:0 0 12px}
+p:last-child{margin-bottom:0}
+mark{
+  background:var(--hl);
+  color:var(--ink);
+  padding:2px 5px;
+  border-radius:6px;
+}
+ul{
+  margin:10px 0 0;
+  padding-left:22px;
+}
+li{margin:8px 0}
+.footer{
+  border-left:4px solid var(--accent2);
+}
+@media (max-width:720px){
+  main{padding:24px 14px 40px}
+  .hero,section{padding:18px}
+  .grid{grid-template-columns:1fr}
+  h1{font-size:25px}
+}
 </style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
+      background: var(--airs-digest-panel) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
 </head>
 <body>
-<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://openai.com/index/chatgpt-memory-dreaming" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
-<div class="wrap">
-  <span class="tag">OpenAI · Research · 2026-06-04</span>
-  <h1>Dreaming：让 ChatGPT 拥有更聪明的长期记忆</h1>
-  <div class="meta">来源：OpenAI · 一篇关于 ChatGPT 记忆架构升级的研究博客</div>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/chatgpt-memory-dreaming" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+  <article>
+    <header class="hero">
+      <p class="kicker">一句话总括</p>
+      <h1>Dreaming 把 ChatGPT 的记忆从静态笔记升级为会后台整理、更新和纠错的用户上下文系统。</h1>
+      <p class="lead">文章真正的贡献在于说明：更有用的 AI 助手不能只“记住几条事实”，还必须能在多次对话和时间变化中维护相关、不过期、可审查的记忆状态。</p>
+    </header>
 
-  <div class="lead">
-    一句话总括：OpenAI 把 ChatGPT 的记忆从"用户喊一声才记的笔记本"，升级为一个<b>在后台自动"做梦"合成记忆</b>的系统——它持续从大量对话中提炼、更新你的上下文，专门攻克记忆在数亿用户、跨年时间尺度下的<b>过时、出错、难规模化</b>三大难题。
-  </div>
-
-  <section>
-    <h2><span class="num">1</span>记忆的进化：从记笔记到会"做梦"</h2>
-    <p>真正的转变不在于"能记多少"，而在于<b>怎么记</b>。早期的 saved memories 只在对话中、靠明确指令写入，像个偶尔记笔记却会忘掉其余一切的人；dreaming 则用后台进程主动整理，把自然出现在对话里的上下文也纳入记忆。</p>
-    <div class="timeline">
-      <div class="step"><div class="y">2024.04</div>Saved memories：手动触发，易遗漏、易过时<div class="s">需说"记住…"</div></div>
-      <div class="step"><div class="y">2025.04</div>Dreaming V0：后台参考聊天历史自动整理<div class="s">补充 saved memories</div></div>
-      <div class="step"><div class="y">2026</div>Dreaming V3：至今最强记忆架构<div class="s">可独立支撑的基础</div></div>
+    <div class="grid" aria-label="关键数据">
+      <div class="stat"><strong>2024.04</strong><span>Saved memories 首次推出</span></div>
+      <div class="stat"><strong>2025.04</strong><span>第一版 Dreaming 引入聊天历史参考</span></div>
+      <div class="stat"><strong>约 5x</strong><span>服务 Dreaming 所需计算量下降</span></div>
     </div>
-    <div class="take">记忆质量的瓶颈不是容量，而是"合成机制"——后台自动整理比被动记笔记更能贴近真实用户。</div>
-  </section>
 
-  <section>
-    <h2><span class="num">2</span>延续上下文：你说过一次，它就记住</h2>
-    <p>文章用水下摄影选购 TTL 闪光灯的例子说明：无记忆时模型只能给出一长串通用兼容性清单，把复杂的对照工作丢回给用户；有记忆时它直接调出"Sony A1 II + Nauticam 防水壳 + Backscatter Mini Flash 3 + Inon Z-330"，给出精确到 SKU 的推荐。</p>
-    <div class="take">记忆把"通用答案"变成"针对你的答案"，这正是个性化助手价值的关键跃迁。</div>
-  </section>
+    <section>
+      <h2>记忆系统的重心从“显式保存”转向“后台综合”。</h2>
+      <p>早期 saved memories 主要依赖用户明确说“记住某事”，因此像一份手动笔记：有用，但覆盖不完整，而且容易随时间过期。Dreaming 则通过后台过程参考多次聊天，把自然出现的偏好、项目和约束综合进记忆状态。</p>
+      <p>这改变了读者对 AI 个性化的理解：个性化不只是保存事实，而是持续整理哪些事实仍然相关。</p>
+    </section>
 
-  <section>
-    <h2><span class="num">3</span>遵循偏好：约束被持续兑现</h2>
-    <p>偏好有多种形态：明确指令（"别再提 Stan"）、个人约束（"我吃素"）、隐含偏好（"我住旧金山附近"→默认推荐本地选项）。新加坡行程的例子里，模型记得用户爱野生动物摄影、要安静晚餐、对酒店空调要求高，于是把"游客打卡清单"换成围绕夜间动物园、Bird Paradise、清晨植物园安排的低暑热行程。</p>
-    <div class="take">好的记忆不只是"记住事实"，更要把偏好转化为持续一致的行动，比如自动给素食用户只出素食方案。</div>
-  </section>
+    <section>
+      <h2>OpenAI 用三个目标衡量“好记忆”：延续、偏好和当前性。</h2>
+      <p>文章把评估拆成三类：能否在新聊天中带入有用上下文，能否遵循用户过去表达的偏好和约束，能否随着时间流逝修正已经过期的信息。比较对象包括 <mark>2024 的 saved memories</mark>、<mark>2025 的 saved memories + Dreaming V0</mark> 和 <mark>2026 的 Dreaming V3</mark>。</p>
+      <p>这一评估框架说明，记忆能力的关键不是“记得越多越好”，而是记得正确、用得合时，并能避免旧信息误导当前回答。</p>
+    </section>
 
-  <section>
-    <h2><span class="num">4</span>保持时效：时间不会因对话结束而停止</h2>
-    <p>传统记忆最大的尴尬是"你早回家了，它还以为你在新加坡"。Dreaming 会随时间自动改写记忆——把"七月将去新加坡"更新为"2026 年七月已去过新加坡"，并切回用户的本地位置与时区。文中外卖推荐的例子，有记忆的版本正确地基于加州 Portola Valley 给出周六晚上的取餐选项，而非凌晨的新加坡。</p>
-    <div class="take">让记忆"感知时间流逝"是它区别于静态笔记的核心能力，也是评测中提升最明显的方向之一。</div>
-  </section>
+    <section>
+      <h2>更强的上下文延续让复杂任务少从零开始。</h2>
+      <p>文章用水下摄影器材示例说明：没有记忆时，模型只能给通用兼容性清单；有记忆时，它能基于用户过去提到的 Sony A1 II、Nauticam NA-A1II、Backscatter Mini Flash 3 和 Inon Z-330，直接指出不同闪光灯对应的 TTL 路径。</p>
+      <p>这类能力让 AI 从“信息查询工具”更接近“长期项目助手”，因为它能把过去的具体条件带入新问题。</p>
+    </section>
 
-  <section>
-    <h2><span class="num">5</span>更可规模化的基础：算力降 5 倍，免费用户也能用</h2>
-    <div class="data">
-      <div class="pill"><b>~5×</b> 为 Free 用户服务 dreaming 的算力下降</div>
-      <div class="pill"><b>US</b> 当日先开放 Plus/Pro</div>
-      <div class="pill"><b>数周内</b> 扩展到更多国家与 Free/Go</div>
-    </div>
-    <p>关键不只是"更聪明"，还是"更便宜到能普及"。算力降低约 5 倍，让 dreaming 首次达到面向免费用户的质量与服务门槛，同时还能提升 Plus/Pro 用户的记忆容量。dreaming 由此成为面向<b>全体用户</b>的共享记忆地基。</p>
-    <div class="take">能力突破若不附带成本下降，就只能服务少数人；5 倍效率提升才是"惠及所有人"从口号变现实的杠杆。</div>
-  </section>
+    <section>
+      <h2>偏好记忆让建议更贴近真实约束，而不是更会讨好。</h2>
+      <p>新加坡旅行示例展示了差异：没有记忆时，回答像普通旅游攻略；有记忆时，模型会结合用户喜欢野生动物摄影、需要强空调、偏好安静晚餐等约束，并使用 July 新加坡约 <mark>31.4°C</mark> 日最高均温、<mark>25.4°C</mark> 最低均温、<mark>146.6 mm</mark> 降雨和 <mark>14 个雨天</mark> 来安排节奏。</p>
+      <p>这说明偏好记忆的价值不在于加几句“我知道你喜欢什么”，而是把行程、地点、时间和选择标准都重新排序。</p>
+    </section>
 
-  <section class="final">
-    <h2>最值得带走的洞见</h2>
-    <ol>
-      <li><b>记忆范式之变：</b>从"被动记笔记"转向后台主动"做梦"合成，是这次升级的本质，而非简单扩容。</li>
-      <li><b>三条评测主线：</b>延续上下文、遵循偏好、保持时效——记忆好坏由这三件事衡量，且代代可量化提升。</li>
-      <li><b>时间感知是分水岭：</b>能自动让"将去"变成"去过"，是长期记忆系统区别于静态记忆的核心。</li>
-      <li><b>效率即普惠：</b>约 5 倍算力下降，让高质量记忆首次得以铺向免费用户，并提升付费用户容量。</li>
-      <li><b>共享地基：</b>Dreaming V3 成为面向所有用户的统一记忆基础，意味着后续个性化能力会在此之上持续叠加。</li>
-    </ol>
-  </section>
-</div>
+    <section>
+      <h2>时间更新是记忆系统最容易被低估的能力。</h2>
+      <p>传统记忆会把“我在新加坡”长期保留，导致用户回家后仍收到新加坡本地建议。Dreaming 的目标是把“你将于 2026 年 7 月去新加坡”更新为“你 2026 年 7 月去过新加坡”，再根据用户当前所在地给出外卖或本地推荐。</p>
+      <p>这让 AI 影响从一次性回答扩展到长期陪伴，但也要求系统持续处理时间、地点和事实状态的变化。</p>
+    </section>
+
+    <section>
+      <h2>可扩展性决定记忆能否成为所有用户的基础能力。</h2>
+      <p>OpenAI 称这次架构更高效，近期改进让服务 Dreaming 的计算需求约降低 <mark>5 倍</mark>，因此可以开始向 Free 用户推出，同时提高 Plus 和 Pro 用户的记忆容量。美国 Plus 和 Pro 用户先获得更新，更多国家以及 Free、Go 用户将在随后数周逐步获得。</p>
+      <p>如果这个方向成立，记忆会从高级功能变成通用 AI 助手的底层能力。</p>
+    </section>
+
+    <section class="footer">
+      <h2>最值得带走的洞见</h2>
+      <ul>
+        <li>AI 记忆的难点不是保存信息，而是判断哪些信息仍然新鲜、相关、可用。</li>
+        <li>Dreaming 代表一种从多轮对话中后台综合用户上下文的架构，而不是单纯扩大记忆列表。</li>
+        <li>好的个性化需要同时处理事实、偏好、约束和时间变化。</li>
+        <li>约 5 倍计算成本下降是产品扩展的关键，因为记忆系统必须服务数亿用户和多年历史。</li>
+        <li>可审查的 memory summary 很重要：越长期的记忆系统，越需要让用户看到、修正和控制它知道什么。</li>
+      </ul>
+    </section>
+  </article>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

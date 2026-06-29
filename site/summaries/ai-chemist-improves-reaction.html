@@ -1,100 +1,356 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>近自主 AI 化学家改进药物化学难反应</title>
-<style>
-  :root{
-    --ink:#1a1f2b; --muted:#5a6270; --line:#e3e7ee;
-    --accent:#0b6e5b; --accent2:#1463c4; --hl:#fff6da; --card:#f7f9fc;
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0; background:#fdfdfb; color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans CJK SC","PingFang SC","Microsoft YaHei",sans-serif;
-    line-height:1.75; font-size:17px;
-  }
-  .wrap{max-width:780px; margin:0 auto; padding:40px 22px 72px}
-  header{border-bottom:3px solid var(--accent); padding-bottom:18px; margin-bottom:8px}
-  .tag{display:inline-block; font-size:12px; letter-spacing:.08em; text-transform:uppercase;
-    color:#fff; background:var(--accent); padding:3px 10px; border-radius:20px; margin-bottom:12px}
-  h1{font-size:28px; line-height:1.35; margin:.2em 0}
-  .meta{color:var(--muted); font-size:14px; margin-top:6px}
-  .lede{
-    background:var(--card); border-left:5px solid var(--accent2);
-    padding:18px 20px; border-radius:8px; margin:26px 0; font-size:18px;
-  }
-  .lede b{color:var(--accent2)}
-  h2{font-size:20px; margin:38px 0 6px; padding-top:10px; border-top:1px solid var(--line)}
-  .sub{color:var(--muted); font-size:14.5px; margin:0 0 12px}
-  mark{background:var(--hl); padding:1px 4px; border-radius:4px; font-weight:600}
-  .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:18px 0}
-  .stat{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px 16px}
-  .stat .n{font-size:24px; font-weight:700; color:var(--accent)}
-  .stat .l{font-size:13px; color:var(--muted); margin-top:4px}
-  .take{font-weight:600; color:var(--accent)}
-  .insights{background:#0f1b2d; color:#eaf0f8; border-radius:12px; padding:24px 26px; margin:40px 0 10px}
-  .insights h2{color:#fff; border-top:none; margin-top:0}
-  .insights ol{margin:10px 0 0; padding-left:20px}
-  .insights li{margin:12px 0}
-  .insights b{color:#7fd9c4}
-  .quote{font-style:italic; color:var(--muted); border-left:3px solid var(--line); padding-left:14px; margin:18px 0}
-  footer{color:var(--muted); font-size:13px; margin-top:30px; text-align:center}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>近自主 AI 化学家改善药物化学反应</title>
+  <style>
+    :root {
+      --bg: #f6f7f4;
+      --card: #ffffff;
+      --ink: #1d2522;
+      --muted: #5e6b66;
+      --line: #d9dfda;
+      --accent: #176b5b;
+      --accent2: #8a4b16;
+      --accent3: #3b5f9b;
+      --hl: #e8f4ef;
+      --hl2: #fff1df;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      line-height: 1.7;
+    }
+    main {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 40px 20px 56px;
+    }
+    header {
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 22px;
+      margin-bottom: 26px;
+    }
+    .eyebrow {
+      color: var(--accent);
+      font-weight: 700;
+      letter-spacing: .02em;
+      margin: 0 0 8px;
+    }
+    h1 {
+      font-size: clamp(30px, 5vw, 52px);
+      line-height: 1.12;
+      margin: 0 0 14px;
+      letter-spacing: 0;
+    }
+    .lead {
+      font-size: 20px;
+      color: var(--muted);
+      margin: 0;
+      max-width: 820px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin: 28px 0;
+    }
+    .metric {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .metric strong {
+      display: block;
+      color: var(--accent);
+      font-size: 28px;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    section {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 22px;
+      margin: 16px 0;
+    }
+    h2 {
+      font-size: 22px;
+      line-height: 1.3;
+      margin: 0 0 10px;
+      letter-spacing: 0;
+    }
+    p { margin: 0 0 12px; }
+    p:last-child { margin-bottom: 0; }
+    .note {
+      background: var(--hl);
+      border-left: 4px solid var(--accent);
+      padding: 12px 14px;
+      border-radius: 6px;
+      color: var(--ink);
+    }
+    .warning {
+      background: var(--hl2);
+      border-left-color: var(--accent2);
+    }
+    ul {
+      margin: 10px 0 0;
+      padding-left: 20px;
+    }
+    li { margin: 8px 0; }
+    .tag {
+      display: inline-block;
+      color: var(--accent3);
+      font-weight: 700;
+    }
+    @media (max-width: 760px) {
+      main { padding: 28px 14px 42px; }
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      section { padding: 18px; }
+    }
+  </style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
+      background: var(--airs-digest-panel) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
 </head>
 <body>
-<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://openai.com/index/ai-chemist-improves-reaction" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
-<div class="wrap">
-  <header>
-    <span class="tag">Research · OpenAI</span>
-    <h1>近自主 AI 化学家，攻克了药物合成里一个"老大难"反应</h1>
-    <div class="meta">来源：OpenAI　|　日期：2026‑06‑17　|　合作方：Molecule.one（Maria）</div>
-  </header>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/ai-chemist-improves-reaction" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+  <main>
+    <header>
+      <p class="eyebrow">一句话总括</p>
+      <h1>GPT-5.4 在真实化学实验循环中提出了一个意外添加剂，并让困难反应的产率可测量地提高。</h1>
+      <p class="lead">这项工作的贡献不是证明 AI 已能独立替代化学家，而是展示前沿模型、专业 agent、高通量实验室和人工判断结合后，可以从开放式目标走到一个可复验的药物化学发现。</p>
+    </header>
 
-  <div class="lede">
-    <b>一句话总括：</b>这不是又一篇"模型综述文献"的论文——GPT‑5.4 在自动化实验室里<b>自主提出了一个连化学家都觉得意外的假设</b>（用温和氧化剂 TEMPO），并经 10,080 次反应与人工台架复现证实，真实地改进了药物化学中长期低产的 Chan–Lam 偶联反应。它的意义在于：AI 第一次在"提出意外想法 → 设计实验 → 解读数据 → 设计后续实验"的科研闭环里贡献了可被同行复现的化学发现。
-  </div>
+    <div class="grid" aria-label="关键数据">
+      <div class="metric"><strong>10,080</strong>Maria Lab 在 OAI-M1-03 中运行的反应数</div>
+      <div class="metric"><strong>16.6%→25.2%</strong>平均产率提升</div>
+      <div class="metric"><strong>15.6%→37.5%</strong>超过 30% 产率的反应比例</div>
+      <div class="metric"><strong>11/14</strong>台架验证中产率提高的底物组合</div>
+    </div>
 
-  <h2>问题为什么重要：合成是新药发现的瓶颈</h2>
-  <p class="sub">科学家只能测试他们"造得出来"的分子。</p>
-  <p>Chan–Lam 偶联用于生成药物中常见的碳氮键，但<mark>一级磺酰胺与硼酸的偶联历来产率很低</mark>。而磺酰胺广泛存在于抗癌药、抗菌药和利尿剂中。一个反应若产率低、副产物多，化学家往往只能放弃有潜力的分子。<span class="take">结论：让这个反应更可靠，等于直接拓宽了医药化学家能探索的分子空间。</span></p>
+    <section>
+      <h2>真正的新意是 AI 参与了完整实验回路，而不只是写方案</h2>
+      <p>GPT-5.4 被接入 Molecule.one 的 Maria AI 与高通量实验室后，生成研究提案、设计实验、分析数据并提出下一轮实验；人类化学家负责 steering、筛选、纠正实验细节、准备实验材料并独立复验关键结果。</p>
+      <p class="note">这改变了“AI 影响科研”的判断标准：模型价值不再只看能否解释文献，而要看它提出的假设能否经受真实仪器、真实分子和实验噪声的检验。</p>
+    </section>
 
-  <h2>方法：前沿模型 + 智能体 + 自动化实验室 + 人类判断</h2>
-  <p class="sub">"近自主"而非"全自主"——人始终在环。</p>
-  <p>科学家撰写的提示词驱动 GPT‑5.4 生成并排序数千份研究提案；人类化学家从最高排名中选出 4 个进入实验室；Maria AI 把高层计划翻译成详细实验指令、跑高通量实验、分析原始数据并回传给 GPT‑5.4。最有前景的 <mark>OAI‑M1‑03</mark> 提议用 TEMPO 等温和氧化剂改进磺酰胺合成。人类的关键修正之一是避免使用 DMSO 溶剂（担心它与对照用的强氧化剂反应）。<span class="take">结论：模型贡献了核心科研想法，人类提供高层引导、纠错与物理实验室的控制权。</span></p>
+    <section>
+      <h2>AI 选中了一个药物化学中有价值但难做的反应问题</h2>
+      <p>最有前景的方案 OAI-M1-03 聚焦 primary sulfonamide 的 Chan-Lam coupling，这类反应用于形成药物中常见的碳-氮键，但历史上与 boronic acids 偶联时产率偏低。</p>
+      <p> sulfonamide 结构存在于抗癌药、抗微生物药和利尿剂等多个治疗领域，因此提升这类反应的可靠性，会扩大药物化学家能实际合成和测试的分子范围。</p>
+    </section>
 
-  <h2>结果：平均产率提升，更多反应达到"实用"水平</h2>
-  <p class="sub">规模是可信度的关键——两轮共跑了一万多次反应。</p>
-  <div class="stats">
-    <div class="stat"><div class="n">10,080</div><div class="l">两轮反应总数（≈化学家十年手工量）</div></div>
-    <div class="stat"><div class="n">88% / 83%</div><div class="l">产率提升的硼酸 / 磺酰胺占比</div></div>
-    <div class="stat"><div class="n">16.6%→25.2%</div><div class="l">平均产率上升</div></div>
-    <div class="stat"><div class="n">15.6%→37.5%</div><div class="l">产率&gt;30% 的反应占比</div></div>
-  </div>
-  <p>万次规模让团队能在 10 种氧化剂中识别出 TEMPO，看到效果在多样底物上重复出现，也看清它的边界。第二轮还发现<mark>更廉价的 4‑羟基‑TEMPO 可替代 TEMPO 且性能损失很小</mark>——这把发现从"有趣"推向"可负担"。<span class="take">结论：足够大的样本量把"偶然好看"的结果，变成了可信、可重复的规律。</span></p>
+    <section>
+      <h2>TEMPO 的效果不是单点偶然，而是在大规模筛选中反复出现</h2>
+      <p>Maria Lab 在两个实验周期中运行了 10,080 个反应，用足够大的实验规模比较十种氧化剂，并观察 TEMPO 对多样化底物组合的重复效果。</p>
+      <p>优化条件下，88% 的 boronic acids 和 83% 的 sulfonamides 测试对象产率提高，说明结果不是只适用于少数“幸运”底物，而是具有一定底物覆盖面。</p>
+    </section>
 
-  <h2>验证：从微升筛选走到台架规模，并经外部专家评审</h2>
-  <p class="sub">小规模实验可能产生在放大后消失的假象。</p>
-  <p>人类化学家手工复现代表性反应：<mark>14 对底物中有 11 对产率提高，其中 8 对增幅超过 2 倍</mark>。四位外部化学专家评审预印本，认可结果新颖、值得分享。全程历时三个月（3 月 4 日首个提示词 → 6 月 4 日交付独立专家）。<span class="take">结论：台架复现 + 同行评审，让这个 AI 主导的发现达到了可发表、可被独立实验室检验的门槛。</span></p>
-  <p class="quote">"高通量实验与现代 AI 的结合代表了科学发现的新前沿……异常温和的条件与实用的氧化剂，为药物合成中最常用的反应之一带来了相当普适的底物范围。"——外部评审专家</p>
+    <section>
+      <h2>产率提升幅度让结果进入更实用的化学讨论</h2>
+      <p>平均产率从 16.6% 提升到 25.2%，产率超过 30% 的反应比例从 15.6% 增至 37.5%。这些数字仍不是制造级结论，但足以说明反应从“多数情况下很差”向“更多情况下可用”移动。</p>
+      <p>这对 AI 科研的意义在于，模型贡献可以用实验产率、底物覆盖和复验成功率来衡量，而不是停留在主观上是否“看起来合理”。</p>
+    </section>
 
-  <h2>边界：它能做什么，不能做什么</h2>
-  <p class="sub">诚实地界定结论范围，是这项工作的一部分。</p>
-  <p>它<b>证明</b>了模型能在有机化学中做出有用贡献（提出特定意外假设、设计与解读实验）；它<b>没有证明</b> AI 能端到端独立运行一个化学研究项目——人类判断不可或缺，且依赖专门的高通量基础设施。产率来自高通量平台，台架仅验证 14 对代表性底物；该方法能否推广到其他偶联反应、底物类别或量产条件，仍待验证。此外，工作被刻意限定在正当的医药化学问题上，未涉及毒素或有害化合物，并叠加了模型层安全护栏与专家监督。<span class="take">结论：这是一个"被严格限定边界"的早期成果，而非通用化学自主能力的证据。</span></p>
+    <section>
+      <h2>台架复验把微升级筛选结果拉回真实实验室</h2>
+      <p>人类化学家在 bench scale 重复了代表性反应，14 组底物组合中有 11 组产率提高，其中 8 组提升超过两倍。</p>
+      <p>这一步很关键，因为微升级高通量筛选可能产生放大后消失的假象；台架复验让结果更接近药物发现中化学家实际会使用的工作流。</p>
+    </section>
 
-  <div class="insights">
-    <h2>最值得带走的洞见</h2>
-    <ol>
-      <li><b>AI 提出了意外的真知。</b>关键贡献不是算力或综述，而是 GPT‑5.4 自主锁定"一级磺酰胺"这一高价值难题，并提出连化学家都感到意外的 TEMPO 假设。</li>
-      <li><b>规模把运气变成证据。</b>10,080 次反应（≈人类十年手工量）让"偶然好看"无处藏身，平均产率 16.6%→25.2%、实用产率占比 15.6%→37.5% 才站得住脚。</li>
-      <li><b>跨尺度复现是分水岭。</b>从微升筛选走到台架，14 对底物 11 对提升、8 对翻倍，加上四位外部专家评审，使其达到可发表、可被独立检验的标准。</li>
-      <li><b>"近自主"是务实的诚实。</b>模型提想法，人类做选择、纠错（如弃用 DMSO）并掌控物理实验室——这正是当下负责任地研究 AI 实验化学的方式。</li>
-      <li><b>真正的考验还在后面。</b>独立实验室能否复现、效果能否覆盖更广分子，才是这一发现价值的最终裁决。</li>
-    </ol>
-  </div>
+    <section>
+      <h2>4-hydroxy-TEMPO 显示 AI 也能推动后续优化，而不只是提出第一个猜想</h2>
+      <p>第一轮数据分析后，系统提出了更聚焦的第二轮实验，并发现更便宜的 4-hydroxy-TEMPO 可以在性能损失很小的情况下替代 TEMPO。</p>
+      <p>这个细节说明，AI 的潜在价值不只是“灵感生成”，还包括根据数据缩小搜索空间、提出可降低成本的变体，并把科研循环推进到下一步。</p>
+    </section>
 
-  <footer>基于 OpenAI 官方博客（2026‑06‑17）整理的中文总结，数据与结论均引自原文。</footer>
-</div>
+    <section>
+      <h2>这仍是近自主，不是全自主科研</h2>
+      <p>文章明确限制了结论：人类判断仍然必要，流程依赖专门的高通量实验室，bench validation 只覆盖 14 组代表性底物，结果尚未证明能推广到其他偶联反应、其他底物类别或制造条件。</p>
+      <p class="note warning">最合理的读法是：AI 已能在受控科学问题中贡献可验证发现，但还不能被视为能独立运行完整化学研究项目的系统。</p>
+    </section>
+
+    <section>
+      <h2>安全边界本身也是实验设计的一部分</h2>
+      <p>项目被限定在合法药物化学问题上，不涉及毒素、化学武器或有害化合物设计；实验进入实验室前由人类化学家筛选，物理基础设施也由专家控制。</p>
+      <p>这提醒读者，AI 科研能力越接近真实实验，越需要把模型拒答、专家监督、实验准入和结果解释边界一起纳入评估。</p>
+    </section>
+
+    <section>
+      <h2>最值得带走的洞见</h2>
+      <ul>
+        <li><span class="tag">可验证性：</span>这项结果的分量来自 10,080 个反应和台架复验，而不是来自模型叙述本身。</li>
+        <li><span class="tag">科研角色：</span>AI 在这里更像能提出、筛选和迭代假设的研究伙伴，而不是替代实验化学家的自动机器。</li>
+        <li><span class="tag">产业意义：</span>更可靠的合成反应会扩大药物化学家能探索的分子空间，因为无法合成的分子通常也无法测试。</li>
+        <li><span class="tag">现实限制：</span>结果仍需独立实验室复现、机制研究和更广底物范围测试，不能外推为通用 AI 化学能力。</li>
+        <li><span class="tag">治理启示：</span>当 AI 进入物理实验循环，安全评估必须覆盖模型、人员、实验平台和研究问题选择。</li>
+      </ul>
+    </section>
+  </main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

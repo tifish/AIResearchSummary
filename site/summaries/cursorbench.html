@@ -3,113 +3,335 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cursor 如何衡量模型质量 · 总结</title>
+<title>CursorBench 如何评估编码模型质量</title>
 <style>
-  :root{
-    --bg:#0f1117; --card:#1a1d27; --card2:#21263340; --text:#e6e9ef;
-    --muted:#9aa3b2; --accent:#5b9dff; --accent2:#7ee0a8; --warn:#ffcf6b;
-    --line:#2c3140;
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0; background:linear-gradient(160deg,#0f1117,#13161f 60%,#0f1117);
-    color:var(--text); font:16px/1.75 -apple-system,BlinkMacSystemFont,"Segoe UI",
-    "PingFang SC","Microsoft YaHei",Roboto,Helvetica,Arial,sans-serif;
-    padding:40px 18px;
-  }
-  .wrap{max-width:780px;margin:0 auto}
-  .kicker{color:var(--accent);font-size:13px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
-  h1{font-size:30px;line-height:1.3;margin:0 0 18px}
-  .meta{color:var(--muted);font-size:13px;margin-bottom:26px}
-  .lead{
-    background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
-    border-radius:12px;padding:18px 20px;font-size:18px;margin-bottom:34px;
-  }
-  .lead b{color:var(--accent2)}
-  section{
-    background:var(--card2);border:1px solid var(--line);border-radius:12px;
-    padding:20px 22px;margin-bottom:20px;
-  }
-  h2{font-size:19px;margin:0 0 10px;color:var(--text)}
-  h2 .n{color:var(--accent);font-weight:700;margin-right:8px}
-  .data{
-    display:inline-block;background:#243047;color:#cfe0ff;border-radius:6px;
-    padding:1px 8px;font-weight:600;font-size:14px;
-  }
-  .data.warn{background:#3a3320;color:var(--warn)}
-  .data.good{background:#1f3a2c;color:var(--accent2)}
-  .take{color:var(--muted);font-style:italic;margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
-  .take::before{content:"洞见 · ";color:var(--accent);font-style:normal;font-weight:600}
-  .insights{
-    background:linear-gradient(135deg,#1a2230,#1d2a23);
-    border:1px solid var(--line);border-radius:14px;padding:24px;
-  }
-  .insights h2{color:var(--accent2)}
-  .insights ol{margin:0;padding-left:20px}
-  .insights li{margin:10px 0}
-  .insights li b{color:var(--text)}
-  a{color:var(--accent)}
+:root {
+  --bg: #f6f7f9;
+  --card: #ffffff;
+  --ink: #17202a;
+  --muted: #5c6672;
+  --line: #dfe4ea;
+  --accent: #2563eb;
+  --accent2: #0f766e;
+  --accent3: #9333ea;
+  --hl: #eaf2ff;
+  --hl2: #eefaf6;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  line-height: 1.72;
+}
+main {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 40px 20px 56px;
+}
+.hero {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 24px;
+  margin-bottom: 24px;
+}
+.kicker {
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+h1 {
+  margin: 10px 0 14px;
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.18;
+}
+.lead {
+  font-size: 20px;
+  color: var(--ink);
+  background: var(--hl);
+  border-left: 5px solid var(--accent);
+  padding: 16px 18px;
+  border-radius: 8px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+section {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 20px;
+}
+section.wide { grid-column: 1 / -1; }
+h2 {
+  margin: 0 0 10px;
+  font-size: 21px;
+  line-height: 1.35;
+}
+p { margin: 0 0 10px; }
+p:last-child { margin-bottom: 0; }
+.data {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+.badge {
+  background: var(--hl2);
+  color: var(--accent2);
+  border: 1px solid color-mix(in srgb, var(--accent2) 24%, transparent);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-weight: 700;
+  font-size: 14px;
+}
+.note {
+  color: var(--muted);
+}
+.insights {
+  background: linear-gradient(135deg, var(--hl), var(--hl2));
+  border-color: var(--line);
+}
+ul {
+  margin: 10px 0 0;
+  padding-left: 22px;
+}
+li { margin: 8px 0; }
+@media (max-width: 760px) {
+  main { padding: 28px 14px 40px; }
+  .grid { grid-template-columns: 1fr; }
+  .lead { font-size: 18px; }
+}
 </style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
+      background: var(--airs-digest-panel) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
 </head>
 <body>
-<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://cursor.com/blog/cursorbench" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
-<div class="wrap">
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/cursorbench" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+  <header class="hero">
+    <div class="kicker">Cursor · Research · 2026-03-11</div>
+    <h1>CursorBench 的核心贡献不是又造了一个榜单，而是把编码模型评测拉回真实开发工作。</h1>
+    <p class="lead">一句话总括：文章主张，用真实 Cursor 会话构造离线评测，再用线上受控实验校准结果，能比公共 benchmark 更准确地区分哪些模型真的让开发者完成工作。</p>
+  </header>
 
-  <div class="kicker">Cursor · Research</div>
-  <h1>Cursor 如何衡量编码 Agent 的模型质量</h1>
-  <div class="meta">来源：Cursor 博客（CursorBench） · 作者 Naman Jain · 2026-03-11</div>
+  <div class="grid">
+    <section>
+      <h2>公共 benchmark 正在失去区分度</h2>
+      <p>Cursor 指出，许多公开 SWE 评测仍偏向 bug fixing，Terminal-Bench 则包含棋局推理等 puzzle 式任务，这些都不能很好代表开发者让编码代理处理的多文件、多工具、多步骤工作。</p>
+      <p class="note">这改变了读者对 AI 评测的理解：高分可能只是说明模型适应了某类静态题目，而不一定说明它能处理真实工程需求。</p>
+    </section>
 
-  <div class="lead">
-    一句话总括：当公开 benchmark 在前沿模型上已经"测不出差距"时，Cursor 用一套来自<b>真实工程会话</b>的内部评测 CursorBench，再配合<b>线上受控实验</b>，构建了一个能真正区分模型、并贴合开发者实际体验的"线上-离线"闭环。
+    <section>
+      <h2>污染和评分问题会放大虚假的进步</h2>
+      <p>文章强调，SWE-bench Verified、Pro、Multilingual 来自公开仓库，任务可能进入训练数据；OpenAI 停止报告 SWE-bench Verified 的结果后，还指出前沿模型能从记忆中复现 gold patch，且近 60% 未解决问题有测试缺陷。</p>
+      <p class="note">结论是：当 benchmark 被污染或测试本身有缺陷时，榜单提升可能混入记忆、测试漏洞和奖励投机，而不是能力增长。</p>
+    </section>
+
+    <section class="wide">
+      <h2>CursorBench 用真实会话重建任务来源</h2>
+      <p>CursorBench 通过 Cursor Blame 把已提交代码追溯到产生它的代理请求，从而得到“开发者查询”和“真实解决方案”的配对；许多任务来自 Cursor 内部代码库和受控来源，以降低模型提前见过任务的风险。</p>
+      <div class="data">
+        <span class="badge">每几个月刷新</span>
+        <span class="badge">真实 Cursor 会话</span>
+        <span class="badge">短而欠规格的任务描述</span>
+      </div>
+      <p class="note">这种设计说明，好的编码评测不只是找一批题，而是要持续跟随开发者如何实际使用代理。</p>
+    </section>
+
+    <section>
+      <h2>任务规模扩大后，模型差异更明显</h2>
+      <p>从初版到 CursorBench-3，正确性评测的问题规模按代码行数和平均文件数大约翻倍，并覆盖 monorepo、多 workspace、生产日志调查、长时间实验等更复杂场景。</p>
+      <p class="note">这让读者看到：前沿模型的差距常常不会在小题上显现，而是在更长上下文、更模糊目标和更多工具调用中暴露。</p>
+    </section>
+
+    <section>
+      <h2>离线分数必须接受线上体验校准</h2>
+      <p>Cursor 不只看离线 grader，还通过线上受控实验追踪交互质量和输出质量等代理结果信号。例如在语义搜索和检索迭代中，他们做过移除语义搜索工具的 ablation，以定位它对大型代码库问答的价值。</p>
+      <p class="note">结论是：一个答案能骗过离线评分器，不代表开发者会觉得它真的可用，线上评估负责捕捉这种落差。</p>
+    </section>
+
+    <section class="wide">
+      <h2>下一代评测要覆盖长时间运行的代理</h2>
+      <p>CursorBench-3 的任务已经比多个公共 benchmark 更长，但仍主要在单个会话内完成。Cursor 预计未来一年，大部分开发工作会转向在自己电脑上长时间运行的代理。</p>
+      <p>这会带来新的评测难题：评分成本要更低，依赖外部服务的任务要可复现，离线评估和真实开发者体验之间的差距还要继续缩小。</p>
+      <p class="note">最终洞见是：编码代理越接近真实工作流，评测就越不能只像考试，而必须像产品质量系统。</p>
+    </section>
+
+    <section class="wide insights">
+      <h2>最值得带走的洞见</h2>
+      <ul>
+        <li>公开榜单的高分不一定代表真实开发体验更好，尤其在任务污染和评分缺陷存在时。</li>
+        <li>真实会话、真实提交和真实开发者反馈，比静态题库更能衡量编码代理的可用性。</li>
+        <li>模型差距会在多文件、长链路、欠规格任务中被放大，小型 bug-fix benchmark 容易低估这种差异。</li>
+        <li>离线评测适合快速比较模型，但必须用线上实验确认它是否真的改善了开发者结果。</li>
+        <li>未来的关键挑战不是再做一个更难榜单，而是评估能独立运行更久、接触真实环境的开发代理。</li>
+      </ul>
+    </section>
   </div>
-
-  <section>
-    <h2><span class="n">01</span>公开 benchmark 在前沿区间已经失灵</h2>
-    <p>文章点名三大病根：<b>对齐</b>——多数 SWE benchmark 仍只测修 bug，Terminal-Bench 偏"找最佳棋步"这类益智题，与真实开发脱节；<b>评分</b>——真实需求往往欠定义、有多种正确解，但 benchmark 只认一种窄答案；<b>污染</b>——SWE-bench Verified/Pro/Multilingual 都取自公开仓库，已进入训练数据。最有冲击力的证据是 <span class="data warn">OpenAI 已停报 SWE-bench Verified</span>，因为前沿模型能凭记忆复现 gold patch，且 <span class="data warn">近 60% 未解题目的测试本身有缺陷</span>。</p>
-    <p class="take">当"标准答案"已被模型背下来、且题目本身有 bug 时，分数衡量的是记忆而非能力——这就是为什么榜单越来越分不出谁更好用。</p>
-  </section>
-
-  <section>
-    <h2><span class="n">02</span>用 Cursor Blame 把代码反向追溯成评测题</h2>
-    <p>CursorBench 的题目不是手工编的，而是用 <b>Cursor Blame</b> 把已提交代码追溯回产出它的 agent 请求，天然得到"开发者查询 + 标准答案"配对。题目多来自内部代码库等受控来源，<b>降低训练泄漏风险</b>，并每几个月刷新一次以跟上用法变化。任务描述刻意做得简短、贴近开发者真实的含糊表达，并用 agentic grader 评分。</p>
-    <p class="take">评测的真实性来自数据来源本身，而不是事后给题目"打补丁"——这是它优于公开基准的根本原因。</p>
-  </section>
-
-  <section>
-    <h2><span class="n">03</span>任务规模翻倍，更难也更接近真实工作</h2>
-    <p>从初版到 CursorBench-3，正确性评测的问题规模在<b>代码行数和平均文件数上约翻倍</b><span class="data">≈2×</span>，单任务行数<b>显著超过</b> SWE-bench Verified/Pro/Multilingual。新增的硬任务包括处理 monorepo 多工作区、排查生产日志、运行长时实验等。</p>
-    <p class="take">规模翻倍不是为了刷难度，而是因为开发者真实交给 agent 的活就是跨多文件、多步骤的——benchmark 必须跟着工作形态走。</p>
-  </section>
-
-  <section>
-    <h2><span class="n">04</span>它能拉开前沿模型，甚至 Haiku 追平 GPT-5</h2>
-    <p>正因任务更复杂、更欠定义，CursorBench 在公开基准已饱和的前沿区间<b>拉出了更大的模型间差距</b>；在某些场景下，<span class="data good">Haiku 可追平甚至超过 GPT-5</span>。换句话说，它能可靠区分那些"开发者用起来明显不同"的模型。</p>
-    <p class="take">"小模型在某些真实任务上超过大模型"这一反直觉结果，恰恰证明通用榜单排名不能直接套用到具体产品场景。</p>
-  </section>
-
-  <section>
-    <h2><span class="n">05</span>线上实验补离线之不足，并互相印证</h2>
-    <p>离线分数高不等于好用。Cursor 在真实流量上做受控实验，跟踪交互与输出质量的一组高层代理指标，捕捉"grader 给高分但开发者觉得更差"的回归。例如优化语义搜索时，他们<b>整体移除语义搜索工具做消融</b>，精确定位它在大型代码库的"仓库相关问答"中最关键。关键是：CursorBench 的排名与线上评测<b>高度一致</b>。</p>
-    <p class="take">离线能扩展、线上才真实——两者的一致性才是"这个评测可信"的最终背书。</p>
-  </section>
-
-  <section>
-    <h2><span class="n">06</span>下一步：为"长时自主 agent"重做评测</h2>
-    <p>CursorBench-3 的任务虽长，但仍在单次会话内完成。团队预判未来一年大部分开发将转向<b>在自有机器上长时运行的 agent</b>，因此要解决三件事：让评分更便宜、为依赖外部服务的任务解决可复现性、缩小离线评估与真实体验的差距。最新生产版本已是 <span class="data">CursorBench 3.1</span>（2026-05，题目更难，分数<b>不可跨版本比较</b>）。</p>
-    <p class="take">评测套件本身也得持续演进——衡量标准一旦静止，就会重蹈公开 benchmark 失灵的覆辙。</p>
-  </section>
-
-  <div class="insights">
-    <h2>最值得带走的洞见</h2>
-    <ol>
-      <li><b>公开 benchmark 在前沿已失效：</b>污染、错对齐、窄评分三重问题，连 OpenAI 都因近 60% 题目测试有缺陷而停报 SWE-bench Verified。</li>
-      <li><b>数据来源决定评测质量：</b>用 Cursor Blame 从真实提交反推题目，天然获得查询-答案配对并降低训练泄漏，比事后修补题目更可信。</li>
-      <li><b>真实任务能拉开模型差距：</b>规模约翻倍、刻意欠定义的题目让前沿模型重新分出高下，甚至出现 Haiku 追平 GPT-5 的反直觉结果。</li>
-      <li><b>离线+线上闭环缺一不可：</b>线上消融实验捕捉"高分却难用"的回归，而离线排名与线上指标的一致性是评测可信度的关键。</li>
-      <li><b>评测必须随工作形态演进：</b>下一战场是长时自主 agent，难点在于降低评分成本、解决可复现性、缩小离线与真实体验的鸿沟。</li>
-    </ol>
-  </div>
-
-</div>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

@@ -3,104 +3,335 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Composer 2 技术报告：用真实环境训练编程智能体</title>
+<title>Composer 2 技术报告总结</title>
 <style>
-  :root{
-    --ink:#1a2230; --muted:#5b6676; --line:#e3e8ef;
-    --accent:#3b6ef0; --accent2:#0fa37f; --warn:#d97706;
-    --bg:#f6f8fb; --card:#ffffff;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-    line-height:1.75;font-size:17px}
-  .wrap{max-width:780px;margin:0 auto;padding:40px 22px 72px}
-  .tag{display:inline-block;font-size:13px;letter-spacing:.04em;color:var(--accent);
-    background:#eaf0ff;border-radius:999px;padding:4px 12px;margin-bottom:14px}
-  h1{font-size:30px;line-height:1.3;margin:.2em 0 .1em}
-  .meta{color:var(--muted);font-size:14px;margin-bottom:26px}
-  .lead{background:linear-gradient(180deg,#eef3ff,#ffffff);border:1px solid var(--line);
-    border-left:5px solid var(--accent);border-radius:12px;padding:18px 20px;font-size:18px;margin:0 0 30px}
-  .lead b{color:var(--accent)}
-  section{background:var(--card);border:1px solid var(--line);border-radius:12px;
-    padding:20px 22px;margin:0 0 18px}
-  h2{font-size:20px;margin:.1em 0 .5em;line-height:1.4}
-  h2 .n{color:var(--accent);font-weight:700;margin-right:8px}
-  .concl{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);
-    color:var(--ink);font-weight:600}
-  .concl::before{content:"洞见 → ";color:var(--accent2);font-weight:700}
-  .stats{display:flex;flex-wrap:wrap;gap:12px;margin:24px 0}
-  .stat{flex:1 1 150px;background:var(--card);border:1px solid var(--line);
-    border-radius:12px;padding:16px;text-align:center}
-  .stat .num{font-size:26px;font-weight:800;color:var(--accent)}
-  .stat .lab{font-size:13px;color:var(--muted);margin-top:4px}
-  .delta{color:var(--accent2);font-weight:700}
-  .takeaways{background:#0f1726;color:#eaf0ff;border-radius:14px;padding:24px 26px;margin-top:30px}
-  .takeaways h2{color:#fff}
-  .takeaways ol{margin:.4em 0 0;padding-left:1.2em}
-  .takeaways li{margin:.5em 0}
-  .takeaways b{color:#7fd1ff}
-  em{color:var(--warn);font-style:normal;font-weight:600}
+:root {
+  --bg: #f6f7f9;
+  --card: #ffffff;
+  --ink: #172033;
+  --muted: #5d6678;
+  --line: #dfe4ec;
+  --accent: #2563eb;
+  --accent2: #0f766e;
+  --accent3: #b45309;
+  --hl: #eaf2ff;
+  --hl2: #ecfdf5;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  line-height: 1.72;
+}
+main {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 40px 20px 56px;
+}
+.hero {
+  padding: 28px;
+  background: linear-gradient(135deg, var(--card), var(--hl));
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.label {
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 700;
+}
+h1 {
+  margin: 0 0 14px;
+  font-size: 30px;
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+.lead {
+  margin: 0;
+  color: var(--muted);
+  font-size: 18px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+section {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 22px;
+}
+section.wide { grid-column: 1 / -1; }
+h2 {
+  margin: 0 0 12px;
+  font-size: 20px;
+  line-height: 1.35;
+}
+p { margin: 0 0 10px; }
+p:last-child { margin-bottom: 0; }
+.metric {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+.metric span {
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--hl);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 14px;
+}
+.note {
+  border-left: 4px solid var(--accent2);
+  padding-left: 14px;
+  color: var(--muted);
+}
+.takeaways {
+  margin-top: 20px;
+  background: var(--hl2);
+  border-color: color-mix(in srgb, var(--accent2), var(--line) 65%);
+}
+ul {
+  margin: 10px 0 0;
+  padding-left: 22px;
+}
+li { margin: 8px 0; }
+@media (max-width: 760px) {
+  main { padding: 24px 14px 40px; }
+  .hero { padding: 22px; }
+  h1 { font-size: 25px; }
+  .lead { font-size: 16px; }
+  .grid { grid-template-columns: 1fr; }
+}
 </style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
+      background: var(--airs-digest-panel) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
 </head>
 <body>
-<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://cursor.com/blog/composer-2-technical-report" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
-<div class="wrap">
-  <span class="tag">Research · Cursor · 2026-03-27</span>
-  <h1>Composer 2 技术报告：把"真实开发环境"搬进模型训练</h1>
-  <div class="meta">作者 Sasha Rush · 来源 Cursor 博客 / arXiv 技术报告</div>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/composer-2-technical-report" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+  <article>
+    <header class="hero">
+      <p class="label">一句话总括</p>
+      <h1>Composer 2 的真正贡献，是把编码模型训练从静态题库推进到接近真实 Cursor 工作流的强化学习闭环。</h1>
+      <p class="lead">报告展示了一个面向 agentic software engineering 的路线：先用代码密集数据继续预训练，补足模型基础能力；再在真实工具、真实 harness 和真实任务分布中做大规模强化学习，让模型学会完成端到端开发任务。</p>
+    </header>
 
-  <p class="lead">一句话总括：Composer 2 的真正贡献不是又刷高了一个分数，而是公开了一条<b>"以代码为重的持续预训练 → 在真实 Cursor 会话里做大规模 RL → 用真实任务基准评测"</b>的完整配方，并证明这条路线能在更低推理成本下逼近前沿模型。</p>
+    <div class="grid">
+      <section>
+        <h2>更好的基座知识，会放大后续 RL 的收益</h2>
+        <p>Composer 2 先在强调代码的数据混合上继续预训练，再进入大规模强化学习。报告的核心观察是，预训练损失降低后，下游 RL 表现也会变好。</p>
+        <p class="note">这改变了对编码 agent 的理解：RL 不是单独的魔法步骤，它依赖更扎实的代码知识作为起点。</p>
+      </section>
 
-  <div class="stats">
-    <div class="stat"><div class="num">61.3</div><div class="lab">CursorBench 得分<br><span class="delta">较 1.5 +37%</span></div></div>
-    <div class="stat"><div class="num">73.7</div><div class="lab">SWE-bench<br>Multilingual</div></div>
-    <div class="stat"><div class="num">61.7</div><div class="lab">Terminal-Bench</div></div>
-  </div>
+      <section>
+        <h2>真实会话比过度规整的公开题更能暴露能力差距</h2>
+        <p>CursorBench 来自 Cursor 工程团队的真实编码会话，任务提示可能很短、含糊，解法可能需要跨许多文件修改数百行代码。</p>
+        <p class="note">这说明评估重点从“能否答对小而清晰的问题”，转向“能否在不完整需求和真实代码库里推进工作”。</p>
+      </section>
 
-  <section>
-    <h2><span class="n">01</span>训练分两段，预训练打底决定 RL 上限</h2>
-    <p>Composer 2 基于开源模型 <strong>Kimi K2.5</strong>，先做侧重代码的持续预训练以加深编程知识，再做大规模强化学习提升端到端的智能体表现。报告发现一个可复用的规律：<em>降低预训练损失能可靠地提升下游 RL 的表现</em>——更好的基础知识会稳定地翻译成更强的智能体。</p>
-    <div class="concl">别把预训练和 RL 当两件独立的事；地基质量直接设定了 RL 能达到的天花板。</div>
-  </section>
+      <section class="wide">
+        <h2>性能提升不是只看准确率，还要看交互成本</h2>
+        <p>Composer 2 在 CursorBench 得分 61.3，比 Composer 1.5 提升 37%；在公开基准上，SWE-bench Multilingual 得分 73.7，Terminal-Bench 得分 61.7。</p>
+        <div class="metric">
+          <span>CursorBench 61.3</span>
+          <span>较 Composer 1.5 +37%</span>
+          <span>SWE-bench Multilingual 73.7</span>
+          <span>Terminal-Bench 61.7</span>
+        </div>
+        <p>报告同时强调它的推理成本显著低于可比模型，因此在准确率和成本之间形成适合交互式开发的权衡。结论是，开发者工具里的模型不只要强，还要足够便宜、快速，才能高频嵌入日常工作。</p>
+      </section>
 
-  <section>
-    <h2><span class="n">02</span>RL 在"和部署一模一样"的环境里进行</h2>
-    <p>RL 训练发生在真实的 Cursor 会话中，使用与上线模型完全相同的工具和 harness，任务分布覆盖开发者真正会让 Composer 做的全部范围。结果是平均表现和 best-of-K 表现<strong>同时</strong>提升——这意味着模型在学习<strong>新的解题路径</strong>，而不只是把概率集中到已知答案上。</p>
-    <div class="concl">环境保真度本身就是能力来源：训练环境越接近真实使用，RL 越能拓展解空间而非收窄它。</div>
-  </section>
+      <section>
+        <h2>RL 训练要模拟部署环境，才会学到可迁移行为</h2>
+        <p>Composer 2 的 RL 训练发生在现实 Cursor 会话中，使用与部署模型相同的工具和 harness，并覆盖开发者实际会提出的多类问题。</p>
+        <p class="note">平均表现和 best-of-K 表现同时改善，暗示模型不是简单收缩到已知答案，而是在学习新的解决路径。</p>
+      </section>
 
-  <section>
-    <h2><span class="n">03</span>CursorBench：用真实代码会话取代失真的公开基准</h2>
-    <p>公开基准常常脱离开发者的真实工作——任务被过度规定、解法狭窄、代码库太小。Cursor 用自家工程团队的真实编码会话构建了 <strong>CursorBench</strong>：提示词简短而模糊，解法往往需要<strong>跨多个文件、数百行</strong>的改动。它贯穿训练与评测，使模型持续对齐真实问题。</p>
-    <div class="concl">评测即指北针；当基准换成真实任务，"刷分"和"变得有用"才开始重合。</div>
-  </section>
+      <section>
+        <h2>基础设施成为模型能力的一部分</h2>
+        <p>训练 Composer 2 需要面向 Blackwell GPU 的自定义低精度 MoE kernel、跨多区域的全异步 RL pipeline，以及用于运行数十万个沙盒编码环境的内部平台 Anyrun。</p>
+        <p class="note">这表明高质量编码 agent 的瓶颈不只在模型结构，还在环境保真、权重同步、容错和大规模沙盒执行能力。</p>
+      </section>
 
-  <section>
-    <h2><span class="n">04</span>同时赢下精度和成本</h2>
-    <p>Composer 2 在 CursorBench 得 <strong>61.3</strong>（较 Composer 1.5 提升 <span class="delta">37%</span>，与最强前沿模型相当），公开基准上 SWE-bench Multilingual 得 <strong>73.7</strong>、Terminal-Bench 得 <strong>61.7</strong>。关键在于它以<strong>显著更低的推理成本</strong>达成这些分数，在精度—成本权衡上取得帕累托最优。</p>
-    <div class="concl">对交互式开发工作流，"够好且够便宜够快"比"绝对最强"更重要；低成本是产品级可用性的硬指标。</div>
-  </section>
-
-  <section>
-    <h2><span class="n">05</span>支撑这一切的基础设施</h2>
-    <p>训练需要大量底层工程：为 <strong>Blackwell GPU</strong> 定制的低精度 MoE 训练核、横跨多区域的<strong>全异步 RL 流水线</strong>，以及内部计算平台 <strong>Anyrun</strong>——可同时运行数十万个沙箱化编码环境。报告还覆盖权重同步、容错与环境保真度的完整技术栈，并附有训练配方的消融实验和智能体行为塑造方法。</p>
-    <div class="concl">前沿编程智能体的瓶颈正从模型架构转向"能否大规模、高保真地模拟真实开发环境"。</div>
-  </section>
-
-  <div class="takeaways">
-    <h2>最值得带走的洞见</h2>
-    <ol>
-      <li><b>地基决定上限：</b>降低预训练损失能可靠提升下游 RL，预训练与 RL 必须当作一条链来优化。</li>
-      <li><b>环境保真 = 能力：</b>在与部署一致的真实 Cursor 会话里做 RL，让模型学到新解法（平均与 best-of-K 同涨）。</li>
-      <li><b>评测要对齐现实：</b>CursorBench 用真实、多文件、模糊提示的任务取代失真公开基准，是对齐真实价值的关键。</li>
-      <li><b>低成本即护城河：</b>61.3 分 + 显著更低推理成本的帕累托最优，比单纯的最高分更适合交互式开发。</li>
-      <li><b>基础设施是隐形主角：</b>Blackwell 低精度核、跨区域异步 RL、数十万沙箱环境（Anyrun）才是这套配方能跑通的前提。</li>
-    </ol>
-  </div>
-</div>
+      <section class="wide takeaways">
+        <h2>最值得带走的洞见</h2>
+        <ul>
+          <li>编码模型的关键进步来自训练环境和真实开发流程的对齐，而不只是扩大模型或优化公开榜单。</li>
+          <li>继续预训练仍然重要，因为更低的预训练损失会提高后续强化学习的上限。</li>
+          <li>CursorBench 的价值在于捕捉真实软件工程中的含糊需求、大范围修改和多文件协作。</li>
+          <li>对交互式开发工具来说，准确率必须和推理成本一起看；低成本的强模型才更容易成为日常工作流的一部分。</li>
+          <li>大规模沙盒环境、异步 RL 和高效 MoE 训练基础设施，正在成为编码 agent 竞争力的核心组成。</li>
+        </ul>
+      </section>
+    </div>
+  </article>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
 </body>
 </html>
-===DIGEST===
-
-Wait, I included an extra trailing `===DIGEST===` line. Let me note: the correct output ends at `</html>`. Please disregard that final stray separator line — the document ends at `</html>

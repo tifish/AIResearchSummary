@@ -3,138 +3,345 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BioMysteryBench：评估 Claude 的生物信息学科研能力</title>
+<title>BioMysteryBench：Claude 的生物信息学研究能力到了哪一步</title>
 <style>
-  :root{
-    --bg:#0f1115; --card:#1a1d24; --soft:#222632; --ink:#e8eaf0;
-    --muted:#a4abbb; --accent:#5e d0c0; --accent:#54d6b6; --warn:#ffb454;
-    --blue:#5aa9ff; --pink:#ff7eb6; --line:#2c313d;
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0; background:linear-gradient(180deg,#0c0e12,#12151c 40%);
-    color:var(--ink); font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;
-    line-height:1.75; padding:0 16px;
-  }
-  .wrap{max-width:820px; margin:0 auto; padding:48px 0 80px}
-  .tag{display:inline-block; font-size:13px; letter-spacing:.08em; text-transform:uppercase;
-    color:#0c0e12; background:var(--accent); padding:4px 12px; border-radius:999px; font-weight:700}
-  h1{font-size:30px; line-height:1.3; margin:18px 0 8px}
-  .meta{color:var(--muted); font-size:14px; margin-bottom:28px}
-  .lede{
-    background:linear-gradient(135deg,#1d2a2a,#1a1d24); border:1px solid var(--line);
-    border-left:4px solid var(--accent); border-radius:14px; padding:20px 22px; font-size:18px;
-    margin:24px 0 36px;
-  }
-  .lede b{color:var(--accent)}
-  h2{font-size:21px; margin:40px 0 6px; padding-top:8px}
-  h2 .num{color:var(--blue); font-weight:800; margin-right:8px}
-  .sub{color:var(--muted); font-size:14px; margin:0 0 14px}
-  p{margin:12px 0}
-  .card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px 20px; margin:16px 0}
-  .insight{border-left:3px solid var(--warn); padding-left:14px; color:#ffe6c2; font-weight:600; margin-top:10px}
-  .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:20px 0}
-  .stat{background:var(--soft); border:1px solid var(--line); border-radius:12px; padding:16px; text-align:center}
-  .stat .big{font-size:30px; font-weight:800; color:var(--accent); display:block; line-height:1.1}
-  .stat .lbl{font-size:13px; color:var(--muted); margin-top:6px}
-  ul{margin:10px 0; padding-left:20px}
-  li{margin:7px 0}
-  .qbox{background:#171b22; border:1px dashed #38404f; border-radius:10px; padding:14px 16px; font-size:15px; color:#cdd4e2}
-  .qbox li{margin:5px 0}
-  .takeaways{background:linear-gradient(135deg,#23202f,#1a1d24); border:1px solid var(--line); border-radius:16px; padding:24px; margin-top:40px}
-  .takeaways h2{margin-top:0}
-  .takeaways ol{padding-left:22px}
-  .takeaways li{margin:12px 0; font-size:16px}
-  .hl{color:var(--accent); font-weight:700}
-  .hlb{color:var(--blue); font-weight:700}
-  .hlp{color:var(--pink); font-weight:700}
-  a{color:var(--blue)}
-  .foot{color:var(--muted); font-size:13px; margin-top:30px; border-top:1px solid var(--line); padding-top:16px}
+:root {
+  --bg: #f6f7f9;
+  --card: #ffffff;
+  --ink: #1c2430;
+  --muted: #607080;
+  --line: #d9e0e7;
+  --accent: #2f6f73;
+  --accent2: #9a5b2f;
+  --accent3: #4b5fb8;
+  --hl: #e7f3f2;
+  --hl2: #fff2df;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  line-height: 1.7;
+}
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 40px 20px 56px;
+}
+header {
+  padding: 28px;
+  background: linear-gradient(135deg, var(--hl), var(--hl2));
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.kicker {
+  margin: 0 0 8px;
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+h1 {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.18;
+  letter-spacing: 0;
+}
+.lead {
+  margin: 18px 0 0;
+  font-size: 18px;
+  color: var(--ink);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 22px 0 0;
+}
+.metric {
+  background: rgba(255,255,255,.68);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+}
+.metric strong {
+  display: block;
+  font-size: 26px;
+  line-height: 1.15;
+  color: var(--accent3);
+}
+.metric span {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 14px;
+}
+section {
+  margin-top: 18px;
+  padding: 24px 26px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+h2 {
+  margin: 0 0 10px;
+  font-size: 22px;
+  line-height: 1.3;
+  letter-spacing: 0;
+}
+p { margin: 0 0 12px; }
+p:last-child { margin-bottom: 0; }
+mark {
+  background: var(--hl2);
+  color: var(--ink);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+.insight {
+  border-left: 4px solid var(--accent);
+  padding-left: 14px;
+  color: var(--muted);
+}
+.takeaways {
+  margin: 10px 0 0;
+  padding-left: 20px;
+}
+.takeaways li { margin: 8px 0; }
+@media (max-width: 760px) {
+  main { padding: 24px 14px 40px; }
+  header, section { padding: 20px; }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 </style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
+      background: var(--airs-digest-panel) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
 </head>
 <body>
-<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/Evaluating-Claude-For-Bioinformatics-With-BioMysteryBench" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
-<div class="wrap">
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/Evaluating-Claude-For-Bioinformatics-With-BioMysteryBench" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+  <header>
+    <p class="kicker">一句话总括</p>
+    <h1>BioMysteryBench 的真正贡献，是用真实生物数据和客观答案测试 AI 是否能完成接近科研现场的开放式分析。</h1>
+    <p class="lead">这不是又一个问答考试，而是让 Claude 在容器里查数据库、装工具、写代码、分析测序数据，并最终给出可验证答案的评测。</p>
+    <div class="grid" aria-label="关键数字">
+      <div class="metric"><strong>99</strong><span>个生物信息学问题</span></div>
+      <div class="metric"><strong>76</strong><span>个人类专家可解任务</span></div>
+      <div class="metric"><strong>23</strong><span>个人类困难任务</span></div>
+      <div class="metric"><strong>30%</strong><span>Mythos Preview 在困难集最高解题率</span></div>
+    </div>
+  </header>
 
-  <span class="tag">Science · Anthropic · 2026-04-29</span>
-  <h1>用 BioMysteryBench 评估 Claude 的生物信息学科研能力</h1>
-  <div class="meta">来源：Anthropic 发现团队（Brianna）</div>
+  <section>
+    <h2>真正难测的不是知识，而是科研中的开放选择。</h2>
+    <p>传统科学 benchmark 常测试知识和推理，但真实生物研究还需要读论文、查数据库、处理噪声数据、写分析管线，并在多条合理路径之间做选择。生物学尤其难评估，因为同一个问题可能有多种正确方法，个体研究决策会改变结论，而且很多问题连人类专家也还没有答案。</p>
+    <p class="insight">这改变了读者对 AI 科学能力的理解：模型是否“懂生物学”不只看它会不会答题，而要看它能否在不确定、开放、工具密集的流程中产出可验证结果。</p>
+  </section>
 
-  <div class="lede">
-    <b>一句话总括：</b>Anthropic 造了一个新基准，巧妙地<b>用数据本身的客观属性而非科学家的主观结论来出题</b>，从而第一次能公平评估——甚至超越——人类专家解决真实生物学难题的能力，并实测出 Claude 已在部分任务上反超 5 人专家小组。
-  </div>
+  <section>
+    <h2>BioMysteryBench 把开放科研任务变成了可打分的问题。</h2>
+    <p>BioMysteryBench 由领域专家设计 <mark>99 个问题</mark>，主要来自 DNA/RNA 测序、单细胞 RNA-seq、甲基化、ChIP-seq、宏基因组、Hi-C、蛋白质组和代谢组等数据。问题答案来自数据的受控属性、临床或实验验证结果，而不是某位科学家的主观结论。</p>
+    <p>Claude 被放进一个带有常用生物信息学工具的容器，可以通过 pip 和 conda 安装额外工具，也能访问 NCBI、Ensembl 等数据库下载参考基因组等资源。评测看最终答案，不限定方法。</p>
+    <p class="insight">关键洞见是：这种设计保留了科研的自由度，却用客观 ground truth 防止评测被主观研究品味污染。</p>
+  </section>
 
-  <h2><span class="num">01</span>科学难做，评估科学更难</h2>
-  <p class="sub">为什么生物学几乎没有像软件工程 SWE-bench 那样的"标准考试"</p>
-  <p>文章先点出评估 AI 科研能力的三大根本障碍，这正是 BioMysteryBench 要解决的痛点：</p>
-  <div class="card">
-    <p><b>① 同一问题有多种"正确"解法。</b>比如研究"为何部分二型糖尿病人对二甲双胍有反应"，既可做全基因组关联（GWAS），也可测肠道菌群——路径取决于专长与资源。按"方法"评分会冤枉创造性解法。</p>
-    <p><b>② 个体研究决策高度主观，噪声数据里微小差异导致截然不同结论。</b>2011 年一篇论文称发现了能预测二甲双胍反应的变异并在两队列复现；一年后糖尿病预防计划复测<b>毫无发现</b>；2012 年的荟萃分析汇集五个队列又判定效应真实但更微弱。</p>
-    <p><b>③ 很多生物学问题人类自己还答不出。</b>二甲双胍问世三十年，学界仍不确定其主要作用靶点——而这恰恰是最该让模型来挑战的题，却无法用"人类答案"当标准。</p>
-  </div>
-  <p class="insight">洞见：BixBench 按结论评分、SciGym 用模拟器造标准答案，各自只解决了一个障碍；三道难题同时绕开，才是 BioMysteryBench 的设计目标。</p>
+  <section>
+    <h2>人类基线显示，评测同时覆盖专家可解题和专家困难题。</h2>
+    <p>每道题最多交给 <mark>5 名领域专家</mark>从零作答；只要至少一名专家答对，就被归为 human-solvable。最终有 <mark>76 题</mark>属于这个集合。另有一批专家组未能解决的题，经质控后移除 <mark>4 个</mark>有问题题目，剩下 <mark>23 个</mark> human-difficult 任务。</p>
+    <p>这些困难题并不等于无解，因为作者要求出题者提交验证 notebook，证明数据中确实有信号。区别在于：信号存在，不代表人类或模型能从零找到它。</p>
+    <p class="insight">这让 benchmark 能观察“超越当前专家面板”的能力，而不是只测试模型是否模仿已知的人类流程。</p>
+  </section>
 
-  <h2><span class="num">02</span>核心创新：让"数据的客观属性"来当标准答案</h2>
-  <p class="sub">既保留真实科研的味道，又不让数据噪声污染评估质量</p>
-  <p>专家被要求收集数据集后，<b>基于数据可控、客观的属性出题，而不是基于无法验证的科学结论</b>。答案来自实验/临床发现或经正交验证的元数据，于是题目不必"人类能解"也能拥有唯一正确答案。</p>
-  <div class="card">
-    <p>这套设计带来"四联"独特性质：</p>
-    <ul>
-      <li><b>方法无关</b>——Claude 可自由下载工具、访问 NCBI/Ensembl 等数据库，只按<b>最终答案</b>评分，不看路径。</li>
-      <li><b>客观的标准答案</b>——如"这块晶体结构属于哪个物种""患者感染了哪种病毒（由 PCR 验证）"。</li>
-      <li><b>可生成"超人类"题目</b>——题目不依赖人类能否解出，含有人类难解甚至解不出的题。</li>
-      <li><b>有验证笔记本兜底</b>——每位出题人须证明信号确实存在于数据中（验证答案比从头求解容易得多）。</li>
-    </ul>
-  </div>
-  <div class="qbox">
-    示例题（多取自 WGS、scRNA-seq、甲基化、ChIP-seq、宏基因组、Hi-C 等测序数据）：
-    <ul>
-      <li>这份单细胞 RNA-seq 数据来自哪个人体器官？</li>
-      <li>实验组相比对照组敲除了哪个基因？</li>
-      <li>从 WGS 序列判断：样本 X 的母本和父本分别是哪个样本？</li>
-      <li>给定未知细胞类型的 H3K27ac ChIP-seq 峰，识别该细胞类型。</li>
-    </ul>
-  </div>
+  <section>
+    <h2>Claude 的强项不只是执行流程，还包括组合证据。</h2>
+    <p>文章观察到，Claude 有时会沿用人类专家常见策略，有时会走完全不同的路径。特别是在困难题上，Opus 4.6 的轨迹显示两类优势：一是模型内部知识覆盖了大量结构生物学、分子谱系和文献元分析信息；二是在不确定时会叠加多种方法，让不同证据线收敛到同一个答案。</p>
+    <p>这种行为不是简单检索或套模板，而更像研究中的“证据三角测量”：当单一方法不稳时，用多个弱信号互相校验。</p>
+    <p class="insight">这改变了 AI 对科研影响的判断：模型的价值可能不只是加速已有管线，而是提供不同于人类直觉的搜索路径和证据组合方式。</p>
+  </section>
 
-  <h2><span class="num">03</span>结果：Claude 已与专家并肩，并在难题上反超</h2>
-  <p class="sub">99 道题、76 道人类可解、23 道人类难解的实测画像</p>
-  <div class="stats">
-    <div class="stat"><span class="big">99</span><div class="lbl">领域专家编写的题目总数</div></div>
-    <div class="stat"><span class="big">76</span><div class="lbl">至少 1 名专家从头解出（人类可解）</div></div>
-    <div class="stat"><span class="big">23</span><div class="lbl">剔除 4 道缺陷题后的"人类难解"题</div></div>
-    <div class="stat"><span class="big">~30%</span><div class="lbl">Claude Mythos Preview 在人类难解题上的解题率</div></div>
-  </div>
-  <p>每道题最多由 5 名专家从头作答。Claude Sonnet 4.6 及更强模型已能解出<b>相当比例的人类难解题</b>——这些题人类 5 人小组都攻不下，模型却能给出正确答案。更重要的是，能力<b>跨代际快速提升</b>。</p>
-  <p class="insight">洞见：模型不再只是"追平"受训科学家——在部分任务上它们已经领先，且有时用的是与人类完全不同的策略。</p>
+  <section>
+    <h2>结果显示，前沿模型已经在部分生物信息学任务上超过专家组。</h2>
+    <p>Claude 的能力随代际提升明显。最新模型能可靠解决多数 human-solvable 任务；在 human-difficult 集合中，Claude Sonnet 4.6 及更强模型解决了显著比例，Claude Mythos Preview 最高达到 <mark>30%</mark> 解题率。</p>
+    <p>同期 Genentech 和 Roche 发布的 CompBioBench 提供了外部参照：该 benchmark 含 <mark>100 个</mark>计算生物学任务，要求多步推理、工具使用、定制代码和外部资源交互；Claude Opus 4.6 达到 <mark>81%</mark>总体成绩，在最难问题上达到 <mark>69%</mark>。</p>
+    <p class="insight">结论不是 AI 已经替代科学家，而是它在可验证的生物信息学子任务上已经能成为真实协作者，且在某些专家未解题上领先。</p>
+  </section>
 
-  <h2><span class="num">04</span>Claude 为什么能赢：两种策略</h2>
-  <p class="sub">一种是 AI 独有的，一种是人类科学家也该学的</p>
-  <div class="card">
-    <p><b class="hlb">"无所不知"——调用庞大知识库直接替代元分析。</b>对需要人类做荟萃分析、拼接多个数据库的任务，Opus 4.6 直接结合其涵盖数十万篇论文的内部知识（结构生物学、分子谱、本体论）与实时分析，一步解出。它甚至像当年科学家凭直觉发现"TATA"启动子那样，直接<b>识别序列/模式</b>，而非靠算法注释——LLM 也许能把这种直觉放大到前所未有的规模。</p>
-    <p><b class="hlp">"知道自己不知道"——不确定时多法并用、证据收敛。</b>当 Opus 4.6 对答案没把握时，会尝试多种解法，选取多条路径共同收敛的那个答案。这是人类科学家也值得借鉴的稳健做法。</p>
-  </div>
-  <p>团队还让 Claude Mythos Preview 自己做了一段分析：它深入了"可靠性"这一重要指标、增添了细节，但<b>没有提出根本性的新问题，略显"无聊"</b>——说明模型已显露研究品味的萌芽，但离深刻洞见仍有距离。</p>
+  <section>
+    <h2>限制同样重要：没被解出的题仍可能只是太难。</h2>
+    <p>BioMysteryBench 的限制在于：对于人类和模型都没解出的任务，很难完全判断它是不可解，还是只是当前能力不够。验证 notebook 能证明信号存在、数据成形，但不能保证任何主体都能从零发现答案。</p>
+    <p class="insight">这个限制反而说明了评测的价值：它保留了一片未知区域，未来更强模型可能首先破解今天无人能解的可验证科研问题。</p>
+  </section>
 
-  <h2><span class="num">05</span>独立佐证与诚实的局限</h2>
-  <p class="sub">同期 Genentech/Roche 的 CompBioBench 给出一致结论</p>
-  <p>就在本文定稿时，Genentech 与 Roche 发布了 <b>CompBioBench</b>（100 道计算生物学题，用合成/增强数据与元数据打乱构造单一标准答案）。结果相互印证：<b class="hl">Claude Opus 4.6 总体达 81%，在最难题上达 69%</b>，说明前沿模型已是生物信息学研究的真正合作者。</p>
-  <p>作者也坦诚局限：对于人类和模型都没解出的题，无法确知它是"不可能"还是"极其困难"；验证笔记本只能保证信号存在、数据规整，不保证有人能从头找到答案。这份不确定性恰是基准的魅力所在。</p>
-
-  <div class="takeaways">
+  <section>
     <h2>最值得带走的洞见</h2>
-    <ol>
-      <li><span class="hl">出题范式的转变</span>：用"数据的客观属性 + 正交验证的元数据"当标准答案，绕开了生物学"多解、主观、人类未解"三大评估障碍，还能造出连专家都解不出的题。</li>
-      <li><span class="hl">能力已到专家水平线之上</span>：在 99 题中，最新几代 Claude 可靠解决多数人类可解题，并在 23 道人类难解题中反超 5 人专家小组（Mythos Preview ~30% 解题率）。</li>
-      <li><span class="hl">AI 的独特优势是"压缩的全文献知识"</span>：能把需要人类做荟萃分析的工作一步替代，甚至凭直觉识别序列模式——这是传统生物学 ML 难以内建的能力。</li>
-      <li><span class="hl">稳健性来自方法叠加</span>：不确定时多法并用、让证据收敛，这一点人类科研也可借鉴。</li>
-      <li><span class="hl">独立基准相互印证</span>：CompBioBench 上 Opus 4.6 达 81%/最难 69%，与本文结论一致，强化"前沿模型已是真正的科研合作者"这一判断；但模型的"研究品味"仍处萌芽期。</li>
-    </ol>
-  </div>
-
-  <div class="foot">
-    原文：Anthropic Research · <span style="color:#7d8597">claude.com/lifesciences</span> · 反馈邮箱 scienceblog@anthropic.com
-  </div>
-
-</div>
+    <ul class="takeaways">
+      <li>AI 科学评测正在从“回答专业题”转向“完成带工具、数据和不确定性的研究流程”。</li>
+      <li>BioMysteryBench 的关键设计是方法无关、答案客观，让模型可以自由选择路径，但最终必须被事实约束。</li>
+      <li>Claude 的进步体现在两方面：多数专家可解题更稳定，一部分专家困难题也能被解出。</li>
+      <li>模型可能通过大规模知识整合和多证据收敛，找到不同于人类专家的有效路线。</li>
+      <li>对科研工作的现实影响不是立即自动化全部发现，而是让 AI 成为能处理数据、生成假设、交叉验证证据的研究伙伴。</li>
+    </ul>
+  </section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

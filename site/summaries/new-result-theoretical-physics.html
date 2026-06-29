@@ -2,93 +2,321 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GPT‑5.2 推导理论物理新结果 · 总结</title>
+<title>GPT-5.2 与单负螺旋度胶子振幅</title>
 <style>
-  :root{
-    --bg:#0f1220; --card:#181c2e; --ink:#e8eaf6; --muted:#9aa3c4;
-    --accent:#6ea8fe; --accent2:#ffd166; --good:#7be0a3; --line:#2a3050;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:linear-gradient(160deg,#0b0e1a,#141831);color:var(--ink);
-    font:16px/1.7 system-ui,"Segoe UI","Microsoft YaHei",sans-serif;padding:32px 16px}
-  .wrap{max-width:780px;margin:0 auto}
-  .tag{display:inline-block;font-size:12px;letter-spacing:.1em;color:var(--accent);
-    border:1px solid var(--line);border-radius:999px;padding:4px 12px;margin-bottom:14px}
-  h1{font-size:28px;line-height:1.3;margin:.2em 0 .1em}
-  .meta{color:var(--muted);font-size:13px;margin-bottom:22px}
-  .lead{background:linear-gradient(135deg,#1d2votes,#1b2140);background:#1b2140;
-    border-left:4px solid var(--accent2);border-radius:12px;padding:18px 20px;
-    font-size:18px;margin:0 0 28px}
-  .lead b{color:var(--accent2)}
-  section{background:var(--card);border:1px solid var(--line);border-radius:14px;
-    padding:20px 22px;margin:16px 0}
-  h2{font-size:19px;margin:0 0 10px;color:var(--accent)}
-  .num{display:inline-block;background:#23284a;color:var(--good);border-radius:8px;
-    padding:1px 8px;font-weight:700;font-variant-numeric:tabular-nums}
-  .kicker{color:var(--good);font-weight:600}
-  .insight{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);
-    color:var(--ink)}
-  .insight::before{content:"洞见 · ";color:var(--muted);font-size:13px}
-  .takeaways{background:linear-gradient(135deg,#13213a,#1a1640);
-    border:1px solid var(--line);border-radius:14px;padding:22px}
-  .takeaways h2{color:var(--accent2)}
-  .takeaways ol{margin:8px 0 0;padding-left:20px}
-  .takeaways li{margin:10px 0}
-  .q{color:var(--muted);font-style:italic;border-left:3px solid var(--line);
-    padding-left:14px;margin:8px 0}
-  code{background:#0d1124;padding:1px 6px;border-radius:6px;color:#cfe0ff;font-size:14px}
+:root{
+  --bg:#f6f7f9;
+  --card:#ffffff;
+  --ink:#18202a;
+  --muted:#687382;
+  --line:#d9e0e8;
+  --accent:#2864d8;
+  --accent2:#0f8a72;
+  --accent3:#8a5a14;
+  --hl:#e9f1ff;
+  --hl2:#edf8f5;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif;
+  line-height:1.72;
+}
+main{
+  max-width:920px;
+  margin:0 auto;
+  padding:42px 20px 56px;
+}
+header{
+  border-bottom:1px solid var(--line);
+  padding-bottom:22px;
+  margin-bottom:24px;
+}
+.kicker{
+  color:var(--accent);
+  font-weight:700;
+  font-size:14px;
+  letter-spacing:.02em;
+}
+h1{
+  margin:8px 0 14px;
+  font-size:34px;
+  line-height:1.2;
+}
+.lede{
+  font-size:20px;
+  background:var(--hl);
+  border-left:5px solid var(--accent);
+  padding:16px 18px;
+  margin:0;
+}
+.meta{
+  margin-top:12px;
+  color:var(--muted);
+  font-size:14px;
+}
+section{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:22px;
+  margin:18px 0;
+}
+h2{
+  margin:0 0 12px;
+  font-size:22px;
+  line-height:1.35;
+}
+p{margin:10px 0}
+.data{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin:14px 0;
+}
+.badge{
+  background:var(--hl2);
+  color:var(--accent2);
+  border:1px solid color-mix(in srgb,var(--accent2) 28%,transparent);
+  border-radius:999px;
+  padding:6px 10px;
+  font-weight:700;
+  font-size:14px;
+}
+.note{
+  color:var(--muted);
+}
+.insights{
+  background:linear-gradient(180deg,var(--card),var(--hl));
+  border-color:color-mix(in srgb,var(--accent) 25%,var(--line));
+}
+ul{
+  margin:10px 0 0;
+  padding-left:22px;
+}
+li{margin:8px 0}
+strong{color:var(--accent3)}
 </style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
+      background: var(--airs-digest-panel) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
 </head>
 <body>
-<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://openai.com/index/new-result-theoretical-physics" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
-<div class="wrap">
-  <span class="tag">RESEARCH · OpenAI</span>
-  <h1>GPT‑5.2 在理论物理中推导出一个新结果</h1>
-  <div class="meta">来源：OpenAI ｜ 日期：2026‑02‑13 ｜ arXiv 预印本《Single-minus gluon tree amplitudes are nonzero》</div>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/new-result-theoretical-physics" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header>
+  <div class="kicker">一句话总括</div>
+  <h1>GPT-5.2 把一个被长期视为“应当为零”的胶子振幅，改写成可证明、可检验的新公式。</h1>
+  <p class="lede">这篇文章真正的贡献不是宣称 AI 替代物理学家，而是展示 AI 如何在专家给出的复杂低阶结果中发现简洁结构，再进入严格证明和物理一致性验证流程。</p>
+  <div class="meta">OpenAI Research，2026 年 2 月 13 日；主题为单负螺旋度 gluon tree amplitudes。</div>
+</header>
 
-  <p class="lead">一句话总括：<b>一类被教科书判定"恒为零"的胶子散射振幅，其实在一个精确定义的特殊运动学切片上并不为零——而发现并证明这件事的核心公式，是由 GPT‑5.2 猜出、AI 自证、人类专家复核的。</b>这不是 AI 帮忙做算术，而是 AI 参与产生了一条新的物理知识。</p>
+<section>
+  <h2>原本被当作零的振幅，在半共线区域不为零。</h2>
+  <p>文章讨论的是胶子散射振幅，也就是计算粒子相互作用概率的核心对象。传统课本论证认为，当一个胶子为负螺旋度、其余 n−1 个胶子为正螺旋度时，树级振幅应为零。</p>
+  <p>新结果指出，这个结论依赖“动量足够一般”的假设；在一个特殊但数学上明确的半共线动量区域，原有论证不再适用，振幅可以非零。</p>
+  <p><strong>洞见：</strong>AI 影响科学的关键不只是加速计算，而是帮助研究者重新审视“通常为真”的条件边界。</p>
+</section>
 
-  <section>
-    <h2>它推翻了一个"默认为零"的结论</h2>
-    <p>散射振幅是物理学家计算粒子如何相互作用概率的核心量。对传递强核力的胶子来说，当<strong>一个胶子取负螺旋度、其余 n−1 个取正螺旋度</strong>时，标准论证认为其树级振幅必然为零，因此这一构型长期被搁置。</p>
-    <p>新论文指出：那个论证<strong>假设了"一般化"的动量</strong>。作者找到了一个数学上自洽、精确定义的动量空间切片——<span class="kicker">半共线区（half-collinear regime）</span>，在这里旧论证失效，振幅<strong>不为零</strong>。</p>
-    <p class="insight">"零"往往只是"在通常情况下为零"。把注意力放到非典型但合法的运动学切片，能让被忽略的物理重新浮现。</p>
-  </section>
-
-  <section>
-    <h2>AI 的真正贡献：把超指数复杂的式子压成一条通式</h2>
-    <p>人类作者手工算到 <span class="num">n = 6</span>，得到极其繁复的费曼图展开（论文 Eqs. <code>29–32</code>），其复杂度随 n <strong>超指数增长</strong>。</p>
-    <p><strong>GPT‑5.2 Pro</strong> 将这些表达式大幅简化为更清爽的形式（Eqs. <code>35–38</code>），并从这些基例中<strong>识别出规律、提出对所有 n 都成立的通式</strong>——即论文核心结果 Eq. <span class="num">39</span>。</p>
-    <p class="insight">"找到一个简单公式"历来靠人的直觉与手感；这正是模式识别最擅长、也最难自动化的环节，如今被 AI 接管了一部分。</p>
-  </section>
-
-  <section>
-    <h2>它不止是猜想，还被独立证明与多重验证</h2>
-    <p>一个<strong>内部带脚手架的 GPT‑5.2 版本</strong>独立推理约 <span class="num">12 小时</span>，得出<strong>同一条公式</strong>并给出<strong>形式化证明</strong>。</p>
-    <p>该公式随后被<strong>解析验证</strong>满足 <strong>Berends-Giele 递推关系</strong>（一种由小积木逐步搭建多粒子树级振幅的标准方法），并与约束粒子变软时振幅行为的<strong>软定理（soft theorem）</strong>核对一致。</p>
-    <p class="insight">AI 给结果、人类与标准方法做交叉验证——这套"生成 + 严格复核"的闭环，正是它被同行称为"期刊级研究"的原因。</p>
-  </section>
-
-  <section>
-    <h2>方法可迁移：从胶子到引力子</h2>
-    <p>借助 GPT‑5.2，这些振幅<strong>已从胶子推广到引力子（graviton，传递引力的粒子）</strong>，更多推广也在进行中。作者来自 IAS、范德堡大学、剑桥、哈佛与 OpenAI。</p>
-    <p class="q">"毫无疑问，物理学家与大语言模型之间的对话能产生根本性的新知识。"——Nathaniel Craig 教授（UCSB）</p>
-    <p class="q">"它特别适合发挥现代 AI 工具的威力……我期待它走向一个通用的'简单公式模式识别'工具。"——Nima Arkani-Hamed 教授（IAS）</p>
-    <p class="insight">单一发现的价值次于方法的可复制性：一个能在多个领域"把复杂式子化简到看见结构"的工具，影响面远大于这一篇论文。</p>
-  </section>
-
-  <div class="takeaways">
-    <h2>最值得带走的洞见</h2>
-    <ol>
-      <li><strong>"恒为零"被改写</strong>：单负螺旋度胶子树级振幅在半共线区不为零，旧结论只在"一般动量"假设下成立。</li>
-      <li><strong>AI 的角色是"发现规律"</strong>：GPT‑5.2 Pro 把超指数复杂的 Eqs.29–32 化简并归纳出对所有 n 成立的 Eq.39，这是人类最依赖直觉的步骤。</li>
-      <li><strong>有证明、有验证</strong>：内部 GPT‑5.2 用约 12 小时独立给出形式化证明，并通过 Berends-Giele 递推与软定理双重核对。</li>
-      <li><strong>方法可迁移</strong>：同一套思路已扩展到引力子，意味着这是一种范式而非孤例。</li>
-      <li><strong>人机协作的模板</strong>：AI 生成洞见 + 人类专家严格验证，构成满足科学严谨性要求的新工作流，被同行评价为"AI 辅助科学的未来一瞥"。</li>
-    </ol>
+<section>
+  <h2>GPT-5.2 从 n≤6 的复杂公式中归纳出全 n 通式。</h2>
+  <p>人类作者先手工算出整数 n 到 n=6 的振幅，得到的是复杂的 Feynman 图展开；文章称其复杂度随 n 超指数增长。GPT-5.2 Pro 将这些低阶表达式大幅简化，并从中识别模式，提出适用于所有 n 的 Eq. (39)。</p>
+  <div class="data">
+    <span class="badge">人工基例：n≤6</span>
+    <span class="badge">目标公式：Eq. (39)</span>
+    <span class="badge">复杂度趋势：超指数增长</span>
   </div>
-</div>
+  <p><strong>洞见：</strong>这里的 AI 价值更接近“简单公式模式识别器”，能把人类难以看清的结构从计算噪声中提取出来。</p>
+</section>
+
+<section>
+  <h2>公式不是停在猜想，而是经过证明和物理检验。</h2>
+  <p>一个内部 scaffolded GPT-5.2 版本又花约 12 小时独立推理，得到同一公式并生成形式证明。随后，作者解析验证该公式满足 Berends-Giele recursion relation，并用 soft theorem 检查其极限行为。</p>
+  <div class="data">
+    <span class="badge">AI 推理时间：约 12 小时</span>
+    <span class="badge">验证一：Berends-Giele 递归</span>
+    <span class="badge">验证二：soft theorem</span>
+  </div>
+  <p><strong>洞见：</strong>这让案例从“模型提出有趣答案”上升到“模型参与可审计的科学发现流程”。</p>
+</section>
+
+<section>
+  <h2>物理意义延伸到更广泛的散射结构。</h2>
+  <p>文章称，在 GPT-5.2 帮助下，相关振幅已经从胶子扩展到引力子，并且更多推广正在进行。对理论物理来说，简洁公式常常是发现更深层结构的入口，而不是单个计算技巧的终点。</p>
+  <p class="note">外部评论者强调，这类结果可能影响高能理论物理研究，并提供一种由领域专家与语言模型共同生成、验证新知识的模板。</p>
+  <p><strong>洞见：</strong>如果这种模式成立，AI 对基础科学的影响会集中在“发现隐藏结构”和“缩短从猜想到证明的路径”。</p>
+</section>
+
+<section class="insights">
+  <h2>最值得带走的洞见</h2>
+  <ul>
+    <li>“振幅为零”的传统结论并非无条件成立，半共线动量区域提供了例外。</li>
+    <li>GPT-5.2 的关键作用是从 n≤6 的复杂表达式中发现简洁的全 n 公式。</li>
+    <li>结果经过约 12 小时 AI 推理、形式证明、递归关系验证和软定理检查，而不是只停留在直觉猜测。</li>
+    <li>这个案例显示，AI 辅助科学最有价值的方向可能是模式识别、公式压缩和可验证推理。</li>
+  </ul>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
 </body>
-</html>
 </html>

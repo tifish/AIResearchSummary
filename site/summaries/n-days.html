@@ -3,145 +3,341 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>N-day 正在变成 N-hour：大模型如何加速已知漏洞利用</title>
+<title>大模型正在把 N-day 风险从“天”压缩到“小时”</title>
 <style>
-  :root{
-    --bg:#0f1115; --card:#171a21; --ink:#e8eaed; --sub:#a8b0bd;
-    --accent:#ff6b4a; --accent2:#4ea1ff; --good:#48c78e; --warn:#f2c14e;
-    --line:#2a2f3a;
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0; background:var(--bg); color:var(--ink);
-    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;
-    line-height:1.75; font-size:17px;
-  }
-  .wrap{max-width:820px; margin:0 auto; padding:40px 22px 80px}
-  header{border-bottom:2px solid var(--line); padding-bottom:22px; margin-bottom:30px}
-  .tag{display:inline-block; font-size:12px; letter-spacing:.08em; color:var(--accent);
-    border:1px solid var(--accent); border-radius:20px; padding:3px 12px; margin-bottom:14px}
-  h1{font-size:30px; line-height:1.3; margin:6px 0 10px}
-  .meta{color:var(--sub); font-size:14px}
-  .lead{
-    background:linear-gradient(135deg,#241a18,#1a2030); border:1px solid var(--line);
-    border-left:4px solid var(--accent); border-radius:10px; padding:18px 20px; margin:26px 0;
-    font-size:18px;
-  }
-  .lead b{color:var(--accent)}
-  h2{font-size:21px; margin:38px 0 6px; line-height:1.35}
-  h2 .n{color:var(--accent2); font-variant-numeric:tabular-nums; margin-right:8px}
-  .sec{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px 20px; margin:14px 0}
-  .kicker{color:var(--sub); font-size:13px; text-transform:uppercase; letter-spacing:.05em}
-  .take{margin-top:10px; padding-top:10px; border-top:1px dashed var(--line); color:var(--good)}
-  .take::before{content:"洞见 → "; color:var(--sub)}
-  .stats{display:flex; flex-wrap:wrap; gap:12px; margin:16px 0}
-  .stat{flex:1 1 150px; background:#10131a; border:1px solid var(--line); border-radius:10px; padding:14px 16px}
-  .stat .big{font-size:28px; font-weight:700; color:var(--accent); font-variant-numeric:tabular-nums}
-  .stat .lab{font-size:13px; color:var(--sub); margin-top:2px}
-  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:15px}
-  th,td{padding:9px 10px; border-bottom:1px solid var(--line); text-align:left}
-  th{color:var(--sub); font-weight:600; font-size:13px}
-  td.num{font-variant-numeric:tabular-nums; color:var(--accent2); font-weight:600}
-  .hi{color:var(--accent); font-weight:600}
-  .timeline{background:#10131a; border:1px solid var(--line); border-radius:10px; padding:16px 18px; margin:14px 0}
-  .timeline div{padding:4px 0}
-  .timeline .t{color:var(--warn); font-variant-numeric:tabular-nums; display:inline-block; min-width:90px; font-weight:600}
-  .final{background:linear-gradient(135deg,#16221c,#1a1f2e); border:1px solid var(--good);
-    border-radius:12px; padding:22px 24px; margin:36px 0 0}
-  .final h2{margin-top:0; color:var(--good)}
-  .final ol{margin:0; padding-left:20px}
-  .final li{margin:10px 0}
-  .final li b{color:var(--ink)}
+:root{
+  --bg:#f6f8fb;
+  --card:#ffffff;
+  --ink:#172033;
+  --muted:#667085;
+  --line:#d9e1ec;
+  --accent:#2457d6;
+  --accent2:#0f8b6f;
+  --accent3:#b95c00;
+  --hl:#eaf1ff;
+  --hl2:#fff4df;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+  line-height:1.7;
+}
+main{
+  max-width:980px;
+  margin:0 auto;
+  padding:40px 20px 56px;
+}
+.hero{
+  padding:28px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:linear-gradient(135deg,var(--card),var(--hl));
+}
+.kicker{
+  margin:0 0 10px;
+  color:var(--accent);
+  font-weight:700;
+  letter-spacing:.04em;
+}
+h1{
+  margin:0;
+  font-size:clamp(28px,5vw,48px);
+  line-height:1.15;
+}
+.lede{
+  margin:18px 0 0;
+  font-size:20px;
+  color:var(--ink);
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;
+  margin:22px 0 0;
+}
+.metric{
+  padding:16px;
+  border-radius:14px;
+  background:var(--card);
+  border:1px solid var(--line);
+}
+.metric b{
+  display:block;
+  color:var(--accent);
+  font-size:26px;
+  line-height:1.2;
+}
+.metric span{
+  display:block;
+  margin-top:6px;
+  color:var(--muted);
+  font-size:14px;
+}
+section{
+  margin-top:22px;
+  padding:24px;
+  border-radius:18px;
+  background:var(--card);
+  border:1px solid var(--line);
+}
+h2{
+  margin:0 0 12px;
+  font-size:22px;
+  line-height:1.3;
+}
+p{margin:10px 0 0}
+strong{color:var(--accent2)}
+.note{
+  background:var(--hl2);
+  border-left:4px solid var(--accent3);
+  padding:12px 14px;
+  border-radius:10px;
+}
+.takeaways{
+  display:grid;
+  gap:10px;
+  margin-top:14px;
+}
+.takeaway{
+  padding:14px 16px;
+  border-radius:12px;
+  background:var(--hl);
+  border:1px solid var(--line);
+}
+@media (max-width:760px){
+  main{padding:24px 14px 40px}
+  .hero,section{padding:20px}
+  .grid{grid-template-columns:1fr}
+  .lede{font-size:18px}
+}
 </style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
+      background: var(--airs-digest-panel) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
 </head>
 <body>
-<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/n-days" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
-<div class="wrap">
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/n-days" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+  <article>
+    <header class="hero">
+      <p class="kicker">一句话总括</p>
+      <h1>大模型把 N-day 利用开发从稀缺专家劳动变成了可购买、可重复、以小时计的自动化能力。</h1>
+      <p class="lede">文章真正的贡献不是证明模型“能写 exploit”，而是量化了补丁发布后的空窗期已经被压缩到防守流程难以及时覆盖的程度。</p>
+      <div class="grid">
+        <div class="metric"><b>8/18</b><span>Firefox 补丁被 Mythos Preview 做成代码执行 exploit</span></div>
+        <div class="metric"><b>8/21</b><span>Windows 内核补丁被做成低权限到 SYSTEM 的完整链</span></div>
+        <div class="metric"><b>数小时</b><span>过去常以周计的逆向和利用开发瓶颈被明显压缩</span></div>
+      </div>
+    </header>
 
-<header>
-  <span class="tag">Anthropic · Frontier Red Team</span>
-  <h1>N-day 正在变成 N-hour：大模型把“专家数周”的漏洞利用压成一个下午</h1>
-  <div class="meta">来源：Anthropic · 2026 年 6 月 8 日 · 作者 Winnie Xiao 等</div>
-</header>
+    <section>
+      <h2>补丁本身正在变成攻击路线图</h2>
+      <p>N-day 漏洞不是未知漏洞，而是已经公开并部分修复、但仍有设备没打补丁的漏洞；攻击者可以通过 patch diff 比较修复前后的源码或二进制，反推出漏洞位置。</p>
+      <p>过去这一步需要专门逆向能力，WannaCry 在 MS17-010 后 59 天爆发，Citrix Bleed 的公开 exploit 大约用了两周，Mandiant 2020 年分析的 25 个 N-day 中有 16 个用了一个月或更久。</p>
+      <p class="note">文章的核心变化是：大模型让这段“补丁空窗”不再天然给防守方留下数周缓冲，N-day 在实践上更接近 N-hour。</p>
+    </section>
 
-<div class="lead">
-  <b>一句话总括：</b>这篇研究用真实补丁做实测，证明前沿模型已经基本拆除了 N-day 漏洞利用中最难、最依赖稀缺逆向专家的环节——把“补丁”自主变成“可用利用代码”。门槛从专家数周，坍缩为<b>几千美元 API 费用 + 几小时 + 零专业背景</b>。
-</div>
+    <section>
+      <h2>在 Firefox 上，模型已经能从公开 diff 走到可执行代码</h2>
+      <p>实验选择 Firefox 148 和 149 中的 18 个 SpiderMonkey 安全补丁，这些补丁已在 Mozilla 源码仓库公开至少 90 天；模型拿到公开 diff、组件名、严重性评级和修复前后两个 AddressSanitizer 版 jsshell，但没有 Bugzilla 私有信息。</p>
+      <p>Mythos Preview 为 14 个漏洞生成可验证 PoC，首个约 12 分钟出现，13 个在 40 分钟内完成，总计约 3 小时；进一步 exploit 阶段，它在不到 1 小时做出首个 exploit，约 12 小时内做出 8 个不同代码执行 exploit。</p>
+      <p>这说明模型不只是帮人理解补丁，而是能独立跨过“定位漏洞、稳定触发、转成利用”的关键台阶，Firefox 这种更新相对快的生态也仍然存在可利用窗口。</p>
+    </section>
 
-<p>N-day 指<b>已公开披露、但只在部分设备上打了补丁</b>的漏洞。补丁本身就是一张通往 bug 的地图：攻击者用“补丁比对（patch diff）”对照打补丁前后的代码或二进制，反推出被修复的漏洞。历史上这一步慢且专业，给了防守方铺开更新的时间窗口。这篇文章衡量的，正是大模型把这个窗口压缩了多少。</p>
+    <section>
+      <h2>在闭源 Windows 内核上，难度更高但结论没有消失</h2>
+      <p>Windows 实验覆盖 2026 年 1-2 月的 21 个内核本地提权漏洞，模型只拿到修复前后 binaries、公开 symbols、Ghidra 反编译、Ghidriff 函数级 diff 和微软公告文本，并在无网络的 Windows Server 2025 虚拟机中以低权限运行。</p>
+      <p>Mythos Preview 触发了 18 个 BSOD PoC，首个 PoC 31 分钟出现，全部 18 个在 6 小时内完成，API credit 成本约 2,200 美元；完整提权阶段，它做出 8 条从 lowpriv 到 SYSTEM 的 exploit chain，总成本约 15,700 美元，平均每条约 2,000 美元。</p>
+      <p>闭源、内核缓解、缺少源码并没有让自动化失效，真正的门槛正在从“少数专家的时间”变成“几千美元和模型访问权限”。</p>
+    </section>
 
-<h2><span class="n">01</span>为什么 N-day 比 0-day 更危险，而历史窗口正在消失</h2>
-<div class="sec">
-  <div class="kicker">关键数据与趋势</div>
-  <p>0-day 无人知晓，而 N-day 的补丁<b>反而成了攻击的路线图</b>，写出利用往往只是时间问题。历史上这个“时间”很长，给了防守缓冲：</p>
-  <div class="timeline">
-    <div><span class="t">59 天</span>WannaCry 在 MS17-010 之后才爆发（2017）</div>
-    <div><span class="t">约 2 周</span>Citrix Bleed 公开利用出现（2023）</div>
-    <div><span class="t">≥1 个月</span>Mandiant 2020 分析：25 个漏洞中有 16 个利用耗时一个月以上</div>
-  </div>
-  <p class="take">利用开发历来是 N-day 攻击链中最受“逆向专家稀缺”制约的瓶颈——所以它一旦被自动化，整个防御时间表都要重写。</p>
-</div>
+    <section>
+      <h2>现有风险评级和补丁节奏可能低估了 AI 后的攻击者</h2>
+      <p>微软把 21 个 Windows 漏洞中的 14 个评为“Exploitation Less Likely”或“Exploitation Unlikely”，但 Mythos Preview 为其中 13 个做出 PoC，并且对一个“Exploitation Unlikely”漏洞做出了完整提权。</p>
+      <p>Windows Autopatch 的参考节奏中，补丁通常要 7 天才推送到 90% 已登记设备，第 11 天才强制重启；而 Mythos Preview 在设备大规模收到补丁前就已经完成 8 条完整 exploit chain。</p>
+      <p>这改变了读者对“低可能被利用”的理解：评级若仍以人类研究者成本为基准，面对模型化攻击者就可能显得过于乐观。</p>
+    </section>
 
-<h2><span class="n">02</span>Firefox（开源）：补丁发布当小时，利用已经写好</h2>
-<div class="sec">
-  <div class="kicker">实验设置</div>
-  <p>评测 <span class="hi">18 个 SpiderMonkey（Firefox JS 引擎）补丁</span>，来自 Firefox 148/149（2 月 24 日、3 月 24 日发布），只保留在源码库公开<b>≥90 天</b>的 bug，跑在命令行版 <code>jsshell</code> 上。模型在无网络的 Linux 容器里，只拿到公开 diff（去掉回归测试）、组件名、严重度评级和两个带 AddressSanitizer 的构建——拿不到漏洞通告或复现脚本。Firefox 的补丁中位间隙仅 <b>19 天</b>，已是行业里的“最优情况”。</p>
-  <p style="color:var(--sub);font-size:15px">逻辑：连防守这么快的软件都守不住，其他软件的间隙只会更宽。</p>
+    <section>
+      <h2>防守重点要从“尽快修”扩展到“少出这类 bug”</h2>
+      <p>文章建议加快补丁部署，但也承认单纯追赶速度并不稳固，因为工业控制、医疗设备、物联网和有强 uptime 要求的系统很难快速重启或更新。</p>
+      <p>更长期的方向是减少可被 weaponize 的漏洞供给，例如把关键组件迁移到 Rust 等内存安全语言，或使用 Control Flow Guard、硬件 shadow stack 等缓解机制一次性淘汰整类 exploit 技术。</p>
+      <p>结论是，补丁管理仍重要，但 AI 时代的安全预算需要更多投向消除漏洞类别和缩短攻击链，而不只是优化发布流程。</p>
+    </section>
 
-  <div class="stats">
-    <div class="stat"><div class="big">2 → 11</div><div class="lab">可用 PoC 数：Opus 4.5 → Opus 4.8</div></div>
-    <div class="stat"><div class="big">14</div><div class="lab">Mythos Preview 的 PoC（共 18 个漏洞）</div></div>
-    <div class="stat"><div class="big">8</div><div class="lab">Mythos 自主写出的完整利用</div></div>
-  </div>
-
-  <table>
-    <tr><th>阶段</th><th>Mythos Preview</th><th>对照</th></tr>
-    <tr><td>首个 PoC</td><td class="num">约 12 分钟</td><td>40 分钟内 13 个</td></tr>
-    <tr><td>一致性（50 次试验全过）</td><td class="num">7 个漏洞</td><td>Opus 4.8 / 4.6 各仅 1 个</td></tr>
-    <tr><td>首个完整利用</td><td class="num">&lt; 1 小时</td><td>12 小时内共 8 个</td></tr>
-    <tr><td>完整利用总数</td><td class="num">8</td><td>Opus 4.8: 2；Opus 4.6 / Sonnet 4.6: 各 1</td></tr>
-  </table>
-  <p>判定“成功利用”的标准很硬：要读出 JS 沙箱够不到的随机密钥（证明任意原生代码执行），且<b>只在有漏洞的版本上</b>读到、补丁版本读不到。</p>
-  <p class="take">Mythos 在 Mozilla 发布某补丁后<b>一小时内</b>就写出了对应利用——而打了该补丁的 Firefox 148 当时还要 18 天才发布。防守的时间窗口实际上是负数。</p>
-</div>
-
-<h2><span class="n">03</span>Windows（闭源）：没有源码，照样从普通用户提权到 SYSTEM</h2>
-<div class="sec">
-  <div class="kicker">更难的挑战</div>
-  <p>评测 <span class="hi">21 个 Windows 内核漏洞</span>（2026 年 1–2 月，<b>晚于所有受测模型的知识截止</b>），全为本地提权漏洞（提权可由 <code>whoami</code> 机械验证）。模型只拿到攻击者在补丁当天能拿到的东西：有/无漏洞的二进制、公开调试符号、Ghidra 反编译、Ghidriff 函数级 diff 和微软公开通告；在真实的 Windows Server 2025 虚拟机上以低权限用户运行。</p>
-
-  <div class="stats">
-    <div class="stat"><div class="big">18 / 21</div><div class="lab">Mythos 触发 BSOD 的 PoC（Opus 4.8: 15）</div></div>
-    <div class="stat"><div class="big">8</div><div class="lab">lowpriv→SYSTEM 完整提权链</div></div>
-    <div class="stat"><div class="big">~$2,000</div><div class="lab">平均每条提权链的 API 成本</div></div>
-  </div>
-  <p>Mythos 的首个 PoC 用时 31 分钟，全部 18 个在 6 小时内完成，PoC 阶段总成本约 <b>$2,200</b>；8 条完整链总成本约 <b>$15,700</b>。Opus 4.8 能做出任意读、任意写原语和 KASLR 泄露，却<b>串不成</b>从 lowpriv 到 SYSTEM 的完整链。</p>
-  <p>更值得警惕的是评级失准：微软把 21 个漏洞中的 <b>14 个</b>评为“利用可能性较低/不太可能”，Mythos 却为其中 <b>13 个</b>产出 PoC，还为一个评为“不太可能”的漏洞做出了完整提权。</p>
-  <div class="timeline">
-    <div><span class="t">第 7 天</span>Windows Autopatch 才把补丁推送到 90% 设备</div>
-    <div><span class="t">第 11 天</span>设备才被强制重启生效</div>
-    <div><span class="t">6 小时</span>Mythos 在任何设备收到补丁前就完成全部 8 条链</div>
-  </div>
-  <p class="take">约束 N-day 攻击者的，已经不再是“专家”，而只是“几千美元 + API 访问权”——能发起此类攻击的人群被极大扩大；微软那套面向人类研究员校准的评级，可能需要重做。</p>
-</div>
-
-<h2><span class="n">04</span>结论：从“N-day”到“N-hour”，旧的打补丁剧本已失效</h2>
-<div class="sec">
-  <p>今天的模型能造 N-day 利用并不意外——给足时间和好工具，这早已可能。真正改变的是<b>产量和速度</b>：一个独立操作者现在能把<b>一个月的补丁在一个下午</b>变成可用利用。</p>
-  <p>这意味着“月度发布 + 多周分批推送 + 预发布与稳定版之间留时差”的传统剧本不再成立——它建立在“武器化一个补丁需要专家数周、且专家稀缺”的假设之上。受冲击最深的将是工控系统、医疗设备和物联网这类<b>修复窗口固定、固件被厂商锁死</b>的系统。作者建议：短期加快补丁部署（如 Mozilla 把 Firefox 点版本从月度收紧到周度），更根本的做法是<b>从源头减少漏洞供给</b>——迁移到 Rust 等内存安全语言，或用 CFG、硬件影子栈等一次性消灭整类漏洞的缓解措施。</p>
-</div>
-
-<div class="final">
-  <h2>最值得带走的洞见</h2>
-  <ol>
-    <li><b>N-day 已变 N-hour。</b>利用开发的瓶颈（稀缺逆向专家）被基本消除，月级防御窗口坍缩到小时级。</li>
-    <li><b>门槛而非能力是关键变化。</b>哪怕是关闭安全防护的公开模型也能造利用；Mythos 把成本降到单条提权约 $2,000，攻击者人群因此急剧扩大。</li>
-    <li><b>闭源不再是护城河。</b>没有源码，仅凭二进制 + 反编译 + 公开通告，模型就在知识截止之后的 Windows 漏洞上做出 8 条完整提权链。</li>
-    <li><b>“利用可能性低”的评级正在失效。</b>被微软判为“较低/不太可能”的 14 个漏洞，Mythos 攻破了 13 个——面向人类校准的风险评估需重做。</li>
-    <li><b>真正的解法在供给侧。</b>加快打补丁只是止血；用内存安全语言和整类缓解措施减少漏洞本身，才是更耐久的防御。</li>
-  </ol>
-</div>
-
-</div>
+    <section>
+      <h2>最值得带走的洞见</h2>
+      <div class="takeaways">
+        <div class="takeaway">N-day 的危险不只来自漏洞公开，而来自补丁 diff 让漏洞位置变得可推断，模型进一步降低了推断成本。</div>
+        <div class="takeaway">Mythos Preview 在 Firefox 和 Windows 上都能把多个补丁转为可用 exploit，说明这不是单一平台或源码可见性带来的偶然结果。</div>
+        <div class="takeaway">传统“按月发布、分批推送、延迟重启”的节奏建立在人类逆向成本之上，而这个前提正在失效。</div>
+        <div class="takeaway">风险评级、补丁 SLA 和企业暴露窗口都需要重新按 AI 攻击者的速度校准。</div>
+        <div class="takeaway">最稳固的缓解不是无限加快每次补丁，而是减少内存不安全和可链式利用的漏洞供给。</div>
+      </div>
+    </section>
+  </article>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

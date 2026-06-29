@@ -3,92 +3,344 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Composer 1.5：把编程 RL 再放大 20 倍</title>
+<title>Composer 1.5 中文总结</title>
 <style>
-  :root{
-    --bg:#0f1116; --card:#181b22; --ink:#e8eaed; --muted:#a3a8b3;
-    --accent:#7aa2ff; --accent2:#6ee7b7; --warn:#ffd479; --line:#2a2e38;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);
-    font-family:-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
-    line-height:1.75;}
-  .wrap{max-width:780px;margin:0 auto;padding:40px 22px 72px;}
-  .tag{display:inline-block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;
-    color:var(--accent2);border:1px solid var(--line);border-radius:999px;padding:3px 12px;margin-bottom:18px;}
-  h1{font-size:30px;line-height:1.3;margin:6px 0 14px;}
-  .meta{color:var(--muted);font-size:14px;margin-bottom:26px;}
-  .lead{background:linear-gradient(135deg,#1d2540,#172033);border:1px solid var(--line);
-    border-left:4px solid var(--accent);border-radius:12px;padding:18px 20px;font-size:17px;margin-bottom:32px;}
-  .lead b{color:var(--accent);}
-  section{background:var(--card);border:1px solid var(--line);border-radius:12px;
-    padding:20px 22px;margin-bottom:20px;}
-  h2{font-size:19px;margin:0 0 10px;color:#fff;}
-  .data{display:inline-block;background:#22273300;color:var(--warn);font-weight:700;}
-  .stat{font-size:15px;color:var(--muted);margin:8px 0;}
-  .stat strong{color:var(--warn);}
-  .insight{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);
-    color:var(--accent2);font-size:15px;}
-  .insight::before{content:"洞见 · ";color:var(--muted);}
-  .takeaways{background:linear-gradient(135deg,#102219,#0f1a22);border:1px solid #244b3a;}
-  .takeaways h2{color:var(--accent2);}
-  ol{margin:10px 0 0;padding-left:20px;}
-  ol li{margin:10px 0;}
-  .big{font-size:34px;font-weight:800;color:var(--accent);vertical-align:-2px;}
-  a{color:var(--accent);}
+:root{
+  --bg:#f6f7f9;
+  --card:#ffffff;
+  --ink:#1f2933;
+  --muted:#667085;
+  --line:#d9dee7;
+  --accent:#2563eb;
+  --accent2:#0f766e;
+  --accent3:#9333ea;
+  --hl:#eaf2ff;
+  --hl2:#eefaf6;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+  line-height:1.72;
+}
+main{
+  max-width:920px;
+  margin:0 auto;
+  padding:36px 18px 48px;
+}
+.header{
+  background:linear-gradient(135deg,var(--hl),var(--hl2));
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:28px;
+  margin-bottom:18px;
+}
+.kicker{
+  color:var(--accent2);
+  font-size:14px;
+  font-weight:700;
+  margin:0 0 8px;
+}
+h1{
+  margin:0;
+  font-size:30px;
+  line-height:1.25;
+  letter-spacing:0;
+}
+.lead{
+  margin:16px 0 0;
+  font-size:18px;
+  color:var(--ink);
+}
+.meta{
+  margin-top:14px;
+  color:var(--muted);
+  font-size:14px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin:18px 0;
+}
+.stat{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:16px;
+}
+.stat strong{
+  display:block;
+  font-size:24px;
+  color:var(--accent);
+  line-height:1.2;
+}
+.stat span{
+  display:block;
+  margin-top:6px;
+  color:var(--muted);
+  font-size:14px;
+}
+section{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:22px;
+  margin-top:14px;
+}
+h2{
+  margin:0 0 10px;
+  font-size:20px;
+  line-height:1.35;
+}
+p{margin:0 0 10px}
+p:last-child{margin-bottom:0}
+.mark{
+  background:var(--hl);
+  color:var(--accent);
+  border-radius:6px;
+  padding:2px 6px;
+  font-weight:700;
+}
+.insights{
+  margin:0;
+  padding-left:20px;
+}
+.insights li{margin:8px 0}
+.note{
+  color:var(--muted);
+  font-size:14px;
+}
+@media (max-width:720px){
+  main{padding:24px 14px 36px}
+  .header{padding:22px}
+  h1{font-size:25px}
+  .lead{font-size:16px}
+  .grid{grid-template-columns:1fr}
+}
 </style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
+      background: var(--airs-digest-panel) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
 </head>
 <body>
-<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://cursor.com/blog/composer-1-5" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
-<div class="wrap">
-  <span class="tag">Research · Cursor</span>
-  <h1>Composer 1.5：在同一个底座上，把编程强化学习再放大 20 倍</h1>
-  <div class="meta">来源：Cursor Team ｜ 日期：2026-02-09 ｜ <a href="https://cursor.com/blog/composer-1-5">原文</a></div>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/composer-1-5" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+  <div class="header">
+    <p class="kicker">一句话总括</p>
+    <h1>Composer 1.5 的真正贡献，是证明面向代码代理的强化学习后训练还能继续放大，并能在速度、推理深度和长任务连续性之间取得实用平衡。</h1>
+    <p class="lead">这不是一篇公布完整排行榜分数的评测论文，而是一篇模型发布说明：Cursor 重点强调训练规模、推理机制和长上下文任务处理方式。</p>
+    <p class="meta">来源：Cursor｜日期：2026 年 2 月 9 日｜分类：Research</p>
+  </div>
 
-  <div class="lead">
-    <b>一句话总括：</b>Composer 1.5 的真正贡献不是“又一个更强的模型”，而是用实证说明——在不换预训练底座的前提下，仅靠把<b>强化学习规模扩大 20 倍</b>，编程能力就能持续、可预测地提升；并通过“思考型”推理与“自我总结”两项设计，让模型在长任务中既快又准。
+  <div class="grid">
+    <div class="stat"><strong>20x</strong><span>强化学习相对 Composer 1 进一步扩展的幅度</span></div>
+    <div class="stat"><strong>&gt; 预训练</strong><span>Composer 1.5 后训练计算量超过基础模型预训练计算量</span></div>
+    <div class="stat"><strong>2 次</strong><span>Terminal-Bench 2.0 每个 model-agent pair 运行 2 次并取平均</span></div>
   </div>
 
   <section>
-    <h2>训练范式在转移：后训练算力首次超过预训练</h2>
-    <p class="stat">Composer 1.5 与 Composer 1 共用同一个预训练模型，区别只在于 RL 规模 —— <strong>扩大了 20 倍</strong>。更反直觉的是，它<strong>后训练阶段消耗的算力，甚至超过了预训练基础模型所用的算力</strong>。</p>
-    <p class="insight">当“练完之后再练”的算力比“练出底座”还多时，能力增长的主战场正从预训练转向强化学习——这意味着编程模型的提升可以靠 RL 扩展持续买到。</p>
+    <h2>核心进展：同一基础模型上继续扩大 RL，难题收益最明显</h2>
+    <p>Cursor 称 Composer 1.5 使用与 Composer 1 相同的预训练模型，但把强化学习后训练继续放大到 <span class="mark">20 倍</span>，并且后训练计算量超过了基础模型的预训练计算量。</p>
+    <p>文章说内部真实世界编码问题 benchmark 显示，模型很快超过 Composer 1，并且随着训练继续提升；提升最明显的部分是挑战性任务。这改变了一个常见直觉：代码模型能力并不只取决于预训练规模，面向任务的 RL 后训练也可能成为主要增益来源。</p>
   </section>
 
   <section>
-    <h2>越投入越强，且难题提升最大</h2>
-    <p class="stat">在 Cursor 内部的真实编程问题基准上，模型<strong>很快超过 Composer 1</strong> 并随规模继续爬升；提升<strong>在困难任务上最为显著</strong>。</p>
-    <p class="insight">“可预测的智能增长”是关键词——它把能力提升从偶然调参变成了可规划的工程投入，难题收益更大也说明扩展打到了真正有价值的部分。</p>
+    <h2>交互体验：容易的问题少想，困难的问题多想</h2>
+    <p>Composer 1.5 被描述为“thinking model”：回答时会生成思考 token，用来理解用户代码库并规划下一步。Cursor 同时强调，日常编码工具不能只追求深度推理，还必须保持交互速度。</p>
+    <p>因此它被训练成在简单问题上用最少思考快速回答，在困难问题上继续推理直到找到满意方案。这个设计的意义在于，AI 编程工具的价值不只是单次答案质量，还包括是否能以符合开发节奏的方式分配计算。</p>
   </section>
 
   <section>
-    <h2>思考型模型：简单问题秒回，难题想到满意为止</h2>
-    <p class="stat">Composer 1.5 会生成“思考 token”来理解代码库、规划下一步。它被训练成<strong>简单问题用最少思考快速响应</strong>，<strong>困难问题则持续思考直到找到满意答案</strong>。</p>
-    <p class="insight">把“该想多久”交给模型自己按难度分配，是兼顾交互速度与深度推理的实用折中——快不再以牺牲难题质量为代价。</p>
+    <h2>长任务能力：自总结让模型在上下文耗尽后继续推进</h2>
+    <p>Composer 1.5 加入了自总结能力：当可用上下文耗尽时，模型会生成有用摘要，让后续探索可以继续。Cursor 称这一能力也被纳入 RL 训练，并且在困难样例中可能递归触发多次。</p>
+    <p>文章的关键结论是，自总结让模型在上下文长度变化时保持原有准确率。对读者来说，这说明长任务中的瓶颈不只是上下文窗口大小，还包括模型能否把已探索的信息压缩成可继续执行的工作状态。</p>
   </section>
 
   <section>
-    <h2>自我总结：上下文用完也不放弃探索</h2>
-    <p class="stat">面对长任务，模型能在上下文耗尽时<strong>自我总结</strong>，继续寻找解法。这一能力作为 RL 的一部分被训练进去（训练中要求它在上下文用尽时产出有用摘要），困难样本上<strong>可递归触发多次</strong>，从而让<strong>准确率随上下文长度变化基本保持不变</strong>。</p>
-    <p class="insight">真正长跑的智能体不靠无限上下文，而靠学会压缩与接力——把记忆管理变成可训练的能力，是长任务可靠性的关键工程解。</p>
+    <h2>评估信息：有 benchmark 方法，但没有公开具体分数</h2>
+    <p>文章提到内部真实世界编码问题 benchmark，也说明 Terminal-Bench 2.0 的评估设置：Cursor 分数使用官方 Harbor evaluation framework 和默认 benchmark 设置，每个 model-agent pair 运行 <span class="mark">2 次</span> 后取平均。</p>
+    <p>不过正文没有给出 Composer 1.5 的具体分数或完整对比表。合理读法是：这篇文章能支持“Cursor 认为 RL 扩展带来持续提升”的方向性判断，但不能单靠正文验证它相对其他模型的精确排名。</p>
   </section>
 
   <section>
-    <h2>评测方法透明：Terminal-Bench 2.0</h2>
-    <p class="stat">评测使用 Laude Institute 维护的 <strong>Terminal-Bench 2.0</strong>；Cursor 用官方 Harbor 框架的默认设置、<strong>每个模型-智能体对运行 2 次取平均</strong>；对其它模型则取官方榜单分与自有基础设施运行分中的较大值。</p>
-    <p class="insight">公开 harness 与取数规则，让“更强”这一说法更可核查；但 2 次取平均、对手取 max 的口径也提醒读者带着一点保留去看对比结果。</p>
+    <h2>结论：Composer 1.5 把 AI 编程模型推向更像开发代理的形态</h2>
+    <p>Composer 1.5 的重点不是单一能力点，而是组合能力：更大规模的 RL、可变深度思考、面向长任务的自总结，以及面向终端任务的评估流程。</p>
+    <p>这给 AI 编程工具的实践启示是，未来竞争可能越来越围绕“能否持续处理真实代码库任务”展开，而不仅是短提示下的代码补全或问答。</p>
   </section>
 
-  <section class="takeaways">
+  <section>
     <h2>最值得带走的洞见</h2>
-    <ol>
-      <li><span class="big">20×</span> 同一预训练底座 + RL 放大 20 倍 = 持续且可预测的编程能力提升，证明编程 RL 可以一直扩展。</li>
-      <li>后训练算力超过预训练，标志着能力增长的重心正从预训练转向强化学习。</li>
-      <li>“按难度分配思考量”让模型在交互速度与深度推理之间自洽，不必二选一。</li>
-      <li>自我总结把上下文管理变成可训练能力，使准确率在长任务中保持稳定。</li>
-      <li>Composer 1.5 定位日常交互式编程，是工程实用主义胜过单纯刷分的一次落地。</li>
-    </ol>
+    <ul class="insights">
+      <li>强化学习后训练在代码代理场景中仍有明显扩展空间，Composer 1.5 的核心信号是 20x RL 带来的持续提升。</li>
+      <li>“思考 token”被用于在代码库理解和行动规划之间建立中间步骤，说明推理过程本身已成为产品能力的一部分。</li>
+      <li>自总结把长任务从“上下文窗口问题”转化为“状态压缩和接续执行问题”，这对真实工程任务尤其重要。</li>
+      <li>文章提供了评估框架信息，但没有披露具体分数；读者应把它视为模型设计和训练方向说明，而不是完整 benchmark 证据。</li>
+      <li>Composer 1.5 的产品定位是日常交互可用：简单任务快速响应，困难任务投入更多推理。</li>
+    </ul>
+    <p class="note">注：正文出现重复抓取内容，以上总结按非重复正文提炼。</p>
   </section>
-</div>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

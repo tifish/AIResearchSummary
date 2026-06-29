@@ -3,129 +3,349 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>让 Claude 成为化学家：NMR 预测与结构解析评测</title>
+<title>Making Claude a chemist 中文总结</title>
 <style>
-  :root{
-    --ink:#1a1a2e; --muted:#55607a; --bg:#f6f7fb; --card:#ffffff;
-    --accent:#6c4cf1; --accent2:#0a8f6e; --warn:#c0392b; --line:#e6e8f0;
-    --hi:#fff6d6;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);
-    font-family:-apple-system,"Segoe UI","Microsoft YaHei",Roboto,Helvetica,Arial,sans-serif;
-    line-height:1.75;font-size:17px}
-  .wrap{max-width:820px;margin:0 auto;padding:32px 20px 64px}
-  header{background:linear-gradient(135deg,#6c4cf1,#0a8f6e);color:#fff;
-    border-radius:18px;padding:30px 28px;box-shadow:0 12px 30px rgba(76,60,150,.25)}
-  header .kicker{font-size:13px;letter-spacing:.12em;text-transform:uppercase;opacity:.9}
-  header h1{margin:.3em 0 .35em;font-size:28px;line-height:1.3}
-  header .meta{font-size:13px;opacity:.92}
-  .lede{background:var(--card);border-left:5px solid var(--accent);
-    margin:22px 0;padding:18px 20px;border-radius:10px;font-size:18px;
-    box-shadow:0 4px 14px rgba(20,30,70,.06)}
-  .lede b{color:var(--accent)}
-  section{background:var(--card);border:1px solid var(--line);border-radius:14px;
-    padding:20px 22px;margin:18px 0;box-shadow:0 4px 14px rgba(20,30,70,.04)}
-  h2{font-size:20px;margin:.1em 0 .6em;color:var(--ink);
-    border-bottom:2px solid var(--line);padding-bottom:8px}
-  h2 .n{display:inline-block;min-width:26px;height:26px;line-height:26px;text-align:center;
-    background:var(--accent);color:#fff;border-radius:7px;font-size:14px;margin-right:8px}
-  .data{background:var(--hi);border-radius:8px;padding:2px 7px;font-weight:700;color:#7a5b00}
-  .take{margin-top:12px;padding:12px 14px;background:#f1f7f4;border-left:4px solid var(--accent2);
-    border-radius:8px;color:#0a5a45;font-weight:600}
-  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:15px}
-  th,td{border:1px solid var(--line);padding:8px 10px;text-align:center}
-  th{background:#efeefb;color:#3b2f7a}
-  td.l{text-align:left}
-  .best{background:#eafaf2;font-weight:700;color:#0a6f54}
-  .insights{background:linear-gradient(135deg,#1a1a2e,#2b2350);color:#fff;border:none}
-  .insights h2{color:#fff;border-color:rgba(255,255,255,.2)}
-  .insights ol{margin:0;padding-left:22px}
-  .insights li{margin:10px 0}
-  .insights b{color:#ffd36b}
-  .warnbox{border-left-color:var(--warn)}
-  .warnbox h2 .n{background:var(--warn)}
-  footer{color:var(--muted);font-size:13px;text-align:center;margin-top:26px}
-  .muted{color:var(--muted);font-size:14px}
+:root {
+  --bg: #f6f7f4;
+  --card: #ffffff;
+  --ink: #1f2528;
+  --muted: #667075;
+  --line: #dfe5df;
+  --accent: #0f766e;
+  --accent2: #7c3aed;
+  --accent3: #b45309;
+  --hl: #e6f5f1;
+  --hl2: #fff3d6;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.72;
+}
+main {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 40px 18px 56px;
+}
+.hero {
+  background: linear-gradient(135deg, var(--hl), var(--card));
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 28px;
+}
+.kicker {
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: .04em;
+  font-size: 14px;
+}
+h1 {
+  margin: 8px 0 14px;
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.18;
+}
+.lead {
+  font-size: 20px;
+  color: var(--ink);
+  margin: 0;
+}
+.meta {
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 22px 0;
+}
+.stat {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px;
+}
+.num {
+  display: block;
+  color: var(--accent2);
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+.label {
+  color: var(--muted);
+  font-size: 14px;
+}
+section {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 24px;
+  margin-top: 18px;
+}
+h2 {
+  margin: 0 0 10px;
+  font-size: 23px;
+  line-height: 1.3;
+}
+p { margin: 0 0 12px; }
+.note {
+  background: var(--hl2);
+  border-left: 4px solid var(--accent3);
+  padding: 12px 14px;
+  border-radius: 10px;
+}
+.takeaways {
+  display: grid;
+  gap: 10px;
+  padding: 0;
+  margin: 14px 0 0;
+  list-style: none;
+}
+.takeaways li {
+  padding: 13px 15px;
+  background: var(--hl);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+@media (max-width: 760px) {
+  main { padding: 24px 14px 40px; }
+  .hero, section { padding: 20px; border-radius: 14px; }
+  .grid { grid-template-columns: 1fr; }
+  .lead { font-size: 18px; }
+}
 </style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
+      background: var(--airs-digest-panel) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
 </head>
 <body>
-<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/making-claude-a-chemist" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
-<div class="wrap">
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/making-claude-a-chemist" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+  <article>
+    <header class="hero">
+      <div class="kicker">一句话总括</div>
+      <h1>Claude 开始能做化学家每天最耗时的“翻译活”</h1>
+      <p class="lead">这篇文章的真正贡献不是宣称 AI 已经会发明化学，而是用 NMR 谱图这个可验证任务证明：通用模型已经能在部分日常分析工作中接近或超过专用软件，并能把谱图、分子式和结构推理连起来。</p>
+      <div class="meta">Anthropic Research · 2026 年 6 月 5 日 · 主题：AI for Science / 化学</div>
+    </header>
 
-<header>
-  <div class="kicker">Anthropic · Science · 2026-06-05</div>
-  <h1>让 Claude 成为化学家：当通用大模型对上专业 NMR 软件</h1>
-  <div class="meta">首篇白皮书 · Opus 4.7 / 4.6 与 Sonnet 4.6 对照 ChemDraw、MestReNova</div>
-</header>
+    <div class="grid">
+      <div class="stat"><span class="num">20</span><span class="label">个正向 NMR 预测化合物，来自训练截止后的预印本</span></div>
+      <div class="stat"><span class="num">±0.079 ppm</span><span class="label">Opus 4.7 在氢谱位置预测上的平均误差</span></div>
+      <div class="stat"><span class="num">15</span><span class="label">个反向结构解析问题，用分子式和 1D NMR 测试</span></div>
+    </div>
 
-<div class="lede">
-  一句话总括：<b>一个没有任何化学专门微调的通用模型（Opus 4.7），在常规核磁共振（NMR）谱图预测上已平均追平甚至超过用了几十年的专业软件，并且能做软件做不到的事——仅凭一维谱图和分子式反推出分子结构。</b>这把“读懂分子”的门槛，从需要专业训练和付费软件，降到了“把数据贴进对话框”。
-</div>
+    <section>
+      <h2>化学家的瓶颈是表示之间的转换</h2>
+      <p>同一个分子会以手绘结构、仪器读数、数据库字符串、专利命名和论文图示等形式出现，化学家必须在这些表示之间来回切换。文章指出，CAS 已收录超过 2.9 亿种公开物质，并且每天新增约 1.5 万种，这让人工检索和核对越来越难扩展。</p>
+      <p>这改变了对 AI 影响的理解：化学 AI 的短期价值不一定是自动发现新药，而是先减轻研究者在结构识别、谱图核对和文献整合上的重复劳动。</p>
+    </section>
 
-<section>
-  <h2><span class="n">1</span>为什么这件事重要</h2>
-  <p>化学家的日常是在白板手绘、仪器读数、数据库查询语法、专利论文记号之间反复“翻译”同一个分子。认错分子代价极高：<span class="data">葡萄糖与果糖</span>同一化学式却走完全不同的代谢路径；把分子翻成镜像，镇静剂就可能变成致畸剂——<span class="data">沙利度胺事件波及逾 1 万名儿童</span>。而翻译工作根本跟不上规模：CAS 登记的物质已超 <span class="data">2.9 亿种</span>，每天还新增约 <span class="data">15,000 种</span>。</p>
-  <div class="take">结论：AI 的价值不在“取代判断”，而在承接这种海量的翻译、回忆与整合负担——多模态、可显式推理的前沿模型，让它第一次真正可行。</div>
-</section>
+    <section>
+      <h2>Opus 4.7 在 1D NMR 正向预测上达到专用软件水平</h2>
+      <p>评测比较了 Claude Opus 4.7、Opus 4.6、Sonnet 4.6、ChemDraw 和 MestReNova。数据集包含 20 个化合物、4 类结构骨架，每类 5 个，并使用训练截止后发布的 ChemRxiv 预印本，目的是降低模型背过答案的可能性。</p>
+      <p>在氢谱预测中，Opus 4.7 平均误差为 ±0.079 ppm，明显小于化学家常用的 ±0.20 ppm 容许窗口；在碳谱中，Opus 4.7 与 MestReNova 接近，误差分别为 ±1.37 和 ±1.48 ppm。结论是，通用大模型在常规谱图预测上已经不只是“能解释文字”，而是能参与化学数据判断。</p>
+    </section>
 
-<section>
-  <h2><span class="n">2</span>实验怎么设计的：避免“出题给自己人”</h2>
-  <p>测试化合物全部取自<span class="data">模型训练截止之后</span>发表的 ChemRxiv 预印本，取每篇论文首个被完整表征的新分子，以规避选择偏差。正向预测用 <span class="data">20 个化合物</span>（4 类骨架、每类 5 个，各代表一类 NMR 难点）；逆向解析用 <span class="data">15 个</span>。每个 Claude 模型对每个化合物查询 3 次取平均，确定性的 ChemDraw / MestReNova 只跑一次。“算对”的窗口定为氢 ±0.20 ppm、碳 ±1.0 ppm。</p>
-  <div class="take">结论：用训练后数据 + 真实预印本，这套设计让“追平专业软件”的说法更可信，而非数据泄漏的假象。</div>
-</section>
+    <section>
+      <h2>模型还能处理谱峰形状和耦合间距</h2>
+      <p>NMR 不只看峰的位置，还看峰的分裂形状和峰间距，这些信息会影响结构判断。文章称，Opus 4.7 匹配实验分裂模式的频率高于其他工具，而三个 Claude 模型约 80% 的子峰间距预测落在 0.5 Hz 内，相比之下 ChemDraw 和 MestReNova 只有 26% 至 35%。</p>
+      <p>这说明模型的优势可能不只是数值拟合，而是能利用上下文和化学推理处理传统规则软件较难覆盖的局部结构信息。</p>
+    </section>
 
-<section>
-  <h2><span class="n">3</span>正向预测：峰位置上已平起平坐</h2>
-  <p>在氢谱上，Opus 4.7 平均误差仅 <span class="data">±0.079 ppm</span>，不到容差窗口的一半，落点命中率最高；碳谱上 Opus 4.7（±1.37 ppm）与 MestReNova（±1.48 ppm）基本打平。Opus 4.6 居中，Sonnet 4.6 最弱——差距在一个出了名难的氯哒嗪 NH 质子上最明显：真值在 6.8–7.9 ppm，Opus 4.7 偏低但稳定，Sonnet 4.6 却给到 10–13，完全跑偏。</p>
-  <table>
-    <tr><th>工具</th><th>氢平均误差</th><th>碳平均误差</th></tr>
-    <tr class="best"><td class="l">Opus 4.7</td><td>±0.079 ppm</td><td>±1.37 ppm</td></tr>
-    <tr><td class="l">MestReNova</td><td>—</td><td>±1.48 ppm</td></tr>
-    <tr><td class="l">Opus 4.6 / Sonnet 4.6</td><td colspan="2">依次走弱，Sonnet 最差</td></tr>
-  </table>
-  <div class="take">结论：在“峰落在哪里”这件核心事上，通用模型已不输专业软件。</div>
-</section>
+    <section>
+      <h2>反向结构解析是更有意义的突破</h2>
+      <p>正向预测是从结构推谱图，专用软件已经能做；更难的是从实验谱图反推结构。研究给 Opus 4.7 提供精确分子式、氢谱和碳谱，让它在 15 个问题中提出最多 3 个候选结构。</p>
+      <p>结果是，8 个较简单目标在每次尝试中都被正确恢复；7 个更复杂目标在加入起始原料提示后，4 个三次全对，其余也达到三次中两次正确。这改变了任务边界：过去通常需要 2D NMR、专业训练和授权软件的解析过程，现在部分 1D 峰表问题可以直接进入对话式工作流。</p>
+    </section>
 
-<section>
-  <h2><span class="n">4</span>峰形与裂分：Claude 反而拉开了差距</h2>
-  <p>峰的形状和子峰间距同样携带结构信息。三款 Claude 模型预测子峰间距误差在<span class="data">半赫兹（0.5 Hz）以内的比例约 80%</span>，而 ChemDraw 与 MestReNova 仅 <span class="data">26%–35%</span>。Opus 4.7 命中实验报告裂分模式的次数也多于任何其他工具，且三次重复跑之间的波动，比它领先次优工具的差距还小。</p>
-  <div class="take">结论：在化学家“顺带要读”的峰形细节上，模型不只是追平，而是明显占优且稳定。</div>
-</section>
+    <section>
+      <h2>结果有价值，但还不能泛化到全部化学</h2>
+      <p>文章主动承认评测规模很小：正向任务只有 20 个化合物，反向任务只有 15 个问题，每个结构家族只覆盖一类失败模式。复杂反向目标如果没有起始原料提示，模型可能会在推理中打转而不提交最终结构。</p>
+      <p class="note">未覆盖范围包括 2D NMR、立体化学、复杂天然产物，以及甲醇-d4、苯-d6、丙酮-d6 等溶剂；慢交换 NH 杂芳环也只通过氯哒嗪类样本测试。最稳妥的解读是：结果具有方向性，但还不是大规模基准的最终结论。</p>
+    </section>
 
-<section>
-  <h2><span class="n">5</span>逆向解析：做软件留给人手工的活</h2>
-  <p>更难的是反过来——从谱图推结构，这是现有 1D 工具留给化学家自己的任务。给 Opus 4.7 提供精确分子式（来自高分辨质谱）和氢、碳谱，要它给出最多三个排名候选。结果：<span class="data">8 个较简单结构（单环/双片段）每次尝试都正确还原</span>；<span class="data">7 个较难结构（稠环、螺环），在追加“起始原料”提示后，4 个三次全对、其余 3 个三次中对两次</span>。传统结构解析软件需要二维谱、专门训练和付费授权，而 Claude 用的是化学家随手能粘进对话框的同一份质谱和一维峰表，零配置。</p>
-  <div class="take">结论：这让“一维谱反推结构”从专业软件专属，变成对话框里就能做的事——真正改变了可及性。</div>
-</section>
+    <section>
+      <h2>Anthropic 的路线是把 Claude 做成化学工作流助手</h2>
+      <p>后续重点包括读取和渲染化学结构、合成路线推理、反应机理解释，以及从论文方法、补充材料和专利中抽取关键化学信息。这些任务成熟度不同，谱图分析已经能被量化评测，而逆合成规划仍在明确边界。</p>
+      <p>最终洞见是，Claude 最现实的角色不是替代化学家，而是在可审计的前提下帮助他们更快完成转换、回忆、核对和整合。</p>
+    </section>
 
-<section class="warnbox">
-  <h2><span class="n">6</span>别过度解读：作者自己划的边界</h2>
-  <p>样本量小（正向 20、逆向 15，每类骨架只代表一类失败模式），结论应视为<b>指示性而非精确</b>。最密集的逆向目标若不给起始原料，模型会反复推理而不收敛——这正是 7 道难题都附带起始原料的原因。溶剂只覆盖 DMSO-d₆、CDCl₃、D₂O；二维谱（COSY、HSQC、HMBC）与立体化学按设计排除，故复杂天然产物未评测。慢交换 NH 杂芳环也仅用氯哒嗪一类代表。</p>
-  <div class="take">结论：这是“能打”的早期证据，不是“已胜出”的定论；理想验证需数百化合物、20–30 类骨架、每类至少 15 个。</div>
-</section>
-
-<section>
-  <h2><span class="n">7</span>下一步盯住哪些瓶颈</h2>
-  <p>Anthropic 把后续重点放在最拖慢化学家的环节：<b>读取与渲染化学结构</b>（图、专利、手绘 ↔ 机器可读 ↔ 系统命名）、<b>反应与合成推理</b>（路线、选择性、副产物）、<b>机理</b>（电子箭头、中间体、过渡态）、<b>文献理解</b>（同一分子的多种画法/命名/缩写/编号）。这些成熟度不一——光谱分析已可基准测试，逆合成规划还在界定阶段。</p>
-  <div class="take">结论：目标不是包打天下，而是让化学家清楚知道“哪里能省时间、哪里仍得靠自己的判断”。</div>
-</section>
-
-<section class="insights">
-  <h2>最值得带走的洞见</h2>
-  <ol>
-    <li><b>通用打平专用</b>：无化学微调的 Opus 4.7，氢谱误差 ±0.079 ppm、碳谱与 MestReNova 持平——通用模型已能与几十年历史的专业软件正面对标。</li>
-    <li><b>真正的新能力在逆向</b>：仅凭一维谱 + 分子式反推结构，简单结构 8/8 全中——这是专业 1D 软件交给人工、Claude 却零配置完成的事。</li>
-    <li><b>峰形上反超而非追平</b>：子峰间距半赫兹内命中率 ~80% vs 软件 26–35%，且跨次重复更稳定。</li>
-    <li><b>方法学上的诚实</b>：用训练截止后的预印本取数、显式承认小样本与“给提示才收敛”，让结论可信也可被审计。</li>
-    <li><b>定位是“助手”不是“替代”</b>：价值在承接翻译、回忆、整合的日常负担，配合而非取代化学家的判断——这才是 AI 进入化学的现实姿态。</li>
-  </ol>
-</section>
-
-<footer>
-  来源：Anthropic Research · “Making Claude a chemist”（2026-06-05）· 本页为中文总结，数据均引自原文白皮书。
-</footer>
-
-</div>
+    <section>
+      <h2>最值得带走的洞见</h2>
+      <ul class="takeaways">
+        <li>AI 在化学中的短期落点，是处理高频、耗时、可验证的分析任务，而不是直接跳到“自动科研”。</li>
+        <li>Opus 4.7 在这组 NMR 正向预测中已经能与 ChemDraw、MestReNova 竞争，氢谱表现尤其突出。</li>
+        <li>反向结构解析展示了更大的工作流价值：模型能从 1D 谱表和分子式提出结构候选，降低初步解析门槛。</li>
+        <li>样本量、骨架覆盖、溶剂范围、2D NMR 和立体化学仍是关键限制，不能把结果外推到所有化学问题。</li>
+        <li>对科研人员最重要的不是“模型是否全知”，而是它在哪些环节可靠、省时、可审计，以及何时必须回到专家判断。</li>
+      </ul>
+    </section>
+  </article>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

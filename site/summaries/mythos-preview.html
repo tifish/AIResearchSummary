@@ -3,134 +3,351 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Claude Mythos Preview 的网络安全能力评估 · 总结</title>
+<title>Claude Mythos Preview 网络安全能力摘要</title>
 <style>
-  :root{
-    --bg:#0f1115; --card:#181b22; --card2:#1f232c; --ink:#e8eaed; --muted:#a3acba;
-    --accent:#ff7a59; --accent2:#5fb3ff; --good:#5fd29a; --warn:#ffd166; --line:#2a2f3a;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);
-    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;
-    line-height:1.75;font-size:17px}
-  .wrap{max-width:860px;margin:0 auto;padding:40px 22px 80px}
-  header{border-bottom:2px solid var(--line);padding-bottom:22px;margin-bottom:30px}
-  .kicker{color:var(--accent);font-weight:700;letter-spacing:.08em;font-size:13px;text-transform:uppercase}
-  h1{font-size:30px;line-height:1.3;margin:.4em 0 .2em}
-  .meta{color:var(--muted);font-size:14px}
-  .lede{background:linear-gradient(135deg,#241a16,#1a2230);border:1px solid var(--line);
-    border-left:5px solid var(--accent);border-radius:12px;padding:20px 22px;margin:26px 0;font-size:19px}
-  .lede b{color:var(--accent)}
-  h2{font-size:21px;margin:42px 0 6px;padding-top:10px}
-  h2 .num{color:var(--accent2);font-weight:800;margin-right:8px}
-  .sub{color:var(--muted);font-size:14px;margin:0 0 14px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:16px 0}
-  .insight{border-left:4px solid var(--good);background:var(--card2);border-radius:8px;
-    padding:12px 16px;margin:14px 0;color:#dbe6df;font-size:15px}
-  .insight b{color:var(--good)}
-  .stats{display:flex;flex-wrap:wrap;gap:14px;margin:18px 0}
-  .stat{flex:1 1 180px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:16px}
-  .stat .big{font-size:30px;font-weight:800;color:var(--accent)}
-  .stat .lab{color:var(--muted);font-size:13px;margin-top:4px}
-  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:15px}
-  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left}
-  th{background:var(--card2);color:var(--accent2)}
-  .vs{color:var(--warn);font-weight:700}
-  ul{padding-left:22px}
-  li{margin:6px 0}
-  code{background:#11141a;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:14px;color:#ffb39e}
-  .takeaways{background:linear-gradient(135deg,#16221c,#1a1f2c);border:1px solid var(--line);
-    border-radius:14px;padding:22px 24px;margin:34px 0 0}
-  .takeaways h2{margin-top:0}
-  .takeaways ol{padding-left:20px}
-  .takeaways li{margin:12px 0;font-size:16px}
-  .tag{display:inline-block;background:#2a2230;color:var(--accent);border:1px solid var(--line);
-    border-radius:999px;padding:2px 12px;font-size:12px;margin-bottom:8px}
-  footer{color:var(--muted);font-size:13px;margin-top:40px;border-top:1px solid var(--line);padding-top:16px}
+:root{
+  --bg:#f6f7fb;
+  --card:#ffffff;
+  --ink:#172033;
+  --muted:#5f6b80;
+  --line:#dfe4ee;
+  --accent:#2f6fed;
+  --accent2:#0f9f8f;
+  --accent3:#c05a14;
+  --hl:#eef4ff;
+  --hl2:#fff3e8;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+  line-height:1.7;
+}
+main{
+  max-width:980px;
+  margin:0 auto;
+  padding:40px 20px 56px;
+}
+header{
+  margin-bottom:24px;
+}
+.kicker{
+  color:var(--accent);
+  font-weight:700;
+  font-size:14px;
+  letter-spacing:0;
+}
+h1{
+  margin:8px 0 12px;
+  font-size:32px;
+  line-height:1.25;
+}
+.lead{
+  background:linear-gradient(135deg,var(--hl),var(--card));
+  border:1px solid var(--line);
+  border-left:6px solid var(--accent);
+  padding:18px 20px;
+  border-radius:8px;
+  font-size:18px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:16px;
+  margin:22px 0;
+}
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:18px;
+}
+.card h2{
+  margin:0 0 8px;
+  font-size:20px;
+}
+.card p{margin:0;color:var(--muted)}
+.metric{
+  display:inline-block;
+  margin:4px 6px 4px 0;
+  padding:3px 8px;
+  border-radius:6px;
+  background:var(--hl);
+  color:var(--accent);
+  font-weight:700;
+}
+.section{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:22px;
+  margin:16px 0;
+}
+.section h2{
+  margin:0 0 10px;
+  font-size:22px;
+}
+.section p{margin:8px 0}
+.note{
+  border-left:4px solid var(--accent2);
+  padding-left:12px;
+  color:var(--muted);
+}
+.warning{
+  background:var(--hl2);
+  border-color:color-mix(in srgb,var(--accent3) 35%,var(--line));
+}
+.takeaways{
+  display:grid;
+  gap:10px;
+  padding:0;
+  margin:12px 0 0;
+  list-style:none;
+}
+.takeaways li{
+  background:var(--hl);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:12px 14px;
+}
+@media (max-width:720px){
+  main{padding:28px 14px 42px}
+  h1{font-size:26px}
+  .grid{grid-template-columns:1fr}
+  .lead{font-size:16px}
+}
 </style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
+      background: var(--airs-digest-panel) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
 </head>
 <body>
-<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/mythos-preview" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
-<div class="wrap">
-  <header>
-    <div class="kicker">Anthropic · Frontier Red Team</div>
-    <h1>Claude Mythos Preview 的网络安全能力评估</h1>
-    <div class="meta">来源：Anthropic ｜ 日期：2026-04-07 ｜ 估计阅读：6 分钟</div>
-  </header>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/mythos-preview" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header>
+  <div class="kicker">Anthropic · Frontier Red Team · 2026-04-07</div>
+  <h1>Mythos Preview 显示出可规模化的漏洞发现与利用能力</h1>
+  <div class="lead"><strong>一句话总括：</strong>这篇文章的真正贡献，是用真实零日、N-day、开源基准和人工复核结果说明，前沿语言模型已经从“辅助找漏洞”跨入“自动发现并利用复杂漏洞”的阶段，安全行业必须按更快节奏组织防御。</div>
+</header>
 
-  <div class="lede">
-    <b>一句话总括：</b>新一代模型 Mythos Preview 不再只是“能找 bug”，而是<b>能自主把真实世界的零日漏洞链接成可工作的攻击利用</b>——在主流操作系统、浏览器和加密库中皆然。这跨过了上一代模型几乎跨不过去的门槛，因此 Anthropic 选择不公开发布它，而是启动 <b>Project Glasswing</b> 优先加固关键软件。
-  </div>
-
-  <h2><span class="num">01</span>真正的飞跃：从“发现漏洞”到“自主利用”</h2>
-  <p class="sub">上一代擅长“找与修”，这一代擅长“找与攻”——而攻是历史上最难自动化的部分。</p>
+<div class="grid">
   <div class="card">
-    一个月前 Anthropic 还写道 Opus 4.6“几乎 0% 的自主利用成功率”。Mythos Preview 不是同一量级：同样的 Firefox 147 漏洞利用基准，Opus 4.6 在数百次尝试中仅成功 <span class="vs">2 次</span>，Mythos Preview 成功 <b>181 次</b>，另有 29 次拿到寄存器控制。
-    <div class="stats">
-      <div class="stat"><div class="big">181 vs 2</div><div class="lab">Firefox 漏洞→可用 exploit 成功次数（Mythos vs Opus 4.6）</div></div>
-      <div class="stat"><div class="big">595</div><div class="lab">约 7000 个 OSS-Fuzz 入口点中 tier 1/2 崩溃数</div></div>
-      <div class="stat"><div class="big">10</div><div class="lab">在已打补丁目标上实现完整控制流劫持（tier 5）</div></div>
-    </div>
-  </div>
-  <div class="insight"><b>为何重要：</b>“写 exploit”历来被视为只有顶尖人类专家能做的机械却高难的工作。一旦它可被规模化自动完成，攻防之间“从公开补丁到大规模利用”的时间窗会被压缩到以小时计——这正是过去二十年安全均衡赖以维系的护城河。</div>
-
-  <h2><span class="num">02</span>这些能力不是被“训练”出来的，是涌现的</h2>
-  <p class="sub">同样让模型更会“修漏洞”的代码、推理、自主性提升，也让它更会“攻漏洞”。</p>
-  <div class="card">
-    Anthropic 强调并未专门训练攻击能力；它是通用能力提升的副产品。换句话说，<b>无法靠“只训练防御不训练攻击”来避免这种能力出现</b>。无安全背景的工程师让模型“通宵找远程代码执行漏洞”，第二天醒来就拿到完整可用 exploit。
-  </div>
-  <div class="insight"><b>为何重要：</b>这打破了“攻击能力可以被刻意隔离”的安慰式假设。能力与门槛同时下降，意味着低技能攻击者也能触达原本属于专家的攻击面。</div>
-
-  <h2><span class="num">03</span>三个标志性漏洞：旧代码里藏了几十年</h2>
-  <p class="sub">最值得震撼的不是漏洞多新，而是它们多老——多年被人类和模糊测试反复审计却漏掉。</p>
-  <table>
-    <tr><th>目标</th><th>年龄</th><th>性质</th></tr>
-    <tr><td>OpenBSD（以安全著称）SACK 实现</td><td>27 年</td><td>有符号整数溢出触发空指针写，可远程崩溃任何 OpenBSD 主机</td></tr>
-    <tr><td>FFmpeg H.264 解码器</td><td>16 年</td><td>哨兵值碰撞导致堆越界写（须构造 65536 个 slice）</td></tr>
-    <tr><td>FreeBSD NFS 服务（CVE-2026-4747）</td><td>17 年</td><td>未认证用户远程获取 root，把 20-gadget 的 ROP 链拆到 6 个 RPC 包</td></tr>
-  </table>
-  <div class="insight"><b>为何重要：</b>这些都是被无数模糊测试器和人类审计“写过的安全代码”。模型的优势不在比人聪明，而在<b>可规模化地审遍每一个文件</b>，包括人们因“这肯定有人查过”而跳过的地方。FreeBSD 案例还揭示：只有真去写 exploit，才发现栈保护等防御因编译细节恰好失效——<b>生成利用本身就是更准确的漏洞分诊手段</b>。</div>
-
-  <h2><span class="num">04</span>规模、成本与人工复核一致性</h2>
-  <p class="sub">便宜、可并行、且模型的严重性判断与人类专家高度吻合。</p>
-  <div class="stats">
-    <div class="stat"><div class="big">&lt;$50</div><div class="lab">找到那个 OpenBSD 漏洞的单次运行成本</div></div>
-    <div class="stat"><div class="big">&lt;$2000</div><div class="lab">一条 Linux N-day root 利用链的完整构造成本</div></div>
-    <div class="stat"><div class="big">89% / 98%</div><div class="lab">198 份报告中人工与模型严重性评级“完全一致 / 误差≤1 级”</div></div>
+    <h2>能力跃迁不是单点突破</h2>
+    <p><span class="metric">181</span><span class="metric">29</span>在Firefox 147 JavaScript引擎实验中，Mythos生成181个可用shell exploit，并另有29次取得寄存器控制；Opus 4.6此前数百次只有2次成功。这说明模型差距不只是“更会写代码”，而是能把漏洞理解、调试和利用链组合起来。</p>
   </div>
   <div class="card">
-    目前已发现的潜在漏洞中<b>不到 1%</b> 完成修复，因此 Anthropic 只能讨论极小一部分，并用 SHA-3 哈希对未披露漏洞做密码学承诺。若复核一致性保持，剩余发现可能还包含<b>逾千个关键级、数千个高危级</b>漏洞——本文所述只是“下界”。
+    <h2>公开内容只是下限</h2>
+    <p><span class="metric">&gt;99%</span><span class="metric">&lt;1%</span>Anthropic称超过99%的发现仍未修补，能公开讨论的不足1%。这意味着文章中的案例不是完整清单，而是对未来披露规模的保守样本。</p>
   </div>
-  <div class="insight"><b>为何重要：</b>当“找到一个真实可利用漏洞”的边际成本降到几十美元，攻击经济学被彻底改写：稀缺的专家时间不再是瓶颈，算力是。</div>
-
-  <h2><span class="num">05</span>N-day 才是最现实的危险，与防御者的行动清单</h2>
-  <p class="sub">已知且已打补丁、但很多系统还没更新的漏洞，是真实世界伤害的主要来源。</p>
-  <div class="card">
-    模型仅凭一个 CVE 编号和 git 提交哈希，就能全自动把公开补丁“逆向”成可用 exploit——补丁本身就是漏洞的路线图。Anthropic 给出的防御建议：
-    <ul>
-      <li><b>现在就用现有前沿模型加固</b>（如 Opus 4.6 仍很擅长找漏洞）；</li>
-      <li><b>缩短补丁周期</b>：尽量开启自动更新、把带 CVE 的依赖升级当紧急事项；</li>
-      <li><b>自动化事件响应与分诊</b>，让模型承担三级分诊、去重、写复现步骤、起草补丁；</li>
-      <li><b>重审漏洞披露政策与遗留系统应急方案</b>，为漏洞洪峰做准备。</li>
-    </ul>
-  </div>
-  <div class="insight"><b>为何重要：</b>长期看 Anthropic 认为防御方会占优（更多代码将由模型写得更安全），但<b>过渡期会动荡</b>，且短期内可能利好攻击方——优势属于“最会用工具的一方”。</div>
-
-  <div class="takeaways">
-    <span class="tag">最值得带走的洞见</span>
-    <h2>5 条带走</h2>
-    <ol>
-      <li><b>门槛被跨过了。</b>自主“写 exploit”从 Opus 4.6 的近乎 0%，跃升到 Mythos Preview 在基准上 181 次成功——这是攻防史上的分水岭，不是渐进改良。</li>
-      <li><b>攻击能力是涌现的，无法靠“只训防御”规避。</b>同一批能力同时强化了修与攻。</li>
-      <li><b>最老的代码最危险。</b>27 年的 OpenBSD、17 年的 FreeBSD root——人类审计的盲区正是模型规模化覆盖的强项。</li>
-      <li><b>经济学已变。</b>几十到几千美元即可产出真实可用利用，瓶颈从专家时间转为算力，攻击可被海量并行。</li>
-      <li><b>立即行动，重点是缩短补丁窗口。</b>N-day 才是现实主战场；自动更新、紧急化 CVE 修复、自动化响应是当下最实际的防线。</li>
-    </ol>
-  </div>
-
-  <footer>
-    本页为基于 Anthropic 原文的中文阅读总结，数据与结论以原文为准。原文：anthropic.com/research/mythos-preview
-  </footer>
 </div>
+
+<section class="section">
+  <h2>零日发现：模型把“全面审计”变得可并行</h2>
+  <p>Anthropic使用隔离容器和简单agent脚手架，让模型阅读代码、提出假设、运行程序、调试验证，并输出漏洞报告与复现步骤；为了覆盖更多文件，还先让模型按风险给文件打分，再并行搜索。</p>
+  <p class="note">关键变化在于成本结构：人类专家通常会优先检查“看起来最危险”的路径，而模型可以把大量边缘文件也系统性扫过，从而发现长期被忽视的问题。</p>
+</section>
+
+<section class="section">
+  <h2>案例显示老漏洞并不等于容易漏洞</h2>
+  <p><span class="metric">27年</span>OpenBSD SACK漏洞涉及边界检查、链表状态和32位序列号溢出的组合，最终可导致远程崩溃；文章称该问题来自1998年加入的实现路径。</p>
+  <p><span class="metric">16年</span>FFmpeg H.264漏洞源于16位表项、32位slice计数和哨兵值碰撞，长期绕过了fuzzer和人工审查。这改变了一个常见直觉：成熟项目中剩下的问题不一定稀少，只是需要跨文件、跨语义的耐心推理。</p>
+</section>
+
+<section class="section">
+  <h2>利用能力比发现能力更改变风险模型</h2>
+  <p><span class="metric">CVE-2026-4747</span><span class="metric">17年</span>文章称Mythos自主发现并利用FreeBSD NFS远程代码执行漏洞，可从未认证网络访问获得root；更重要的是，人类没有在发现后继续手把手指导利用过程。</p>
+  <p>这说明漏洞评级不能只靠“看起来是否可利用”。当模型能快速尝试真实利用链时，过去依赖攻击开发难度形成的缓冲时间会缩短。</p>
+</section>
+
+<section class="section">
+  <h2>基准结果显示防御摩擦正在贬值</h2>
+  <p><span class="metric">约1000仓库</span><span class="metric">约7000入口点</span>在OSS-Fuzz语料上，Sonnet 4.6和Opus 4.6主要达到tier 1/2，且各只有1个tier 3；Mythos达到595个tier 1/2、若干tier 3/4，并在10个完整修补目标上达到tier 5控制流劫持。</p>
+  <p class="note">文章的核心安全判断是：让攻击“繁琐”的缓解措施会变弱，因为模型擅长机械化地磨过复杂步骤；真正的硬边界仍然重要。</p>
+</section>
+
+<section class="section">
+  <h2>人工复核给了严重性判断一个参照</h2>
+  <p><span class="metric">198份</span><span class="metric">89%</span><span class="metric">98%</span>在198份人工复核漏洞报告中，专家有89%完全同意Claude的严重性评级，98%与模型评级相差不超过一个等级。</p>
+  <p>这并不证明每个待披露发现都成立，但说明模型输出已经足够接近专业 triage，可用于放大安全团队的初筛、去重和复现能力。</p>
+</section>
+
+<section class="section warning">
+  <h2>防守建议：补丁窗口必须缩短</h2>
+  <p>N-day部分尤其重要：文章称从CVE编号和补丁提交出发，Mythos可在半天到一天内生成本地提权exploit，成本低于1000到2000美元级别。</p>
+  <p>这改变了披露后的风险曲线：补丁发布不再意味着风险下降，反而可能成为攻击者自动化生成exploit的路线图，因此自动更新、紧急依赖升级和更快发布流程会变成基础能力。</p>
+</section>
+
+<section class="section">
+  <h2>最值得带走的洞见</h2>
+  <ul class="takeaways">
+    <li>前沿模型的网络安全能力已经同时覆盖漏洞发现、复现、评级和部分利用开发，不能再只按“代码助手”理解。</li>
+    <li>成熟、被反复审计的基础软件仍可能隐藏高影响漏洞；模型的优势来自规模化、耐心和跨语义推理。</li>
+    <li>防守方短期要把模型用于triage、复现、补丁建议、配置审查和事件响应，先建立流程比等待更强模型更现实。</li>
+    <li>N-day风险会显著上升，因为公开补丁与CVE足以成为自动生成exploit的输入。</li>
+    <li>长期看模型可能让软件更安全，但过渡期会更危险，安全工程需要围绕更高漏洞流量和更短攻击窗口重建。</li>
+  </ul>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

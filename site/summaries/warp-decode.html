@@ -3,133 +3,358 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Warp Decode：翻转并行轴，让 MoE 解码更快更准</title>
+<title>Better MoE model inference with warp decode 中文总结</title>
 <style>
-  :root{
-    --bg:#0f1117; --card:#1a1d27; --ink:#e8eaf0; --sub:#9aa3b8;
-    --accent:#6ea8fe; --accent2:#7ee0c0; --warn:#ffd166; --hot:#ff7b72;
-    --line:#2a2f3d;
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0; background:var(--bg); color:var(--ink);
-    font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-    line-height:1.75; font-size:17px;
-  }
-  .wrap{max-width:820px; margin:0 auto; padding:40px 22px 80px}
-  .tag{display:inline-block; font-size:13px; color:var(--accent2); letter-spacing:.1em; text-transform:uppercase; margin-bottom:10px}
-  h1{font-size:30px; line-height:1.3; margin:.2em 0 .5em}
-  .lede{
-    background:linear-gradient(135deg,#1d2740,#16202e);
-    border-left:4px solid var(--accent); border-radius:10px;
-    padding:18px 20px; font-size:18px; color:#eef2ff; margin:24px 0 36px;
-  }
-  .lede b{color:var(--accent2)}
-  h2{font-size:21px; margin:42px 0 6px; color:#fff}
-  h2 .num{color:var(--accent); font-weight:700; margin-right:8px}
-  .sub{color:var(--sub); font-size:14px; margin:0 0 14px}
-  section{border-top:1px solid var(--line); padding-top:8px}
-  .stat{
-    display:flex; flex-wrap:wrap; gap:14px; margin:18px 0;
-  }
-  .chip{
-    flex:1 1 150px; background:var(--card); border:1px solid var(--line);
-    border-radius:12px; padding:14px 16px;
-  }
-  .chip .big{font-size:26px; font-weight:800; color:var(--accent2)}
-  .chip .lbl{font-size:13px; color:var(--sub); margin-top:4px}
-  .insight{
-    margin-top:12px; padding:10px 14px; background:#161b22;
-    border-left:3px solid var(--warn); border-radius:6px; color:#f0e6c8; font-size:15.5px;
-  }
-  .insight::before{content:"洞见 · "; color:var(--warn); font-weight:700}
-  code{background:#11151c; color:#9ad0ff; padding:1px 6px; border-radius:5px; font-size:14px}
-  .takeaways{
-    margin-top:48px; background:linear-gradient(135deg,#15212e,#1a1230);
-    border:1px solid var(--line); border-radius:14px; padding:24px 26px;
-  }
-  .takeaways h2{border:0; margin-top:0}
-  .takeaways ol{margin:10px 0 0; padding-left:22px}
-  .takeaways li{margin:12px 0}
-  .takeaways b{color:var(--accent2)}
-  .foot{margin-top:40px; color:var(--sub); font-size:13px; text-align:center}
-  a{color:var(--accent)}
+:root {
+  --bg: #f6f8fb;
+  --card: #ffffff;
+  --ink: #172033;
+  --muted: #5e6a7d;
+  --line: #dfe5ee;
+  --accent: #2563eb;
+  --accent2: #0f766e;
+  --accent3: #b45309;
+  --hl: #eaf2ff;
+  --hl2: #ecfdf5;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.72;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 36px 18px 48px;
+}
+.hero {
+  padding: 28px;
+  background: linear-gradient(135deg, var(--card), var(--hl));
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.kicker {
+  margin: 0 0 8px;
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 700;
+}
+h1 {
+  margin: 0 0 14px;
+  font-size: 30px;
+  line-height: 1.25;
+}
+.lead {
+  margin: 0;
+  font-size: 19px;
+  color: var(--ink);
+  font-weight: 650;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 18px 0 0;
+}
+.metric {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+}
+.metric strong {
+  display: block;
+  font-size: 22px;
+  color: var(--accent2);
+}
+.metric span {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+}
+section {
+  margin-top: 18px;
+  padding: 22px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+h2 {
+  margin: 0 0 10px;
+  font-size: 21px;
+  line-height: 1.35;
+}
+p {
+  margin: 0 0 10px;
+}
+p:last-child {
+  margin-bottom: 0;
+}
+mark {
+  background: var(--hl2);
+  color: var(--accent2);
+  padding: 1px 5px;
+  border-radius: 5px;
+}
+.data {
+  border-left: 4px solid var(--accent);
+  padding: 10px 12px;
+  margin: 12px 0;
+  background: var(--hl);
+  color: var(--ink);
+}
+.takeaways {
+  background: linear-gradient(135deg, var(--card), var(--hl2));
+}
+ul {
+  margin: 10px 0 0;
+  padding-left: 22px;
+}
+li {
+  margin: 8px 0;
+}
+@media (max-width: 720px) {
+  main { padding: 22px 12px 34px; }
+  .hero, section { padding: 18px; }
+  h1 { font-size: 24px; }
+  .lead { font-size: 17px; }
+  .grid { grid-template-columns: 1fr; }
+}
 </style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
+      background: var(--airs-digest-panel) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
 </head>
 <body>
-<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://cursor.com/blog/warp-decode" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
-<div class="wrap">
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/warp-decode" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+  <article>
+    <header class="hero">
+      <p class="kicker">一句话总括</p>
+      <h1>Warp decode 的贡献是把 MoE decode 从“按专家调度”改成“按输出值调度”，在小批量生成阶段同时减少内存搬运、提高吞吐并改善数值精度。</h1>
+      <p class="lead">这篇文章真正说明的是：当 MoE 推理的瓶颈来自数据重排和随机访存时，改变并行粒度比继续沿着专家中心流水线做局部融合更有效。</p>
+      <div class="grid">
+        <div class="metric"><strong>1.84x</strong><span>Blackwell 上端到端 decode 吞吐提升</span></div>
+        <div class="metric"><strong>1.4x</strong><span>输出更接近完整 FP32 参考</span></div>
+        <div class="metric"><strong>3.95 TB/s</strong><span>B=32 时持续带宽，约为峰值 58%</span></div>
+      </div>
+    </header>
 
-  <div class="tag">Cursor · Research · 2026-04-06</div>
-  <h1>Warp Decode：把并行轴从"专家"翻转到"输出"，让 MoE 解码更快也更准</h1>
+    <section>
+      <h2>传统 MoE decode 的问题不是计算太少，而是为专家视角搬了太多数据</h2>
+      <p>传统 MoE 路径通常先按专家收集 token，再执行专家计算，最后把结果重组回来。这个组织方式在 prefill 和大 batch 下有效，因为很多 token 会共享专家，数据整理成本能被摊薄。</p>
+      <div class="data">文章给出的典型例子是每层从 <mark>128 个专家中选择 8 个</mark>。但在自回归 decode 中，系统常常一次只生成一个 token，传统路径 <mark>8 个阶段里有 5 个</mark>主要是在处理布局，而不是做真正的神经网络计算。</div>
+      <p>这改变了我们对 MoE 推理瓶颈的理解：小批量生成阶段的关键不是让专家 kernel 更漂亮，而是避免为了专家中心布局制造额外工作。</p>
+    </section>
 
-  <div class="lede">
-    一句话总括：Cursor 发现，在 Blackwell GPU 上做小批量、逐 token 的 MoE 解码时，<b>围绕"输出值"而非"专家"组织内核</b>能同时拿下两件通常此消彼长的事——吞吐 <b>提升 1.84 倍</b>，精度 <b>逼近 FP32 1.4 倍</b>。其本质是认清解码阶段"没有足够共享计算可摊销"，于是删掉了为专家视图服务的所有数据搬运。
-  </div>
+    <section>
+      <h2>Warp decode 的核心是让每个 warp 固定负责一个输出标量</h2>
+      <p>GPU warp 由 32 条并行 lane 组成。Warp decode 不再把 warp 分配给专家，而是让每个 warp 负责一个输出值，直接流式读取所需权重，把 8 个路由专家的贡献折叠到同一个 FP32 累加器中。</p>
+      <div class="data">整个 MoE compute layer 被压缩为两个 kernel：<mark>moe_gate_up_3d_batched</mark> 和 <mark>moe_down_3d_batched</mark>。gate/up 阶段复用同一次读取的激活向量，down 阶段把 top-k 路由权重直接并入投影累加。</div>
+      <p>这个设计的洞见是：当每个 warp 的生命周期都只对应一个稳定输出地址时，跨 warp 同步、中间 staging 和额外 epilogue 都不再是必要结构。</p>
+    </section>
 
-  <section>
-    <h2><span class="num">01</span>传统 MoE 路径的浪费，在解码阶段被放大</h2>
-    <p class="sub">问题不在数学，在数据搬运。</p>
-    <p>现代 MoE 每个 token 只激活一小撮专家（例如每层从 128 选 8）。围绕专家来收集 token、计算、再重组，在 prefill 和大批量时很划算，因为每个专家的共享计算能摊销组织开销。但解码每次只产出一个 token——<b>八个流水线阶段里有五个纯粹在搬数据、不做任何计算</b>。</p>
-    <div class="insight">解码瓶颈不是算力而是内存带宽与冗余搬运；沿用大批量的内核结构，等于为不存在的"共享工作"反复付费。</div>
-  </section>
+    <section>
+      <h2>主要加速来自删除阶段和缓冲，而不是只靠指令级微优化</h2>
+      <p>Warp decode 删除了传统路径中的 padding、scatter 和 combine。传统方案需要把每个专家的 token 列表补齐到 power-of-2 或 128 byte 边界，还要把每个专家的中间结果写到显存，再由单独步骤合并。</p>
+      <div class="data">对 hidden dimension 2048、8 个专家、BF16 来说，传统 per-expert 输出缓冲为 <mark>8 × 2048 × 2 bytes = 32 KB/token</mark>，这些数据会被写入、读回、再丢弃。Warp decode 让这些中间结果停留在寄存器累加器里，直到最终单标量写出。</div>
+      <p>这说明 MoE decode 的优化收益很大一部分来自减少无效内存流量；省下的 L2 容量可以留给真正影响性能的权重行读取。</p>
+    </section>
 
-  <section>
-    <h2><span class="num">02</span>核心改动：一个 warp 只算一个输出值</h2>
-    <p class="sub">两个融合内核取代八个阶段。</p>
-    <p>GPU 以 32 条通道为一组（warp）执行。warp decode 让<b>每个 warp 终身只负责一个输出标量</b>：直接从内存流式读取所需权重，把 8 个路由专家的贡献折叠进一个 FP32 累加器，最后只写一次结果。整个 MoE 计算被压缩成 <code>moe_gate_up_3d_batched</code> 和 <code>moe_down_3d_batched</code> 两个内核。down 内核用 <code>__shfl_xor_sync</code> 蝶形归约（编译为单条 <code>shfl.sync.bfly</code> 硬件指令）在寄存器间交换数据，绕过共享内存，连同步都"烧"进了指令里。</p>
-    <div class="insight">删除阶段不是简单"融合"，而是从并行结构的根部重组——这才让 padding、scatter、combine 彻底消失，而非被合并。</div>
-  </section>
+    <section>
+      <h2>独立 warp 让调度器更容易隐藏随机访存延迟</h2>
+      <p>在 warp decode 中，每个 warp 只读取只读激活和自己需要的权重行，累加器在私有寄存器中，输出写入唯一地址。调度器看到的是一批没有依赖边的独立工作项。</p>
+      <div class="data">文章特别提到 B200 有 <mark>148 个 streaming multiprocessors</mark>，当数千个 warp 同时在飞行时，一个 warp 等待内存加载，调度器就可以立刻切换到另一个 warp。输出维度翻倍时，独立 warp 数也翻倍，而不增加同步。</div>
+      <p>这里的关键趋势是：MoE 路由带来的随机权重访问无法完全消除，但可以用更扁平、更独立的工作组织方式把延迟藏到有用计算后面。</p>
+    </section>
 
-  <section>
-    <h2><span class="num">03</span>消除的开销：阶段、缓冲区、跨 warp 协调</h2>
-    <p class="sub">不形成 per-expert 批次，也就没有相应的成本。</p>
-    <div class="stat">
-      <div class="chip"><div class="big">5→0</div><div class="lbl">删除的纯搬运阶段（含 padding/scatter/combine）</div></div>
-      <div class="chip"><div class="big">32&nbsp;KB+</div><div class="lbl">每 token 省下的中间缓冲流量（8×2048×2B 的 per-expert 输出缓冲）</div></div>
-    </div>
-    <p>传统路径要把激活复制重排成"专家主序"缓冲，还要为 8 个专家各写一份中间结果再读回归约。warp decode 把这 8 份贡献折叠进 32 条通道的寄存器累加器，<b>直到最后一次单标量写出前，什么都不落到全局内存</b>，腾出的 L2 缓存留给真正决定性能的权重行。</p>
-    <div class="insight">省下的不仅是计算，更是"内存往返"——在带宽受限的解码里，少搬一次数据往往比少算一次更值钱。</div>
-  </section>
+    <section>
+      <h2>结果显示它同时改善吞吐、精度和硬件利用率</h2>
+      <p>Cursor 在内部推理系统中，用 Qwen-3 风格模型和 NVIDIA B200 GPU 测试，看到跨上下文长度 bucket 都稳定的吞吐提升。这意味着收益主要发生在生成阶段，而不是依赖 prompt 长度。</p>
+      <div class="data">核心结果包括：<mark>1.84x</mark> decode 吞吐提升；输出比传统路径 <mark>1.4x</mark> 更接近完整 FP32 ground truth；B200 连续读峰值为 <mark>6.8 TB/s</mark>，warp decode 在 B=32 下达到 <mark>3.95 TB/s</mark>，即 <mark>58%</mark>；最小余弦相似度 <mark>&gt;0.999996</mark>，最大绝对误差 <mark>0.001953</mark>。</div>
+      <p>这改变了“更快通常牺牲精度”的直觉：因为它移除了 BF16 激活到 MXFP8 再转回的中间量化步骤，所以速度和精度可以同时受益。</p>
+    </section>
 
-  <section>
-    <h2><span class="num">04</span>为什么更快：天然"令人尴尬地并行"</h2>
-    <p class="sub">每个 warp 完全独立，调度器随便排都对。</p>
-    <p>每个 warp 只读自己需要的权重行、累加器在私有寄存器、输出写到唯一地址，warp 之间没有任何共享可变状态。于是 GPU 调度器可以任意顺序发射任一 warp：某个 warp 等内存时立刻切到另一个。<b>B200 的 148 个 SM 上有成千上万 warp 在飞</b>，内存延迟几乎被其他 warp 的有效计算完全掩盖。输出维度翻倍就线性翻倍独立 warp 数，无需新增同步。</p>
-    <div class="insight">把工作变成"无边的扁平命名空间"，等于把延迟隐藏交给硬件调度器——这是比手写流水线更可靠的加速来源。</div>
-  </section>
+    <section>
+      <h2>它不是 MoE 的通用替代品，而是 decode 场景的专门解法</h2>
+      <p>文章明确说 warp decode 不是专家中心执行的全面替代。prefill 和大批量推理中，许多 token 共享同一个专家，专家打包的组织成本可以被大量计算摊薄，仍然有优势。</p>
+      <div class="data">Warp decode 赢在“每个专家共享工作不够多”的场景，也就是 MoE 自回归 decode 常见的小 batch 生成路径。它面向的是生成速度、延迟和数值误差，而不是所有 MoE 阶段。</div>
+      <p>最终洞见是：AI 系统性能不只由训练数据、RL 或模型结构决定，推理 kernel 的组织方式也会直接影响研究迭代速度和用户感受到的模型质量。</p>
+    </section>
 
-  <section>
-    <h2><span class="num">05</span>结果：更快、更准、且贴近硬件极限</h2>
-    <p class="sub">在 B200 上跑 Qwen-3 风格模型的实测。</p>
-    <div class="stat">
-      <div class="chip"><div class="big">1.84×</div><div class="lbl">解码吞吐提升（各上下文长度区间均平坦）</div></div>
-      <div class="chip"><div class="big">1.4×</div><div class="lbl">输出更接近 FP32 全精度参考</div></div>
-      <div class="chip"><div class="big">3.95 TB/s</div><div class="lbl">实测带宽（B=32），达 6.8 TB/s 峰值的 58%</div></div>
-    </div>
-    <p>精度提升来自全程保持 BF16 激活、FP32 累加，省掉了 BF16↔MXFP8 量化往返带来的、会逐层累积的舍入误差。正确性也很硬：<b>最小余弦相似度 &gt;0.999996，最大绝对误差 0.001953</b>。剩下到峰值的差距，主要是专家路由造成的随机访问（一个 token 可能命中 5、8、14、19 等不相邻专家）带来的内存延迟。</p>
-    <div class="insight">"更快"常以"更糙"为代价；warp decode 反而因删掉量化步骤而更准——这是同时改善性能与精度的罕见内核。</div>
-  </section>
-
-  <section>
-    <h2><span class="num">06</span>边界：它不是万能替代品</h2>
-    <p class="sub">解码场景的专用武器，而非通用方案。</p>
-    <p>prefill 和大批量推理仍然适合专家中心式打包，因为大量 token 共享同一专家，组织成本能被足够多的真实计算摊销。warp decode 只在"每个专家共享工作不足以摊销开销"时取胜——而这正是 MoE 解码的常态。它服务于更快迭代 Composer：<b>预训练数据和 RL 决定模型输出的质量，而 warp decode 这类推理投入决定这些输出多快、多准地到达开发者手中</b>。</p>
-  </section>
-
-  <div class="takeaways">
-    <h2>最值得带走的洞见</h2>
-    <ol>
-      <li><b>瓶颈决定结构。</b>大批量推理的"专家中心"结构在逐 token 解码里大半是无用搬运——优化第一步是认清当前负载的真实瓶颈，而非沿用既有范式。</li>
-      <li><b>翻转并行轴是关键杠杆。</b>从"warp 算专家"改为"warp 算一个输出值"，一举消除了填充、scatter、combine 和两个中间缓冲，把八阶段压成两个融合内核。</li>
-      <li><b>减少内存往返胜过减少计算。</b>带宽受限场景下，让数据"直到最后一刻才落全局内存"释放出的 L2 缓存，是 1.84× 加速的主因。</li>
-      <li><b>独立性即可调度性。</b>每个 warp 完全无共享状态，使内核"令人尴尬地并行"，把内存延迟隐藏交给硬件调度器，并随维度线性扩展。</li>
-      <li><b>快与准可以兼得。</b>去掉 MXFP8 量化往返后，warp decode 既提速又把精度拉近 FP32 1.4 倍——推理工程的投入直接转化为模型迭代速度。</li>
-    </ol>
-  </div>
-
-  <div class="foot">原文：Cursor Blog · “Better MoE model inference with warp decode” · 作者 Less Wright、Federico Cassano、Zhiyuan Zhang · <a href="https://cursor.com/blog/warp-decode">cursor.com/blog/warp-decode</a></div>
-
-</div>
+    <section class="takeaways">
+      <h2>最值得带走的洞见</h2>
+      <ul>
+        <li>MoE decode 的低效常来自专家中心布局的管理成本，而不只是矩阵乘性能不足。</li>
+        <li>把并行轴翻转到输出标量后，可以删除 padding、scatter、combine 和大块中间缓冲。</li>
+        <li>独立 warp 把随机访存变成更容易调度隐藏的延迟问题，而不是全局同步问题。</li>
+        <li>去掉中间激活量化让吞吐和精度同时提升，说明系统优化也可能改善模型输出质量。</li>
+        <li>Warp decode 的适用边界很清楚：它适合小批量 MoE 生成，不应替代 prefill 和大批量专家打包路径。</li>
+      </ul>
+    </section>
+  </article>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

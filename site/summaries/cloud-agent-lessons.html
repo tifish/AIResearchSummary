@@ -3,91 +3,336 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>云端 AI Agent 的构建经验总结 · Cursor</title>
+<title>云端 Agent 的真正产品是什么</title>
 <style>
-  :root{
-    --bg:#0f1117; --card:#1a1d27; --ink:#e8eaf0; --muted:#9aa3b2;
-    --accent:#6ea8fe; --accent2:#7ee0c0; --warn:#ffd479; --line:#2a2f3d;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);
-    font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-    line-height:1.8;font-size:17px}
-  .wrap{max-width:780px;margin:0 auto;padding:48px 22px 80px}
-  .kicker{color:var(--accent);font-size:13px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px}
-  h1{font-size:30px;line-height:1.3;margin:0 0 8px}
-  .meta{color:var(--muted);font-size:14px;margin-bottom:28px}
-  .lede{background:linear-gradient(135deg,#1c2740,#15212e);border:1px solid var(--line);
-    border-left:4px solid var(--accent);border-radius:12px;padding:20px 22px;margin:0 0 36px;font-size:18px}
-  .lede b{color:var(--accent2)}
-  h2{font-size:21px;margin:42px 0 6px;padding-top:10px;border-top:1px solid var(--line)}
-  .sub{color:var(--muted);font-size:14px;margin:0 0 14px}
-  p{margin:12px 0}
-  .stats{display:flex;flex-wrap:wrap;gap:12px;margin:18px 0}
-  .stat{flex:1 1 150px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
-  .stat .n{font-size:24px;font-weight:700;color:var(--accent2)}
-  .stat .l{font-size:13px;color:var(--muted)}
-  .take{font-weight:600;color:var(--warn)}
-  .insights{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px 26px;margin-top:40px}
-  .insights h2{border:0;margin-top:0;color:var(--accent)}
-  .insights ol{margin:0;padding-left:22px}
-  .insights li{margin:12px 0}
-  code{background:#222634;padding:2px 6px;border-radius:5px;font-size:14px;color:var(--accent2)}
+:root {
+  --bg: #f6f7fb;
+  --card: #ffffff;
+  --ink: #18202f;
+  --muted: #5f6b7a;
+  --line: #dfe4ec;
+  --accent: #2563eb;
+  --accent2: #0f9f8e;
+  --accent3: #b45309;
+  --hl: #e8f0ff;
+  --hl2: #fff4dd;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.72 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 44px 20px 56px;
+}
+.hero {
+  padding: 30px 0 22px;
+  border-bottom: 1px solid var(--line);
+}
+.label {
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0;
+  margin: 0 0 8px;
+}
+h1 {
+  font-size: 34px;
+  line-height: 1.2;
+  margin: 0 0 14px;
+}
+.lead {
+  font-size: 20px;
+  line-height: 1.65;
+  color: var(--ink);
+  max-width: 780px;
+  margin: 0;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 24px 0;
+}
+.stat {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 18px;
+}
+.stat strong {
+  display: block;
+  font-size: 26px;
+  line-height: 1.2;
+  color: var(--accent2);
+}
+.stat span {
+  color: var(--muted);
+}
+section {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 22px;
+  margin: 16px 0;
+}
+h2 {
+  font-size: 21px;
+  line-height: 1.35;
+  margin: 0 0 10px;
+}
+p { margin: 0 0 12px; }
+p:last-child { margin-bottom: 0; }
+mark {
+  background: var(--hl);
+  color: var(--ink);
+  padding: 2px 5px;
+  border-radius: 4px;
+}
+.insight {
+  border-left: 4px solid var(--accent);
+  background: var(--hl);
+}
+.takeaways {
+  background: linear-gradient(135deg, var(--hl), var(--hl2));
+  border-color: transparent;
+}
+ul {
+  margin: 10px 0 0;
+  padding-left: 20px;
+}
+li { margin: 8px 0; }
+@media (max-width: 700px) {
+  main { padding: 28px 16px 42px; }
+  h1 { font-size: 28px; }
+  .lead { font-size: 18px; }
+  .grid { grid-template-columns: 1fr; }
+}
 </style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
+      background: var(--airs-digest-panel) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
 </head>
 <body>
-<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://cursor.com/blog/cloud-agent-lessons" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
-<div class="wrap">
-  <div class="kicker">Cursor · Research · 2026-06-02</div>
-  <h1>我们在构建云端 Agent 中学到的事</h1>
-  <div class="meta">作者：Josh Ma　·　来源：Cursor Blog</div>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/cloud-agent-lessons" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+  <article>
+    <header class="hero">
+      <p class="label">一句话总括</p>
+      <h1>云端 agent 的真正产品，是让模型像开发者一样拥有可靠、可恢复、可操作的工作环境。</h1>
+      <p class="lead">Cursor 的核心贡献不是宣布 cloud agents 更强，而是把它们背后的工程条件讲清楚：环境完整性、耐久执行、状态解耦和工具边界，正在决定 agent 能不能稳定完成真实开发任务。</p>
+    </header>
 
-  <div class="lede">
-    一句话总括：构建长时运行的云端编程 agent，真正的难点<b>不是把本地 agent 移植到服务器</b>，而是要在 agent 周围重建一整套"企业级 IT"——完整的开发环境、持久化执行、状态解耦——决定成败的往往是这些看不见的基础设施，而不是模型本身。
-  </div>
+    <div class="grid">
+      <div class="stat"><strong>5000 万+</strong><span>Temporal 每天处理的 actions</span></div>
+      <div class="stat"><strong>700 万+</strong><span>Temporal 覆盖的 unique workflows</span></div>
+      <div class="stat"><strong>40%+</strong><span>Cursor 内部 PR 来自 cloud agents</span></div>
+      <div class="stat"><strong>两 9+</strong><span>迁移 Temporal 后达到的可靠性水平</span></div>
+    </div>
 
-  <h2>环境，才是真正的产品</h2>
-  <p class="sub">关键趋势：决定云端 agent 输出质量的最大单一因素，是它是否拥有和真实开发者一样完整的开发环境。</p>
-  <p>本地 agent 免费继承了你笔记本上现成的环境，云端却要从零重建，而且很难判断有没有做对。环境不全时<strong>不会崩溃也不会报错</strong>，只表现为输出质量"悄悄变差"——人们往往误以为是模型不行。模型越聪明，这个差距越致命，因为强模型本该更充分地利用环境。</p>
-  <p>为达到"完整环境"，Cursor 重建了大量基础设施：VM 的休眠/恢复、镜像的 checkpoint/restore/fork、受控网络访问，以及密钥脱敏、网络策略、凭证管理。</p>
-  <p class="take">结论：在云端，"搭好环境"本身就是产品力，它比换模型更能决定结果。</p>
+    <section>
+      <h2>完整开发环境比提示词更像产品本体</h2>
+      <p>本地 agent 自动继承开发者电脑上的依赖、网络、工具链和认证，而云端 agent 必须从零重建这些条件。Cursor 发现，环境不完整时常常不是直接报错，而是输出质量微妙下降，容易被误判成模型能力不足。</p>
+      <p>这改变了对 AI 编程影响的理解：模型越强，越能利用环境，也越受环境缺陷限制。真正的云端 agent 产品需要 VM 休眠与恢复、镜像 checkpoint、环境交互 harness、受控网络访问、密钥脱敏和凭证管理。</p>
+    </section>
 
-  <h2>长时运行的 agent 需要"持久化执行"</h2>
-  <p class="sub">关键数据：可靠性从"一个 9"跃升到"两个 9"，靠的是迁移到 Temporal。</p>
-  <div class="stats">
-    <div class="stat"><div class="n">1×9 → 2×9</div><div class="l">可靠性从 ~90% 跨越到 99%+</div></div>
-    <div class="stat"><div class="n">5000 万+</div><div class="l">Temporal 每天处理的 action</div></div>
-    <div class="stat"><div class="n">700 万+</div><div class="l">独立 workflow 数量</div></div>
-    <div class="stat"><div class="n">数天~数周</div><div class="l">单次任务可跨越的时长</div></div>
-  </div>
-  <p>云端 VM 会遭遇推理服务中断、pod 替换、EC2 节点宕机。最初的"work-stealing"架构只是把本地逻辑搬上服务器，非常脆弱。当团队发现自己快要重造一遍 Temporal 已解决的重试、跨机调度、节点容错时，便直接迁移过去。架构上也从"永生"workflow 改为"完成单个任务即退出"的短 workflow，便于版本升级。</p>
-  <p class="take">结论：长时 agent 的可靠性不是靠模型，而是靠借用成熟的持久化执行引擎。</p>
+    <section>
+      <h2>长任务的关键不是跑得久，而是失败后还能继续</h2>
+      <p>云端 agent 可以并行运行、无人值守，并承担从数小时到数天甚至数周的任务，但 VM、pod、EC2 节点和推理服务都会中断。Cursor 早期采用 work-stealing 架构，可靠性大约只有“一 9”，说明把本地循环直接搬到服务器并不够。</p>
+      <p>迁移到 Temporal 后，agent loop 可以跨推理波动、pod 休眠恢复和长时间运行保持耐久，可靠性超过“两 9”。这说明云端 agent 的价值不只来自一次生成，而来自可调度、可重试、可恢复的执行系统。</p>
+    </section>
 
-  <h2>把 agent、机器、对话状态解耦</h2>
-  <p class="sub">关键趋势：一个 agent 已不再是"一台机器上的一个循环"。</p>
-  <p>它可能在一台机上运行、向多台机派生异步子 agent，或本地起步再委派到云端——子 agent 甚至能比父进程活得更久。因此 Cursor 让 <strong>agent loop（放在 Temporal）、机器状态、对话状态三者独立</strong>，可以单独管理 pod 生命周期，使用只读 VM 或预热 VM 等优化。对话侧则用 append-only 存储流式推送到客户端，并能在某步重试后让客户端"回退流"、用新数据覆盖旧数据。</p>
-  <p class="take">结论：解耦让同一个 agent 能横跨多种机器与重试场景而不丢状态。</p>
+    <section>
+      <h2>agent、机器和对话状态必须拆开</h2>
+      <p>一个云端 agent 不再等于一台机器上的一个循环：它可能启动异步 subagent，跨多种 pod 工作，甚至本地开始、云端继续。Cursor 因此把 agent loop 放在 Temporal 中，让机器生命周期可以单独管理。</p>
+      <p>对话层也被拆出核心 workflow，使用 append-only 存储向 Web 和桌面客户端流式发送更新，并在重试时让客户端回退旧输出、显示新结果。这个设计让读者看到，agent 体验的稳定性依赖后端状态模型，而不只是前端聊天窗口。</p>
+    </section>
 
-  <h2>学会"适时让开"</h2>
-  <p class="sub">关键趋势：模型变强后，逻辑从 harness 不断移交给 agent 自己掌控。</p>
-  <p>早期不信任 agent，harness 会在每个任务后复查、强制提交并推送。如今多仓库操作只需把仓库布局和分支/PR 工具交给 agent 自行决定；CI Autofix 也从"harness 抓日志"简化为"给 agent 一个 GitHub CLI"。但 harness 不会消失，只是内容在变——例如 computer use 仍保留专用子 agent（独立模型路由、提示、录屏，共享 VNC/Chrome），因为模型还没准备好独立处理。云端还需要更"自主"的提示词，因为在云端阻塞等待的代价远高于本地。</p>
-  <p class="take">结论：harness 的角色从"替 agent 做"转向"给 agent 工具，让它自己做"。</p>
+    <section>
+      <h2>harness 的职责正在从替 agent 做事，转向给 agent 工具</h2>
+      <p>早期 harness 会检查任务、强制 commit 和 push，也会硬编码多仓库或 CI Autofix 的处理逻辑。随着模型变强，Cursor 把更多决策移给 agent：提供 repo 布局、branch 和 PR 工具、GitHub CLI，以及可搜索的大输出文件。</p>
+      <p>这不是取消 harness，而是改变边界。比如 computer use 仍需要专门 subagent、模型路由、提示和录屏，但父 agent 能决定何时调用它。结论是，优秀的编排层应该减少硬编码流程，同时保留模型尚不能可靠独立完成的支架。</p>
+    </section>
 
-  <h2>未来：自愈式环境</h2>
-  <p class="sub">关键趋势：超越"牵着手"与"完全放手"的二元选择。</p>
-  <p>目标是让 agent 能理解周围系统：当密钥缺失、网络被封或环境阻碍进展时，能主动上报并<strong>自我修复</strong>。Cursor 把其中一条路径称为 <code>autoinstall</code>。当前内部已有 <strong>超过 40% 的 PR 来自云端 agent 且仍在增长</strong>。</p>
-  <p class="take">结论：下一步的竞争力在于 agent 能否自己诊断并修好自己的运行环境。</p>
+    <section>
+      <h2>下一阶段是自愈环境，而不是更多人工托管</h2>
+      <p>Cursor 认为更好的模式不是在“牵着 agent 走”和“完全放手”之间二选一，而是让 agent 能理解系统状态。它应能报告密钥缺失、网络受限或环境阻塞，并通过类似 autoinstall 的能力主动修复。</p>
+      <p>这会改变团队采用 AI 开发工具的成本结构：企业不只是买一个会写代码的模型，而是在租用一套可诊断、可管控、可扩展的 agent 运行平台。</p>
+    </section>
 
-  <div class="insights">
-    <h2>最值得带走的洞见</h2>
-    <ol>
-      <li><b>环境质量 > 模型选择。</b>云端 agent 输出变差，最常见的根因是环境不完整，而非模型——而它从不报错，只悄悄退化。</li>
-      <li><b>可靠性是工程问题。</b>从一个 9 到两个 9 的飞跃来自迁移到 Temporal（每天 5000 万 action、700 万 workflow），而不是更强的提示词。</li>
-      <li><b>把状态解耦。</b>agent loop、机器、对话三者分离，才能支撑子 agent 跨机、长达数周、可重试的运行。</li>
-      <li><b>随模型变强而"让开"。</b>把确定性逻辑持续交还给 agent 控制，harness 不消失但越来越薄。</li>
-      <li><b>云端的成本结构不同。</b>阻塞等待代价极高，因此云端 agent 必须更自主，并最终走向能自我诊断、自我修复的环境。</li>
-    </ol>
-  </div>
-</div>
+    <section class="takeaways">
+      <h2>最值得带走的洞见</h2>
+      <ul>
+        <li>云端 agent 的核心竞争力正在从模型输出，转向完整开发环境和运行基础设施。</li>
+        <li>长任务 agent 必须默认会失败，并把重试、恢复、调度和版本升级作为基础能力。</li>
+        <li>对话状态、机器状态和 agent loop 解耦后，agent 才能跨 pod、跨时间、跨子任务稳定运行。</li>
+        <li>harness 不应永远写死流程，而应逐步变成 agent 可调用、可组合的工具层。</li>
+        <li>未来更强的 cloud agents 会主动诊断和修复环境问题，这比单纯提高模型能力更接近真实生产需求。</li>
+      </ul>
+    </section>
+  </article>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

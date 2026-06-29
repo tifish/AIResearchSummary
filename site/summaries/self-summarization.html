@@ -3,106 +3,348 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>训练 Composer 应对长程任务：自我总结</title>
+<title>Training Composer for longer horizons - 中文总结</title>
 <style>
-  :root{
-    --bg:#0f1117; --card:#1a1d27; --ink:#e8eaf0; --muted:#9aa3b5;
-    --accent:#6ea8fe; --accent2:#5ce0b8; --warn:#ffb86b; --line:#2a2f3d;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);
-    font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-    line-height:1.75;font-size:17px}
-  .wrap{max-width:780px;margin:0 auto;padding:40px 22px 80px}
-  .kicker{font-size:13px;letter-spacing:.12em;color:var(--accent2);text-transform:uppercase}
-  h1{font-size:30px;line-height:1.3;margin:.3em 0 .2em}
-  .meta{color:var(--muted);font-size:14px;margin-bottom:28px}
-  .lede{background:linear-gradient(135deg,#1d2433,#1a1d27);border:1px solid var(--line);
-    border-left:4px solid var(--accent);border-radius:12px;padding:18px 20px;font-size:18px;margin:24px 0 34px}
-  .lede b{color:var(--accent)}
-  section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin:18px 0}
-  h2{font-size:20px;margin:.1em 0 .5em;color:var(--ink)}
-  h2 .tag{font-size:12px;color:var(--accent2);display:block;letter-spacing:.08em;margin-bottom:4px;font-weight:400}
-  .data{display:flex;flex-wrap:wrap;gap:12px;margin:14px 0}
-  .stat{flex:1 1 150px;background:#11141d;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
-  .stat .n{font-size:24px;font-weight:700;color:var(--accent)}
-  .stat .l{font-size:13px;color:var(--muted)}
-  .take{font-weight:600;color:var(--accent2)}
-  ol.steps{padding-left:20px;margin:10px 0}
-  ol.steps li{margin:6px 0}
-  .insights{background:linear-gradient(135deg,#16261f,#1a1d27);border:1px solid #2c4a3c;border-radius:12px;padding:22px 24px;margin-top:30px}
-  .insights h2{color:var(--accent2)}
-  .insights li{margin:10px 0}
-  strong.hl{color:var(--warn)}
-  .quote{border-left:3px solid var(--muted);padding:4px 14px;color:var(--muted);font-style:italic;margin:14px 0}
+:root{
+  --bg:#f6f7f4;
+  --card:#ffffff;
+  --ink:#1f2528;
+  --muted:#667276;
+  --line:#dfe5df;
+  --accent:#176b87;
+  --accent2:#8a5a14;
+  --accent3:#4f7d3a;
+  --hl:#e8f4f7;
+  --hl2:#fff3dc;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:linear-gradient(180deg,var(--bg),#eef2ee);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+  line-height:1.72;
+}
+main{
+  max-width:980px;
+  margin:0 auto;
+  padding:36px 20px 52px;
+}
+.hero{
+  border:1px solid var(--line);
+  background:var(--card);
+  border-radius:8px;
+  padding:28px;
+  box-shadow:0 10px 30px rgba(31,37,40,.06);
+}
+.eyebrow{
+  margin:0 0 10px;
+  color:var(--accent);
+  font-weight:700;
+  font-size:14px;
+}
+h1{
+  margin:0 0 14px;
+  font-size:30px;
+  line-height:1.25;
+  letter-spacing:0;
+}
+.lead{
+  margin:0;
+  font-size:19px;
+  color:var(--ink);
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  margin:18px 0 26px;
+}
+.metric{
+  background:var(--hl);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:16px;
+}
+.metric strong{
+  display:block;
+  font-size:25px;
+  color:var(--accent);
+  line-height:1.2;
+}
+.metric span{
+  color:var(--muted);
+  font-size:14px;
+}
+section{
+  margin-top:18px;
+  border:1px solid var(--line);
+  background:var(--card);
+  border-radius:8px;
+  padding:22px;
+}
+h2{
+  margin:0 0 10px;
+  font-size:21px;
+  line-height:1.35;
+}
+p{margin:0 0 12px}
+p:last-child{margin-bottom:0}
+mark{
+  background:var(--hl2);
+  color:var(--ink);
+  padding:.08em .28em;
+  border-radius:4px;
+}
+.callout{
+  border-left:4px solid var(--accent3);
+  background:color-mix(in srgb,var(--hl) 70%,var(--card));
+  padding:13px 15px;
+  border-radius:6px;
+  color:var(--ink);
+}
+ul{
+  margin:10px 0 0;
+  padding-left:22px;
+}
+li{margin:8px 0}
+.footer{
+  background:var(--ink);
+  color:#fff;
+}
+.footer h2{color:#fff}
+.footer li{color:#e6ece8}
+@media (max-width:760px){
+  main{padding:22px 14px 36px}
+  .hero,section{padding:18px}
+  h1{font-size:25px}
+  .lead{font-size:17px}
+  .grid{grid-template-columns:1fr}
+}
 </style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
+      background: var(--airs-digest-panel) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
 </head>
 <body>
-<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://cursor.com/blog/self-summarization" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
-<div class="wrap">
-  <div class="kicker">Cursor · Research</div>
-  <h1>训练 Composer 应对更长的任务视野：把“压缩”变成模型自己学会的本事</h1>
-  <div class="meta">来源：Cursor 博客 · 2026-06-29 收录 · 原文 2026-03-17 · 作者 Federico Cassano & Sasha Rush</div>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/self-summarization" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+  <article>
+    <header class="hero">
+      <p class="eyebrow">一句话总括</p>
+      <h1>Composer 的贡献是把上下文压缩训练成模型自己的长期记忆策略</h1>
+      <p class="lead">这篇文章真正要说明的是：长程编码代理不只需要更大的上下文窗口，还需要在训练中学会哪些历史信息会影响最终任务成败。</p>
+    </header>
 
-  <div class="lede">
-    <b>一句话总括：</b>Cursor 不再把“上下文压缩”当作 harness 在外部硬塞的补丁，而是把它<b>折叠进强化学习训练循环</b>，让编程模型 Composer 学会在合适时机自己总结上下文——这使它能从远超上下文窗口的长轨迹中获得训练信号，并更省 token 地完成数百步的复杂编程任务。
-  </div>
-
-  <section>
-    <h2><span class="tag">问题</span>压缩是必需的，但传统压缩会“失忆”</h2>
-    <p>CursorBench 内部基准显示：在真实困难编程任务上，<strong class="hl">更多的思考与代码库探索 = 更好的表现</strong>。但智能体的轨迹长度增长得比模型上下文窗口更快。</p>
-    <p>现有 harness 通常用两种方式压缩：文本空间里用提示式总结模型，或滑动窗口直接丢弃旧上下文（也有人探索更慢的隐空间向量压缩）。它们的共同缺陷是<strong class="hl">会丢掉关键信息</strong>，任务越长效果越差。</p>
-    <p class="take">结论：压缩躲不掉，但“在模型外面做压缩”天生会遗忘——这正是要在训练里解决的。</p>
-  </section>
-
-  <section>
-    <h2><span class="tag">方法</span>自我总结：让模型在训练中就学会“该记住什么”</h2>
-    <p>Composer 是在 Cursor 智能体 harness 内用强化学习训练的专用编程模型，因此可以做到“压缩在循环内”。运行流程是：</p>
-    <ol class="steps">
-      <li>从提示开始生成，直到触及固定 token 长度阈值；</li>
-      <li>插入一个合成查询，要求模型总结当前上下文；</li>
-      <li>给模型“草稿空间”思考最佳摘要，再生成压缩后的上下文；</li>
-      <li>带着摘要 + 会话状态（计划、剩余任务、已总结次数等）回到第 1 步。</li>
-    </ol>
-    <p>关键在于：同样的总结流程被放进<strong class="hl">训练</strong>。一次 rollout 可由多段生成靠摘要串联，<b>摘要本身也会被奖励或惩罚</b>——用最终奖励回传给链上所有 token，好摘要被加权、丢信息的差摘要被降权。技术上无需大改训练框架。</p>
-    <p class="take">结论：压缩不再是外挂技巧，而成了模型可被训练、可被优化的内在行为；难题上它常会多次自我总结。</p>
-  </section>
-
-  <section>
-    <h2><span class="tag">效果</span>误差减半，token 只用五分之一</h2>
-    <div class="data">
-      <div class="stat"><div class="n">−50%</div><div class="l">相比调优基线，压缩造成的误差持续降低一半</div></div>
-      <div class="stat"><div class="n">1/5</div><div class="l">token 用量，并复用 KV 缓存</div></div>
-      <div class="stat"><div class="n">~1,000</div><div class="l">自我摘要平均 token 数（基线 &gt;5,000）</div></div>
+    <div class="grid" aria-label="关键数据">
+      <div class="metric"><strong>50%</strong><span>自我总结约减少一半压缩错误</span></div>
+      <div class="metric"><strong>1/5</strong><span>相比强提示基线使用约五分之一 token</span></div>
+      <div class="metric"><strong>170 轮</strong><span>案例任务中完成长链路工程求解</span></div>
     </div>
-    <p>对照的是一个高度调优的提示式压缩基线：它的总结提示长达数千 token、含近十几个精心措辞的段落，输出压缩上下文平均超过 5,000 token。而 Composer 因为是被“训练出来”的，只需极短提示——内容差不多就是<span class="quote">“请总结这段对话”</span>——输出摘要平均仅约 1,000 token，因为它学会了按情境判断哪些是高价值信息。</p>
-    <p>在 <b>80k</b> 和 <b>40k</b> 两种触发阈值（后者总结更频繁）的受限环境下，自我总结在 CursorBench 上都明显更好且更省 token。</p>
-    <p class="take">结论：把压缩交给模型自己，不仅更聪明，还更便宜、更快（可复用缓存）。</p>
-  </section>
 
-  <section>
-    <h2><span class="tag">实证</span>170 个回合、10 万 token 压成 1 千，解出 DOOM 难题</h2>
-    <p>案例来自 Terminal-Bench 2.0 的 <b>make-doom-for-mips</b>：把 DOOM 源码编译成能在给定 vm.js 上运行的 MIPS 程序、并把每帧写成 bmp。题目描述简洁却极难，多个强力模型在官方成绩里都做不对。</p>
-    <p>一个早期研究版 Composer 正确解出了它：工作了 <strong class="hl">170 个回合</strong>，过程中写出紧凑、人类可读、结构化的自我摘要——把超过 <strong class="hl">100,000 token</strong> 压缩到它认为最有用的约 <strong class="hl">1,000 token</strong>。</p>
-    <p class="take">结论：这正是压缩的终极承诺——让模型靠长推理链“一次性”啃下需要数百步的硬问题。</p>
-  </section>
+    <section>
+      <h2>长任务失败的关键不是不会总结，而是总结不参与学习</h2>
+      <p>传统代理通常在上下文快满时由外部系统压缩历史：要么用提示词让另一个摘要过程改写文本，要么滑动窗口丢掉旧内容。文章指出，这些方法都会在长任务中遗失关键线索，尤其是软件工程任务里那些早期调查、失败尝试和局部约束。</p>
+      <p class="callout">这改变了对 AI 编码影响的理解：模型的长期能力不是单纯由上下文长度决定，而是由它能否持续保留“会影响后续行动的信息”决定。</p>
+    </section>
 
-  <section>
-    <h2><span class="tag">展望</span>通往更长任务视野</h2>
-    <p>把压缩折叠进训练循环，Composer 获得了一个<b>显式的、把关键信息高效带向未来</b>的机制。Cursor 把它视为迈向更长、更复杂流程（如多智能体协调）的一步，并预告 Composer 下一版本即将公布。</p>
-  </section>
+    <section>
+      <h2>自我总结被放进强化学习轨迹后，摘要本身也会被奖励</h2>
+      <p>Composer 在接近固定 token 阈值时暂停，收到一个合成摘要请求，先思考应保留什么，再生成压缩上下文；压缩后的状态包含摘要、计划状态、剩余任务和已总结次数等信息，然后继续生成。</p>
+      <p>训练时，Cursor 把多个由摘要串起来的生成步骤视为同一条 rollout，并用最终奖励作用到链条里的所有 token。好的摘要因为帮助最终成功而被上调权重，丢失关键事实的摘要则被下调。</p>
+      <p class="callout">结论是，压缩不再是推理时的补丁，而变成了模型可学习、可优化的行为。</p>
+    </section>
 
-  <div class="insights">
-    <h2>最值得带走的洞见</h2>
-    <ol>
-      <li><b>压缩应该是“训练目标”而非“外部补丁”。</b>当摘要本身进入奖励信号，模型才会真正学会保留关键信息，而不是机械裁剪。</li>
-      <li><b>“训练出来”的能力极其省事。</b>基线要数千 token 的精雕提示，Composer 只需一句“请总结”就能产出更好、约 1/5 长度的摘要。</li>
-      <li><b>质量与效率可以同时拿。</b>误差减半、token 用 1/5、还能复用 KV 缓存——并非通常的取舍关系。</li>
-      <li><b>长程能力是“硬题一次过”的前提。</b>170 回合解出连强力模型都失败的 DOOM-MIPS 难题，证明把 10 万 token 压成 1 千仍能保住解题所需信息。</li>
-      <li><b>方向指向多智能体。</b>自我总结只是起点，真正目标是让模型在更长、更复杂的协作流程中保持智能。</li>
-    </ol>
-  </div>
-</div>
+    <section>
+      <h2>更短的自我总结反而比复杂提示压缩更有效</h2>
+      <p>文章将自我总结与一个高度调优的提示式压缩基线比较。基线提示有数千 token，包含近十个精心设计的保留项，输出压缩上下文平均超过 <mark>5,000 token</mark>；Composer 只需要接近“请总结对话”的短提示，平均输出约 <mark>1,000 token</mark>。</p>
+      <p>在 <mark>80k</mark> 与 <mark>40k</mark> token 触发阈值下，自我总结都在 CursorBench 上表现更好，约减少 <mark>50%</mark> 压缩错误，同时使用约 <mark>五分之一</mark> token，并能复用 KV cache。</p>
+      <p class="callout">这说明更长、更细的摘要模板未必带来更可靠的长期能力；经过训练的模型可以用更少文字保留更高价值的信息。</p>
+    </section>
+
+    <section>
+      <h2>真实工程案例显示，长程代理需要跨越大量探索与失败尝试</h2>
+      <p>文章用 Terminal-Bench 2.0 的 make-doom-for-mips 任务作为案例：模型需要处理 Doom 源码、生成目标文件 doomgeneric_mips，并让 vm.js 运行输出帧图像。作者称该题在官方数字中难倒了多个强模型。</p>
+      <p>Composer 的早期研究检查点完成了这个任务，总共工作 <mark>170 轮</mark>，过程中把超过 <mark>100,000 token</mark> 的轨迹压缩成约 <mark>1,000 token</mark> 的人类可读结构化摘要。</p>
+      <p class="callout">这个例子强调，AI 编码代理的价值会越来越体现在“长时间保持问题状态并迭代工程方案”，而不是一次性写出短答案。</p>
+    </section>
+
+    <section>
+      <h2>这项工作指向更长周期的代理训练，而不只是更大的上下文窗口</h2>
+      <p>Cursor 将自我总结描述为走向长程代理的一步，未来目标包括更复杂过程和多代理协作。核心路线是把代理运行中真正会出现的上下文压缩、状态延续和错误恢复纳入训练，而不是只在推理框架外部修补。</p>
+      <p class="callout">最终洞见是：如果 AI 系统要承担更复杂的软件任务，训练目标必须覆盖“如何记住并继续工作”这一过程能力。</p>
+    </section>
+
+    <section class="footer">
+      <h2>最值得带走的洞见</h2>
+      <ul>
+        <li>长程编码能力的瓶颈之一是上下文压缩质量，而不是单纯的上下文窗口大小。</li>
+        <li>当摘要参与强化学习奖励后，模型会学会为最终成功保留关键信息。</li>
+        <li>Composer 的自我总结平均约 1,000 token，却优于超过 5,000 token 的复杂提示式压缩基线。</li>
+        <li>在 40k 和 80k token 触发环境下，压缩错误约减少 50%，说明该方法对更频繁压缩也有韧性。</li>
+        <li>长程代理的下一步竞争点，是能否跨很多轮探索、测试和修正持续推进真实工程任务。</li>
+      </ul>
+    </section>
+  </article>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
 </body>
-</html>
 </html>

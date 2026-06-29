@@ -3,124 +3,341 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SWE-bench Verified 为何不再衡量前沿编码能力</title>
+<title>SWE-bench Verified 为什么失效</title>
 <style>
-  :root{
-    --bg:#0f1419; --card:#1a212b; --ink:#e6edf3; --muted:#9aa7b4;
-    --accent:#4ea1ff; --warn:#ff7a59; --good:#3ddc97; --line:#2a3340;
-    --chip:#222c38;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);
-    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;
-    line-height:1.75;font-size:17px}
-  .wrap{max-width:820px;margin:0 auto;padding:40px 22px 80px}
-  header{border-bottom:1px solid var(--line);padding-bottom:26px;margin-bottom:30px}
-  .tag{display:inline-block;font-size:13px;color:var(--accent);
-    border:1px solid var(--accent);border-radius:999px;padding:2px 12px;margin-bottom:14px}
-  h1{font-size:30px;line-height:1.3;margin:6px 0 14px}
-  .meta{color:var(--muted);font-size:14px}
-  .lead{background:linear-gradient(135deg,#15324f,#1a212b);
-    border-left:4px solid var(--accent);border-radius:10px;
-    padding:18px 22px;margin:26px 0;font-size:18px}
-  .lead b{color:var(--accent)}
-  section{background:var(--card);border:1px solid var(--line);
-    border-radius:12px;padding:22px 24px;margin:20px 0}
-  h2{font-size:20px;margin:0 0 6px;color:#fff}
-  .sub{color:var(--muted);font-size:14px;margin:0 0 14px}
-  .num{color:var(--warn);font-weight:700}
-  .good{color:var(--good);font-weight:700}
-  .take{background:#102a22;border-left:3px solid var(--good);
-    padding:8px 14px;border-radius:6px;margin-top:14px;font-size:15.5px}
-  .take::before{content:"结论 · ";color:var(--good);font-weight:700}
-  .stats{display:flex;flex-wrap:wrap;gap:12px;margin:24px 0}
-  .stat{flex:1 1 150px;background:var(--chip);border:1px solid var(--line);
-    border-radius:10px;padding:14px 16px;text-align:center}
-  .stat .big{font-size:26px;font-weight:800;color:var(--accent)}
-  .stat .lbl{font-size:13px;color:var(--muted);margin-top:4px}
-  code{background:#0c1117;border:1px solid var(--line);border-radius:5px;
-    padding:1px 6px;font-size:14px;color:#ffd479}
-  .final{background:linear-gradient(135deg,#1c2a1f,#1a212b);
-    border:1px solid #2f5a3f;border-radius:12px;padding:24px;margin-top:30px}
-  .final h2{color:var(--good)}
-  ol{padding-left:22px}
-  ol li{margin:10px 0}
-  ol li b{color:#fff}
+:root{
+  --bg:#f6f7f9;
+  --card:#ffffff;
+  --ink:#172033;
+  --muted:#5d677a;
+  --line:#d9dee8;
+  --accent:#3157d5;
+  --accent2:#0f8b8d;
+  --accent3:#b35c00;
+  --hl:#eaf0ff;
+  --hl2:#fff4df;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+  line-height:1.72;
+}
+main{
+  max-width:980px;
+  margin:0 auto;
+  padding:34px 18px 48px;
+}
+.hero{
+  padding:28px;
+  background:linear-gradient(135deg,var(--hl),var(--card));
+  border:1px solid var(--line);
+  border-radius:8px;
+}
+.kicker{
+  color:var(--accent);
+  font-weight:700;
+  font-size:14px;
+}
+h1{
+  margin:8px 0 12px;
+  font-size:32px;
+  line-height:1.2;
+  letter-spacing:0;
+}
+.lead{
+  margin:0;
+  font-size:18px;
+  color:var(--ink);
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+  margin:18px 0;
+}
+.stat{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:16px;
+}
+.num{
+  display:block;
+  font-size:26px;
+  font-weight:800;
+  color:var(--accent);
+}
+.label{
+  display:block;
+  color:var(--muted);
+  font-size:14px;
+}
+section{
+  margin-top:18px;
+  padding:22px;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:8px;
+}
+h2{
+  margin:0 0 10px;
+  font-size:22px;
+  line-height:1.3;
+}
+p{margin:8px 0;color:var(--ink)}
+.note{
+  padding:12px 14px;
+  border-left:4px solid var(--accent2);
+  background:var(--hl);
+  color:var(--ink);
+  border-radius:6px;
+}
+.warn{
+  border-left-color:var(--accent3);
+  background:var(--hl2);
+}
+ul{
+  margin:8px 0 0;
+  padding-left:22px;
+}
+li{margin:8px 0}
+.badge{
+  display:inline-block;
+  margin:3px 6px 3px 0;
+  padding:3px 8px;
+  border-radius:999px;
+  background:var(--hl);
+  color:var(--accent);
+  font-size:13px;
+  font-weight:700;
+}
+@media (max-width:720px){
+  main{padding:20px 12px 36px}
+  .hero,section{padding:18px}
+  h1{font-size:26px}
+  .grid{grid-template-columns:1fr}
+}
 </style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
+      background: var(--airs-digest-panel) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
 </head>
 <body>
-<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://openai.com/index/why-we-no-longer-evaluate-swe-bench-verified" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
-<div class="wrap">
-  <header>
-    <span class="tag">Research · OpenAI</span>
-    <h1>SWE-bench Verified 为何不再衡量前沿编码能力</h1>
-    <div class="meta">OpenAI · 2026 年 2 月 23 日</div>
-  </header>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/why-we-no-longer-evaluate-swe-bench-verified" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+  <article>
+    <header class="hero">
+      <div class="kicker">一句话总括</div>
+      <h1>SWE-bench Verified 的问题不是“太难”，而是它已经混入了测试缺陷和训练暴露。</h1>
+      <p class="lead">OpenAI 的核心贡献是说明：当前高分模型在这个公开 benchmark 上的表现，越来越难解释为真实软件工程能力提升。</p>
+    </header>
 
-  <div class="lead">
-    <b>一句话总括：</b>业界最常用的自主软件工程基准 SWE-bench Verified 同时被“训练污染”和“测试缺陷”双重侵蚀，分数上涨不再代表模型变强——OpenAI 因此停止报告它，转而推荐 SWE-bench Pro。
-  </div>
+    <div class="grid">
+      <div class="stat"><span class="num">500</span><span class="label">Verified 最终题量</span></div>
+      <div class="stat"><span class="num">59.4%</span><span class="label">审计题目存在实质问题</span></div>
+      <div class="stat"><span class="num">74.9% → 80.9%</span><span class="label">近 6 个月公开进展</span></div>
+    </div>
 
-  <div class="stats">
-    <div class="stat"><div class="big">74.9%→80.9%</div><div class="lbl">近 6 个月最优成绩仅微涨</div></div>
-    <div class="stat"><div class="big">59.4%</div><div class="lbl">受审难题含实质测试缺陷</div></div>
-    <div class="stat"><div class="big">500</div><div class="lbl">Verified 精选题量（原 1699）</div></div>
-    <div class="stat"><div class="big">100%</div><div class="lbl">受测前沿模型均出现污染迹象</div></div>
-  </div>
+    <section>
+      <h2>Verified 曾经修正旧评测，但现在剩余误差开始主导结论</h2>
+      <p>SWE-bench Verified 在 2024 年 8 月发布，目的是修复原始 SWE-bench 中无法完成、测试误配或环境不稳定的问题。它从 1,699 个问题中筛出 500 个，每题由 3 名专家独立审查。</p>
+      <p>这让它一度成为前沿模型发布时常用的编程能力指标。问题是，当模型分数已经很高时，剩下的失败不一定代表模型不会写代码，可能只是题目和测试本身无法公正区分正确解。</p>
+      <p class="note">理解 AI 编程能力时，benchmark 的质量会在高分区变得更关键：测试集的小缺陷会被放大成对模型能力的错误判断。</p>
+    </section>
 
-  <section>
-    <h2>进步放缓，敲响怀疑的钟</h2>
-    <p class="sub">是模型遇到天花板，还是数据集本身出了问题？</p>
-    <p>自 2024 年 8 月发布以来，Verified 成为前沿模型发布的标准指标。但最先进成绩在过去 6 个月只从 <span class="num">74.9%</span> 升到 <span class="num">80.9%</span>。停滞迫使 OpenAI 反问：剩下的失败是模型的局限，还是数据集的毛病？</p>
-    <div class="take">趋缓的曲线往往不是能力见顶，而是测量工具失真的早期信号。</div>
-  </section>
+    <section>
+      <h2>测试既过窄又过宽，正确修复也可能被判失败</h2>
+      <p>OpenAI 审计了 138 个 SWE-bench Verified 问题，这些题是 OpenAI o3 在 64 次独立运行中不稳定或经常失败的子集，占完整 500 题的 27.6%。每个案例至少由 6 名有经验的软件工程师复核。</p>
+      <p>结果显示，59.4% 的审计题存在实质性测试或题目描述问题。其中 35.5% 是“过窄测试”，也就是测试强制某个实现细节；18.8% 是“过宽测试”，也就是测试覆盖了题目没有说明的额外功能；另有 5.1% 属于其他问题。</p>
+      <p>这改变了读者对 AI 影响的理解：模型失败不总是能力不足，自动测试也可能把合理的软件工程解法误判为错误。</p>
+    </section>
 
-  <section>
-    <h2>测试要么太窄、要么太宽，会拒绝正确答案</h2>
-    <p class="sub">审计 o3 在 64 次运行中未稳定解出的 138 题，每题至少 6 名工程师复核</p>
-    <p>这 138 题占数据集的 <span class="num">27.6%</span>，其中 <span class="num">59.4%</span> 存在实质缺陷，对最强模型乃至人类都几乎无解：</p>
-    <ul>
-      <li><b>过窄测试（35.5%）</b>：强制特定实现细节。如 <code>pylint-4551</code> 的测试直接 import 描述里从未提及的 <code>get_annotation</code> 函数，许多功能正确的方案因 import 报错被判错。</li>
-      <li><b>过宽测试（18.8%）</b>：检查描述之外的功能。如 <code>sympy-18199</code> 的 PR 同时修了 3 个 issue，但任务描述只写了其中 1 个，模型把描述的部分做对了仍会挂在另外两个上。</li>
-      <li><b>其它杂项（5.1%）</b>：无法归入上述类型。</li>
-    </ul>
-    <div class="take">当“正确”由有缺陷的测试定义时，失败分既可能来自模型，也可能来自评分器本身。</div>
-  </section>
+    <section>
+      <h2>污染让高分更像“见过答案”，而不是“会解决问题”</h2>
+      <p>SWE-bench Verified 的问题来自公开 GitHub 仓库，代码、PR、release notes 和讨论都可能进入模型训练数据。OpenAI 发现 GPT-5.2 曾解决 31 个几乎不可能仅凭题面完成的任务，这提示模型可能拥有题外信息。</p>
+      <p>随后 OpenAI 设计了自动红队流程：让 GPT-5 针对每个任务，在 15 轮内用不同提示策略探测 GPT-5.2-Chat、Claude Opus 4.5 和 Gemini 3 Flash Preview 是否能吐出任务特定信息。结果显示，三类模型都出现过强污染例子，包括复现 gold patch、文件名、方法名、正则表达式或逐字注释。</p>
+      <p class="note warn">当 benchmark 题目和答案出现在训练材料中，分数就可能衡量“暴露程度”，而不是衡量模型在新问题上的工程能力。</p>
+    </section>
 
-  <section>
-    <h2>污染：模型在“考前看过答案”</h2>
-    <p class="sub">基准与源码、发布说明全是开源公开的，难以从训练数据中剔除</p>
-    <p>线索先出现在自家模型：<b>GPT‑5.2 解出了 31 道被判定几乎不可能的题</b>。在 <code>django-14725</code> 中，测试要求一个描述未提的 <code>edit_only</code> 参数，而 GPT‑5.2 的思维链显示它知道该参数是 Django 4.1 引入的发布说明细节。</p>
-    <p>为量化范围，OpenAI 让 <b>GPT‑5</b> 在 15 轮内自动红队探测 <b>GPT‑5.2‑Chat、Claude Opus 4.5、Gemini 3 Flash Preview</b>（特意选非推理模型），由裁判模型按“无→强”给污染评级。结果——所有受测模型都能逐字复现 gold patch 或问题描述：</p>
-    <ul>
-      <li><code>django-11451</code>：GPT‑5.2 凭片段输出精确 gold patch，含新早返条件 <code>if username is None or password is None</code>。</li>
-      <li><code>astropy-13236</code>：Claude Opus 4.5 复现 4 行改动、文件名、方法名，连 diff 里的行内注释都逐字背出。</li>
-      <li><code>django-11099</code>：Gemini 3 Flash <b>仅凭任务 ID</b> 就吐出问题描述与 gold patch 细节，包括新正则与精确行号。</li>
-    </ul>
-    <div class="take">证据还显示：见过题的模型更易通过——因为它们掌握了通过“欠规约测试”所需的额外信息，分数被悄悄抬高。</div>
-  </section>
+    <section>
+      <h2>SWE-bench Pro 是过渡方案，私有原创评测才是方向</h2>
+      <p>OpenAI 因此停止报告 SWE-bench Verified 分数，并建议其他模型开发者也停止使用它作为前沿发布指标。它推荐暂时报告 SWE-bench Pro，原因是污染迹象更少、更不严重，且被测模型没有产出完整逐字 gold patch。</p>
+      <p>但文章也强调，SWE-bench Pro 不是终点。更可靠的方向是原创、私有、较少暴露在公开爬取数据中的任务，并结合训练有素的人工评审进行整体评分。</p>
+      <p>结论是：未来 AI 编程评测不能只靠公开仓库加自动单测，还要把污染控制、任务保密、测试稳健性和人工判断纳入设计。</p>
+    </section>
 
-  <section>
-    <h2>替代方案与两条通用教训</h2>
-    <p class="sub">改报 SWE-bench Pro，并把发现写进未来的评测方法论</p>
-    <p>同一污染流程检测 SWE-bench Pro 时，命中更稀少、更轻微，<span class="good">没有任何模型能产出完整逐字的 gold patch</span>，故 OpenAI 推荐业界改用它。两条更广的教训：</p>
-    <ul>
-      <li><b>公开素材 = 污染风险</b>：用公开抓取数据构建基准时必须额外做污染测试，数据要加密发布（如密码保护），训练侧严格遵守 canary 字符串过滤。</li>
-      <li><b>自动评分极难做对</b>：理想测试应既无视无关实现细节、又能防住取巧解；这类问题靠多轮大规模人工标注才能揪出。</li>
-    </ul>
-    <p>OpenAI 表示将持续投入私有、由专家撰写的基准（如 <code>GDPVal</code>，任务私密撰写、由训练过的评审整体评分），并呼吁产学界共建。</p>
-  </section>
-
-  <div class="final">
-    <h2>最值得带走的洞见</h2>
-    <ol>
-      <li><b>分数停滞≠能力见顶。</b>74.9%→80.9% 的微涨更多是基准失真，而非模型触顶。</li>
-      <li><b>“干净的测量”比“高分”更稀缺。</b>受审难题中 59.4% 因测试过窄/过宽而无法被正确解出，评分器本身在制造失败。</li>
-      <li><b>开源基准天然会被训练数据污染。</b>所有受测前沿模型都能逐字复现答案，Gemini 3 Flash 甚至只凭 ID。</li>
-      <li><b>污染会“静默”抬分。</b>见过题的模型靠记忆补足欠规约测试，让排行榜失去区分真实能力的作用。</li>
-      <li><b>未来在私有、专家撰写、整体评分的基准。</b>SWE-bench Pro 是过渡，GDPVal 式的私密评测才是衡量真实进步的方向。</li>
-    </ol>
-  </div>
-</div>
+    <section>
+      <h2>最值得带走的洞见</h2>
+      <ul>
+        <li><span class="badge">洞见一</span>前沿模型接近 benchmark 上限后，分数停滞可能来自数据集缺陷，而不一定来自能力瓶颈。</li>
+        <li><span class="badge">洞见二</span>公开来源评测天然有污染风险，尤其当问题、PR、测试和答案都可被训练语料覆盖时。</li>
+        <li><span class="badge">洞见三</span>自动测试必须既不绑定无关实现细节，也不能偷偷要求题面外功能，否则会误伤正确解。</li>
+        <li><span class="badge">洞见四</span>真实软件工程能力需要用更新、更私有、更贴近开放式工作的评测来衡量。</li>
+      </ul>
+    </section>
+  </article>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

@@ -3,120 +3,341 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>用 Auto-review 治理 Agent 自主权 · 总结</title>
+<title>Governing agent autonomy with Auto-review - 中文总结</title>
 <style>
-  :root{
-    --bg:#0f1115; --card:#171a21; --ink:#e8eaed; --sub:#a9b0bd;
-    --accent:#5aa9ff; --accent2:#7ee0a8; --warn:#ffb454; --line:#262b35;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);
-    font:16px/1.75 -apple-system,"Segoe UI",Roboto,"Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;}
-  .wrap{max-width:780px;margin:0 auto;padding:40px 22px 64px;}
-  .tag{display:inline-block;font-size:13px;letter-spacing:.5px;color:var(--accent2);
-    border:1px solid var(--line);border-radius:999px;padding:3px 12px;margin-bottom:18px;}
-  h1{font-size:30px;line-height:1.3;margin:0 0 10px;}
-  .meta{color:var(--sub);font-size:14px;margin-bottom:28px;}
-  .lede{background:linear-gradient(135deg,#1b2330,#171a21);border:1px solid var(--line);
-    border-left:4px solid var(--accent);border-radius:12px;padding:18px 20px;margin:0 0 34px;font-size:18px;}
-  .lede b{color:var(--accent);}
-  section{background:var(--card);border:1px solid var(--line);border-radius:12px;
-    padding:20px 22px;margin:0 0 18px;}
-  h2{font-size:19px;margin:0 0 8px;color:#fff;}
-  h2 .n{color:var(--accent);font-weight:700;margin-right:8px;}
-  .data{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0;}
-  .pill{background:#0e1420;border:1px solid var(--line);border-radius:9px;padding:8px 12px;font-size:14px;}
-  .pill b{color:var(--accent2);font-size:17px;}
-  .insight{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);color:var(--sub);}
-  .insight b{color:var(--warn);}
-  .big{font-size:22px;color:#fff;}
-  .takeaways{background:linear-gradient(135deg,#10261c,#13201a);border:1px solid #1f4233;}
-  .takeaways h2{color:var(--accent2);}
-  ol{margin:8px 0 0;padding-left:22px;}
-  ol li{margin:10px 0;}
-  ol li b{color:#fff;}
-  .foot{color:var(--sub);font-size:13px;margin-top:26px;text-align:center;}
-  a{color:var(--accent);}
+:root{
+  --bg:#f7f8fb;
+  --card:#ffffff;
+  --ink:#18202a;
+  --muted:#5f6b7a;
+  --line:#dfe5ee;
+  --accent:#2563eb;
+  --accent2:#0f766e;
+  --accent3:#b45309;
+  --hl:#eaf2ff;
+  --hl2:#ecfdf5;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+  line-height:1.72;
+}
+main{
+  max-width:980px;
+  margin:0 auto;
+  padding:44px 20px 56px;
+}
+.hero{
+  border:1px solid var(--line);
+  background:linear-gradient(135deg,var(--card),var(--hl));
+  border-radius:18px;
+  padding:30px;
+}
+.label{
+  display:inline-block;
+  color:var(--accent);
+  font-weight:700;
+  font-size:14px;
+  margin-bottom:10px;
+}
+h1{
+  margin:0 0 14px;
+  font-size:32px;
+  line-height:1.25;
+  letter-spacing:0;
+}
+.lead{
+  margin:0;
+  color:var(--ink);
+  font-size:18px;
+}
+.meta{
+  margin-top:16px;
+  color:var(--muted);
+  font-size:14px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:18px;
+  margin-top:22px;
+}
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:22px;
+}
+.card.wide{grid-column:1/-1}
+h2{
+  margin:0 0 10px;
+  font-size:21px;
+  line-height:1.35;
+}
+p{margin:0 0 12px}
+p:last-child{margin-bottom:0}
+.data{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin:14px 0;
+}
+.badge{
+  background:var(--hl2);
+  color:var(--accent2);
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:6px 10px;
+  font-weight:700;
+  font-size:14px;
+}
+.note{
+  color:var(--muted);
+}
+.takeaways{
+  margin-top:22px;
+  background:var(--card);
+  border-left:5px solid var(--accent3);
+  border-radius:14px;
+  padding:24px;
+}
+.takeaways h2{margin-bottom:12px}
+ul{
+  margin:0;
+  padding-left:20px;
+}
+li{margin:8px 0}
+@media (max-width:760px){
+  main{padding:24px 14px 40px}
+  .hero{padding:22px}
+  h1{font-size:26px}
+  .lead{font-size:16px}
+  .grid{grid-template-columns:1fr}
+}
 </style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
+      background: var(--airs-digest-panel) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
 </head>
 <body>
-<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://cursor.com/blog/agent-autonomy-auto-review" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
-<div class="wrap">
-  <span class="tag">Research · Cursor · 2026-06-11</span>
-  <h1>用 Auto-review 把 Agent 自主权做成"旋钮"，而不是"开关"</h1>
-  <div class="meta">作者：David Gomes & Travis McPeak ·
-    <a href="https://cursor.com/blog/agent-autonomy-auto-review">原文</a></div>
-
-  <div class="lede">
-    <b>一句话总括：</b>Cursor 的真正贡献，不是又加了一道安全检查，而是用一个能读工作区、带轻量推理的小型"分类器智能体"，
-    在动作执行前判断它<i>是否符合用户意图</i>——从而在几乎不打断用户的情况下给本地 agent 装上可调节的安全闸。
-  </div>
-
-  <section>
-    <h2><span class="n">01</span>问题：自主与安全的两难，靠"多问一句"解决不了</h2>
-    <p>Agent 要高效，就需要自主；但本地 agent 紧挨着文件、密钥、环境变量、MCP 工具甚至生产系统，自主越多风险越大。
-    最朴素的办法是"每个动作都先问用户"，但弹窗太多反而制造新的安全问题：</p>
-    <p class="big">问得太频繁，人就不再认真看，审批流于形式。</p>
-    <p class="insight"><b>洞见：</b>安全感不等于安全。把"打断频率"本身当成一个要被优化的成本，是这套设计与传统权限弹窗的根本分野。</p>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/agent-autonomy-auto-review" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+  <section class="hero">
+    <span class="label">一句话总括</span>
+    <h1>Auto-review 的贡献，是把本地 AI 代理的安全治理做成“按上下文调速”的审查回路，而不是把自主性关回确认弹窗里。</h1>
+    <p class="lead">文章讨论的不是单个安全功能，而是一个更普遍的问题：当代理能读文件、跑命令、接触凭据和生产环境时，怎样让它继续高效行动，同时在真正越界前减速。</p>
+    <p class="meta">Cursor Research，2026 年 6 月 11 日；作者 David Gomes 与 Travis McPeak。</p>
   </section>
 
-  <section>
-    <h2><span class="n">02</span>核心判断：看的不是"动作危不危险"，而是"配不配得上用户的请求"</h2>
-    <p>同一条命令在一个工作流里无害，在另一个里就不可接受。分类器被赋予的中心规则是：
-    <b>安全代价低时更宽松，代价高时更谨慎</b>。关键不是动作孤立看是否冒险，而是它<i>是否被用户的请求所正当化</i>。</p>
-    <p class="insight"><b>洞见：</b>把"意图一致性"作为裁决标准，让日常开发畅通无阻，只有真正高后果的动作才需要用户给出更明确的信号。</p>
-  </section>
+  <section class="grid">
+    <article class="card">
+      <h2>风险不在命令本身，而在命令和用户意图的关系里</h2>
+      <p>同一个命令在一种任务里可能只是正常开发步骤，在另一种任务里可能会读取秘密、改动生产数据或造成大副作用。Auto-review 因此不只看工具调用字符串，而是把用户请求、动作后果和犯错代价一起纳入判断。</p>
+      <p>这改变了对 AI 影响的理解：代理安全不是简单限制能力，而是判断能力在当前任务中是否被正当地使用。结论是，自治程度需要按上下文连续调节。</p>
+    </article>
 
-  <section>
-    <h2><span class="n">03</span>工程取舍：小模型、能动手、零额外往返</h2>
-    <p>分类器跑在每次工具调用之前，必须又快又准。一个反直觉的发现是——</p>
-    <p class="big">低推理模型并不总是更快：它读不懂策略时会反复纠结，花更多 token 得到更差答案。</p>
-    <div class="data">
-      <div class="pill">模型策略：<b>小模型 + 足够推理</b></div>
-      <div class="pill">可调用工具：<b>ReadFile / Grep / Glob / ListDir</b></div>
-      <div class="pill">部署：<b>同一 RPC 流</b>，无独立端点</div>
-    </div>
-    <p>它是"agentic"的：像 <code>python script.py</code> 这种命令，安全与否取决于文件内容，所以分类器会先检查工作区再裁决；
-    并与父 agent 共用 RPC 流（类似 subagent 架构），避免每次审查前都多一次网络往返带来的延迟。</p>
-    <p class="insight"><b>洞见：</b>安全组件必须"隐形"——延迟和成本一旦显现，就会被绕过或关掉。把它塞进 agent 主循环而非旁路，是能默认开启的前提。</p>
-  </section>
+    <article class="card">
+      <h2>分类器被放进执行路径，因此速度和判断力同样重要</h2>
+      <p>Cursor 选择用一个小型、带足够推理能力的分类器代理，在工具调用执行前做审查；低推理模型并不总是更快，因为理解不了策略时反而会消耗更多时间和 token。</p>
+      <p>分类器还可以用 ReadFile、Grep、Glob、ListDir 等工具检查工作区，例如判断 <code>python script.py</code> 背后实际会做什么。结论是，本地代理治理需要“轻量但能看上下文”的模型，而不是纯规则表。</p>
+    </article>
 
-  <section>
-    <h2><span class="n">04</span>评测：真实数据定基线，合成数据补极端</h2>
-    <div class="data">
-      <div class="pill">来源：约 <b>12 小时</b> 内部开发会话</div>
-      <div class="pill">去重标注后：<b>6,122 行</b></div>
-      <div class="pill">合成场景：读密钥/碰生产数据/跟随不可信指令</div>
-    </div>
-    <p>评测直接跑生产同款后端分类器回路，覆盖工具使用、最终判定、模型回退与解析失败的完整路径。
-    团队还专门盯"抖动"（flapping）：同一案例六次放行四次拦截，往往说明策略或提示词定义不清，需要收紧到行为一致。</p>
-    <p class="insight"><b>洞见：</b>策略一变就得重新标注/重建评测集，否则是在用过时的问题定义考核新分类器——安全策略的"数据债"是持续工程成本。</p>
-  </section>
+    <article class="card wide">
+      <h2>真正有用的阻止，不应默认变成用户打断</h2>
+      <p>Auto-review 的阻止结果会先反馈给父代理，说明为什么动作不合适；父代理可以缩小命令范围、换工具、避开高风险步骤，只有需要更明确信号时才打断用户。</p>
+      <div class="data">
+        <span class="badge">约 4% 审查动作被阻止</span>
+        <span class="badge">约 7% 聊天出现中断</span>
+        <span class="badge">部分企业此前约 40% 动作被阻止</span>
+      </div>
+      <p class="note">这些早期数据说明，审查机制的价值不只是“挡住危险动作”，还在于把许多危险路径转化成代理可自行修正的路径。结论是，安全反馈如果能回到代理循环里，就能减少用户疲劳。</p>
+    </article>
 
-  <section>
-    <h2><span class="n">05</span>效果：拦截很少，打断更少</h2>
-    <div class="data">
-      <div class="pill">分类器运行时拦截：<b>约 4%</b> 动作</div>
-      <div class="pill">含中断的对话：<b>仅约 7%</b></div>
-      <div class="pill">对照（部分企业旧方案）：<b>约 40%</b> 动作被拦</div>
-    </div>
-    <p>多数动作早被允许列表或沙箱覆盖，分类器只在需要上下文判断时才出手。即便拦截，也是先把<b>解释返回给父 agent</b>，
-    后者通常能收窄动作、换个工具或干脆避开风险步骤，而不必惊动用户。</p>
-    <p class="insight"><b>洞见：</b>从约 40% 拦截到约 7% 对话才中断，量级差异说明"反馈给 agent 自我修正"比"反馈给人审批"在体验上是数量级的改进。</p>
+    <article class="card">
+      <h2>评测数据必须覆盖日常工作和罕见坏情况</h2>
+      <p>Cursor 先从约 12 小时内部开发者会话提炼正常代理工作的基线，再去重整理成 6,122 条标注样本；同时用合成数据覆盖读取机密、触碰生产数据、遵循不受信指令和大副作用操作等低频高风险场景。</p>
+      <p>这说明 AI 安全评测不能只看线上常见行为，因为最需要防的错误往往很少自然出现。结论是，生产数据和合成攻击案例需要一起构成评测面。</p>
+    </article>
+
+    <article class="card">
+      <h2>稳定性本身也是安全指标</h2>
+      <p>评测运行在与生产相同的后端分类器循环中，覆盖工具使用、最终 allow/block 决策、模型覆盖和解析失败；团队还检查同一案例多次运行是否“摇摆”，例如六次允许、四次阻止。</p>
+      <p>这种 flapping 往往意味着策略或提示词没有定义清楚。结论是，代理治理不只追求平均准确率，还要追求同一风险在重复判断中的一致性。</p>
+    </article>
   </section>
 
   <section class="takeaways">
-    <h2>最值得带走的 5 条洞见</h2>
-    <ol>
-      <li><b>自主权应是连续旋钮：</b>由上下文（后果×意图）决定是否减速，而非一个全局权限开关。</li>
-      <li><b>判据是意图一致性：</b>问"这动作配不配得上用户的请求"，而不是"这动作看起来危不危险"。</li>
-      <li><b>小而能推理 + agentic：</b>低推理未必更快；让分类器能读工作区、并嵌进主 RPC 流，才能既准又无额外延迟。</li>
-      <li><b>把打断当成本来优化：</b>拦截先反馈给父 agent 自我修正，约 4% 拦截最终只让约 7% 对话产生中断。</li>
-      <li><b>安全策略有数据债：</b>策略迭代必须同步重标评测集，并用重复跑测找"抖动"来保证行为稳定。</li>
-    </ol>
+    <h2>最值得带走的洞见</h2>
+    <ul>
+      <li>本地 AI 代理越有用，越会靠近文件、凭据、环境变量和生产系统，权限治理必须进入执行路径。</li>
+      <li>频繁确认会制造新的安全问题：用户会疲劳，审批也会失去意义。</li>
+      <li>更好的模式是让代理在低风险处自由行动，在高后果边界前由上下文分类器减速。</li>
+      <li>阻止动作的解释应该优先反馈给代理本身，让它改走安全路径，而不是马上打断人。</li>
+      <li>Auto-review 的意义在于把代理自治做成可评测、可迭代的工程系统，而不是一次性权限设置。</li>
+    </ul>
   </section>
-
-  <div class="foot">目前聚焦桌面端本地 agent，新用户默认开启，老用户可在 Settings &gt; Agents 启用。</div>
-</div>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

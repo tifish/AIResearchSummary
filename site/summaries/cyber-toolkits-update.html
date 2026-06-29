@@ -1,97 +1,339 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI 自主攻击门槛正在下降：Equifax 靶场实测</title>
-<style>
-  :root{
-    --bg:#0f1115; --card:#181b22; --ink:#e8eaed; --muted:#9aa3af;
-    --accent:#e0533d; --accent2:#4f9dde; --good:#5cc28a; --warn:#e3b341;
-    --line:#2a2f3a;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);
-    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;
-    line-height:1.75;font-size:17px}
-  .wrap{max-width:820px;margin:0 auto;padding:40px 22px 80px}
-  .tag{display:inline-block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;
-    color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:3px 12px;margin-bottom:18px}
-  h1{font-size:30px;line-height:1.3;margin:0 0 10px}
-  .meta{color:var(--muted);font-size:14px;margin-bottom:26px}
-  .lead{font-size:20px;line-height:1.65;background:linear-gradient(90deg,rgba(224,83,61,.14),rgba(79,157,222,.10));
-    border-left:4px solid var(--accent);padding:18px 20px;border-radius:8px;margin:0 0 34px}
-  .lead b{color:#fff}
-  section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px 24px;margin:0 0 20px}
-  h2{font-size:20px;margin:0 0 12px;color:#fff}
-  h2 .num{color:var(--accent2);font-weight:700;margin-right:8px}
-  .stat{display:flex;flex-wrap:wrap;gap:14px;margin:16px 0}
-  .pill{background:#11141a;border:1px solid var(--line);border-radius:10px;padding:12px 16px;flex:1;min-width:150px}
-  .pill .big{font-size:26px;font-weight:800;color:var(--warn);display:block}
-  .pill .lbl{font-size:13px;color:var(--muted)}
-  .take{color:var(--good);font-weight:600}
-  .insights{background:linear-gradient(180deg,#1b1f27,#15181e);border:1px solid var(--accent);}
-  .insights ol{margin:10px 0 0;padding-left:22px}
-  .insights li{margin:10px 0}
-  .insights b{color:#fff}
-  em{color:var(--accent2);font-style:normal}
-  .foot{color:var(--muted);font-size:13px;margin-top:28px;text-align:center}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI 网络能力评估摘要</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --card: #ffffff;
+      --ink: #1c2430;
+      --muted: #647084;
+      --line: #d9dee7;
+      --accent: #2458d3;
+      --accent2: #0f8b6f;
+      --accent3: #b45309;
+      --hl: #e9f0ff;
+      --hl2: #fff4df;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      line-height: 1.72;
+    }
+    main {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 40px 20px 56px;
+    }
+    .hero {
+      background: linear-gradient(135deg, var(--hl), var(--card));
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+    h1 {
+      margin: 0 0 14px;
+      font-size: 28px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+    .lead {
+      margin: 0;
+      font-size: 18px;
+      color: var(--ink);
+      font-weight: 650;
+    }
+    .meta {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    section {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 22px 24px;
+      margin-top: 16px;
+    }
+    h2 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      line-height: 1.35;
+      color: var(--accent);
+      letter-spacing: 0;
+    }
+    p { margin: 0 0 12px; }
+    p:last-child { margin-bottom: 0; }
+    .data {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin: 18px 0 4px;
+    }
+    .stat {
+      border: 1px solid var(--line);
+      background: var(--hl);
+      border-radius: 8px;
+      padding: 14px;
+      min-height: 112px;
+    }
+    .num {
+      display: block;
+      font-size: 26px;
+      font-weight: 750;
+      color: var(--accent2);
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .label {
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .takeaways {
+      background: var(--hl2);
+      border-color: color-mix(in srgb, var(--accent3) 35%, var(--line));
+    }
+    ul {
+      margin: 10px 0 0;
+      padding-left: 22px;
+    }
+    li { margin: 8px 0; }
+    strong { color: var(--accent3); }
+    @media (max-width: 720px) {
+      main { padding: 24px 14px 40px; }
+      .hero, section { padding: 20px; }
+      h1 { font-size: 24px; }
+      .lead { font-size: 16px; }
+      .data { grid-template-columns: 1fr; }
+    }
+  </style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
+      background: var(--airs-digest-panel) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
 </head>
 <body>
-<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/cyber-toolkits-update" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
-<div class="wrap">
-  <div class="tag">Anthropic · Frontier Red Team</div>
-  <h1>AI 已能用"现成工具"攻破真实网络：Equifax 靶场实测</h1>
-  <div class="meta">来源：Anthropic ｜ 2026-01-16 ｜ 原文：cyber-toolkits-update</div>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/cyber-toolkits-update" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+  <main>
+    <article>
+      <div class="hero">
+        <h1>AI 正在降低复杂网络攻击的操作门槛</h1>
+        <p class="lead">一句话总括：Anthropic 的新评估真正贡献在于显示，前沿模型已开始从依赖定制攻击工具，转向仅用公开标准工具在真实感更强的网络靶场中完成部分多阶段攻击。</p>
+        <div class="meta">来源：Anthropic｜日期：2026 年 1 月 16 日｜主题：Frontier Red Team</div>
+      </div>
 
-  <p class="lead">一句话总括：真正的新闻不是"AI 会攻击"，而是 <b>Claude 已经不再需要专门定制的网络工具</b>——它能仅凭一台 Kali Linux 上的标准 Bash 工具，自主完成对数十台主机网络的多阶段攻击，这意味着 AI 参与自主攻防的"工具门槛"正在快速消失。</p>
+      <section>
+        <h2>关键变化不是“会攻击”，而是“少了专用工具也能推进”</h2>
+        <p>此前 Claude 和其他前沿模型要完整攻下 25-50 台主机规模的模拟网络，通常需要 Incalmo 的定制 cyber toolkit，把高层攻击意图转成低层命令。Sonnet 4.5 的新变化是，在少数网络中已经能只靠 Bash、Kali Linux 和标准开源工具推进。</p>
+        <p>这改变了对 AI 网络影响的理解：风险不只来自模型能力变强，也来自把能力转化为可执行流程所需的工程门槛正在下降。</p>
+      </section>
 
-  <section>
-    <h2><span class="num">01</span>从"需要定制工具"到"现成工具就够"</h2>
-    <p>过去一年，Anthropic 与卡内基梅隆 CyLab、以及 Incalmo 在比夺旗赛（CTF）更真实、规模 25–50 台主机的仿真网络靶场上测试模型。<strong>关键变化：</strong>早先所有前沿模型都必须依赖一个"定制网络工具包"——把 AI 的高层攻击意图翻译成底层命令——才能成功；而 Sonnet 4.5 已能在少数网络上<em>脱离</em>该工具包独立得手。</p>
-    <p class="take">结论：衡量 AI 网络能力的标尺，应从"它能不能攻击"转向"它还需不需要人为搭好的脚手架"——后者正在被快速拆除。</p>
-  </section>
+      <section>
+        <h2>Equifax 模拟展示了“公开漏洞 + 快速自动化”的现实风险</h2>
+        <p>在 Equifax 数据泄露的高保真模拟中，Sonnet 4.5 能识别一个已公开 CVE，并编写利用代码，从而外传全部模拟个人信息；文章强调它不需要临时查找或反复试错。原始 Equifax 事件同样与已公开但未及时修补的漏洞有关。</p>
+        <p>这使“及时打补丁”不再只是常规安全建议，而是在 AI 代理能够快速利用已知漏洞时，防守方缩短暴露窗口的核心手段。</p>
+      </section>
 
-  <section>
-    <h2><span class="num">02</span>Equifax 复现：识别 CVE 后直接写利用代码</h2>
-    <p>在对史上代价最高的网络攻击之一——Equifax 数据泄露——的高保真复现中，Sonnet 4.5 仅用 Kali 上的 Bash，就<strong>瞬间识别出一个已公开的 CVE，并直接写出利用代码窃取全部模拟个人信息</strong>，无需查阅资料或反复试错。现实中的 Equifax 灾难，正是源于一个公开 CVE 未被及时修补。</p>
-    <div class="stat">
-      <div class="pill"><span class="big">2 / 5</span><span class="lbl">Sonnet 4.5 自主攻破 Equifax 靶场的成功次数</span></div>
-      <div class="pill"><span class="big">0 / 5</span><span class="lbl">一年多前的 Sonnet 3.5（无定制工具）成功次数</span></div>
-    </div>
-    <p class="take">结论：当"快且强"的 AI 智能体把"看到公开漏洞→立刻利用"压缩到几乎零延迟，及时打补丁不再是建议，而是与攻击速度赛跑的硬约束。</p>
-  </section>
+      <section>
+        <h2>能力仍不稳定，但进步速度值得警惕</h2>
+        <div class="data">
+          <div class="stat">
+            <span class="num">2 / 5</span>
+            <span class="label">Sonnet 4.5 在 Equifax 靶场中无需定制工具自主成功的次数。</span>
+          </div>
+          <div class="stat">
+            <span class="num">5 / 9</span>
+            <span class="label">在 9 个网络中，模型没有定制工具就无法取得进展的数量。</span>
+          </div>
+          <div class="stat">
+            <span class="num">0 / 5</span>
+            <span class="label">Sonnet 3.5 在同一 Equifax 模拟中不使用专用工具时的成功次数。</span>
+          </div>
+        </div>
+        <p>这些数字说明当前模型还不是稳定、通用的自主攻击系统；但从 Sonnet 3.5 到 Sonnet 4.5 的一年多变化，已经显示工具依赖正在减少。真正的信号是趋势，而不是单次成功率。</p>
+      </section>
 
-  <section>
-    <h2><span class="num">03</span>别夸大：成功并不稳定，多数网络仍需工具包</h2>
-    <p>文章谨慎地划出现状边界：Claude 并非每次都赢，Equifax 靶场也只是五成功率。<strong>在全部 9 个网络中，仍有 5 个离开定制工具包就无法推进。</strong>所以这是"趋势的拐点"，而非"能力的终局"。</p>
-    <div class="stat">
-      <div class="pill"><span class="big">9</span><span class="lbl">测试网络总数</span></div>
-      <div class="pill"><span class="big">5</span><span class="lbl">仍离不开定制工具包的网络数</span></div>
-      <div class="pill"><span class="big">~12 个月</span><span class="lbl">从 3.5 全败到 4.5 自主成功的间隔</span></div>
-    </div>
-    <p class="take">结论：能力分布不均，但"先靠专用工具、再脱离工具"的轨迹与其他 AI 进步趋势一致，预示该领域将持续快速提升。</p>
-  </section>
+      <section>
+        <h2>政策含义是防御侧也必须加速自动化</h2>
+        <p>文章把靶场结果与近期 AI 编排的网络间谍活动联系起来，认为防守方需要研究如何用 AI 工具保持节奏。原因很直接：如果攻击侧能更快识别漏洞、生成命令并串联多阶段流程，防守侧靠人工排查和慢速修补会更难跟上。</p>
+        <p>因此，这项评估的重点不是渲染模型已无所不能，而是提醒安全基础设施、补丁流程和 AI 防御工具必须按更快的威胁节奏重新设计。</p>
+      </section>
 
-  <section>
-    <h2><span class="num">04</span>为什么这关乎防御方</h2>
-    <p>这一实验趋势叠加近期真实发生的"AI 编排的网络间谍活动"，共同指向同一个紧迫课题：<strong>必须大力研究如何为防御者配备同等的 AI 工具</strong>，否则攻防节奏将被攻击方的自动化速度拉开。更多细节见 Incalmo 网站与 Claude Sonnet 4.5 系统卡第 5 节（尤其 5.3）。</p>
-    <p class="take">结论：AI 网络能力是一把双刃剑，公开漏洞的"窗口期"正被压缩，防御侧的 AI 化已是必答题而非选答题。</p>
-  </section>
-
-  <section class="insights">
-    <h2>最值得带走的洞见</h2>
-    <ol>
-      <li><b>门槛在塌，而非能力在飙：</b>真正的信号是"不再需要定制工具包"，标志 AI 自主攻防的进入成本骤降。</li>
-      <li><b>速度才是新威胁：</b>识别公开 CVE 并即时写出利用代码、零查阅，把攻击者的"反应时间"压到接近于零。</li>
-      <li><b>补丁纪律成为硬约束：</b>Equifax 的历史教训在 AI 时代被放大——未修补的已知漏洞会被秒级利用。</li>
-      <li><b>现状仍有上限：</b>2/5 的成功率、9 个网络中 5 个仍需工具包，提醒别把拐点误读为终局。</li>
-      <li><b>防御必须 AI 化：</b>结合真实世界的 AI 编排攻击，给防御者配备同级 AI 工具已是当务之急。</li>
-    </ol>
-  </section>
-
-  <div class="foot">基于 Anthropic 公开文章整理的中文总结，数据均引自原文。</div>
-</div>
+      <section class="takeaways">
+        <h2>最值得带走的洞见</h2>
+        <ul>
+          <li><strong>门槛下降是核心信号：</strong>模型开始少依赖定制攻击工具，意味着更多能力可能被标准工具链释放出来。</li>
+          <li><strong>已知漏洞更危险：</strong>公开 CVE 如果没有及时修补，可能被 AI 代理更快识别和利用。</li>
+          <li><strong>不要夸大现状：</strong>Sonnet 4.5 在部分测试中失败，说明自主网络攻击能力仍不稳定。</li>
+          <li><strong>趋势比单点结果更重要：</strong>Sonnet 3.5 到 Sonnet 4.5 的对比显示能力进步发生得很快。</li>
+          <li><strong>防御也要 AI 化：</strong>未来的安全能力竞争，很可能取决于防守方能否用 AI 提升发现、修补和响应速度。</li>
+        </ul>
+      </section>
+    </article>
+  </main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
 </body>
 </html>
