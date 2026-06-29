@@ -3,139 +3,115 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GPT‑Rosalind：把"会推理"装进科研工作流 · 总结</title>
+<title>GPT‑Rosalind：为生命科学打造的专用推理模型</title>
 <style>
   :root{
-    --bg:#0f1115; --card:#171a21; --card2:#1d2129;
-    --text:#e7eaf0; --muted:#9aa3b2; --line:#2a2f3a;
-    --accent:#6ea8fe; --warn:#ff7a7a; --good:#5dd1a0; --gold:#f2c14e;
+    --ink:#1a2233; --muted:#5b6577; --line:#e3e8f0;
+    --accent:#2f6df0; --accent2:#16a085; --warn:#c0392b;
+    --bg:#f6f8fc; --card:#ffffff; --hl:#fff7e6;
   }
   *{box-sizing:border-box}
   body{
-    margin:0; background:var(--bg); color:var(--text);
-    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Microsoft YaHei",sans-serif;
-    line-height:1.75; font-size:17px;
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+    line-height:1.75;font-size:17px;
   }
-  .wrap{max-width:760px; margin:0 auto; padding:40px 22px 80px}
-  header.hd{border-bottom:1px solid var(--line); padding-bottom:22px; margin-bottom:30px}
-  .kicker{color:var(--accent); font-size:13px; letter-spacing:.08em; text-transform:uppercase; margin:0 0 10px}
-  h1{font-size:30px; line-height:1.3; margin:0 0 14px}
-  .meta{color:var(--muted); font-size:14px}
-  .lede{
-    background:linear-gradient(135deg,#1c2533,#191d26);
-    border:1px solid var(--line); border-left:4px solid var(--accent);
-    border-radius:12px; padding:18px 20px; margin:26px 0 36px; font-size:18px;
+  .wrap{max-width:820px;margin:0 auto;padding:32px 20px 64px}
+  header{
+    background:linear-gradient(135deg,#1e3a8a,#2f6df0);
+    color:#fff;border-radius:16px;padding:32px 28px;margin-bottom:28px;
+    box-shadow:0 8px 30px rgba(47,109,240,.25);
   }
-  .lede b{color:var(--accent)}
-  section{margin:34px 0}
-  h2{font-size:21px; margin:0 0 6px; line-height:1.4}
-  h2 .tag{display:inline-block; font-size:12px; color:var(--gold); border:1px solid var(--line); border-radius:999px; padding:2px 10px; margin-right:10px; vertical-align:middle}
-  .body{color:#d6dbe6}
-  .take{color:var(--muted); font-style:italic; border-left:2px solid var(--line); padding-left:12px; margin-top:12px}
-  .stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0}
-  .stat{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px}
-  .stat .big{font-size:24px; font-weight:700}
-  .stat .lbl{color:var(--muted); font-size:13px; margin-top:4px}
-  table{width:100%; border-collapse:collapse; margin:16px 0; font-size:15px; background:var(--card); border-radius:12px; overflow:hidden}
-  th,td{padding:10px 12px; text-align:left; border-bottom:1px solid var(--line); vertical-align:top}
-  th{background:var(--card2); color:var(--muted); font-weight:600}
-  td.num{font-variant-numeric:tabular-nums; text-align:right}
-  .hi{color:var(--gold); font-weight:700}
-  .lo{color:var(--good); font-weight:700}
-  .pattern{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin:12px 0}
-  .pattern .pct{color:var(--gold); font-weight:700; font-size:18px}
-  .quote{background:var(--card2); border-left:3px solid var(--gold); border-radius:0 10px 10px 0; padding:12px 16px; margin:16px 0; color:#dfe4ee; font-size:15px}
-  .insights{background:linear-gradient(135deg,#15211b,#171a21); border:1px solid #244235; border-radius:14px; padding:22px 24px; margin-top:42px}
-  .insights h2{color:var(--good)}
-  .insights ol{margin:14px 0 0; padding-left:22px}
-  .insights li{margin:10px 0}
-  .note{color:var(--muted); font-size:13px; border-top:1px solid var(--line); margin-top:40px; padding-top:16px}
-  b.k{color:var(--gold)}
+  header .tag{display:inline-block;background:rgba(255,255,255,.18);
+    padding:4px 12px;border-radius:999px;font-size:13px;letter-spacing:.5px;margin-bottom:14px}
+  header h1{margin:0 0 12px;font-size:27px;line-height:1.4}
+  header .lead{margin:0;font-size:18px;font-weight:500;opacity:.96}
+  header .meta{margin-top:16px;font-size:13px;opacity:.85}
+  section{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:14px;padding:22px 24px;margin-bottom:20px;
+  }
+  h2{font-size:19px;margin:0 0 12px;color:var(--ink);
+    border-left:4px solid var(--accent);padding-left:10px}
+  h2 .sub{display:block;font-size:13px;color:var(--muted);font-weight:400;margin-top:4px;padding-left:1px}
+  p{margin:10px 0}
+  .conclude{margin-top:12px;font-weight:600;color:var(--accent2)}
+  .stat-row{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0}
+  .stat{
+    flex:1 1 150px;background:var(--bg);border:1px solid var(--line);
+    border-radius:10px;padding:14px;text-align:center
+  }
+  .stat .n{font-size:24px;font-weight:700;color:var(--accent)}
+  .stat .l{font-size:13px;color:var(--muted);margin-top:4px}
+  .hl{background:var(--hl);border-left:4px solid #f0a500;padding:12px 14px;border-radius:8px;margin:12px 0}
+  ul{margin:10px 0;padding-left:22px}
+  li{margin:7px 0}
+  .takeaways{background:linear-gradient(135deg,#0f2a4a,#16334f);color:#fff;border:none}
+  .takeaways h2{color:#fff;border-left-color:#5fd0c0}
+  .takeaways li{margin:11px 0}
+  .takeaways b{color:#7fe0d0}
+  .note{font-size:13px;color:var(--muted);margin-top:8px}
+  em{color:var(--warn);font-style:normal;font-weight:600}
 </style>
 </head>
 <body>
 <nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://openai.com/index/introducing-gpt-rosalind" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
 <div class="wrap">
 
-  <header class="hd">
-    <p class="kicker">OpenAI · Research</p>
-    <h1>GPT‑Rosalind：把"会推理"装进真实科研工作流的领域模型</h1>
-    <p class="meta">来源 OpenAI ｜ 2026-04-16 ｜ 分类 Research</p>
-  </header>
+<header>
+  <span class="tag">OpenAI · Research · 2026‑04‑16</span>
+  <h1>GPT‑Rosalind：从通用大模型走向"专用科学模型"</h1>
+  <p class="lead">一句话总括：OpenAI 推出首款面向生命科学的前沿推理模型，真正的贡献不是又一个更强的聊天模型，而是把推理、工具调用与生物化学领域知识打包成能跑通真实科研工作流、并已用可对比人类专家的基准证明价值的垂直模型。</p>
+  <p class="meta">命名致敬揭示 DNA 结构的 Rosalind Franklin。</p>
+</header>
 
-  <div class="lede">
-    一句话总括：GPT‑Rosalind 的真正贡献，不是又一个"更聪明"的通用模型，而是把<b>前沿推理与"会用科研工具/数据库"的能力捆在一起</b>，专攻药物发现最早期那段最碎、最费时、最难规模化的工作流——并且用<b>"可信访问"的受控部署</b>把能力开放和生物滥用防控设计成同一件事。
+<section>
+  <h2>问题不在科学本身，而在工作流<span class="sub">为什么需要专用模型</span></h2>
+  <p>新药从靶点发现到监管批准在美国平均要花 <strong>10–15 年</strong>。早期发现阶段的每一点进步都会向下游复利放大——更好的靶点、更强的假设、更高质量的实验。</p>
+  <p>但科研的瓶颈常常是工作流本身：科学家要在海量文献、专业数据库、实验数据和不断演化的假设之间来回穿梭，过程<strong>耗时、碎片化、难以规模化</strong>。</p>
+  <p class="conclude">结论：GPT‑Rosalind 瞄准的是"流程加速"而非单点问答——让科学家更快从问题走到证据、再到洞见。</p>
+</section>
+
+<section>
+  <h2>用真实科研基准检验，而非刷榜<span class="sub">行业评测才是说服力来源</span></h2>
+  <div class="stat-row">
+    <div class="stat"><div class="n">领先</div><div class="l">BixBench 生物信息学基准（已公开评分中最佳）</div></div>
+    <div class="stat"><div class="n">6 / 11</div><div class="l">LABBench2 任务上超过 GPT‑5.4</div></div>
   </div>
-
-  <section>
-    <h2><span class="tag">为什么是早期</span>10–15 年的研发链，越前面越值钱</h2>
-    <p class="body">一款新药在美国从靶点发现走到监管获批，平均要 <b>10–15 年</b>。文章的核心论点是：早期阶段的每一点增益都会向下游<b>复利</b>——更好的靶点选择、更强的生物学假设、更高质量的实验。可真正卡住进度的，往往不只是科学本身的难度，还有<b>研究工作流的复杂度</b>：研究者要在海量文献、专用数据库、实验数据和不断演化的假设之间来回穿梭，费时、割裂、难以扩展。</p>
-    <p class="take">结论：值得用 AI 攻的不是"算得更快"，而是把早期发现的碎片化流程接成一条可复用的链——因为收益会一路放大。</p>
-  </section>
-
-  <section>
-    <h2><span class="tag">定位</span>不是更强的脑，而是更会用工具的科研搭子</h2>
-    <p class="body">GPT‑Rosalind 被定义为面向生物学、药物发现与转化医学的前沿推理模型，覆盖化学、蛋白工程、基因组学。关键差异在于：它不仅在分子、蛋白、基因、通路、疾病相关生物学上推理更强，更<b>擅长在多步工作流里调用科学工具和数据库</b>——文献综述、序列到功能解读、实验规划、数据分析。它以研究命名于揭示 DNA 结构的 <b class="k">Rosalind Franklin</b>，并明确这是生命科学系列的"第一发"。</p>
-    <p class="take">结论：这条产品线押注的方向是"长程、重工具"的科研任务，而工具使用能力被当成与推理同等重要的一极。</p>
-  </section>
-
-  <section>
-    <h2><span class="tag">怎么交付</span>受控模型 + 免费插件，两条腿走路</h2>
-    <p class="body">交付方式被拆成两层：能力更强的<b>生命科学模型</b>通过"可信访问"开放给美国合规 Enterprise 客户；同时推出一个<b>免费的 Codex 生命科学研究插件</b>，作为编排层，把模型接到 <b>50+ 个公共多组学数据库、文献源和生物工具</b>，覆盖人类遗传学、功能基因组、蛋白结构、生化、临床证据、公共研究发现等可复用工作流。值得注意：插件人人可用、可配主线模型，<b>把"会用工具"这件事与"用哪个模型"解耦</b>。</p>
-    <div class="stat-grid">
-      <div class="stat">
-        <div class="big">ChatGPT · Codex · API</div>
-        <div class="lbl">以研究预览形式上线，面向通过可信访问审核的客户</div>
-      </div>
-      <div class="stat">
-        <div class="big">50+ 工具/数据源</div>
-        <div class="lbl">免费 Codex 插件作为编排层，连接公共多组学库与文献</div>
-      </div>
-    </div>
-    <p class="body">早期合作方包括 <b>Amgen、Moderna、Allen Institute、Thermo Fisher Scientific</b> 等制药、生物科技与生命科学技术机构。研究预览期内使用<b>不消耗已有额度或 token</b>（受滥用护栏约束），定价与开放范围随计划扩大再公布。</p>
-    <p class="take">结论：把"工具编排层"免费铺给所有人，把"最强推理"留在受控通道——这是一种能力普惠与风险收口并行的发行策略。</p>
-  </section>
-
-  <section>
-    <h2><span class="tag">证据</span>用真实基准和专家百分位说话，而非演示</h2>
-    <p class="body">评测覆盖科学发现的核心能力：化学反应机理、蛋白结构/突变效应/相互作用、DNA 序列的系统发育解读，以及能否解读实验输出、识别专家级模式、综合外部信息来设计后续实验，并正确选用计算工具与数据库。三组对外可比的结果尤其关键——</p>
-    <table>
-      <thead><tr><th>基准 / 评测</th><th>结果</th></tr></thead>
-      <tbody>
-        <tr><td>BixBench（真实生信与数据分析）</td><td>在<b class="lo">已公布分数的模型中领先</b></td></tr>
-        <tr><td>LABBench2（检索/数据库/序列/方案设计，11 项任务）</td><td>在 <b class="lo">6/11</b> 项胜过 GPT‑5.4，最大提升来自端到端分子克隆设计 <b class="hi">CloningQA</b></td></tr>
-        <tr><td>Dyno Therapeutics · RNA 序列到功能（未公开、未污染数据）</td><td>对比 57 位人类专家历史成绩，best‑of‑10：预测 <b class="lo">&gt;95 百分位</b>、生成 <b class="lo">~84 百分位</b></td></tr>
-      </tbody>
-    </table>
-    <p class="body">Dyno 的设置尤其有说服力：用<b>未公开、未污染</b>的序列，直接在 Codex app 里评测，并和真实 AI‑bio 专家的历史分数对齐——这把"模型能不能替代专业判断"放到了可量化的刻度上，而不是停留在挑选过的演示。</p>
-    <p class="take">结论：领域模型的价值正被搬到"真实任务 + 专家百分位"的硬尺度上衡量，这比通用 leaderboard 更能反映科研可用性。</p>
-  </section>
-
-  <section>
-    <h2><span class="tag">安全</span>"可信访问"：把能力开放当成安全产品来设计</h2>
-    <p class="body">最强的生命科学模型先<b>仅向美国 Enterprise 客户</b>按受控结构开放，依三条原则评估准入：<b>有益用途</b>（须从事有明确公共利益的合法科研）、<b>强治理与安全监督</b>（具备合规与防滥用控制）、<b>企业级受控访问</b>（仅限受管环境内的获批用户）。组织还须同意研究预览条款、遵守使用政策，并可能在准入或续期时被要求补充信息。与此同时，连接器与研究插件向更广人群开放，让主线模型也能更好服务科研。</p>
-    <p class="take">结论：这一发布把"谁能用、在什么护栏下用"前置为产品的一部分，刻意在强生物能力与滥用风险之间做收口。</p>
-  </section>
-
-  <section>
-    <h2><span class="tag">下一步</span>从问题到证据，再到病人的治疗</h2>
-    <p class="body">这是系列首发，官方定位为"长期承诺"的起点：持续提升生物推理、扩展重工具与长程工作流支持、与顶尖科研机构评估真实影响。已在推进的合作包括与 <b class="k">Los Alamos 国家实验室</b>探索 AI 引导的<b>蛋白与催化剂设计</b>，包括让 AI 在保持或改进关键功能特性的前提下修改生物结构；落地侧还有 McKinsey、BCG、Bain 等顾问伙伴帮助识别高价值场景。</p>
-    <p class="take">结论：目标不是单点能力，而是把"问题→证据→洞见→新疗法"整条链路上的科研伙伴关系做厚。</p>
-  </section>
-
-  <div class="insights">
-    <h2>最值得带走的洞见</h2>
-    <ol>
-      <li><b>赌注从"更聪明"转向"更会用工具"。</b>GPT‑Rosalind 把前沿推理与科研工具/数据库调用捆在一起，瞄准早期发现里最碎、最费时的多步工作流——因为 10–15 年研发链上越早的增益越复利。</li>
-      <li><b>能力分两层发行。</b>最强模型走受控的"可信访问"，而连接 50+ 数据源的 Codex 插件免费且可配主线模型——把"会用工具"与"用哪个模型"解耦，普惠与收口并行。</li>
-      <li><b>用硬尺度证明价值。</b>BixBench 在已公布分数中领先、LABBench2 在 6/11 项超 GPT‑5.4（CloningQA 提升最大）、Dyno 未污染 RNA 任务上 best‑of‑10 排进人类专家 95/84 百分位。</li>
-      <li><b>安全被设计进访问方式本身。</b>有益用途、强治理、企业级受控访问三原则，先限美国 Enterprise，把强生物能力与滥用防控做成同一件事。</li>
-      <li><b>这是系列首发，不是终点。</b>与 Los Alamos 探索 AI 引导的蛋白/催化剂设计，指向"修改生物结构同时保功能"的长程目标。</li>
-    </ol>
+  <p>LABBench2 覆盖文献检索、数据库访问、序列操作、实验方案设计等真实任务。提升最显著的是 <strong>CloningQA</strong>——需要端到端设计分子克隆所需的 DNA 与酶试剂，这是对"能否真正动手做实验"的硬考验。</p>
+  <div class="hl">
+    <p style="margin:0">与 <strong>Dyno Therapeutics</strong> 合作、使用未公开且无污染的 RNA 序列做"序列→功能"预测与生成：在 Codex 中直接评测时，模型 best-of-ten 提交在预测任务上超过 57 位人类专家历史成绩的 <strong>第 95 百分位</strong>，在更难的序列生成任务上约 <strong>第 84 百分位</strong>。</p>
   </div>
+  <p class="conclude">结论：用"未污染数据 + 人类专家分布"对比，比传统刷榜更可信——这改变了我们判断 AI 科研能力的标尺：不是答得对，而是能不能挤进顶尖专家行列。</p>
+</section>
 
-  <p class="note">注：本页为第三方中文摘要，非医疗或投资建议；模型能力、准入条件、定价与开放范围以 OpenAI 官方公告与研究预览条款为准。文中基准与百分位均引自原文表述，部分对比依赖"已公布分数"的模型范围。</p>
+<section>
+  <h2>把模型接到科学家真正在用的工具上<span class="sub">免费插件是更广的杠杆</span></h2>
+  <p>配套发布的 <strong>Life Sciences 研究插件</strong>（Codex / GitHub，免费）连接 <strong>50 多个</strong>公共多组学数据库、文献源与生物学工具，提供蛋白结构查询、序列搜索、文献综述、公共数据集发现等可复用工作流。</p>
+  <p>关键设计：插件作为"编排层"处理宽泛、模糊、多步的问题；企业用户可叠加 GPT‑Rosalind 获得更深的生物推理，而<strong>所有用户都能用主线模型搭配该插件</strong>。</p>
+  <p class="conclude">结论：专用模型走"可信访问"窄门，但工具生态走"广泛开放"——后者让影响力不被访问门槛锁死。</p>
+</section>
+
+<section>
+  <h2>访问受控，因为风险真实<span class="sub">能力越强，治理越重</span></h2>
+  <p>模型先以"<strong>可信访问</strong>"结构面向美国合格企业客户开放，围绕资质、访问管理和组织治理设控，核心三原则：<strong>有益用途、强治理与安全监督、受控访问 + 企业级安全</strong>，以防范生物滥用。</p>
+  <p>合作方阵容覆盖产业与科研两端：<strong>Amgen、Moderna、Allen Institute、Thermo Fisher</strong>，并与 <strong>Los Alamos 国家实验室</strong>探索 AI 引导的蛋白与催化剂设计。研究预览期内使用<em>不消耗现有额度或 tokens</em>（受滥用防护约束）。</p>
+  <p class="conclude">结论：前沿科学能力的部署正在从"开放 API"转向"治理优先"模式，这是高风险领域 AI 商业化的新范式。</p>
+</section>
+
+<section class="takeaways">
+  <h2>最值得带走的洞见</h2>
+  <ul>
+    <li><b>垂直专用模型成形：</b>AI 正从"更聪明的通用模型"分化出"为特定科学工作流优化的领域模型"，GPT‑Rosalind 是这条路线的首发。</li>
+    <li><b>评测标尺升级：</b>用未污染数据对比人类专家百分位（预测第 95、生成第 84），比刷公开榜更能说明真实科研价值。</li>
+    <li><b>工具调用是核心能力：</b>价值不在单次回答，而在端到端跑通文献检索、克隆设计、实验规划等多步流程（CloningQA 提升最大）。</li>
+    <li><b>开放与受控并行：</b>强模型走可信访问窄门，免费插件 + 主线模型走广泛开放，兼顾安全与普惠。</li>
+    <li><b>治理成为部署前提：</b>在生物等高风险领域，企业级安全与组织治理已和模型能力本身同等重要。</li>
+  </ul>
+  <p class="note">提示：本文为产品发布，多数为厂商自述评测；除少数公开基准外，结果尚待独立复现。</p>
+</section>
 
 </div>
 </body>
+</html>
 </html>

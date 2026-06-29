@@ -3,178 +3,153 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>OpenAI 如何写 Model Spec：把"AI 该怎么行为"变成一份能被公众辩论的公共契约</title>
+<title>OpenAI Model Spec 背后的方法论 · 中文总结</title>
 <style>
   :root{
-    --bg:#0f1115;
-    --card:#171a21;
-    --card2:#1d212b;
-    --ink:#e8eaf0;
-    --muted:#9aa3b2;
-    --line:#2a2f3a;
-    --accent:#10a37f;
-    --accent2:#6ea8fe;
-    --good:#5fbf8f;
-    --warn:#e0b15a;
-    --pill:#232838;
+    --bg:#0f1419; --card:#1a2029; --ink:#e8edf2; --muted:#9aa7b4;
+    --accent:#10a37f; --accent2:#3b82f6; --warn:#e0a458; --line:#2a323d;
+    --chip:#23303a;
   }
   *{box-sizing:border-box}
   body{
-    margin:0;
-    background:linear-gradient(180deg,#0c0e12 0%,#0f1115 100%);
-    color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-    line-height:1.75;
-    font-size:17px;
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.75; font-size:17px;
   }
-  .wrap{max-width:820px;margin:0 auto;padding:40px 22px 72px}
-  .kicker{
-    display:inline-block;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;
-    color:var(--accent);font-weight:700;margin-bottom:14px;
-  }
-  .meta{color:var(--muted);font-size:13.5px;margin-bottom:26px}
+  .wrap{max-width:820px;margin:0 auto;padding:48px 22px 80px}
+  header{border-bottom:2px solid var(--line);padding-bottom:26px;margin-bottom:34px}
+  .kicker{color:var(--accent);font-weight:700;letter-spacing:.08em;font-size:13px;text-transform:uppercase}
+  h1{font-size:31px;line-height:1.3;margin:12px 0 14px}
+  .meta{color:var(--muted);font-size:14px}
   .meta a{color:var(--accent2);text-decoration:none}
-  h1{font-size:30px;line-height:1.3;margin:0 0 22px;font-weight:800;letter-spacing:-.01em}
-  .lede{
-    font-size:20px;line-height:1.6;color:#fff;font-weight:600;
-    background:linear-gradient(135deg,rgba(16,163,127,.16),rgba(110,168,254,.10));
-    border:1px solid var(--line);border-left:4px solid var(--accent);
-    border-radius:14px;padding:20px 22px;margin:0 0 34px;
+  .lead{
+    background:linear-gradient(135deg,#11302a,#13212e);
+    border:1px solid var(--accent);border-radius:14px;
+    padding:22px 24px;margin:30px 0;font-size:18.5px
   }
-  h2{
-    font-size:21px;font-weight:750;margin:42px 0 14px;line-height:1.4;
-    padding-bottom:8px;border-bottom:1px solid var(--line);
+  .lead b{color:var(--accent)}
+  section{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:14px;padding:24px 26px;margin:22px 0
   }
-  h2 .num{color:var(--accent);font-size:15px;font-weight:700;margin-right:8px;vertical-align:1px}
-  p{margin:12px 0}
+  h2{font-size:21px;margin:4px 0 14px;line-height:1.4}
+  h2 .num{color:var(--accent2);font-weight:800;margin-right:10px}
+  .data{
+    display:flex;flex-wrap:wrap;gap:8px;margin:14px 0
+  }
+  .chip{
+    background:var(--chip);border:1px solid var(--line);border-radius:999px;
+    padding:5px 13px;font-size:13.5px;color:#cfe5dd
+  }
+  .chip b{color:#fff}
   .take{
-    margin-top:12px;padding:12px 16px;background:var(--card2);border-radius:10px;
-    border-left:3px solid var(--accent2);color:#dfe6f2;font-size:15.5px;
+    border-left:4px solid var(--accent);background:#12231f;
+    padding:11px 16px;margin-top:14px;border-radius:0 8px 8px 0;
+    font-weight:600;color:#d7f0e8
   }
-  .take b{color:var(--accent2)}
-  .stats{
-    display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-    gap:12px;margin:18px 0 6px;
+  .hard{border-left-color:var(--warn);background:#2a2317;color:#f0dcb8}
+  ul{margin:10px 0 0;padding-left:20px}
+  li{margin:7px 0}
+  .quote{color:var(--muted);font-style:italic;border-left:3px solid var(--line);padding-left:14px;margin:14px 0}
+  .final{
+    background:linear-gradient(135deg,#15243a,#13302a);
+    border:1px solid var(--accent2);border-radius:16px;padding:26px 28px;margin-top:34px
   }
-  .stat{
-    background:var(--card);border:1px solid var(--line);border-radius:12px;
-    padding:14px 16px;
-  }
-  .stat .big{font-size:26px;font-weight:800;color:#fff;line-height:1.1}
-  .stat .big .u{font-size:15px;color:var(--accent);font-weight:700;margin-left:2px}
-  .stat .lbl{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.4}
-  table{
-    width:100%;border-collapse:collapse;margin:16px 0;font-size:15px;
-    background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;
-  }
-  th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
-  th{background:var(--pill);color:#fff;font-weight:700;font-size:13.5px}
-  tr:last-child td{border-bottom:none}
-  td .hl{color:var(--accent);font-weight:700}
-  .hl{color:var(--accent);font-weight:700}
-  .pill{
-    display:inline-block;background:var(--pill);color:#cdd5e3;border:1px solid var(--line);
-    border-radius:999px;padding:2px 11px;font-size:12.5px;margin:2px 4px 2px 0;
-  }
-  .insights{
-    margin-top:46px;background:linear-gradient(135deg,rgba(95,191,143,.10),rgba(110,168,254,.08));
-    border:1px solid var(--line);border-radius:16px;padding:24px 24px 8px;
-  }
-  .insights h2{border:none;margin-top:0;color:#fff}
-  .insights ol{margin:0;padding-left:0;list-style:none;counter-reset:ins}
-  .insights li{
-    counter-increment:ins;position:relative;padding:12px 0 12px 44px;
-    border-bottom:1px dashed var(--line);
-  }
-  .insights li:last-child{border-bottom:none}
-  .insights li::before{
-    content:counter(ins);position:absolute;left:0;top:11px;
-    width:28px;height:28px;border-radius:50%;
-    background:var(--accent);color:#04140f;font-weight:800;font-size:14px;
-    display:flex;align-items:center;justify-content:center;
-  }
-  .insights b{color:#fff}
-  .foot{margin-top:34px;color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padding-top:16px}
-  em{color:var(--warn);font-style:normal;font-weight:600}
+  .final h2{color:#fff}
+  .final ol{padding-left:22px;margin:6px 0 0}
+  .final li{margin:11px 0;font-size:17.5px}
+  .final li b{color:var(--accent)}
+  footer{color:var(--muted);font-size:13px;text-align:center;margin-top:40px}
 </style>
 </head>
 <body>
-<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#10a37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://openai.com/index/our-approach-to-the-model-spec" target="_blank" rel="noopener noreferrer" style="color:#10a37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
+<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://openai.com/index/our-approach-to-the-model-spec" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
 <div class="wrap">
+  <header>
+    <div class="kicker">OpenAI · Research · 2026-03-25</div>
+    <h1>Model Spec 背后的方法论：把"模型该怎么行为"变成公开制度</h1>
+    <div class="meta">原文：Inside our approach to the Model Spec ·
+      <a href="https://openai.com/index/our-approach-to-the-model-spec">openai.com</a></div>
+  </header>
 
-  <span class="kicker">对齐 · 一篇更短的解读</span>
-  <h1>为什么"让 AI 自己想明白该怎么做"行不通：OpenAI 公开 Model Spec 的设计内幕</h1>
-  <div class="meta">
-    来源：OpenAI · 2026年3月25日 · <a href="https://openai.com/index/our-approach-to-the-model-spec">原文链接</a> · 分类：Research / Alignment
+  <div class="lead">
+    <b>一句话总括：</b>这篇文章不讲 Model Spec 写了哪些规则，而是公开它的"幕后操作系统"——为什么 OpenAI 要把模型的意图行为写成一份可被公众阅读、辩论、评估、修订的活文档，以及这份文档如何被结构化、撰写和迭代。真正的贡献在于：它把 AI 对齐从内部训练的黑箱，转化为一套有问责机制的公共治理实践。
   </div>
 
-  <div class="lede">
-    一句话总括：这篇文章不是发布新规则，而是公开 Model Spec 背后的"为什么"——OpenAI 主张，模型该如何行为是一个充满价值取舍、无法靠"更聪明"自动推导出来的问题，所以必须写成一份公众能读、能质疑、能修订的公共文档，并据此训练、评测和迭代。真正的洞见是：随着模型更强、更自主、部署更广，"行为模糊"的代价不是变小而是变大，因此一份清晰的行为框架不是越来越没必要，而是越来越关键。
-  </div>
+  <section>
+    <h2><span class="num">01</span>Model Spec 是写给人看的"接口"，不是写给模型的代码</h2>
+    <p>OpenAI 明确：Spec 是 <b>interface（接口）而非 implementation（实现）</b>，它描述"想要的行为"，刻意不绑定 token 格式或训练配方等会变的细节。它的主要受众是人——员工、用户、开发者、研究者、政策制定者，而不是模型本身。它也只描述"模型"，不等于整个产品（还有自定义指令、记忆、监控、策略执行等多层防御）。</p>
+    <div class="data">
+      <span class="chip">首版：<b>2024 年</b></span>
+      <span class="chip">定位：描述<b>意图行为</b>，非当前完美行为</span>
+      <span class="chip">理念：<b>defense in depth</b> 纵深防御</span>
+    </div>
+    <div class="take take">为什么改变认知：它否定了"AI 安全=调模型"的简化想象——安全首先是一份人类能共同审查的公开契约。</div>
+  </section>
 
-  <h2><span class="num">01</span>Model Spec 是"接口"不是"实现"，写给人看而非写给模型看</h2>
-  <p>OpenAI 强调 Model Spec 描述的是"想要的行为"，而非产生这些行为的每一处实现细节——它刻意不绑定内部 token 格式或具体训练配方，因为这些会变而目标不变。它的首要读者不是模型，而是 OpenAI 员工、用户、开发者、研究者和政策制定者。</p>
-  <div class="take"><b>洞见：</b>把"意图"和"实现"分开，意味着行为规范可以独立于训练技术被公开辩论。这是一种把内部价值判断"外化"为公共契约的治理设计——行为是 bug 还是 feature，公众有了一个稳定的参照点来判断。</div>
+  <section>
+    <h2><span class="num">02</span>开篇三目标定方向，但不直接命令模型</h2>
+    <p>Spec 以高层意图开篇，声明三个系统级目标，并把它们之间的权衡讲具体。关键细节：造福人类是 <b>OpenAI 的目标，而非让模型自主追求的目标</b>——否则 OpenAI 就成了在广义上"裁决道德"的一方。当 Spec 应用出现歧义时，这段开篇用来兜底解释。</p>
+    <div class="data">
+      <span class="chip">① 迭代部署，<b>赋能</b>开发者与用户</span>
+      <span class="chip">② 防止<b>严重伤害</b></span>
+      <span class="chip">③ 维持 OpenAI <b>运营许可</b></span>
+    </div>
+    <div class="take take">洞见：把"对人类好"留给人类去辩论，让模型遵循指挥链，是出于尊重人类自主与思想自由的刻意选择。</div>
+  </section>
 
-  <h2><span class="num">02</span>顶层三目标：先讲清楚到底在为谁、为什么优化</h2>
-  <p>Spec 开篇先给出系统级意图，明确三个目标，并解释如何在实践中权衡它们：</p>
-  <table>
-    <tr><th>目标</th><th>含义</th></tr>
-    <tr><td><span class="hl">迭代部署、赋能</span></td><td>持续部署能让开发者与用户受益、可被掌控的模型</td></tr>
-    <tr><td><span class="hl">防止严重伤害</span></td><td>避免模型对用户或他人造成重大危害</td></tr>
-    <tr><td><span class="hl">维持运营许可</span></td><td>保住 OpenAI 继续运营、继续提供服务的社会与法律前提</td></tr>
-  </table>
-  <p>一个微妙之处：这段前言<em>不是</em>给模型的直接指令。"造福人类"是 OpenAI 的目标，而非希望模型自主追求的目标——他们不想让模型自己去裁决"什么对社会好"。</p>
-  <div class="take"><b>洞见：</b>OpenAI 明确拒绝让模型当"道德裁判"。模型应遵循指挥链，而不是依据自己对社会利益的判断来挑选服从哪条指令——这是出于对人类自主与思想自由的重视，把价值裁量权留在人这一侧。</div>
+  <section>
+    <h2><span class="num">03</span>指挥链 + 硬规则/默认值：在安全边界内最大化自由</h2>
+    <p>核心是 <b>Chain of Command（指挥链）</b>：每条策略和指令都有"权限级别"，冲突时模型优先遵守更高权限指令的字面与精神。要造炸弹 → 优先硬安全边界；要求"吐槽我一下" → 一般优先满足，覆盖低权限的反滥用默认。这让一小套<b>不可覆盖的硬规则</b>与一大套<b>可覆盖的默认值</b>并存。</p>
+    <ul>
+      <li><b>硬规则（root/system 级）</b>：多为禁止性，针对灾难性风险、人身伤害、违法、破坏指挥链；并为 <b>18 岁以下用户</b>叠加额外保护。类比"互联网基础设施"，只在必要时才设限。</li>
+      <li><b>默认值</b>：可被显式指令覆盖的"最佳猜测"起点；语气风格类可隐式引导，真实性/客观性类只能被显式指令改变，以防"凭感觉悄悄漂移"。</li>
+    </ul>
+    <div class="take hard">为什么重要：用极少的不可逾越红线 + 大量可调默认，同时换来用户自由、开发者控制和可预测性——这是 Spec 的工程化核心。</div>
+  </section>
 
-  <h2><span class="num">03</span>指挥链：少量"不可覆盖的硬规则" + 大量"可覆盖的默认值"</h2>
-  <p>Spec 的核心是"指挥链"（Chain of Command）：指令可能来自 OpenAI、开发者、用户，彼此会冲突，每条都被赋予一个权威级别，模型须优先服从更高权威指令的"字面与精神"。</p>
-  <table>
-    <tr><th>类型</th><th>性质</th><th>例子</th></tr>
-    <tr><td><span class="hl">硬规则</span></td><td>root/system 级，用户和开发者都不可覆盖，多为禁止性</td><td>拒绝协助造炸弹等灾难性/人身伤害、违法、破坏指挥链；对未满 18 岁用户额外加固</td></tr>
-    <tr><td><span class="hl">默认值</span></td><td>可被显式指令覆盖的"最佳猜测"起点，保证可预测与可操控</td><td>语气风格可隐式调整；真实性、客观性等只能被显式指令覆盖</td></tr>
-  </table>
-  <p>用户要求"被吐槽一下"，模型应优先满足，而非死守反"辱骂"的低权威默认值；但若用户想改变事实立场，必须给出<em>显式</em>指令——这样改变才透明、可追溯，而不是"凭感觉悄悄漂移"。</p>
-  <div class="take"><b>洞见：</b>"少量硬约束 + 大量可覆盖默认"是在"安全边界"内最大化用户自由和开发者控制权的工程化解法。OpenAI 把 AI 类比为互联网基础设施：正因要服务极广人群，才只在必要时才设限制思想自由的规则。</div>
+  <section>
+    <h2><span class="num">04</span>智能再高，也替代不了价值权衡</h2>
+    <p>文章正面回应"先进 AI 难道不能自己想明白吗"：在数学等有客观对错的领域，智能可以替代规则；但模型多数时候处在<b>没有唯一正确答案</b>的价值地带。即便模型更聪明，也无法告诉你该做什么伦理取舍。若唯一规则是"有益且安全"，人类就<b>失去了辩论边界</b>的机制，一切决定都被甩给模型。</p>
+    <div class="quote">类比：成文宪法 vs 判例法——宪法给原则，但仍需解释机制、澄清与明确裁决来处理棘手个案。Model Spec 三者兼任。</div>
+    <div class="take take">反直觉结论：模型越强、越具自主性、部署越广，<b>模糊的代价越高</b>，清晰的行为框架因此更重要，而非更不重要。</div>
+  </section>
 
-  <h2><span class="num">04</span>解释性工具：决策准则 + 精挑细选的范例</h2>
-  <p>层级之外，Spec 用两类"解释性工具"帮模型和人在灰色地带保持一致：<strong>决策准则</strong>（如控制副作用时，权衡"最小化不可逆操作、行动与目标相称、减少意外、优先可逆方案"）和<strong>具体范例</strong>（一段提示配上合规与不合规两种回答，落在重要决策边界附近）。</p>
-  <p>范例数量刻意保持很少、只留信息量最大的；更长尾的覆盖交给更广的评测套件。文中举例：面对"如何开一家烟草公司"，更好的回答是直接给出结构化商业计划，而非先抛出一串道德质问——体现"假定善意、不做评判、尊重思想自由"。</p>
-  <div class="take"><b>洞见：</b>规则无法穷尽现实，所以需要"判例"。这正是文中那个核心类比：成文宪法给出高层原则，但仍需案例法、解释和明确裁决来处理混乱的边缘情形——Model Spec 同时扮演原则声明、公共框架和修订流程三种角色。</div>
+  <section>
+    <h2><span class="num">05</span>"现实的抱负"与跨职能共识写作</h2>
+    <p>写作在"如实描述现状"与"描述遥远理想"之间取平衡，通常瞄准<b>领先现状 0–3 个月</b>，让 Spec 在若干活跃开发领域略微超前于模型。它由开放的内部流程产出：任何 OpenAI 员工可评论或提案，最终由跨职能利益相关方审批。</p>
+    <div class="data">
+      <span class="chip">超前幅度：<b>0–3 个月</b></span>
+      <span class="chip"><b>数十人</b>直接贡献文本</span>
+      <span class="chip">研究/工程/产品/安全/政策/法务等<b>多职能</b>审批</span>
+    </div>
+    <p class="quote">一个意外发现：只要逼自己把权衡写得足够精确，让分歧变具体，"真正的共识往往是可能的"。</p>
+    <div class="take take">洞见：大量 Spec 写作其实是"翻译"——把已有的安全与政策工作变得更简单、一致、可读，而不丢失原意。</div>
+  </section>
 
-  <h2><span class="num">05</span>"现实的理想主义"：通常只领先模型 0–3 个月</h2>
-  <p>在"如实描述今天的行为"和"描绘遥远理想"之间，OpenAI 选择折中：通常瞄准比当下领先 <span class="hl">0–3 个月</span>。Spec 因此常在几个活跃开发领域略微跑在模型前面，但仍扎根于"已经在做或有具体近期计划"的现实。</p>
-  <div class="stats">
-    <div class="stat"><div class="big">2024</div><div class="lbl">Model Spec 首版发布，此后持续迭代</div></div>
-    <div class="stat"><div class="big">0–3<span class="u">个月</span></div><div class="lbl">规范刻意领先当前模型行为的时间窗</div></div>
-  </div>
-  <div class="take"><b>洞见：</b>规范既是"现状描述"也是"训练目标"。承认生产模型"尚未完全符合 Spec"（训练滞后、训练误教、长尾无法穷尽、泛化偏离意图），反而让这份文档更诚实、更可被检验。</div>
+  <section>
+    <h2><span class="num">06</span>用 Evals 量化差距：模型与规范的对齐可被测量</h2>
+    <p>OpenAI 承认生产模型尚未完全符合 Spec：训练可能滞后于规范更新、可能无意教出不一致行为（视为严重 bug）、无法覆盖所有长尾、泛化可能偏离意图。为此本文随附发布 <b>Model Spec Evals</b>——一套基于场景、力图用少量代表性样例覆盖尽可能多 Spec 断言的评估套件，用来追踪模型行为与规范何处脱节、模型是否按预期理解规范。</p>
+    <div class="data">
+      <span class="chip">配套发布：<b>Model Spec Evals</b></span>
+      <span class="chip">图表显示<b>各章节合规度随迭代提升</b></span>
+      <span class="chip">提示：部分提升源于"用旧模型对照更新政策"的测量效应</span>
+    </div>
+    <div class="take take">为什么改变认知：对齐不再只是口号，而是有公开断言、可设计评估、可诊断事故的可执行工程。</div>
+  </section>
 
-  <h2><span class="num">06</span>配套发布 Model Spec Evals：让"是否对齐"可被测量</h2>
-  <p>随文同时发布 <span class="hl">Model Spec Evals</span>——一套场景化评测，用少量代表性样例尽量覆盖 Spec 中的各项主张，用来追踪模型行为与规范之间的偏差，并检验模型是否按预期理解了规范。它只是更广评测策略的一部分，后者还涵盖安全、真实性、谄媚、人格风格与能力等多维度。</p>
-  <p>文中给出的合规度随时间的曲线显示对齐"真实而广泛地改善"，但也坦承其中含有"用更新的政策去衡量更老的模型"带来的小幅效应。</p>
-  <div class="take"><b>洞见：</b>规范若不能被评测，就只是价值宣言。OpenAI 给出的三条成功标准——<b>可读性</b>（人能形成准确预期）、<b>可执行性</b>（能用来设计评测、诊断事故、做产品决策）、<b>可修订性</b>（能演进而不沦为不稳定的移动靶）——把"写规范"变成了一件可被工程检验的事。</div>
-
-  <h2><span class="num">07</span>为什么不能只给"安全且有用"这一条规则？</h2>
-  <p>这是全文的思想核心。在数学这类有客观成败标准的领域，智能可以替代细则；但模型大量工作处在"没有唯一正确答案"的价值密集空间。"有用且安全"到底意味着什么，高度依赖语境、本质上是价值取舍——智能本身并不告诉你该如何权衡伦理。</p>
-  <p>更关键的是：如果唯一规则就是"有用且安全"，那么人类就<em>失去了一切讨论与裁决的抓手</em>——比如模型该拒绝哪类内容，将完全交由模型自己决定。明确的规则反而是让不同立场的人能够协调、并迫使任何改动都必须"显式化"的机制。</p>
-  <div class="take"><b>洞见：</b>"更强的 AI 自己就能想明白"是个诱人但危险的错觉。文章反向论证：模型越自主、越广泛部署，模糊的代价越高——所以清晰的行为框架越来越重要，而不是越来越多余。同时 OpenAI 也承认，并非一切都能化为显式规则，越自主的系统越依赖"沟通不确定性、尊重自主边界、避免意外、长期追踪意图"等更广的禀赋。</div>
-
-  <div class="insights">
-    <h2>最值得带走的 5 条洞见</h2>
+  <div class="final">
+    <h2>最值得带走的洞见</h2>
     <ol>
-      <li><b>智能不能替代价值判断。</b>在没有唯一正解的伦理空间里，"更聪明的模型"不会自动知道该如何取舍——这正是 Model Spec 存在的根本理由，也是对"AGI 自己会想明白"论调的直接反驳。</li>
-      <li><b>把意图外化为公共契约。</b>Model Spec 是"接口"而非"实现"，写给人看而非写给模型看；开源迭代让"行为是 bug 还是 feature"有了公众可参照的稳定靶子。</li>
-      <li><b>少量硬约束 + 大量可覆盖默认。</b>指挥链按权威级别排序，root/system 级硬规则不可覆盖，其余默认值可被显式指令调整——在安全边界内最大化用户自由与开发者控制。</li>
-      <li><b>不让模型当道德裁判。</b>"造福人类"是 OpenAI 的目标而非交给模型自主追求的目标；价值裁量权刻意留在人这一侧，以保护人的自主与思想自由。</li>
-      <li><b>可读、可执行、可修订是三条硬指标。</b>配套的 Model Spec Evals 让"模型行为是否符合意图"可被持续测量，把行为规范从宣言变成可检验、可迭代的治理工具。</li>
+      <li><b>Spec 是给人的公共契约。</b>它把"模型该怎么行为"从训练黑箱搬到公开桌面，让 bug 与 feature 可被区分、被批评、被改进。</li>
+      <li><b>结构即治理。</b>指挥链 + 少量硬规则 + 大量可覆盖默认 + 决策准则与示例，在安全边界内同时最大化用户自由与开发者控制。</li>
+      <li><b>智能不替代价值。</b>越强的模型越需要显式框架，因为伦理取舍没有唯一正解，人类必须保留辩论边界的机制。</li>
+      <li><b>现实的抱负。</b>瞄准领先现状 0–3 个月，Spec 是一份会迭代的活文档，靠数十人跨职能共识与公众反馈驱动。</li>
+      <li><b>三条成功标准。</b>可读性（Legibility）、可执行性（Actionability）、可修订性（Revisability）——既要能被理解和挑战，也要能落地评估并持续修订而不失稳。</li>
     </ol>
   </div>
 
-  <div class="foot">
-    本页为基于 OpenAI《Inside our approach to the Model Spec》（2026 年 3 月 25 日）公开博文的中文独立总结。原文为框架性/方法论文章，数字事实有限，本页所列要点（三目标、指挥链、0–3 个月领先窗、Model Spec Evals 等）均取自原文表述。具体细节与原始链接请参阅 OpenAI 官方全文。
-  </div>
-
+  <footer>本页为基于 OpenAI 原文的中文总结，便于快速理解，细节与措辞以原文为准。</footer>
 </div>
 </body>
 </html>

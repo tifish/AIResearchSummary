@@ -3,118 +3,131 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cursor 大型代码库安全索引复用 · 中文总结</title>
+<title>安全地索引大型代码库 · 总结</title>
 <style>
   :root{
-    --bg:#0f1115; --card:#171a21; --ink:#e8eaed; --muted:#9aa3b2;
-    --accent:#7c9cff; --accent2:#5ad1a8; --warn:#ffb454; --line:#262b36;
-    --chip:#1e2530;
+    --bg:#0f1115; --card:#1a1d26; --ink:#e8eaf0; --muted:#9aa3b2;
+    --accent:#5b9dff; --accent2:#42d6a4; --warn:#ffcc66; --line:#2a2f3a;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-    line-height:1.75;font-size:17px}
-  .wrap{max-width:820px;margin:0 auto;padding:40px 22px 72px}
-  .kicker{color:var(--accent);font-size:13px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px}
-  h1{font-size:30px;line-height:1.3;margin:0 0 6px}
-  .meta{color:var(--muted);font-size:14px;margin-bottom:24px}
-  .lede{background:linear-gradient(135deg,#1b2333,#171a21);border:1px solid var(--line);
-    border-left:4px solid var(--accent);border-radius:12px;padding:18px 20px;font-size:19px;margin:0 0 30px}
-  .lede b{color:var(--accent2)}
-  section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin:0 0 18px}
-  h2{font-size:20px;margin:0 0 10px;color:var(--ink)}
-  h2 .num{color:var(--accent);font-weight:700;margin-right:8px}
-  p{margin:0 0 10px}
-  .take{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);color:var(--accent2);font-size:15px}
-  .take::before{content:"洞见 · ";color:var(--muted)}
-  .stats{display:flex;flex-wrap:wrap;gap:10px;margin:6px 0 4px}
-  .stat{background:var(--chip);border:1px solid var(--line);border-radius:10px;padding:10px 14px;flex:1 1 150px}
-  .stat .big{font-size:22px;font-weight:700;color:var(--accent)}
-  .stat .lbl{font-size:13px;color:var(--muted)}
-  table{width:100%;border-collapse:collapse;margin:8px 0;font-size:15px}
-  th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left}
-  th{color:var(--muted);font-weight:600}
-  td.from{color:var(--warn)} td.to{color:var(--accent2);font-weight:700}
-  .pillrow{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 6px}
-  .pill{background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:13px;color:var(--muted)}
-  .keys{background:linear-gradient(135deg,#16241f,#171a21);border:1px solid var(--line);border-left:4px solid var(--accent2);border-radius:12px;padding:20px 22px;margin-top:26px}
-  .keys h2{color:var(--accent2)}
-  ol.keys-list{margin:6px 0 0;padding-left:20px}
-  ol.keys-list li{margin:0 0 10px}
-  .foot{color:var(--muted);font-size:13px;margin-top:26px;text-align:center}
-  code{background:#0c0e12;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:14px;color:var(--accent)}
+  body{
+    margin:0; background:linear-gradient(160deg,#0c0e13,#141824);
+    color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
+    "PingFang SC","Microsoft YaHei",sans-serif; line-height:1.75;
+  }
+  .wrap{max-width:820px; margin:0 auto; padding:48px 22px 80px}
+  header h1{font-size:30px; margin:0 0 6px; letter-spacing:.3px}
+  .meta{color:var(--muted); font-size:14px; margin-bottom:26px}
+  .lead{
+    background:linear-gradient(135deg,#1f2533,#181b24);
+    border:1px solid var(--line); border-left:4px solid var(--accent);
+    padding:18px 20px; border-radius:12px; font-size:18px; margin-bottom:34px;
+  }
+  .lead b{color:var(--accent2)}
+  section{
+    background:var(--card); border:1px solid var(--line);
+    border-radius:12px; padding:20px 22px; margin:18px 0;
+  }
+  section h2{
+    font-size:19px; margin:0 0 10px; color:#fff;
+    display:flex; gap:10px; align-items:baseline;
+  }
+  section h2 .tag{
+    font-size:12px; color:var(--accent); border:1px solid var(--accent);
+    border-radius:20px; padding:2px 10px; font-weight:600; white-space:nowrap;
+  }
+  .nums{display:flex; flex-wrap:wrap; gap:12px; margin:14px 0}
+  .num{
+    background:#11141c; border:1px solid var(--line); border-radius:10px;
+    padding:12px 14px; flex:1 1 150px;
+  }
+  .num .big{font-size:22px; font-weight:700; color:var(--warn)}
+  .num .lbl{font-size:13px; color:var(--muted); margin-top:2px}
+  .insight{
+    margin-top:12px; padding-top:10px; border-top:1px dashed var(--line);
+    color:var(--accent2); font-size:15px;
+  }
+  .insight::before{content:"洞见 · "; color:var(--muted)}
+  .takeaway{
+    background:linear-gradient(135deg,#162033,#10131b);
+    border:1px solid var(--accent); border-radius:14px; padding:22px 24px; margin-top:34px;
+  }
+  .takeaway h2{color:var(--accent); font-size:20px; margin:0 0 14px}
+  .takeaway ol{margin:0; padding-left:22px}
+  .takeaway li{margin:10px 0}
+  code{background:#0c0e13; padding:1px 6px; border-radius:5px; color:var(--accent2); font-size:.92em}
+  .flow{color:var(--muted); font-size:14px}
 </style>
 </head>
 <body>
 <nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://cursor.com/blog/secure-codebase-indexing" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
 <div class="wrap">
-  <div class="kicker">Cursor · Research</div>
-  <h1>把"小时级"的代码库索引压成"秒级"，还不让你看到自己没有的代码</h1>
-  <div class="meta">来源：Cursor 博客 · 作者 Jeremy Stribling · 2026-01-27</div>
+  <header>
+    <h1>安全地索引大型代码库</h1>
+    <div class="meta">Cursor · Research · 2026-01-27 · 作者 Jeremy Stribling</div>
+  </header>
 
-  <p class="lede">一句话总括：Cursor 发现"同一组织内同一代码库的克隆平均有 <b>92%</b> 相似"，于是不再为每个新人从零重建索引，而是用 <b>Merkle 树 + 相似度哈希 + 内容证明</b>安全复用队友的现成索引——把首次可查询时间从最长 <b>4 小时压到 21 秒</b>，同时用密码学保证客户端绝不会看到它本地没有的文件。</p>
-
-  <section>
-    <h2>为什么值得做：语义搜索是 agent 性能的杠杆，但慢</h2>
-    <div class="stats">
-      <div class="stat"><div class="big">+12.5%</div><div class="lbl">语义搜索平均提升回答准确率</div></div>
-      <div class="stat"><div class="big">≥80%</div><div class="lbl">索引完成度门槛（之前搜索不可用）</div></div>
-      <div class="stat"><div class="big">数小时</div><div class="lbl">几万文件大仓库朴素索引耗时</div></div>
-    </div>
-    <p>除了准确率，语义搜索还让生成的改动更容易被代码库长期保留、整体请求满意度更高。但代价是：大仓库朴素索引要跑几小时，且要等索引完成至少 80% 才能用——新人入职、换机器时这段空窗反复出现。</p>
-    <p class="take">真正要解决的不是"索引快不快"，而是"如何不为每个人重复支付同一份昂贵成本"。</p>
-  </section>
-
-  <section>
-    <h2><span class="num">1</span>建立首个索引：用 Merkle 树只同步"变了的分支"</h2>
-    <p>Cursor 给每个文件算加密哈希，目录哈希再由其子节点哈希推导，组成一棵 Merkle 树。本地小改只会改动该文件及其一路到根的父目录哈希；与服务端对比即可精确定位差异——哈希不同的同步、相同的跳过、客户端缺的从服务端删、服务端缺的补上，且同步过程从不修改客户端文件。</p>
-    <div class="pillrow">
-      <span class="pill">5 万文件工作区</span>
-      <span class="pill">仅文件名 + SHA-256 ≈ 3.2 MB</span>
-      <span class="pill">每次只走哈希不同的分支</span>
-    </div>
-    <p>变更文件被切成语法块，转成驱动语义搜索的 embedding；生成 embedding 是最贵的一步，所以放到后台异步做，并<strong>按块内容缓存</strong>，未变的块直接命中缓存。</p>
-    <p class="take">Merkle 树把"全量传输"变成"差量遍历"，是后面一切复用与安全机制的密码学地基。</p>
-  </section>
-
-  <section>
-    <h2><span class="num">2</span>找到可复用的索引：用 simhash 在向量库里"搜索一个代码库"</h2>
-    <p>新人加入时，客户端从 Merkle 树派生出一个<strong>相似度哈希（simhash）</strong>——它是整库文件内容哈希的单值摘要。客户端上传 simhash，服务端把它当向量，在"同团队（或同用户）所有现有索引"的 simhash 向量库里检索；命中且超过阈值，就直接把那个索引当作新代码库的初始索引。</p>
-    <p>拷贝在后台进行；与此同时客户端已经可以对被拷贝的原索引发起语义搜索，于是首次查询几乎瞬时返回。前提是两条约束都成立：结果必须反映用户本地代码库（即使有差异），且客户端绝不能看到自己没有的代码。</p>
-    <p class="take">"代码库相似度"被工程化成一个可向量检索的数，复用从经验直觉变成了可计算的匹配。</p>
-  </section>
-
-  <section>
-    <h2><span class="num">3</span>证明你有权访问：用内容证明堵住跨副本泄露</h2>
-    <p>安全性同样建在 Merkle 树上：树里每个节点都是其下内容的加密哈希，<strong>只有真正持有文件才能算出对应哈希</strong>。从拷贝索引启动时，客户端连同 simhash 一起上传完整 Merkle 树，为每个加密路径关联一个哈希；服务端把这棵树存成一组<strong>内容证明（content proof）</strong>。</p>
-    <p>检索时服务端拿客户端的树去过滤结果——证明不了持有某文件，该结果就被丢弃。客户端因此能立即查询、且只看到与拷贝索引共享的代码；后台同步补齐剩余差异，待两端树根一致后服务端删除内容证明，之后查询直接走完全同步的索引。</p>
-    <p class="take">同一棵 Merkle 树既是提速工具又是访问控制凭据——安全不是事后补丁，而是复用机制自带的副产品。</p>
-  </section>
-
-  <section>
-    <h2><span class="num">4</span>更快的上手：仓库越大，收益越夸张</h2>
-    <p>复用队友索引对各种规模都有效，且效果随仓库规模放大：</p>
-    <table>
-      <tr><th>分位</th><th>原首次查询</th><th>复用后</th></tr>
-      <tr><td>中位数仓库</td><td class="from">7.87 秒</td><td class="to">525 毫秒</td></tr>
-      <tr><td>P90</td><td class="from">2.82 分钟</td><td class="to">1.87 秒</td></tr>
-      <tr><td>P99</td><td class="from">4.03 小时</td><td class="to">21 秒</td></tr>
-    </table>
-    <p class="take">越大的代码库原本越痛，这套方案的收益越大——它消除的是一类反复发生的重复工作，而非一次性优化。</p>
-  </section>
-
-  <div class="keys">
-    <h2>最值得带走的 5 条洞见</h2>
-    <ol class="keys-list">
-      <li><b>语义搜索是 agent 的性能杠杆：</b>平均把回答准确率拉高 12.5%，并让改动更易被保留——值得为它的"可用速度"投入工程。</li>
-      <li><b>"92% 相似"是整套设计的支点：</b>同组织内代码库克隆高度相似，意味着为每人从零索引本质上是重复劳动，可以安全省掉。</li>
-      <li><b>一棵 Merkle 树身兼三职：</b>差量同步（5 万文件只传约 3.2 MB 哈希）、相似度匹配（派生 simhash）、访问控制（内容证明），密码学结构被一物多用。</li>
-      <li><b>安全与提速并非取舍：</b>用"只有持有文件才能算出其哈希"这一性质做内容证明，客户端能秒级查询却永远看不到自己没有的代码。</li>
-      <li><b>收益随规模指数级放大：</b>P99 仓库从 4.03 小时降到 21 秒——对超大代码库，这是"能不能用"而不仅是"快不快"的区别。</li>
-    </ol>
+  <div class="lead">
+    一句话总括：Cursor 发现同一组织内同一代码库的多份克隆平均有 <b>92%</b> 相同，于是不再为每个新成员从零重建索引，而是<b>安全地复用队友的现成索引</b>——并用 Merkle 树的密码学特性确保你只能搜到自己本地真正拥有的代码，把大仓库的首次查询从数小时缩短到数秒。
   </div>
 
-  <div class="foot">基于 Cursor 官方博客正文整理 · 数据均取自原文 · 仅作中文阅读摘要</div>
+  <section>
+    <h2>语义搜索是 agent 性能的主引擎 <span class="tag">为什么重要</span></h2>
+    <p>这不是锦上添花的功能，而是 agent 能否给出好答案的关键。Cursor 的内部评测显示语义搜索带来了可量化的全面提升。</p>
+    <div class="nums">
+      <div class="num"><div class="big">+12.5%</div><div class="lbl">平均回答准确率提升</div></div>
+      <div class="num"><div class="big">↑</div><div class="lbl">生成代码更易被保留、用户满意度更高</div></div>
+    </div>
+    <div class="insight">索引速度不是工程细节，而是直接决定用户能多快从一个大代码库里获得有用答案。</div>
+  </section>
+
+  <section>
+    <h2>naive 索引在大仓库上是个真问题 <span class="tag">痛点</span></h2>
+    <p>小项目几乎瞬间完成，但有数万文件的大仓库如果朴素地逐文件处理，可能要花<strong>数小时</strong>；更糟的是，语义搜索要等到至少 <strong>80%</strong> 的索引完成才可用。新成员入职、换机器都要重付这笔成本。</p>
+    <div class="insight">真正卡住用户的不是索引总时长，而是"在能用之前要等多久"（time-to-first-query）。</div>
+  </section>
+
+  <section>
+    <h2>Merkle 树让同步只走"变化的分支" <span class="tag">核心机制 1</span></h2>
+    <p>Cursor 用 <strong>Merkle 树</strong>表示代码库：每个文件有密码学哈希，每个文件夹的哈希由其子节点哈希算出。改一个文件，只会改动它自己和到根目录这一条路径上的哈希。客户端与服务端对比哈希，只同步不同的分支，相同的跳过，且<strong>同步过程从不修改客户端文件</strong>。</p>
+    <div class="num" style="margin:6px 0"><div class="big">3.2 MB → 仅差异分支</div><div class="lbl">5 万文件工作区，仅文件名+SHA-256 就约 3.2 MB；有了树就只传哈希不同的部分</div></div>
+    <p class="flow">改文件时按语法切成 chunk → 转成 embedding（最贵的一步，后台异步做）→ 按 chunk 内容缓存，未变的 chunk 命中缓存，不在推理时重复付费。</p>
+    <div class="insight">用密码学哈希的"变化定位"能力，把"每次全量传输"变成"只传 diff"，索引因此既快更新又轻维护。</div>
+  </section>
+
+  <section>
+    <h2>用 simhash 在向量库里找到"最该复用的索引" <span class="tag">核心机制 2</span></h2>
+    <p>新用户加入时，客户端从 Merkle 树派生出一个<strong>相似度哈希（simhash）</strong>——它是整个代码库内容哈希的单值摘要。把它当作向量，在<strong>同团队/同用户</strong>的所有现有索引中做向量搜索；若某个结果的相似度超过阈值，就拿它作为新代码库的初始索引。</p>
+    <p>复制在后台进行，同时客户端已经可以对被复制的原索引发起语义搜索——这就是"秒级首次查询"的来源。</p>
+    <div class="insight">"大多数人的代码库高度相似"这一朴素观察，被转化成了一个可检索、可匹配的工程量（simhash + 向量库）。</div>
+  </section>
+
+  <section>
+    <h2>用"内容证明"保证你看不到没有的代码 <span class="tag">核心机制 3 · 安全</span></h2>
+    <p>复用别人索引的风险是代码泄露。Cursor 复用 Merkle 树的密码学性质：<strong>只有真正拥有文件，才能算出对应哈希</strong>。客户端上传完整 Merkle 树，服务端把它存为一组<strong>内容证明（content proofs）</strong>；搜索时按这些哈希过滤结果——<strong>客户端证明不了自己拥有某文件，对应结果就被丢弃</strong>。后台同步逐步对齐差异，一旦两端树根一致，服务端删除内容证明，之后查询走完全同步好的索引。</p>
+    <div class="insight">访问控制不靠额外的权限系统，而是直接复用索引本身已有的密码学结构——安全与性能同源。</div>
+  </section>
+
+  <section>
+    <h2>效果：仓库越大，收益越大 <span class="tag">结果</span></h2>
+    <div class="nums">
+      <div class="num"><div class="big">7.87s → 525ms</div><div class="lbl">中位仓库 首次查询</div></div>
+      <div class="num"><div class="big">2.82min → 1.87s</div><div class="lbl">第 90 百分位</div></div>
+      <div class="num"><div class="big">4.03h → 21s</div><div class="lbl">第 99 百分位</div></div>
+    </div>
+    <div class="insight">收益随仓库规模放大——最痛苦的"超大仓库等数小时"恰恰被压缩得最狠（从 4 小时到 21 秒）。</div>
+  </section>
+
+  <div class="takeaway">
+    <h2>最值得带走的洞见</h2>
+    <ol>
+      <li><strong>语义搜索是 agent 的核心能力</strong>：平均 +12.5% 准确率，所以"多快能用上索引"直接影响体验，而非边角优化。</li>
+      <li><strong>"团队代码高度相似"是可被利用的事实</strong>：92% 的相似度意味着从零重建索引是巨大的重复劳动，复用是显而易见但需要安全设计的捷径。</li>
+      <li><strong>同一个 Merkle 树同时解决三件事</strong>：增量同步、相似度匹配（simhash）、以及访问控制（内容证明）——好的数据结构让性能与安全同源。</li>
+      <li><strong>安全不是性能的对立面</strong>：靠"只有拥有文件才能算出哈希"这一密码学事实做访问控制，既不泄露代码又能立刻查询。</li>
+      <li><strong>真正的指标是 time-to-first-query</strong>：把它从 4 小时降到 21 秒，意味着大型代码库可以在秒级被理解，而不是小时级。</li>
+    </ol>
+  </div>
 </div>
 </body>
 </html>

@@ -3,127 +3,144 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>OpenAI 的首批"证明提交"：AI 在研究级数学上交出可核验的答卷</title>
+<title>OpenAI 的 First Proof 证明尝试：AI 能写出可核查的研究级证明吗？</title>
 <style>
   :root{
-    --bg:#0f1115; --card:#181b22; --card2:#1f232c; --ink:#e8eaed; --sub:#a9b0bb;
-    --line:#2c313c; --accent:#10a37f; --accent2:#6ea8fe; --good:#5fd38d; --warn:#f0c674; --bad:#f08a8a;
+    --ink:#1a1d24; --muted:#5b6472; --line:#e4e8ee;
+    --accent:#2f6df0; --accent-soft:#eaf1ff;
+    --good:#0a7a4b; --good-soft:#e6f6ee;
+    --warn:#b23b3b; --warn-soft:#fbeaea;
+    --paper:#ffffff; --bg:#f6f8fb;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-    line-height:1.75;font-size:16px;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:860px;margin:0 auto;padding:40px 22px 72px}
-  .tag{display:inline-block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;
-    color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:3px 12px;margin-bottom:18px}
-  .meta{color:var(--sub);font-size:13px;margin-bottom:26px}
-  .meta a{color:var(--accent2);text-decoration:none}
-  h1{font-size:30px;line-height:1.3;margin:0 0 22px;font-weight:700}
-  .lede{font-size:19px;line-height:1.7;background:linear-gradient(135deg,#1a2a25,#181b22);
-    border-left:4px solid var(--accent);border-radius:10px;padding:20px 22px;margin:0 0 38px;color:#f3f4f6}
-  .lede b{color:var(--accent)}
-  h2{font-size:21px;margin:42px 0 6px;line-height:1.4;font-weight:700}
-  h2 .num{color:var(--accent);font-size:15px;font-weight:600;margin-right:8px}
-  .insight{color:var(--good);font-weight:600;margin-top:10px;
-    border-top:1px dashed var(--line);padding-top:10px;display:block}
-  .insight::before{content:"洞见 → ";color:var(--sub);font-weight:600}
-  p{margin:12px 0}
-  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:20px 0}
-  .stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
-  .stat .big{font-size:26px;font-weight:800;color:var(--accent2);line-height:1.1}
-  .stat .lbl{font-size:12.5px;color:var(--sub);margin-top:6px;line-height:1.4}
-  table{width:100%;border-collapse:collapse;margin:18px 0;font-size:14.5px;
-    background:var(--card);border-radius:10px;overflow:hidden}
-  th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line)}
-  th{background:var(--card2);color:var(--sub);font-weight:600;font-size:13px}
-  td b{color:var(--accent2)}
-  tr:last-child td{border-bottom:none}
-  .ok{color:var(--good);font-weight:700}
-  .rev{color:var(--warn);font-weight:700}
-  .no{color:var(--bad);font-weight:700}
-  .quote{background:var(--card);border-left:3px solid var(--accent2);border-radius:0 10px 10px 0;
-    padding:16px 20px;margin:20px 0;color:#dfe3ea;font-size:15.5px;line-height:1.7}
-  .quote .by{display:block;margin-top:10px;color:var(--sub);font-size:13px;font-style:normal}
-  .pill{display:inline-block;background:#22302b;color:var(--warn);border-radius:6px;
-    padding:1px 8px;font-size:13px;font-weight:600}
-  .takeaways{margin-top:48px;background:var(--card);border:1px solid var(--line);
-    border-radius:14px;padding:24px 26px}
-  .takeaways h2{margin-top:0}
-  .takeaways ol{margin:14px 0 0;padding-left:22px}
-  .takeaways li{margin:14px 0;padding-left:6px}
-  .takeaways li b{color:var(--accent)}
-  .foot{color:var(--sub);font-size:12.5px;margin-top:36px;border-top:1px solid var(--line);padding-top:16px}
-  em{color:var(--warn);font-style:normal}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans CJK SC","Microsoft YaHei",sans-serif;
+    line-height:1.75; font-size:17px;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding:40px 22px 80px}
+  header.head{
+    background:linear-gradient(135deg,#16213e,#2f6df0);
+    color:#fff; border-radius:18px; padding:34px 30px; margin-bottom:30px;
+    box-shadow:0 10px 30px rgba(22,33,62,.18);
+  }
+  header.head .tag{
+    display:inline-block; font-size:13px; letter-spacing:.06em;
+    background:rgba(255,255,255,.18); padding:4px 12px; border-radius:999px; margin-bottom:14px;
+  }
+  header.head h1{font-size:27px; line-height:1.4; margin:0 0 14px}
+  header.head .meta{font-size:14px; opacity:.85}
+  .lede{
+    background:var(--accent-soft); border-left:5px solid var(--accent);
+    border-radius:12px; padding:18px 22px; margin:0 0 34px; font-size:18px;
+  }
+  .lede strong{color:var(--accent)}
+  section{
+    background:var(--paper); border:1px solid var(--line); border-radius:14px;
+    padding:24px 26px; margin-bottom:20px;
+  }
+  section h2{font-size:20px; margin:0 0 14px; line-height:1.45}
+  section p{margin:0 0 12px}
+  .takeaway{
+    margin-top:14px; padding:12px 16px; background:#f3f6fb;
+    border-radius:10px; font-size:15.5px; color:var(--muted);
+  }
+  .takeaway b{color:var(--ink)}
+  .stats{display:flex; flex-wrap:wrap; gap:12px; margin:6px 0 4px}
+  .stat{
+    flex:1 1 150px; background:var(--accent-soft); border-radius:12px;
+    padding:14px 16px; text-align:center;
+  }
+  .stat .n{font-size:26px; font-weight:700; color:var(--accent); display:block}
+  .stat .l{font-size:13px; color:var(--muted); margin-top:4px}
+  .pill{display:inline-block; padding:2px 9px; border-radius:6px; font-size:14px; font-weight:600}
+  .pill.good{background:var(--good-soft); color:var(--good)}
+  .pill.warn{background:var(--warn-soft); color:var(--warn)}
+  .timeline{list-style:none; margin:8px 0 0; padding:0}
+  .timeline li{padding:8px 0 8px 18px; border-left:2px solid var(--line); position:relative}
+  .timeline li::before{
+    content:""; position:absolute; left:-6px; top:14px; width:10px; height:10px;
+    border-radius:50%; background:var(--accent);
+  }
+  .timeline .d{font-size:13px; color:var(--muted); font-weight:600}
+  .insights{
+    background:#101726; color:#eaf0ff; border-radius:16px; padding:26px 28px; margin-top:30px;
+  }
+  .insights h2{color:#fff; font-size:21px; margin:0 0 16px}
+  .insights ol{margin:0; padding-left:20px}
+  .insights li{margin:0 0 12px; line-height:1.7}
+  .insights li b{color:#9ec1ff}
+  blockquote{
+    margin:14px 0 0; padding:14px 18px; background:#fbfcfe;
+    border-left:4px solid var(--accent); border-radius:8px;
+    font-style:italic; color:var(--muted); font-size:15.5px;
+  }
 </style>
 </head>
 <body>
 <nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://openai.com/index/first-proof-submissions" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
 <div class="wrap">
 
-  <span class="tag">Research · OpenAI</span>
-  <div class="meta">来源：OpenAI · 2026 年 2 月 20 日 · <a href="https://openai.com/index/first-proof-submissions">原文链接</a></div>
+  <header class="head">
+    <span class="tag">OpenAI · Research · 2026-02-20</span>
+    <h1>AI 第一次正面挑战"可核查的研究级数学证明"</h1>
+    <div class="meta">来源：OpenAI ｜ 主题：First Proof 数学挑战的 10 道题证明尝试</div>
+  </header>
 
-  <h1>首批"证明提交"：AI 在研究级数学上交出可被专家核验的答卷</h1>
+  <p class="lede">
+    <strong>一句话总括：</strong>OpenAI 让一个仍在训练中的内部模型独立攻克了 10 道研究级数学难题，并公开全部证明尝试——其真正贡献不是"又解了几道题"，而是把 AI 推到了一个<strong>需要专家逐行核查、正确性难以判定</strong>的检验场，给出了前沿模型"做研究"能力的第一手、可被公开质疑的证据。
+  </p>
 
-  <p class="lede">这篇文章真正的贡献，不是又刷新了一个分数，而是把 AI 的数学能力放进了一个<b>"对错难以判定、必须由领域专家逐行核验"</b>的真实考场——First Proof 的 10 道研究级难题。OpenAI 用一个内部模型全部作答并公开尝试，据专家初步反馈<b>至少 5 道大概率正确</b>。同样关键的是它公开了反例与流程缺陷：原以为做对的第 2 题被改判为错，整个过程也承认是"有人类介入的快速冲刺"，而非干净的受控评测。这让结论既振奋又可信。</p>
+  <section>
+    <h2>① 这不是刷榜，而是一场"专家也要花一周"的硬仗</h2>
+    <p>First Proof 要求 AI 构建端到端的完整论证，而非给出短答案或竞赛式解题。出题人是各领域顶尖专家，<b>其中至少几道题在作者自己找到解法前曾悬而未决多年</b>；据估计，一个学科高度对口的学术院系也得花约一周才能解出其中许多题。</p>
+    <p class="takeaway"><b>洞见：</b>题目的"难"在于正确性本身难以验证——这正是基准测试通常测不到、却最像真实科研的部分。</p>
+  </section>
 
-  <h2><span class="num">01</span>这不是竞赛题，而是"开放多年才被解出"的真问题</h2>
-  <p>First Proof 与短答案、竞赛式数学的关键区别在于：它要求在专业领域里搭建<b>端到端的完整论证</b>，且正确性"不经专家审阅就难以确立"。出题人都是各自领域的顶尖专家，<em>其中至少有两道题在作者本人找到解法前已经开放了多年</em>；OpenAI 估计，一个学科高度重合的学术系所"有可能"在一周内解出其中多道。这意味着考的不是套路，而是研究本身。</p>
-  <span class="insight">把模型放进"答案本身需要被发现、且只有专家能验真"的场景，才真正逼出研究级推理，而这正是常规 benchmark 最容易漏掉的部分。</span>
+  <section>
+    <h2>② 10 道题中至少 5 道大概率正确</h2>
+    <div class="stats">
+      <div class="stat"><span class="n">10</span><span class="l">全部尝试的题目</span></div>
+      <div class="stat"><span class="n">≥5</span><span class="l">专家判断高概率正确</span></div>
+      <div class="stat"><span class="n">#4·5·6·9·10</span><span class="l">被看好的题号</span></div>
+    </div>
+    <p>基于专家反馈，OpenAI 认为第 4、5、6、9、10 题的证明<span class="pill good">大概率正确</span>，另有几道仍在评审中。但故事也有反转：第 2 题最初被认为正确，依据官方点评与社区进一步分析，<span class="pill warn">现已判定为错误</span>。</p>
+    <p class="takeaway"><b>洞见：</b>"先以为对、后被推翻"恰恰说明了核查的价值——AI 的证明能写得足够像样以骗过初判，因此独立评审不可或缺。</p>
+  </section>
 
-  <h2><span class="num">02</span>核心结果：10 题中至少 5 题大概率正确，且公开了错题</h2>
-  <div class="stats">
-    <div class="stat"><div class="big">10 / 10</div><div class="lbl">模型对全部 10 道题给出证明尝试</div></div>
-    <div class="stat"><div class="big">≥ 5</div><div class="lbl">据专家反馈大概率正确（第 4、5、6、9、10 题）</div></div>
-    <div class="stat"><div class="big">2/14</div><div class="lbl">2026 年 2 月 14 日 PT 0:00 公开全部尝试</div></div>
-  </div>
-  <table>
-    <tr><th>问题</th><th>当前判断</th></tr>
-    <tr><td>第 4、5、6、9、10 题</td><td class="ok">大概率正确</td></tr>
-    <tr><td>其余若干题</td><td class="rev">仍在评审中</td></tr>
-    <tr><td>第 2 题</td><td class="no">起初以为正确，现已改判为错误</td></tr>
-  </table>
-  <p>值得注意的是诚实度：OpenAI 原本认为第 2 题的尝试"大概率正确"，但根据官方 First Proof 点评与进一步的社区分析，现已承认它是<em>错的</em>。配套预印本收录了全部 10 份证明尝试，并新增了一份附录，给出模拟人机交互过程的<b>提示词模式与示例</b>。</p>
-  <span class="insight">公开错题和"仍在评审"，比只晒对的更有说服力——因为它把判断权交给了能验真的外部专家。</span>
+  <section>
+    <h2>③ 能力是"一天天肉眼可见地变聪明"的</h2>
+    <ul class="timeline">
+      <li><span class="d">周末初试</span> 模型已能解出第 9、10 题。</li>
+      <li><span class="d">随训练推进</span> 又解出至少 3 道，含来自团队熟悉领域的第 6 题。</li>
+      <li><span class="d">两天后</span> 再拿下第 4 题。</li>
+    </ul>
+    <blockquote>"我们正在训练一个以提升思维严谨度为主要目标的新模型，希望它能连续思考数小时并对结论保持高度自信……看着模型一天天明显变聪明，相当不可思议。" —— James R. Lee（OpenAI 推理研究员）</blockquote>
+    <p class="takeaway"><b>洞见：</b>解题数量随训练逐步增加，意味着这类能力不是固定快照，而是可以被"训练曲线"持续推高的——这改变了我们对模型上限的判断方式。</p>
+  </section>
 
-  <h2><span class="num">03</span>方法的诚实交代：有人在场，这是一次"冲刺"</h2>
-  <p>结果亮眼，但 OpenAI 主动划清了边界：模型在<b>有限人工监督</b>下运行。具体包括——在沿训练过程提示不同版本时，人类有时会建议重试此前奏效的策略；在收到专家反馈后，要求模型展开或澄清证明的某些部分以便核验；还撮合了<b>该模型与 ChatGPT 之间的来回</b>用于验证、排版与风格；部分题目则由人工从几次尝试里"择优呈现"。OpenAI 直言这是"一次快速冲刺，流程不如我们希望的受控评测那样干净"，并表示期待与组织方讨论更严谨的评测框架。</p>
-  <span class="insight">"AI 解出 5 道"应被读作"在人类引导与多次尝试下、由专家初步认可"，而非全自动一次过；承认这一点反而抬高了证据质量。</span>
+  <section>
+    <h2>④ 坦白的方法论：有限人工监督，过程并不"干净"</h2>
+    <p>OpenAI 明确说明这是一次"快速冲刺"：过程中会建议重试看起来有效的策略，按专家反馈让模型澄清证明，让该模型与 ChatGPT 来回校验格式与风格，部分题目还由人工从几次尝试中挑选最佳结果。证明尝试于 <b>2026 年 2 月 14 日 0:00（太平洋时间）</b>公开，预印本含全部 10 份尝试及一份记录提示词模式的新增附录。</p>
+    <p class="takeaway"><b>洞见：</b>这份罕见的"自曝其短"很重要——它提醒读者：当前结果是在人类引导下取得的，尚未构成受控、可复现的严格评测。</p>
+  </section>
 
-  <h2><span class="num">04</span>为什么用"前沿研究"而非 benchmark 来衡量下一代模型</h2>
-  <p>OpenAI 的方法论主张是：<b>原创前沿研究或许是评估下一代模型能力最重要的方式</b>。Benchmark 有用，却容易漏掉研究中最难的几件事——维持长链条推理、选对抽象层次、消化问题表述里的歧义，以及<b>产出能经受专家审视的论证</b>。像 First Proof 这样的挑战，恰好把这些能力放在"正确性难以判定、失败模式信息量很大"的环境里压力测试。</p>
-  <span class="insight">当分数趋于饱和，能不能写出"专家挑不出毛病的论证"正成为更有区分度的标尺。</span>
+  <section>
+    <h2>⑤ 一条延续的轨迹：从 IMO 金牌到胶子振幅公式</h2>
+    <p>这项工作接续此前成果：<b>2025 年 7 月</b>通用推理模型达到 IMO 金牌水平（<b>42 分中得 35 分</b>）；<b>2025 年 11 月</b>发布 GPT-5 加速数学、物理、生物等领域研究的案例研究；近期 GPT-5.2 提出一个胶子振幅公式的候选表达式，再由内部模型完成形式化证明并经作者验证。</p>
+    <p class="takeaway"><b>洞见：</b>把这些点连起来，方向已经清晰——AI 正从"答题者"转向"科研协作者"，而 First Proof 是检验这一转变是否真实的压力测试。</p>
+  </section>
 
-  <h2><span class="num">05</span>一个"按天变聪明"的在训模型</h2>
-  <p>研究员 James R. Lee 的叙述给出了过程的动态画面：他们正在训练一个<b>以"提升思考严谨性"为首要目标</b>的新模型，希望它能连续思考数小时并对结论保持高度自信。First Proof 公布时正好成了理想试验场——周末初试就解出第 9、10 题；随着训练推进能力增强，按其估计又至少多解 3 道，并先后攻下第 6 题、两天后又拿下第 4 题（这两道都来自团队熟悉的领域）。</p>
-  <div class="quote">
-    "看着一个模型一天天变得肉眼可见地更聪明，是相当不可思议的。"
-    <span class="by">— James R. Lee，OpenAI 推理方向研究员</span>
-  </div>
-  <span class="insight">能力提升不再只发生在版本之间，而是在<em>单次训练过程内</em>逐日显现——这改变了我们对"模型进步节奏"的直觉。</span>
-
-  <h2><span class="num">06</span>放进更大的脉络：从 IMO 金牌到物理公式</h2>
-  <table>
-    <tr><th>时间</th><th>里程碑</th></tr>
-    <tr><td>2025 年 7 月</td><td>通用推理模型达 IMO <b>金牌级</b>（35/42 分）</td></tr>
-    <tr><td>2025 年 11 月</td><td>"用 GPT-5 加速科学"：数学、物理、生物等领域的具体进展案例（含局限）</td></tr>
-    <tr><td>近期</td><td>GPT-5.2 提出<b>胶子振幅</b>公式候选，由内部模型形式化证明并经作者验证</td></tr>
-  </table>
-  <p>First Proof 不是孤立事件，而是这条"AI 参与真实科研"曲线上的最新一点：从竞赛数学的高分，到与研究者协作做出具体科学进展，再到在物理中"提出候选公式—证明—验证"的闭环。OpenAI 表示，希望把这些新能力放进未来的公开模型，并与社区一起探讨如何评估研究级推理。</p>
-  <span class="insight">趋势线正从"会做题"滑向"能参与发现"——衡量标准也随之从答对率转向能否经得起同行核验。</span>
-
-  <div class="takeaways">
-    <h2>最值得带走的 5 条洞见</h2>
+  <div class="insights">
+    <h2>最值得带走的洞见</h2>
     <ol>
-      <li><b>研究级数学已不是铁壁。</b>10 道开放、需端到端论证的难题中，至少 5 道（第 4、5、6、9、10 题）被专家初步认为大概率正确——有的题此前已开放多年。</li>
-      <li><b>诚实是这份成绩的一部分。</b>原以为做对的第 2 题被公开改判为错，多题"仍在评审"，正确性交由能验真的外部专家裁定，而非自我宣布。</li>
-      <li><b>这是"有人引导的冲刺"，不是全自动。</b>人类建议策略、要求澄清证明、撮合模型与 ChatGPT 互验、并择优呈现——读结果时务必带上这层边界。</li>
-      <li><b>前沿研究正成为新的"评测场"。</b>当 benchmark 趋饱和，能否维持长推理、选对抽象、写出经得起专家审视的论证，才是区分下一代模型的关键。</li>
-      <li><b>进步在"按天"发生。</b>同一次训练过程内，模型从解出 2 道逐步到至少 5 道——能力跃迁的时间尺度正在压缩，并已延伸到物理等真实科研。</li>
+      <li><b>评测范式在迁移：</b>OpenAI 主张用"前沿原创研究"而非基准测试来衡量下一代模型，因为长链推理、选对抽象、处理模糊问题、写出经得起专家审查的论证，正是基准测不到的部分。</li>
+      <li><b>5/10 是有保留的乐观：</b>至少 5 道大概率正确令人印象深刻，但"几道仍在评审""第 2 题被推翻"提醒我们，最终成绩取决于独立专家核查而非自评。</li>
+      <li><b>能力可被训练曲线推高：</b>同一模型随训练逐日多解出题目，说明研究级推理能力是动态、可提升的，而非一次性快照。</li>
+      <li><b>透明胜过完美：</b>OpenAI 主动承认有限人工监督和流程不规范，这种坦诚让结果更可信，也为未来更严格的评测框架留出空间。</li>
+      <li><b>"可核查"是新瓶颈：</b>当 AI 能写出足以骗过初判的证明，难点已从"能不能解"转向"我们能不能验证"——这正是人机协作下一阶段的核心挑战。</li>
     </ol>
   </div>
-
-  <div class="foot">本页为基于 OpenAI 原文的中文要点总结，所有数字、题号、日期与判断（含第 2 题改判为错误）均取自原文；"至少 5 题大概率正确""仍在评审"等表述反映文章发布时点的专家初步反馈，最终正确性以后续评审为准。</div>
 
 </div>
 </body>

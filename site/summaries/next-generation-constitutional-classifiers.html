@@ -3,146 +3,136 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>下一代宪法分类器：更省算力地挡住通用越狱 · 总结</title>
+<title>下一代宪法分类器：更高效地防御通用越狱</title>
 <style>
   :root{
-    --bg:#0f1115; --card:#171a21; --card2:#1d2129;
-    --text:#e7eaf0; --muted:#9aa3b2; --line:#2a2f3a;
-    --accent:#6ea8fe; --warn:#ff7a7a; --good:#5dd1a0; --gold:#f2c14e;
+    --bg:#f6f7f9; --card:#ffffff; --ink:#1d2433; --soft:#5b6577;
+    --accent:#c8623a; --accent2:#2e6f9e; --good:#2e7d52; --bad:#b5413a;
+    --line:#e7eaee; --hl:#fff4ec;
   }
   *{box-sizing:border-box}
-  body{
-    margin:0; background:var(--bg); color:var(--text);
-    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Microsoft YaHei",sans-serif;
-    line-height:1.75; font-size:17px;
-  }
-  .wrap{max-width:760px; margin:0 auto; padding:40px 22px 80px}
-  header.hd{border-bottom:1px solid var(--line); padding-bottom:22px; margin-bottom:30px}
-  .kicker{color:var(--accent); font-size:13px; letter-spacing:.08em; text-transform:uppercase; margin:0 0 10px}
-  h1{font-size:30px; line-height:1.3; margin:0 0 14px}
-  .meta{color:var(--muted); font-size:14px}
-  .lede{
-    background:linear-gradient(135deg,#1c2533,#191d26);
-    border:1px solid var(--line); border-left:4px solid var(--accent);
-    border-radius:12px; padding:18px 20px; margin:26px 0 36px; font-size:18px;
-  }
-  .lede b{color:var(--accent)}
-  section{margin:34px 0}
-  h2{font-size:21px; margin:0 0 6px; line-height:1.4}
-  h2 .tag{display:inline-block; font-size:12px; color:var(--gold); border:1px solid var(--line); border-radius:999px; padding:2px 10px; margin-right:10px; vertical-align:middle}
-  .body{color:#d6dbe6}
-  .take{color:var(--muted); font-style:italic; border-left:2px solid var(--line); padding-left:12px; margin-top:12px}
-  .stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0}
-  .stat{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px}
-  .stat .big{font-size:26px; font-weight:700}
-  .stat .big.good{color:var(--good)}
-  .stat .big.warn{color:var(--warn)}
-  .stat .big.gold{color:var(--gold)}
-  .stat .lbl{color:var(--muted); font-size:13px; margin-top:4px}
-  .flow{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:16px 0}
-  .flow .node{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:10px 14px; font-size:14px}
-  .flow .node.hot{border-color:var(--accent); color:var(--accent)}
-  .flow .node.heavy{border-color:var(--gold); color:var(--gold)}
-  .flow .sep{color:var(--muted)}
-  .atk{display:grid; grid-template-columns:1fr; gap:12px; margin:18px 0}
-  .atk .row{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px}
-  .atk .name{font-weight:700; color:var(--warn); margin-bottom:4px}
-  .insights{background:linear-gradient(135deg,#15211b,#171a21); border:1px solid #244235; border-radius:14px; padding:22px 24px; margin-top:42px}
-  .insights h2{color:var(--good)}
-  .insights ol{margin:14px 0 0; padding-left:22px}
-  .insights li{margin:10px 0}
-  .note{color:var(--muted); font-size:13px; border-top:1px solid var(--line); margin-top:40px; padding-top:16px}
-  b.k{color:var(--gold)}
-  code{background:#0b0d12; border:1px solid var(--line); border-radius:6px; padding:1px 6px; font-size:14px}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,"Segoe UI","Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.75;font-size:17px}
+  .wrap{max-width:820px;margin:0 auto;padding:32px 20px 64px}
+  header{border-left:6px solid var(--accent);padding:6px 0 6px 18px;margin-bottom:8px}
+  .kicker{color:var(--accent);font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+  h1{font-size:28px;line-height:1.3;margin:6px 0 4px}
+  .meta{color:var(--soft);font-size:14px}
+  .tldr{background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid var(--line);
+    border-radius:14px;padding:20px 22px;margin:22px 0;box-shadow:0 1px 0 rgba(0,0,0,.02)}
+  .tldr b{color:var(--accent2)}
+  h2{font-size:20px;margin:34px 0 6px;padding-bottom:6px;border-bottom:2px solid var(--line)}
+  .lead{color:var(--soft);font-size:14.5px;margin:0 0 10px}
+  section{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:18px 22px;margin:14px 0}
+  .insight{background:var(--hl);border-radius:10px;padding:10px 14px;margin-top:10px;
+    font-weight:600;color:#7a3b22}
+  .stats{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0}
+  .stat{flex:1 1 150px;background:#fff;border:1px solid var(--line);border-radius:12px;
+    padding:14px 16px;text-align:center}
+  .stat .n{font-size:26px;font-weight:800;color:var(--accent)}
+  .stat .l{font-size:12.5px;color:var(--soft);margin-top:4px}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:15px}
+  th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left}
+  th{background:#f0f3f6;color:var(--soft);font-weight:700}
+  .up{color:var(--bad);font-weight:700}.down{color:var(--good);font-weight:700}
+  .takeaways{background:#11253a;color:#eaf1f7;border-radius:16px;padding:22px 26px;margin-top:30px}
+  .takeaways h2{color:#fff;border-color:#2f4a63}
+  .takeaways ol{margin:10px 0 0;padding-left:20px}
+  .takeaways li{margin:10px 0}
+  .takeaways b{color:#ffd9c2}
+  code{background:#eef1f4;padding:1px 6px;border-radius:5px;font-size:14px}
 </style>
 </head>
 <body>
 <nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/next-generation-constitutional-classifiers" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
 <div class="wrap">
 
-  <header class="hd">
-    <p class="kicker">Anthropic · Alignment</p>
-    <h1>下一代宪法分类器：更省算力地挡住通用越狱</h1>
-    <p class="meta">来源 Anthropic ｜ 分类 Alignment ｜ 2026-01-09</p>
+  <header>
+    <div class="kicker">Anthropic · Alignment · 2026-01-09</div>
+    <h1>下一代宪法分类器：用"内部直觉"几乎零成本地堵住通用越狱</h1>
+    <div class="meta">Constitutional Classifiers++ — 更稳健、更少误拒、几乎不增加算力</div>
   </header>
 
-  <div class="lede">
-    一句话总括：Anthropic 推出第二代防越狱系统 <b>Constitutional Classifiers++</b>。真正的贡献不是"再加一层过滤"，而是把昂贵的安全审查改造成一套<b>级联集成架构</b>——先用复用神经网络激活、几乎免费的"内部探针"筛掉绝大多数流量，只有可疑对话才升级到更强的分类器。结果是<b>更稳健、更少误拒、几乎不增加算力</b>：上一代要多花 23.7% 算力，新一代只要约 1%，且至今没人找到通用越狱。
+  <div class="tldr">
+    <b>一句话总括：</b>Anthropic 没有靠"更大更贵的过滤器"硬扛越狱，而是把可解释性研究变成产品——用读取模型<strong>内部激活（Claude 的"直觉")</strong>的轻量探针先筛全部流量，只把可疑对话升级给能同时看输入与输出的强分类器。结果是攻击成功率降到历史最低、误拒率几乎归零，而额外算力成本从上一代的 23.7% 压到约 <strong>1%</strong>。
   </div>
 
   <section>
-    <h2><span class="tag">起点</span>第一代很有效，但代价不小</h2>
-    <p class="body">越狱（jailbreak）指绕过安全护栏、套出有害信息的技巧，尤其令人担忧的是它能协助制造化生放核（CBRN）武器。Anthropic 上一代"宪法分类器"用一部"宪法"（自然语言规则，比如"可以帮做大学化学作业，但不能协助合成一类管制化学品"）生成合成数据来训练分类器，把越狱成功率<b>从 86% 压到 4.4%</b>，拦下约 95% 本可绕过内置安全训练的攻击。但代价是：算力成本上升 <b>23.7%</b>、无害问题的拒答率上升 <b>0.38%</b>，而且在赏金计划中仍被找到 <b>1 个</b>通用越狱。</p>
-    <div class="stat-grid">
-      <div class="stat"><div class="big warn">86% → 4.4%</div><div class="lbl">第一代把越狱成功率大幅压低</div></div>
-      <div class="stat"><div class="big warn">+23.7%</div><div class="lbl">第一代带来的额外算力开销</div></div>
+    <h2>背景：第一代已经很好，但代价不小</h2>
+    <p class="lead">关键数据 · 趋势</p>
+    <p>越狱（jailbreak）是绕过安全护栏、套出有害信息的技术，CBRN（化生放核武器）相关请求风险最高。第一代宪法分类器用"宪法"（自然语言规则，如"可以帮大学化学作业，但不能合成一类管制化学品"）生成的合成数据训练，把越狱成功率从 <span class="up">86%</span> 降到 <span class="down">4.4%</span>，拦下 95% 本可绕过内置安全训练的攻击。</p>
+    <div class="stats">
+      <div class="stat"><div class="n">86%→4.4%</div><div class="l">越狱成功率（第一代）</div></div>
+      <div class="stat"><div class="n">+23.7%</div><div class="l">额外算力成本</div></div>
+      <div class="stat"><div class="n">+0.38%</div><div class="l">良性请求误拒率上升</div></div>
+      <div class="stat"><div class="n">1 个</div><div class="l">被发现的通用越狱</div></div>
     </div>
-    <p class="take">结论：第一代证明了"宪法 + 分类器"可行，但"又贵又略增误拒"让它难以规模化。</p>
+    <div class="insight">结论：第一代证明了思路可行，但"贵 + 偶尔误拒 + 仍存在一个通用越狱"是必须解决的真问题。</div>
   </section>
 
   <section>
-    <h2><span class="tag">仍能奏效的攻击</span>把危险拆碎、或给它换个无害马甲</h2>
-    <p class="body">随着模型变强，越狱也在进化。额外的对抗测试暴露出两类老分类器挡不住的攻击，关键在于它们都<b>把输入与输出偷偷关联起来</b>，使单看任一侧都显得无害。</p>
-    <div class="atk">
-      <div class="row"><div class="name">重构攻击（Reconstruction）</div><div class="body">把有害信息拆成一段段看似无害的片段——例如散落在代码库各处的函数——再让模型抽取并拼回完整答案。</div></div>
-      <div class="row"><div class="name">输出混淆攻击（Output obfuscation）</div><div class="body">让模型把危险内容伪装成无害输出：把化学试剂称作"食用香精"，或用比喻、谜语把有害概念映射到平淡词汇上，只看输出便难以识别。</div></div>
-    </div>
-    <p class="body">更值得警惕的是，这些攻击往往会<b>顺带削弱模型能力</b>：在衡量博士级生化物概念的 <b class="k">GPQA Diamond</b> 上，某些越狱手法把模型表现<b>从 74% 拉低到最低 32%</b>，而且不同手法掉幅差别很大——这种波动意味着攻击者很可能开发出既能达成目的、又更少损耗能力的新策略。</p>
-    <p class="take">结论：越狱已从"骗过输出"升级为"跨输入输出做隐写"，分别审查两端的旧思路必然漏检。</p>
+    <h2>新威胁：聪明的攻击会"拆分"和"伪装"</h2>
+    <p class="lead">为什么旧系统会被攻破</p>
+    <p>对抗测试暴露了两类绕过手法：<strong>重构攻击</strong>把有害信息拆成一串看似无害的片段（如散落在代码里的函数），再让模型重组；<strong>输出混淆攻击</strong>让模型把危险词替换成无害说法（把化学试剂叫"食品香精"，或用比喻、谜语映射）。旧系统的软肋在于<strong>分开看输入和输出</strong>——"如何使用食品香精"单看无害，但配上把"食品香精"定义为试剂的输入就原形毕露。</p>
+    <p>更值得警惕的是：这些攻击还会<strong>顺带削弱模型能力</strong>。在衡量博士级理科概念的 GPQA Diamond 上，模型表现从 <span class="up">74%</span> 一度跌到 <span class="down">32%</span>，且不同越狱手法损伤差异很大。</p>
+    <div class="insight">结论：能力损伤的"参差不齐"是个危险信号——它意味着攻击者还能找到既保留模型能力、又绕过防御的新策略。</div>
   </section>
 
   <section>
-    <h2><span class="tag">核心转向</span>不再分开看输入和输出，而是成对审查</h2>
-    <p class="body">老系统的软肋正源于<b>把输入、输出分开评估</b>。"怎么用食用香精"单独看无害，可一旦与"食用香精=化学试剂"的输入配在一起，就立刻露馅。于是新方案用单一的"<b>交换分类器</b>（exchange classifier）"取代分立的输入/输出分类器，让它在输入语境下审查输出。在人工红队测试中，这一改动把成功越狱次数<b>砍掉一半以上</b>——但单独使用会让算力<b>增加 50%</b>。</p>
-    <div class="stat-grid">
-      <div class="stat"><div class="big good">&gt; 50%</div><div class="lbl">交换分类器减少的成功越狱（人工红队）</div></div>
-      <div class="stat"><div class="big warn">+50%</div><div class="lbl">单独使用交换分类器带来的算力增量</div></div>
-    </div>
-    <p class="take">结论：能看到"对话两端"才能识破隐写式越狱，但若直接全量上这套，成本又回到了不可接受的水平。</p>
+    <h2>解法一：把"输入分类器+输出分类器"合并成"交换分类器"</h2>
+    <p class="lead">让防御看到对话的两端</p>
+    <p>新系统用一个<strong>"交换（exchange）分类器"</strong>取代分离的输入/输出分类器，在输入的上下文里审视输出。能看到对话两端后，它在人工红队测试中把成功越狱<strong>减少一半以上</strong>。代价是算力增加 50%——这正是下一步要解决的问题。</p>
+    <div class="insight">结论：把"配对关系"还给分类器，是识别伪装类攻击的关键一招。</div>
   </section>
 
   <section>
-    <h2><span class="tag">省成本</span>级联架构：轻量先筛，可疑才升级</h2>
-    <p class="body">为压成本又不失稳健，团队采用"<b>级联架构</b>（cascade）"：第一级是廉价的轻量分类器，筛查全部对话；只有被标记的才送进更准、更贵的第二级。这带来两个好处——其一，被标记的对话是<b>升级而非拒答</b>，所以第一级可以容忍更高的误报率而不至于频繁拒绝用户（相当于把请求"转交给经理"而不是当场回绝）；其二，绝大多数对话止步于轻量级，<b>整体运行成本大幅降低</b>。</p>
-    <div class="flow">
-      <span class="node hot">轻量分类器：筛查全部流量</span><span class="sep">→</span>
-      <span class="node">标记可疑（宁可多标、不轻易拒）</span><span class="sep">→</span>
-      <span class="node heavy">第二级强分类器：最终判定</span>
-    </div>
-    <p class="take">结论：把"拒绝"改成"升级"，既消解误拒带来的用户挫败，又让算力只花在真正可疑的少数对话上。</p>
+    <h2>解法二：级联架构——便宜的先筛，可疑的才升级</h2>
+    <p class="lead">用"分诊"换成本与体验</p>
+    <p>轻量的一级分类器筛查所有对话，只有被标记的才送往更准、更贵的二级分类器。两个好处：①被标记的对话是<strong>升级而非直接拒绝</strong>（"交给经理处理"），所以一级可以容忍更高误报率而不惹恼用户；②绝大多数对话由轻量层处理，整体<strong>大幅更便宜</strong>。</p>
+    <div class="insight">结论：把"拒绝"改成"升级"，同时解决了成本高和误拒多两个痛点。</div>
   </section>
 
   <section>
-    <h2><span class="tag">几乎免费</span>内部探针：读出 Claude 的"直觉"</h2>
-    <p class="body">团队还想把效率推到极致，办法是基于可解释性研究开发"<b>内部探针分类器</b>"——复用模型生成时本就产生的内部激活。当 Claude 处理可疑请求时，它的内部激活里会先于回答就浮现出类似"这看起来有害"的模式；这些中间状态平时用完即弃，而探针能可靠地从中读出有害信号，<b>几乎不花额外算力</b>，像是拿到了 Claude 的"直觉"。它还多加两层保护：其一<b>更难被骗</b>——攻击者能操控最终输出，却很难操纵内部表征；其二与外部分类器<b>互补</b>——探针看得见外部分类器看不见的东西，反之亦然。</p>
-    <p class="take">结论：把模型"想说话前的念头"变成安全信号，既便宜又难以伪造，是这代系统省钱又增稳的关键。</p>
+    <h2>解法三：内部探针——读取 Claude 的"直觉"，几乎免费</h2>
+    <p class="lead">可解释性研究落地为产品</p>
+    <p>模型生成文本时，每一步都会产生捕捉理解的内部状态；遇到可疑请求时，内部激活里会出现类似"这看起来有害"的模式，<strong>甚至早于它决定怎么回答</strong>。这些激活本是用完即弃的中间计算，Anthropic 找到办法可靠地探测它们——相当于几乎零成本拿到 Claude 的"直觉"。探针还有两层额外价值：<strong>更难被骗</strong>（骗最终输出容易，操纵内部表征难）；并且与外部分类器<strong>互补</strong>（探针能看到外部分类器看不到的，反之亦然）。</p>
+    <div class="insight">结论：可解释性不只是"看懂模型"，它能直接变成又便宜又难骗的防线。</div>
   </section>
 
   <section>
-    <h2><span class="tag">成绩单</span>误拒降 87%、算力仅 +1%、零通用越狱</h2>
-    <p class="body">最终的生产系统把以上技术组合起来：<b>线性探针</b>筛查全部流量，把被标记的对话升级给"<b>探针+分类器集成</b>"做最终判定。在 Claude Sonnet 4.5 流量上线一个月，对无害问题的拒答率降到 <b>0.05%</b>——较初代<b>下降 87%</b>；若施加到 Claude Opus 4.0 流量上，仅增加约 <b>1%</b> 算力。稳健性也创下纪录：累计 <b>1,700+ 小时</b>、<b>198,000 次</b>红队尝试，只发现 <b>1 个</b>高危漏洞（每千次查询 0.005），是迄今所有方案中最低的，且<b>至今无人找到通用越狱</b>。</p>
-    <div class="stat-grid">
-      <div class="stat"><div class="big good">0.05%</div><div class="lbl">无害问题拒答率（较初代降 87%）</div></div>
-      <div class="stat"><div class="big gold">~1%</div><div class="lbl">施加到 Opus 4.0 流量的额外算力</div></div>
-      <div class="stat"><div class="big">198,000</div><div class="lbl">红队尝试次数（累计 1,700+ 小时）</div></div>
-      <div class="stat"><div class="big good">0.005 / 千</div><div class="lbl">高危漏洞检出率，史上最低</div></div>
-    </div>
-    <p class="body">未来方向包括：把分类器信号直接融入模型的生成过程、训练模型自身更抗混淆、用自动化红队生成更好的训练数据，以及构造贴近边界的样本，让分类器更精确地学会"允许与不允许"的分界线。</p>
-    <p class="take">结论：第二代证明了安全与成本不必二选一——靠架构而非堆算力，就能把误拒和越狱率同时压到历史最低。</p>
+    <h2>成绩单：最难攻破，却几乎不增成本</h2>
+    <p class="lead">生产环境实测数据</p>
+    <p>最终系统组合三招：线性探针筛全部流量 → 标记的对话升级给"探针-分类器"集成做终判。</p>
+    <table>
+      <tr><th>指标</th><th>第一代</th><th>Constitutional Classifiers++</th></tr>
+      <tr><td>良性请求误拒率</td><td>较高</td><td><span class="down">0.05%</span>（Sonnet 4.5 部署一月，降 87%）</td></tr>
+      <tr><td>额外算力成本</td><td>+23.7%</td><td><span class="down">约 +1%</span>（应用于 Opus 4.0 流量）</td></tr>
+      <tr><td>红队规模</td><td>—</td><td>累计 >1,700 小时 / 198,000 次尝试</td></tr>
+      <tr><td>高危漏洞</td><td>—</td><td>仅 1 个，检出率 0.005/千次（历史最低）</td></tr>
+      <tr><td>通用越狱</td><td>被发现 1 个</td><td><span class="down">至今 0 个</span></td></tr>
+    </table>
+    <div class="insight">结论：这是 Anthropic 测试过攻击成功率最低的系统，并且成本与误拒同时大降——稳健和好用第一次不再是取舍。</div>
   </section>
 
-  <div class="insights">
-    <h2>最值得带走的洞见</h2>
+  <section>
+    <h2>下一步：从"事后过滤"走向"内生抵抗"</h2>
+    <p class="lead">未来研究方向</p>
+    <p>Anthropic 列出的方向包括：把分类器信号<strong>直接接入模型的生成过程</strong>、训练模型自身<strong>抵抗混淆</strong>、用自动化红队生成更好的训练数据，以及用针对性样本帮分类器学清"允许与禁止的边界"。</p>
+    <div class="insight">结论：防御正从"外挂护栏"转向"让模型本身更难被骗"。</div>
+  </section>
+
+  <div class="takeaways">
+    <h2>最值得带走的 5 条洞见</h2>
     <ol>
-      <li><b>安全可以"越做越便宜"。</b>第一代多花 23.7% 算力，第二代仅约 1%，却更稳健、误拒更低——关键不是堆算力，而是用级联和内部探针把昂贵审查只用在刀刃上。</li>
-      <li><b>分开看输入输出是结构性漏洞。</b>"食用香精"单看无害，配上"它=化学试剂"就露馅；新一代用成对的交换分类器审查，人工红队下越狱直接腰斩。</li>
-      <li><b>模型的"内部直觉"是近乎免费的安全信号。</b>复用神经网络激活读出"这看起来有害"，既难被攻击者操控，又与外部分类器互补，各自能看见对方看不见的东西。</li>
-      <li><b>"升级而非拒绝"破解了误拒难题。</b>把可疑请求转交给更强的二级判定，第一级就能放心多标记而不骚扰用户，拒答率因此降到 0.05%。</li>
-      <li><b>"无通用越狱"是有代价的纪录。</b>1,700+ 小时、198,000 次红队后仅 1 个高危漏洞；但重构与输出混淆攻击仍能在 GPQA 上把能力从 74% 压到 32%，提醒我们防御是持续军备竞赛。</li>
+      <li><b>安全不必更贵。</b>额外算力从 23.7% 降到约 1%，证明更强的防御可以同时更便宜——成本不再是部署安全的借口。</li>
+      <li><b>可解释性变现了。</b>读取模型内部激活的"直觉探针"既便宜又更难被骗，是把对齐研究转化为生产防线的标志性案例。</li>
+      <li><b>"升级而非拒绝"是体验关键。</b>级联架构让误拒率降到 0.05%（降 87%），说明安全与可用性可以兼得。</li>
+      <li><b>看上下文才能识破伪装。</b>合并成"交换分类器"后越狱减半，提醒我们：把输入输出割裂审查正是旧防御的结构性弱点。</li>
+      <li><b>没有"完美防御"，但门槛在抬高。</b>198,000 次尝试只剩 1 个高危漏洞、0 个通用越狱；同时攻击会损伤模型能力（GPQA 74%→32%），意味着攻防仍是动态拉锯。</li>
     </ol>
   </div>
-
-  <p class="note">注：本文为 Anthropic 研究文章《Next-generation Constitutional Classifiers: More efficient protection against universal jailbreaks》（2026-01-09，分类 Alignment）的中文总结；86%→4.4%、+23.7%、+0.38%、~1%、交换分类器、级联架构、内部探针、GPQA Diamond 74%→32%、0.05%（降 87%）、1,700+ 小时 / 198,000 次、0.005 / 千次、无通用越狱等均为原文信息。</p>
 
 </div>
 </body>

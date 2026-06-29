@@ -3,150 +3,122 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>用 Claude + 属性测试在 Python 生态里抓 bug · 总结</title>
+<title>用 Claude + 属性测试在 Python 生态里找 bug</title>
 <style>
   :root{
-    --bg:#0f1115; --card:#171a21; --card2:#1d2129;
-    --text:#e7eaf0; --muted:#9aa3b2; --line:#2a2f3a;
-    --accent:#6ea8fe; --warn:#ff7a7a; --good:#5dd1a0; --gold:#f2c14e;
+    --ink:#1a1a1a; --muted:#5c6470; --line:#e3e6ea;
+    --accent:#c2410c; --accent2:#0e7490; --bg:#fafaf8;
+    --card:#ffffff; --good:#15803d; --bad:#b91c1c;
   }
   *{box-sizing:border-box}
   body{
-    margin:0; background:var(--bg); color:var(--text);
-    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Microsoft YaHei",sans-serif;
-    line-height:1.75; font-size:17px;
+    margin:0; background:var(--bg); color:var(--ink);
+    font:16px/1.75 -apple-system,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans CJK SC","Microsoft YaHei",sans-serif;
   }
-  .wrap{max-width:760px; margin:0 auto; padding:40px 22px 80px}
-  header.hd{border-bottom:1px solid var(--line); padding-bottom:22px; margin-bottom:30px}
-  .kicker{color:var(--accent); font-size:13px; letter-spacing:.08em; text-transform:uppercase; margin:0 0 10px}
-  h1{font-size:30px; line-height:1.3; margin:0 0 14px}
-  .meta{color:var(--muted); font-size:14px}
+  .wrap{max-width:780px; margin:0 auto; padding:40px 22px 72px}
+  header{border-bottom:3px solid var(--accent); padding-bottom:18px; margin-bottom:8px}
+  .kicker{font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); font-weight:700}
+  h1{font-size:29px; line-height:1.35; margin:.35em 0 .25em}
+  .meta{font-size:13px; color:var(--muted)}
   .lede{
-    background:linear-gradient(135deg,#1a2330,#191d26);
-    border:1px solid var(--line); border-left:4px solid var(--accent);
-    border-radius:12px; padding:18px 20px; margin:26px 0 36px; font-size:18px;
+    background:linear-gradient(180deg,#fff7ed,#fff);
+    border:1px solid #fed7aa; border-left:5px solid var(--accent);
+    border-radius:10px; padding:18px 20px; margin:26px 0; font-size:17px;
   }
   .lede b{color:var(--accent)}
-  section{margin:30px 0}
-  h2{font-size:21px; margin:0 0 6px; line-height:1.4}
-  h2 .tag{display:inline-block; font-size:12px; color:var(--gold); border:1px solid var(--line); border-radius:999px; padding:2px 10px; margin-right:10px; vertical-align:middle}
-  .body{color:#d6dbe6}
-  .take{color:var(--muted); font-style:italic; border-left:2px solid var(--line); padding-left:12px; margin-top:12px}
-  .stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0}
-  .stat{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px}
-  .stat .big{font-size:26px; font-weight:700}
-  .stat .big.good{color:var(--good)}
-  .stat .big.gold{color:var(--gold)}
-  .stat .lbl{color:var(--muted); font-size:13px; margin-top:4px}
-  .flow{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:8px 8px; margin:18px 0}
-  .rung{display:flex; align-items:flex-start; gap:12px; padding:10px 12px; border-bottom:1px solid var(--line)}
-  .rung:last-child{border-bottom:none}
-  .rung .t{font-weight:700; font-variant-numeric:tabular-nums; min-width:30px; color:var(--gold)}
-  .rung .d{color:#d6dbe6; flex:1}
-  .rung .d b{color:var(--good)}
-  .codeline{background:#0b0d12; border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin:14px 0; font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace; font-size:13.5px; color:#c8d2e0; overflow-x:auto}
-  .codeline .hl{color:var(--warn)}
-  .bugtable{width:100%; border-collapse:collapse; margin:16px 0; font-size:14.5px}
-  .bugtable th,.bugtable td{text-align:left; padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:top}
-  .bugtable th{color:var(--muted); font-weight:600; font-size:13px}
-  .bugtable td code{color:var(--gold); font-size:13px}
-  .pill{display:inline-block; font-size:12px; padding:1px 8px; border-radius:999px; white-space:nowrap}
-  .pill.ok{color:var(--good); border:1px solid #2c4a3c}
-  .pill.no{color:var(--warn); border:1px solid #4a2c30}
-  .insights{background:linear-gradient(135deg,#16211c,#171a21); border:1px solid #243a30; border-radius:14px; padding:22px 24px; margin-top:40px}
-  .insights h2{color:var(--good)}
-  .insights ol{margin:14px 0 0; padding-left:22px}
-  .insights li{margin:10px 0}
-  .note{color:var(--muted); font-size:13px; border-top:1px solid var(--line); margin-top:40px; padding-top:16px}
-  b.k{color:var(--gold)}
+  h2{font-size:20px; margin:38px 0 6px; line-height:1.4}
+  h2 .num{color:var(--accent2); font-weight:800; margin-right:.4em}
+  .sub{color:var(--muted); font-size:14px; margin:0 0 12px}
+  p{margin:.6em 0}
+  .insight{
+    margin:12px 0 0; padding:10px 14px; background:#ecfdf5;
+    border-left:4px solid var(--good); border-radius:0 8px 8px 0; font-size:15px;
+  }
+  .insight b{color:var(--good)}
+  .stats{display:flex; flex-wrap:wrap; gap:12px; margin:22px 0}
+  .stat{
+    flex:1 1 140px; background:var(--card); border:1px solid var(--line);
+    border-radius:12px; padding:14px 16px; text-align:center;
+  }
+  .stat .big{font-size:27px; font-weight:800; color:var(--accent2); line-height:1.1}
+  .stat .lab{font-size:12.5px; color:var(--muted); margin-top:4px}
+  table{width:100%; border-collapse:collapse; margin:16px 0; font-size:14.5px}
+  th,td{text-align:left; padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:top}
+  th{background:#f1f5f9; font-size:13px; color:#334155}
+  .tag{display:inline-block; font-size:12px; font-weight:700; padding:2px 8px; border-radius:20px}
+  .ok{background:#dcfce7; color:var(--good)}
+  .pend{background:#fef9c3; color:#a16207}
+  .no{background:#fee2e2; color:var(--bad)}
+  code{background:#f3f4f6; padding:1px 5px; border-radius:4px; font-size:13.5px; font-family:"SFMono-Regular",Consolas,monospace}
+  .takeaways{
+    margin-top:40px; background:#0f172a; color:#e2e8f0;
+    border-radius:14px; padding:24px 26px;
+  }
+  .takeaways h2{color:#fff; margin-top:0}
+  .takeaways ol{margin:.5em 0 0; padding-left:1.2em}
+  .takeaways li{margin:.7em 0; line-height:1.7}
+  .takeaways b{color:#fdba74}
+  footer{margin-top:34px; font-size:12.5px; color:var(--muted); text-align:center}
 </style>
 </head>
 <body>
 <nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/property-based-testing" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
 <div class="wrap">
-
-  <header class="hd">
-    <p class="kicker">Anthropic · Frontier Red Team</p>
-    <h1>用 Claude + 属性测试，在 Python 生态里批量抓 bug</h1>
-    <p class="meta">来源 Anthropic ｜ 作者 Muhammad Maaz、Liam DeVoe、Zac Hatfield-Dodds、Nicholas Carlini（MATS / Anthropic / 东北大学）｜ 2026-01-14</p>
+  <header>
+    <div class="kicker">Anthropic · Frontier Red Team</div>
+    <h1>用 Claude + 属性测试，在整个 Python 生态里找 bug</h1>
+    <div class="meta">来源：Anthropic（与 MATS、东北大学合作） · 2026-01-14 · NeurIPS 2025 DL4Code Workshop</div>
   </header>
 
   <div class="lede">
-    一句话总括：研究者把"基于属性的测试"（property-based testing）这件高门槛的活儿交给了一个 Claude 智能体——它不靠人写测试用例，而是<b>从函数名、文档和类型注解里推断"代码本应满足的一般性属性"</b>，再用 Hypothesis 像模糊测试那样自动生成海量输入去找反例，从而在 <b>NumPy、SciPy、Pandas</b> 等顶级库中翻出了数百个候选 bug，部分补丁已被官方合并。真正的看点不是"AI 会找 bug"，而是它能<b>把一种强大却难用的测试范式自动化到可被维护者采纳的质量</b>。
+    一句话总括：研究者让一个 AI agent 不去猜"哪个输入会出错"，而是<b>推断代码本该恒成立的通用属性</b>（如"Wald 分布采样必为正"），再用 Hypothesis 自动搜反例——结果在 NumPy、SciPy、Pandas 等顶级库里挖出数百个真实 bug，多个已被上游合并修复。
   </div>
 
-  <section>
-    <h2><span class="tag">核心方法</span>不写用例，而是推断"应当成立的属性"</h2>
-    <p class="body">传统测试是"举例式"的：开发者写死一个输入和期望输出，但<b>没想到的边界往往也没被实现</b>。属性测试反过来——只描述一个不变量（例如"JSON 反序列化是序列化的逆运算"）和输入域，框架自动搜索反例。门槛在于"想出正确的属性"，而论文发现 <b>LLM 恰好擅长从上下文归纳属性</b>：读代码、拉文档、看它如何被调用，就能提出该成立的不变式。</p>
-    <p class="take">结论：智能体把属性测试里最难的"人类创造性"环节自动化了，让测试在更高抽象层运作。</p>
-  </section>
+  <h2><span class="num">①</span>方法的关键不是"测试用例"，而是"属性"</h2>
+  <p class="sub">从"我能想到的边界"升级到"代码该满足的规律"</p>
+  <p>传统的<strong>示例测试</strong>要求开发者手写"输入→预期输出"，但开发者想不到的边界，往往也正是实现里漏掉的边界。<strong>属性测试</strong>反过来：只描述一条普适规律（如"反序列化是序列化的逆运算"）和输入域，框架像 fuzz 一样自动生成大量输入去找反例。agent 通过读类型注解、docstring、函数名、注释来<strong>推断</strong>这些属性，写成 Hypothesis 测试，再用<strong>自我反思循环</strong>判断失败到底是真 bug 还是测试写错了。</p>
+  <div class="insight"><b>洞见：</b>LLM 真正的强项不是生成输入，而是从上下文"读懂代码应该遵守什么规律"——这正是属性测试最难的人工环节。</div>
 
-  <section>
-    <h2><span class="tag">智能体怎么跑</span>一个自带自我反思的 Claude Code 命令</h2>
-    <p class="body">智能体是一个自定义 Claude Code 命令，接受单个目标（一个文件 / 模块 / 函数，如 <code>numpy</code>、<code>json.loads</code>），用待办清单做多步推理，按五步闭环工作：</p>
-    <div class="flow">
-      <div class="rung"><span class="t">①</span><span class="d">读懂目标：阅读代码、拉文档、理清它与代码库其余部分的关系</span></div>
-      <div class="rung"><span class="t">②</span><span class="d">基于发现<b>提出属性</b>（grounding 在真实用法与文档上，减少臆测）</span></div>
-      <div class="rung"><span class="t">③</span><span class="d">用 <b>Hypothesis</b> 写出对应的属性测试</span></div>
-      <div class="rung"><span class="t">④</span><span class="d"><b>运行并反思</b>：失败了——是真 bug 还是测试该改？通过了——是否只是平凡的测试？</span></div>
-      <div class="rung"><span class="t">⑤</span><span class="d">确信是真 bug 才写出格式化的<b>bug 报告</b></span></div>
-    </div>
-    <p class="body">设计的第一优先级是<b>压低误报</b>。有一次智能体写的测试一开始"通过"，自我反思后才发现自己把整个测试包进了 try-catch；去掉之后测试失败，bug 现身。研究者还观察到：<b>Opus 4.1 与 Sonnet 4.5 的自我反思能力明显强于 Sonnet 4</b>。</p>
-    <p class="take">结论：让模型"质疑自己刚写的测试"，是把噪声压到开发者愿意看的关键一步。</p>
-  </section>
+  <h2><span class="num">②</span>规模化评测：排序排名让有效率从一半飙到八成以上</h2>
+  <p class="sub">先用 Opus 4.1 海量产出，再用打分排序筛精华</p>
+  <div class="stats">
+    <div class="stat"><div class="big">100+</div><div class="lab">覆盖的流行 Python 包</div></div>
+    <div class="stat"><div class="big">984</div><div class="lab">第一阶段生成的 bug 报告</div></div>
+    <div class="stat"><div class="big">56%</div><div class="lab">抽查 50 份中的有效 bug</div></div>
+    <div class="stat"><div class="big">32%</div><div class="lab">有效且值得上报</div></div>
+  </div>
+  <p>关键转折在<strong>排序</strong>：团队据人工复核建立 15 分制评分表，让 Opus 4.1 给全部报告打分。在高分报告中，有效率升到 <strong>86%</strong>，"既有效又值得上报"升到 <strong>81%</strong>。第二阶段改用 <strong>Sonnet 4.5</strong> 在 10 个重点包上多次运行，并引入更精细的评测 agent，外加 <strong>3 名付费专家</strong>复核高危 bug。</p>
+  <div class="insight"><b>洞见：</b>原始产出噪声大不要紧——一个便宜的"LLM 排序层"就能把信噪比从"掷硬币"提升到"五份里四份靠谱"，这是让此类工具真正可用的关键工程一招。</div>
 
-  <section>
-    <h2><span class="tag">真实评测</span>984 份报告，排序后命中率大幅抬升</h2>
-    <p class="body">研究者在 <b>100+ 个流行 Python 包</b>（数值计算、解析、数据库等）上运行智能体。第一阶段用 <b>Claude Opus 4.1</b> 生成 <b class="k">984</b> 份 bug 报告，人工抽查 50 份：</p>
-    <div class="stat-grid">
-      <div class="stat"><div class="big">56%</div><div class="lbl">抽查报告中是真实 bug</div></div>
-      <div class="stat"><div class="big">32%</div><div class="lbl">真实且"值得上报"</div></div>
-      <div class="stat"><div class="big good">86%</div><div class="lbl">按 15 分制排序后，<b>最高分</b>报告中真实</div></div>
-      <div class="stat"><div class="big good">81%</div><div class="lbl">最高分报告中真实且可上报</div></div>
-    </div>
-    <p class="body">也就是说，<b>用 Opus 4.1 按一套 15 分制 rubric 给报告排序</b>，能把原始 56% 的有效率拉到顶部的 86%——排序这一步本身就极大提升了交付质量。第二阶段改用 <b>Sonnet 4.5</b> 在 10 个重要包上多次运行，并引入一个 Sonnet 4.5 评估智能体读代码与报告核验严重性，再请 3 名专家人工复核高危 bug。</p>
-    <p class="take">结论：发现 bug 之外，"自动排序 / 分诊"是让 AI 找 bug 工具真正可用的隐形一半。</p>
-  </section>
+  <h2><span class="num">③</span>五个真实战果：真 bug，且维护者认账</h2>
+  <p class="sub">维护者才是最终裁判，agent 的发现经得起这一关</p>
+  <table>
+    <tr><th>项目</th><th>bug</th><th>状态</th></tr>
+    <tr><td><code>numpy</code></td><td><code>random.wald</code> 因灾难性抵消偶返负数；重写后相对误差降低近 <b>10 个数量级</b></td><td><span class="tag ok">已合并</span></td></tr>
+    <tr><td><code>aws-lambda-powertools</code></td><td><code>slice_dictionary()</code> 迭代器未自增，重复返回首块</td><td><span class="tag ok">已合并</span></td></tr>
+    <tr><td><code>tokenizers</code></td><td>缺右括号生成非法 HSL CSS（用正则匹配 HSL 颜色码查出）</td><td><span class="tag ok">已合并</span></td></tr>
+    <tr><td><code>cloudformation-cli</code></td><td><code>item_hash()</code> 用 <code>.sort()</code> 返回 None，所有列表哈希相同</td><td><span class="tag pend">已提交</span></td></tr>
+    <tr><td><code>python-dateutil</code></td><td><code>easter()</code> 儒略历下返回非周日，维护者判为预期行为</td><td><span class="tag no">无效</span></td></tr>
+  </table>
+  <div class="insight"><b>洞见：</b>这些不是玩具 bug——一个被全球数百万项目依赖的 NumPy 随机数函数都存在数值缺陷，说明属性测试能触及人类测试长期忽视的角落。</div>
 
-  <section>
-    <h2><span class="tag">不滥发报告</span>每个 bug 平均一小时、三名专家把关</h2>
-    <p class="body">为了不给维护者添负担，上报流程刻意比自家代码评审更严：只挑最高优先级 → 交 <b>3 名专家</b>评审、<b>平均每个 bug 约 1 小时</b> → <b>任一人存疑即丢弃</b> → 作者再亲自复核 → 仍有把握才手动提 issue。所有数据（含未验证、甚至已判定无效的 bug）都公开，供维护者自查。</p>
-    <p class="take">结论：负责任披露的成本很高，但"宁可漏报不可误报"才是开发者愿意采用此类工具的前提。</p>
-  </section>
+  <h2><span class="num">④</span>诚实的局限：语义微妙处，agent 会"误判属性"</h2>
+  <p class="sub">代码的隐式假设，只有维护者能定夺</p>
+  <p>dateutil 的案例暴露了边界：当代码涉及不同日历系统这类<strong>微妙/隐式语义</strong>时，agent 推断出的"属性"可能根本不是开发者的本意。换言之，"什么才是正确属性"有时只有维护者能回答。这也是团队<strong>不惜成本压低误报</strong>的原因——三名专家各审约一小时、任一人存疑即丢弃，作者再逐一复核才上报。</p>
+  <div class="insight"><b>洞见：</b>这类工具的瓶颈正从"能不能找到反例"转向"推断的属性是否真的成立"——后者本质是规约（specification）问题，仍需人类把关。</div>
 
-  <section>
-    <h2><span class="tag">战果清单</span>5 个精选 bug，4 个已被官方接受</h2>
-    <table class="bugtable">
-      <tr><th>项目</th><th>问题</th><th>状态</th></tr>
-      <tr><td><code>numpy</code></td><td><code>random.wald</code> 偶尔返回负数（Wald 分布本应恒正）；根因是灾难性抵消，重写后<b>相对误差降低近 10 个数量级</b></td><td><span class="pill ok">PR 已合并</span></td></tr>
-      <tr><td><code>aws-lambda-powertools</code></td><td><code>slice_dictionary()</code> 因迭代器未自增，<b>重复返回第一块</b>（切片再重组应还原原字典）</td><td><span class="pill ok">PR 已合并</span></td></tr>
-      <tr><td><code>cloudformation-cli</code></td><td><code>item_hash()</code> 因用了 in-place <code>.sort()</code>（返回 None），所有列表都得到 <code>hash(None)</code></td><td><span class="pill ok">PR 已提交</span></td></tr>
-      <tr><td><code>tokenizers</code></td><td><code>calculate_label_colors()</code> 少一个右括号，输出<b>非法 HSL 颜色</b>（用正则校验 HSL 格式抓出）</td><td><span class="pill ok">PR 已合并</span></td></tr>
-      <tr><td><code>python-dateutil</code></td><td><code>easter()</code> 在儒略历下某些年份返回非周日日期</td><td><span class="pill no">判为按设计 · 无效</span></td></tr>
-    </table>
-    <p class="body">每个 bug 都对应一条朴素属性：Wald 样本应恒正、切片重组应还原、不同输入的哈希应不同、颜色字符串应匹配 HSL 正则。而 <code>dateutil</code> 的反例揭示了边界——<b>当代码有微妙/隐含语义时，只有维护者能裁定"正确的属性"是什么</b>。</p>
-    <p class="take">结论：智能体擅长把"显而易见但没人测"的不变量变成测试；对语义争议，它无法替代领域判断。</p>
-  </section>
-
-  <section>
-    <h2><span class="tag">为什么重要</span>测试、找 bug，是攻防赛跑的前哨</h2>
-    <p class="body">作者把这条线索放进更大的图景：很多导致安全漏洞的其实是<b>逻辑 bug</b>，而逻辑 bug 正适合属性测试（此前他们也用类似思路找智能合约漏洞）。随着 LLM 越来越会<b>利用</b>漏洞，必须抢先用它来<b>发现并修</b>漏洞。本文未做自动修补，但作者认为：一旦能较完整地刻画正确性属性，<b>让 LLM 提出高质量补丁</b>会是顺理成章的下一步。</p>
-    <p class="take">结论：把属性测试自动化，是"在攻击者之前用 AI 加固代码"这场赛跑里的一步先手。</p>
-  </section>
-
-  <div class="insights">
+  <div class="takeaways">
     <h2>最值得带走的洞见</h2>
     <ol>
-      <li><b>难点从"写用例"转移到"想属性"，而这正是 LLM 的强项。</b>智能体从函数名、文档、调用关系里归纳出应当成立的不变量，使高门槛的属性测试得以自动化。</li>
-      <li><b>"自动排序"和"发现"同样重要。</b>原始报告仅 56% 有效，用 Opus 4.1 按 15 分制排序后，顶部报告有效率升到 86%、可上报率 81%——分诊是工具可用性的隐形一半。</li>
-      <li><b>自我反思直接决定误报率。</b>智能体能发现"自己把测试包进了 try-catch"这类自欺；Opus 4.1 / Sonnet 4.5 在这点上明显强于 Sonnet 4。</li>
-      <li><b>真实战果而非演示。</b>NumPy（误差降近 10 个数量级）、aws-lambda-powertools、tokenizers 等补丁已被官方合并，维护者是最终裁判。</li>
-      <li><b>边界很清楚：语义争议归人类。</b>dateutil 的"无效"报告说明，对隐含/微妙语义，只有维护者能定义正确属性；自动找 bug 是人工测试的补充，不是替代。</li>
+      <li><b>范式转变：</b>让 AI 推断"代码该满足的属性"，比让它猜"哪个输入会崩"更契合 LLM 的语义理解强项。</li>
+      <li><b>排序即放大器：</b>984 份原始报告靠 LLM 打分排序，高分有效率从 56% 提到 86%——筛选层比生成层更决定可用性。</li>
+      <li><b>真刀真枪有效：</b>NumPy、tokenizers、aws-powertools 等顶级库的 bug 已被上游合并，其中 wald 修复把数值误差降了近 10 个数量级。</li>
+      <li><b>误报是头号敌人：</b>多层人工 + 专家复核的严苛流程，体现了"开发者工具的价值取决于少打扰开发者"这一信条。</li>
+      <li><b>下一步是补丁：</b>一旦属性能近乎完整地刻画正确性，自动生成高质量补丁就在不远处——这也是 AI 找 bug 必须跑在攻击者前面的原因。</li>
     </ol>
   </div>
 
-  <p class="note">注：本文为对 Anthropic 官方研究博客《Finding bugs across the Python ecosystem with Claude and property-based testing》（2026-01-14，Frontier Red Team）的中文总结。论文发表于 2025 NeurIPS Deep Learning for Code Workshop，源自一个 MATS 项目；完整 bug 列表（含未验证与无效项）已公开于作者站点。</p>
-
+  <footer>原文：anthropic.com/research/property-based-testing · 数据与 bug 列表见 agentic-pbt-site</footer>
 </div>
 </body>
 </html>

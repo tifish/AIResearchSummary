@@ -3,152 +3,129 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LifeSciBench：把生命科学 AI 评测从"答题"推进到"能否胜任研究" · 总结</title>
+<title>LifeSciBench：衡量 AI 能否做真正的生命科学研究</title>
 <style>
   :root{
-    --bg:#0f1115; --card:#171a21; --card2:#1d2129;
-    --text:#e7eaf0; --muted:#9aa3b2; --line:#2a2f3a;
-    --accent:#6ea8fe; --warn:#ff7a7a; --good:#5dd1a0; --gold:#f2c14e;
+    --ink:#1a2230; --muted:#5b6678; --line:#e3e8ef;
+    --accent:#1f6feb; --accent2:#0b8457; --warn:#b4530a; --bg:#f6f8fb; --card:#fff;
   }
   *{box-sizing:border-box}
-  body{
-    margin:0; background:var(--bg); color:var(--text);
-    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Microsoft YaHei",sans-serif;
-    line-height:1.75; font-size:17px;
-  }
-  .wrap{max-width:760px; margin:0 auto; padding:40px 22px 80px}
-  header.hd{border-bottom:1px solid var(--line); padding-bottom:22px; margin-bottom:30px}
-  .kicker{color:var(--accent); font-size:13px; letter-spacing:.08em; text-transform:uppercase; margin:0 0 10px}
-  h1{font-size:30px; line-height:1.3; margin:0 0 14px}
-  .meta{color:var(--muted); font-size:14px}
-  .lede{
-    background:linear-gradient(135deg,#1c2533,#191d26);
-    border:1px solid var(--line); border-left:4px solid var(--accent);
-    border-radius:12px; padding:18px 20px; margin:26px 0 36px; font-size:18px;
-  }
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.8;font-size:17px}
+  .wrap{max-width:820px;margin:0 auto;padding:40px 22px 80px}
+  header{border-bottom:3px solid var(--accent);padding-bottom:22px;margin-bottom:10px}
+  .tag{display:inline-block;font-size:13px;color:var(--accent);font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+  h1{font-size:30px;line-height:1.35;margin:.35em 0 .15em}
+  .meta{color:var(--muted);font-size:14px}
+  .lede{background:linear-gradient(135deg,#eef4ff,#e8f7f0);border:1px solid var(--line);
+    border-radius:14px;padding:20px 22px;margin:26px 0;font-size:18px}
   .lede b{color:var(--accent)}
-  section{margin:34px 0}
-  h2{font-size:21px; margin:0 0 6px; line-height:1.4}
-  h2 .tag{display:inline-block; font-size:12px; color:var(--gold); border:1px solid var(--line); border-radius:999px; padding:2px 10px; margin-right:10px; vertical-align:middle}
-  .body{color:#d6dbe6}
-  .take{color:var(--muted); font-style:italic; border-left:2px solid var(--line); padding-left:12px; margin-top:12px}
-  .stat-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin:18px 0}
-  .stat{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px}
-  .stat .big{font-size:24px; font-weight:700}
-  .stat .lbl{color:var(--muted); font-size:13px; margin-top:4px}
-  table{width:100%; border-collapse:collapse; margin:16px 0; font-size:15px; background:var(--card); border-radius:12px; overflow:hidden}
-  th,td{padding:10px 12px; text-align:left; border-bottom:1px solid var(--line)}
-  th{background:var(--card2); color:var(--muted); font-weight:600}
-  td.num{font-variant-numeric:tabular-nums; text-align:right}
-  .hi{color:var(--warn); font-weight:700}
-  .lo{color:var(--good); font-weight:700}
-  .pillars{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0}
-  .pillar{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px}
-  .pillar .h{color:var(--gold); font-weight:700; margin-bottom:4px}
-  .quote{background:var(--card2); border-left:3px solid var(--gold); border-radius:0 10px 10px 0; padding:12px 16px; margin:16px 0; color:#dfe4ee; font-size:15px}
-  .insights{background:linear-gradient(135deg,#15211b,#171a21); border:1px solid #244235; border-radius:14px; padding:22px 24px; margin-top:42px}
-  .insights h2{color:var(--good)}
-  .insights ol{margin:14px 0 0; padding-left:22px}
-  .insights li{margin:10px 0}
-  .note{color:var(--muted); font-size:13px; border-top:1px solid var(--line); margin-top:40px; padding-top:16px}
-  b.k{color:var(--gold)}
+  h2{font-size:21px;margin:42px 0 6px;padding-left:12px;border-left:5px solid var(--accent)}
+  h2 .sub{display:block;font-size:14px;color:var(--muted);font-weight:400;border:0;padding:0;margin-top:4px}
+  section p{margin:12px 0}
+  .insight{background:#fff8ee;border-left:4px solid var(--warn);padding:10px 16px;border-radius:0 8px 8px 0;margin-top:12px}
+  .insight b{color:var(--warn)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:22px 0}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
+  .stat .n{font-size:26px;font-weight:800;color:var(--accent)}
+  .stat .l{font-size:13px;color:var(--muted);margin-top:4px}
+  table{width:100%;border-collapse:collapse;margin:18px 0;font-size:15px;background:var(--card);border-radius:10px;overflow:hidden}
+  th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line)}
+  th{background:#eef2f8;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  .up{color:var(--accent2);font-weight:700}
+  .down{color:var(--warn);font-weight:700}
+  .takeaways{background:#101a2b;color:#eaf0fa;border-radius:16px;padding:26px 28px;margin-top:46px}
+  .takeaways h2{color:#fff;border-left-color:var(--accent);margin-top:0}
+  .takeaways ol{margin:14px 0 0;padding-left:22px}
+  .takeaways li{margin:12px 0}
+  .takeaways b{color:#8fc0ff}
+  footer{color:var(--muted);font-size:13px;margin-top:40px;text-align:center}
 </style>
 </head>
 <body>
 <nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://openai.com/index/introducing-life-sci-bench" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
 <div class="wrap">
+<header>
+  <span class="tag">OpenAI · Research</span>
+  <h1>LifeSciBench：AI 能不能像科学家那样做研究判断？</h1>
+  <div class="meta">来源：OpenAI ｜ 2026-06-17 ｜ 原标题 Introducing LifeSciBench</div>
+</header>
 
-  <header class="hd">
-    <p class="kicker">OpenAI · Research</p>
-    <h1>LifeSciBench：把生命科学 AI 评测从"答题"推进到"能否胜任研究"</h1>
-    <p class="meta">来源：OpenAI · 2026 年 6 月 17 日 · Research</p>
-  </header>
+<div class="lede">
+一句话总括：<b>LifeSciBench 不是又一个“生物知识问答题库”，而是把 750 个真实药物研发场景拆成近两万条专家评分标准</b>，专门测量 AI 能否在证据不全、需要权衡取舍的研究工作中给出可用的判断——结果显示前沿模型“会写会说”，但“做精确实验决策”仍差得远。
+</div>
 
-  <div class="lede">
-    一句话总括：OpenAI 造了一个由产业科学家出题、独立专家评审的生命科学基准——它问的不是"模型会不会答生物题"，而是<b>模型能否像一个有判断力的科研协作者那样工作</b>。真正的贡献不是又一张排行榜，而是<b>一份带 19,020 条专家评分标准的"研究级"考卷</b>，第一次把"会说"和"会做"之间的差距量化了出来。
-  </div>
+<section>
+<h2>它为什么不同<span class="sub">把“答对结论”和“答得让科学家能用”分开评分</span></h2>
+<p>过去的生命科学评测多是窄领域、有标准答案的封闭题。LifeSciBench 改为模拟科学家向同事下达的真实请求：给出科学提示、相关材料，要求自由作答。每道题由专家撰写细粒度评分标准，不仅看最终答案对不对，还看推理过程是否科学合理、有没有漏掉关键的实验局限或风险提示。</p>
+<div class="grid">
+  <div class="stat"><div class="n">750</div><div class="l">专家撰写任务（7 工作流 / 7 领域）</div></div>
+  <div class="stat"><div class="n">173</div><div class="l">博士级科学家作者</div></div>
+  <div class="stat"><div class="n">19,020</div><div class="l">评分标准（平均每题 25 条）</div></div>
+  <div class="stat"><div class="n">1,062</div><div class="l">附带图表/序列等工件</div></div>
+</div>
+<div class="insight"><b>洞见：</b>评分标准的颗粒度（每题 25 条）意味着，一个“大方向对但漏了关键 caveat”的回答会被判为不合格——这正是真实科研评审的方式。</div>
+</section>
 
-  <section>
-    <h2><span class="tag">出发点</span>真实科研不是"单点事实问答"，旧基准量不到</h2>
-    <p class="body">科学家的日常是：在证据残缺时做判断、调和互相矛盾的结果、设计难做的实验、给检测排错、评估转化风险、在不确定中决定下一步。可现有生命科学评测多数聚焦窄领域或孤立技能，题目格式规整、答案干净——能测知识，却测不出模型能否在"研究级"工作的宽度上真正出力。LifeSciBench 就是为补这块空白而生，每道题都锚定在有博士训练、且在生物科技/制药一线推进过新药项目的科学家的判断上。</p>
-    <p class="take">结论：要测"AI 对科研有没有用"，就得让题目长得像研究本身——脏、开放、要权衡。</p>
-  </section>
+<section>
+<h2>这些任务有多“硬”<span class="sub">多步推理 + 必须读材料，而非背书式作答</span></h2>
+<p>79% 的任务需要多步推理或决策，平均 4 步；53% 的任务必须从至少一个附件（图、PDF、表格、序列、结构文件）中提取并综合信息，而不能只靠提示文字。任务在被接受前平均经过六轮自动审查和至少两轮专家评审，相关领域评审一致性需达到 90% 以上。</p>
+<div class="insight"><b>洞见：</b>“必须读材料”这一点把基准从知识测试推向了真实研究能力测试——这恰恰也是后面模型最容易失分的地方。</div>
+</section>
 
-  <section>
-    <h2><span class="tag">规模</span>750 道题背后，是产业科学家堆出来的工程量</h2>
-    <p class="body">基准含 <b class="k">750</b> 道专家撰写任务，覆盖 <b>7 类工作流</b>（证据处理、分析、设计与优化、科学推理、验证与运营、转化、科学沟通）和 <b>7 个生物领域</b>。出题人是 <b>173 名</b>具博士学历加生物医药产业经验的科学家；每题可不限轮次反复修改，被采纳的题平均经历 <b>6 轮</b>自动审查与至少 <b>2 轮</b>专家评审，且评审需锚定可验证的正确答案或强专家共识（相关领域内 <b>≥90%</b> 一致）。</p>
-    <div class="stat-grid">
-      <div class="stat"><div class="big">750</div><div class="lbl">专家撰写任务</div></div>
-      <div class="stat"><div class="big">1,062</div><div class="lbl">任务附件（图/表/序列/结构…）</div></div>
-      <div class="stat"><div class="big">173</div><div class="lbl">出题科学家</div></div>
-      <div class="stat"><div class="big">19,020</div><div class="lbl">评分标准条目</div></div>
-      <div class="stat"><div class="big">25</div><div class="lbl">平均每题评分条目数</div></div>
-      <div class="stat"><div class="big">453</div><div class="lbl">独立专家评审</div></div>
-    </div>
-    <p class="body">复杂度也被刻意拉高：<b class="k">79%</b> 的任务需要多步推理或决策（平均 <b>4 步</b>），<b class="k">53%</b> 的任务必须解读或综合至少一件附件，而不是只看提示文字。</p>
-    <p class="take">结论：这不是众包速成题库，而是用产业级评审流程"养"出来的考卷——成本高，但更难被刷分糊弄。</p>
-  </section>
+<section>
+<h2>基准本身经得起检验<span class="sub">453 位独立专家背书，各维度一致性 &gt;96%</span></h2>
+<p>验证由 453 位未参与出题的专家完成，其中 97% 拥有博士或同等学位，平均 12 年从业经验、14 篇同行评审论文，88% 获得过奖项或 fellowship。他们在“贴近真实科研、考查正确的科学推理、有证据支撑、整体有用”四个维度上的认可度均超过 96%。</p>
+<div class="insight"><b>洞见：</b>当一个 AI 基准的“裁判”比绝大多数论文作者还资深，它的分数才真正代表研究级标准，而非众包众测的噪声。</div>
+</section>
 
-  <section>
-    <h2><span class="tag">怎么评</span>不只看最终答案对不对，还看"答得是否站得住、用得上"</h2>
-    <p class="body">每道题配一份细到具体科学主张、计算、决策、论证的评分标准，全库共 <b>19,020</b> 条（平均每题 25 条）。这呼应了真实科研的评判方式：一个回答可能得出正确的高层结论，却因为漏掉关键的检测局限、或没有主动指出一个高度要紧的生物学细节而被判"不完整"；反过来，一个部分回答即便没全解出，也可能含有高质量推理。所以基准既报<b>精确通过率</b>（达 70% 门槛才算通过），也报<b>评分得分</b>（按条目给部分分）。</p>
-    <div class="quote">示例题（节选）：为一款治疗杜氏肌营养不良的 AAV9 微抗肌萎缩蛋白基因疗法，在 FDA Type B 会议前"硬核"挑刺——逐项审视西方印迹定量、免疫荧光抗体选择、用外部自然史队列做对照的统计、AAV 持久性、安全性等，指出证据哪里撑不起"以蛋白表达作为替代终点"的结论，以及要补什么数据才能补上缺口。这类题没有干净的单一答案，却有可被专家一致认可的"正确核心判断"。</div>
-    <p class="take">结论：把"对/错"换成"对、且完整、且对决策有用"，才量得出模型离真正可用还差多少。</p>
-  </section>
+<section>
+<h2>模型强在哪：会综合、会沟通<span class="sub">通过阈值 70%；GPT‑Rosalind 全面优于 GPT‑5.5</span></h2>
+<p>整体精确通过率从 GPT‑5.5 的 25.7% 升到 GPT‑Rosalind 的 36.1%。进步最明显的是“科学沟通”和“转化研究”——即组织证据、写出令专家信服的解释，以及把临床前证据连接到临床意义。</p>
+<table>
+  <tr><th>任务类别</th><th>GPT‑5.5</th><th>GPT‑Rosalind</th></tr>
+  <tr><td>整体精确通过率</td><td>25.7%</td><td class="up">36.1%</td></tr>
+  <tr><td>科学沟通（n=9，需谨慎）</td><td>56.3%</td><td class="up">71.1%</td></tr>
+  <tr><td>转化研究 bench-to-bedside</td><td>36.8%</td><td class="up">57.7%</td></tr>
+  <tr><td>“专家可用/可执行输出”得分</td><td>29.1%</td><td class="up">44.7%</td></tr>
+  <tr><td>不确定性与 caveat 处理</td><td>29.3%</td><td class="up">44.8%</td></tr>
+</table>
+<div class="insight"><b>洞见：</b>模型最有用的场景是“证据边界清晰、需要结构化科学判断”的任务——它更像一个会写综述的助手，而非能独立设计实验的研究员。</div>
+</section>
 
-  <section>
-    <h2><span class="tag">可信度</span>出题与评审分离，独立专家给出 96%+ 的认可</h2>
-    <p class="body">为验证基准质量，OpenAI 请了 <b>453 名</b>未参与出题的评审：其中 <b>97%</b> 持博士或同等学位，平均 <b>12 年</b>领域经验、<b>14 篇</b>同行评审论文，<b>88%</b> 至少获过一项奖项或 fellowship。他们在"贴合真实科研""考查正确的推理与领域技能""有证据/共识支撑""整体作为评测是否有用"四个维度打分，<b>每一项认可度都超过 96%</b>。</p>
-    <p class="take">结论：高一致性说明这套题不是某个人的主观偏好，而是领域内能达成共识的"好题"。</p>
-  </section>
+<section>
+<h2>模型弱在哪：要读材料、要精确就崩<span class="sub">附件、设计优化、精确输出是三大短板</span></h2>
+<p>一旦任务依赖图表/序列等工件，通过率从纯文本的 45.1% 跌到 28.1%（GPT‑5.5 从 29.9% 跌到 21.9%）。设计/优化/预测仅 30.7%、分析仅 30.3%。需要精确输出时更糟：数值类 14.8%、序列/结构类 24.0%、构建体生成 27.3% 且几乎无进步——而这些恰是 CRISPR 供体设计、siRNA 设计等必须“拿来即用”的环节。</p>
+<table>
+  <tr><th>需精确/读材料的任务</th><th>GPT‑Rosalind 通过率</th></tr>
+  <tr><td>纯文本 → 含工件/URL</td><td><span class="up">45.1%</span> → <span class="down">28.1%</span></td></tr>
+  <tr><td>数值类输出</td><td class="down">14.8%</td></tr>
+  <tr><td>序列 / 结构输出</td><td class="down">24.0%</td></tr>
+  <tr><td>构建体生成</td><td class="down">27.3%</td></tr>
+</table>
+<p>另有约 14% 的任务，模型拿到可观的评分点却未通过阈值；GPT‑Rosalind 有 109 道题通过率低于 20% 却仍获得至少 50% 的评分奖励——它“走了一半路”，但漏掉关键约束、用错证据或没把推理落到可用的最终决策上。</p>
+<div class="insight"><b>洞见：</b>“部分正确”在科研中往往等于失败。模型能找到相关证据，却常在最后一步——精确计算、合规约束、可执行结论上掉链子。</div>
+</section>
 
-  <section>
-    <h2><span class="tag">结果·强项</span>会"综合与沟通"的地方，模型进步最快</h2>
-    <p class="body">新模型 <b>GPT‑Rosalind</b> 相比 <b>GPT‑5.5</b>，整体精确通过率从 <b class="hi">25.7%</b> 提升到 <b class="lo">36.1%</b>。进步最猛的方向是科学沟通与转化：</p>
-    <table>
-      <thead><tr><th>任务类别</th><th class="num">GPT‑5.5</th><th class="num">GPT‑Rosalind</th></tr></thead>
-      <tbody>
-        <tr><td>科学沟通（n=9，需谨慎）</td><td class="num">56.3%</td><td class="num lo">71.1%</td></tr>
-        <tr><td>转化（bench‑to‑bedside）</td><td class="num">36.8%</td><td class="num lo">57.7%</td></tr>
-        <tr><td>"对专家有用/可执行"输出</td><td class="num">29.1%</td><td class="num lo">44.7%</td></tr>
-        <tr><td>不确定性与 caveat 处理</td><td class="num">29.3%</td><td class="num lo">44.8%</td></tr>
-      </tbody>
-    </table>
-    <p class="take">结论：当任务有清晰的证据边界、要的是结构化的科学判断时，模型最有用——它擅长"组织证据、写给专家看"。</p>
-  </section>
+<section>
+<h2>作者怎么定位它<span class="sub">任务级能力 ≠ 真实研发影响</span></h2>
+<p>团队明确：在 LifeSciBench 上表现好，只代表“现实任务级能力”，不等于能加速发现或改善 R&D 产出。真实研究是迭代的——收集新证据、修正假设、设计后续实验，这些动态它并未覆盖。下一步是把基准成绩与真实研究环境中的部署研究连接起来。</p>
+</section>
 
-  <section>
-    <h2><span class="tag">结果·短板</span>一碰附件、要精确输出、要做设计，立刻掉链子</h2>
-    <p class="body">最清晰的鸿沟在"附件"：GPT‑Rosalind 在纯文本任务上 <b class="lo">45.1%</b>，一旦任务带图表/序列文件/URL 就跌到 <b class="hi">28.1%</b>（GPT‑5.5 同样从 29.9% 跌到 21.9%）。设计优化预测（<b>30.7%</b>）与分析（<b>30.3%</b>）是最难的两类工作流。要求精确输出时更脆：</p>
-    <div class="pillars">
-      <div class="pillar"><div class="h">数值类</div>GPT‑Rosalind 仅 <b class="hi">14.8%</b>——小数点级误差就掉到门槛之下。</div>
-      <div class="pillar"><div class="h">序列/结构类</div>仅 <b class="hi">24.0%</b>，而这正是 CRISPR/HDR 供体、siRNA 设计等要"拿来就能用"的场景。</div>
-      <div class="pillar"><div class="h">构建体生成</div>仅 <b class="hi">27.3%</b>，相比 GPT‑5.5 几乎没进步。</div>
-      <div class="pillar"><div class="h">"差一点"现象</div>约 <b>14%</b> 任务拿到可观评分却没过门槛；Rosalind 有 <b>109</b> 题通过率不足 20%，却仍得到 ≥50% 的评分。</div>
-    </div>
-    <p class="body">"差一点"的本质是：模型常常找对了部分证据、给出貌似合理的部分答案，却因漏掉一个关键约束、用错证据、算不完整、或没把推理连到一个有科学价值的最终决策而失败。</p>
-    <p class="take">结论：模型已能"说得像专家"，但在需要精确、可直接落地的硬产出上，离可用还有明显距离。</p>
-  </section>
+<div class="takeaways">
+<h2>最值得带走的洞见</h2>
+<ol>
+  <li><b>测“有用”而非“答对”。</b>近两万条专家评分标准让基准衡量的是科学判断质量，而非知识检索——这是评测范式的转变。</li>
+  <li><b>会写会说先到，能做实验级精确决策最后到。</b>科学沟通已达 71%，而数值输出仅 14.8%，差距揭示了当前 AI 在科研中的真实分工。</li>
+  <li><b>“读材料”是分水岭。</b>含工件任务通过率近乎腰斩（45%→28%），说明多模态科学证据的提取与整合仍是核心瓶颈。</li>
+  <li><b>部分正确即失败。</b>14% 的任务“走了一半”，提醒我们：在高风险研发中，最后一步的精确与合规比大方向更决定可用性。</li>
+  <li><b>分数高 ≠ 能加速发现。</b>作者自己强调基准不能替代真实研究观测——读者应把它当能力下限的标尺，而非研发影响的承诺。</li>
+</ol>
+</div>
 
-  <section>
-    <h2><span class="tag">边界</span>基准测的是"自包含任务"，不等于"加速发现"</h2>
-    <p class="body">OpenAI 自己划清了界限：LifeSciBench 聚焦反映产业工作流的自包含任务，仍把许多专科和任务类型留在范围之外，也无法捕捉真实研究的迭代动态——收集新证据、修订假设、设计后续实验。所以在基准上表现强，应被解读为"具备真实的任务级能力"，而非"对下游研究有直接影响"的证明。下一步是把基准表现连到真实研究环境中的部署研究，在更长周期、多轮反馈与实验跟进中检验模型是否真的加速了 R&D。</p>
-    <p class="take">结论：这是一把更接近真实科研的尺子，但量的是"单题能力"，不是"科研产出"——别把高分直接读成"AI 能做研究了"。</p>
-  </section>
-
-  <div class="insights">
-    <h2>最值得带走的洞见</h2>
-    <ol>
-      <li><b>评测换了问法。</b>从"会不会答生物题"改成"能不能像有判断力的协作者那样干活"——750 道题、7 类工作流、平均 4 步推理，53% 必须读附件。</li>
-      <li><b>用 19,020 条标准量"完整性"。</b>不只看最终答案，还看是否完整、是否点出关键 caveat、是否对决策有用；同时报精确通过率（70% 门槛）与部分给分。</li>
-      <li><b>强在"会说"。</b>GPT‑Rosalind 把整体精确通过率从 25.7% 抬到 36.1%，进步最猛的是科学沟通（→71.1%）和转化（→57.7%），以及不确定性处理（→44.8%）。</li>
-      <li><b>弱在"会做"。</b>带附件从 45.1% 跌到 28.1%；数值类仅 14.8%、序列/结构 24.0%、构建体生成 27.3%——越要精确、可落地，越掉链子。基准远未饱和。</li>
-      <li><b>高分 ≠ 加速发现。</b>基准只测自包含任务，作者明确它不能替代在真实、长周期、多轮迭代研究环境中的部署验证。</li>
-    </ol>
-  </div>
-
-  <p class="note">注：文中 AAV9 微抗肌萎缩蛋白等案例仅为说明评测任务的复杂度，不构成医疗或监管建议。科学沟通类别样本量小（n=9），相关百分比需谨慎解读。GPT‑Rosalind、GPT‑5.5 为原文所用模型代号。</p>
-
+<footer>基于 OpenAI《Introducing LifeSciBench》（2026-06-17）整理的中文总结，数据均引自原文。</footer>
 </div>
 </body>
+</html>
 </html>

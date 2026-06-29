@@ -3,152 +3,131 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>为生物学里的 AI Agent 铺路 · 总结</title>
+<title>为生物学中的智能体铺路 · 总结</title>
 <style>
   :root{
-    --bg:#0f1115; --card:#171a21; --card2:#1d2129;
-    --text:#e7eaf0; --muted:#9aa3b2; --line:#2a2f3a;
-    --accent:#6ea8fe; --warn:#ff7a7a; --good:#5dd1a0; --gold:#f2c14e;
+    --bg:#0f1419; --card:#1a2129; --ink:#e8edf2; --muted:#9fb0c0;
+    --accent:#5db0ff; --accent2:#7ee0c0; --warn:#ff8a7a; --line:#2b3744;
+    --hl:#fff3c4;
   }
   *{box-sizing:border-box}
-  body{
-    margin:0; background:var(--bg); color:var(--text);
-    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Microsoft YaHei",sans-serif;
-    line-height:1.75; font-size:17px;
-  }
-  .wrap{max-width:760px; margin:0 auto; padding:40px 22px 80px}
-  header.hd{border-bottom:1px solid var(--line); padding-bottom:22px; margin-bottom:30px}
-  .kicker{color:var(--accent); font-size:13px; letter-spacing:.08em; text-transform:uppercase; margin:0 0 10px}
-  h1{font-size:30px; line-height:1.3; margin:0 0 14px}
-  .meta{color:var(--muted); font-size:14px}
-  .lede{
-    background:linear-gradient(135deg,#1c2533,#191d26);
-    border:1px solid var(--line); border-left:4px solid var(--accent);
-    border-radius:12px; padding:18px 20px; margin:26px 0 36px; font-size:18px;
-  }
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.8;font-size:17px}
+  .wrap{max-width:780px;margin:0 auto;padding:40px 22px 80px}
+  header{border-bottom:2px solid var(--line);padding-bottom:24px;margin-bottom:8px}
+  .kicker{color:var(--accent2);font-size:13px;letter-spacing:.12em;text-transform:uppercase;margin:0 0 10px}
+  h1{font-size:30px;line-height:1.35;margin:0 0 16px}
+  .meta{color:var(--muted);font-size:13px}
+  .lede{background:linear-gradient(135deg,#1c2a3a,#16202b);border-left:4px solid var(--accent);
+    padding:20px 22px;border-radius:10px;margin:26px 0;font-size:18px}
   .lede b{color:var(--accent)}
-  section{margin:34px 0}
-  h2{font-size:21px; margin:0 0 6px; line-height:1.4}
-  h2 .tag{display:inline-block; font-size:12px; color:var(--gold); border:1px solid var(--line); border-radius:999px; padding:2px 10px; margin-right:10px; vertical-align:middle}
-  .body{color:#d6dbe6}
-  .take{color:var(--muted); font-style:italic; border-left:2px solid var(--line); padding-left:12px; margin-top:12px}
-  .stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0}
-  .stat{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px}
-  .stat .big{font-size:24px; font-weight:700}
-  .stat .lbl{color:var(--muted); font-size:13px; margin-top:4px}
-  .fall{display:flex; align-items:baseline; gap:8px; flex-wrap:wrap}
-  .fall .from{color:var(--muted); text-decoration:line-through}
-  .fall .arrow{color:var(--muted)}
-  .fall .to{color:var(--warn); font-weight:700}
-  .fall .good{color:var(--good); font-weight:700}
-  table{width:100%; border-collapse:collapse; margin:16px 0; font-size:15px; background:var(--card); border-radius:12px; overflow:hidden}
-  th,td{padding:10px 12px; text-align:left; border-bottom:1px solid var(--line)}
-  th{background:var(--card2); color:var(--muted); font-weight:600}
-  td.num{font-variant-numeric:tabular-nums; text-align:right}
-  .hi{color:var(--warn); font-weight:700}
-  .lo{color:var(--good); font-weight:700}
-  .pattern{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin:12px 0}
-  .pattern .pct{color:var(--gold); font-weight:700; font-size:18px}
-  .quote{background:var(--card2); border-left:3px solid var(--gold); border-radius:0 10px 10px 0; padding:12px 16px; margin:16px 0; color:#dfe4ee; font-size:15px}
-  .insights{background:linear-gradient(135deg,#15211b,#171a21); border:1px solid #244235; border-radius:14px; padding:22px 24px; margin-top:42px}
-  .insights h2{color:var(--good)}
-  .insights ol{margin:14px 0 0; padding-left:22px}
-  .insights li{margin:10px 0}
-  .note{color:var(--muted); font-size:13px; border-top:1px solid var(--line); margin-top:40px; padding-top:16px}
-  b.k{color:var(--gold)}
+  section{background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:22px 24px;margin:22px 0}
+  h2{font-size:20px;margin:0 0 12px;color:var(--ink)}
+  h2 .num{color:var(--accent);font-weight:700;margin-right:8px}
+  p{margin:10px 0}
+  .muted{color:var(--muted)}
+  .concl{margin-top:14px;padding:12px 16px;background:#11202a;border-radius:8px;
+    border-left:3px solid var(--accent2);color:#d6f3e8}
+  .concl b{color:var(--accent2)}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:18px 0}
+  .stat{background:#121a22;border:1px solid var(--line);border-radius:10px;padding:16px;text-align:center}
+  .stat .big{font-size:26px;font-weight:800;color:var(--accent)}
+  .stat .big.warn{color:var(--warn)}
+  .stat .lab{font-size:12.5px;color:var(--muted);margin-top:6px}
+  mark{background:var(--hl);color:#1a1300;padding:0 4px;border-radius:3px}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:15px}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:left}
+  th{background:#13202b;color:var(--accent2)}
+  .takeaways{background:linear-gradient(135deg,#152433,#1a2b22);border:1px solid #2f4a44}
+  .takeaways ol{margin:8px 0 0;padding-left:22px}
+  .takeaways li{margin:12px 0}
+  .takeaways b{color:var(--accent2)}
+  .analogy{font-style:italic;color:var(--muted);border-top:1px dashed var(--line);
+    border-bottom:1px dashed var(--line);padding:14px 0;margin:16px 0}
 </style>
 </head>
 <body>
 <nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/agents-in-biology" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
 <div class="wrap">
-
-  <header class="hd">
-    <p class="kicker">Anthropic · Science</p>
-    <h1>为生物学里的 AI Agent 铺路</h1>
-    <p class="meta">来源 Anthropic ｜ 作者 Laura Luebbert ｜ 2026-06-08</p>
+  <header>
+    <p class="kicker">Anthropic · Science · 2026-06-08</p>
+    <h1>为生物学中的智能体铺路</h1>
+    <p class="meta">作者 Laura Luebbert 等 · 案例：用 gget virus 让 AI 智能体可靠检索病毒序列</p>
   </header>
 
   <div class="lede">
-    一句话总括：科研 Agent 的真正瓶颈不在"会不会推理"，而在<b>没有可靠的确定性数据检索通道</b>。本文用病毒学做实验证明：与其等模型更强，不如给它们一层<b>确定性工具（gget virus）</b>——它把序列检索准确率从"时好时坏"提到接近 100%，并让"用哪个模型"几乎不再重要。
+    <b>一句话总括：</b>真正卡住 AI 科学智能体的，不是它们的推理能力，而是为“人类点击网页”而生的生物数据基础设施；本文用 VirBench 基准证明——给智能体加一个<b>确定性检索层（gget virus）</b>，病毒序列检索准确率就能从勉强可用跃升到接近 100%，而且让模型好坏几乎不再重要。
   </div>
 
   <section>
-    <h2><span class="tag">核心比喻</span>给汽车开的城市，还是给行人走的老城</h2>
-    <p class="body">用 Agent 去检索生物数据，像开车穿过一座汽车出现之前修建的古城：街道美丽却狭窄曲折（古怪的文件格式、散落的数据库、一次性脚本）。而软件基础设施本来就是"为汽车修的"——铺好的路、清晰的车道、版本控制、文档完善的 API。于是<b>编程 Agent 进步神速，生物 Agent 却步履维艰</b>。差别不只在数据，更在软件能给出可编译、可验证的奖励，而生物学几乎没有简单又有意义的可验证奖励。</p>
-    <p class="take">结论：科研 Agent 落后的根因是基础设施，而非智力——缺的是一层"机器可调用"的确定性执行层。</p>
+    <h2><span class="num">01</span>问题的本质：城市为马车而建，智能体却开着汽车</h2>
+    <p>生物数据库像一座汽车出现之前建成的古城——美丽却街道狭窄曲折：各自的标识符、格式、过滤逻辑散落各处，访问要靠一次性脚本拼凑。软件世界则天生“为汽车铺好了路”（版本控制、规范 API、包管理器），所以编程智能体进步飞快，生物智能体却步履维艰。</p>
+    <p class="analogy">“代码是最简单的部分！大部分工作都在浏览器里点来点去。” —— Karpathy 抱怨 web 开发的痛点，正是生物学家长期面对的困境。</p>
+    <div class="concl"><b>洞见：</b>瓶颈不只是“会不会想”，而是缺少一个机器可调用的<b>确定性执行层</b>来查询生物数据。</div>
   </section>
 
   <section>
-    <h2><span class="tag">为什么生死攸关</span>埃博拉疫情里的"点击税"</h2>
-    <p class="body">病毒学是最难的场景之一。研究者要从 NCBI Virus（汇集 GenBank、RefSeq、INSDC 等的网页门户）取序列，而大量筛选逻辑只存在于网页界面里，得靠人手反复点选复现复杂过滤条件——这对人烦琐，对 Agent 几乎不可行。</p>
-    <div class="stat-grid">
-      <div class="stat">
-        <div class="big">13 → 8</div>
-        <div class="lbl">2026-05-14 DRC 分析 13 份血样，次日确诊 8 例 Bundibugyo 病毒病</div>
-      </div>
-      <div class="stat">
-        <div class="big">&gt;1000 例 · &gt;200 死</div>
-        <div class="lbl">截至 2026-05-29 WHO 报告（确诊+疑似）</div>
-      </div>
+    <h2><span class="num">02</span>为什么细节是生死攸关的：埃博拉疫情的实时压力</h2>
+    <p>2026 年 5 月 14 日，刚果（金）INRB 分析 13 份血样，次日确诊 8 例布迪布焦型埃博拉；到 <mark>5 月 29 日，WHO 报告超 1000 例疑似/确诊、逾 200 例死亡</mark>。回答“病毒变异多大、现有诊断还测得到吗、现有疗法还有效吗”都要与 NCBI Virus 中的历史基因组比对——而第一步竟是人工在网页里点击、手动复现复杂过滤条件。</p>
+    <div class="concl"><b>洞见：</b>检索基因组本应自动化，现实却依赖“浏览器点击税”，在疫情响应这种争分夺秒的场景里，这种摩擦会带来真实的生命代价。</div>
+  </section>
+
+  <section>
+    <h2><span class="num">03</span>放任智能体单干会怎样：看起来对，其实错</h2>
+    <p>团队构建基准 <b>VirBench</b> 测试现有顶尖科研智能体（Claude、Biomni OSS、Edison Analysis、GPT）。</p>
+    <div class="stats">
+      <div class="stat"><div class="big">120</div><div class="lab">真实病毒查询</div></div>
+      <div class="stat"><div class="big">40</div><div class="lab">覆盖病原体</div></div>
+      <div class="stat"><div class="big warn">16.9–91.3%</div><div class="lab">裸模型平均准确率</div></div>
+      <div class="stat"><div class="big">≈100%</div><div class="lab">可靠任务实际要求</div></div>
     </div>
-    <p class="body">面对新疫情，公共卫生要急答三问：这株病毒与以往埃博拉差多少？现有诊断还测得到吗？现有疗法还保护得了吗？回答它们的<b>第一步就是去 NCBI Virus 比对历史基因组</b>——而这一步至今要靠手动点网页、手工复现过滤、再祈祷数据集完整正确。</p>
-    <p class="take">结论：检索是漫长生物流程的起点，起点错了，后面全错——而它恰恰最难自动化。</p>
+    <p>更糟的是<b>不可复现</b>：同一个埃博拉查询（应返回 <b>266</b> 条），Sonnet 4 三次分别返回 <mark>106 / 15 / 5</mark> 条。漏检源于大结果集没拉完，多检源于过滤错误；查询一旦超过三四个并列过滤条件，性能显著下降。</p>
+    <div class="concl"><b>洞见：</b>序列检索往往是漫长生物流程的第一步——一个“看似合理却错误”的起点，会沿途污染所有下游结论。</div>
   </section>
 
   <section>
-    <h2><span class="tag">实测结果</span>VirBench：最强模型也够不到 100% 这条线</h2>
-    <p class="body">团队构建 <b class="k">VirBench</b>：120 个真实查询、覆盖 40 种病原体、人工核验真值。结果是各 Agent 平均准确率 <b>16.9%–91.3%</b>，可这类任务的及格线<b>实际是 100%</b>——少一条或多一条记录，就可能改变"诊断是否覆盖流行毒株""疫情起点早了还是晚了几周"的判断。</p>
-    <div class="quote">同一条埃博拉查询、完全相同的提示词，Sonnet 4 三次跑出截然不同的结果：</div>
-    <div class="stat">
-      <div class="fall"><span class="big">真值 266 条</span></div>
-      <div class="fall"><span class="to">106</span><span class="arrow">·</span><span class="to">15</span><span class="arrow">·</span><span class="to">5</span></div>
-      <div class="lbl">三次运行返回的序列数 —— 不仅不准，而且不可复现</div>
-    </div>
-    <p class="body">后果直接传导到结论：用人工精选数据集建树得到正确的 <b>2014 年 1 月</b> TMRCA（最近共同祖先时间，即疫情推断起点）；而 Sonnet 4 的结果里，两次明显缺数据（一棵树把起点错推到 <b class="hi">1922 年</b>），看似合理的那次也漏了几内亚序列，把起点挪到 2014 年 4 月。抗体疗法 maftivimab / MBP134 的靶点突变分析同样三次给出三种印象。</p>
-    <p class="take">结论：检索的"小选择"会改写生物学结论；不可复现本身就是科学不可接受的失败。</p>
-  </section>
-
-  <section>
-    <h2><span class="tag">失败规律</span>越大越复杂，越容易翻车</h2>
-    <p class="body">误差大多来自基础设施缺陷而非智力：抓不全大结果集就<b>少数</b>，过滤用错就<b>多数</b>。偏差最大的恰是记录海量的病毒——Influenza A、HIV-1、SARS-CoV-2；同时筛选条件超过 <b>3–4 个</b>后性能明显下滑。</p>
-    <div class="pattern"><span class="pct">少数</span> · 大结果集分页中途停下，没取完就交答案。</div>
-    <div class="pattern"><span class="pct">多数</span> · 元数据字段含义依赖上下文/惯例，过滤被错误套用。</div>
-    <p class="take">结论：Agent 往往"懂任务"，却没有机器可执行、可验证、可重复的方式去落地它——答案看着像样却是错的。</p>
-  </section>
-
-  <section>
-    <h2><span class="tag">解法</span>gget virus：在人行道下挖一条高速隧道</h2>
-    <p class="body">团队与 NCBI 合作开发 <b class="k">gget virus</b>，把浏览器式检索翻译成准确、可复现的接口：它跨 REST、Datasets、E-utilities 协调多个底层库，决定哪些过滤走 API、哪些需本地校验，自动分批抓全大结果集，必要时取回 GenBank 记录来过滤并保留信息，最后给出人机皆可读、带完整日志的标准化输出。</p>
+    <h2><span class="num">04</span>错误如何改写科学结论：从 2014 年 1 月到 1922 年</h2>
+    <p>用这些数据集重建系统发育树、推断最近共同祖先时间（TMRCA，即疫情起源日期）：</p>
     <table>
-      <thead><tr><th>条件</th><th class="num">准确率</th><th class="num">运行间波动</th></tr></thead>
-      <tbody>
-        <tr><td>Agent 自己上（裸 NCBI Virus）</td><td class="num hi">16.9%–91.3%</td><td class="num hi">大</td></tr>
-        <tr><td>接入 gget virus（全体）</td><td class="num lo">&gt;90%</td><td class="num lo">基本消失</td></tr>
-        <tr><td>接入 gget virus（GPT-5.5 峰值）</td><td class="num lo">99.7%</td><td class="num lo">—</td></tr>
-      </tbody>
+      <tr><th>数据来源</th><th>推断的 TMRCA</th></tr>
+      <tr><td>人工精选数据集</td><td>2014 年 1 月（与既往报告一致）</td></tr>
+      <tr><td>Sonnet 4 · 不完整数据集</td><td><mark>被推回 1922 年</mark></td></tr>
+      <tr><td>Sonnet 4 · 表面合理的数据集</td><td>漏掉几内亚序列，偏移到 2014 年 4 月</td></tr>
     </table>
-    <p class="body">最深刻的结论是：<b>加上确定性层后，模型选择变得不再重要</b>，模型间差距大幅收窄。这意味着可靠的数据集构建不必依赖最新、最贵的模型——<b>更便宜的模型 + 对的工具</b>就能降低波动、扩大可及性。</p>
-    <p class="take">结论：把"确定性"放进基础设施，而不是每次都让昂贵模型现场硬闯一遍。</p>
+    <p>同样，针对抗体疗法 maftivimab、MBP134 的表位变异分析，三次运行给出三种不同的“变异印象”。</p>
+    <div class="concl"><b>洞见：</b>看似微不足道的检索选择，能直接改变“疫情何时何地起源”“疗法是否仍然有效”这类核心生物学判断。</div>
   </section>
 
   <section>
-    <h2><span class="tag">向前看</span>就算工具有一天会过时，结论依旧成立</h2>
-    <p class="body">若把模型能力曲线外推，可以想象不远的将来 Agent 强到能自己应付乱糟糟的门户，gget 这类工具的收益趋近于零。但作者提醒：<b>"能做"不等于"该每次重新做一遍"</b>。一个能硬闯混乱流程的模型，可能仍太贵、太慢、太难审计、太难信任。即便工具终将过时，给生物数据库的教训不变——把 Agent 当作规模化用户来设计。</p>
+    <h2><span class="num">05</span>解法：在古城底下挖一条确定性高速隧道</h2>
+    <p>团队与 NCBI 合作开发 <b>gget virus</b>——一个确定性检索层，统一协调 REST、Datasets、E-utilities 等底层 API：决定哪些过滤走 API、哪些需本地校验，处理大结果集分批拉取，并输出人机皆可读、带完整日志的标准结果。</p>
+    <div class="stats">
+      <div class="stat"><div class="big" style="color:var(--accent2)">&gt;90%</div><div class="lab">所有智能体准确率</div></div>
+      <div class="stat"><div class="big" style="color:var(--accent2)">99.7%</div><div class="lab">GPT-5.5 峰值</div></div>
+      <div class="stat"><div class="big" style="color:var(--accent2)">≈0</div><div class="lab">重复运行波动</div></div>
+    </div>
+    <p>更关键的是：模型之间的差距大幅收窄，<mark>“用哪个模型”变得不再重要</mark>——廉价模型配上正确的工具，就能产出可靠结果。</p>
+    <div class="concl"><b>洞见：</b>可靠的数据集构建不该取决于能否用上最新、最贵的模型；确定性工具把可靠性“民主化”了。</div>
   </section>
 
-  <div class="insights">
+  <section>
+    <h2><span class="num">06</span>工具会过时，但教训不会</h2>
+    <p>随着模型能力飞涨，未来智能体或许能自己穿越混乱的门户，gget virus 这类工具的价值可能趋近于零。但作者提醒：即便智能体“做得到”，也不意味着每次都该由它现场重造——这可能太贵、太慢、太难审计、太难信任。</p>
+    <div class="concl"><b>洞见：</b>无论工具是否过时，对生物数据库的根本启示不变——<b>把智能体当作规模化用户来设计，并为规模而建</b>。底层（标识符、模式、检索逻辑、坐标系、元数据约定）必须“无聊地可靠”，上层的创造力才有意义。</div>
+  </section>
+
+  <section class="takeaways">
     <h2>最值得带走的洞见</h2>
     <ol>
-      <li><b>瓶颈是基础设施，不是智力。</b>科研 Agent 缺的是确定性的数据检索执行层；裸调数据库时最强模型也只有 16.9%–91.3%，够不到 100% 这条硬线。</li>
-      <li><b>不可复现和不准确一样致命。</b>同一查询同一提示词，Sonnet 4 返回 106 / 15 / 5 条（真值 266），把疫情起点从 2014 年 1 月错推到 1922 年——检索的小选择会改写生物学结论。</li>
-      <li><b>加一层确定性工具立竿见影。</b>接入 gget virus 后全体准确率 &gt;90%、GPT-5.5 达 99.7%，运行波动基本消失。</li>
-      <li><b>它让模型选择变得无关紧要。</b>便宜模型配对的工具就够用——可靠性不该绑定在最新最贵的模型上，这扩大了科学的可及性。</li>
-      <li><b>为 Agent 而建是长期方向。</b>正如 Karpathy 所言"要为 Agent 而建"；即便未来模型自己能闯关，数据库也应把 Agent 当规模化用户来设计。</li>
+      <li><b>瓶颈在基础设施，不在智能。</b>顶尖模型也只有 16.9%–91.3% 的准确率，失败主要源于网页化、异构的数据接口，而非推理不足。</li>
+      <li><b>不可复现比不准确更危险。</b>同一查询三次返回 106/15/5 条（应为 266），让“看似合理”的答案悄悄污染整条科研流程。</li>
+      <li><b>小检索错误 = 大结论错误。</b>数据集差异能把埃博拉起源时间从 2014 年 1 月错推到 1922 年，足以改变公共卫生判断。</li>
+      <li><b>确定性层是当前的关键解。</b>加入 gget virus 后准确率全面超 90%、峰值 99.7%，波动归零，模型选择不再重要——可靠性变得便宜可及。</li>
+      <li><b>为智能体而建是普遍命题。</b>从 Karpathy 的 web 抱怨到病毒学，凡是把智能体塞进“为人类点击而设计”的环境，都需要把它们当作规模化用户重新铺路。</li>
     </ol>
-  </div>
-
-  <p class="note">注：本文分析仅作示例，不构成医疗或公共卫生建议；埃博拉治疗请以 WHO 官方指南为准。一个值得玩味的细节：360 次运行中，GPT-5.5 曾在未被提示的情况下自行找到并使用 gget virus，那正是该题唯一答对的一次。</p>
-
+  </section>
 </div>
 </body>
 </html>

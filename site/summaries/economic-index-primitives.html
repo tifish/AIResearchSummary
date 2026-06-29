@@ -2,149 +2,174 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Anthropic 经济指数：理解 AI 使用的新积木</title>
 <style>
   :root{
-    --ink:#1a1a1a; --muted:#5c6470; --line:#e4e7ec;
-    --accent:#c8643c; --accent-soft:#fbeee7;
-    --blue:#2f5d8a; --blue-soft:#eaf1f8;
-    --green:#3a7a4e; --green-soft:#e9f4ec;
-    --warn:#9a6a1a; --warn-soft:#fbf3e0;
+    --ink:#1a1a1a; --soft:#5a5a5a; --line:#e6e3dc;
+    --accent:#c8643c; --accent2:#3a6b8a; --bg:#faf8f4;
+    --card:#ffffff; --hl:#fbeee6; --hl2:#e9f1f5;
   }
-  *{box-sizing:border-box}
+  *{box-sizing:border-box;}
   body{
-    margin:0; background:#f6f7f9; color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans CJK SC","Microsoft YaHei",sans-serif;
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Segoe UI","Helvetica Neue",-apple-system,"Microsoft YaHei",sans-serif;
     line-height:1.75; font-size:17px;
   }
-  .wrap{max-width:780px; margin:0 auto; padding:32px 20px 64px;}
-  header{padding:28px 0 8px; border-bottom:3px solid var(--accent);}
-  .kicker{font-size:13px; letter-spacing:.08em; color:var(--accent); font-weight:700; text-transform:uppercase;}
-  h1{font-size:30px; line-height:1.3; margin:10px 0 8px;}
-  .meta{color:var(--muted); font-size:14px;}
+  .wrap{max-width:760px; margin:0 auto; padding:48px 22px 80px;}
+  header{border-bottom:3px solid var(--accent); padding-bottom:22px; margin-bottom:32px;}
+  .kicker{font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); font-weight:700;}
+  h1{font-size:30px; line-height:1.3; margin:10px 0 14px;}
+  .meta{font-size:14px; color:var(--soft);}
   .lede{
-    background:var(--accent-soft); border:1px solid #f0d6c8; border-radius:12px;
-    padding:18px 20px; margin:26px 0; font-size:18px;
+    background:var(--hl); border-left:5px solid var(--accent);
+    padding:18px 20px; border-radius:6px; margin:28px 0 36px;
+    font-size:18.5px;
   }
-  .lede b{color:var(--accent);}
-  h2{font-size:21px; margin:38px 0 6px; line-height:1.4;}
-  .takeaway{color:var(--muted); font-size:14px; margin:-2px 0 14px; font-style:italic;}
-  p{margin:10px 0;}
-  .stat-row{display:flex; flex-wrap:wrap; gap:12px; margin:16px 0;}
+  .lede strong{color:var(--accent);}
+  section{margin:34px 0;}
+  h2{
+    font-size:21px; margin:0 0 6px; line-height:1.4;
+    border-left:4px solid var(--accent2); padding-left:12px;
+  }
+  .body{margin:10px 0 0;}
+  .take{
+    margin-top:12px; font-size:15.5px; color:#333;
+    background:var(--hl2); padding:11px 15px; border-radius:6px;
+  }
+  .take b{color:var(--accent2);}
+  .stat-row{display:flex; flex-wrap:wrap; gap:12px; margin:18px 0;}
   .stat{
-    flex:1 1 150px; background:#fff; border:1px solid var(--line); border-radius:10px;
-    padding:14px 16px;
+    flex:1 1 150px; background:var(--card); border:1px solid var(--line);
+    border-radius:8px; padding:14px 16px; text-align:center;
   }
-  .stat .num{font-size:26px; font-weight:800; color:var(--blue); line-height:1.1;}
-  .stat .lbl{font-size:13px; color:var(--muted); margin-top:4px;}
-  .insight{
-    border-left:4px solid var(--green); background:var(--green-soft);
-    padding:10px 16px; border-radius:0 8px 8px 0; margin:14px 0; font-size:15.5px;
+  .stat .n{font-size:25px; font-weight:800; color:var(--accent);}
+  .stat .l{font-size:13px; color:var(--soft); margin-top:4px; line-height:1.5;}
+  table{width:100%; border-collapse:collapse; margin:16px 0; font-size:15px;}
+  th,td{padding:9px 11px; border-bottom:1px solid var(--line); text-align:left;}
+  th{background:#f0ece4; font-weight:700;}
+  td.num{font-weight:700; color:var(--accent2);}
+  .insights{
+    background:#22303a; color:#f3f1ec; border-radius:10px;
+    padding:26px 28px; margin-top:46px;
   }
-  .insight b{color:var(--green);}
-  .warnbox{
-    border-left:4px solid var(--warn); background:var(--warn-soft);
-    padding:10px 16px; border-radius:0 8px 8px 0; margin:14px 0; font-size:15.5px;
-  }
-  .warnbox b{color:var(--warn);}
-  table{width:100%; border-collapse:collapse; margin:16px 0; font-size:15px; background:#fff;}
-  th,td{border:1px solid var(--line); padding:9px 12px; text-align:left;}
-  th{background:var(--blue-soft); color:var(--blue); font-weight:700;}
-  .final{
-    background:#1a1a1a; color:#f4f4f4; border-radius:14px; padding:24px 26px; margin:40px 0 0;
-  }
-  .final h2{color:#fff; margin-top:0;}
-  .final ol{margin:12px 0 0; padding-left:22px;}
-  .final li{margin:10px 0;}
-  .final li b{color:#ffb38a;}
-  .src{color:var(--muted); font-size:13px; margin-top:28px;}
+  .insights h2{color:#fff; border-left-color:var(--accent); }
+  .insights ol{margin:16px 0 0; padding-left:20px;}
+  .insights li{margin:0 0 14px; line-height:1.7;}
+  .insights li b{color:#f0a87f;}
+  footer{margin-top:40px; font-size:13px; color:var(--soft); text-align:center;}
+  a{color:var(--accent2);}
 </style>
 </head>
 <body>
 <nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/economic-index-primitives" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
 <div class="wrap">
+
 <header>
-  <div class="kicker">Anthropic · Research · 2026-01-15</div>
-  <h1>经济指数第四期：用五个"经济基元"丈量 AI 对工作的真实影响</h1>
-  <div class="meta">样本：2025 年 11 月 · Claude.ai 与一方 API 各 100 万条对话 · 主力模型 Claude Sonnet 4.5</div>
+  <div class="kicker">Anthropic · 经济研究</div>
+  <h1>把"AI 到底改变了什么工作"变成可测量的五块积木</h1>
+  <div class="meta">来源：Anthropic ｜ 2026 年 1 月 15 日 ｜ 第四份经济指数报告</div>
 </header>
 
 <div class="lede">
-  这份报告真正的贡献，不是又一次"AI 让人更快"的宣言，而是搭起了一套<b>可长期复用、可比较的测量框架</b>——五个"经济基元"（任务复杂度、技能水平、用途、AI 自主性、成功率）。它带来的最关键修正是：<b>一旦把"任务是否真的做成"算进去，AI 的生产力红利就要打掉约三分之一</b>。
+  <strong>一句话总括：</strong>Anthropic 不再只统计"AI 被用在哪些任务"，而是为每条对话打上五项<strong>"经济原语"</strong>（复杂度、技能、用途、自主性、成功率），由此得出两个关键修正——AI 的提速最集中在<strong>高学历任务</strong>，而一旦把"做没做成"算进去，此前乐观的生产力预测会被下调约三分之一。
 </div>
 
-<h2>越复杂的任务，AI 提速越多——红利流向高学历工作</h2>
-<div class="takeaway">AI 当前不是普惠工具，而是高人力资本任务的放大器。</div>
-<div class="stat-row">
-  <div class="stat"><div class="num">9×</div><div class="lbl">需高中学历（12 年）任务的提速（Claude.ai）</div></div>
-  <div class="stat"><div class="num">12×</div><div class="lbl">需大学学历（16 年）任务的提速（Claude.ai）</div></div>
-</div>
-<p>提速幅度随复杂度上升而加大，API 上更明显。这与"白领专业人士更常在工作中用 AI"的现实一致，意味着<strong>生产力增益当前主要落在高技能岗位</strong>，而非均匀分布。</p>
-<div class="insight"><b>洞见：</b>AI 短期内更像"技能偏向型技术变革"，可能拉大而非缩小不同技能工作者之间的差距。</div>
+<section>
+  <h2>新方法：五项"经济原语"取代单一的任务计数</h2>
+  <p class="body">
+    报告基于 2025 年 11 月的样本（主力模型为 Claude Sonnet 4.5），采用隐私保护分析，覆盖 <b>100 万条 Claude.ai 消费者对话</b> 与 <b>100 万条第一方 API（企业）转录</b>。原语包括：任务复杂度、所需技能水平、使用目的（工作/教育/个人）、AI 自主性、任务成功率——它们由 Claude 对每条对话回答统一问题而生成。
+  </p>
+  <div class="take"><b>为什么重要：</b>过去只能说"AI 覆盖了某个任务"，现在能区分"覆盖的是难任务还是易任务、做成了没有"，这是从计数到因果分析的跨越。</div>
+</section>
 
-<h2>但成功率会反向修正：越难的任务越容易失败</h2>
-<div class="takeaway">提速很诱人，可靠性才是能否真正自动化的闸门。</div>
-<table>
-  <tr><th>任务所需教育</th><th>成功率</th></tr>
-  <tr><td>大学学历（16 年）</td><td>66%</td></tr>
-  <tr><td>高中以下</td><td>70%</td></tr>
-</table>
-<p>复杂任务成功率更低，会削弱但不会抵消提速效应——因为提速随复杂度上升的速度，快过成功率随复杂度下降的速度。这正是"基元"框架的价值：把两股相反的力量分别量化，而不是混为一谈。</p>
+<section>
+  <h2>越难的任务，AI 提速越多——红利流向高人力资本</h2>
+  <div class="stat-row">
+    <div class="stat"><div class="n">9×</div><div class="l">高中学历(12年)任务的提速</div></div>
+    <div class="stat"><div class="n">12×</div><div class="l">大学学历(16年)任务的提速</div></div>
+  </div>
+  <p class="body">
+    在 Claude.ai 上，需要更高教育背景的任务被提速更多（API 上幅度更大）。这与"白领更常在工作中使用 AI"的证据一致：当前生产力红利主要落在高技能任务上，而非替代低端劳动。
+  </p>
+  <div class="take"><b>洞见：</b>AI 当下更像"高技能放大器"而非"低技能替代器"，这重塑了关于谁先受益的直觉。</div>
+</section>
 
-<h2>"任务时长地平线"：本报告的口径远比基准测试乐观</h2>
-<div class="takeaway">同一个模型，换个测量方式，"能干多久的活"差出一个数量级。</div>
-<div class="stat-row">
-  <div class="stat"><div class="num">2 小时</div><div class="lbl">METR 基准：50% 成功率对应任务时长</div></div>
-  <div class="stat"><div class="num">3.5 小时</div><div class="lbl">本报告 API 数据（企业）</div></div>
-  <div class="stat"><div class="num">19 小时</div><div class="lbl">本报告 Claude.ai 数据（消费者）</div></div>
-</div>
-<p>差异并不矛盾：真实用户会把复杂任务<strong>拆成小步并不断纠偏</strong>，还存在"挑有把握的活来交给 Claude"的选择偏差。这提醒我们，固定题库的基准与真实使用是两套口径，都需要，但不能直接划等号。</p>
+<section>
+  <h2>把成功率算进去：复杂任务的优势被削弱但未抹平</h2>
+  <table>
+    <tr><th>任务所需学历</th><th>成功率</th></tr>
+    <tr><td>大学学历</td><td class="num">66%</td></tr>
+    <tr><td>高中以下学历</td><td class="num">70%</td></tr>
+  </table>
+  <p class="body">
+    复杂任务成功率略低，但提速随复杂度上升的幅度，大于成功率随复杂度下降的幅度——所以净效应仍偏向复杂任务。可靠性是个折扣项，但不至于翻盘。
+  </p>
+  <div class="take"><b>洞见：</b>评估 AI 价值不能只看"快多少"，还要乘上"做成的概率"。</div>
+</section>
 
-<h2>职业覆盖率升至 49%，但"受影响最深的职业"被重排了</h2>
-<div class="takeaway">数错对象会误判风险——加权成功率后，名单变了。</div>
-<p>至少 1/4 任务被 Claude 覆盖的职业占比，从 2025 年 1 月的 36% 升至累计 49%。但一旦按任务频率、时长和成功率加权，画面就变了：<strong>数据录入员、放射科医生</strong>受影响远超单看覆盖率的判断，而<strong>教师、软件开发者</strong>反而相对更轻。</p>
-<div class="insight"><b>洞见：</b>"AI 覆盖了多少任务"和"AI 真正改变了多少工作"不是一回事；只看覆盖率会高估某些岗位、低估另一些。</div>
+<section>
+  <h2>时间跨度：Claude 的"有效工作时长"远超基准测试</h2>
+  <div class="stat-row">
+    <div class="stat"><div class="n">2 小时</div><div class="l">METR 基准下 50% 成功率</div></div>
+    <div class="stat"><div class="n">3.5 小时</div><div class="l">API 数据下 50% 成功率</div></div>
+    <div class="stat"><div class="n">19 小时</div><div class="l">Claude.ai 下 50% 成功率</div></div>
+  </div>
+  <p class="body">
+    差距并非矛盾：真实用户会把复杂任务拆成小步、形成纠错反馈回路，且存在"挑有把握的任务来问"的选择偏差。固定题库的基准与真实使用，测的是不同东西。
+  </p>
+  <div class="take"><b>洞见：</b>"AI 能独立工作多久"取决于人怎么用它——人机协作把有效时间跨度拉长了一个量级。</div>
+</section>
 
-<h2>潜在的"去技能化"信号</h2>
-<div class="takeaway">AI 优先接手的是岗位里更高学历的那部分活。</div>
-<div class="stat-row">
-  <div class="stat"><div class="num">14.4 年</div><div class="lbl">Claude 覆盖任务的平均所需教育</div></div>
-  <div class="stat"><div class="num">13.2 年</div><div class="lbl">经济体任务平均所需教育</div></div>
-</div>
-<p>Claude 更倾向覆盖需要副学士级别（14.4 年）教育的任务。若这些高学历任务被抽走，岗位平均会被"去技能化"，技术写作、旅行代理、教师等首当其冲（房地产经理等少数反向）。</p>
-<div class="warnbox"><b>注意：</b>报告强调这<b>不是预测</b>——劳动力市场可能动态调整，模型进步也会改变 AI 覆盖的任务构成。这是一个"近期最可能效应"的信号，而非定论。</div>
+<section>
+  <h2>职业覆盖上升，但"受影响最深"的职业被重新洗牌</h2>
+  <div class="stat-row">
+    <div class="stat"><div class="n">36% → 49%</div><div class="l">至少 1/4 任务被 Claude 覆盖的职业占比（2025.1 → 汇总）</div></div>
+    <div class="stat"><div class="n">14.4 年</div><div class="l">Claude 覆盖任务的平均所需教育（经济平均 13.2 年）</div></div>
+  </div>
+  <p class="body">
+    一旦按成功率、任务频率和耗时加权，画面就变了：数据录入员、放射科医生受影响远超单纯覆盖率所示，而教师、软件开发者反而相对较轻。由于 Claude 更多覆盖高学历任务，"抽走"这些任务会在一阶效应上对许多职业产生<b>去技能化</b>倾向（技术写作、旅行顾问、教师等）。
+  </p>
+  <div class="take"><b>洞见：</b>"覆盖得多"不等于"冲击得深"；加权后才看清真正暴露的岗位。报告强调去技能化只是信号、非预言。</div>
+</section>
 
-<h2>宏观红利：加上"可靠性"后要打三分之一折扣</h2>
-<div class="takeaway">乐观估计成立的前提，是任务真的被做成。</div>
-<div class="stat-row">
-  <div class="stat"><div class="num">1.8 pp</div><div class="lbl">仅按提速估计的美国年生产率增量（复刻旧结论）</div></div>
-  <div class="stat"><div class="num">1.2 pp</div><div class="lbl">计入成功率后（Claude.ai）</div></div>
-  <div class="stat"><div class="num">1.0 pp</div><div class="lbl">计入成功率后（API，任务更难）</div></div>
-</div>
-<p>即便只剩 1 个百分点，也能把美国生产率增速拉回 1990 年代末、2000 年代初的水平，依然可观。而且该估计未计入模型变强或用法变成熟的可能——报告调查之后 Claude Opus 4.5 已发布，能力进一步提升。</p>
+<section>
+  <h2>宏观生产力：诚实地把乐观预测下调三分之一</h2>
+  <table>
+    <tr><th>口径</th><th>美国年生产率增长提升</th></tr>
+    <tr><td>仅按任务提速（旧法）</td><td class="num">+1.8 个百分点</td></tr>
+    <tr><td>按可靠性调整（Claude.ai）</td><td class="num">+1.2 个百分点</td></tr>
+    <tr><td>按可靠性调整（API）</td><td class="num">+1.0 个百分点</td></tr>
+  </table>
+  <p class="body">
+    即便降到 +1 个百分点，也相当于把美国生产率增速拉回 1990 年代末至 2000 年代初的水平。而且该估计未计入模型变强（如已发布的 Claude Opus 4.5）或使用方式更成熟带来的上行空间。
+  </p>
+  <div class="take"><b>洞见：</b>把"成功率"纳入模型，让宏观预测更可信，也更克制——这是方法论上的诚实。</div>
+</section>
 
-<h2>2025 年的趋势：使用高度集中，增强反超自动化</h2>
-<div class="takeaway">红利与采用都不均匀，且少数任务吃掉大头。</div>
-<ul>
-  <li><strong>集中度</strong>：3000 个工作任务中前十占 24%（1 月为 21%）；计算与数学类约占 Claude.ai 的 1/3、API 的近一半。</li>
-  <li><strong>增强 vs 自动化</strong>：增强以 52% 对 45% 反超（8 月曾是自动化 49% 领先 47%），但拉长看自动化份额仍在缓升。</li>
-  <li><strong>地理</strong>：美、印、日、英、韩领先，采用仍由人均 GDP 解释；但美国各州使用趋于均衡，若延续，2–5 年内可能全国拉平。</li>
-  <li><strong>发展阶段差异</strong>：低收入国家更多用于教育，高收入国家更多用于工作与个人生活——与 Anthropic 在卢旺达"从 AI 素养到 Claude Pro"的试点设计相呼应。</li>
-</ul>
+<section>
+  <h2>趋势更新：使用仍高度集中，增强反超自动化</h2>
+  <p class="body">
+    使用高度集中：3,000 个工作任务中，前十名占 Claude.ai 工作对话的 <b>24%</b>（高于 2025 年 1 月的 21%）；计算与数学类任务约占 Claude.ai 的三分之一、API 的近一半。交互模式上，<b>增强（52%）反超自动化（45%）</b>，逆转了 8 月样本，但长周期看自动化份额仍在缓慢上升。地理上美、印、日、英、韩领先，且美国各州使用正趋于均衡——若趋势持续，模型预测 2–5 年内全美使用将拉平。低收入国家更多用于教育，高收入国家则更多用于工作与个人用途。
+  </p>
+  <div class="take"><b>洞见：</b>AI 红利在国家、职业、任务三个层面都"分布不均"，这是全篇最稳健的结论。</div>
+</section>
 
-<div class="final">
+<div class="insights">
   <h2>最值得带走的洞见</h2>
   <ol>
-    <li><b>框架比结论更重要：</b>五个"经济基元"让"AI 如何影响工作"首次有了可持续追踪、可横向比较的实证基线。</li>
-    <li><b>红利要打折：</b>计入任务成功率后，美国生产率增量从 1.8 pp 降至 1.0–1.2 pp——可靠性是被长期忽视的关键变量。</li>
-    <li><b>影响高度不均：</b>提速集中在高学历、高复杂度任务，受冲击职业经加权后被重排，"覆盖率"会误导判断。</li>
-    <li><b>去技能化是信号而非预言：</b>AI 先接手岗位中更高技能的部分，近期可能压低岗位平均技能，但市场会否调整仍未知。</li>
-    <li><b>看消费者→企业的迁移：</b>当任务从 Claude.ai 流向 API，往往意味着它变可靠了——这将是 AI 真正影响生产率的前瞻指标。</li>
+    <li><b>从计数到因果：</b>五项"经济原语"让 Anthropic 能回答"AI 提速了谁、做成了没有"，建立了对照未来的实证基线。</li>
+    <li><b>红利偏向高技能：</b>需大学学历的任务被提速 12 倍、高中学历 9 倍，AI 当前是高人力资本任务的放大器。</li>
+    <li><b>可靠性是关键折扣：</b>计入成功率后，美国生产率增益预测从 +1.8 降到 +1.0~1.2 个百分点——更低但仍可观。</li>
+    <li><b>真实使用 ≠ 基准测试：</b>靠拆解任务与纠错回路，Claude.ai 的 50% 成功时间跨度达 19 小时，远超 METR 的 2 小时。</li>
+    <li><b>影响高度不均：</b>加权后受冲击最深的是数据录入员、放射科医生等，并对部分职业呈一阶去技能化信号——但这是信号而非预言。</li>
   </ol>
 </div>
 
-<p class="src">来源：Anthropic《Economic Index: New building blocks for understanding AI use》，2026-01-15 · 原文：anthropic.com/research/economic-index-primitives</p>
+<footer>
+  原文：Anthropic Economic Index（第四份报告）· economic-index-primitives · 2026-01-15
+</footer>
+
 </div>
 </body>
 </html>

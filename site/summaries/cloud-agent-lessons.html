@@ -3,132 +3,91 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cursor：构建云端 Agent 的五条经验</title>
+<title>云端 AI Agent 的构建经验总结 · Cursor</title>
 <style>
   :root{
-    --bg:#0f1115; --card:#171a21; --card2:#1d212b; --ink:#e8ebf0; --soft:#a8b0bd;
-    --accent:#7aa2ff; --accent2:#5ee0b8; --warn:#ffcc66; --line:#272c38; --hi:#2a3550;
+    --bg:#0f1117; --card:#1a1d27; --ink:#e8eaf0; --muted:#9aa3b2;
+    --accent:#6ea8fe; --accent2:#7ee0c0; --warn:#ffd479; --line:#2a2f3d;
   }
   *{box-sizing:border-box}
-  body{
-    margin:0; background:var(--bg); color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-    line-height:1.75; font-size:17px;
-  }
-  .wrap{max-width:820px; margin:0 auto; padding:40px 22px 80px;}
-  header{border-bottom:1px solid var(--line); padding-bottom:24px; margin-bottom:8px;}
-  .kicker{font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); font-weight:700;}
-  h1{font-size:30px; line-height:1.25; margin:.4em 0 .3em;}
-  .meta{color:var(--soft); font-size:14px;}
-  .meta a{color:var(--soft);}
-  .tldr{
-    background:linear-gradient(135deg,#1b2440,#161b28); border:1px solid var(--hi);
-    border-radius:14px; padding:20px 22px; margin:28px 0 36px;
-  }
-  .tldr .lbl{font-size:13px; font-weight:700; color:var(--accent2); letter-spacing:.08em; text-transform:uppercase;}
-  .tldr p{margin:.5em 0 0; font-size:18.5px;}
-  section{
-    background:var(--card); border:1px solid var(--line); border-radius:14px;
-    padding:22px 24px; margin:18px 0;
-  }
-  section h2{font-size:21px; margin:.1em 0 .2em; line-height:1.35;}
-  section h2 .num{color:var(--accent); font-weight:800; margin-right:8px;}
-  .body{color:var(--ink);}
-  .insight{
-    margin-top:14px; padding:12px 16px; border-left:3px solid var(--accent2);
-    background:var(--card2); border-radius:0 10px 10px 0; color:#d7f3e8; font-size:15.5px;
-  }
-  .insight b{color:var(--accent2);}
-  .stats{display:flex; flex-wrap:wrap; gap:12px; margin:30px 0;}
-  .stat{
-    flex:1 1 150px; background:var(--card2); border:1px solid var(--line);
-    border-radius:12px; padding:16px 18px;
-  }
-  .stat .n{font-size:26px; font-weight:800; color:var(--accent);}
-  .stat .n.g{color:var(--accent2);}
-  .stat .t{font-size:13.5px; color:var(--soft); margin-top:4px;}
-  .takeaways{background:linear-gradient(135deg,#16221c,#161b28); border:1px solid #2c4438;}
-  .takeaways h2{color:var(--accent2);}
-  .takeaways ol{margin:.6em 0 0; padding-left:22px;}
-  .takeaways li{margin:.55em 0;}
-  em.k{color:var(--warn); font-style:normal; font-weight:600;}
-  code{background:#0b0d12; padding:1px 6px; border-radius:6px; font-size:14.5px; color:#cfe0ff;}
-  footer{color:var(--soft); font-size:13px; text-align:center; margin-top:34px;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.8;font-size:17px}
+  .wrap{max-width:780px;margin:0 auto;padding:48px 22px 80px}
+  .kicker{color:var(--accent);font-size:13px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px}
+  h1{font-size:30px;line-height:1.3;margin:0 0 8px}
+  .meta{color:var(--muted);font-size:14px;margin-bottom:28px}
+  .lede{background:linear-gradient(135deg,#1c2740,#15212e);border:1px solid var(--line);
+    border-left:4px solid var(--accent);border-radius:12px;padding:20px 22px;margin:0 0 36px;font-size:18px}
+  .lede b{color:var(--accent2)}
+  h2{font-size:21px;margin:42px 0 6px;padding-top:10px;border-top:1px solid var(--line)}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 14px}
+  p{margin:12px 0}
+  .stats{display:flex;flex-wrap:wrap;gap:12px;margin:18px 0}
+  .stat{flex:1 1 150px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .stat .n{font-size:24px;font-weight:700;color:var(--accent2)}
+  .stat .l{font-size:13px;color:var(--muted)}
+  .take{font-weight:600;color:var(--warn)}
+  .insights{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px 26px;margin-top:40px}
+  .insights h2{border:0;margin-top:0;color:var(--accent)}
+  .insights ol{margin:0;padding-left:22px}
+  .insights li{margin:12px 0}
+  code{background:#222634;padding:2px 6px;border-radius:5px;font-size:14px;color:var(--accent2)}
 </style>
 </head>
 <body>
 <nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://cursor.com/blog/cloud-agent-lessons" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
 <div class="wrap">
-  <header>
-    <div class="kicker">Cursor · Research</div>
-    <h1>构建云端 Agent 一年，我们学到的五件事</h1>
-    <div class="meta">来源：Cursor ｜ 作者：Josh Ma ｜ 2026-06-02 ｜ <a href="https://cursor.com/blog/cloud-agent-lessons">原文</a></div>
-  </header>
+  <div class="kicker">Cursor · Research · 2026-06-02</div>
+  <h1>我们在构建云端 Agent 中学到的事</h1>
+  <div class="meta">作者：Josh Ma　·　来源：Cursor Blog</div>
 
-  <div class="tldr">
-    <div class="lbl">一句话总括</div>
-    <p>云端 Agent 真正的工程难点，不是把本地 Agent「搬上服务器」，而是要为它重建一整套<strong>开发环境 + 持久化执行 + 编排</strong>的「操作系统层」——模型越聪明，这层基础设施越是决定成败。</p>
+  <div class="lede">
+    一句话总括：构建长时运行的云端编程 agent，真正的难点<b>不是把本地 agent 移植到服务器</b>，而是要在 agent 周围重建一整套"企业级 IT"——完整的开发环境、持久化执行、状态解耦——决定成败的往往是这些看不见的基础设施，而不是模型本身。
   </div>
 
+  <h2>环境，才是真正的产品</h2>
+  <p class="sub">关键趋势：决定云端 agent 输出质量的最大单一因素，是它是否拥有和真实开发者一样完整的开发环境。</p>
+  <p>本地 agent 免费继承了你笔记本上现成的环境，云端却要从零重建，而且很难判断有没有做对。环境不全时<strong>不会崩溃也不会报错</strong>，只表现为输出质量"悄悄变差"——人们往往误以为是模型不行。模型越聪明，这个差距越致命，因为强模型本该更充分地利用环境。</p>
+  <p>为达到"完整环境"，Cursor 重建了大量基础设施：VM 的休眠/恢复、镜像的 checkpoint/restore/fork、受控网络访问，以及密钥脱敏、网络策略、凭证管理。</p>
+  <p class="take">结论：在云端，"搭好环境"本身就是产品力，它比换模型更能决定结果。</p>
+
+  <h2>长时运行的 agent 需要"持久化执行"</h2>
+  <p class="sub">关键数据：可靠性从"一个 9"跃升到"两个 9"，靠的是迁移到 Temporal。</p>
   <div class="stats">
-    <div class="stat"><div class="n">90% → 99%</div><div class="t">可靠性：从「一个 9」迁到 Temporal 后超过「两个 9」</div></div>
-    <div class="stat"><div class="n g">50M+</div><div class="t">Temporal 每天处理的 actions 数</div></div>
-    <div class="stat"><div class="n">7M+</div><div class="t">覆盖的唯一工作流数量</div></div>
-    <div class="stat"><div class="n g">40%+</div><div class="t">Cursor 内部由云端 Agent 产生的 PR 占比</div></div>
+    <div class="stat"><div class="n">1×9 → 2×9</div><div class="l">可靠性从 ~90% 跨越到 99%+</div></div>
+    <div class="stat"><div class="n">5000 万+</div><div class="l">Temporal 每天处理的 action</div></div>
+    <div class="stat"><div class="n">700 万+</div><div class="l">独立 workflow 数量</div></div>
+    <div class="stat"><div class="n">数天~数周</div><div class="l">单次任务可跨越的时长</div></div>
   </div>
+  <p>云端 VM 会遭遇推理服务中断、pod 替换、EC2 节点宕机。最初的"work-stealing"架构只是把本地逻辑搬上服务器，非常脆弱。当团队发现自己快要重造一遍 Temporal 已解决的重试、跨机调度、节点容错时，便直接迁移过去。架构上也从"永生"workflow 改为"完成单个任务即退出"的短 workflow，便于版本升级。</p>
+  <p class="take">结论：长时 agent 的可靠性不是靠模型，而是靠借用成熟的持久化执行引擎。</p>
 
-  <section>
-    <h2><span class="num">01</span>开发环境本身就是产品</h2>
-    <div class="body">
-      过去一年最大的发现：决定云端 Agent 产出质量的<em class="k">单一最大因素</em>，是它有没有一个像真人开发者那样的完整环境。本地 Agent 能「免费」继承你笔记本上的环境，云端却要从零重建，而且做得不到位时几乎没有报错——表现只是产出质量「悄悄变差」，很容易被误判成「模型不行」。为达到「完整环境」，团队不得不重建大量基础设施：VM 的休眠/恢复、镜像的快照/还原/分叉、受控网络访问，乃至密钥脱敏、网络策略、凭证管理——本质上是在<em class="k">为 Agent 搭建企业级 IT</em>。
-    </div>
-    <div class="insight"><b>洞见：</b>当模型足够强，环境就成了产能瓶颈——「模型变笨了」往往其实是「环境没配齐」。</div>
-  </section>
+  <h2>把 agent、机器、对话状态解耦</h2>
+  <p class="sub">关键趋势：一个 agent 已不再是"一台机器上的一个循环"。</p>
+  <p>它可能在一台机上运行、向多台机派生异步子 agent，或本地起步再委派到云端——子 agent 甚至能比父进程活得更久。因此 Cursor 让 <strong>agent loop（放在 Temporal）、机器状态、对话状态三者独立</strong>，可以单独管理 pod 生命周期，使用只读 VM 或预热 VM 等优化。对话侧则用 append-only 存储流式推送到客户端，并能在某步重试后让客户端"回退流"、用新数据覆盖旧数据。</p>
+  <p class="take">结论：解耦让同一个 agent 能横跨多种机器与重试场景而不丢状态。</p>
 
-  <section>
-    <h2><span class="num">02</span>长时运行的 Agent 需要持久化执行</h2>
-    <div class="body">
-      云端 Agent 跑在隔离 VM 中，可大规模并行、承接动辄数小时的长任务，但也因此暴露在推理服务中断、Pod 被替换、EC2 节点宕机等扰动下。最初的「工作窃取」架构是本地思路的照搬，脆弱到早期 Beta 只有「一个 9」的可靠性。当团队发现自己正在重造 Temporal 已解决的持久化原语（重试、跨机调度、节点故障容错）时，索性迁了过去——可靠性一举跨过「两个 9」，且能扛住跨越数天乃至数周的运行。架构上还从「永生」工作流改为<em class="k">完成单个任务即退出的短工作流</em>，让版本升级更简单。
-    </div>
-    <div class="insight"><b>洞见：</b>遇到「重试、调度、容错」这类通用难题，别自己造轮子——成熟的持久化执行框架比手写 loop 靠谱一个量级。</div>
-  </section>
+  <h2>学会"适时让开"</h2>
+  <p class="sub">关键趋势：模型变强后，逻辑从 harness 不断移交给 agent 自己掌控。</p>
+  <p>早期不信任 agent，harness 会在每个任务后复查、强制提交并推送。如今多仓库操作只需把仓库布局和分支/PR 工具交给 agent 自行决定；CI Autofix 也从"harness 抓日志"简化为"给 agent 一个 GitHub CLI"。但 harness 不会消失，只是内容在变——例如 computer use 仍保留专用子 agent（独立模型路由、提示、录屏，共享 VNC/Chrome），因为模型还没准备好独立处理。云端还需要更"自主"的提示词，因为在云端阻塞等待的代价远高于本地。</p>
+  <p class="take">结论：harness 的角色从"替 agent 做"转向"给 agent 工具，让它自己做"。</p>
 
-  <section>
-    <h2><span class="num">03</span>让 Agent、机器与对话状态相互解耦</h2>
-    <div class="body">
-      一个云端 Agent 早已不是「一台机器上的一个循环」：它可能在一台机器运行、把异步子 Agent 撒到多台、甚至子 Agent 比父 Agent 活得更久。因此团队把<em class="k">Agent 循环、机器状态、对话状态</em>拆成独立组件——Agent 循环放在 Temporal 而非 VM 里，于是可独立管理 Pod 生命周期，并启用只读 VM、预热 VM 等优化。对话侧则把存储与流式层独立出来，做成追加写（append-only）机制：当某步失败、流出过部分输出后又被重试，客户端能侦测到并「回退」流、用新数据覆盖旧数据。
-    </div>
-    <div class="insight"><b>洞见：</b>解耦让「机器可换、循环可迁、对话可重放」三者互不拖累——这是并行与容错的前提。</div>
-  </section>
+  <h2>未来：自愈式环境</h2>
+  <p class="sub">关键趋势：超越"牵着手"与"完全放手"的二元选择。</p>
+  <p>目标是让 agent 能理解周围系统：当密钥缺失、网络被封或环境阻碍进展时，能主动上报并<strong>自我修复</strong>。Cursor 把其中一条路径称为 <code>autoinstall</code>。当前内部已有 <strong>超过 40% 的 PR 来自云端 agent 且仍在增长</strong>。</p>
+  <p class="take">结论：下一步的竞争力在于 agent 能否自己诊断并修好自己的运行环境。</p>
 
-  <section>
-    <h2><span class="num">04</span>懂得「让开」：把控制权交还给 Agent</h2>
-    <div class="body">
-      早期不信任 Agent，harness 会在每个任务后复查、强制提交并推送。随着模型变强，逻辑被不断从 harness 移交给<em class="k">Agent 自己控制的工具</em>：多仓库从硬编码改为「给它仓库布局 + 分支/PR 工具，让它自己决定」；CI Autofix 从「harness 抓日志写进 VM」简化为「直接给它 <code>GitHub CLI</code>，大输出自动落盘供检索」。harness 没有消失，只是内容在变——比如计算机使用仍需专门子 Agent（独立模型路由、提示、录屏，共享环境里的 VNC 与 Chrome，可直接跑 Playwright），但<strong>何时调用由 Agent 自己决定</strong>。此外，云端提示词更鼓励自主，因为「阻塞等待」的代价远高于本地（没人盯着，可能一等就是几小时）。
-    </div>
-    <div class="insight"><b>洞见：</b>harness 的演化方向是「确定性逻辑越来越少、交给 Agent 的工具越来越多」——阻塞成本越高，自主性越值钱。</div>
-  </section>
-
-  <section>
-    <h2><span class="num">05</span>下一步：自愈式环境</h2>
-    <div class="body">
-      未来的目标是跳出「手把手 vs 完全放手」的二选一，给 Agent 理解周遭系统的工具：当缺密钥、网络被封、或环境阻碍进展时，Agent 能<em class="k">主动上报并自我修复</em>。团队把其中一条路径称为 <code>autoinstall</code>。结论是：云端 Agent 仅最近几个月就进步巨大，且变化速率只会加快——而 Cursor 的价值在于让团队直接享用这片广阔能力面，无需自己搭建和维护底层基础设施。
-    </div>
-    <div class="insight"><b>洞见：</b>从「人来兜底环境」到「环境自愈」，是 Agent 基础设施成熟度的下一个分水岭。</div>
-  </section>
-
-  <section class="takeaways">
-    <h2>最值得带走的 5 条洞见</h2>
+  <div class="insights">
+    <h2>最值得带走的洞见</h2>
     <ol>
-      <li><b>环境 = 产能。</b>模型越强，缺失的开发环境越会以「质量悄悄下降」而非报错的形式拖垮产出。</li>
-      <li><b>可靠性靠框架买。</b>迁到 Temporal 让可靠性从「一个 9」跨到「两个 9」，如今日处理 5000 万+ actions、覆盖 700 万+ 工作流。</li>
-      <li><b>三态解耦是并行与容错的地基。</b>Agent 循环 / 机器 / 对话彼此独立，才能换机、迁移、回放流而互不拖累。</li>
-      <li><b>趋势是不断「让开」。</b>逻辑从 harness 迁往 Agent 工具；阻塞成本高，故云端 Agent 被设计得更自主。</li>
-      <li><b>它正在自我证明。</b>Cursor 内部已有 40%+ 的 PR 出自云端 Agent，下一站是能自报问题、自我修复的「自愈式环境」。</li>
+      <li><b>环境质量 > 模型选择。</b>云端 agent 输出变差，最常见的根因是环境不完整，而非模型——而它从不报错，只悄悄退化。</li>
+      <li><b>可靠性是工程问题。</b>从一个 9 到两个 9 的飞跃来自迁移到 Temporal（每天 5000 万 action、700 万 workflow），而不是更强的提示词。</li>
+      <li><b>把状态解耦。</b>agent loop、机器、对话三者分离，才能支撑子 agent 跨机、长达数周、可重试的运行。</li>
+      <li><b>随模型变强而"让开"。</b>把确定性逻辑持续交还给 agent 控制，harness 不消失但越来越薄。</li>
+      <li><b>云端的成本结构不同。</b>阻塞等待代价极高，因此云端 agent 必须更自主，并最终走向能自我诊断、自我修复的环境。</li>
     </ol>
-  </section>
-
-  <footer>本页为基于 Cursor 原文《What we’ve learned building cloud agents》的中文总结，数据均引自原文。</footer>
+  </div>
 </div>
 </body>
 </html>

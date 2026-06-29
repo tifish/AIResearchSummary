@@ -3,140 +3,133 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Warp Decode：把并行轴从“专家”翻转到“输出”</title>
+<title>Warp Decode：翻转并行轴，让 MoE 解码更快更准</title>
 <style>
   :root{
-    --bg:#0f1115; --card:#171a21; --card2:#1d212b; --ink:#e7ebf2; --muted:#9aa6b8;
-    --accent:#5ed0a8; --accent2:#7aa2ff; --warn:#ffb454; --line:#2a3140;
-    --good:#3ecf8e;
+    --bg:#0f1117; --card:#1a1d27; --ink:#e8eaf0; --sub:#9aa3b8;
+    --accent:#6ea8fe; --accent2:#7ee0c0; --warn:#ffd166; --hot:#ff7b72;
+    --line:#2a2f3d;
   }
   *{box-sizing:border-box}
   body{
     margin:0; background:var(--bg); color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
     line-height:1.75; font-size:17px;
   }
   .wrap{max-width:820px; margin:0 auto; padding:40px 22px 80px}
-  .kicker{color:var(--accent); font-weight:700; letter-spacing:.08em; font-size:13px; text-transform:uppercase}
-  h1{font-size:30px; line-height:1.3; margin:.3em 0 .2em}
-  .meta{color:var(--muted); font-size:14px; margin-bottom:26px}
-  .lead{
-    background:linear-gradient(135deg,#1b2330,#161b24);
-    border:1px solid var(--line); border-left:4px solid var(--accent);
-    border-radius:12px; padding:18px 20px; font-size:18px; margin:22px 0 30px;
+  .tag{display:inline-block; font-size:13px; color:var(--accent2); letter-spacing:.1em; text-transform:uppercase; margin-bottom:10px}
+  h1{font-size:30px; line-height:1.3; margin:.2em 0 .5em}
+  .lede{
+    background:linear-gradient(135deg,#1d2740,#16202e);
+    border-left:4px solid var(--accent); border-radius:10px;
+    padding:18px 20px; font-size:18px; color:#eef2ff; margin:24px 0 36px;
   }
-  .lead b{color:var(--accent)}
-  h2{font-size:21px; margin:38px 0 6px; padding-top:8px}
-  h2 .num{color:var(--accent2); font-weight:800; margin-right:8px}
-  .sub{color:var(--muted); font-size:14px; margin:0 0 12px}
-  p{margin:12px 0}
-  .takeaway{
-    margin:10px 0 4px; padding:10px 14px; background:var(--card2);
-    border-radius:8px; border-left:3px solid var(--good); font-size:15.5px;
+  .lede b{color:var(--accent2)}
+  h2{font-size:21px; margin:42px 0 6px; color:#fff}
+  h2 .num{color:var(--accent); font-weight:700; margin-right:8px}
+  .sub{color:var(--sub); font-size:14px; margin:0 0 14px}
+  section{border-top:1px solid var(--line); padding-top:8px}
+  .stat{
+    display:flex; flex-wrap:wrap; gap:14px; margin:18px 0;
   }
-  .takeaway b{color:var(--good)}
-  .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:22px 0}
-  .stat{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px}
-  .stat .big{font-size:26px; font-weight:800; color:var(--accent)}
-  .stat .lbl{color:var(--muted); font-size:13px; margin-top:4px}
-  .cmp{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:16px 0}
-  .cmp>div{border:1px solid var(--line); border-radius:10px; padding:14px}
-  .cmp .old{background:#221a1a; border-color:#4a2f2f}
-  .cmp .new{background:#16241f; border-color:#2f4a3e}
-  .cmp h4{margin:0 0 8px; font-size:14px}
-  .cmp .old h4{color:var(--warn)}
-  .cmp .new h4{color:var(--good)}
-  .cmp ul{margin:6px 0 0; padding-left:18px; font-size:14.5px; color:var(--muted)}
-  code{background:#0b0e13; border:1px solid var(--line); border-radius:5px; padding:1px 6px; font-size:14px; color:#cdd6e6}
-  .final{
-    margin-top:42px; background:linear-gradient(135deg,#16241f,#15202a);
-    border:1px solid var(--line); border-radius:14px; padding:22px 24px;
+  .chip{
+    flex:1 1 150px; background:var(--card); border:1px solid var(--line);
+    border-radius:12px; padding:14px 16px;
   }
-  .final h2{margin-top:0}
-  .final ol{margin:8px 0 0; padding-left:22px}
-  .final li{margin:10px 0}
-  .final li b{color:var(--accent)}
-  @media(max-width:560px){.cmp,.grid{grid-template-columns:1fr}}
+  .chip .big{font-size:26px; font-weight:800; color:var(--accent2)}
+  .chip .lbl{font-size:13px; color:var(--sub); margin-top:4px}
+  .insight{
+    margin-top:12px; padding:10px 14px; background:#161b22;
+    border-left:3px solid var(--warn); border-radius:6px; color:#f0e6c8; font-size:15.5px;
+  }
+  .insight::before{content:"洞见 · "; color:var(--warn); font-weight:700}
+  code{background:#11151c; color:#9ad0ff; padding:1px 6px; border-radius:5px; font-size:14px}
+  .takeaways{
+    margin-top:48px; background:linear-gradient(135deg,#15212e,#1a1230);
+    border:1px solid var(--line); border-radius:14px; padding:24px 26px;
+  }
+  .takeaways h2{border:0; margin-top:0}
+  .takeaways ol{margin:10px 0 0; padding-left:22px}
+  .takeaways li{margin:12px 0}
+  .takeaways b{color:var(--accent2)}
+  .foot{margin-top:40px; color:var(--sub); font-size:13px; text-align:center}
+  a{color:var(--accent)}
 </style>
 </head>
 <body>
 <nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://cursor.com/blog/warp-decode" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
 <div class="wrap">
-  <div class="kicker">Cursor · Research</div>
-  <h1>Warp Decode：把并行轴从“专家”翻转到“输出”</h1>
-  <div class="meta">来源：Cursor · 2026 年 4 月 6 日 · 作者：Less Wright、Federico Cassano、Zhiyuan Zhang</div>
 
-  <div class="lead">
-    一句话总括：在 MoE 模型“每次只产出一个 token”的解码阶段，传统按<b>专家</b>组织的内核有一大半步骤只是在搬数据；Cursor 把并行轴翻转成按<b>输出</b>组织——每个 warp 只算一个输出值——从而在 Blackwell GPU 上同时拿到 <b>1.84x</b> 吞吐和 <b>1.4x</b> 更高的精度。这是一个罕见的“既更快又更准”的内核。
+  <div class="tag">Cursor · Research · 2026-04-06</div>
+  <h1>Warp Decode：把并行轴从"专家"翻转到"输出"，让 MoE 解码更快也更准</h1>
+
+  <div class="lede">
+    一句话总括：Cursor 发现，在 Blackwell GPU 上做小批量、逐 token 的 MoE 解码时，<b>围绕"输出值"而非"专家"组织内核</b>能同时拿下两件通常此消彼长的事——吞吐 <b>提升 1.84 倍</b>，精度 <b>逼近 FP32 1.4 倍</b>。其本质是认清解码阶段"没有足够共享计算可摊销"，于是删掉了为专家视图服务的所有数据搬运。
   </div>
 
-  <div class="grid">
-    <div class="stat"><div class="big">1.84x</div><div class="lbl">B200 上解码吞吐提升</div></div>
-    <div class="stat"><div class="big">1.4x</div><div class="lbl">输出更接近 FP32 真值</div></div>
-    <div class="stat"><div class="big">58%</div><div class="lbl">达到硬件连续读峰值的比例</div></div>
-    <div class="stat"><div class="big">5/8</div><div class="lbl">传统路径中纯“记账”的阶段</div></div>
-  </div>
+  <section>
+    <h2><span class="num">01</span>传统 MoE 路径的浪费，在解码阶段被放大</h2>
+    <p class="sub">问题不在数学，在数据搬运。</p>
+    <p>现代 MoE 每个 token 只激活一小撮专家（例如每层从 128 选 8）。围绕专家来收集 token、计算、再重组，在 prefill 和大批量时很划算，因为每个专家的共享计算能摊销组织开销。但解码每次只产出一个 token——<b>八个流水线阶段里有五个纯粹在搬数据、不做任何计算</b>。</p>
+    <div class="insight">解码瓶颈不是算力而是内存带宽与冗余搬运；沿用大批量的内核结构，等于为不存在的"共享工作"反复付费。</div>
+  </section>
 
-  <h2><span class="num">1</span>问题：解码阶段，专家中心的内核在“空转”</h2>
-  <p class="sub">关键数据与趋势</p>
-  <p>现代 MoE 每层把每个 token 路由到一小撮专家（例如从 <code>128</code> 个里选 <code>8</code> 个）。主流实现围绕专家组织计算：收集每个专家要处理的 token、批量算、再重组。这在 prefill 和大批量下很划算，因为同一专家被很多 token 共享，整理数据的开销被真实计算摊薄。</p>
-  <p>但在自回归解码阶段，一次只产出一个 token，专家间没有足够的共享计算量。结果是：传统八阶段流水线里有<b>五个阶段</b>纯粹在为“专家视图”整理数据布局，不做任何实际运算。</p>
-  <div class="takeaway"><b>结论：</b>解码阶段的瓶颈不是算力，而是为专家中心布局付出的、无法摊薄的记账开销。</div>
+  <section>
+    <h2><span class="num">02</span>核心改动：一个 warp 只算一个输出值</h2>
+    <p class="sub">两个融合内核取代八个阶段。</p>
+    <p>GPU 以 32 条通道为一组（warp）执行。warp decode 让<b>每个 warp 终身只负责一个输出标量</b>：直接从内存流式读取所需权重，把 8 个路由专家的贡献折叠进一个 FP32 累加器，最后只写一次结果。整个 MoE 计算被压缩成 <code>moe_gate_up_3d_batched</code> 和 <code>moe_down_3d_batched</code> 两个内核。down 内核用 <code>__shfl_xor_sync</code> 蝶形归约（编译为单条 <code>shfl.sync.bfly</code> 硬件指令）在寄存器间交换数据，绕过共享内存，连同步都"烧"进了指令里。</p>
+    <div class="insight">删除阶段不是简单"融合"，而是从并行结构的根部重组——这才让 padding、scatter、combine 彻底消失，而非被合并。</div>
+  </section>
 
-  <h2><span class="num">2</span>做法：每个 warp 只负责一个输出标量</h2>
-  <p class="sub">关键数据与趋势</p>
-  <p>GPU 以 <code>32</code> 条并行 lane 为一个 warp 执行。新做法让每个 warp 只算一个输出值：直接从显存流式读取所需权重，把八个路由专家的贡献在私有寄存器里累加成一个 FP32 running total，最后只写一次结果。整个 MoE 计算层被压成两个内核——<code>moe_gate_up_3d_batched</code> 和 <code>moe_down_3d_batched</code>。</p>
-  <p>down 内核里，每个 warp 负责一个 token 的一个输出维度，遍历 top-k 专家、把路由权重直接折进累加器；最后用 <code>__shfl_xor_sync</code>（编译成单条 <code>shfl.sync.bfly</code> 硬件指令）在 lane 之间做蝶形归约，完全绕开 shared memory——没有 L1 往返、没有 bank conflict、没有显式 barrier。</p>
-  <div class="takeaway"><b>结论：</b>“按输出组织”让每个 warp 在整个生命周期里只有一个稳定任务，从根上消除了暂存、跨 warp 同步和中间缓冲。</div>
-
-  <h2><span class="num">3</span>提速来源：删阶段、删缓冲、再加上 warp 独立</h2>
-  <p class="sub">关键数据与趋势</p>
-  <div class="cmp">
-    <div class="old">
-      <h4>传统路径</h4>
-      <ul>
-        <li>把每个专家的 token 列表 padding 到 2 的幂 / 128 字节边界</li>
-        <li>scatter：八份中间结果写回显存</li>
-        <li>combine：再跑一遍归约把它们合起来</li>
-        <li>激活 gather 缓冲（batch=1 时是已有数据的整份拷贝）</li>
-        <li>每 token 的专家输出缓冲：8×2048×2B = <b>32KB</b></li>
-      </ul>
+  <section>
+    <h2><span class="num">03</span>消除的开销：阶段、缓冲区、跨 warp 协调</h2>
+    <p class="sub">不形成 per-expert 批次，也就没有相应的成本。</p>
+    <div class="stat">
+      <div class="chip"><div class="big">5→0</div><div class="lbl">删除的纯搬运阶段（含 padding/scatter/combine）</div></div>
+      <div class="chip"><div class="big">32&nbsp;KB+</div><div class="lbl">每 token 省下的中间缓冲流量（8×2048×2B 的 per-expert 输出缓冲）</div></div>
     </div>
-    <div class="new">
-      <h4>Warp Decode</h4>
-      <ul>
-        <li>从不形成“每专家批次”，padding 直接消失</li>
-        <li>路由权重折进累加器，八份中间结果不再落地</li>
-        <li>省下 combine 这一整趟读写</li>
-        <li>无需 gather 缓冲</li>
-        <li>去掉 32KB+ 的中间缓冲流量，腾出 L2 给真正决定性能的权重行</li>
-      </ul>
+    <p>传统路径要把激活复制重排成"专家主序"缓冲，还要为 8 个专家各写一份中间结果再读回归约。warp decode 把这 8 份贡献折叠进 32 条通道的寄存器累加器，<b>直到最后一次单标量写出前，什么都不落到全局内存</b>，腾出的 L2 缓存留给真正决定性能的权重行。</p>
+    <div class="insight">省下的不仅是计算，更是"内存往返"——在带宽受限的解码里，少搬一次数据往往比少算一次更值钱。</div>
+  </section>
+
+  <section>
+    <h2><span class="num">04</span>为什么更快：天然"令人尴尬地并行"</h2>
+    <p class="sub">每个 warp 完全独立，调度器随便排都对。</p>
+    <p>每个 warp 只读自己需要的权重行、累加器在私有寄存器、输出写到唯一地址，warp 之间没有任何共享可变状态。于是 GPU 调度器可以任意顺序发射任一 warp：某个 warp 等内存时立刻切到另一个。<b>B200 的 148 个 SM 上有成千上万 warp 在飞</b>，内存延迟几乎被其他 warp 的有效计算完全掩盖。输出维度翻倍就线性翻倍独立 warp 数，无需新增同步。</p>
+    <div class="insight">把工作变成"无边的扁平命名空间"，等于把延迟隐藏交给硬件调度器——这是比手写流水线更可靠的加速来源。</div>
+  </section>
+
+  <section>
+    <h2><span class="num">05</span>结果：更快、更准、且贴近硬件极限</h2>
+    <p class="sub">在 B200 上跑 Qwen-3 风格模型的实测。</p>
+    <div class="stat">
+      <div class="chip"><div class="big">1.84×</div><div class="lbl">解码吞吐提升（各上下文长度区间均平坦）</div></div>
+      <div class="chip"><div class="big">1.4×</div><div class="lbl">输出更接近 FP32 全精度参考</div></div>
+      <div class="chip"><div class="big">3.95 TB/s</div><div class="lbl">实测带宽（B=32），达 6.8 TB/s 峰值的 58%</div></div>
     </div>
-  </div>
-  <p>更妙的是保留下来的计算也更快：内核“天生 embarrassingly parallel”——warp 之间没有共享可变状态。调度器可以任意顺序发射任何 warp，某个 warp 等访存时立刻切到别的；B200 的 <code>148</code> 个 SM 上同时有成千上万 warp 在飞，访存延迟几乎被其他 warp 的有用计算完全掩盖。输出维度或批大小翻倍，独立 warp 数线性翻倍，无需额外同步。</p>
-  <div class="takeaway"><b>结论：</b>大部分吞吐增益来自“删阶段”，而 warp 独立则让剩余计算的延迟被调度自然隐藏——两者叠加才有 1.84x。</div>
+    <p>精度提升来自全程保持 BF16 激活、FP32 累加，省掉了 BF16↔MXFP8 量化往返带来的、会逐层累积的舍入误差。正确性也很硬：<b>最小余弦相似度 &gt;0.999996，最大绝对误差 0.001953</b>。剩下到峰值的差距，主要是专家路由造成的随机访问（一个 token 可能命中 5、8、14、19 等不相邻专家）带来的内存延迟。</p>
+    <div class="insight">"更快"常以"更糙"为代价；warp decode 反而因删掉量化步骤而更准——这是同时改善性能与精度的罕见内核。</div>
+  </section>
 
-  <h2><span class="num">4</span>为什么还更准：少了一次 MXFP8 来回</h2>
-  <p class="sub">关键数据与趋势</p>
-  <p>传统路径把 BF16 激活转成 MXFP8 再转回，会引入一个随层数累积的舍入误差底噪。Warp decode 全程保持激活为 BF16、累加器为 FP32，归约从不在被降级的输入上进行。结果：输出比传统路径与 32 位真值接近 <b>1.4x</b>。正确性也很扎实——最小余弦相似度 <code>&gt; 0.999996</code>，最大绝对误差 <code>0.001953</code>。</p>
-  <div class="takeaway"><b>结论：</b>这次提速不是用精度换来的；恰恰相反，去掉中间量化步骤让速度和精度同向改善。</div>
+  <section>
+    <h2><span class="num">06</span>边界：它不是万能替代品</h2>
+    <p class="sub">解码场景的专用武器，而非通用方案。</p>
+    <p>prefill 和大批量推理仍然适合专家中心式打包，因为大量 token 共享同一专家，组织成本能被足够多的真实计算摊销。warp decode 只在"每个专家共享工作不足以摊销开销"时取胜——而这正是 MoE 解码的常态。它服务于更快迭代 Composer：<b>预训练数据和 RL 决定模型输出的质量，而 warp decode 这类推理投入决定这些输出多快、多准地到达开发者手中</b>。</p>
+  </section>
 
-  <h2><span class="num">5</span>离硬件极限有多近，以及它的适用边界</h2>
-  <p class="sub">关键数据与趋势</p>
-  <p>B200 连续读（0,1,2,3）实测峰值 <code>6.8 TB/s</code>；warp decode 在 B=32 时持续 <code>3.95 TB/s</code>，即峰值的 <b>58%</b>。剩下的差距主要来自专家路由带来的随机访存——一个 token 可能路由到 5、8、14、19 这种不相邻的专家。吞吐增益在所有上下文长度桶上保持一致，证明这是纯粹的生成期收益，与 prompt 长度无关。</p>
-  <p>但作者明确：warp decode <b>不是</b>专家中心执行的通用替代品。prefill 和大批量推理里很多 token 共享同一专家，整理开销能被足够的真实计算摊薄，专家中心打包仍然更优。warp decode 只在“每专家共享工作量不足以摊薄开销”时才赢——而这恰是 MoE 解码的常态。</p>
-  <div class="takeaway"><b>结论：</b>它是为特定场景（小批量解码）量身打造的工具，价值在于让 Composer 的迭代更快、输出更准地抵达开发者。</div>
-
-  <div class="final">
+  <div class="takeaways">
     <h2>最值得带走的洞见</h2>
     <ol>
-      <li><b>换并行轴，而不是优化老流水线。</b>把“按专家”改成“按输出”，五个记账阶段直接消失——有时最大的优化是重组问题，而非加速旧步骤。</li>
-      <li><b>解码 ≠ prefill。</b>同一个 MoE，在批量大时该用专家中心打包，在一次只出一个 token 时该用 warp decode；没有放之四海皆准的内核。</li>
-      <li><b>“更快”和“更准”可以同源。</b>去掉中间 MXFP8 量化既省了一趟数据搬运，又消除了累积舍入误差——1.84x 吞吐与 1.4x 精度来自同一个简化。</li>
-      <li><b>warp 独立是性能的杠杆。</b>无共享可变状态、单一稳定任务，让调度器用海量在飞 warp 把访存延迟藏起来，这是它“embarrassingly parallel”的本质。</li>
-      <li><b>推理投资和训练投资互补。</b>预训练数据与 RL 决定模型输出的质量，而 warp decode 这类推理优化决定这些输出能多快、多准地送到用户手里。</li>
+      <li><b>瓶颈决定结构。</b>大批量推理的"专家中心"结构在逐 token 解码里大半是无用搬运——优化第一步是认清当前负载的真实瓶颈，而非沿用既有范式。</li>
+      <li><b>翻转并行轴是关键杠杆。</b>从"warp 算专家"改为"warp 算一个输出值"，一举消除了填充、scatter、combine 和两个中间缓冲，把八阶段压成两个融合内核。</li>
+      <li><b>减少内存往返胜过减少计算。</b>带宽受限场景下，让数据"直到最后一刻才落全局内存"释放出的 L2 缓存，是 1.84× 加速的主因。</li>
+      <li><b>独立性即可调度性。</b>每个 warp 完全无共享状态，使内核"令人尴尬地并行"，把内存延迟隐藏交给硬件调度器，并随维度线性扩展。</li>
+      <li><b>快与准可以兼得。</b>去掉 MXFP8 量化往返后，warp decode 既提速又把精度拉近 FP32 1.4 倍——推理工程的投入直接转化为模型迭代速度。</li>
     </ol>
   </div>
+
+  <div class="foot">原文：Cursor Blog · “Better MoE model inference with warp decode” · 作者 Less Wright、Federico Cassano、Zhiyuan Zhang · <a href="https://cursor.com/blog/warp-decode">cursor.com/blog/warp-decode</a></div>
+
 </div>
 </body>
 </html>

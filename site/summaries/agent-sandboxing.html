@@ -3,143 +3,102 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>给本地代理造一个安全沙箱 · 总结</title>
+<title>为本地代理打造安全沙箱 · 总结</title>
 <style>
   :root{
-    --bg:#0f1115; --card:#171a21; --card2:#1d2129;
-    --text:#e7eaf0; --muted:#9aa3b2; --line:#2a2f3a;
-    --accent:#6ea8fe; --warn:#ff7a7a; --good:#5dd1a0; --gold:#f2c14e;
+    --bg:#0f1115; --card:#181b22; --ink:#e8eaf0; --muted:#a4abbd;
+    --accent:#6ea8fe; --accent2:#7ee0b6; --warn:#ffcf6e; --line:#2a2f3a;
   }
   *{box-sizing:border-box}
-  body{
-    margin:0; background:var(--bg); color:var(--text);
-    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Microsoft YaHei",sans-serif;
-    line-height:1.75; font-size:17px;
-  }
-  .wrap{max-width:760px; margin:0 auto; padding:40px 22px 80px}
-  header.hd{border-bottom:1px solid var(--line); padding-bottom:22px; margin-bottom:30px}
-  .kicker{color:var(--accent); font-size:13px; letter-spacing:.08em; text-transform:uppercase; margin:0 0 10px}
-  h1{font-size:30px; line-height:1.3; margin:0 0 14px}
-  .meta{color:var(--muted); font-size:14px}
-  .lede{
-    background:linear-gradient(135deg,#1c2533,#191d26);
-    border:1px solid var(--line); border-left:4px solid var(--accent);
-    border-radius:12px; padding:18px 20px; margin:26px 0 36px; font-size:18px;
-  }
-  .lede b{color:var(--accent)}
-  section{margin:30px 0}
-  h2{font-size:21px; margin:0 0 6px; line-height:1.4}
-  h2 .tag{display:inline-block; font-size:12px; color:var(--gold); border:1px solid var(--line); border-radius:999px; padding:2px 10px; margin-right:10px; vertical-align:middle}
-  .body{color:#d6dbe6}
-  .take{color:var(--muted); font-style:italic; border-left:2px solid var(--line); padding-left:12px; margin-top:12px}
-  .stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0}
-  .stat{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px}
-  .stat .big{font-size:26px; font-weight:700}
-  .stat .lbl{color:var(--muted); font-size:13px; margin-top:4px}
-  .plat{display:grid; grid-template-columns:1fr; gap:12px; margin:18px 0}
-  .plat .row{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px}
-  .plat .os{font-weight:700; color:var(--accent); margin-bottom:4px}
-  .plat .prim{color:var(--gold); font-weight:600}
-  .flow{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:16px 0}
-  .flow .node{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:10px 14px; font-size:14px}
-  .flow .node.hot{border-color:var(--accent); color:var(--accent)}
-  .flow .sep{color:var(--muted)}
-  .insights{background:linear-gradient(135deg,#15211b,#171a21); border:1px solid #244235; border-radius:14px; padding:22px 24px; margin-top:40px}
-  .insights h2{color:var(--good)}
-  .insights ol{margin:14px 0 0; padding-left:22px}
-  .insights li{margin:10px 0}
-  .note{color:var(--muted); font-size:13px; border-top:1px solid var(--line); margin-top:40px; padding-top:16px}
-  b.k{color:var(--gold)}
-  code{background:#0b0d12; border:1px solid var(--line); border-radius:6px; padding:1px 6px; font-size:14px}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.75;font-size:17px}
+  .wrap{max-width:780px;margin:0 auto;padding:40px 22px 70px}
+  .kicker{color:var(--accent);font-weight:700;letter-spacing:.08em;font-size:13px;text-transform:uppercase}
+  h1{font-size:30px;line-height:1.3;margin:8px 0 6px}
+  .meta{color:var(--muted);font-size:14px;margin-bottom:26px}
+  .lede{background:linear-gradient(135deg,#1d2738,#1a2230);border:1px solid var(--line);
+    border-left:4px solid var(--accent);border-radius:12px;padding:18px 20px;margin:0 0 30px;font-size:18px}
+  .lede b{color:var(--accent2)}
+  h2{font-size:21px;margin:34px 0 4px;padding-top:10px;border-top:1px solid var(--line)}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 12px}
+  section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 20px 18px;margin-bottom:18px}
+  .stats{display:flex;flex-wrap:wrap;gap:12px;margin:18px 0 6px}
+  .stat{flex:1 1 150px;background:#11151c;border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .stat .n{font-size:28px;font-weight:800;color:var(--accent)}
+  .stat .l{color:var(--muted);font-size:13px}
+  .take{font-weight:600;color:var(--accent2)}
+  table{width:100%;border-collapse:collapse;margin:8px 0;font-size:15px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--accent);font-weight:700}
+  code{background:#11151c;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:14px;color:var(--warn)}
+  .keys{background:linear-gradient(135deg,#13251c,#142a20);border:1px solid #245038;border-radius:12px;padding:8px 22px 18px;margin-top:26px}
+  .keys h2{border-top:none;color:var(--accent2)}
+  ol.keys-list li{margin:10px 0}
 </style>
 </head>
 <body>
 <nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://cursor.com/blog/agent-sandboxing" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
 <div class="wrap">
-
-  <header class="hd">
-    <p class="kicker">Cursor · Research</p>
-    <h1>给本地代理造一个安全沙箱</h1>
-    <p class="meta">来源 Cursor ｜ 作者 Ani Betts, Yash Gaitonde & Alex Haugland ｜ 2026-02-18</p>
-  </header>
+  <div class="kicker">Cursor · Research</div>
+  <h1>给本地编码代理装上"安全护栏"</h1>
+  <div class="meta">来源：Cursor · 2026-02-18 · 作者：Ani Betts, Yash Gaitonde, Alex Haugland</div>
 
   <div class="lede">
-    一句话总括：Cursor 把"代理跑命令该不该批准"从<b>逐条人工审批</b>换成<b>沙箱默认放行、越界才申请</b>——让代理在一个受控环境里自由探索和改动，只有要踏出环境（最常见是上网）时才请求批准。真正的贡献不是"加了一层限制"，而是<b>用各操作系统原生的沙箱原语，把安全边界做到既不破坏构建/测试等正常工作流、又能消灭审批疲劳</b>，并在三大平台上拿出了可验证的落地数据。
+    一句话总括：Cursor 把"代理沙箱化"做成了一个跨三大操作系统的生产级方案——
+    代理在受控环境里<b>自由运行</b>，只在需要越界（多为联网）时才请求批准，从而把"批准疲劳"换成了可量化的效率提升：<b>停顿减少 40%</b>。
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">40%</div><div class="l">沙箱代理比未沙箱代理停顿更少</div></div>
+    <div class="stat"><div class="n">~1/3</div><div class="l">受支持平台上已启用沙箱的请求</div></div>
+    <div class="stat"><div class="n">3 个月</div><div class="l">从开发到推出的周期</div></div>
   </div>
 
   <section>
-    <h2><span class="tag">为什么需要</span>"每条命令都批"会退化成"闭眼点同意"</h2>
-    <p class="body">能自己跑终端命令的代理越来越强，自动放行能解锁更强的能力，但代价是风险：跑偏的代理可能删库、发坏代码、泄露密钥。直觉解法是"每条命令都让人审"——可批准一多，<b>人就不再认真看</b>；当工程师并行跑多个代理、在多个审批弹窗间来回切换时更糟。结果是<b>审批疲劳</b>，让审批本身失去意义。</p>
-    <p class="take">结论：安全不能靠"多按几次同意"，否则审批沦为形式。</p>
+    <h2>问题不是"风险"，而是"批准疲劳"</h2>
+    <p class="sub">人工逐条批准看似安全，实则会自我瓦解</p>
+    <p>自动批准让代理更强大，但一个出错的代理可能删库、发布坏代码或泄露密钥。逐条人工批准能缓解风险——但只是暂时的：批准越积越多，用户就不再仔细看；并行跑多个代理、在批准弹窗间反复切换时尤其严重。</p>
+    <p class="take">洞见：真正的失败模式不是技术漏洞，而是人类注意力的耗尽——沙箱的价值在于把"每条都问"变成"只在越界时问"。</p>
   </section>
 
   <section>
-    <h2><span class="tag">核心做法</span>沙箱内自由跑，越界才打断</h2>
-    <p class="body">过去三个月，Cursor 在 macOS、Linux、Windows 上陆续上线代理沙箱：代理在受控环境里自由运行，只在<b>需要走出环境</b>时才请求批准。目标是给代理足够的施展空间却拒绝高风险权限。难点在于平衡——很多终端命令连基本的测试/构建都会用到意料之外的权限，<b>过于天真的沙箱会把这些挡掉、直接搞坏工作流</b>。效果很直接：沙箱化代理的中断次数比未沙箱化时<b>减少 40%</b>，为用户省下大量人工审查时间。</p>
-    <div class="stat-grid">
-      <div class="stat">
-        <div class="big">40%</div>
-        <div class="lbl">沙箱化代理"停下来等批准"的次数减少幅度</div>
-      </div>
-      <div class="stat">
-        <div class="big">1/3</div>
-        <div class="lbl">受支持平台上目前在沙箱内运行的请求占比</div>
-      </div>
-    </div>
-    <p class="take">结论：把默认从"问"改成"放行 + 越界才问"，是同时改善安全与体验的关键转向。</p>
+    <h2>同一套 API，三套截然不同的底层实现</h2>
+    <p class="sub">操作系统提供的原语，决定了设计取舍</p>
+    <p>Cursor 对外暴露统一的沙箱 API，但每个平台的实现完全不同。难点在于：很多普通命令（连测试、构建）都需要意料之外的权限，过于天真的沙箱会直接卡死代理的工作流。</p>
+    <table>
+      <tr><th>平台</th><th>方案</th><th>关键取舍</th></tr>
+      <tr><td>macOS</td><td>Seatbelt（<code>sandbox-exec</code>）</td><td>在 App Sandbox/容器/虚拟机/Seatbelt 四选一；前三者分别带来签名复杂度、仅限 Linux 二进制、启动与内存开销。Seatbelt 2007 推出、2016 弃用，但 Chrome 等仍在用；按 <code>.cursorignore</code> 运行时动态生成策略。</td></tr>
+      <tr><td>Linux</td><td>Landlock + seccomp</td><td>seccomp 拦截危险系统调用，Landlock 限制文件系统；用 overlay 把忽略文件替换为不可读写副本。查找与重挂载这些文件是最慢环节，因为 seccomp-bpf 拿不到文件路径。</td></tr>
+      <tr><td>Windows</td><td>WSL2 里跑 Linux 沙箱</td><td>原生 Windows 原语多为浏览器设计，不适合通用开发工具；正与微软合作补齐。</td></tr>
+    </table>
+    <p class="take">洞见：没有"通用沙箱"，每个平台都是安全与可用性之间的一次重新谈判。</p>
   </section>
 
   <section>
-    <h2><span class="tag">实现</span>同一套 API，三平台各用各的原语</h2>
-    <p class="body">Cursor 对外暴露<b>统一的沙箱 API</b>，但底层因操作系统各异而实现不同——平台提供的沙箱原语，直接决定了设计取舍。</p>
-    <div class="plat">
-      <div class="row">
-        <div class="os">macOS · 选 Seatbelt</div>
-        <div class="body">在 App Sandbox、容器、虚拟机、Seatbelt 四选一。App Sandbox 要给代理执行的每个二进制签名，复杂且会让代理改过的二进制<b>继承 Cursor 的信任</b>，反成新攻击面；容器只能跑 Linux 二进制；虚拟机启动慢、内存开销大。最终选 <span class="prim">Seatbelt</span>（经 <code>sandbox-exec</code>）：2007 年推出、2016 年弃用，但 Chrome 等关键应用仍在用，能用一套策略约束整棵子进程树的系统调用与文件读写，并按 <code>.cursorignore</code> 等设置在<b>运行时动态生成</b>。</div>
-      </div>
-      <div class="row">
-        <div class="os">Linux · Landlock + seccomp</div>
-        <div class="body">内核给了原语，但要靠用户态自己拼成可用沙箱，现成开源项目都不支持 <code>.cursorignore</code> 这类特性。于是直接用 <span class="prim">seccomp 拦危险系统调用 + Landlock 管文件</span>：把工作区映射到 overlay 文件系统，再用 Landlock 把被忽略的文件<b>覆盖成不可读写的副本</b>。最慢的一步是找到并重挂这些文件——因为 seccomp-bpf 上下文里拿不到文件路径，没法像 macOS 那样"惰性过滤"。</div>
-      </div>
-      <div class="row">
-        <div class="os">Windows · 跑在 WSL2 里</div>
-        <div class="body">直接把 <span class="prim">Linux 沙箱放进 WSL2</span> 运行。造一个等效的原生 Windows 沙箱要难得多——现有原语多是为浏览器设计的，不支持通用开发工具。Cursor 正与微软合作推动这些原语落地。</div>
-      </div>
-    </div>
-    <p class="take">结论：没有"一招通吃"的沙箱，可用性来自对每个系统原语脾气的精细迁就。</p>
+    <h2>光有沙箱不够，还得"教会"模型用它</h2>
+    <p class="sub">最典型的失败：反复重试同一命令，却从不升级权限</p>
+    <p>沙箱只有在代理能预判"哪些命令会成功、何时需要升级权限"时才有效。Cursor 先更新 Shell 工具描述说明约束，再用内部基准 <code>Cursor Bench</code> 对比有无沙箱的表现，发现代理常陷入"无脑重试"。解法是改进工具结果的渲染：显式指出是哪条沙箱约束导致失败，并在适当时建议升级权限——之后代理恢复得更优雅，离线评测显著提升。</p>
+    <p class="take">洞见：沙箱是"人机协议"的一部分，错误信息的措辞和提示，本身就是让代理可用的工程内容。</p>
   </section>
 
   <section>
-    <h2><span class="tag">让模型会用</span>不只是关进去，还要教它认识围栏</h2>
-    <p class="body">沙箱要有效，代理得能<b>预判</b>哪些命令在里面会成功、并认出何时需要提权。Cursor 先改写 Shell 工具说明，讲清当前是否有文件、git、网络权限以及如何申请提权——这一步靠大量手工测试反复调提示词。随后用内部基准 <b class="k">Cursor Bench</b> 对比开/关沙箱，发现一个典型失败：代理会<b>反复重试同一条命令却不改权限</b>。对策是改写 Shell 结果的回显，把"导致失败的具体沙箱限制"明确摆出来、必要时建议提权。上线这些提醒后，代理从沙箱相关失败中恢复得优雅得多，离线评测显著提升。</p>
-    <div class="flow">
-      <span class="node">命令失败</span><span class="sep">→</span>
-      <span class="node hot">回显点明"被哪条限制挡住"</span><span class="sep">→</span>
-      <span class="node">建议提权 / 改路径</span><span class="sep">→</span>
-      <span class="node">代理优雅恢复，不再死循环重试</span>
-    </div>
-    <p class="take">结论：离线评测只是一角，真正给出信心的是逐步灰度放量后的真实反馈。</p>
+    <h2>从"写代码"走向"操作生产系统"</h2>
+    <p class="sub">已落地，并指向"沙箱原生代理"</p>
+    <p>离线评测只是局部，Cursor 通过逐步灰度放量、收集内外反馈才最终发货；如今约三分之一请求跑在沙箱中，并已上线 NVIDIA 等企业客户。下一步是"沙箱原生代理"——直接基于环境约束训练，让代理能自由编写脚本和程序，而不只是受限于工具调用。</p>
+    <p class="take">洞见：当代理从"生成代码"跨入"运行生产系统"，执行边界从锦上添花变成了前提条件。</p>
   </section>
 
-  <section>
-    <h2><span class="tag">落地与展望</span>已接入 NVIDIA，下一步是"沙箱原生"代理</h2>
-    <p class="body">在内外部真实反馈支撑下，沙箱正式发布：目前受支持平台上约<b>三分之一</b>的请求在沙箱内运行，并已接入 <b class="k">NVIDIA</b> 等多家企业客户。文章把这件事放进更大的趋势里：当代理从"写代码"走向"操作生产系统"，提供执行边界至关重要。Cursor 接下来最期待<b>沙箱原生（sandbox-native）</b>的代理——直接在环境约束上训练，从而被允许<b>自己写脚本和程序</b>，而不再局限于工具调用。</p>
-    <p class="take">结论：沙箱不只是安全补丁，而是让代理获得更大自由度的前提条件。</p>
-  </section>
-
-  <div class="insights">
+  <div class="keys">
     <h2>最值得带走的洞见</h2>
-    <ol>
-      <li><b>逐条审批是伪安全。</b>批准一多、并行代理一多，人就不再细看，审批退化成闭眼点同意——沙箱把默认改成"放行 + 越界才问"，正面破解了审批疲劳。</li>
-      <li><b>40% 与 1/3 是硬指标。</b>沙箱化代理中断减少 40%，受支持平台上已有三分之一请求在沙箱内跑，并接入 NVIDIA——说明这不是实验性开关而是规模化能力。</li>
-      <li><b>没有通用沙箱。</b>macOS 用弃用但仍可靠的 Seatbelt、Linux 拼 Landlock+seccomp、Windows 借 WSL2——每个平台的原语脾气直接塑造了实现。</li>
-      <li><b>安全件必须"懂工作流"。</b>天真沙箱会挡掉连测试/构建都需要的权限；可用性来自对意外权限需求的精细迁就。</li>
-      <li><b>光关进去不够，得教它认围栏。</b>把"被哪条限制挡住"明确回显给模型，比单纯加限制更能让代理优雅恢复、不再死循环重试。</li>
+    <ol class="keys-list">
+      <li><b>可量化收益：</b>沙箱代理停顿减少 40%，约 1/3 请求已启用——这是把"安全 vs 效率"从口号变成了数字。</li>
+      <li><b>真正的敌人是注意力：</b>逐条人工批准会因"批准疲劳"自我失效，沙箱通过"只在越界时打断"才解决根因。</li>
+      <li><b>没有银弹：</b>macOS 用 Seatbelt、Linux 用 Landlock+seccomp、Windows 借 WSL2——统一 API 之下是三套受 OS 原语约束的妥协。</li>
+      <li><b>模型必须"懂沙箱"：</b>清晰的失败信息与升级提示，比沙箱本身的隔离机制同样关键，否则代理会无脑重试。</li>
+      <li><b>方向是沙箱原生代理：</b>未来代理将基于环境约束训练、直接写程序，执行边界会成为代理能力的一部分而非外挂。</li>
     </ol>
   </div>
-
-  <p class="note">注：本文为 Cursor 研究博客《Implementing a secure sandbox for local agents》（2026-02-18，Ani Betts / Yash Gaitonde / Alex Haugland）的中文总结；40%、三分之一、NVIDIA、Seatbelt（2007 推出 / 2016 弃用）、Landlock、seccomp、WSL2、Cursor Bench 等均为原文信息。</p>
-
 </div>
 </body>
 </html>

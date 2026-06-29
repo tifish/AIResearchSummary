@@ -3,133 +3,96 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>动态上下文发现：让 Agent 自己按需拉取上下文</title>
+<title>动态上下文发现 · Cursor 总结</title>
 <style>
   :root{
-    --bg:#0f1117; --card:#171a23; --card2:#1d2130; --ink:#e8eaf0; --muted:#a3aabb;
-    --accent:#5b8cff; --accent2:#36d399; --warn:#ffb454; --line:#2a2f3e; --hl:#243046;
+    --bg:#0f1117; --card:#1a1d27; --ink:#e8eaf0; --muted:#a0a6b8;
+    --accent:#6ea8fe; --accent2:#7ee0c0; --hi:#ffd66e; --line:#2a2e3a;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:linear-gradient(180deg,#0c0e14,#0f1117 40%);color:var(--ink);
-    font:16px/1.7 -apple-system,"Segoe UI",Roboto,"Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;}
-  .wrap{max-width:860px;margin:0 auto;padding:40px 22px 64px;}
-  .eyebrow{display:inline-block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;
-    color:var(--accent2);border:1px solid var(--line);border-radius:999px;padding:5px 12px;margin-bottom:18px;}
-  h1{font-size:30px;line-height:1.25;margin:0 0 8px;font-weight:800;letter-spacing:-.01em;}
-  .meta{color:var(--muted);font-size:13.5px;margin-bottom:26px;}
-  .meta a{color:var(--accent);text-decoration:none;}
-  .tldr{background:linear-gradient(135deg,#1a2440,#1b2030);border:1px solid #2c3a5e;
-    border-radius:16px;padding:22px 24px;margin:0 0 34px;}
-  .tldr .label{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:8px;}
-  .tldr p{margin:0;font-size:18px;line-height:1.6;font-weight:600;}
-  .stat{display:flex;gap:16px;align-items:baseline;background:var(--hl);border-left:4px solid var(--accent2);
-    border-radius:0 12px 12px 0;padding:16px 20px;margin:18px 0;}
-  .stat .num{font-size:34px;font-weight:800;color:var(--accent2);line-height:1;white-space:nowrap;}
-  .stat .txt{font-size:14.5px;color:var(--ink);}
-  .stat .txt small{display:block;color:var(--muted);margin-top:3px;}
-  section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:16px 0;}
-  section h2{font-size:19px;margin:0 0 10px;line-height:1.4;font-weight:700;}
-  section h2 .n{display:inline-block;width:26px;height:26px;border-radius:8px;background:var(--accent);color:#0c0e14;
-    font-size:14px;font-weight:800;text-align:center;line-height:26px;margin-right:10px;vertical-align:middle;}
-  section p{margin:8px 0;color:#d7dbe7;}
-  .kicker{color:var(--muted);font-size:13.5px;}
-  .take{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);font-size:14.5px;}
-  .take b{color:var(--warn);}
-  code{background:#0b0d13;border:1px solid var(--line);border-radius:6px;padding:1px 7px;font-size:13.5px;
-    color:#cfe0ff;font-family:ui-monospace,"Cascadia Code",Consolas,monospace;}
-  .concept{display:flex;gap:14px;flex-wrap:wrap;margin:14px 0 4px;}
-  .pill{flex:1 1 220px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
-  .pill .t{font-weight:700;margin-bottom:4px;}
-  .pill.stat-bg{border-color:#3a4a6e;}
-  .pill .muted{color:var(--muted);font-size:13.5px;}
-  .arrow{color:var(--accent);font-weight:800;}
-  .insights{background:linear-gradient(135deg,#101826,#13202b);border:1px solid #294056;border-radius:16px;
-    padding:24px 26px;margin-top:34px;}
-  .insights h2{font-size:20px;margin:0 0 14px;color:var(--accent2);}
-  .insights ol{margin:0;padding-left:22px;}
-  .insights li{margin:11px 0;padding-left:6px;line-height:1.65;}
-  .insights li b{color:#fff;}
-  footer{color:var(--muted);font-size:12.5px;margin-top:30px;text-align:center;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Microsoft YaHei",sans-serif;
+    line-height:1.8;font-size:17px}
+  .wrap{max-width:820px;margin:0 auto;padding:40px 22px 80px}
+  .tag{display:inline-block;font-size:13px;color:var(--accent2);
+    border:1px solid var(--line);border-radius:999px;padding:3px 12px;margin-bottom:18px}
+  h1{font-size:30px;line-height:1.35;margin:6px 0 14px}
+  .meta{color:var(--muted);font-size:14px;margin-bottom:26px}
+  .lead{background:linear-gradient(135deg,#1d2740,#162033);border:1px solid #2c3a5a;
+    border-radius:14px;padding:22px 24px;font-size:19px;margin-bottom:34px}
+  .lead b{color:var(--hi)}
+  h2{font-size:21px;margin:38px 0 6px;padding-left:12px;border-left:4px solid var(--accent)}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 14px;padding-left:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:18px 22px;margin:14px 0}
+  .stat{font-size:34px;font-weight:700;color:var(--accent2);letter-spacing:.5px}
+  .stat small{font-size:15px;color:var(--muted);font-weight:400;display:block;margin-top:4px}
+  .insight{color:var(--hi);font-weight:600}
+  ul{padding-left:20px;margin:8px 0}
+  li{margin:7px 0}
+  .takeaway{background:linear-gradient(135deg,#15241d,#13201c);border:1px solid #294a3c;
+    border-radius:14px;padding:22px 26px;margin-top:40px}
+  .takeaway h2{border:0;padding:0;margin:0 0 14px;color:var(--accent2)}
+  .takeaway ol{padding-left:22px}
+  .takeaway li{margin:11px 0}
+  code{background:#242938;padding:1px 7px;border-radius:5px;font-size:14px;color:#ffd9a0}
 </style>
 </head>
 <body>
 <nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://cursor.com/blog/dynamic-context-discovery" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
 <div class="wrap">
+  <span class="tag">Cursor · Research · 2026-01-06</span>
+  <h1>动态上下文发现：用"文件"让 Agent 按需取用上下文</h1>
+  <div class="meta">作者：Jediah Katz 等多位 Cursor 员工 · 原文：cursor.com/blog/dynamic-context-discovery</div>
 
-  <span class="eyebrow">Cursor · Research</span>
-  <h1>动态上下文发现：少给前置信息，让 Agent 自己按需取</h1>
-  <div class="meta">来源：Cursor &nbsp;·&nbsp; 作者：Jediah Katz &nbsp;·&nbsp; 2026-01-06 &nbsp;·&nbsp; <a href="https://cursor.com/blog/dynamic-context-discovery">原文链接</a></div>
-
-  <div class="tldr">
-    <div class="label">一句话总括</div>
-    <p>Cursor 提出"动态上下文发现"——不再把一切静态塞进提示词，而是把数据落成文件、让 Agent 按需检索；并用一个真实 A/B 实验证明这能把调用 MCP 时的总 token 量砍掉近一半。</p>
+  <div class="lead">
+    一句话总括：Cursor 把"塞满上下文窗口"的传统做法，换成<b>让 agent 自己按需去文件里拉取上下文</b>——更少前置信息、更高 token 效率，并用一组真实工程案例证明，文件是当下最简单也最稳妥的 LLM 工具接口原语。
   </div>
 
-  <div class="concept">
-    <div class="pill">
-      <div class="t">静态上下文</div>
-      <div class="muted">始终被注入提示词，无论是否用到——token 一直在烧，还可能引入矛盾信息。</div>
-    </div>
-    <div class="pill stat-bg">
-      <div class="t">动态上下文发现 <span class="arrow">→</span></div>
-      <div class="muted">只把"入口"放进上下文，真正的数据存为文件，Agent 用 grep / tail / 语义搜索按需拉取。</div>
-    </div>
+  <h2>核心转变：从"静态注入"到"动态发现"</h2>
+  <p class="sub">模型越强，越不需要喂得太满</p>
+  <div class="card">
+    随着 agent 模型变强，Cursor 发现<strong>前置信息给得越少，agent 反而越能自己找到相关上下文</strong>。他们把这种"按需拉取"称为 dynamic context discovery，与始终全量包含的 static context 相对。好处有二：只把必要数据放进窗口，token 更省；减少互相矛盾或干扰的信息，回答质量更高。
+    <p class="insight" style="margin-bottom:0">洞见：上下文工程的优化方向，正从"如何塞得更全"转为"如何让模型自己取"——这是一种对模型能力增长的顺势设计。</p>
   </div>
 
-  <div class="stat">
-    <div class="num">-46.9%</div>
-    <div class="txt">在 A/B 测试中，对于调用了 MCP 工具的运行，把 MCP 工具描述按服务器同步到文件夹后，Agent 总 token 量下降 46.9%。
-      <small>统计显著；方差较大，取决于安装的 MCP 数量。</small></div>
+  <h2>最硬的证据：MCP 工具按需加载省下近一半 token</h2>
+  <p class="sub">每个服务器一个文件夹，只在提示里留工具名</p>
+  <div class="card">
+    <div class="stat">−46.9%<small>在调用了 MCP 工具的运行中，agent 总 token 下降幅度（A/B 测试，统计显著，方差随 MCP 数量增大）</small></div>
+    很多 MCP 服务器自带大量工具和冗长描述，却始终全量进提示、大部分从不被用，多个服务器叠加更糟。Cursor 把工具描述同步到文件夹（<code>每服务器一个文件夹</code>而非扁平索引），系统提示里只留工具名，需要时再让 agent 用 <code>rg</code>、<code>jq</code> 去查找。额外收获：文件还能传达工具状态——例如某 MCP 需要重新认证时，agent 可主动提醒用户，而不再"直接忘掉"。
+    <p class="insight" style="margin-bottom:0">洞见：减少上下文占用应是"编码 agent 的责任"，而非指望每个 MCP 服务器自我优化——这把架构责任划清了。</p>
   </div>
 
-  <section>
-    <h2><span class="n">1</span>过长的工具响应不截断，而是写成文件</h2>
-    <p class="kicker">截断 shell / MCP 的长结果会丢失你本想要的信息。</p>
-    <p>Cursor 把超长输出写入文件，Agent 先用 <code>tail</code> 看结尾，需要更多再继续读。第一方工具（编辑、搜索代码库）本就用精简响应格式控制膨胀，但第三方工具拿不到同等待遇，文件化补上了这一环。</p>
-    <div class="take"><b>洞见：</b>用"读文件"替代"截断"，触达上下文上限而被迫总结的次数明显减少。</div>
-  </section>
+  <h2>把"会撑爆上下文的东西"统统变成文件</h2>
+  <p class="sub">长响应、聊天历史、技能、终端输出，一律落盘按需读</p>
+  <div class="card">
+    <ul>
+      <li><b>长工具响应 → 文件</b>：第三方 shell/MCP 的超长 JSON 不再被截断（截断会丢关键数据），而是写入文件，agent 先 <code>tail</code> 看结尾、按需再读，减少了触及上限时不必要的总结。</li>
+      <li><b>聊天历史 → 文件</b>：上下文写满触发总结时，总结是有损压缩、易丢细节；把历史作为文件提供，agent 可回查找回被遗漏的关键信息。</li>
+      <li><b>Agent Skills 开放标准</b>：技能的名称+描述作静态上下文，正文用 grep 与语义搜索按需发现；技能还能打包可执行脚本，因为本质都是文件。</li>
+      <li><b>集成终端会话 → 文件</b>：终端输出同步到本地文件系统，问"我的命令为什么失败"时 agent 能 grep 长日志里相关片段，效果对齐 CLI 类 agent，但属动态发现而非静态注入。</li>
+    </ul>
+    <p class="insight" style="margin-bottom:0">洞见：五个看似不同的问题，被同一个抽象（文件）统一解决——这正是好原语的标志。</p>
+  </div>
 
-  <section>
-    <h2><span class="n">2</span>总结时保留聊天历史作为可回查的文件</h2>
-    <p class="kicker">上下文填满触发的总结是一种有损压缩，Agent 可能忘掉任务的关键细节。</p>
-    <p>当上下文窗口触顶（或用户手动总结）时，Cursor 给 Agent 一个历史文件的引用。一旦发现摘要里缺了关键信息，它能回到历史中搜索找回。</p>
-    <div class="take"><b>洞见：</b>不必把"记忆"全压进摘要，给一条回查通道就能对冲压缩损失。</div>
-  </section>
+  <h2>为什么选"文件"这个朴素抽象</h2>
+  <p class="sub">不确定它是终局，但它是最安全的赌注</p>
+  <div class="card">
+    Cursor 坦承文件未必是 LLM 工具的最终接口，但在 agent 快速演进的当下，文件简单、强大，且比"又发明一个无法预判未来的新抽象"更稳妥。相关改进将在数周内对所有用户上线。
+    <p class="insight" style="margin-bottom:0">洞见：在技术高速变化期，押注通用、低风险的原语，往往胜过押注精巧但脆弱的专用抽象。</p>
+  </div>
 
-  <section>
-    <h2><span class="n">3</span>支持 Agent Skills 开放标准</h2>
-    <p class="kicker">Skill 用文件定义如何完成某类专门任务。</p>
-    <p>Skill 的名称与描述作为"静态上下文"进系统提示，正文、可执行脚本则是文件；Agent 用 grep 和语义搜索动态拉取相关 Skill。因为它们本质就是文件，找到与某个 Skill 相关的内容很容易。</p>
-    <div class="take"><b>洞见：</b>"放入口、藏正文"成为扩展能力的统一范式——能力可无限增长而不撑爆提示词。</div>
-  </section>
-
-  <section>
-    <h2><span class="n">4</span>MCP 工具按需加载（省 token 的核心来源）</h2>
-    <p class="kicker">MCP 适合访问 OAuth 背后的资源（生产日志、设计文件、企业文档），但很多服务器工具又多又啰嗦，且总被全量注入。</p>
-    <p>Cursor 给每个 MCP 服务器建一个文件夹同步工具描述（而非散落的扁平索引，便于用 <code>rg</code>、<code>jq</code> 过滤）。系统提示里只留工具名等少量静态上下文，用时再查找。文件化还顺带解决了一个体验问题：服务器需要重新鉴权时，Agent 不再"忘掉"这些工具，而能主动提示用户去重新认证。</p>
-    <div class="take"><b>洞见：</b>团队认为降低上下文占用是编码 Agent 的责任，不该指望每个 MCP 服务器自我优化——这正是 -46.9% 的来源。</div>
-  </section>
-
-  <section>
-    <h2><span class="n">5</span>集成终端会话全部当作文件</h2>
-    <p class="kicker">不必再把终端输出复制粘贴进 Agent。</p>
-    <p>Cursor 把集成终端的输出同步到本地文件系统，于是"为什么我的命令失败了？"这类提问，Agent 能直接理解你在指什么。终端历史可能很长，Agent 用 grep 只取相关片段，对长跑服务的日志尤其有用。</p>
-    <div class="take"><b>洞见：</b>这复刻了 CLI 编码 Agent 自带历史上下文的优势，但改为"动态发现"而非"静态注入"。</div>
-  </section>
-
-  <div class="insights">
+  <div class="takeaway">
     <h2>最值得带走的洞见</h2>
     <ol>
-      <li><b>模型越强，越该少喂。</b>随着 Agent 能力提升，"前置信息给得越少、让它自己取"反而效果更好——这是贯穿全文的方向性判断。</li>
-      <li><b>省 token 不是噱头，有硬数据。</b>MCP 工具按文件夹同步带来 <b>46.9%</b> 的 token 下降（统计显著），证明动态发现的实际收益。</li>
-      <li><b>动态发现同时省钱又提质。</b>更少 token 之外，剔除无关/矛盾信息还能直接改善 Agent 的回答质量。</li>
-      <li><b>"文件"是当下最好的通用原语。</b>它简单、可被 grep/tail/jq 操作，比再造一层抽象更安全、更面向未知的未来——尽管它未必是 LLM 工具的最终形态。</li>
-      <li><b>这是横切所有模型的改进。</b>harness 会针对每个前沿模型单独调优，但这类上下文工程改进对所有模型通用，且将在数周内向全体用户上线。</li>
+      <li><strong>范式转变</strong>：模型越强，越该"少喂、让它自己取"——动态发现取代静态注入。</li>
+      <li><strong>可量化收益</strong>：MCP 工具按需加载使相关运行的 token 降低 <b>46.9%</b>，证明这不是玄学而是可测的工程改进。</li>
+      <li><strong>统一抽象</strong>：长响应、聊天历史、技能、终端输出——四类上下文膨胀源都用"文件 + 按需 grep/read"一招解决。</li>
+      <li><strong>责任归属</strong>：降低上下文占用是编码 agent 的职责，而非依赖每个 MCP/工具提供方自觉优化。</li>
+      <li><strong>务实赌注</strong>：在不确定终局接口时，选择文件这种通用原语，是对未来最稳健的押注。</li>
     </ol>
   </div>
-
-  <footer>本页为基于原文的中文总结，仅供快速阅读 · 数据与结论均出自 Cursor 研究博客原文</footer>
-
 </div>
 </body>
 </html>

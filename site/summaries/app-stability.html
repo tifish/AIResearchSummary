@@ -3,146 +3,101 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cursor：如何让桌面应用不再崩溃</title>
+<title>Cursor 如何让应用保持稳定</title>
 <style>
   :root{
-    --bg:#0f1115; --card:#171a21; --card2:#1d212b; --ink:#e8ebf0; --soft:#a8b0bd;
-    --accent:#7aa2ff; --accent2:#5ee0b8; --warn:#ffcc66; --line:#272c38; --hi:#2a3550;
+    --bg:#0f1115; --card:#181b22; --ink:#e8eaed; --muted:#a3a8b3;
+    --accent:#6ea8fe; --accent2:#4ade80; --warn:#fbbf24; --line:#272b34;
   }
   *{box-sizing:border-box}
-  body{
-    margin:0; background:var(--bg); color:var(--ink);
+  body{margin:0;background:var(--bg);color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-    line-height:1.75; font-size:17px;
-  }
-  .wrap{max-width:820px; margin:0 auto; padding:40px 22px 80px;}
-  header{border-bottom:1px solid var(--line); padding-bottom:24px; margin-bottom:8px;}
-  .kicker{font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); font-weight:700;}
-  h1{font-size:30px; line-height:1.25; margin:.4em 0 .3em;}
-  .meta{color:var(--soft); font-size:14px;}
-  .meta a{color:var(--soft);}
-  .tldr{
-    background:linear-gradient(135deg,#1b2440,#161b28); border:1px solid var(--hi);
-    border-radius:14px; padding:20px 22px; margin:28px 0 36px;
-  }
-  .tldr .lbl{font-size:13px; font-weight:700; color:var(--accent2); letter-spacing:.08em; text-transform:uppercase;}
-  .tldr p{margin:.5em 0 0; font-size:18.5px;}
-  section{
-    background:var(--card); border:1px solid var(--line); border-radius:14px;
-    padding:22px 24px; margin:18px 0;
-  }
-  section h2{font-size:21px; margin:.1em 0 .2em; line-height:1.35;}
-  section h2 .num{color:var(--accent); font-weight:800; margin-right:8px;}
-  .body{color:var(--ink);}
-  .insight{
-    margin-top:14px; padding:12px 16px; border-left:3px solid var(--accent2);
-    background:var(--card2); border-radius:0 10px 10px 0; color:#d7f3e8; font-size:15.5px;
-  }
-  .insight b{color:var(--accent2);}
-  .stats{display:flex; flex-wrap:wrap; gap:12px; margin:30px 0;}
-  .stat{
-    flex:1 1 150px; background:var(--card2); border:1px solid var(--line);
-    border-radius:12px; padding:16px 18px;
-  }
-  .stat .n{font-size:26px; font-weight:800; color:var(--accent);}
-  .stat .n.g{color:var(--accent2);}
-  .stat .t{font-size:13.5px; color:var(--soft); margin-top:4px;}
-  .twocol{display:flex; flex-wrap:wrap; gap:14px; margin-top:14px;}
-  .twocol .col{flex:1 1 300px; background:var(--card2); border:1px solid var(--line); border-radius:12px; padding:16px 18px;}
-  .twocol .col h3{margin:.1em 0 .4em; font-size:16px; color:var(--accent);}
-  .twocol .col.g h3{color:var(--accent2);}
-  .takeaways{background:linear-gradient(135deg,#16221c,#161b28); border:1px solid #2c4438;}
-  .takeaways h2{color:var(--accent2);}
-  .takeaways ol{margin:.6em 0 0; padding-left:22px;}
-  .takeaways li{margin:.55em 0;}
-  em.k{color:var(--warn); font-style:normal; font-weight:600;}
-  code{background:#0b0d12; padding:1px 6px; border-radius:6px; font-size:14.5px; color:#cfe0ff;}
-  footer{color:var(--soft); font-size:13px; text-align:center; margin-top:34px;}
+    line-height:1.75;padding:0 16px}
+  .wrap{max-width:780px;margin:0 auto;padding:48px 0 80px}
+  .kicker{color:var(--accent);font-size:13px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+  h1{font-size:30px;line-height:1.25;margin:0 0 18px}
+  .meta{color:var(--muted);font-size:13px;margin-bottom:28px}
+  .lead{font-size:19px;background:linear-gradient(135deg,#1d2230,#171a21);
+    border-left:4px solid var(--accent);border-radius:10px;padding:18px 20px;margin:0 0 34px}
+  .lead b{color:var(--accent2)}
+  .stats{display:flex;gap:14px;flex-wrap:wrap;margin:0 0 34px}
+  .stat{flex:1 1 220px;background:var(--card);border:1px solid var(--line);
+    border-radius:12px;padding:18px 20px}
+  .stat .num{font-size:34px;font-weight:800;color:var(--accent2);line-height:1}
+  .stat .lab{color:var(--muted);font-size:14px;margin-top:8px}
+  h2{font-size:20px;margin:38px 0 6px;padding-top:8px;border-top:1px solid var(--line)}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 10px}
+  p{margin:10px 0}
+  .take{color:var(--warn);font-weight:600}
+  .tag{display:inline-block;background:#222633;color:var(--accent);
+    font-size:12px;padding:2px 10px;border-radius:20px;margin-right:6px}
+  .insights{background:linear-gradient(135deg,#13241a,#15181f);
+    border:1px solid #1f3b2a;border-radius:14px;padding:22px 24px;margin-top:40px}
+  .insights h2{border:0;margin:0 0 12px;color:var(--accent2)}
+  .insights ol{margin:0;padding-left:20px}
+  .insights li{margin:10px 0}
+  code{background:#222633;padding:1px 6px;border-radius:5px;font-size:13px;color:#cdd3df}
 </style>
 </head>
 <body>
 <nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://cursor.com/blog/app-stability" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
 <div class="wrap">
-  <header>
-    <div class="kicker">Cursor · Research</div>
-    <h1>让被全天重度使用的桌面应用「不崩溃」</h1>
-    <div class="meta">来源：Cursor ｜ 作者：Andrew Chan & Kevin Nguyen ｜ 2026-04-21 ｜ <a href="https://cursor.com/blog/app-stability">原文</a></div>
-  </header>
+  <div class="kicker">Cursor · Research</div>
+  <h1>Cursor 如何让应用保持稳定</h1>
+  <div class="meta">来源：Cursor ｜ 2026-04-21 ｜ 作者：Andrew Chan & Kevin Nguyen</div>
 
-  <div class="tldr">
-    <div class="lbl">一句话总括</div>
-    <p>Cursor 把「桌面应用稳定性」从玄学变成了工程：用<strong>可观测性 + 双向定位 + 防回归护栏</strong>三套系统，几个月内把内存崩溃率压下七八成——证明 Agentic 时代提速越快，越要靠扎实的旧工程基本功为新工具链「重新配套」。</p>
+  <div class="lead">
+    一句话总括：Cursor 没有靠零散打补丁，而是把“崩溃”当成一个<b>可测量、可归因、可防回归的工程问题</b>来治理——结果是内存溢出崩溃率成倍下降。文章真正的贡献，是一套适用于大型 Electron/VS Code 类应用的稳定性方法论。
   </div>
 
   <div class="stats">
-    <div class="stat"><div class="n g">↓80%</div><div class="t">OOM 每会话发生率，相比 2 月底峰值</div></div>
-    <div class="stat"><div class="n g">↓73%</div><div class="t">OOM 每请求发生率，自 3 月 1 日起</div></div>
-    <div class="stat"><div class="n">2 类</div><div class="t">崩溃模式：急性 OOM 与慢性 OOM</div></div>
-    <div class="stat"><div class="n">分钟级</div><div class="t">崩溃事件到仪表盘更新的延迟</div></div>
+    <div class="stat">
+      <div class="num">↓80%</div>
+      <div class="lab">OOM 每会话崩溃率，相比 2 月底峰值</div>
+    </div>
+    <div class="stat">
+      <div class="num">↓73%</div>
+      <div class="lab">OOM 每请求崩溃率，相比 3 月 1 日</div>
+    </div>
   </div>
 
-  <section>
-    <h2><span class="num">01</span>问题的根：多进程架构里的「内存耗尽」</h2>
-    <div class="body">
-      Cursor 建立在 VS Code 与 Electron 之上，是<em class="k">多进程架构</em>：崩溃可能发生在驱动编辑器与新 Agents 窗口的渲染进程，也可能发生在驱动扩展、存储、Agent 功能的工具进程。其中<strong>渲染进程崩溃最致命</strong>——它会让编辑器彻底不可用，而且多由命中 <code>V8</code> 内存上限引发，因此成为治理重点。随着 subagents、即时 grep、浏览器使用等「越来越有野心」的功能上线，加上用户全天重度使用，连罕见崩溃都会造成巨大干扰。
-    </div>
-    <div class="insight"><b>洞见：</b>绝大多数崩溃的根因是 OOM（内存耗尽）——稳定性问题的本质，是一道内存管理题。</div>
-  </section>
+  <h2>崩溃的根因几乎都是内存溢出（OOM）</h2>
+  <p class="sub">多进程架构下，渲染进程崩溃最致命</p>
+  <p>Cursor 基于 VS Code 与 Electron 的多进程架构，崩溃可能发生在<strong>渲染进程</strong>（编辑器与新的 agents 窗口）或<strong>工具进程</strong>（扩展、存储、agent 功能）。渲染进程崩溃最严重，会完全阻断编辑器使用，且多由命中 V8 内存上限引起；扩展进程崩溃通常能自动恢复。这改变了一个直觉：随着 subagents、即时 grep、浏览器调用等“更野心勃勃”的功能上线，稳定性不是越做越简单，而是越来越难。</p>
+  <p class="take">结论：把崩溃按进程类型分级，让团队能把精力集中在最伤用户的渲染进程 OOM 上。</p>
 
-  <section>
-    <h2><span class="num">02</span>先能「看见」：分钟级的崩溃可观测性</h2>
-    <div class="body">
-      每一次致命崩溃都会被遥测上报，附带受影响进程、崩溃类型、设备与应用元数据，以及（在可获取时的）minidump 与堆栈。团队据此构建了可<em class="k">按应用版本拆分</em>的指标，分别按「每会话」（多少会话遇到崩溃）和「每请求」（受影响会话的严重程度）口径计算。仪表盘在崩溃事件发生后<strong>数分钟内</strong>即更新，于是新版本一发布就能紧密追踪、快速发现潜在回归。
-    </div>
-    <div class="insight"><b>洞见：</b>「每会话 vs 每请求」两个口径分别回答了「波及面多广」和「问题多严重」——治理前先把度量分清楚。</div>
-  </section>
+  <h2>先有“仪表盘”，才谈得上修复</h2>
+  <p class="sub">每次崩溃都带上下文，按版本拆分、分钟级更新</p>
+  <p>每个致命崩溃都由遥测上报，附带受影响进程、崩溃类型、设备/应用元数据、minidump 与栈轨迹。团队据此构建可按 app 版本拆分的指标，分别按<strong>每会话</strong>（有多少会话遇崩溃）和<strong>每请求</strong>（崩溃有多严重）计算，仪表盘在崩溃事件后几分钟内更新。</p>
+  <p class="take">结论：可观测性是前提——能在分钟级发现新版本的回归，才敢快速发布。</p>
 
-  <section>
-    <h2><span class="num">03</span>双向夹击：自上而下找贡献者，自下而上挖根因</h2>
-    <div class="body">
-      调试用<em class="k">两条腿走路</em>。下面拆开看两套互补的方法。
-    </div>
-    <div class="twocol">
-      <div class="col">
-        <h3>Top-down 自上而下</h3>
-        对已知内存密集的功能，把崩溃指标关联到 <code>Statsig</code> 里的特征开关并做 A/B 测试，量化它对崩溃率的贡献；同时追踪与崩溃强相关、更易在开发期观察的代理指标——典型如<strong>超大消息载荷</strong>（进程间通道里超阈值的消息，附带 callstack 回溯到源码）；再为并行 Agent、工具调用、终端等加「面包屑」，让每次崩溃都带着事发前的活动记录。
-      </div>
-      <div class="col g">
-        <h3>Bottom-up 自下而上</h3>
-        把单个崩溃追到根因。主进程跑一个用 <code>CDP</code>（Chrome DevTools Protocol）的崩溃监视服务实时捕获 OOM 堆栈，并已<strong>向上游打补丁 Electron</strong>，使其无需笨重的 CDP 机制也能拿到堆栈；这些堆栈喂给每日自动化，分析后对高置信度问题<strong>自动提 PR</strong> 并逐版本验证。配合用户自愿提交的堆快照、以及低采样率的持续堆分配剖析（可做版本间 diff）。
-      </div>
-    </div>
-    <div class="insight"><b>洞见：</b>代理指标（超大载荷）让问题在崩溃发生前就暴露，自动化 PR 让定位到修复形成闭环——这是把人力从「逐个救火」中解放出来的关键。</div>
-  </section>
+  <h2>双路调试：自上而下归因，自下而上溯源</h2>
+  <p class="sub"><span class="tag">Top-down</span><span class="tag">Bottom-up</span></p>
+  <p><strong>自上而下</strong>：把崩溃指标关联到 Statsig 里的功能开关，用 A/B 测试量化某功能对崩溃率的贡献；同时监控<strong>超大消息负载</strong>这类代理指标（与内存问题强相关），并附上调用栈追溯到源码；再用<strong>面包屑</strong>记录崩溃前的活动（并行 agent、工具调用、终端）。</p>
+  <p><strong>自下而上</strong>：主进程跑一个崩溃监视服务，用 Chrome DevTools Protocol（CDP）实时捕获 OOM 崩溃栈，并向上游 Electron 提交补丁以摆脱笨重的 CDP 机制；这些崩溃栈喂给一个<strong>每日自动化</strong>，逐栈分析、为高置信度问题自动提 PR 并逐版本验证修复。配合用户自愿提交的<strong>堆快照</strong>与全量用户的<strong>低采样率堆分配剖析</strong>，团队甚至能对两个版本做内存分配路径的 diff。</p>
+  <p class="take">结论：归因解决“是哪个功能的锅”，溯源解决“具体是哪行代码泄漏”，两者缺一不可。</p>
 
-  <section>
-    <h2><span class="num">04</span>对症下药：急性 OOM 与慢性 OOM</h2>
-    <div class="body">
-      两套方法共同揭示出崩溃落入两种模式。<strong>急性 OOM</strong>：内存骤增、进程瞬死，多见于堆栈而少见于堆快照，常因一次性加载太多数据——应用大量处理用户工作区内容，会从磁盘或 IPC 加载完整文件，而某些工作区含超大文件能把应用噎死，对策是加 killswitch 或把大 blob 分块处理。<strong>慢性 OOM</strong>：内存在会话中缓慢爬升直至越限，多因手动管理的状态未被释放、或经游离强引用泄漏资源——它在堆快照中稳定可见，靠追踪 retainer、理清长生命周期对象来修复，<em class="k">部分修复已回馈上游 VSCode</em>。扩展崩溃则部分靠进程隔离缓解（类似 Chrome 隔离标签页，代价是略多内存）。
-    </div>
-    <div class="insight"><b>洞见：</b>「骤死」和「慢漏」需要完全不同的工具与心智模型——一个靠崩溃堆栈，一个靠堆快照；分清类型才能不浪费定位精力。</div>
-  </section>
+  <h2>两类 OOM，两套打法</h2>
+  <p class="sub">突发型 vs 缓慢累积型</p>
+  <p><strong>突发型 OOM</strong>：内存瞬间飙升导致进程死亡，常因一次性加载过大数据（应用大量读取用户工作区文件，遇到超大文件就会噎住）。靠 <code>killswitch</code> 或把大数据块分批处理来缓解，多见于崩溃栈、少见于堆快照。</p>
+  <p><strong>缓慢累积型 OOM</strong>：内存在一次会话中缓慢爬升，源于状态未正确释放或强引用泄漏；在堆快照中可靠出现，靠追踪 retainer、清理长生命周期对象修复——团队已向 VSCode 上游提交多个泄漏修复。扩展崩溃则通过<strong>进程隔离</strong>（类似 Chrome 隔离标签页）缓解，代价是略多的系统内存。</p>
+  <p class="take">结论：对症下药——突发型靠栈与限流，累积型靠堆快照与生命周期管理。</p>
 
-  <section>
-    <h2><span class="num">05</span>修不难，难在「不让新坑出现」</h2>
-    <div class="body">
-      修崩溃通常比防崩溃容易，因为修复是针对性的；而<em class="k">预防</em>要让每位开发者都意识到自己对稳定性的影响，又不能牺牲 Agent 带来的速度，于是同时投入流程与工具：为每一大类 OOM/崩溃沉淀 <strong>Bugbot 规则</strong>；用 <strong>Skills</strong> 通过 Agentic 计算机使用轻松压测应用；<strong>消除「足枪」</strong>（用垃圾回收替换手动资源管理以避免泄漏）；每次改动后跑传统自动化性能测试；并用<strong>指标回归自动回滚</strong>闭合检测环路。
-    </div>
-    <div class="insight"><b>洞见：</b>Agentic 开发让「上新功能」和「引入性能 bug」都更容易——稳定性靠的不是新魔法，而是把回归预防工程化、自动化。</div>
-  </section>
+  <h2>修复容易，防止复发难</h2>
+  <p class="sub">用流程与工具在不牺牲 agent 速度的前提下守住稳定性</p>
+  <p>团队认为修复是定点的、相对简单，难的是让每个开发者都意识到自己对稳定性的影响。手段包括：为每类已知 OOM/崩溃建立 <strong>Bugbot 规则</strong>、用能做“agentic 计算机操作”的 Skills 做压力测试、用<strong>垃圾回收替代手工管理资源</strong>以消除泄漏隐患、每次代码改动后跑自动性能测试、以及在指标回归时<strong>自动回滚</strong>。</p>
+  <p class="take">结论：在 agent 让发功能和发 bug 都更快的时代，防回归必须工程化、自动化。</p>
 
-  <section class="takeaways">
+  <div class="insights">
     <h2>最值得带走的洞见</h2>
     <ol>
-      <li><b>数字说话。</b>OOM 每会话率较 2 月底峰值降 80%，每请求率自 3 月 1 日降 73%——稳定性是能被度量、被持续压低的工程目标。</li>
-      <li><b>先看见，再治理。</b>分钟级、可按版本拆分、分「每会话/每请求」两口径的仪表盘，是一切快速发现回归的前提。</li>
-      <li><b>两条腿走路。</b>自上而下用特征开关 A/B 和代理指标量化贡献，自下而上用 CDP 崩溃堆栈与堆快照挖根因，并把高置信度修复做成每日自动 PR。</li>
-      <li><b>分型施治。</b>急性 OOM 靠 killswitch 与分块处理，慢性 OOM 靠追 retainer 清理生命周期——部分泄漏修复已回馈上游 VSCode。</li>
-      <li><b>难点在预防。</b>Bugbot 规则、压测 Skills、用 GC 消除足枪、性能测试与自动回滚，让提速不以稳定性为代价——Agentic 时代依旧要靠软件工程基本功，只是为新一代工具重新配套。</li>
+      <li><strong>数字会说话</strong>：OOM 每会话降 80%、每请求降 73%，证明系统化方法比逐个救火更有效。</li>
+      <li><strong>先测量再修复</strong>：分钟级、可按版本拆分的崩溃仪表盘，是一切优化的地基。</li>
+      <li><strong>归因 + 溯源是一对</strong>：A/B 测试告诉你“哪个功能”，崩溃栈与堆快照告诉你“哪行代码”。</li>
+      <li><strong>OOM 分两类、各有解法</strong>：突发型靠限流分块，累积型靠追踪 retainer 与生命周期管理。</li>
+      <li><strong>稳定性是新世代的老功夫</strong>：agent 加速了发布也加速了 bug，软件工程的基本功反而比以往更重要。</li>
     </ol>
-  </section>
-
-  <footer>本页为基于 Cursor 原文《Keeping the Cursor app stable》的中文总结，数据均引自原文。</footer>
+  </div>
 </div>
 </body>
 </html>

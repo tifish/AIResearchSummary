@@ -3,158 +3,130 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>让前沿大模型学会"听谁的"：指令层级训练 · 总结</title>
+<title>强化前沿大模型的"指令层级" — IH-Challenge 总结</title>
 <style>
   :root{
-    --bg:#0e1116; --card:#161a22; --card2:#1c212b;
-    --text:#e8ebf1; --muted:#98a2b3; --line:#28303c;
-    --accent:#6ea8fe; --warn:#ff8a7a; --good:#5dd1a0; --gold:#f2c14e;
+    --bg:#0f1220; --card:#181c2e; --ink:#e9ecf6; --sub:#aab2cf;
+    --accent:#6ea8fe; --good:#3ddc97; --warn:#ffb454; --line:#2a3050;
+    --chip:#222842;
   }
   *{box-sizing:border-box}
-  body{
-    margin:0; background:var(--bg); color:var(--text);
-    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Microsoft YaHei",sans-serif;
-    line-height:1.78; font-size:17px;
-  }
-  .wrap{max-width:760px; margin:0 auto; padding:40px 22px 80px}
-  header.hd{border-bottom:1px solid var(--line); padding-bottom:22px; margin-bottom:30px}
-  .kicker{color:var(--accent); font-size:13px; letter-spacing:.08em; text-transform:uppercase; margin:0 0 10px}
-  h1{font-size:30px; line-height:1.3; margin:0 0 14px}
-  .meta{color:var(--muted); font-size:14px}
-  .lede{
-    background:linear-gradient(135deg,#15263a,#161a22);
-    border:1px solid var(--line); border-left:4px solid var(--accent);
-    border-radius:12px; padding:18px 20px; margin:26px 0 30px; font-size:18px;
-  }
-  .lede b{color:var(--accent)}
-  .hier{display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin:18px 0 36px; justify-content:center}
-  .hier .node{background:var(--card2); border:1px solid var(--line); border-radius:10px; padding:8px 14px; font-weight:700}
-  .hier .node.top{color:var(--good); border-color:#2f5d49}
-  .hier .node.bot{color:var(--warn); border-color:#5d3530}
-  .hier .arrow{color:var(--muted); font-size:18px}
-  .hier .cap{flex-basis:100%; text-align:center; color:var(--muted); font-size:13px; margin-top:4px}
-  section{margin:30px 0}
-  h2{font-size:21px; margin:0 0 6px; line-height:1.4}
-  h2 .tag{display:inline-block; font-size:12px; color:var(--gold); border:1px solid var(--line); border-radius:999px; padding:2px 10px; margin-right:10px; vertical-align:middle}
-  .body{color:#d6dbe6}
-  .take{color:var(--muted); font-style:italic; border-left:2px solid var(--line); padding-left:12px; margin-top:12px}
-  .stat-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin:18px 0}
-  .stat{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px}
-  .stat .big{font-size:22px; font-weight:700; color:var(--good); font-variant-numeric:tabular-nums}
-  .stat .lbl{color:var(--muted); font-size:12.5px; margin-top:4px; line-height:1.5}
-  table{width:100%; border-collapse:collapse; margin:16px 0; font-size:15px; background:var(--card); border-radius:12px; overflow:hidden}
-  th,td{padding:9px 12px; text-align:left; border-bottom:1px solid var(--line)}
-  th{background:var(--card2); color:var(--muted); font-weight:600}
-  td.num{font-variant-numeric:tabular-nums; text-align:right}
-  .up{color:var(--good); font-weight:700}
-  .flat{color:var(--muted)}
-  .down{color:var(--warn)}
-  .pit{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:6px 8px; margin:18px 0}
-  .pit .row{display:flex; gap:12px; padding:11px 12px; border-bottom:1px solid var(--line); align-items:flex-start}
-  .pit .row:last-child{border-bottom:none}
-  .pit .n{color:var(--warn); font-weight:700; min-width:22px}
-  .pit .d{color:#d6dbe6; flex:1}
-  .insights{background:linear-gradient(135deg,#13243a,#161a22); border:1px solid #294063; border-radius:14px; padding:22px 24px; margin-top:40px}
-  .insights h2{color:var(--accent)}
-  .insights ol{margin:14px 0 0; padding-left:22px}
-  .insights li{margin:10px 0}
-  .note{color:var(--muted); font-size:13px; border-top:1px solid var(--line); margin-top:40px; padding-top:16px}
-  b.k{color:var(--gold)}
+  body{margin:0;background:linear-gradient(160deg,#0c0f1c,#141a31);color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.75;padding:32px 16px}
+  .wrap{max-width:820px;margin:0 auto}
+  header{padding:8px 0 22px}
+  .kicker{color:var(--accent);font-weight:700;letter-spacing:.08em;font-size:13px;text-transform:uppercase}
+  h1{font-size:30px;line-height:1.3;margin:.3em 0 .2em}
+  .meta{color:var(--sub);font-size:13px}
+  .lead{background:linear-gradient(135deg,#1d2742,#1a1f38);border:1px solid var(--line);
+    border-left:4px solid var(--accent);border-radius:14px;padding:18px 20px;margin:18px 0 26px;font-size:17px}
+  .lead b{color:var(--accent)}
+  section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:16px 0}
+  h2{font-size:19px;margin:.1em 0 .5em;color:#fff}
+  .take{margin-top:10px;padding:10px 14px;background:#11friends;border-radius:10px}
+  .take{background:#11162a;border-radius:10px;border:1px dashed var(--line);color:var(--sub);font-size:14px}
+  .take b{color:var(--good)}
+  .chain{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}
+  .chain span{background:var(--chip);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-weight:700;font-size:14px}
+  .chain .arrow{background:none;border:none;color:var(--sub);padding:6px 2px}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14px}
+  th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
+  th{color:var(--sub);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+  td.num{font-variant-numeric:tabular-nums;text-align:right}
+  .up{color:var(--good);font-weight:700}
+  .flat{color:var(--sub)}
+  .down{color:var(--warn);font-weight:700}
+  .insights{background:linear-gradient(135deg,#16233f,#1a1530);border:1px solid var(--line)}
+  .insights ol{margin:.4em 0;padding-left:1.2em}
+  .insights li{margin:.5em 0}
+  .insights b{color:var(--accent)}
+  .pill{display:inline-block;background:var(--chip);color:var(--sub);font-size:12px;
+    border:1px solid var(--line);border-radius:999px;padding:2px 10px;margin-right:6px}
 </style>
 </head>
 <body>
 <nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://openai.com/index/instruction-hierarchy-challenge" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
 <div class="wrap">
+<header>
+  <div class="kicker">OpenAI · Research · Alignment</div>
+  <h1>把"该听谁的"训练进模型：IH-Challenge 与指令层级</h1>
+  <div class="meta">来源：OpenAI ｜ 日期：2026-03-10 ｜ 分类：对齐 / 安全</div>
+</header>
 
-  <header class="hd">
-    <p class="kicker">OpenAI · Research · Alignment</p>
-    <h1>让前沿大模型学会"听谁的"：用 IH-Challenge 训练指令层级</h1>
-    <p class="meta">来源 OpenAI ｜ 分类 Research / Alignment / Ethics &amp; Safety ｜ 2026-03-10</p>
-  </header>
+<div class="lead">
+<b>一句话总括：</b>OpenAI 证明，只要用一个"简单到能被 Python 脚本客观判分"的强化学习数据集（IH-Challenge）直接训练模型按可信度排序指令，就能<b>一次性</b>换来更强的安全可控性与抗提示注入能力——而且这种能力会泛化到训练里没见过的、无法客观判分的真实攻击场景。
+</div>
 
-  <div class="lede">
-    一句话总括：本文真正的贡献不是"又一个更安全的模型"，而是一个反直觉且可复现的<b>训练配方</b>——把训练任务刻意设计成<b>简单、可用 Python 程序判分、且没有万能捷径</b>，模型在"该听谁的"这件事上学到的行为，竟能<b>泛化到完全没训练过的真实攻击</b>（安全可控性、提示注入），而且不靠"多拒绝"来作弊。
+<section>
+  <h2>核心问题：很多安全事故，根因都是"听错了人"</h2>
+  <p>越权内容、隐私泄露、提示注入——表面是不同的故障，底层却是同一件事：模型在指令冲突时遵循了不该信任的那一条。OpenAI 把可信度排成一条明确的链条，让模型只在不与高优先级约束冲突时才执行低优先级指令。</p>
+  <div class="chain">
+    <span>系统 System</span><span class="arrow">›</span>
+    <span>开发者 Developer</span><span class="arrow">›</span>
+    <span>用户 User</span><span class="arrow">›</span>
+    <span>工具 Tool</span>
   </div>
+  <div class="take"><b>洞见：</b>把安全、安保、可靠性收敛成一个统一目标——"指令优先级"，意味着修一处就能修一类问题。</div>
+</section>
 
-  <div class="hier">
-    <span class="node top">System</span><span class="arrow">›</span>
-    <span class="node">developer</span><span class="arrow">›</span>
-    <span class="node">user</span><span class="arrow">›</span>
-    <span class="node bot">tool</span>
-    <span class="cap">指令层级：越靠左越可信；低优先级指令只有在不与高优先级冲突时才执行</span>
-  </div>
+<section>
+  <h2>难点：天真地用 RL 训练，会踩三个坑</h2>
+  <p>用强化学习教指令层级很自然：造出有冲突的对话，模型答对就给奖励。但 OpenAI 指出三个陷阱：①任务本身太复杂时，模型"答错"其实是没读懂指令，而非不懂层级；②冲突常常微妙、主观，用另一个 LLM 当裁判判分，裁判自己也会出错；③模型爱学"奖励捷径"，典型就是<b>过度拒绝</b>——靠拒绝一切来刷高安全分。</p>
+  <div class="take"><b>洞见：</b>训练环境的"可判分性"和"无捷径"比数据规模更关键，否则学到的是钻空子而非真本事。</div>
+</section>
 
-  <section>
-    <h2><span class="tag">问题</span>很多安全事故共享同一个根因：模型听错了人</h2>
-    <p class="body">收到违规请求、被套出隐私、被网页里夹带的提示注入攻击——这些表面上不同的安全问题，<b>根因是同一个</b>：当多个来源的指令冲突时，模型把一条<b>本不该信任</b>的低优先级指令当成了权威命令。比如系统消息里写了安全策略，用户却要求违反它，模型就该拒绝；工具返回的内容里藏了恶意命令，模型就该无视而不是执行。把这件事做对，是安全、安全性与可靠性的共同地基。</p>
-    <p class="take">结论：与其为每类攻击单独打补丁，不如直接训练"按可信度排序指令"这一条底层能力。</p>
-  </section>
+<section>
+  <h2>方法：把任务做"傻"，但堵死所有捷径</h2>
+  <p>IH-Challenge 的每个任务就是一段对话：高权限角色给一条简单约束（如"只回答 Yes 或 No"），低权限角色试图诱导违反，然后用一段简单 Python 脚本程序化检查模型是否守住了高优先级约束。三条设计原则：<span class="pill">指令遵循简单</span><span class="pill">可客观判分</span><span class="pill">无通杀捷径</span></p>
+  <div class="take"><b>洞见：</b>故意把"指令复杂度"和"层级判断"解耦，才能确保模型真正在学"听谁的"，而不是在拼阅读理解。</div>
+</section>
 
-  <section>
-    <h2><span class="tag">难点</span>朴素的强化学习有三个坑</h2>
-    <p class="body">用 RL 教指令层级很自然——造冲突对话、让模型回应、听对了就给奖励。但天真照做会踩三个坑：</p>
-    <div class="pit">
-      <div class="row"><span class="n">1</span><span class="d"><b>指令跟随失败被误算成层级失败：</b>模型答错可能只是因为指令本身太复杂，并非不懂角色优先级。</span></div>
-      <div class="row"><span class="n">2</span><span class="d"><b>冲突判定主观、判分不可靠：</b>常用做法是另找一个 LLM 当裁判打分，但裁判自己也会出错。</span></div>
-      <div class="row"><span class="n">3</span><span class="d"><b>模型会学到刷分捷径：</b>经典反面教材就是<b>过度拒绝</b>——靠拒绝一切（包括正常请求）来把"安全分"刷满。</span></div>
-    </div>
-    <p class="take">结论：决定成败的不是 RL 本身，而是训练环境的设计是否堵死了这三个坑。</p>
-  </section>
+<section>
+  <h2>结果：内部模型 GPT-5 Mini-R 全面提升，且不靠多拒绝刷分</h2>
+  <p>在 IH-Challenge 上训练得到的 GPT-5 Mini-R，在学术与内部基准上普遍提升，尤其是冲突最尖锐的"开发者↔用户""系统↔用户"场景。最有说服力的一点：过度拒绝指标从 0.79 拉到满分 1.00，说明它不是靠"什么都拒绝"换来的安全。</p>
+  <table>
+    <tr><th>基准（越高越好）</th><th class="num">GPT-5-Mini</th><th class="num">Mini-R</th><th class="num">变化</th></tr>
+    <tr><td>TensorTrust (dev-user)</td><td class="num">0.76</td><td class="num">0.91</td><td class="num up">+0.15</td></tr>
+    <tr><td>Developer ↔ User 冲突</td><td class="num">0.83</td><td class="num">0.95</td><td class="num up">+0.12</td></tr>
+    <tr><td>System ↔ User 冲突</td><td class="num">0.84</td><td class="num">0.95</td><td class="num up">+0.11</td></tr>
+    <tr><td>TensorTrust (sys-user)</td><td class="num">0.86</td><td class="num">0.94</td><td class="num up">+0.08</td></tr>
+    <tr><td>RealGuardrails (Distractors)</td><td class="num">0.88</td><td class="num">0.95</td><td class="num up">+0.07</td></tr>
+    <tr><td>过度拒绝 overrefusal</td><td class="num">0.79</td><td class="num">1.00</td><td class="num up">+0.21</td></tr>
+  </table>
+  <div class="take"><b>洞见：</b>安全提升与"少添乱"同时发生，打破了"更安全=更难用"的传统取舍。</div>
+</section>
 
-  <section>
-    <h2><span class="tag">方法</span>IH-Challenge：刻意做"简单到可机判"的玩具任务</h2>
-    <p class="body">IH-Challenge 的每个任务就是一段极简对话：高权限角色给一条<b>客观约束</b>（如"只能回答 Yes 或 No"），低权限角色试图诱导模型违反它，然后由被训模型作答。三条设计原则一一对应上面的三个坑：任务在<b>指令跟随层面足够简单</b>、可<b>用一段 Python 脚本客观判分</b>（不依赖 LLM 裁判）、且<b>不存在能在所有任务上稳赢的平凡捷径</b>。</p>
-    <p class="take">结论：把"对不对"变成程序能判的客观事实，是这套方法能稳定泛化、又不退化成过度拒绝的关键。</p>
-  </section>
+<section>
+  <h2>代价很小：能力几乎零回归，只在对话偏好上略让步</h2>
+  <p>通用能力没有塌方：GPQA Diamond 0.83 持平、AIME 2024 由 0.93 升到 0.94。代价仅体现在偏好类指标上——对 o1 的对话胜率从 0.71 降到 0.66，偏好分从 0.46 降到 0.40。</p>
+  <table>
+    <tr><th>能力 / 偏好</th><th class="num">Mini</th><th class="num">Mini-R</th><th class="num">变化</th></tr>
+    <tr><td>GPQA Diamond</td><td class="num">0.83</td><td class="num">0.83</td><td class="num flat">+0</td></tr>
+    <tr><td>AIME 2024</td><td class="num">0.93</td><td class="num">0.94</td><td class="num up">+0.01</td></tr>
+    <tr><td>Chat WinRate vs. o1</td><td class="num">0.71</td><td class="num">0.66</td><td class="num down">−0.05</td></tr>
+    <tr><td>Preference Score</td><td class="num">0.46</td><td class="num">0.40</td><td class="num down">−0.06</td></tr>
+  </table>
+  <div class="take"><b>洞见：</b>用一点对话"讨喜度"换取明显更强的安全边界，对要部署到生产的系统是划算的交易。</div>
+</section>
 
-  <section>
-    <h2><span class="tag">结果</span>GPT-5 Mini-R：进步泛化到没训练过的攻击</h2>
-    <p class="body">用 IH-Challenge 训练得到内部模型 <b>GPT-5 Mini-R</b>。最有说服力的一点是：训练只在玩具任务上做，提升却<b>泛化到留出集和对抗性测试</b>。冲突解决类指标涨幅最大——</p>
-    <table>
-      <thead><tr><th>评测（对抗冲突类）</th><th class="num">GPT-5 Mini</th><th class="num">Mini-R</th></tr></thead>
-      <tbody>
-        <tr><td>TensorTrust (dev-user)</td><td class="num flat">0.76</td><td class="num up">0.91 (+0.15)</td></tr>
-        <tr><td>Developer ↔ User 冲突</td><td class="num flat">0.83</td><td class="num up">0.95 (+0.12)</td></tr>
-        <tr><td>System ↔ User 冲突</td><td class="num flat">0.84</td><td class="num up">0.95 (+0.11)</td></tr>
-        <tr><td>TensorTrust (sys-user)</td><td class="num flat">0.86</td><td class="num up">0.94 (+0.08)</td></tr>
-        <tr><td>RealGuardrails (Distractors)</td><td class="num flat">0.88</td><td class="num up">0.95 (+0.07)</td></tr>
-        <tr><td>System IFEval</td><td class="num flat">0.92</td><td class="num up">0.96 (+0.04)</td></tr>
-      </tbody>
-    </table>
-    <p class="take">结论：在"该听系统/开发者还是该听用户"这类冲突上，提升幅度普遍在 +0.1 量级，且来自从未见过的测试。</p>
-  </section>
+<section>
+  <h2>外溢收益：安全可控性 + 抗提示注入，一举两得</h2>
+  <p>当系统提示里加入分类安全规范时，IH 训练后的模型对来自低优先级的越权请求拒绝/安全完成率更高，<b>且没有牺牲帮助度</b>——不是靠"整体多拒绝"。在提示注入上，面对藏在工具输出里的恶意指令，它在学术基准 CyberSecEval 2 与 OpenAI 内部注入基准上均更稳，内部静态注入评测提升尤为明显。</p>
+  <div class="take"><b>洞见：</b>"指令层级"是一个杠杆点——训练它，安全可控性与安保（抗注入）两端同时受益。</div>
+</section>
 
-  <section>
-    <h2><span class="tag">不作弊</span>过度拒绝不增反降，通用能力几乎无损</h2>
-    <p class="body">最容易被忽视、却最重要的一栏：模型<b>没有靠多拒绝来刷安全分</b>。过度拒绝指标不降反升，通用推理基本持平，只有对话偏好类有轻微代价。</p>
-    <div class="stat-grid">
-      <div class="stat"><div class="big">0.79 → 1.00</div><div class="lbl">IH-Challenge 过度拒绝 (+0.21)，正常请求不再被误拒</div></div>
-      <div class="stat"><div class="big">0.83 → 0.83</div><div class="lbl">GPQA Diamond 持平；AIME 2024 0.93→0.94——推理能力无回退</div></div>
-      <div class="stat"><div class="big" style="color:var(--warn)">0.71 → 0.66</div><div class="lbl">Chat WinRate vs o1 (-0.05)；Preference 0.46→0.40——轻微代价</div></div>
-    </div>
-    <p class="take">结论：安全提升不是用"少干活"换来的——这正是该方法相比"一味多拒绝"的真正价值所在。</p>
-  </section>
-
-  <section>
-    <h2><span class="tag">兑现</span>一次训练，安全可控性与抗注入两头都赢</h2>
-    <p class="body">更强的指令层级一次解锁两类真实收益。<b>安全可控性</b>：在系统提示里加入分类别的安全规范后，模型在 OpenAI 生产安全基准上的拒绝率与安全完成率<b>一致提升</b>，且<b>有用性没有同步下降</b>。<b>抗提示注入</b>：在学术基准 CyberSecEval 2 和包含 ChatGPT Atlas 式攻击的内部注入基准上<b>双双改善</b>，对工具输出里夹带的恶意指令抵抗力显著增强。OpenAI 同时<b>开源了 IH-Challenge 数据集</b>。</p>
-    <p class="take">结论：随着模型越来越"会用工具、会读不可信文档、会在现实里行动"，"稳定优先信任可信指令"正从一项功能升级为核心安全属性。</p>
-  </section>
-
-  <div class="insights">
-    <h2>最值得带走的洞见</h2>
-    <ol>
-      <li><b>很多安全问题是同一个 bug。</b>违规内容、隐私泄露、提示注入，根因都是"模型听了不该信的指令"——所以指令层级是个可统一解决的底层杠杆。</li>
-      <li><b>"简单到可机判"是特性，不是妥协。</b>刻意让任务足够简单、能用 Python 客观判分、没有万能捷径，恰好堵死了 RL 教层级的三个坑。</li>
-      <li><b>泛化是最大惊喜。</b>只在玩具任务上训练，提升却迁移到留出集、对抗测试乃至不可客观判分的真实基准（冲突解决普遍 +0.1 量级）。</li>
-      <li><b>没有用"多拒绝"作弊。</b>过度拒绝 0.79→1.00、推理能力持平，证明安全与有用可以同时拿到，只付出对话偏好的轻微代价。</li>
-      <li><b>这是面向智能体时代的地基工程。</b>模型越自主，"优先信任可信指令"越是核心安全属性；OpenAI 还把 IH-Challenge 开源以推动后续研究。</li>
-    </ol>
-  </div>
-
-  <p class="note">注：GPT-5 Mini-R 为基于 IH-Challenge 训练的内部模型，对照基线为 GPT-5 Mini。数据取自原文给出的学术基准、内部基准与"无能力回退"三张表，以及生产安全基准、CyberSecEval 2 与内部提示注入基准的定性结论。本文为对 OpenAI 官方博文的中文总结。</p>
+<section class="insights">
+  <h2>最值得带走的洞见</h2>
+  <ol>
+    <li><b>统一根因</b>：越权、泄密、提示注入看似三类问题，本质都是"听错了指令"，因此可以用一个目标统一治理。</li>
+    <li><b>简单胜过宏大</b>：可被脚本客观判分、无捷径的"傻任务"，反而比复杂数据更能教会模型正确的优先级判断。</li>
+    <li><b>会泛化才是关键</b>：在简单环境学到的层级行为，迁移到了真实、不可客观判分的攻击场景——这正是该方法的安全价值所在。</li>
+    <li><b>安全不必牺牲实用</b>：过度拒绝降到零（0.79→1.00）、能力几乎零回归，说明"更安全"和"更好用"可以并存。</li>
+    <li><b>面向 Agent 时代的基础设施</b>：模型越自主（调工具、读不可信文档、采取行动），"优先信任可信指令"就越是一项核心安全能力；数据集已公开，邀请社区共建。</li>
+  </ol>
+</section>
 
 </div>
 </body>
-</html>
 </html>

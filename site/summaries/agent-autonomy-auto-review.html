@@ -3,148 +3,120 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>用 Auto-review 治理代理自主权 · 总结</title>
+<title>用 Auto-review 治理 Agent 自主权 · 总结</title>
 <style>
   :root{
-    --bg:#0f1115; --card:#171a21; --card2:#1d2129;
-    --text:#e7eaf0; --muted:#9aa3b2; --line:#2a2f3a;
-    --accent:#6ea8fe; --warn:#ff7a7a; --good:#5dd1a0; --gold:#f2c14e;
+    --bg:#0f1115; --card:#171a21; --ink:#e8eaed; --sub:#a9b0bd;
+    --accent:#5aa9ff; --accent2:#7ee0a8; --warn:#ffb454; --line:#262b35;
   }
   *{box-sizing:border-box}
-  body{
-    margin:0; background:var(--bg); color:var(--text);
-    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Microsoft YaHei",sans-serif;
-    line-height:1.75; font-size:17px;
-  }
-  .wrap{max-width:760px; margin:0 auto; padding:40px 22px 80px}
-  header.hd{border-bottom:1px solid var(--line); padding-bottom:22px; margin-bottom:30px}
-  .kicker{color:var(--accent); font-size:13px; letter-spacing:.08em; text-transform:uppercase; margin:0 0 10px}
-  h1{font-size:30px; line-height:1.3; margin:0 0 14px}
-  .meta{color:var(--muted); font-size:14px}
-  .lede{
-    background:linear-gradient(135deg,#1c2533,#191d26);
-    border:1px solid var(--line); border-left:4px solid var(--accent);
-    border-radius:12px; padding:18px 20px; margin:26px 0 36px; font-size:18px;
-  }
-  .lede b{color:var(--accent)}
-  section{margin:30px 0}
-  h2{font-size:21px; margin:0 0 6px; line-height:1.4}
-  h2 .tag{display:inline-block; font-size:12px; color:var(--gold); border:1px solid var(--line); border-radius:999px; padding:2px 10px; margin-right:10px; vertical-align:middle}
-  .body{color:#d6dbe6}
-  .take{color:var(--muted); font-style:italic; border-left:2px solid var(--line); padding-left:12px; margin-top:12px}
-  .stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0}
-  .stat{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px}
-  .stat .big{font-size:26px; font-weight:700}
-  .stat .lbl{color:var(--muted); font-size:13px; margin-top:4px}
-  .fall{display:flex; align-items:baseline; gap:8px; flex-wrap:wrap}
-  .fall .from{color:var(--muted); text-decoration:line-through}
-  .fall .arrow{color:var(--muted)}
-  .fall .to{color:var(--good); font-weight:700}
-  .pattern{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin:12px 0}
-  .pattern .pct{color:var(--gold); font-weight:700; font-size:18px}
-  .flow{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:16px 0}
-  .flow .node{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:10px 14px; font-size:14px}
-  .flow .node.hot{border-color:var(--accent); color:var(--accent)}
-  .flow .sep{color:var(--muted)}
-  .insights{background:linear-gradient(135deg,#15211b,#171a21); border:1px solid #244235; border-radius:14px; padding:22px 24px; margin-top:40px}
-  .insights h2{color:var(--good)}
-  .insights ol{margin:14px 0 0; padding-left:22px}
-  .insights li{margin:10px 0}
-  .note{color:var(--muted); font-size:13px; border-top:1px solid var(--line); margin-top:40px; padding-top:16px}
-  b.k{color:var(--gold)}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.75 -apple-system,"Segoe UI",Roboto,"Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;}
+  .wrap{max-width:780px;margin:0 auto;padding:40px 22px 64px;}
+  .tag{display:inline-block;font-size:13px;letter-spacing:.5px;color:var(--accent2);
+    border:1px solid var(--line);border-radius:999px;padding:3px 12px;margin-bottom:18px;}
+  h1{font-size:30px;line-height:1.3;margin:0 0 10px;}
+  .meta{color:var(--sub);font-size:14px;margin-bottom:28px;}
+  .lede{background:linear-gradient(135deg,#1b2330,#171a21);border:1px solid var(--line);
+    border-left:4px solid var(--accent);border-radius:12px;padding:18px 20px;margin:0 0 34px;font-size:18px;}
+  .lede b{color:var(--accent);}
+  section{background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:20px 22px;margin:0 0 18px;}
+  h2{font-size:19px;margin:0 0 8px;color:#fff;}
+  h2 .n{color:var(--accent);font-weight:700;margin-right:8px;}
+  .data{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0;}
+  .pill{background:#0e1420;border:1px solid var(--line);border-radius:9px;padding:8px 12px;font-size:14px;}
+  .pill b{color:var(--accent2);font-size:17px;}
+  .insight{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);color:var(--sub);}
+  .insight b{color:var(--warn);}
+  .big{font-size:22px;color:#fff;}
+  .takeaways{background:linear-gradient(135deg,#10261c,#13201a);border:1px solid #1f4233;}
+  .takeaways h2{color:var(--accent2);}
+  ol{margin:8px 0 0;padding-left:22px;}
+  ol li{margin:10px 0;}
+  ol li b{color:#fff;}
+  .foot{color:var(--sub);font-size:13px;margin-top:26px;text-align:center;}
+  a{color:var(--accent);}
 </style>
 </head>
 <body>
 <nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://cursor.com/blog/agent-autonomy-auto-review" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
 <div class="wrap">
-
-  <header class="hd">
-    <p class="kicker">Cursor · Research</p>
-    <h1>用 Auto-review 治理代理自主权</h1>
-    <p class="meta">来源 Cursor ｜ 作者 David Gomes & Travis McPeak ｜ 2026-06-11</p>
-  </header>
+  <span class="tag">Research · Cursor · 2026-06-11</span>
+  <h1>用 Auto-review 把 Agent 自主权做成"旋钮"，而不是"开关"</h1>
+  <div class="meta">作者：David Gomes & Travis McPeak ·
+    <a href="https://cursor.com/blog/agent-autonomy-auto-review">原文</a></div>
 
   <div class="lede">
-    一句话总括：Cursor 把"代理该不该自己动手"从<b>一个全局开关</b>变成<b>一个按情境调节的旋钮</b>——用一个小而能查文件的"分类器"代理，在每个工具调用执行前判断它是否符合用户意图，低风险放行、跨越实质边界才减速。真正的创新不在"加了一道审查"，而在<b>被拦下的动作不弹窗问人，而是把理由回传给父代理自行改道</b>，从而既不牺牲自主性，也不制造审批疲劳。
+    <b>一句话总括：</b>Cursor 的真正贡献，不是又加了一道安全检查，而是用一个能读工作区、带轻量推理的小型"分类器智能体"，
+    在动作执行前判断它<i>是否符合用户意图</i>——从而在几乎不打断用户的情况下给本地 agent 装上可调节的安全闸。
   </div>
 
   <section>
-    <h2><span class="tag">为什么需要</span>"每步都问"本身就是一种安全失败</h2>
-    <p class="body">本地代理就跑在文件、凭证、环境变量、MCP 工具和生产系统旁边，自主性越高、越省事，但一旦动作越界风险也越大。直觉解法是"动手前先问用户"——可问得太频繁，<b>人就不再认真看</b>，审批流于形式，等于没有保护。文章把这点挑明：许可弹窗开太多，不是更安全，而是更不安全。</p>
-    <p class="take">结论：自主与安全的矛盾，不能靠"多问"解决，只能靠"问得准"。</p>
+    <h2><span class="n">01</span>问题：自主与安全的两难，靠"多问一句"解决不了</h2>
+    <p>Agent 要高效，就需要自主；但本地 agent 紧挨着文件、密钥、环境变量、MCP 工具甚至生产系统，自主越多风险越大。
+    最朴素的办法是"每个动作都先问用户"，但弹窗太多反而制造新的安全问题：</p>
+    <p class="big">问得太频繁，人就不再认真看，审批流于形式。</p>
+    <p class="insight"><b>洞见：</b>安全感不等于安全。把"打断频率"本身当成一个要被优化的成本，是这套设计与传统权限弹窗的根本分野。</p>
   </section>
 
   <section>
-    <h2><span class="tag">核心判断</span>风险不在命令本身，而在"动作—意图—后果"的关系</h2>
-    <p class="body">同一条命令，在一个工作流里无害，在另一个里不可接受。所以分类器被赋予的中心规则是：<b>安全代价低就宽松，代价高就谨慎</b>。判断的关键不是"这动作单看像不像危险"，而是"它是否被用户的请求所正当化"。这让常规开发畅通无阻，只有高后果动作才需要用户给出更明确的信号。</p>
-    <p class="take">结论：把"风险"定义成情境关系而非命令黑名单，是整套设计成立的前提。</p>
+    <h2><span class="n">02</span>核心判断：看的不是"动作危不危险"，而是"配不配得上用户的请求"</h2>
+    <p>同一条命令在一个工作流里无害，在另一个里就不可接受。分类器被赋予的中心规则是：
+    <b>安全代价低时更宽松，代价高时更谨慎</b>。关键不是动作孤立看是否冒险，而是它<i>是否被用户的请求所正当化</i>。</p>
+    <p class="insight"><b>洞见：</b>把"意图一致性"作为裁决标准，让日常开发畅通无阻，只有真正高后果的动作才需要用户给出更明确的信号。</p>
   </section>
 
   <section>
-    <h2><span class="tag">怎么造</span>小模型、能查工作区、不另开端点</h2>
-    <p class="body">分类器卡在代理循环里、在工具执行<b>之前</b>运行，所以必须又快又准。一个反直觉的发现是：<b>推理能力更弱的模型未必更快</b>——它读不懂策略或工具调用时，反而会消耗更多 token 去找一个更差的答案。最佳折中是"一个有足够推理力、能干净利落下判断的小模型"。它还是<b>能动手的（agentic）</b>：像 <code>python script.py</code> 是否安全要看文件内容，于是分类器可用 <b class="k">ReadFile、Grep、Glob、ListDir</b> 先查工作区再决定。为省下每次调用前的额外往返延迟，它不走独立分类端点，而是<b>与父代理共用同一 RPC 流</b>，采用类似子代理的架构。</p>
-    <p class="take">结论：放在执行路径上的安全组件，"低延迟"和"够聪明"必须同时满足，工程取舍都围绕这一点。</p>
-  </section>
-
-  <section>
-    <h2><span class="tag">关键设计</span>拦截不等于弹窗，而是给父代理一条反馈</h2>
-    <p class="body">最重要的决定是"拦下之后做什么"。Cursor 刻意<b>不让分类器变成又一个审批弹窗生成器</b>：它阻止某动作时，会把<b>解释</b>回传给父代理，父代理常常据此收窄动作、换个工具或绕开危险步骤，<b>全程不打扰用户</b>。让这条反馈有用的，正是"用户意图"——判断标准始终是"这动作是否被用户要做的事所正当化"。</p>
-    <div class="flow">
-      <span class="node">动作待执行</span><span class="sep">→</span>
-      <span class="node hot">分类器审查</span><span class="sep">→</span>
-      <span class="node">拦截 + 解释</span><span class="sep">→</span>
-      <span class="node">父代理改走更窄路径</span><span class="sep">→</span>
-      <span class="node">继续工作（不打扰用户）</span>
+    <h2><span class="n">03</span>工程取舍：小模型、能动手、零额外往返</h2>
+    <p>分类器跑在每次工具调用之前，必须又快又准。一个反直觉的发现是——</p>
+    <p class="big">低推理模型并不总是更快：它读不懂策略时会反复纠结，花更多 token 得到更差答案。</p>
+    <div class="data">
+      <div class="pill">模型策略：<b>小模型 + 足够推理</b></div>
+      <div class="pill">可调用工具：<b>ReadFile / Grep / Glob / ListDir</b></div>
+      <div class="pill">部署：<b>同一 RPC 流</b>，无独立端点</div>
     </div>
-    <p class="take">结论：把"拦截"重新定义成"给代理的反馈"而非"给用户的提问"，是降本增效的关键一招。</p>
+    <p>它是"agentic"的：像 <code>python script.py</code> 这种命令，安全与否取决于文件内容，所以分类器会先检查工作区再裁决；
+    并与父 agent 共用 RPC 流（类似 subagent 架构），避免每次审查前都多一次网络往返带来的延迟。</p>
+    <p class="insight"><b>洞见：</b>安全组件必须"隐形"——延迟和成本一旦显现，就会被绕过或关掉。把它塞进 agent 主循环而非旁路，是能默认开启的前提。</p>
   </section>
 
   <section>
-    <h2><span class="tag">怎么测</span>真实会话打底，合成数据补极端</h2>
-    <p class="body">评测要同时覆盖"该放行的"和"该拦截的"。第一组数据来自内部真实使用、用来摸清正常开发的形态：从约 <b class="k">12 小时</b>内部开发会话出发，裁剪去重后整理成 <b class="k">6,122</b> 行标注。但最坏情况在日常里出现得不够，于是再用<b>合成数据</b>补上：读取密钥、触碰生产数据、跟随不可信指令、造成大副作用等。评测跑在与生产<b>完全相同</b>的后端分类器循环上，覆盖工具调用、最终判定、模型覆盖和解析失败的全路径。团队还专门盯"<b>抖动（flapping）</b>"：同一案例放行 6 次又拦 4 次，往往意味着策略或提示词没说清——反复运行就能揪出这些不稳定案例并收紧。</p>
-    <p class="take">结论：策略会随认知变化，每次改类别都要重标数据，否则是在用旧标准考新模型。</p>
-  </section>
-
-  <section>
-    <h2><span class="tag">效果</span>4% 被拦，7% 会话有中断，对比此前 40%</h2>
-    <p class="body">实际上只有一小部分动作需要分类器审查——很多命令已被允许清单或沙箱覆盖，分类器主要在"需要情境判断"时才出场。它运行时约阻止 <b class="k">4%</b> 的动作，但拦截不等于立刻弹窗。最终落到用户头上的中断很少：Auto-review 模式下仅约 <b class="k">7%</b> 的会话会出现至少一次中断。作为对照，部分合作的企业客户此前组织内约 <b>40%</b> 的动作被直接阻止。</p>
-    <div class="stat-grid">
-      <div class="stat">
-        <div class="big">~4%</div>
-        <div class="lbl">分类器运行时被阻止的动作占比（且未必弹窗）</div>
-      </div>
-      <div class="stat">
-        <div class="big">~7%</div>
-        <div class="lbl">Auto-review 会话中出现 ≥1 次用户中断的比例</div>
-      </div>
+    <h2><span class="n">04</span>评测：真实数据定基线，合成数据补极端</h2>
+    <div class="data">
+      <div class="pill">来源：约 <b>12 小时</b> 内部开发会话</div>
+      <div class="pill">去重标注后：<b>6,122 行</b></div>
+      <div class="pill">合成场景：读密钥/碰生产数据/跟随不可信指令</div>
     </div>
-    <div class="stat">
-      <div class="fall"><span class="big">动作被阻止率</span></div>
-      <div class="fall"><span class="from">~40%（部分企业此前）</span><span class="arrow">→</span><span class="to">~7% 会话有中断</span></div>
-      <div class="lbl">从"频繁硬拦"转向"少数情境化中断"</div>
-    </div>
-    <p class="take">结论：大多数被拦的情况里，父代理能据反馈换一条更窄更安全的路继续做，用户基本无感。</p>
+    <p>评测直接跑生产同款后端分类器回路，覆盖工具使用、最终判定、模型回退与解析失败的完整路径。
+    团队还专门盯"抖动"（flapping）：同一案例六次放行四次拦截，往往说明策略或提示词定义不清，需要收紧到行为一致。</p>
+    <p class="insight"><b>洞见：</b>策略一变就得重新标注/重建评测集，否则是在用过时的问题定义考核新分类器——安全策略的"数据债"是持续工程成本。</p>
   </section>
 
   <section>
-    <h2><span class="tag">边界与展望</span>仍是早期，目标是把"减速"绑定到情境</h2>
-    <p class="body">Auto-review 仍处早期，目前聚焦桌面端的<b>本地代理</b>；随着代理能力增强，对"自主权连续谱"的理解还会变。Cursor 想要的是：让代理拥有真正的自主，同时把"何时该减速"交给<b>情境</b>而非一个全局许可开关来决定。它<b>已对新用户默认开启</b>，老用户可在 <b>Settings &gt; Agents</b> 启用。</p>
-    <p class="take">结论：这套"分类器 + 反馈"的思路，预计会扩展到更多治理代理自主权的场景。</p>
+    <h2><span class="n">05</span>效果：拦截很少，打断更少</h2>
+    <div class="data">
+      <div class="pill">分类器运行时拦截：<b>约 4%</b> 动作</div>
+      <div class="pill">含中断的对话：<b>仅约 7%</b></div>
+      <div class="pill">对照（部分企业旧方案）：<b>约 40%</b> 动作被拦</div>
+    </div>
+    <p>多数动作早被允许列表或沙箱覆盖，分类器只在需要上下文判断时才出手。即便拦截，也是先把<b>解释返回给父 agent</b>，
+    后者通常能收窄动作、换个工具或干脆避开风险步骤，而不必惊动用户。</p>
+    <p class="insight"><b>洞见：</b>从约 40% 拦截到约 7% 对话才中断，量级差异说明"反馈给 agent 自我修正"比"反馈给人审批"在体验上是数量级的改进。</p>
   </section>
 
-  <div class="insights">
-    <h2>最值得带走的洞见</h2>
+  <section class="takeaways">
+    <h2>最值得带走的 5 条洞见</h2>
     <ol>
-      <li><b>"多问"是伪安全。</b>审批弹窗一多，人就不再细读，保护形同虚设——真正的安全来自"问得准"，而非"问得多"。</li>
-      <li><b>风险是情境关系，不是命令黑名单。</b>判断标准被定义为"动作是否被用户意图正当化"，同一命令可放行也可拦截。</li>
-      <li><b>拦截 ≠ 弹窗。</b>把阻止变成"回传给父代理的反馈"，让代理自行改道，是同时压低安全风险与审批疲劳的关键一招。</li>
-      <li><b>数字会说话。</b>分类器运行时仅拦约 4% 动作、仅约 7% 会话出现中断，对照部分企业此前约 40% 的硬拦，体验改善显著。</li>
-      <li><b>放在执行路径上的安全件，必须又快又聪明。</b>共用 RPC 流省往返、小模型留足推理、能查工作区再判断——工程取舍都服务于"低延迟 + 够准"。</li>
+      <li><b>自主权应是连续旋钮：</b>由上下文（后果×意图）决定是否减速，而非一个全局权限开关。</li>
+      <li><b>判据是意图一致性：</b>问"这动作配不配得上用户的请求"，而不是"这动作看起来危不危险"。</li>
+      <li><b>小而能推理 + agentic：</b>低推理未必更快；让分类器能读工作区、并嵌进主 RPC 流，才能既准又无额外延迟。</li>
+      <li><b>把打断当成本来优化：</b>拦截先反馈给父 agent 自我修正，约 4% 拦截最终只让约 7% 对话产生中断。</li>
+      <li><b>安全策略有数据债：</b>策略迭代必须同步重标评测集，并用重复跑测找"抖动"来保证行为稳定。</li>
     </ol>
-  </div>
+  </section>
 
-  <p class="note">注：本文为 Cursor 研究博客《Governing agent autonomy with Auto-review》（2026-06-11，David Gomes & Travis McPeak）的中文总结；4%、7%、40%、6,122 行、12 小时等均为原文数据。</p>
-
+  <div class="foot">目前聚焦桌面端本地 agent，新用户默认开启，老用户可在 Settings &gt; Agents 启用。</div>
 </div>
 </body>
 </html>

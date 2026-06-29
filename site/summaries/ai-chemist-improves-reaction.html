@@ -3,124 +3,98 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>近乎自主的 AI 化学家改进了一类医药化学难反应</title>
+<title>近自主 AI 化学家改进药物化学难反应</title>
 <style>
   :root{
-    --bg:#0f1115; --card:#171a21; --card2:#1e222b; --ink:#e8eaed; --muted:#9aa3af;
-    --accent:#4ea1ff; --accent2:#7ee787; --warn:#ffb454; --line:#2a2f3a;
-    --good:#2ea043;
+    --ink:#1a1f2b; --muted:#5a6270; --line:#e3e7ee;
+    --accent:#0b6e5b; --accent2:#1463c4; --hl:#fff6da; --card:#f7f9fc;
   }
   *{box-sizing:border-box}
   body{
-    margin:0; background:var(--bg); color:var(--ink);
-    font:16px/1.75 -apple-system,"Segoe UI",Roboto,"Helvetica Neue","Microsoft YaHei",sans-serif;
-    -webkit-font-smoothing:antialiased;
+    margin:0; background:#fdfdfb; color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans CJK SC","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.75; font-size:17px;
   }
-  .wrap{max-width:760px; margin:0 auto; padding:40px 22px 80px}
-  .kicker{color:var(--accent); font-weight:700; letter-spacing:.08em; font-size:13px; text-transform:uppercase}
-  h1{font-size:30px; line-height:1.3; margin:.35em 0 .2em; letter-spacing:-.01em}
-  .meta{color:var(--muted); font-size:14px; margin-bottom:26px}
+  .wrap{max-width:780px; margin:0 auto; padding:40px 22px 72px}
+  header{border-bottom:3px solid var(--accent); padding-bottom:18px; margin-bottom:8px}
+  .tag{display:inline-block; font-size:12px; letter-spacing:.08em; text-transform:uppercase;
+    color:#fff; background:var(--accent); padding:3px 10px; border-radius:20px; margin-bottom:12px}
+  h1{font-size:28px; line-height:1.35; margin:.2em 0}
+  .meta{color:var(--muted); font-size:14px; margin-top:6px}
   .lede{
-    background:linear-gradient(135deg,#1b2533,#171a21);
-    border:1px solid var(--line); border-left:4px solid var(--accent);
-    border-radius:12px; padding:18px 20px; margin:0 0 30px; font-size:18px; line-height:1.7;
+    background:var(--card); border-left:5px solid var(--accent2);
+    padding:18px 20px; border-radius:8px; margin:26px 0; font-size:18px;
   }
   .lede b{color:var(--accent2)}
-  h2{font-size:21px; margin:42px 0 6px; line-height:1.4}
-  h2 .num{color:var(--accent); font-variant-numeric:tabular-nums; margin-right:.4em}
-  .sub{color:var(--muted); font-size:14px; margin:0 0 14px}
-  p{margin:.6em 0}
+  h2{font-size:20px; margin:38px 0 6px; padding-top:10px; border-top:1px solid var(--line)}
+  .sub{color:var(--muted); font-size:14.5px; margin:0 0 12px}
+  mark{background:var(--hl); padding:1px 4px; border-radius:4px; font-weight:600}
   .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:18px 0}
-  .stat{background:var(--card2); border:1px solid var(--line); border-radius:10px; padding:14px 16px}
-  .stat .big{font-size:26px; font-weight:800; color:var(--accent2); font-variant-numeric:tabular-nums; line-height:1.1}
-  .stat .lbl{color:var(--muted); font-size:13px; margin-top:4px}
-  .flow{
-    display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:14px 0;
-    color:var(--muted); font-size:14px;
-  }
-  .chip{background:var(--card2); border:1px solid var(--line); color:var(--ink); border-radius:999px; padding:6px 12px; font-size:13px}
-  .arrow{color:var(--accent)}
-  .take{font-weight:600; color:var(--ink)}
-  .note{background:#211c12; border:1px solid #3a3017; border-left:4px solid var(--warn); border-radius:10px; padding:12px 16px; margin:16px 0; font-size:14.5px; color:#f0e4cf}
-  .insights{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:8px 22px 18px; margin-top:38px}
-  .insights h2{margin-top:22px}
-  ol.ins{counter-reset:i; list-style:none; padding-left:0; margin:6px 0}
-  ol.ins li{counter-increment:i; position:relative; padding:12px 0 12px 46px; border-bottom:1px dashed var(--line)}
-  ol.ins li:last-child{border-bottom:0}
-  ol.ins li::before{
-    content:counter(i); position:absolute; left:0; top:11px;
-    width:30px; height:30px; border-radius:8px; background:var(--accent); color:#06121f;
-    font-weight:800; display:flex; align-items:center; justify-content:center; font-size:15px;
-  }
-  .end{color:var(--muted); font-size:13px; margin-top:34px; border-top:1px solid var(--line); padding-top:14px}
-  b.h{color:var(--accent2)}
+  .stat{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px 16px}
+  .stat .n{font-size:24px; font-weight:700; color:var(--accent)}
+  .stat .l{font-size:13px; color:var(--muted); margin-top:4px}
+  .take{font-weight:600; color:var(--accent)}
+  .insights{background:#0f1b2d; color:#eaf0f8; border-radius:12px; padding:24px 26px; margin:40px 0 10px}
+  .insights h2{color:#fff; border-top:none; margin-top:0}
+  .insights ol{margin:10px 0 0; padding-left:20px}
+  .insights li{margin:12px 0}
+  .insights b{color:#7fd9c4}
+  .quote{font-style:italic; color:var(--muted); border-left:3px solid var(--line); padding-left:14px; margin:18px 0}
+  footer{color:var(--muted); font-size:13px; margin-top:30px; text-align:center}
 </style>
 </head>
 <body>
 <nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://openai.com/index/ai-chemist-improves-reaction" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
 <div class="wrap">
-
-  <div class="kicker">OpenAI · Research</div>
-  <h1>近乎自主的 AI 化学家，改进了一类医药化学里的"硬骨头"反应</h1>
-  <div class="meta">来源：OpenAI · 2026 年 6 月 17 日 · 与 Molecule.one 合作</div>
+  <header>
+    <span class="tag">Research · OpenAI</span>
+    <h1>近自主 AI 化学家，攻克了药物合成里一个"老大难"反应</h1>
+    <div class="meta">来源：OpenAI　|　日期：2026‑06‑17　|　合作方：Molecule.one（Maria）</div>
+  </header>
 
   <div class="lede">
-    一句话总括：GPT‑5.4 在一套接入真实高通量实验室的智能化学体（Maria）中，<b>自己提出了一个让化学家意外的假设</b>——用温和氧化剂 TEMPO 改进伯磺酰胺的 Chan–Lam 偶联——并通过两轮共 10,080 个真实反应得到验证，再由人类化学家在台架上手工复现。它证明的不是"AI 能自己跑完一个化学项目"，而是"AI 已能在研究闭环的关键环节做出可被同行检验的真实贡献"。
+    <b>一句话总括：</b>这不是又一篇"模型综述文献"的论文——GPT‑5.4 在自动化实验室里<b>自主提出了一个连化学家都觉得意外的假设</b>（用温和氧化剂 TEMPO），并经 10,080 次反应与人工台架复现证实，真实地改进了药物化学中长期低产的 Chan–Lam 偶联反应。它的意义在于：AI 第一次在"提出意外想法 → 设计实验 → 解读数据 → 设计后续实验"的科研闭环里贡献了可被同行复现的化学发现。
   </div>
 
-  <h2><span class="num">01</span>问题为什么重要：合成是新药发现的瓶颈</h2>
-  <p class="sub">能不能做出分子，决定了能不能测试这个分子。</p>
-  <p>小分子药物全靠有机合成。Chan–Lam 偶联用来形成<b class="h">碳氮键</b>——药物里极常见的键，但它并非对所有底物都好用。其中<b class="h">伯磺酰胺与硼酸的偶联历来收率很低</b>，而磺酰胺这一基团广泛出现在抗癌药、抗菌药和利尿剂中。把这个反应做得更可靠，等于把医药化学家"能探索的分子空间"直接撑大。</p>
-  <p class="take">结论：选这个反应不是为了炫技，而是卡在一个真实、有临床价值、却长期低效的合成瓶颈上。</p>
+  <h2>问题为什么重要：合成是新药发现的瓶颈</h2>
+  <p class="sub">科学家只能测试他们"造得出来"的分子。</p>
+  <p>Chan–Lam 偶联用于生成药物中常见的碳氮键，但<mark>一级磺酰胺与硼酸的偶联历来产率很低</mark>。而磺酰胺广泛存在于抗癌药、抗菌药和利尿剂中。一个反应若产率低、副产物多，化学家往往只能放弃有潜力的分子。<span class="take">结论：让这个反应更可靠，等于直接拓宽了医药化学家能探索的分子空间。</span></p>
 
-  <h2><span class="num">02</span>系统怎么搭：模型出主意，实验室出数据，人类把关</h2>
-  <p class="sub">"近乎自主"而非"完全自主"——人类的判断仍是必需品。</p>
-  <div class="flow">
-    <span class="chip">GPT‑5.4 生成并排序数千个研究提案</span>
-    <span class="arrow">→</span>
-    <span class="chip">人类筛出最高分的 4 个进实验室</span>
-    <span class="arrow">→</span>
-    <span class="chip">Maria 译成详细实验网格并运行</span>
-    <span class="arrow">→</span>
-    <span class="chip">结果回传给 GPT‑5.4 分析、提出下一轮</span>
-  </div>
-  <p>四个提案里，<b>OAI‑M1‑03</b> 提议用 TEMPO 等温和氧化剂——化学家觉得"既意外又有意思"。人类的主要修正是<b class="h">避免使用 DMSO 作溶剂</b>，担心它与对照用的强氧化剂反应。整个过程历时三个月：从 3 月 4 日第一个提示，到 6 月 4 日把结果交给独立专家。</p>
-  <p class="take">结论：模型负责"提出关键想法"，人类负责高层把关、纠正细节、备料和手工复现——这重新定义了"自主"的边界在哪里。</p>
+  <h2>方法：前沿模型 + 智能体 + 自动化实验室 + 人类判断</h2>
+  <p class="sub">"近自主"而非"全自主"——人始终在环。</p>
+  <p>科学家撰写的提示词驱动 GPT‑5.4 生成并排序数千份研究提案；人类化学家从最高排名中选出 4 个进入实验室；Maria AI 把高层计划翻译成详细实验指令、跑高通量实验、分析原始数据并回传给 GPT‑5.4。最有前景的 <mark>OAI‑M1‑03</mark> 提议用 TEMPO 等温和氧化剂改进磺酰胺合成。人类的关键修正之一是避免使用 DMSO 溶剂（担心它与对照用的强氧化剂反应）。<span class="take">结论：模型贡献了核心科研想法，人类提供高层引导、纠错与物理实验室的控制权。</span></p>
 
-  <h2><span class="num">03</span>发现了什么：TEMPO 让难反应整体抬升</h2>
-  <p class="sub">不是个别样本好看，而是在多样底物上重复出现的效应。</p>
+  <h2>结果：平均产率提升，更多反应达到"实用"水平</h2>
+  <p class="sub">规模是可信度的关键——两轮共跑了一万多次反应。</p>
   <div class="stats">
-    <div class="stat"><div class="big">10,080</div><div class="lbl">两轮共运行的反应数<br>≈ 化学家做十年</div></div>
-    <div class="stat"><div class="big">16.6%→25.2%</div><div class="lbl">平均收率</div></div>
-    <div class="stat"><div class="big">15.6%→37.5%</div><div class="lbl">收率超 30% 的反应占比</div></div>
-    <div class="stat"><div class="big">88% / 83%</div><div class="lbl">收率提升的硼酸 / 磺酰胺底物比例</div></div>
+    <div class="stat"><div class="n">10,080</div><div class="l">两轮反应总数（≈化学家十年手工量）</div></div>
+    <div class="stat"><div class="n">88% / 83%</div><div class="l">产率提升的硼酸 / 磺酰胺占比</div></div>
+    <div class="stat"><div class="n">16.6%→25.2%</div><div class="l">平均产率上升</div></div>
+    <div class="stat"><div class="n">15.6%→37.5%</div><div class="l">产率&gt;30% 的反应占比</div></div>
   </div>
-  <p>规模本身就是方法的一部分：化学结果在少数样本上容易误导，上万次反应才让团队能从<b class="h">10 种氧化剂里挑出 TEMPO</b>、看到效应跨多样组合重复、并找出它的局限。第二轮还发现一个实用细节——<b class="h">更便宜的 4‑羟基‑TEMPO 能近乎等效替代</b> TEMPO。</p>
-  <p class="take">结论：高通量给出的不只是"一个好结果"，而是"一个在统计上站得住、还自带成本优化方案"的结果。</p>
+  <p>万次规模让团队能在 10 种氧化剂中识别出 TEMPO，看到效果在多样底物上重复出现，也看清它的边界。第二轮还发现<mark>更廉价的 4‑羟基‑TEMPO 可替代 TEMPO 且性能损失很小</mark>——这把发现从"有趣"推向"可负担"。<span class="take">结论：足够大的样本量把"偶然好看"的结果，变成了可信、可重复的规律。</span></p>
 
-  <h2><span class="num">04</span>它是真的吗：放大到台架后仍然成立</h2>
-  <p class="sub">微升级筛选的假象会在更大尺度上消失——所以人类把它重做了一遍。</p>
-  <p>人类化学家手工在台架尺度复现代表性反应：<b class="h">14 对底物里 11 对收率上升，其中 8 对提升超过两倍</b>。这一步关键，因为极小尺度实验有时会引入放大后消失的假象，台架验证也是论文发表的惯例。四位外部化学专家审阅了预印本，认为结果<b>新颖、值得分享</b>。更强的检验还在后头：独立实验室能否复现、化学家在更广分子上是否觉得好用。</p>
-  <div class="note">同期测试的另三个提案：OAI‑M1‑02、OAI‑M1‑04 获实验证实，OAI‑M1‑01 被证伪——这说明系统会出真知灼见，也会出错，而筛选与验证机制能把对错分开。</div>
+  <h2>验证：从微升筛选走到台架规模，并经外部专家评审</h2>
+  <p class="sub">小规模实验可能产生在放大后消失的假象。</p>
+  <p>人类化学家手工复现代表性反应：<mark>14 对底物中有 11 对产率提高，其中 8 对增幅超过 2 倍</mark>。四位外部化学专家评审预印本，认可结果新颖、值得分享。全程历时三个月（3 月 4 日首个提示词 → 6 月 4 日交付独立专家）。<span class="take">结论：台架复现 + 同行评审，让这个 AI 主导的发现达到了可发表、可被独立实验室检验的门槛。</span></p>
+  <p class="quote">"高通量实验与现代 AI 的结合代表了科学发现的新前沿……异常温和的条件与实用的氧化剂，为药物合成中最常用的反应之一带来了相当普适的底物范围。"——外部评审专家</p>
 
-  <h2><span class="num">05</span>边界与安全：明确说清"它没证明什么"</h2>
-  <p class="sub">把能力放在一个有正当科学价值、又可控的问题里。</p>
-  <p>作者强调这<b>不</b>等于 AI 能独立从头到尾跑完一个化学研究项目：人类判断不可或缺，工作依赖专门的高通量基础设施，也未证明方法能推广到其他偶联反应或生产条件。安全上，工作被刻意限定在合法的医药化学问题，未涉及毒素或有害化合物；模型已通过英国 AI 安全研究所的相关评估，并叠加了"人类选提案、审计划、掌控物理设备"这一层控制。</p>
-  <p class="take">结论：负责任的研究方式 = 选有明确价值的问题 + 模型层安全 + 专家监督 + 受约束的物理实验，三者缺一不可。</p>
+  <h2>边界：它能做什么，不能做什么</h2>
+  <p class="sub">诚实地界定结论范围，是这项工作的一部分。</p>
+  <p>它<b>证明</b>了模型能在有机化学中做出有用贡献（提出特定意外假设、设计与解读实验）；它<b>没有证明</b> AI 能端到端独立运行一个化学研究项目——人类判断不可或缺，且依赖专门的高通量基础设施。产率来自高通量平台，台架仅验证 14 对代表性底物；该方法能否推广到其他偶联反应、底物类别或量产条件，仍待验证。此外，工作被刻意限定在正当的医药化学问题上，未涉及毒素或有害化合物，并叠加了模型层安全护栏与专家监督。<span class="take">结论：这是一个"被严格限定边界"的早期成果，而非通用化学自主能力的证据。</span></p>
 
   <div class="insights">
-    <h2>最值得带走的 5 条洞见</h2>
-    <ol class="ins">
-      <li>AI 的贡献第一次落在"提出意外且正确的假设"上——TEMPO 改进伯磺酰胺 Chan–Lam 偶联，这比综述文献或建议一次性实验高了一个量级。</li>
-      <li>规模是方法论：10,080 次反应把"运气好看"和"真效应"区分开，也是从 10 种氧化剂里筛出赢家、并发现廉价替代品的前提。</li>
-      <li>可验证性是这项工作的硬通货——微升级结果在台架上 14 对中 11 对复现、且多数翻倍，加上四位外部专家背书，让它经得起检验。</li>
-      <li>"近乎自主"是当下诚实的定位：模型出想法，人类把关、纠错、复现；AI 接管了研究闭环的一部分，但远未接管全部。</li>
-      <li>能力与风险同源——把工作限定在正当问题、叠加模型安全与人类对物理设施的控制，是研究实验化学 AI 的可复制范式。</li>
+    <h2>最值得带走的洞见</h2>
+    <ol>
+      <li><b>AI 提出了意外的真知。</b>关键贡献不是算力或综述，而是 GPT‑5.4 自主锁定"一级磺酰胺"这一高价值难题，并提出连化学家都感到意外的 TEMPO 假设。</li>
+      <li><b>规模把运气变成证据。</b>10,080 次反应（≈人类十年手工量）让"偶然好看"无处藏身，平均产率 16.6%→25.2%、实用产率占比 15.6%→37.5% 才站得住脚。</li>
+      <li><b>跨尺度复现是分水岭。</b>从微升筛选走到台架，14 对底物 11 对提升、8 对翻倍，加上四位外部专家评审，使其达到可发表、可被独立检验的标准。</li>
+      <li><b>"近自主"是务实的诚实。</b>模型提想法，人类做选择、纠错（如弃用 DMSO）并掌控物理实验室——这正是当下负责任地研究 AI 实验化学的方式。</li>
+      <li><b>真正的考验还在后面。</b>独立实验室能否复现、效果能否覆盖更广分子，才是这一发现价值的最终裁决。</li>
     </ol>
   </div>
 
-  <div class="end">关键数字一览：10,080 个反应 · 平均收率 16.6%→25.2% · 超 30% 收率占比 15.6%→37.5% · 台架 11/14 对提升 · 历时 3 个月（3 月 4 日 → 6 月 4 日）· 4 位外部专家审阅。</div>
-
+  <footer>基于 OpenAI 官方博客（2026‑06‑17）整理的中文总结，数据与结论均引自原文。</footer>
 </div>
 </body>
 </html>

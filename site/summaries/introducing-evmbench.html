@@ -6,121 +6,120 @@
 <title>EVMbench：衡量 AI 智能体攻防智能合约的能力</title>
 <style>
   :root{
-    --bg:#0f1117; --card:#181b24; --ink:#e8eaf0; --muted:#9aa3b2;
-    --accent:#5b8cff; --accent2:#34d399; --danger:#ff6b6b; --warn:#f7b955;
-    --line:#262b38;
+    --bg:#0e1116; --card:#171b22; --ink:#e8ecf1; --muted:#9aa6b2;
+    --accent:#4ea1ff; --accent2:#36d399; --warn:#ffb454; --danger:#ff6b6b;
+    --line:#262c36;
   }
   *{box-sizing:border-box}
   body{
-    margin:0; background:linear-gradient(180deg,#0c0e14,#0f1117 240px);
-    color:var(--ink); font:16px/1.7 -apple-system,"Segoe UI",Roboto,"Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;
-    padding:0 18px 80px;
+    margin:0; background:linear-gradient(180deg,#0b0e13,#0e1116 240px);
+    color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
+    "Hiragino Sans GB","Microsoft YaHei",sans-serif; line-height:1.75;
   }
-  .wrap{max-width:820px;margin:0 auto}
-  header{padding:54px 0 22px;border-bottom:1px solid var(--line)}
-  .tag{display:inline-block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;
-    color:var(--accent2);border:1px solid var(--line);border-radius:999px;padding:4px 12px;margin-bottom:18px}
-  h1{font-size:34px;line-height:1.25;margin:0 0 14px;font-weight:800;letter-spacing:-.01em}
-  .meta{color:var(--muted);font-size:14px}
-  .lede{
-    margin:26px 0 0;padding:20px 22px;background:linear-gradient(135deg,#1a2233,#161a24);
-    border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:14px;font-size:18px
+  .wrap{max-width:820px; margin:0 auto; padding:48px 22px 80px}
+  .kicker{color:var(--accent); font-weight:700; letter-spacing:.08em; font-size:13px; text-transform:uppercase}
+  h1{font-size:30px; line-height:1.3; margin:.3em 0 .2em}
+  .meta{color:var(--muted); font-size:14px; margin-bottom:26px}
+  .tldr{
+    background:linear-gradient(135deg,#15233a,#172a26); border:1px solid var(--line);
+    border-left:4px solid var(--accent); border-radius:12px; padding:18px 20px; margin:24px 0 34px;
+    font-size:17px;
   }
-  .lede b{color:#fff}
-  h2{font-size:21px;margin:46px 0 6px;font-weight:750}
-  h2 .lead{display:block;font-size:14px;color:var(--muted);font-weight:500;margin-top:4px}
-  p{margin:12px 0}
-  .insight{color:var(--accent2);font-weight:600}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:22px 0}
-  .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
-  .stat .n{font-size:30px;font-weight:800;letter-spacing:-.02em}
-  .stat .n.up{color:var(--accent2)} .stat .n.big{color:var(--accent)} .stat .n.warn{color:var(--warn)}
-  .stat .l{font-size:13px;color:var(--muted);margin-top:6px}
-  .modes{display:grid;grid-template-columns:1fr;gap:12px;margin:18px 0}
-  .mode{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;gap:14px;align-items:flex-start}
-  .mode .k{flex:0 0 84px;font-weight:700;color:var(--accent)}
-  .mode.ex .k{color:var(--accent2)}
-  .bar{margin:14px 0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
-  .bar .row{display:flex;align-items:center;gap:12px;margin:10px 0}
-  .bar .name{flex:0 0 130px;font-size:14px;color:var(--muted)}
-  .track{flex:1;height:22px;background:#11141d;border-radius:8px;overflow:hidden;border:1px solid var(--line)}
-  .fill{height:100%;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:12px;font-weight:700;color:#06210f}
-  .fill.now{background:linear-gradient(90deg,#1f6f4a,#34d399)}
-  .fill.old{background:linear-gradient(90deg,#3a3f4d,#6b7280);color:#e8eaf0}
-  .note{background:#1c1410;border:1px solid #3a2a18;border-left:4px solid var(--warn);border-radius:12px;padding:14px 18px;margin:18px 0;color:#f0d9bd}
-  ul.takeaways{list-style:none;padding:0;margin:14px 0;counter-reset:t}
-  ul.takeaways li{counter-increment:t;background:var(--card);border:1px solid var(--line);border-radius:12px;
-    padding:14px 16px 14px 54px;margin:10px 0;position:relative}
-  ul.takeaways li::before{content:counter(t);position:absolute;left:14px;top:13px;width:26px;height:26px;
-    background:var(--accent);color:#06122e;border-radius:8px;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:14px}
-  .end{margin:40px 0 0;padding:22px;background:linear-gradient(135deg,#15211b,#141821);border:1px solid var(--line);border-radius:14px}
-  .end h2{margin-top:0}
+  .tldr b{color:var(--accent2)}
+  h2{font-size:21px; margin:38px 0 6px; padding-top:8px; border-top:1px solid var(--line)}
+  .lead{color:var(--muted); font-size:14px; margin:0 0 12px}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px 18px; margin:14px 0}
+  .stat-row{display:flex; flex-wrap:wrap; gap:14px; margin:18px 0}
+  .stat{flex:1 1 150px; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px}
+  .stat .n{font-size:28px; font-weight:800; color:var(--accent)}
+  .stat .n.up{color:var(--accent2)}
+  .stat .l{font-size:13px; color:var(--muted); margin-top:2px}
+  .bar{height:10px; border-radius:6px; background:#222933; overflow:hidden; margin:6px 0 2px}
+  .bar > span{display:block; height:100%}
+  .insight{color:var(--accent2); font-weight:600}
+  .modes li{margin:6px 0}
+  .modes b{color:var(--warn)}
+  .takeaways{background:linear-gradient(135deg,#1a2030,#101622); border:1px solid var(--line); border-radius:14px; padding:8px 22px 18px}
+  .takeaways h2{border-top:none}
+  .takeaways ol{padding-left:20px}
+  .takeaways li{margin:10px 0}
+  .tag{display:inline-block; font-size:12px; color:var(--muted); border:1px solid var(--line); border-radius:999px; padding:2px 10px; margin-right:6px}
   a{color:var(--accent)}
 </style>
 </head>
 <body>
 <nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://openai.com/index/introducing-evmbench" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
 <div class="wrap">
-<header>
-  <span class="tag">OpenAI · Research · 2026-02-18</span>
-  <h1>EVMbench：把 AI 智能体放进“千亿美元合约”的攻防靶场</h1>
-  <div class="meta">来源 OpenAI（与 Paradigm 合作） · 原文标题 Introducing EVMbench</div>
-</header>
 
-<p class="lede"><b>一句话总括：</b>EVMbench 不是又一个刷分榜，而是首个在<strong>真实经济环境</strong>下、用确定性链上沙箱去测量 AI 智能体能否“发现、修补、利用”高危智能合约漏洞的基准——它把“AI 在网络安全里既是矛也是盾”这件事变成了<strong>可复现的数字</strong>。</p>
+  <div class="kicker">OpenAI · Research</div>
+  <h1>EVMbench：给 AI 智能体的“智能合约攻防考卷”</h1>
+  <div class="meta">来源：OpenAI（与 Paradigm 合作）· 2026 年 2 月 18 日</div>
 
-<h2>为什么这事值得测：合约托管的是真金白银
-  <span class="lead">智能合约长期管理着 1000 亿美元以上的开源加密资产，攻防能力差一点，后果都是钱。</span></h2>
-<p>当 AI 智能体读写、执行代码的能力快速增长时，在“有经济意义”的环境里量化它们的能力就变得紧迫。EVMbench 取材于 40 次审计、共 117 个精选高危漏洞，多数来自 Code4rena 等公开审计竞赛，并额外纳入了面向稳定币支付的 <em>Tempo</em> L1 区块链审计场景——这正是“智能体驱动的稳定币支付”预计快速增长的方向。<span class="insight">把基准锚定在即将爆发的支付场景，是它区别于纯学术 benchmark 的关键。</span></p>
+  <div class="tldr">
+    一句话总括：EVMbench 第一次用<b>可复现、可量化</b>的方式回答“AI 智能体能在多大程度上发现、修补和攻破智能合约漏洞”——
+    答案是<b>“攻易守难”</b>：模型已能端到端地把合约里的钱掏空，却仍不擅长穷尽式审计和无副作用地修复。
+  </div>
 
-<div class="grid">
-  <div class="stat"><div class="n big">$100B+</div><div class="l">智能合约托管的开源加密资产</div></div>
-  <div class="stat"><div class="n">117</div><div class="l">精选高危漏洞</div></div>
-  <div class="stat"><div class="n">40</div><div class="l">漏洞来源的审计数量</div></div>
-  <div class="stat"><div class="n warn">$10M</div><div class="l">承诺投入的网络防御 API 额度</div></div>
-</div>
+  <h2>它为什么重要：被守护的是上千亿美元</h2>
+  <p class="lead">关键数据 → 趋势 → 结论</p>
+  <p>智能合约常态化地保护着 <b>超过 1000 亿美元</b>的开源加密资产。当 AI 智能体越来越会读写和执行代码，它们既是潜在攻击者，也是潜在防御者。
+  <span class="insight">结论：在这种“经济上真实有后果”的环境里测量模型能力，本身就是一种网络安全风险预警。</span></p>
 
-<h2>三种能力模式：发现、修补、利用
-  <span class="lead">同一批漏洞，从三个角度逼问智能体——审得出吗？补得好吗？真能打穿吗？</span></h2>
-<div class="modes">
-  <div class="mode"><div class="k">Detect</div><div>审计整个合约仓库，按对“真值漏洞”的<strong>召回率</strong>及对应审计赏金计分。</div></div>
-  <div class="mode"><div class="k">Patch</div><div>修改易受攻击的合约，必须<strong>保持原有功能</strong>的同时消除可利用性，由自动化测试与漏洞利用检查验证。</div></div>
-  <div class="mode ex"><div class="k">Exploit</div><div>在沙箱链上执行端到端的<strong>资金抽取攻击</strong>，通过交易重放与链上验证程序化评分。</div></div>
-</div>
-<p>评测框架用 Rust 编写：部署合约、确定性重放智能体交易、限制不安全的 RPC 方法。利用任务跑在隔离的本地 <em>Anvil</em> 实例而非真实网络，且所有漏洞都是历史上已公开记录的。<span class="insight">确定性重放 + 历史漏洞，是“可复现、可负责任发布”的工程底座。</span></p>
+  <h2>基准长什么样：117 个真实漏洞，外加稳定币支付场景</h2>
+  <div class="stat-row">
+    <div class="stat"><div class="n">117</div><div class="l">精选高危漏洞</div></div>
+    <div class="stat"><div class="n">40</div><div class="l">来源审计项目</div></div>
+    <div class="stat"><div class="n">3</div><div class="l">能力模式</div></div>
+  </div>
+  <p>漏洞多数取自 Code4rena 等公开代码审计竞赛，另外加入了为<b>高吞吐、低成本稳定币支付</b>而设计的 Tempo L1 区块链的若干审计场景。
+  <span class="insight">结论：把基准延伸到“支付型合约”，正是押注智能体驱动的稳定币支付将成为下一个实际高发领域。</span></p>
 
-<h2>核心结果：六个月内，攻击得分翻倍
-  <span class="lead">在目标最明确的“利用”模式上，前沿模型的提升幅度惊人。</span></h2>
-<div class="bar">
-  <div class="row"><div class="name">GPT‑5.3‑Codex（Codex CLI）</div>
-    <div class="track"><div class="fill now" style="width:71%">71.0%</div></div></div>
-  <div class="row"><div class="name">GPT‑5（约半年前）</div>
-    <div class="track"><div class="fill old" style="width:33.3%">33.3%</div></div></div>
-</div>
-<p>在 Exploit 模式下，GPT‑5.3‑Codex 拿下 <strong>71.0%</strong>，相对约六个月前发布、仅 <strong>33.3%</strong> 的 GPT‑5 是<strong>翻倍级</strong>跃升。<span class="insight">这条曲线本身就是“AI 网络安全能力拐点”的一手证据。</span></p>
+  <h2>三种考法：检测、修补、利用</h2>
+  <ul class="modes">
+    <li><b>Detect 检测</b>：审计合约仓库，按对真实漏洞的召回率与对应赏金计分。</li>
+    <li><b>Patch 修补</b>：改写易受攻击的合约，必须既保留功能又消除可利用性，由自动测试与漏洞检查验证。</li>
+    <li><b>Exploit 利用</b>：在沙盒链上对部署的合约发起端到端“掏空资金”攻击，通过交易重放与链上验证程序化评分。</li>
+  </ul>
+  <p class="lead">为保证客观可复现，团队用 Rust 写了测试框架，在隔离的本地 <b>Anvil</b> 环境中确定性重放交易、限制不安全 RPC 方法；所有漏洞都是历史且公开记录的。</p>
 
-<h2>但“补”和“审”仍是短板：智能体爱见好就收
-  <span class="lead">任务目标越模糊，模型表现越差——它们偏爱明确的胜利条件。</span></h2>
-<p>智能体在 Exploit 上表现最好，因为目标极其清晰：<em>一直迭代直到把钱抽干</em>。相比之下：Detect 模式里，智能体常常找到<strong>一个</strong>问题就停手，而非穷尽式审计整个代码库；Patch 模式里，<strong>既保功能又消除隐蔽漏洞</strong>始终很难。因此 Detect 召回率与 Patch 成功率都<strong>远未达到满覆盖</strong>。<span class="insight">“会打不一定会防”——防御侧的能力缺口，恰恰是最该被关注的风险面。</span></p>
+  <h2>核心结果：六个月，攻破率从 33% 跳到 71%</h2>
+  <div class="card">
+    <div>GPT‑5.3‑Codex（经 Codex CLI）· exploit 模式</div>
+    <div class="bar"><span style="width:71%;background:linear-gradient(90deg,#36d399,#4ea1ff)"></span></div>
+    <div style="font-size:13px;color:var(--muted)">71.0%</div>
+    <div style="margin-top:10px">GPT‑5（六个多月前发布）· exploit 模式</div>
+    <div class="bar"><span style="width:33.3%;background:#ff6b6b"></span></div>
+    <div style="font-size:13px;color:var(--muted)">33.3%</div>
+  </div>
+  <p><span class="insight">结论：仅半年多，模型的实战攻破能力翻了一倍多</span>——这正是“AI 对攻防双方都可能是变革性力量”的实证，也意味着风险演进速度远快于直觉。</p>
 
-<div class="note"><strong>诚实的边界：</strong>EVMbench 不等于真实世界的全部难度。漏洞来自 Code4rena 竞赛，虽真实且高危，但被大规模部署、经过更多审视的合约可能更难打穿；Detect 模式下，智能体若报出审计员没发现的“额外问题”，目前<strong>无法可靠区分</strong>这是真漏洞还是误报；Exploit 设定中交易顺序重放，依赖精确时序的攻击不在范围内，链状态是干净的本地 Anvil 而非主网分叉，且只支持单链。</div>
+  <h2>有趣的行为差异：目标越明确，模型越强</h2>
+  <p>智能体在 exploit 上表现最好，因为目标极其明确——“不断迭代直到资金被掏空”。而在 detect 上，它们<b>常常找到一个问题就停手</b>，而非穷尽式审计；在 patch 上，<b>既要消除细微漏洞又要保留完整功能</b>仍然很难。detect 召回率与 patch 成功率都低于完整覆盖。
+  <span class="insight">结论：当前模型擅长“有清晰胜利条件的进攻”，不擅长“开放式、需要彻底性的防守”。</span></p>
 
-<h2>既是尺子，也是行动呼吁：把 AI 拉进防御一侧
-  <span class="lead">网络安全天然是“双刃剑”，OpenAI 选择用证据驱动、加速防御者、拖慢滥用。</span></h2>
-<p>OpenAI 把 EVMbench 同时定位为<strong>测量工具</strong>和<strong>号召</strong>：呼吁开发者和安全研究者把 AI 辅助审计纳入工作流。配套动作包括——扩大安全研究智能体 <em>Aardvark</em> 的私测、为广泛使用的开源项目提供免费代码库扫描，以及在 2023 年网络安全资助计划之上，再承诺 <strong>1000 万美元 API 额度</strong>加速网络防御（尤其面向开源软件与关键基础设施）。其缓解手段涵盖安全训练、自动化监控、高级能力的可信访问与威胁情报执行管线。</p>
+  <h2>诚实的边界：基准不等于真实世界的全部难度</h2>
+  <p>漏洞来自审计竞赛，虽真实且高危，但广泛部署的主流合约受过更多审视、更难攻破；detect 模式无法判断模型多报的漏洞是“人类漏掉的真问题”还是误报；exploit 采用顺序重放、干净的本地链（而非主网分叉）、仅支持单链，需依赖时序的攻击和某些主网部署被排除在外。
+  <span class="insight">结论：分数应被读作“能力下界与趋势信号”，而非“现实安全水平的最终判决”。</span></p>
 
-<div class="end">
-<h2>最值得带走的洞见</h2>
-<ul class="takeaways">
-  <li><strong>能力拐点是真的：</strong>同一“利用”任务上的得分半年内从 33.3% 跳到 71.0%，AI 的攻防能力正以可测的速度逼近实战。</li>
-  <li><strong>攻强于防：</strong>智能体在目标明确的攻击上最强，却在需要穷尽审计、保持功能的“发现/修补”上明显落后——防御自动化才是当前的能力洼地。</li>
-  <li><strong>经济锚定是设计重点：</strong>1000 亿美元资产 + 面向稳定币支付的 Tempo 场景，让基准衡量的是“有钱可丢”的真实风险，而非抽象分数。</li>
-  <li><strong>可复现是负责任发布的前提：</strong>Rust 确定性重放、隔离 Anvil、仅用已公开历史漏洞，让评测既硬核又不外溢攻击能力。</li>
-  <li><strong>结论是“加速防御者”：</strong>OpenAI 用开放任务工具、Aardvark 扩测和 1000 万美元额度，把这条曲线的红利尽量推向防御一侧——读者该据此把 AI 审计纳入自己的安全流程。</li>
-</ul>
-</div>
+  <h2>不只是测量，更是行动号召</h2>
+  <p>OpenAI 同步推进防御侧投入：扩大安全研究智能体 <b>Aardvark</b> 的私测、为广泛使用的开源项目提供免费代码库扫描，并基于 2023 年的网络安全资助计划再投入 <b>1000 万美元</b> API 额度，重点支持开源软件与关键基础设施。基准的任务、工具与评测框架全部开放。
+  <span class="insight">结论：因为网络安全本质“双重用途”，策略是“加速防御者、拖慢滥用者”的循证迭代路线。</span></p>
+
+  <div class="takeaways">
+    <h2>最值得带走的洞见</h2>
+    <ol>
+      <li><b>能力不对称是核心发现：</b>AI 当前“攻强守弱”，目标明确的攻击进步快，开放式的检测与修补仍是瓶颈。</li>
+      <li><b>进步速度惊人：</b>exploit 得分半年从 33.3% 升到 71.0%，提醒我们 AI 网络风险按月而非按年演进。</li>
+      <li><b>真实经济场景才有意义：</b>117 个真实漏洞 + 守护 1000 亿美元的合约，让评测扎根于有实际后果的环境。</li>
+      <li><b>支付型合约是新前沿：</b>纳入 Tempo 稳定币支付场景，预判智能体驱动的链上支付将成为高发领域。</li>
+      <li><b>测量即倡议：</b>开放基准、扩大 Aardvark、投入 1000 万美元，意在把 AI 辅助审计推成开发者与安全研究者的标准工作流。</li>
+    </ol>
+  </div>
+
+  <div style="margin-top:26px">
+    <span class="tag">Benchmark</span><span class="tag">智能合约安全</span><span class="tag">AI Agent</span><span class="tag">双重用途</span>
+  </div>
 
 </div>
 </body>
-</html>
 </html>

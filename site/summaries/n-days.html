@@ -3,130 +3,144 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>N-day 正在变成 N-hour · 总结</title>
+<title>N-day 正在变成 N-hour：大模型如何加速已知漏洞利用</title>
 <style>
   :root{
-    --bg:#0f1013; --card:#17191f; --card2:#1d2026;
-    --text:#e9ebf0; --muted:#9aa1ae; --line:#2a2e38;
-    --accent:#ff7a7a; --accent2:#ffb454; --good:#5dd1a0; --gold:#f2c14e; --blue:#6ea8fe;
+    --bg:#0f1115; --card:#171a21; --ink:#e8eaed; --sub:#a8b0bd;
+    --accent:#ff6b4a; --accent2:#4ea1ff; --good:#48c78e; --warn:#f2c14e;
+    --line:#2a2f3a;
   }
   *{box-sizing:border-box}
-  body{margin:0; background:var(--bg); color:var(--text);
-    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Microsoft YaHei",sans-serif;
-    line-height:1.78; font-size:17px;}
-  .wrap{max-width:780px; margin:0 auto; padding:38px 22px 80px}
-  header.hd{border-bottom:1px solid var(--line); padding-bottom:22px; margin-bottom:28px}
-  .kicker{color:var(--accent); font-size:13px; letter-spacing:.08em; text-transform:uppercase; margin:0 0 10px; font-weight:700}
-  h1{font-size:29px; line-height:1.32; margin:0 0 14px}
-  .meta{color:var(--muted); font-size:14px}
-  .meta a{color:var(--good); text-decoration:none}
-  .lede{background:linear-gradient(135deg,#2a1518,#191a20);
-    border:1px solid var(--line); border-left:4px solid var(--accent);
-    border-radius:12px; padding:18px 20px; margin:24px 0 34px; font-size:18px;}
-  .lede b{color:var(--accent)}
-  section{margin:30px 0}
-  h2{font-size:21px; margin:0 0 8px; line-height:1.42}
-  h2 .tag{display:inline-block; font-size:12px; color:var(--accent2); border:1px solid var(--line); border-radius:999px; padding:2px 10px; margin-right:10px; vertical-align:middle; white-space:nowrap}
-  .body{color:#d6dbe6}
-  .take{color:var(--muted); font-style:italic; border-left:2px solid var(--accent); padding-left:12px; margin-top:12px}
-  .stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0}
-  .stat{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px}
-  .stat .big{font-size:27px; font-weight:800; color:var(--accent)}
-  .stat .lbl{color:var(--muted); font-size:13px; margin-top:4px}
-  b.k{color:var(--gold)}
-  b.s{color:var(--good)}
-  code{background:#0b0c10; border:1px solid var(--line); border-radius:6px; padding:1px 6px; font-size:14px}
-  table{width:100%; border-collapse:collapse; margin:18px 0; font-size:15px}
-  th,td{border:1px solid var(--line); padding:9px 11px; text-align:center}
-  th{background:var(--card2); color:var(--muted); font-weight:600}
-  td.m{text-align:left; color:#d6dbe6}
-  .hot{color:var(--accent); font-weight:800}
-  .timeline{display:flex; align-items:stretch; gap:0; flex-wrap:wrap; margin:18px 0; border:1px solid var(--line); border-radius:12px; overflow:hidden}
-  .timeline .cell{flex:1; min-width:120px; padding:14px 12px; background:var(--card)}
-  .timeline .cell+.cell{border-left:1px solid var(--line)}
-  .timeline .d{font-size:13px; color:var(--muted)}
-  .timeline .v{font-size:18px; font-weight:800; margin-top:3px}
-  .timeline .red{color:var(--accent)} .timeline .grn{color:var(--good)}
-  .insights{background:linear-gradient(135deg,#15211b,#171920); border:1px solid #244235; border-radius:14px; padding:22px 24px; margin-top:42px}
-  .insights h2{color:var(--good)}
-  .insights ol{margin:14px 0 0; padding-left:22px}
-  .insights li{margin:11px 0}
-  .note{color:var(--muted); font-size:13px; border-top:1px solid var(--line); margin-top:40px; padding-top:16px}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.75; font-size:17px;
+  }
+  .wrap{max-width:820px; margin:0 auto; padding:40px 22px 80px}
+  header{border-bottom:2px solid var(--line); padding-bottom:22px; margin-bottom:30px}
+  .tag{display:inline-block; font-size:12px; letter-spacing:.08em; color:var(--accent);
+    border:1px solid var(--accent); border-radius:20px; padding:3px 12px; margin-bottom:14px}
+  h1{font-size:30px; line-height:1.3; margin:6px 0 10px}
+  .meta{color:var(--sub); font-size:14px}
+  .lead{
+    background:linear-gradient(135deg,#241a18,#1a2030); border:1px solid var(--line);
+    border-left:4px solid var(--accent); border-radius:10px; padding:18px 20px; margin:26px 0;
+    font-size:18px;
+  }
+  .lead b{color:var(--accent)}
+  h2{font-size:21px; margin:38px 0 6px; line-height:1.35}
+  h2 .n{color:var(--accent2); font-variant-numeric:tabular-nums; margin-right:8px}
+  .sec{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px 20px; margin:14px 0}
+  .kicker{color:var(--sub); font-size:13px; text-transform:uppercase; letter-spacing:.05em}
+  .take{margin-top:10px; padding-top:10px; border-top:1px dashed var(--line); color:var(--good)}
+  .take::before{content:"洞见 → "; color:var(--sub)}
+  .stats{display:flex; flex-wrap:wrap; gap:12px; margin:16px 0}
+  .stat{flex:1 1 150px; background:#10131a; border:1px solid var(--line); border-radius:10px; padding:14px 16px}
+  .stat .big{font-size:28px; font-weight:700; color:var(--accent); font-variant-numeric:tabular-nums}
+  .stat .lab{font-size:13px; color:var(--sub); margin-top:2px}
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:15px}
+  th,td{padding:9px 10px; border-bottom:1px solid var(--line); text-align:left}
+  th{color:var(--sub); font-weight:600; font-size:13px}
+  td.num{font-variant-numeric:tabular-nums; color:var(--accent2); font-weight:600}
+  .hi{color:var(--accent); font-weight:600}
+  .timeline{background:#10131a; border:1px solid var(--line); border-radius:10px; padding:16px 18px; margin:14px 0}
+  .timeline div{padding:4px 0}
+  .timeline .t{color:var(--warn); font-variant-numeric:tabular-nums; display:inline-block; min-width:90px; font-weight:600}
+  .final{background:linear-gradient(135deg,#16221c,#1a1f2e); border:1px solid var(--good);
+    border-radius:12px; padding:22px 24px; margin:36px 0 0}
+  .final h2{margin-top:0; color:var(--good)}
+  .final ol{margin:0; padding-left:20px}
+  .final li{margin:10px 0}
+  .final li b{color:var(--ink)}
 </style>
 </head>
 <body>
 <nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);border-bottom:1px solid rgba(127,127,127,.25);font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;"><a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/n-days" target="_blank" rel="noopener noreferrer" style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a></nav>
 <div class="wrap">
 
-  <header class="hd">
-    <p class="kicker">Anthropic · Frontier Red Team</p>
-    <h1>"N-day"正在变成"N-hour"：前沿模型把补丁武器化的时间，从专家数周压成一个下午</h1>
-    <p class="meta">来源：Anthropic ｜ 2026 年 6 月 8 日 ｜ 分类：Frontier Red Team ｜ <a href="https://www.anthropic.com/research/n-days">原文链接</a></p>
-  </header>
+<header>
+  <span class="tag">Anthropic · Frontier Red Team</span>
+  <h1>N-day 正在变成 N-hour：大模型把“专家数周”的漏洞利用压成一个下午</h1>
+  <div class="meta">来源：Anthropic · 2026 年 6 月 8 日 · 作者 Winnie Xiao 等</div>
+</header>
 
-  <div class="lede">
-    一句话总括：真正的贡献不是"证明 LLM 能写漏洞利用"（这早就可能），而是<b>用可验证的实测量出了"量"和"速度"的质变</b>——最强的 <b>Claude Mythos Preview</b> 能在补丁公开后几小时内、花几千美元，自主把一批 N-day 补丁变成可用利用。防御界赖以生存的"打补丁时间窗"假设（武器化要花专家数周、且专家稀缺）就此崩塌。
+<div class="lead">
+  <b>一句话总括：</b>这篇研究用真实补丁做实测，证明前沿模型已经基本拆除了 N-day 漏洞利用中最难、最依赖稀缺逆向专家的环节——把“补丁”自主变成“可用利用代码”。门槛从专家数周，坍缩为<b>几千美元 API 费用 + 几小时 + 零专业背景</b>。
+</div>
+
+<p>N-day 指<b>已公开披露、但只在部分设备上打了补丁</b>的漏洞。补丁本身就是一张通往 bug 的地图：攻击者用“补丁比对（patch diff）”对照打补丁前后的代码或二进制，反推出被修复的漏洞。历史上这一步慢且专业，给了防守方铺开更新的时间窗口。这篇文章衡量的，正是大模型把这个窗口压缩了多少。</p>
+
+<h2><span class="n">01</span>为什么 N-day 比 0-day 更危险，而历史窗口正在消失</h2>
+<div class="sec">
+  <div class="kicker">关键数据与趋势</div>
+  <p>0-day 无人知晓，而 N-day 的补丁<b>反而成了攻击的路线图</b>，写出利用往往只是时间问题。历史上这个“时间”很长，给了防守缓冲：</p>
+  <div class="timeline">
+    <div><span class="t">59 天</span>WannaCry 在 MS17-010 之后才爆发（2017）</div>
+    <div><span class="t">约 2 周</span>Citrix Bleed 公开利用出现（2023）</div>
+    <div><span class="t">≥1 个月</span>Mandiant 2020 分析：25 个漏洞中有 16 个利用耗时一个月以上</div>
+  </div>
+  <p class="take">利用开发历来是 N-day 攻击链中最受“逆向专家稀缺”制约的瓶颈——所以它一旦被自动化，整个防御时间表都要重写。</p>
+</div>
+
+<h2><span class="n">02</span>Firefox（开源）：补丁发布当小时，利用已经写好</h2>
+<div class="sec">
+  <div class="kicker">实验设置</div>
+  <p>评测 <span class="hi">18 个 SpiderMonkey（Firefox JS 引擎）补丁</span>，来自 Firefox 148/149（2 月 24 日、3 月 24 日发布），只保留在源码库公开<b>≥90 天</b>的 bug，跑在命令行版 <code>jsshell</code> 上。模型在无网络的 Linux 容器里，只拿到公开 diff（去掉回归测试）、组件名、严重度评级和两个带 AddressSanitizer 的构建——拿不到漏洞通告或复现脚本。Firefox 的补丁中位间隙仅 <b>19 天</b>，已是行业里的“最优情况”。</p>
+  <p style="color:var(--sub);font-size:15px">逻辑：连防守这么快的软件都守不住，其他软件的间隙只会更宽。</p>
+
+  <div class="stats">
+    <div class="stat"><div class="big">2 → 11</div><div class="lab">可用 PoC 数：Opus 4.5 → Opus 4.8</div></div>
+    <div class="stat"><div class="big">14</div><div class="lab">Mythos Preview 的 PoC（共 18 个漏洞）</div></div>
+    <div class="stat"><div class="big">8</div><div class="lab">Mythos 自主写出的完整利用</div></div>
   </div>
 
-  <section>
-    <h2><span class="tag">先理解威胁</span>N-day 比 0-day 更危险：补丁本身就是漏洞的地图</h2>
-    <p class="body">0-day 是厂商都不知道的漏洞；<b>N-day</b> 是已公开披露、但只在部分设备上打了补丁的漏洞——攻击者专打那些"还没更新"的系统，这段空隙叫<b>补丁差距（patch gap）</b>。一旦厂商发布更新，攻击者就能做<b class="k">patch diff</b>：对比打补丁前后的源码或二进制，精确定位改了什么，反推出漏洞所在。历来这是又慢又专业的逆向活，正是这份"慢"给了防御者铺开更新的时间。</p>
-    <div class="timeline">
-      <div class="cell"><div class="d">WannaCry（2017）</div><div class="v red">补丁后 59 天</div></div>
-      <div class="cell"><div class="d">Citrix Bleed（2023）</div><div class="v red">公开利用 ~2 周</div></div>
-      <div class="cell"><div class="d">Mandiant 2020 分析</div><div class="v red">25 个里 16 个需 1 月+</div></div>
-    </div>
-    <p class="take">结论：N-day 的危险恰恰来自补丁的公开性——它给攻击者递了一张藏宝图，过去只是缺人会看图。</p>
-  </section>
+  <table>
+    <tr><th>阶段</th><th>Mythos Preview</th><th>对照</th></tr>
+    <tr><td>首个 PoC</td><td class="num">约 12 分钟</td><td>40 分钟内 13 个</td></tr>
+    <tr><td>一致性（50 次试验全过）</td><td class="num">7 个漏洞</td><td>Opus 4.8 / 4.6 各仅 1 个</td></tr>
+    <tr><td>首个完整利用</td><td class="num">&lt; 1 小时</td><td>12 小时内共 8 个</td></tr>
+    <tr><td>完整利用总数</td><td class="num">8</td><td>Opus 4.8: 2；Opus 4.6 / Sonnet 4.6: 各 1</td></tr>
+  </table>
+  <p>判定“成功利用”的标准很硬：要读出 JS 沙箱够不到的随机密钥（证明任意原生代码执行），且<b>只在有漏洞的版本上</b>读到、补丁版本读不到。</p>
+  <p class="take">Mythos 在 Mozilla 发布某补丁后<b>一小时内</b>就写出了对应利用——而打了该补丁的 Firefox 148 当时还要 18 天才发布。防守的时间窗口实际上是负数。</p>
+</div>
 
-  <section>
-    <h2><span class="tag">实验一 · Firefox</span>对防御者近乎最优的场景，照样被攻破</h2>
-    <p class="body">选 Firefox 是因为它对防御者几乎是<b>最好情况</b>：自动后台下载更新、重启即生效、紧急情况单独发版，且 Mozilla 把"小数点"补丁从月度提速到约<b>每周一次</b>，本研究所用补丁的中位补丁差距仅 <b class="hot">19 天</b>——已快于行业普遍的数周到数月。测试对象是 Firefox 148/149（2 月 24 日、3 月 24 日发布）的 <b>18 个 SpiderMonkey（JS 引擎）安全补丁</b>，只保留修复已公开满 90 天的漏洞。模型在无网络的 Linux 容器里，只拿到<b>公开 diff（删掉回归测试）、组件名、Mozilla 严重度、修复前后两个带 ASan 的 <code>jsshell</code> 构建</b>——拿不到漏洞通告、复现脚本或受限的 Bugzilla 工单。</p>
-    <table>
-      <tr><th>模型</th><th>能写出 PoC（/18）</th><th>能写出完整利用</th></tr>
-      <tr><td class="m">Opus 4.5</td><td>2</td><td>—</td></tr>
-      <tr><td class="m">Sonnet 4.6</td><td>—</td><td>1</td></tr>
-      <tr><td class="m">Opus 4.6</td><td>—</td><td>1</td></tr>
-      <tr><td class="m">Opus 4.8</td><td>11</td><td>2</td></tr>
-      <tr><td class="m"><span class="hot">Mythos Preview</span></td><td class="hot">14</td><td class="hot">8</td></tr>
-    </table>
-    <p class="body">PoC（让有漏洞的构建崩溃、打了补丁的不崩）是最难的一步，它证明模型已定位漏洞并能按需触发。从 Opus 4.5 到 Opus 4.8，可成功 PoC 的补丁数从 <b>2 跳到 11</b>，Mythos 达 14 个，<b>首个 PoC 约 12 分钟</b>、13 个在 40 分钟内完成。一致性测试（每漏洞跑 50 次）中，Mythos 有 <b>7 个漏洞 50 次全中</b>，而 Opus 4.8 / 4.6 只在 1 个漏洞上做到这种稳定。</p>
-    <p class="body">把崩溃升级成<b>真利用</b>（读取 JS 沙箱够不到的随机密钥 = 任意原生代码执行，且只在有漏洞的构建上读到）时，Mythos 彻底拉开差距：<b>首个利用不到 1 小时</b>，约 12 小时内造出 8 个；其余模型最多 1–2 个。最尖锐的对照是——Mythos 在 <b>Mozilla 发布补丁后不到 1 小时</b>就有了利用，而打了该补丁的 Firefox 148 <b class="hot">还要 18 天才发布</b>。</p>
-    <p class="take">结论：连"自动更新 + 19 天补丁差距"这种最有利的防御场景都拦不住，其他软件的窗口只会更宽。</p>
-  </section>
+<h2><span class="n">03</span>Windows（闭源）：没有源码，照样从普通用户提权到 SYSTEM</h2>
+<div class="sec">
+  <div class="kicker">更难的挑战</div>
+  <p>评测 <span class="hi">21 个 Windows 内核漏洞</span>（2026 年 1–2 月，<b>晚于所有受测模型的知识截止</b>），全为本地提权漏洞（提权可由 <code>whoami</code> 机械验证）。模型只拿到攻击者在补丁当天能拿到的东西：有/无漏洞的二进制、公开调试符号、Ghidra 反编译、Ghidriff 函数级 diff 和微软公开通告；在真实的 Windows Server 2025 虚拟机上以低权限用户运行。</p>
 
-  <section>
-    <h2><span class="tag">实验二 · Windows</span>没有源码也成立：从 lowpriv 一路提权到 SYSTEM</h2>
-    <p class="body">闭源更难——没有源码，模型只能从编译后的二进制和被剥掉变量名/类型/结构的反编译里工作。测试对象是 <b>21 个 Windows 内核漏洞</b>（2026 年 1–2 月，<b>晚于所有受测模型的知识截止</b>），全部是本地提权漏洞，靠 <code>whoami</code> 机械验证。模型只拿到攻击者在补丁当天能拿到的东西：漏洞前后二进制、公开调试符号、Ghidra 反编译、Ghidriff 函数级 diff、以及微软公开通告。环境是一台跑着对应版本的 Windows Server 2025 实机虚拟机，代码以低权限运行、无网络。</p>
-    <div class="stat-grid">
-      <div class="stat"><div class="big">18 / 21</div><div class="lbl">Mythos 触发蓝屏的漏洞数（首个 31 分钟、全部 6 小时内，约 \$2,200）</div></div>
-      <div class="stat"><div class="big">8</div><div class="lbl">Mythos 造出的完整提权利用链（约 \$15,700，单条约 \$2,000）</div></div>
-      <div class="stat"><div class="big">13 / 14</div><div class="lbl">微软评级"Less Likely / Unlikely"中被 Mythos 攻破的数量（含 1 个"Unlikely"成功提权）</div></div>
-      <div class="stat"><div class="big">\$几千</div><div class="lbl">如今 N-day 的唯一硬约束：钱 + API 访问，门槛大幅降低</div></div>
-    </div>
-    <p class="body">触发漏洞只是第一步；要"提权"还得串起绕过内核缓解的各种原语。Opus 4.8 已能造出任意读、任意写原语并找到 KASLR 泄露，<b>但串不成 lowpriv→SYSTEM 的完整链</b>；Mythos 不仅串成了，还造出 8 条不同的链。更值得警惕的是：微软的风险评级目前是按<b>人类研究员</b>校准的，而 Mythos 把 14 个"不太可能被利用"的里头攻破了 13 个——这套评级体系可能需要重估。</p>
-    <p class="body">对照 Windows Autopatch（通常算较快的）：约 <b>第 7 天</b>补丁才覆盖到 90% 的设备，<b>第 11 天</b>才强制重启。按这个速度，<b class="hot">Mythos 能在任何设备拿到补丁之前，就完成全部 8 条完整利用链</b>。</p>
-    <p class="take">结论：最耗时的逆向与利用开发环节被压成几小时，N-day 攻击者的准入门槛从"专家团队"降到"几千美元 + API"。</p>
-  </section>
-
-  <section>
-    <h2><span class="tag">影响与对策</span>月度发版 + 多周灰度的打补丁剧本已失效</h2>
-    <p class="body">今天的打补丁套路——月度节奏、数周分批灰度、预发布与稳定通道之间留时间差——全都建立在"武器化一个补丁要花专家数周、且专家稀缺"的假设上。这个假设已不成立："N-day"成了误导性说法，<b>N-hour 才更贴近现实</b>。受冲击最大的是历来最难打补丁的系统：工业控制系统、医疗设备、IoT——它们受固定维护窗口、厂商锁定固件、在线时长保证所限。Anthropic 给的更<b>持久</b>的解法不是一味提速打补丁，而是<b>攻击 bug 的供给</b>：把关键组件迁移到 <b class="s">Rust</b> 等内存安全语言，或用一次性消灭整类利用的缓解（如 Control Flow Guard、硬件影子栈）。</p>
-    <p class="take">结论：与其和模型赛跑着加快打补丁，不如从源头减少可被武器化的漏洞数量。</p>
-  </section>
-
-  <div class="insights">
-    <h2>最值得带走的洞见</h2>
-    <ol>
-      <li><b>变的是"量"和"速度"，不是"能不能"。</b>LLM 能写 N-day 利用早已可能；Mythos Preview 带来的是把"一个月的补丁"在一个下午、用几千美元批量变成可用利用——这是质变。</li>
-      <li><b>补丁公开即倒计时开始。</b>Mythos 在 Mozilla 发补丁后不到 1 小时就有了 Firefox 利用，而修复版本还要 18 天才发布；在 Windows 上它能赶在任何设备装上补丁前就备好 8 条提权链。</li>
-      <li><b>闭源不再是护城河。</b>仅凭二进制、反编译和公开通告，模型就在 21 个 Windows 内核漏洞上做出 18 个蓝屏 PoC、8 条 lowpriv→SYSTEM 完整链，平均每条约 \$2,000。</li>
-      <li><b>按人类校准的风险评级要重估。</b>微软评为"不太可能被利用"的 14 个漏洞里，Mythos 攻破 13 个——当 Mythos 级模型普及，"利用可能性"的评估前提就变了。</li>
-      <li><b>真正的解法在供给侧。</b>提速打补丁只是和模型赛跑；迁移到 Rust、部署消灭整类漏洞的缓解，才是把攻击面持久缩小的方向。</li>
-    </ol>
+  <div class="stats">
+    <div class="stat"><div class="big">18 / 21</div><div class="lab">Mythos 触发 BSOD 的 PoC（Opus 4.8: 15）</div></div>
+    <div class="stat"><div class="big">8</div><div class="lab">lowpriv→SYSTEM 完整提权链</div></div>
+    <div class="stat"><div class="big">~$2,000</div><div class="lab">平均每条提权链的 API 成本</div></div>
   </div>
+  <p>Mythos 的首个 PoC 用时 31 分钟，全部 18 个在 6 小时内完成，PoC 阶段总成本约 <b>$2,200</b>；8 条完整链总成本约 <b>$15,700</b>。Opus 4.8 能做出任意读、任意写原语和 KASLR 泄露，却<b>串不成</b>从 lowpriv 到 SYSTEM 的完整链。</p>
+  <p>更值得警惕的是评级失准：微软把 21 个漏洞中的 <b>14 个</b>评为“利用可能性较低/不太可能”，Mythos 却为其中 <b>13 个</b>产出 PoC，还为一个评为“不太可能”的漏洞做出了完整提权。</p>
+  <div class="timeline">
+    <div><span class="t">第 7 天</span>Windows Autopatch 才把补丁推送到 90% 设备</div>
+    <div><span class="t">第 11 天</span>设备才被强制重启生效</div>
+    <div><span class="t">6 小时</span>Mythos 在任何设备收到补丁前就完成全部 8 条链</div>
+  </div>
+  <p class="take">约束 N-day 攻击者的，已经不再是“专家”，而只是“几千美元 + API 访问权”——能发起此类攻击的人群被极大扩大；微软那套面向人类研究员校准的评级，可能需要重做。</p>
+</div>
 
-  <p class="note">注：本文为 Anthropic 前沿红队博客《Measuring LLMs' impact on N-day exploits》（2026-06-08）的中文总结；18 个 Firefox/SpiderMonkey 补丁、Mythos Preview 的 14 PoC / 8 利用、首个 PoC 约 12 分钟、Firefox 148 晚 18 天发布、21 个 Windows 内核漏洞、18/21 蓝屏（\$2,200）、8 条提权链（\$15,700）、13/14 攻破低评级、Autopatch 第 7/11 天、WannaCry 59 天、Citrix Bleed ~2 周、Mandiant 25 中 16 等均为原文数据。</p>
+<h2><span class="n">04</span>结论：从“N-day”到“N-hour”，旧的打补丁剧本已失效</h2>
+<div class="sec">
+  <p>今天的模型能造 N-day 利用并不意外——给足时间和好工具，这早已可能。真正改变的是<b>产量和速度</b>：一个独立操作者现在能把<b>一个月的补丁在一个下午</b>变成可用利用。</p>
+  <p>这意味着“月度发布 + 多周分批推送 + 预发布与稳定版之间留时差”的传统剧本不再成立——它建立在“武器化一个补丁需要专家数周、且专家稀缺”的假设之上。受冲击最深的将是工控系统、医疗设备和物联网这类<b>修复窗口固定、固件被厂商锁死</b>的系统。作者建议：短期加快补丁部署（如 Mozilla 把 Firefox 点版本从月度收紧到周度），更根本的做法是<b>从源头减少漏洞供给</b>——迁移到 Rust 等内存安全语言，或用 CFG、硬件影子栈等一次性消灭整类漏洞的缓解措施。</p>
+</div>
+
+<div class="final">
+  <h2>最值得带走的洞见</h2>
+  <ol>
+    <li><b>N-day 已变 N-hour。</b>利用开发的瓶颈（稀缺逆向专家）被基本消除，月级防御窗口坍缩到小时级。</li>
+    <li><b>门槛而非能力是关键变化。</b>哪怕是关闭安全防护的公开模型也能造利用；Mythos 把成本降到单条提权约 $2,000，攻击者人群因此急剧扩大。</li>
+    <li><b>闭源不再是护城河。</b>没有源码，仅凭二进制 + 反编译 + 公开通告，模型就在知识截止之后的 Windows 漏洞上做出 8 条完整提权链。</li>
+    <li><b>“利用可能性低”的评级正在失效。</b>被微软判为“较低/不太可能”的 14 个漏洞，Mythos 攻破了 13 个——面向人类校准的风险评估需重做。</li>
+    <li><b>真正的解法在供给侧。</b>加快打补丁只是止血；用内存安全语言和整类缓解措施减少漏洞本身，才是更耐久的防御。</li>
+  </ol>
+</div>
 
 </div>
 </body>
