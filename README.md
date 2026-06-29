@@ -1,6 +1,6 @@
 # AI 研究摘要
 
-这个仓库包含一组 Python 脚本和一个 Python 刷新入口（`refresh.py`），以及一个已经生成好的静态网页，用来跟踪 Anthropic、OpenAI、Cursor 的 AI 研究更新。刷新流程支持 Codex CLI 和 Claude Code CLI 两种 Agent。
+这个仓库包含一组 Python 脚本和一个 Python 刷新入口（`refresh.py`），以及一个已经生成好的静态网页，用来跟踪 Anthropic、OpenAI、Cursor 的 AI 研究更新。刷新流程支持三种 Agent 后端，都复用你已有的登录、不按 token 计费：Codex CLI、Claude Code CLI，以及 Claude Agent SDK（`claude-sdk`，走 Claude Code 订阅，拿结构化结果、错误判断更稳）。
 
 ## 依赖
 
@@ -55,8 +55,9 @@ python -m pip install -r requirements.txt
 在仓库根目录运行下面任一入口：
 
 ```bat
-Refresh-Codex.cmd      :: 使用 Codex CLI（codex exec）
-Refresh-Claude.cmd     :: 使用 Claude Code CLI（claude --print）
+Refresh-Codex.cmd       :: 使用 Codex CLI（codex exec）
+Refresh-Claude.cmd      :: 使用 Claude Code CLI（claude --print，解析 stdout）
+Refresh-Claude-SDK.cmd  :: 使用 Claude Agent SDK（订阅登录、不按 token 计费，结果更稳）
 ```
 
 它们都调用 `refresh.py`，也可以直接运行并传参：
@@ -64,6 +65,8 @@ Refresh-Claude.cmd     :: 使用 Claude Code CLI（claude --print）
 ```bat
 python refresh.py --agent codex
 python refresh.py --agent claude
+python refresh.py --agent claude-sdk    :: 走 Claude Agent SDK；需先 pip install claude-agent-sdk 且已登录 Claude Code
+                                        :: 可选：set AIRS_CLAUDE_MODEL=sonnet 指定模型（默认用账号默认模型）
 python refresh.py --jobs 20            :: 生成摘要+总结的并发数（默认 12；只受 API 速率限制，瞬时错误自动重试）
 python refresh.py --fetch-delay 3      :: 抓取正文之间的间隔秒数（默认 1.5，抓网页是串行的，可拉长）
 python refresh.py --discover-only      :: 只做发现，列出文章（步骤一，不生成）

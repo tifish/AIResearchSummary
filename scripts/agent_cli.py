@@ -1,12 +1,21 @@
-"""Drive the configured agent CLI (codex/claude) for a single generation step.
+"""Drive the configured agent for a single generation step.
+
+Three backends, all reusing your existing login (no per-token API key needed):
+  - codex       : Codex CLI (`codex exec`)
+  - claude      : Claude Code CLI (`claude --print`), output parsed from stdout
+  - claude-sdk  : Claude Agent SDK (`claude-agent-sdk`) over the same Claude Code
+                  subscription login — structured results + typed errors instead
+                  of scraping stdout. Set AIRS_CLAUDE_MODEL to pick a model.
 
 The generate_* test scripts use these helpers to produce one article's summary or
-digest through the same CLI the full Refresh flow uses — no API key required.
+digest through the same backend the full Refresh flow uses.
 """
 
 from __future__ import annotations
 
+import asyncio
 import json
+import os
 import re
 import subprocess
 import sys
@@ -35,8 +44,63 @@ _TRANSIENT_RE = re.compile(
 )
 
 
+def _run_claude_sdk(prompt: str) -> str:
+    """One Claude Agent SDK call over the user's Claude Code subscription login.
+
+    Pure text generation: all tools disabled, single turn, no user/project
+    CLAUDE.md or settings loaded — so the model is driven only by `prompt` and the
+    output is reproducible. Returns the assistant's full text (same contract as the
+    CLI path). Raises RuntimeError on failure; the caller decides if it's transient.
+    """
+    try:
+        from claude_agent_sdk import (
+            AssistantMessage,
+            ClaudeAgentOptions,
+            CLINotFoundError,
+            ResultMessage,
+            TextBlock,
+            query,
+        )
+    except ImportError as exc:
+        raise RuntimeError(
+            "claude-agent-sdk not installed. Run: python -m pip install claude-agent-sdk"
+        ) from exc
+
+    options = ClaudeAgentOptions(
+        model=os.environ.get("AIRS_CLAUDE_MODEL") or None,  # None -> account default
+        allowed_tools=[],            # pure LLM call: no filesystem/tool access
+        permission_mode="dontAsk",   # headless: never block on a permission prompt
+        max_turns=1,                 # single shot
+        setting_sources=[],          # ignore user/project CLAUDE.md & settings
+    )
+
+    async def _collect() -> str:
+        parts: list[str] = []
+        result_text, error_detail = None, None
+        async for msg in query(prompt=prompt, options=options):
+            if isinstance(msg, AssistantMessage):
+                parts.extend(b.text for b in msg.content if isinstance(b, TextBlock))
+            elif isinstance(msg, ResultMessage):
+                result_text = msg.result
+                if msg.is_error:
+                    error_detail = msg.result or msg.api_error_status or msg.subtype
+        if error_detail:
+            raise RuntimeError(f"result error: {error_detail}")
+        text = "".join(parts).strip() or (result_text or "").strip()
+        if not text:
+            raise RuntimeError("returned no text")
+        return text
+
+    try:
+        return asyncio.run(_collect())
+    except CLINotFoundError as exc:
+        raise RuntimeError(
+            "Claude Code CLI not found / not logged in — run `claude` once to log in."
+        ) from exc
+
+
 def run_agent(prompt: str, agent: str = "codex", retries: int = 3) -> str:
-    """Pipe prompt to the agent CLI via stdin and return its stdout.
+    """Run one generation step through the chosen backend and return its text.
 
     Transient errors (rate limit / overload / 5xx / timeout) are retried with
     exponential backoff, so higher --jobs concurrency doesn't drop articles on a
@@ -47,27 +111,35 @@ def run_agent(prompt: str, agent: str = "codex", retries: int = 3) -> str:
                "--dangerously-bypass-approvals-and-sandbox", "-"]
     elif agent == "claude":
         cmd = ["claude", "--print", "--dangerously-skip-permissions"]
+    elif agent == "claude-sdk":
+        cmd = None
     else:
-        raise ValueError(f"Unknown agent '{agent}'. Use 'codex' or 'claude'.")
+        raise ValueError(f"Unknown agent '{agent}'. Use 'codex', 'claude', or 'claude-sdk'.")
 
     detail, code = "", None
     for attempt in range(1, retries + 1):
-        try:
-            proc = subprocess.run(cmd, input=prompt, capture_output=True, text=True, encoding="utf-8")
-        except FileNotFoundError as exc:
-            raise RuntimeError(
-                f"Agent CLI '{agent}' not found on PATH. Install and log in to it first."
-            ) from exc
-        if proc.returncode == 0:
-            return proc.stdout
-        # Some CLIs (e.g. claude) print the real error to stdout, not stderr.
-        detail = "\n".join(s for s in ((proc.stderr or "").strip(), (proc.stdout or "").strip()) if s)
-        code = proc.returncode
+        if agent == "claude-sdk":
+            try:
+                return _run_claude_sdk(prompt)
+            except RuntimeError as exc:
+                detail, code = str(exc), None
+        else:
+            try:
+                proc = subprocess.run(cmd, input=prompt, capture_output=True, text=True, encoding="utf-8")
+            except FileNotFoundError as exc:
+                raise RuntimeError(
+                    f"Agent CLI '{agent}' not found on PATH. Install and log in to it first."
+                ) from exc
+            if proc.returncode == 0:
+                return proc.stdout
+            # Some CLIs (e.g. claude) print the real error to stdout, not stderr.
+            detail = "\n".join(s for s in ((proc.stderr or "").strip(), (proc.stdout or "").strip()) if s)
+            code = proc.returncode
         if attempt < retries and _TRANSIENT_RE.search(detail):
             time.sleep(min(2 ** attempt, 20))
             continue
         break
-    raise RuntimeError(f"{agent} CLI failed (exit {code}): {detail[:800]}")
+    raise RuntimeError(f"{agent} failed (exit {code}): {detail[:800]}")
 
 
 def extract_json(text: str) -> str:
