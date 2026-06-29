@@ -1,7 +1,7 @@
-"""Generate an article's Chinese summary (摘要) and standalone digest (总结) in ONE agent call.
+"""Generate an article's Chinese title, summary (摘要), and standalone digest (总结) in ONE agent call.
 
-The agent returns both parts in a single response, separated by ===SUMMARY=== /
-===DIGEST=== markers, so the article body and the agent overhead are paid once.
+The agent returns all parts in a single response with explicit markers, so the
+article body and the agent overhead are paid once.
 """
 
 from __future__ import annotations
@@ -21,6 +21,7 @@ if hasattr(sys.stdout, "reconfigure"):
 if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8")
 
+TITLE_ZH_MARK = "===TITLE_ZH==="
 SUMMARY_MARK = "===SUMMARY==="
 VALUE_MARK = "===VALUE==="
 DIGEST_MARK = "===DIGEST==="
@@ -39,7 +40,7 @@ def build_prompt(meta: dict) -> str:
 
 
 def generate(meta: dict, agent: str) -> dict:
-    """One agent call -> {summary_zh, value_zh, html}.
+    """One agent call -> {title_zh, summary_zh, value_zh, html}.
 
     Output is marker-delimited plain text (not JSON), so the model can write
     Chinese with arbitrary quotes/punctuation without breaking a JSON parse.
@@ -47,7 +48,10 @@ def generate(meta: dict, agent: str) -> dict:
     output = run_agent(build_prompt(meta), agent)
     if SUMMARY_MARK not in output or VALUE_MARK not in output or DIGEST_MARK not in output:
         raise ValueError("agent output is missing a ===SUMMARY===/===VALUE===/===DIGEST=== marker")
-    after_summary = output.split(SUMMARY_MARK, 1)[1]
+    before_summary, after_summary = output.split(SUMMARY_MARK, 1)
+    title_zh = ""
+    if TITLE_ZH_MARK in before_summary:
+        title_zh = before_summary.split(TITLE_ZH_MARK, 1)[1].strip()
     summary_zh, after_value = after_summary.split(VALUE_MARK, 1)
     value_zh, digest_part = after_value.split(DIGEST_MARK, 1)
     summary_zh = summary_zh.strip()
@@ -58,16 +62,19 @@ def generate(meta: dict, agent: str) -> dict:
     if "<html" not in html.lower():
         raise ValueError("agent did not return an HTML digest")
     html = prepare_digest_html(html, meta["url"])
-    return {"summary_zh": summary_zh, "value_zh": value_zh, "html": html}
+    return {"title_zh": title_zh, "summary_zh": summary_zh, "value_zh": value_zh, "html": html}
 
 
-def upsert_summary(state_path: Path, meta: dict, summary_zh: str, value_zh: str) -> None:
+def upsert_summary(state_path: Path, meta: dict, summary_zh: str, value_zh: str, title_zh: str = "") -> None:
     records = load_articles(state_path) if state_path.exists() else []
     url = normalize_url(meta["url"])
+    resolved_title_zh = str(title_zh or meta.get("title_zh", "")).strip()
     for record in records:
         if normalize_url(str(record.get("url", ""))) == url:
             record["summary_zh"] = summary_zh
             record["value_zh"] = value_zh
+            if resolved_title_zh:
+                record["title_zh"] = resolved_title_zh
             if meta.get("source_hash"):
                 record["source_hash"] = meta["source_hash"]
             break
@@ -77,6 +84,7 @@ def upsert_summary(state_path: Path, meta: dict, summary_zh: str, value_zh: str)
             "source_name": meta["source_name"],
             "url": url,
             "title": meta["title"],
+            "title_zh": resolved_title_zh,
             "date": meta["date"],
             "category": meta["category"],
             "summary_zh": summary_zh,

@@ -1,7 +1,7 @@
 """Apply parallel-generated results to the site.
 
 Reads the manifest (from prepare_batch.py) and a results JSON
-(list of {"url", "summary_zh", "value_zh", "html"} produced by the Workflow):
+(list of {"url", "title_zh", "summary_zh", "value_zh", "html"} produced by the Workflow):
 upserts summaries into articles.json, writes each digest page (with nav injected),
 and re-renders index.html.
 
@@ -44,7 +44,13 @@ def main() -> int:
             skipped += 1
             continue
         record = json.loads(Path(item["input"]).read_text(encoding="utf-8"))
-        upsert_summary(state, record, str(res["summary_zh"]).strip(), str(res.get("value_zh", "")).strip())
+        upsert_summary(
+            state,
+            record,
+            str(res["summary_zh"]).strip(),
+            str(res.get("value_zh", "")).strip(),
+            str(res.get("title_zh", "")).strip(),
+        )
         summaries += 1
         html = str(res.get("html", ""))
         if "<html" in html.lower():

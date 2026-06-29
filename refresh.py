@@ -42,7 +42,7 @@ def render(site, state) -> None:
 
 def process(meta, agent, site, state, force) -> bool:
     result = generate.generate(meta, agent)
-    generate.upsert_summary(state, meta, result["summary_zh"], result["value_zh"])
+    generate.upsert_summary(state, meta, result["summary_zh"], result["value_zh"], result.get("title_zh", ""))
     return generate.write_digest(site, summary_slug(meta["url"]), result["html"], force)
 
 
@@ -73,7 +73,7 @@ def process_batch(work, args, state, site, force_digest=False) -> int:
         if not isinstance(res, dict):
             print(f"  skipped {title}: {res} ({_pool_status(futures)})", flush=True)
             return False
-        generate.upsert_summary(state, meta, res["summary_zh"], res["value_zh"])
+        generate.upsert_summary(state, meta, res["summary_zh"], res["value_zh"], res.get("title_zh", ""))
         generate.write_digest(site, summary_slug(meta["url"]), res["html"], force_digest)
         done += 1
         print(f"  generated: {title} ({_pool_status(futures)})", flush=True)

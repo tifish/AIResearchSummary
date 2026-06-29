@@ -306,6 +306,7 @@ def render_summary(summary: str, value: str) -> str:
 def render_article(record: dict[str, Any], site_dir: Path) -> str:
     summary = str(record.get("summary_zh", "")).strip()
     value = str(record.get("value_zh", "")).strip()
+    title_zh = str(record.get("title_zh", "")).strip()
     source = str(record.get("source", "") or "unknown").strip().lower()
     source_name = str(record.get("source_name", "") or source or "Unknown").strip()
     source_home_url = SOURCE_HOME_URLS.get(source, str(record.get("url", "")))
@@ -313,9 +314,10 @@ def render_article(record: dict[str, Any], site_dir: Path) -> str:
     art_month = month_num(record)
     search_text = " ".join(
         str(record.get(key, ""))
-        for key in ("source", "source_name", "title", "date", "category", "summary_zh", "value_zh")
+        for key in ("source", "source_name", "title", "title_zh", "date", "category", "summary_zh", "value_zh")
     )
     summary_html = render_summary(summary, value)
+    title_zh_html = f'<p class="title-zh" lang="zh-CN">{esc(title_zh)}</p>' if title_zh else ""
     local_summary_href = summary_href(record, site_dir)
     summary_link = (
         f'<a class="source-link summary-link" href="{esc(local_summary_href)}" target="_blank" rel="noopener noreferrer">阅读总结</a>'
@@ -329,7 +331,10 @@ def render_article(record: dict[str, Any], site_dir: Path) -> str:
           <time>{esc(record.get("date"))}</time>
           <span>{esc(record.get("category"))}</span>
         </div>
-        <h2>{esc(record.get("title"))}</h2>
+        <div class="title-block">
+          <h2>{esc(record.get("title"))}</h2>
+          {title_zh_html}
+        </div>
         <div class="summary">
         {summary_html}
         </div>
@@ -633,6 +638,17 @@ def render_page(articles: list[dict[str, Any]], site_dir: Path | None = None) ->
       font-size: 20px;
       line-height: 1.3;
       letter-spacing: 0;
+    }}
+    .title-block {{
+      display: grid;
+      gap: 4px;
+    }}
+    .title-zh {{
+      margin: 0;
+      color: var(--muted);
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.3;
     }}
     p {{
       margin: 0;
