@@ -1,6 +1,6 @@
 # AI 研究摘要
 
-[直接查看索引网页](https://htmlpreview.github.io/?https://github.com/tifish/AIResearchSummary/blob/main/site/index.html)
+[直接查看索引网页](https://tifish.github.io/AIResearchSummary/)
 
 这个仓库包含一组 Python 脚本和一个 Python 刷新入口（`refresh.py`），以及一个已经生成好的静态网页，用来跟踪 Anthropic、OpenAI、Cursor 的 AI 研究更新。刷新流程支持三种 Agent 后端，都复用你已有的登录、不按 token 计费：Codex CLI、Claude Code CLI，以及 Claude Agent SDK（`claude-sdk`，走 Claude Code 订阅，拿结构化结果、错误判断更稳）。
 
