@@ -7,6 +7,8 @@ checks that block urllib.
 
 Always runs headed (so Cloudflare / human checks can render) and reuses a fixed
 persistent profile (<repo>/.chrome-profile) so clearance cookies survive between runs.
+Within one Python process, the Chrome context is reused; each fetch opens a temporary
+tab and closes only that tab when finished.
 "Load more" pagination stops by article DATE (a caller-supplied stop_when), not a
 click count.
 
@@ -21,10 +23,12 @@ Optional environment variables:
 from __future__ import annotations
 
 import argparse
+import atexit
 import os
 import re
 import sys
 import time
+import threading
 from pathlib import Path
 
 
@@ -40,6 +44,8 @@ LOAD_MORE_SETTLE_MS = 500
 LOAD_MORE_MAX_WAIT_MS = 8000
 LOAD_MORE_MIN_GROWTH = 500
 LOAD_MORE_RE = re.compile(r"load\s*more|show\s*more|see\s*more|view\s*more|加载更多|查看更多|显示更多|更多", re.I)
+_SESSION_LOCK = threading.RLock()
+_SESSION: dict | None = None
 
 
 def _ensure_playwright():
@@ -55,6 +61,99 @@ def _ensure_playwright():
 
 def _profile_dir() -> str:
     return str(Path(__file__).resolve().parents[1] / ".chrome-profile")
+
+
+def close_browser_session() -> None:
+    """Close the cached browser session when the Python process exits."""
+    global _SESSION
+    with _SESSION_LOCK:
+        session = _SESSION
+        _SESSION = None
+
+    if not session:
+        return
+    closers = (
+        ("context", "close_context"),
+        ("browser", "close_browser"),
+    )
+    for key, flag in closers:
+        if not session.get(flag):
+            continue
+        obj = session.get(key)
+        if obj is None:
+            continue
+        try:
+            obj.close()
+        except Exception:
+            pass
+    playwright = session.get("playwright")
+    if playwright is not None:
+        try:
+            playwright.stop()
+        except Exception:
+            pass
+
+
+atexit.register(close_browser_session)
+
+
+def _close_startup_pages(context) -> None:
+    """The dedicated profile may restore old tabs; keep the fetch session clean."""
+    for page in list(getattr(context, "pages", [])):
+        try:
+            page.close()
+        except Exception:
+            pass
+
+
+def _browser_context(cdp: str | None, channel: str | None, headless: bool):
+    global _SESSION
+    key = (cdp or "", channel or "", headless)
+    with _SESSION_LOCK:
+        if _SESSION is not None and _SESSION.get("key") == key:
+            return _SESSION["context"]
+        if _SESSION is not None:
+            close_browser_session()
+
+        sync_playwright = _ensure_playwright()
+        playwright = sync_playwright().start()
+        browser = None
+        try:
+            if cdp:
+                browser = playwright.chromium.connect_over_cdp(cdp)
+                if browser.contexts:
+                    context = browser.contexts[0]
+                    close_context = False
+                else:
+                    context = browser.new_context()
+                    close_context = True
+            else:
+                launch_kwargs: dict = {
+                    "headless": headless,
+                    "args": ["--disable-blink-features=AutomationControlled"],
+                }
+                if channel:
+                    launch_kwargs["channel"] = channel
+                context = playwright.chromium.launch_persistent_context(_profile_dir(), **launch_kwargs)
+                _close_startup_pages(context)
+                close_context = True
+        except Exception:
+            try:
+                if browser is not None:
+                    browser.close()
+            finally:
+                playwright.stop()
+            raise
+
+        _SESSION = {
+            "key": key,
+            "playwright": playwright,
+            "browser": browser,
+            "context": context,
+            "close_context": close_context,
+            "close_browser": False,
+        }
+        return context
 
 
 def _find_load_more(page):
@@ -188,36 +287,21 @@ def fetch_rendered(
     if given, is the intended stop condition (e.g. articles reached the date cutoff);
     max_loads is only a safety cap.
     """
-    sync_playwright = _ensure_playwright()
     cdp = os.environ.get("AIRS_CHROME_CDP")
     headless = False  # always headed so Cloudflare / human checks can render
     channel = os.environ.get("AIRS_CHROME_CHANNEL", "chrome") or None
     if max_loads is None:
         max_loads = SAFETY_MAX_LOADS
 
-    with sync_playwright() as playwright:
-        if cdp:
-            browser = playwright.chromium.connect_over_cdp(cdp)
-            context = browser.contexts[0] if browser.contexts else browser.new_context()
-            page = context.new_page()
-            try:
-                return _load(page, url, wait_selector, timeout_ms, load_more, max_loads, stop_when)
-            finally:
-                page.close()
-                browser.close()
-
-        launch_kwargs: dict = {
-            "headless": headless,
-            "args": ["--disable-blink-features=AutomationControlled"],
-        }
-        if channel:
-            launch_kwargs["channel"] = channel
-        context = playwright.chromium.launch_persistent_context(_profile_dir(), **launch_kwargs)
-        page = context.new_page()
+    context = _browser_context(cdp, channel, headless)
+    page = context.new_page()
+    try:
+        return _load(page, url, wait_selector, timeout_ms, load_more, max_loads, stop_when)
+    finally:
         try:
-            return _load(page, url, wait_selector, timeout_ms, load_more, max_loads, stop_when)
-        finally:
-            context.close()
+            page.close()
+        except Exception:
+            pass
 
 
 def main() -> int:

@@ -16,7 +16,7 @@ python -m pip install -r requirements.txt
 
 - **发现**（抓列表页）走本地 Chrome 渲染，并自动点击“Load more”翻页，按来源现有最新文章的月份停止（翻到该月份之前即停；最早只追溯到 2026-01）；失败时回退静态抓取。
 - **抽取正文**优先静态 HTTP，抓不到时（如 OpenAI 反爬）再回退本地 Chrome。
-- Chrome 固定**有头**运行、用固定的持久化目录 `.chrome-profile/`（保留 Cloudflare 通行 cookie）；需本机已安装 Google Chrome。
+- Chrome 固定**有头**运行、用固定的持久化目录 `.chrome-profile/`（保留 Cloudflare 通行 cookie）；同一个刷新进程会复用同一个 Chrome，上下文里每篇只开临时 tab，抓完就关 tab；需本机已安装 Google Chrome。
 
 可选环境变量：
 
