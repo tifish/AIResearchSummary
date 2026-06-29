@@ -39,7 +39,8 @@ def load_prompt(name: str) -> str:
 
 _TRANSIENT_RE = re.compile(
     r"rate.?limit|overloaded|too many requests|\b429\b|\b500\b|\b502\b|\b503\b|\b529\b|"
-    r"internal server error|bad gateway|service unavailable|timeout|timed out|temporarily",
+    r"internal server error|bad gateway|service unavailable|timeout|timed out|temporarily|"
+    r"maximum number of turns",  # claude-sdk: occasional long output doesn't finish in one turn — retry
     re.I,
 )
 

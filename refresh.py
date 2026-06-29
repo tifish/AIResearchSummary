@@ -101,6 +101,7 @@ def main() -> int:
     parser.add_argument("--discover-only", action="store_true", help="只做发现（步骤一），列出发现到的文章，不生成、不渲染。")
     parser.add_argument("--url", default=None, help="只对这一篇文章生成摘要和总结（步骤二，单篇测试，覆盖已有总结页）。")
     parser.add_argument("--missing-digests", action="store_true", help="为 articles.json 中缺独立总结页的文章补生成（摘要+总结）。")
+    parser.add_argument("--regenerate-all", action="store_true", help="对 articles.json 中所有文章重新抓取正文并重生成摘要+总结（强制覆盖已有总结页）。")
     parser.add_argument("--jobs", type=int, default=12, help="生成摘要+总结的并发数（并行调用 claude/codex CLI，默认 12；1=串行；只受 API 速率限制约束，瞬时错误自动重试）。")
     parser.add_argument("--fetch-delay", type=float, default=1.5, help="抓取文章正文之间的间隔秒数（默认 1.5，对来源站点友好；抓网页是串行的）。")
     parser.add_argument("--dry-run", action="store_true", help="不调用 Agent、不写文件。")
@@ -158,6 +159,21 @@ def main() -> int:
         if not work:
             render(site, state)
             print("All articles already have a digest page.")
+            return 0
+        process_batch(work, args, state, site, force_digest=True)
+        return 0
+
+    if args.regenerate_all:
+        records = load_articles(state)
+        work = [r for r in records if r.get("url")]
+        print(f"{len(work)} article(s) to regenerate (re-extract + re-generate, force overwrite).")
+        if args.dry_run:
+            for r in work:
+                print(f"  would regenerate: {r.get('date', '')} | {r.get('source', '')} | {r.get('title', '')}")
+            return 0
+        if not work:
+            render(site, state)
+            print("No articles to regenerate.")
             return 0
         process_batch(work, args, state, site, force_digest=True)
         return 0
