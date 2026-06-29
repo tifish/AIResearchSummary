@@ -17,8 +17,10 @@ import asyncio
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
 import time
 from pathlib import Path
 
@@ -107,9 +109,14 @@ def run_agent(prompt: str, agent: str = "codex", retries: int = 3) -> str:
     exponential backoff, so higher --jobs concurrency doesn't drop articles on a
     momentary API hiccup. Non-transient errors (e.g. auth) fail immediately.
     """
+    tmpdir = None
+    last_msg = None  # codex: read the clean final message from here, not noisy stdout
     if agent == "codex":
+        tmpdir = tempfile.mkdtemp(prefix="airs_codex_")
+        last_msg = Path(tmpdir) / "last.txt"
         cmd = ["codex", "exec", "--skip-git-repo-check",
-               "--dangerously-bypass-approvals-and-sandbox", "-"]
+               "--dangerously-bypass-approvals-and-sandbox",
+               "-o", str(last_msg), "-"]
     elif agent == "claude":
         cmd = ["claude", "--print", "--dangerously-skip-permissions"]
     elif agent == "claude-sdk":
@@ -117,30 +124,41 @@ def run_agent(prompt: str, agent: str = "codex", retries: int = 3) -> str:
     else:
         raise ValueError(f"Unknown agent '{agent}'. Use 'codex', 'claude', or 'claude-sdk'.")
 
-    detail, code = "", None
-    for attempt in range(1, retries + 1):
-        if agent == "claude-sdk":
-            try:
-                return _run_claude_sdk(prompt)
-            except RuntimeError as exc:
-                detail, code = str(exc), None
-        else:
-            try:
-                proc = subprocess.run(cmd, input=prompt, capture_output=True, text=True, encoding="utf-8")
-            except FileNotFoundError as exc:
-                raise RuntimeError(
-                    f"Agent CLI '{agent}' not found on PATH. Install and log in to it first."
-                ) from exc
-            if proc.returncode == 0:
-                return proc.stdout
-            # Some CLIs (e.g. claude) print the real error to stdout, not stderr.
-            detail = "\n".join(s for s in ((proc.stderr or "").strip(), (proc.stdout or "").strip()) if s)
-            code = proc.returncode
-        if attempt < retries and _TRANSIENT_RE.search(detail):
-            time.sleep(min(2 ** attempt, 20))
-            continue
-        break
-    raise RuntimeError(f"{agent} failed (exit {code}): {detail[:800]}")
+    try:
+        detail, code = "", None
+        for attempt in range(1, retries + 1):
+            if agent == "claude-sdk":
+                try:
+                    return _run_claude_sdk(prompt)
+                except RuntimeError as exc:
+                    detail, code = str(exc), None
+            else:
+                try:
+                    proc = subprocess.run(cmd, input=prompt, capture_output=True, text=True, encoding="utf-8")
+                except FileNotFoundError as exc:
+                    raise RuntimeError(
+                        f"Agent CLI '{agent}' not found on PATH. Install and log in to it first."
+                    ) from exc
+                if proc.returncode == 0:
+                    if last_msg is not None:  # codex: final message is in the file, stdout is just progress noise
+                        text = last_msg.read_text(encoding="utf-8") if last_msg.exists() else ""
+                        if text.strip():
+                            return text
+                        detail, code = "codex exited 0 but wrote no final message", proc.returncode
+                    else:
+                        return proc.stdout
+                else:
+                    # Some CLIs (e.g. claude) print the real error to stdout, not stderr.
+                    detail = "\n".join(s for s in ((proc.stderr or "").strip(), (proc.stdout or "").strip()) if s)
+                    code = proc.returncode
+            if attempt < retries and _TRANSIENT_RE.search(detail):
+                time.sleep(min(2 ** attempt, 20))
+                continue
+            break
+        raise RuntimeError(f"{agent} failed (exit {code}): {detail[:800]}")
+    finally:
+        if tmpdir:
+            shutil.rmtree(tmpdir, ignore_errors=True)
 
 
 def extract_json(text: str) -> str:
