@@ -178,7 +178,7 @@ def render_page(articles: list[dict[str, Any]], site_dir: Path | None = None) ->
         month_counts[month_num(article)] = month_counts.get(month_num(article), 0) + 1
 
     year_keys = sorted(year_counts, key=lambda k: (-1 if k == "unknown" else int(k)), reverse=True)
-    month_keys = sorted(month_counts, key=lambda k: (99 if k == "unknown" else int(k)))
+    month_keys = sorted(month_counts, key=lambda k: (-1 if k == "unknown" else int(k)), reverse=True)
 
     year_buttons = "\n".join(
         [_chip("year-filter", "all", "全部年份", total, True)]
