@@ -4,9 +4,9 @@
     discover -> per new article: extract -> generate (摘要 + 总结 in ONE agent call) -> render
 
 Thin orchestrator; the real work lives in scripts/. Extraction is serial (OpenAI uses
-local Chrome); generation runs in parallel (--jobs). Modes: default batch (newly
-discovered + missing digest pages), --url (one article), --discover-only (list),
---missing-digests (backfill only).
+local Chrome), but each article is queued for parallel generation as soon as it is
+extracted. Modes: default batch (newly discovered + missing digest pages), --url
+(one article), --discover-only (list), --missing-digests (backfill only).
 """
 
 from __future__ import annotations
@@ -47,16 +47,9 @@ def process(meta, agent, site, state, force) -> bool:
 
 
 def process_batch(work, args, state, site, force_digest=False) -> int:
-    """Extract serially, then generate summaries+digests in parallel and apply."""
-    prepared = []
-    for idx, art in enumerate(work):
-        if idx and args.fetch_delay > 0:
-            time.sleep(args.fetch_delay)
-        try:
-            extracted = extract(art["url"])
-            prepared.append({**art, "article_text": extracted["article_text"], "source_hash": extracted["source_hash"]})
-        except Exception as exc:
-            print(f"  extract skipped {art.get('url')}: {exc}")
+    """Extract serially, queue each extracted article for generation immediately."""
+    total = len(work)
+    jobs = max(1, args.jobs)
 
     def _generate(meta):
         try:
@@ -72,26 +65,58 @@ def process_batch(work, args, state, site, force_digest=False) -> int:
             return False
         generate.upsert_summary(state, meta, res["summary_zh"], res["value_zh"])
         generate.write_digest(site, summary_slug(meta["url"]), res["html"], force_digest)
-        print(f"  done: {title}")
+        print(f"  generated: {title}", flush=True)
         return True
 
-    jobs = max(1, args.jobs)
-    print(f"Generating {len(prepared)} article(s) with {jobs} parallel job(s)...")
-    done = 0
-    if jobs == 1:
-        for meta in prepared:
-            if _apply(*_generate(meta)):
-                done += 1
-    else:
-        from concurrent.futures import ThreadPoolExecutor, as_completed
+    def _drain_completed(futures, *, wait_for_next=False):
+        nonlocal done
+        if not futures:
+            return futures
+        if wait_for_next:
+            from concurrent.futures import FIRST_COMPLETED, wait
 
-        with ThreadPoolExecutor(max_workers=jobs) as pool:
-            futures = [pool.submit(_generate, meta) for meta in prepared]
-            for fut in as_completed(futures):  # write each as it finishes (resilient)
-                if _apply(*fut.result()):
-                    done += 1
+            completed, pending = wait(futures, return_when=FIRST_COMPLETED)
+        else:
+            completed = {fut for fut in futures if fut.done()}
+            pending = futures - completed
+        for fut in completed:
+            if _apply(*fut.result()):
+                done += 1
+        return pending
+
+    print(
+        f"Processing {total} article(s): extracting serially, "
+        f"generating as each extract finishes (jobs={jobs}).",
+        flush=True,
+    )
+    done = 0
+    submitted = 0
+
+    from concurrent.futures import ThreadPoolExecutor
+
+    with ThreadPoolExecutor(max_workers=jobs) as pool:
+        futures = set()
+        for idx, art in enumerate(work, start=1):
+            if idx > 1 and args.fetch_delay > 0:
+                futures = _drain_completed(futures)
+                time.sleep(args.fetch_delay)
+            title = art.get("title") or art.get("url")
+            print(f"  extracting {idx}/{total}: {title}", flush=True)
+            try:
+                extracted = extract(art["url"])
+                meta = {**art, "article_text": extracted["article_text"], "source_hash": extracted["source_hash"]}
+                futures.add(pool.submit(_generate, meta))
+                submitted += 1
+                print(f"  queued {idx}/{total}: {title}", flush=True)
+            except Exception as exc:
+                print(f"  extract skipped {idx}/{total} {art.get('url')}: {exc}", flush=True)
+            futures = _drain_completed(futures)
+
+        while futures:
+            futures = _drain_completed(futures, wait_for_next=True)
+
     render(site, state)
-    print(f"Done. {done}/{len(prepared)} generated (jobs={jobs}). Open site/index.html.")
+    print(f"Done. {done}/{submitted} generated (jobs={jobs}). Open site/index.html.")
     return done
 
 
@@ -114,7 +139,7 @@ def main() -> int:
     parser.add_argument("--url", default=None, help="只对这一篇文章生成摘要和总结（步骤二，单篇测试，覆盖已有总结页）。")
     parser.add_argument("--missing-digests", action="store_true", help="只为 articles.json 中缺独立总结页的文章补生成（默认刷新已自动执行）。")
     parser.add_argument("--regenerate-all", action="store_true", help="对 articles.json 中所有文章重新抓取正文并重生成摘要+总结（强制覆盖已有总结页）。")
-    parser.add_argument("--jobs", type=int, default=12, help="生成摘要+总结的并发数（并行调用 codex/claude 后端，默认 12；1=串行；只受 API 速率限制约束，瞬时错误自动重试）。")
+    parser.add_argument("--jobs", type=int, default=12, help="生成摘要+总结的并发数（并行调用 codex/claude 后端，默认 12；1=一次只生成一篇；只受 API 速率限制约束，瞬时错误自动重试）。")
     parser.add_argument("--fetch-delay", type=float, default=1.5, help="抓取文章正文之间的间隔秒数（默认 1.5，对来源站点友好；抓网页是串行的）。")
     parser.add_argument("--dry-run", action="store_true", help="不调用 Agent、不写文件。")
     args = parser.parse_args()
