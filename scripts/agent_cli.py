@@ -1,14 +1,15 @@
 """Drive the configured agent for a single generation step.
 
-Two backends, both reusing your existing login (no per-token API key needed):
-  - codex   : Codex CLI (`codex exec`), final message read from a `-o` file
-              (clean), not scraped from noisy stdout.
-  - claude  : Claude Agent SDK (`claude-agent-sdk`) over the Claude Code
-              subscription login — structured results + typed errors. Set
-              AIRS_CLAUDE_MODEL to pick a model (default = account default).
+Two SDK backends, both reusing your existing login (no per-token API key, no CLI
+subprocess + stdout scraping):
+  - codex   : OpenAI Codex SDK (`openai-codex`) over the Codex CLI login.
+              AIRS_CODEX_MODEL picks a model (default = account default).
+  - claude  : Claude Agent SDK (`claude-agent-sdk`) over the Claude Code login.
+              AIRS_CLAUDE_MODEL picks a model (default = account default).
 
-The generate_* test scripts use these helpers to produce one article's summary or
-digest through the same backend the full Refresh flow uses.
+Both return the model's final text (the generate flow then splits it on the
+===SUMMARY===/===VALUE===/===DIGEST=== markers). The generate_* test scripts use
+these helpers to produce one article's summary/digest the same way Refresh does.
 """
 
 from __future__ import annotations
@@ -17,10 +18,7 @@ import asyncio
 import json
 import os
 import re
-import shutil
-import subprocess
 import sys
-import tempfile
 import time
 from pathlib import Path
 
@@ -42,7 +40,8 @@ def load_prompt(name: str) -> str:
 _TRANSIENT_RE = re.compile(
     r"rate.?limit|overloaded|too many requests|\b429\b|\b500\b|\b502\b|\b503\b|\b529\b|"
     r"internal server error|bad gateway|service unavailable|timeout|timed out|temporarily|"
-    r"maximum number of turns",  # claude (SDK): occasional long output doesn't finish in one turn — retry
+    r"maximum number of turns|"   # claude (SDK): occasional long output doesn't finish in one turn — retry
+    r"ServerBusyError|RetryLimitExceededError|server busy",  # codex (SDK) transient error types
     re.I,
 )
 
@@ -102,61 +101,66 @@ def _run_claude_sdk(prompt: str) -> str:
         ) from exc
 
 
+def _run_codex_sdk(prompt: str) -> str:
+    """One Codex SDK call over the user's Codex CLI login.
+
+    Pure text generation: read-only sandbox + deny-all approvals so it never writes
+    files or blocks on an approval prompt (the prompt is self-contained). Returns
+    the turn's final text. Raises RuntimeError on failure; the caller decides if
+    it's transient.
+    """
+    try:
+        from openai_codex import ApprovalMode, Codex, CodexError, Sandbox
+    except ImportError as exc:
+        raise RuntimeError(
+            "openai-codex not installed. Run: python -m pip install openai-codex"
+        ) from exc
+
+    model = os.environ.get("AIRS_CODEX_MODEL") or None  # None -> account default
+    try:
+        with Codex() as codex:
+            thread = codex.thread_start(
+                sandbox=Sandbox.read_only,
+                approval_mode=ApprovalMode.deny_all,
+                model=model,
+            )
+            result = thread.run(prompt)
+    except CodexError as exc:
+        raise RuntimeError(f"codex error ({type(exc).__name__}): {exc}") from exc
+
+    if getattr(result, "error", None):
+        raise RuntimeError(f"codex result error: {result.error}")
+    text = (result.final_response or "").strip()
+    if not text:
+        raise RuntimeError(f"codex returned no text (status={getattr(result, 'status', None)})")
+    return text
+
+
 def run_agent(prompt: str, agent: str = "codex", retries: int = 3) -> str:
-    """Run one generation step through the chosen backend and return its text.
+    """Run one generation step through the chosen SDK backend and return its text.
 
     Transient errors (rate limit / overload / 5xx / timeout) are retried with
     exponential backoff, so higher --jobs concurrency doesn't drop articles on a
     momentary API hiccup. Non-transient errors (e.g. auth) fail immediately.
     """
-    tmpdir = None
-    last_msg = None  # codex: read the clean final message from here, not noisy stdout
     if agent == "codex":
-        tmpdir = tempfile.mkdtemp(prefix="airs_codex_")
-        last_msg = Path(tmpdir) / "last.txt"
-        cmd = ["codex", "exec", "--skip-git-repo-check",
-               "--dangerously-bypass-approvals-and-sandbox",
-               "-o", str(last_msg), "-"]
+        attempt_fn = _run_codex_sdk
     elif agent == "claude":
-        cmd = None  # claude goes through the Agent SDK, not a subprocess
+        attempt_fn = _run_claude_sdk
     else:
         raise ValueError(f"Unknown agent '{agent}'. Use 'codex' or 'claude'.")
 
-    try:
-        detail, code = "", None
-        for attempt in range(1, retries + 1):
-            if agent == "claude":
-                try:
-                    return _run_claude_sdk(prompt)
-                except RuntimeError as exc:
-                    detail, code = str(exc), None
-            else:
-                try:
-                    proc = subprocess.run(cmd, input=prompt, capture_output=True, text=True, encoding="utf-8")
-                except FileNotFoundError as exc:
-                    raise RuntimeError(
-                        f"Agent CLI '{agent}' not found on PATH. Install and log in to it first."
-                    ) from exc
-                if proc.returncode == 0:
-                    if last_msg is not None:  # codex: final message is in the file, stdout is just progress noise
-                        text = last_msg.read_text(encoding="utf-8") if last_msg.exists() else ""
-                        if text.strip():
-                            return text
-                        detail, code = "codex exited 0 but wrote no final message", proc.returncode
-                    else:
-                        return proc.stdout
-                else:
-                    # Some CLIs (e.g. claude) print the real error to stdout, not stderr.
-                    detail = "\n".join(s for s in ((proc.stderr or "").strip(), (proc.stdout or "").strip()) if s)
-                    code = proc.returncode
-            if attempt < retries and _TRANSIENT_RE.search(detail):
-                time.sleep(min(2 ** attempt, 20))
-                continue
-            break
-        raise RuntimeError(f"{agent} failed (exit {code}): {detail[:800]}")
-    finally:
-        if tmpdir:
-            shutil.rmtree(tmpdir, ignore_errors=True)
+    detail = ""
+    for attempt in range(1, retries + 1):
+        try:
+            return attempt_fn(prompt)
+        except RuntimeError as exc:
+            detail = str(exc)
+        if attempt < retries and _TRANSIENT_RE.search(detail):
+            time.sleep(min(2 ** attempt, 20))
+            continue
+        break
+    raise RuntimeError(f"{agent} failed: {detail[:800]}")
 
 
 def extract_json(text: str) -> str:

@@ -2,7 +2,7 @@
 
 [直接查看索引网页](https://tifish.github.io/AIResearchSummary/)
 
-这个仓库包含一组 Python 脚本和一个 Python 刷新入口（`refresh.py`），以及一个已经生成好的静态网页，用来跟踪 Anthropic、OpenAI、Cursor 的 AI 研究更新。刷新流程支持两种 Agent 后端，都复用你已有的登录、不按 token 计费：Codex CLI（`codex exec`），以及 Claude Agent SDK（`claude`，走 Claude Code 订阅，拿结构化结果、错误判断更稳）。
+这个仓库包含一组 Python 脚本和一个 Python 刷新入口（`refresh.py`），以及一个已经生成好的静态网页，用来跟踪 Anthropic、OpenAI、Cursor 的 AI 研究更新。刷新流程支持两种 Agent 后端，都走 SDK、复用你已有的登录、不按 token 计费：Codex SDK（`codex`，走 Codex CLI 订阅）和 Claude Agent SDK（`claude`，走 Claude Code 订阅）——拿结构化结果、错误判断更稳。
 
 ## 依赖
 
@@ -57,14 +57,15 @@ python -m pip install -r requirements.txt
 在仓库根目录运行下面任一入口：
 
 ```bat
-Refresh-Codex.cmd       :: 使用 Codex CLI（codex exec）
-Refresh-Claude.cmd      :: 使用 Claude Agent SDK（订阅登录、不按 token 计费，结果更稳）
+Refresh-Codex.cmd       :: 使用 Codex SDK（openai-codex，订阅登录、不按 token 计费）
+Refresh-Claude.cmd      :: 使用 Claude Agent SDK（claude-agent-sdk，订阅登录、不按 token 计费）
 ```
 
 它们都调用 `refresh.py`，也可以直接运行并传参：
 
 ```bat
-python refresh.py --agent codex
+python refresh.py --agent codex        :: 走 Codex SDK；需先 pip install openai-codex 且已登录 Codex CLI
+                                       :: 可选：set AIRS_CODEX_MODEL=... 指定模型（默认用账号默认模型）
 python refresh.py --agent claude       :: 走 Claude Agent SDK；需先 pip install claude-agent-sdk 且已登录 Claude Code
                                        :: 可选：set AIRS_CLAUDE_MODEL=sonnet 指定模型（默认用账号默认模型）
 python refresh.py --jobs 20            :: 生成摘要+总结的并发数（默认 12；只受 API 速率限制，瞬时错误自动重试）
