@@ -1,11 +1,11 @@
 """Drive the configured agent for a single generation step.
 
-Three backends, all reusing your existing login (no per-token API key needed):
-  - codex       : Codex CLI (`codex exec`)
-  - claude      : Claude Code CLI (`claude --print`), output parsed from stdout
-  - claude-sdk  : Claude Agent SDK (`claude-agent-sdk`) over the same Claude Code
-                  subscription login — structured results + typed errors instead
-                  of scraping stdout. Set AIRS_CLAUDE_MODEL to pick a model.
+Two backends, both reusing your existing login (no per-token API key needed):
+  - codex   : Codex CLI (`codex exec`), final message read from a `-o` file
+              (clean), not scraped from noisy stdout.
+  - claude  : Claude Agent SDK (`claude-agent-sdk`) over the Claude Code
+              subscription login — structured results + typed errors. Set
+              AIRS_CLAUDE_MODEL to pick a model (default = account default).
 
 The generate_* test scripts use these helpers to produce one article's summary or
 digest through the same backend the full Refresh flow uses.
@@ -42,7 +42,7 @@ def load_prompt(name: str) -> str:
 _TRANSIENT_RE = re.compile(
     r"rate.?limit|overloaded|too many requests|\b429\b|\b500\b|\b502\b|\b503\b|\b529\b|"
     r"internal server error|bad gateway|service unavailable|timeout|timed out|temporarily|"
-    r"maximum number of turns",  # claude-sdk: occasional long output doesn't finish in one turn — retry
+    r"maximum number of turns",  # claude (SDK): occasional long output doesn't finish in one turn — retry
     re.I,
 )
 
@@ -118,16 +118,14 @@ def run_agent(prompt: str, agent: str = "codex", retries: int = 3) -> str:
                "--dangerously-bypass-approvals-and-sandbox",
                "-o", str(last_msg), "-"]
     elif agent == "claude":
-        cmd = ["claude", "--print", "--dangerously-skip-permissions"]
-    elif agent == "claude-sdk":
-        cmd = None
+        cmd = None  # claude goes through the Agent SDK, not a subprocess
     else:
-        raise ValueError(f"Unknown agent '{agent}'. Use 'codex', 'claude', or 'claude-sdk'.")
+        raise ValueError(f"Unknown agent '{agent}'. Use 'codex' or 'claude'.")
 
     try:
         detail, code = "", None
         for attempt in range(1, retries + 1):
-            if agent == "claude-sdk":
+            if agent == "claude":
                 try:
                     return _run_claude_sdk(prompt)
                 except RuntimeError as exc:

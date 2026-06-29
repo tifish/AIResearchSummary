@@ -77,25 +77,208 @@ def summary_href(record: dict[str, Any], site_dir: Path) -> str:
     return f"summaries/{slug}.html"
 
 
+DIGEST_THEME_HEAD = """  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
+      background: var(--airs-digest-panel) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>"""
+
+DIGEST_THEME_SCRIPT = """  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>"""
+
+
+def inject_digest_theme(html: str) -> str:
+    if "airs-digest-theme-style" not in html:
+        head_match = re.search(r"</head\s*>", html, re.IGNORECASE)
+        if head_match:
+            html = html[: head_match.start()] + DIGEST_THEME_HEAD + "\n" + html[head_match.start() :]
+        else:
+            html = DIGEST_THEME_HEAD + "\n" + html
+    if "airs-digest-theme-script" in html:
+        return html
+    body_match = re.search(r"</body\s*>", html, re.IGNORECASE)
+    if body_match:
+        return html[: body_match.start()] + DIGEST_THEME_SCRIPT + "\n" + html[body_match.start() :]
+    return html + "\n" + DIGEST_THEME_SCRIPT
+
+
 def inject_nav(html: str, url: str) -> str:
     """Insert a standard nav bar (back to index + original article) at the top of a
     digest page. Idempotent (marked with the airs-digest-nav class)."""
     if "airs-digest-nav" in html:
         return html
     nav = (
-        '<nav class="airs-digest-nav" style="display:flex;gap:18px;flex-wrap:wrap;'
-        "align-items:center;padding:10px 16px;margin:0;background:rgba(127,127,127,.08);"
-        "border-bottom:1px solid rgba(127,127,127,.25);"
-        "font:14px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;\">"
-        '<a href="../index.html" style="color:#2aa37f;font-weight:600;text-decoration:none;">&#8592; 返回索引</a>'
-        f'<a href="{esc(url)}" target="_blank" rel="noopener noreferrer" '
-        'style="color:#2aa37f;font-weight:600;text-decoration:none;">阅读原文 &#8599;</a>'
+        '<nav class="airs-digest-nav">'
+        '<div class="airs-digest-nav-links">'
+        '<a href="../index.html">&#8592; 返回索引</a>'
+        f'<a href="{esc(url)}" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a>'
+        "</div>"
+        '<button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button>'
         "</nav>"
     )
     match = re.search(r"<body[^>]*>", html, re.IGNORECASE)
     if match:
         return html[: match.end()] + "\n" + nav + html[match.end() :]
     return nav + html
+
+
+def prepare_digest_html(html: str, url: str) -> str:
+    return inject_digest_theme(inject_nav(html, url))
 
 
 def render_summary(summary: str, value: str) -> str:

@@ -96,13 +96,14 @@ def process_batch(work, args, state, site, force_digest=False) -> int:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Discover -> generate (summary + digest) -> render the site.")
-    parser.add_argument("--agent", choices=["codex", "claude", "claude-sdk"], default="codex")
+    parser.add_argument("--agent", choices=["codex", "claude"], default="codex",
+                        help="codex=Codex CLI；claude=Claude Agent SDK（订阅登录，需 pip install claude-agent-sdk）。")
     parser.add_argument("--sources", default=None, help="逗号分隔的来源 id，默认全部。")
     parser.add_argument("--discover-only", action="store_true", help="只做发现（步骤一），列出发现到的文章，不生成、不渲染。")
     parser.add_argument("--url", default=None, help="只对这一篇文章生成摘要和总结（步骤二，单篇测试，覆盖已有总结页）。")
     parser.add_argument("--missing-digests", action="store_true", help="为 articles.json 中缺独立总结页的文章补生成（摘要+总结）。")
     parser.add_argument("--regenerate-all", action="store_true", help="对 articles.json 中所有文章重新抓取正文并重生成摘要+总结（强制覆盖已有总结页）。")
-    parser.add_argument("--jobs", type=int, default=12, help="生成摘要+总结的并发数（并行调用 claude/codex CLI，默认 12；1=串行；只受 API 速率限制约束，瞬时错误自动重试）。")
+    parser.add_argument("--jobs", type=int, default=12, help="生成摘要+总结的并发数（并行调用 codex/claude 后端，默认 12；1=串行；只受 API 速率限制约束，瞬时错误自动重试）。")
     parser.add_argument("--fetch-delay", type=float, default=1.5, help="抓取文章正文之间的间隔秒数（默认 1.5，对来源站点友好；抓网页是串行的）。")
     parser.add_argument("--dry-run", action="store_true", help="不调用 Agent、不写文件。")
     args = parser.parse_args()

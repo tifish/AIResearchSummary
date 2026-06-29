@@ -17,7 +17,7 @@ from pathlib import Path
 
 from agent_cli import extract_html
 from generate import upsert_summary
-from render_site import default_site_dir, inject_nav, load_articles, render_page
+from render_site import default_site_dir, load_articles, prepare_digest_html, render_page
 
 
 if hasattr(sys.stdout, "reconfigure"):
@@ -48,7 +48,7 @@ def main() -> int:
         summaries += 1
         html = str(res.get("html", ""))
         if "<html" in html.lower():
-            html = inject_nav(extract_html(html), item["url"])
+            html = prepare_digest_html(extract_html(html), item["url"])
             out = Path(item["out_file"])
             out.parent.mkdir(parents=True, exist_ok=True)
             out.write_text(html, encoding="utf-8")
