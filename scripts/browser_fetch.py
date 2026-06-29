@@ -97,21 +97,42 @@ def close_browser_session() -> None:
 atexit.register(close_browser_session)
 
 
-def _close_startup_pages(context) -> None:
-    """The dedicated profile may restore old tabs; keep the fetch session clean."""
+def _close_extra_pages(context, keep_pages) -> None:
+    """The dedicated profile may restore old tabs; keep only pages we own."""
+    keep = {id(page) for page in keep_pages if page is not None}
     for page in list(getattr(context, "pages", [])):
+        if id(page) in keep:
+            continue
         try:
             page.close()
         except Exception:
             pass
 
 
-def _browser_context(cdp: str | None, channel: str | None, headless: bool):
+def _ensure_keepalive_page(session: dict):
+    page = session.get("keepalive_page")
+    if page is not None:
+        try:
+            if not page.is_closed():
+                return page
+        except Exception:
+            pass
+
+    page = session["context"].new_page()
+    try:
+        page.goto("about:blank")
+    except Exception:
+        pass
+    session["keepalive_page"] = page
+    return page
+
+
+def _browser_session(cdp: str | None, channel: str | None, headless: bool):
     global _SESSION
     key = (cdp or "", channel or "", headless)
     with _SESSION_LOCK:
         if _SESSION is not None and _SESSION.get("key") == key:
-            return _SESSION["context"]
+            return _SESSION
         if _SESSION is not None:
             close_browser_session()
 
@@ -135,7 +156,6 @@ def _browser_context(cdp: str | None, channel: str | None, headless: bool):
                 if channel:
                     launch_kwargs["channel"] = channel
                 context = playwright.chromium.launch_persistent_context(_profile_dir(), **launch_kwargs)
-                _close_startup_pages(context)
                 close_context = True
         except Exception:
             try:
@@ -152,8 +172,26 @@ def _browser_context(cdp: str | None, channel: str | None, headless: bool):
             "context": context,
             "close_context": close_context,
             "close_browser": False,
+            "cleaned_pages": False,
+            "keepalive_page": None,
         }
-        return context
+        return _SESSION
+
+
+def _new_fetch_page(cdp: str | None, channel: str | None, headless: bool):
+    session = _browser_session(cdp, channel, headless)
+    try:
+        keepalive_page = _ensure_keepalive_page(session) if session.get("close_context") else None
+        page = session["context"].new_page()
+    except Exception:
+        close_browser_session()
+        session = _browser_session(cdp, channel, headless)
+        keepalive_page = _ensure_keepalive_page(session) if session.get("close_context") else None
+        page = session["context"].new_page()
+    if session.get("close_context") and not session.get("cleaned_pages"):
+        _close_extra_pages(session["context"], (keepalive_page, page))
+        session["cleaned_pages"] = True
+    return page
 
 
 def _find_load_more(page):
@@ -293,8 +331,7 @@ def fetch_rendered(
     if max_loads is None:
         max_loads = SAFETY_MAX_LOADS
 
-    context = _browser_context(cdp, channel, headless)
-    page = context.new_page()
+    page = _new_fetch_page(cdp, channel, headless)
     try:
         return _load(page, url, wait_selector, timeout_ms, load_more, max_loads, stop_when)
     finally:
