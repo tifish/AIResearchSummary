@@ -29,7 +29,6 @@ from discover_articles import (  # noqa: E402
     default_state_path,
     discover,
     normalize_url,
-    read_existing_urls,
 )
 from extract_article import extract  # noqa: E402
 from render_site import default_site_dir, load_articles, render_page, summary_slug  # noqa: E402
@@ -94,6 +93,13 @@ def process_batch(work, args, state, site, force_digest=False) -> int:
     return done
 
 
+def missing_digest_records(records, site):
+    return [
+        r for r in records
+        if r.get("url") and not (site / "summaries" / f"{summary_slug(str(r['url']))}.html").exists()
+    ]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Discover -> generate (summary + digest) -> render the site.")
     parser.add_argument("--agent", choices=["codex", "claude"], default="codex",
@@ -148,10 +154,7 @@ def main() -> int:
 
     if args.missing_digests:
         records = load_articles(state)
-        work = [
-            r for r in records
-            if r.get("url") and not (site / "summaries" / f"{summary_slug(str(r['url']))}.html").exists()
-        ]
+        work = missing_digest_records(records, site)
         print(f"{len(work)} article(s) missing a digest page.")
         if args.dry_run:
             for r in work:
@@ -183,21 +186,31 @@ def main() -> int:
     articles, source_errors = discover(sources, DEFAULT_SINCE)
     for err in source_errors:
         print(f"  source error: {err}")
-    existing = read_existing_urls(state)
+    records = load_articles(state)
+    missing_digests = missing_digest_records(records, site)
+    existing = {normalize_url(str(r.get("url", ""))) for r in records if r.get("url")}
     new_articles = [a for a in articles if normalize_url(a["url"]) not in existing]
-    print(f"Discovered {len(articles)}, {len(new_articles)} new.")
+    print(f"Discovered {len(articles)}, {len(new_articles)} new; {len(missing_digests)} missing digest(s) to regenerate.")
 
     if args.dry_run:
+        for art in missing_digests:
+            print(f"  would regenerate missing digest: {art.get('date', '')} | {art.get('source', '')} | {art.get('title', '')}")
         for art in new_articles:
             print(f"  would process: {art.get('date', '')} | {art.get('source', '')} | {art.get('title', '')}")
         return 0
 
-    if not new_articles:
+    done = 0
+    if missing_digests:
+        done += process_batch(missing_digests, args, state, site, force_digest=True)
+
+    if new_articles:
+        done += process_batch(new_articles, args, state, site, force_digest=False)
+
+    if done == 0:
         render(site, state)
         print("No new articles. Rendered site/index.html.")
         return 0
 
-    process_batch(new_articles, args, state, site, force_digest=False)
     return 0
 
 
