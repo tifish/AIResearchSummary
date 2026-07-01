@@ -3,120 +3,288 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Making Claude a chemist 中文总结</title>
+<title>让 Claude 成为化学家</title>
 <style>
 :root {
-  --bg: #f6f7f4;
+  --bg: #f7f4ee;
+  --ink: #18202a;
+  --muted: #66717f;
+  --line: #d8d0c5;
   --card: #ffffff;
-  --ink: #1f2528;
-  --muted: #667075;
-  --line: #dfe5df;
-  --accent: #0f766e;
-  --accent2: #7c3aed;
-  --accent3: #b45309;
-  --hl: #e6f5f1;
-  --hl2: #fff3d6;
+  --surface: #fff8ea;
+  --surface-soft: #eef6f2;
+  --panel: #edf2ff;
+  --band: #17212f;
+  --band-ink: #f6f2e8;
+  --data: #1b73e8;
+  --data-bg: #e7f0ff;
+  --risk: #c2410c;
+  --risk-bg: #fff0e8;
+  --opportunity: #0f766e;
+  --opportunity-bg: #e5f7f3;
+  --conclusion: #7c3aed;
+  --conclusion-bg: #f1eaff;
+  --accent: #d97706;
+  --accent-bg: #fff4d6;
+  --shadow: 0 18px 50px rgba(24, 32, 42, 0.10);
+}
+:root[data-theme="dark"] {
+  --bg: #101317;
+  --ink: #ece7dd;
+  --muted: #a9b0bb;
+  --line: #303845;
+  --card: #181d24;
+  --surface: #241f16;
+  --surface-soft: #12241f;
+  --panel: #151e32;
+  --band: #080b10;
+  --band-ink: #f3eadb;
+  --data: #6aa7ff;
+  --data-bg: #10233f;
+  --risk: #fb8b57;
+  --risk-bg: #33180f;
+  --opportunity: #42d6c5;
+  --opportunity-bg: #0f2b27;
+  --conclusion: #b896ff;
+  --conclusion-bg: #251a3f;
+  --accent: #f5b84b;
+  --accent-bg: #35270b;
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #101317;
+    --ink: #ece7dd;
+    --muted: #a9b0bb;
+    --line: #303845;
+    --card: #181d24;
+    --surface: #241f16;
+    --surface-soft: #12241f;
+    --panel: #151e32;
+    --band: #080b10;
+    --band-ink: #f3eadb;
+    --data: #6aa7ff;
+    --data-bg: #10233f;
+    --risk: #fb8b57;
+    --risk-bg: #33180f;
+    --opportunity: #42d6c5;
+    --opportunity-bg: #0f2b27;
+    --conclusion: #b896ff;
+    --conclusion-bg: #251a3f;
+    --accent: #f5b84b;
+    --accent-bg: #35270b;
+    --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  }
 }
 * { box-sizing: border-box; }
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
   background: var(--bg);
   color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
   line-height: 1.72;
 }
-main {
-  max-width: 980px;
-  margin: 0 auto;
-  padding: 40px 18px 56px;
-}
+main { overflow: hidden; }
 .hero {
-  background: linear-gradient(135deg, var(--hl), var(--card));
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  padding: 28px;
+  padding: 72px 7vw 56px;
+  background: linear-gradient(135deg, var(--band), #243246);
+  color: var(--band-ink);
 }
 .kicker {
   color: var(--accent);
   font-weight: 700;
-  letter-spacing: .04em;
-  font-size: 14px;
+  letter-spacing: 0;
 }
 h1 {
-  margin: 8px 0 14px;
-  font-size: clamp(28px, 4vw, 44px);
+  margin: 18px 0 8px;
+  font-size: clamp(2rem, 5vw, 4.8rem);
+  line-height: 1.08;
+  letter-spacing: 0;
+}
+.original {
+  margin: 0 0 28px;
+  color: var(--muted);
+  font-size: 1rem;
+}
+.one {
+  max-width: 880px;
+  font-size: clamp(1.15rem, 2vw, 1.55rem);
+  color: var(--band-ink);
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--line);
+}
+.metric {
+  padding: 28px 24px;
+  background: var(--data-bg);
+}
+.metric:nth-child(2) { background: var(--opportunity-bg); }
+.metric:nth-child(3) { background: var(--conclusion-bg); }
+.metric:nth-child(4) { background: var(--risk-bg); }
+.metric strong {
+  display: block;
+  font-size: clamp(1.8rem, 3vw, 3rem);
+  line-height: 1;
+}
+.metric span {
+  display: block;
+  margin-top: 10px;
+  color: var(--muted);
+}
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  padding: 64px 7vw;
+  background: var(--card);
+}
+.split h2, .flow h2, .table-zone h2, .limits h2, .takeaways h2 {
+  margin: 0 0 18px;
+  font-size: clamp(1.55rem, 3vw, 2.4rem);
   line-height: 1.18;
 }
 .lead {
-  font-size: 20px;
+  font-size: 1.1rem;
   color: var(--ink);
-  margin: 0;
 }
-.meta {
-  margin-top: 16px;
-  color: var(--muted);
-  font-size: 14px;
-}
-.grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  margin: 22px 0;
-}
-.stat {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 16px;
-}
-.num {
-  display: block;
-  color: var(--accent2);
-  font-size: 26px;
-  font-weight: 800;
-  line-height: 1.2;
-}
-.label {
-  color: var(--muted);
-  font-size: 14px;
-}
-section {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 24px;
-  margin-top: 18px;
-}
-h2 {
-  margin: 0 0 10px;
-  font-size: 23px;
-  line-height: 1.3;
-}
-p { margin: 0 0 12px; }
 .note {
-  background: var(--hl2);
-  border-left: 4px solid var(--accent3);
-  padding: 12px 14px;
-  border-radius: 10px;
+  border-left: 6px solid var(--opportunity);
+  padding: 16px 20px;
+  background: var(--opportunity-bg);
+  color: var(--ink);
 }
-.takeaways {
+.flow {
+  padding: 62px 7vw;
+  background: var(--surface);
+}
+.steps {
   display: grid;
-  gap: 10px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-top: 26px;
+}
+.step {
+  position: relative;
+  padding: 22px;
+  border-top: 5px solid var(--accent);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+.step b {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+.table-zone {
+  padding: 62px 7vw;
+  background: var(--panel);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+th, td {
+  padding: 18px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  color: var(--data);
+  font-size: 0.92rem;
+}
+.insight {
+  margin-top: 28px;
+  padding: 24px 28px;
+  background: var(--band);
+  color: var(--band-ink);
+  border-left: 8px solid var(--conclusion);
+  font-size: 1.18rem;
+}
+.limits {
+  padding: 62px 7vw;
+  background: var(--risk-bg);
+}
+.limit-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 28px;
+  align-items: start;
+}
+.limit-list {
+  margin: 0;
   padding: 0;
-  margin: 14px 0 0;
   list-style: none;
 }
-.takeaways li {
-  padding: 13px 15px;
-  background: var(--hl);
-  border: 1px solid var(--line);
-  border-radius: 12px;
+.limit-list li {
+  margin-bottom: 14px;
+  padding: 14px 16px;
+  background: var(--card);
+  border-left: 5px solid var(--risk);
 }
-@media (max-width: 760px) {
-  main { padding: 24px 14px 40px; }
-  .hero, section { padding: 20px; border-radius: 14px; }
-  .grid { grid-template-columns: 1fr; }
-  .lead { font-size: 18px; }
+.future {
+  padding: 44px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+.future b { color: var(--opportunity); }
+.takeaways {
+  padding: 66px 7vw 76px;
+  background: var(--surface-soft);
+}
+.mosaic {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr 1fr;
+  gap: 18px;
+}
+.tile {
+  padding: 24px;
+  min-height: 160px;
+  background: var(--card);
+  border-bottom: 6px solid var(--data);
+}
+.tile:nth-child(2) {
+  background: var(--conclusion-bg);
+  border-color: var(--conclusion);
+}
+.tile:nth-child(3) {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+}
+.tile:nth-child(4) {
+  grid-column: span 2;
+  background: var(--opportunity-bg);
+  border-color: var(--opportunity);
+}
+.tile:nth-child(5) {
+  background: var(--risk-bg);
+  border-color: var(--risk);
+}
+.tile h3 {
+  margin: 0 0 10px;
+  font-size: 1.1rem;
+}
+@media (max-width: 860px) {
+  .metrics, .steps, .split, .limit-grid, .mosaic {
+    grid-template-columns: 1fr;
+  }
+  .tile:nth-child(4) { grid-column: auto; }
+  .hero, .split, .flow, .table-zone, .limits, .takeaways {
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+  table { font-size: 0.92rem; }
+  th, td { padding: 12px; }
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -193,13 +361,6 @@ p { margin: 0 0 12px; }
     body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
       color: inherit;
     }
-    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
-      border-color: var(--airs-digest-line) !important;
-    }
-    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
-      background: var(--airs-digest-panel) !important;
-      color: var(--airs-digest-ink) !important;
-    }
     body :where(.muted, .meta, .kicker, small) {
       color: var(--airs-digest-muted) !important;
     }
@@ -260,67 +421,123 @@ p { margin: 0 0 12px; }
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/making-claude-a-chemist" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
 <main>
-  <article>
-    <header class="hero">
-      <div class="kicker">一句话总括</div>
-      <h1>Claude 开始能做化学家每天最耗时的“翻译活”</h1>
-      <p class="lead">这篇文章的真正贡献不是宣称 AI 已经会发明化学，而是用 NMR 谱图这个可验证任务证明：通用模型已经能在部分日常分析工作中接近或超过专用软件，并能把谱图、分子式和结构推理连起来。</p>
-      <div class="meta">Anthropic Research · 2026 年 6 月 5 日 · 主题：AI for Science / 化学</div>
-    </header>
+  <section class="hero">
+    <div class="kicker">一句话总括</div>
+    <h1>让 Claude 成为化学家</h1>
+    <p class="original">Making Claude a chemist</p>
+    <p class="one">Anthropic 的核心贡献不是宣称 AI 已经会“做化学”，而是展示 Claude Opus 4.7 已能在 NMR 谱图这种化学家高频、费时、需要判断力的任务中接近专业软件，并开始反向推断分子结构。</p>
+  </section>
 
-    <div class="grid">
-      <div class="stat"><span class="num">20</span><span class="label">个正向 NMR 预测化合物，来自训练截止后的预印本</span></div>
-      <div class="stat"><span class="num">±0.079 ppm</span><span class="label">Opus 4.7 在氢谱位置预测上的平均误差</span></div>
-      <div class="stat"><span class="num">15</span><span class="label">个反向结构解析问题，用分子式和 1D NMR 测试</span></div>
+  <section class="metrics" aria-label="关键数字">
+    <div class="metric"><strong>20</strong><span>个新化合物用于正向 NMR 预测，来自训练截止后的 ChemRxiv 预印本。</span></div>
+    <div class="metric"><strong>±0.079 ppm</strong><span>Opus 4.7 的氢谱平均误差，低于化学家常用容忍窗口的一半。</span></div>
+    <div class="metric"><strong>约 80%</strong><span>Claude 模型对子峰间距的预测落在 0.5 Hz 内。</span></div>
+    <div class="metric"><strong>15</strong><span>个反向结构解析问题，用来测试 Claude 能否从谱图提出结构。</span></div>
+  </section>
+
+  <section class="split">
+    <div>
+      <h2>问题不是记住分子，而是在表示之间准确转换</h2>
+      <p class="lead">化学家每天都在图像、SMILES、专利文字、数据库记录和仪器读数之间切换。每种表示都指向同一个化学实体，但需要不同的阅读能力。</p>
+      <p>这改变了读者对 AI 影响的理解。AI 在化学中的早期价值，可能不是替代化学家设计全新反应，而是减少这些转换、查证和整合的时间成本。</p>
     </div>
+    <div class="note">
+      <p>CAS 已记录超过 2.9 亿种公开物质，并且每天约新增 1.5 万种。单靠人工追踪这些结构和证据，规模上已经很难维持。</p>
+      <p>因此，能读图、读谱、读论文细节，并把它们连到同一个分子上的模型，会直接改变研究流程。</p>
+    </div>
+  </section>
 
-    <section>
-      <h2>化学家的瓶颈是表示之间的转换</h2>
-      <p>同一个分子会以手绘结构、仪器读数、数据库字符串、专利命名和论文图示等形式出现，化学家必须在这些表示之间来回切换。文章指出，CAS 已收录超过 2.9 亿种公开物质，并且每天新增约 1.5 万种，这让人工检索和核对越来越难扩展。</p>
-      <p>这改变了对 AI 影响的理解：化学 AI 的短期价值不一定是自动发现新药，而是先减轻研究者在结构识别、谱图核对和文献整合上的重复劳动。</p>
-    </section>
+  <section class="flow">
+    <h2>评估流程：从结构到谱图，再从谱图回到结构</h2>
+    <p>文章先测试正向预测。工具拿到 SMILES 和溶剂信息后，预测氢谱和碳谱峰位。随后，文章测试反向解析，让 Opus 4.7 根据分子式和 1D NMR 谱图提出候选结构。</p>
+    <div class="steps">
+      <div class="step"><b>1</b><p>选择训练截止后的新化合物，降低模型靠记忆命中的风险。</p></div>
+      <div class="step"><b>2</b><p>让 Claude、ChemDraw 和 MestReNova 预测每个氢峰和碳峰的位置。</p></div>
+      <div class="step"><b>3</b><p>把预测峰与实验峰配对，并用 ppm 误差衡量准确度。</p></div>
+      <div class="step"><b>4</b><p>让 Opus 4.7 从分子式和谱图反推结构，测试软件较少覆盖的方向。</p></div>
+    </div>
+  </section>
 
-    <section>
-      <h2>Opus 4.7 在 1D NMR 正向预测上达到专用软件水平</h2>
-      <p>评测比较了 Claude Opus 4.7、Opus 4.6、Sonnet 4.6、ChemDraw 和 MestReNova。数据集包含 20 个化合物、4 类结构骨架，每类 5 个，并使用训练截止后发布的 ChemRxiv 预印本，目的是降低模型背过答案的可能性。</p>
-      <p>在氢谱预测中，Opus 4.7 平均误差为 ±0.079 ppm，明显小于化学家常用的 ±0.20 ppm 容许窗口；在碳谱中，Opus 4.7 与 MestReNova 接近，误差分别为 ±1.37 和 ±1.48 ppm。结论是，通用大模型在常规谱图预测上已经不只是“能解释文字”，而是能参与化学数据判断。</p>
-    </section>
+  <section class="table-zone">
+    <h2>结果：Opus 4.7 不只是接近专用软件</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>任务</th>
+          <th>关键数据</th>
+          <th>为什么重要</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>氢谱峰位预测</td>
+          <td>Opus 4.7 平均误差为 ±0.079 ppm，容忍窗口为 ±0.20 ppm。</td>
+          <td>这说明通用模型已经能处理化学家日常会认为“足够准”的一类读谱任务。</td>
+        </tr>
+        <tr>
+          <td>碳谱峰位预测</td>
+          <td>Opus 4.7 为 ±1.37 ppm，MestReNova 为 ±1.48 ppm，二者接近。</td>
+          <td>AI 的表现不是只在语言解释上有用，而是能进入定量预测。</td>
+        </tr>
+        <tr>
+          <td>峰形和子峰间距</td>
+          <td>Claude 模型约 80% 落在 0.5 Hz 内，ChemDraw 和 MestReNova 为 26% 至 35%。</td>
+          <td>谱图不只看位置。峰形和间距也承载结构信息，这让模型更接近化学家的实际阅读方式。</td>
+        </tr>
+        <tr>
+          <td>反向结构解析</td>
+          <td>8 个简单目标每次都找回正确结构。7 个较难目标在给出起始物提示后也基本成功。</td>
+          <td>这把 AI 从“验证一个结构是否合理”推进到“提出可能结构”，影响更接近研究助理。</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="insight">真正的变化在于方向反转：传统软件常从结构预测谱图，而 Claude 可以从谱图和分子式提出结构候选。</div>
+  </section>
 
-    <section>
-      <h2>模型还能处理谱峰形状和耦合间距</h2>
-      <p>NMR 不只看峰的位置，还看峰的分裂形状和峰间距，这些信息会影响结构判断。文章称，Opus 4.7 匹配实验分裂模式的频率高于其他工具，而三个 Claude 模型约 80% 的子峰间距预测落在 0.5 Hz 内，相比之下 ChemDraw 和 MestReNova 只有 26% 至 35%。</p>
-      <p>这说明模型的优势可能不只是数值拟合，而是能利用上下文和化学推理处理传统规则软件较难覆盖的局部结构信息。</p>
-    </section>
+  <section class="limits">
+    <div class="limit-grid">
+      <div>
+        <h2>限制：这是强信号，不是最终定论</h2>
+        <ul class="limit-list">
+          <li>正向任务只有 20 个化合物，反向任务只有 15 个问题，样本量仍小。</li>
+          <li>较难的反向目标需要起始物提示，否则模型可能反复推理而不收敛。</li>
+          <li>未覆盖 2D NMR、立体化学、复杂天然产物，以及更多溶剂体系。</li>
+          <li>NH 活性杂芳环的覆盖有限，不能直接推广到所有相近骨架。</li>
+        </ul>
+      </div>
+      <div class="future">
+        <h2>下一步更关键</h2>
+        <p><b>更大的基准集</b>应该覆盖数百个化合物和 20 至 30 类骨架。每类至少 15 个化合物，才能区分模型差异和结构类别差异。</p>
+        <p><b>更真实的任务</b>还需要加入 2D 谱图、更多溶剂、立体化学和文献中的非结构化实验细节。</p>
+      </div>
+    </div>
+  </section>
 
-    <section>
-      <h2>反向结构解析是更有意义的突破</h2>
-      <p>正向预测是从结构推谱图，专用软件已经能做；更难的是从实验谱图反推结构。研究给 Opus 4.7 提供精确分子式、氢谱和碳谱，让它在 15 个问题中提出最多 3 个候选结构。</p>
-      <p>结果是，8 个较简单目标在每次尝试中都被正确恢复；7 个更复杂目标在加入起始原料提示后，4 个三次全对，其余也达到三次中两次正确。这改变了任务边界：过去通常需要 2D NMR、专业训练和授权软件的解析过程，现在部分 1D 峰表问题可以直接进入对话式工作流。</p>
-    </section>
-
-    <section>
-      <h2>结果有价值，但还不能泛化到全部化学</h2>
-      <p>文章主动承认评测规模很小：正向任务只有 20 个化合物，反向任务只有 15 个问题，每个结构家族只覆盖一类失败模式。复杂反向目标如果没有起始原料提示，模型可能会在推理中打转而不提交最终结构。</p>
-      <p class="note">未覆盖范围包括 2D NMR、立体化学、复杂天然产物，以及甲醇-d4、苯-d6、丙酮-d6 等溶剂；慢交换 NH 杂芳环也只通过氯哒嗪类样本测试。最稳妥的解读是：结果具有方向性，但还不是大规模基准的最终结论。</p>
-    </section>
-
-    <section>
-      <h2>Anthropic 的路线是把 Claude 做成化学工作流助手</h2>
-      <p>后续重点包括读取和渲染化学结构、合成路线推理、反应机理解释，以及从论文方法、补充材料和专利中抽取关键化学信息。这些任务成熟度不同，谱图分析已经能被量化评测，而逆合成规划仍在明确边界。</p>
-      <p>最终洞见是，Claude 最现实的角色不是替代化学家，而是在可审计的前提下帮助他们更快完成转换、回忆、核对和整合。</p>
-    </section>
-
-    <section>
-      <h2>最值得带走的洞见</h2>
-      <ul class="takeaways">
-        <li>AI 在化学中的短期落点，是处理高频、耗时、可验证的分析任务，而不是直接跳到“自动科研”。</li>
-        <li>Opus 4.7 在这组 NMR 正向预测中已经能与 ChemDraw、MestReNova 竞争，氢谱表现尤其突出。</li>
-        <li>反向结构解析展示了更大的工作流价值：模型能从 1D 谱表和分子式提出结构候选，降低初步解析门槛。</li>
-        <li>样本量、骨架覆盖、溶剂范围、2D NMR 和立体化学仍是关键限制，不能把结果外推到所有化学问题。</li>
-        <li>对科研人员最重要的不是“模型是否全知”，而是它在哪些环节可靠、省时、可审计，以及何时必须回到专家判断。</li>
-      </ul>
-    </section>
-  </article>
+  <section class="takeaways">
+    <h2>最值得带走的洞见</h2>
+    <div class="mosaic">
+      <div class="tile">
+        <h3>AI 的近期价值在日常瓶颈</h3>
+        <p>Claude 先帮助化学家处理读谱、转写、核对和整合，而不是直接替代完整科研判断。</p>
+      </div>
+      <div class="tile">
+        <h3>通用模型已经能进入专业测量</h3>
+        <p>Opus 4.7 在部分 NMR 指标上接近或超过 ChemDraw、MestReNova。</p>
+      </div>
+      <div class="tile">
+        <h3>反向解析是更大的信号</h3>
+        <p>从谱图提出结构候选，比从结构预测谱图更接近化学家的推理工作。</p>
+      </div>
+      <div class="tile">
+        <h3>可审计推理很重要</h3>
+        <p>模型能展示步骤，化学家可以检查假设和中间判断。这让 AI 更像可协作工具，而不是黑箱答案机。</p>
+      </div>
+      <div class="tile">
+        <h3>边界仍然清楚</h3>
+        <p>样本小、任务窄、未覆盖 2D NMR 和立体化学。读者应把结果看作方向性证据，而不是通用化学能力证明。</p>
+      </div>
+    </div>
+  </section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

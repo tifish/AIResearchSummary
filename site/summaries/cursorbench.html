@@ -3,19 +3,66 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CursorBench 如何评估编码模型质量</title>
+<title>我们如何在 Cursor 中比较模型质量</title>
 <style>
 :root {
-  --bg: #f6f7f9;
-  --card: #ffffff;
-  --ink: #17202a;
-  --muted: #5c6672;
-  --line: #dfe4ea;
-  --accent: #2563eb;
-  --accent2: #0f766e;
-  --accent3: #9333ea;
-  --hl: #eaf2ff;
-  --hl2: #eefaf6;
+  --bg: #f7f4ee;
+  --ink: #1b1f24;
+  --muted: #667085;
+  --line: #d8d2c8;
+  --paper: #fffaf2;
+  --panel: #edf6f5;
+  --panel2: #fff0f0;
+  --panel3: #f1f0ff;
+  --panel4: #eef7e8;
+  --dark-band: #18212b;
+  --dark-ink: #f7fafc;
+  --data: #0b78d0;
+  --risk: #d44848;
+  --opp: #15845f;
+  --conclusion: #7a54d1;
+  --gold: #b7791f;
+  --shadow: rgba(31, 41, 55, .10);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111417;
+    --ink: #eef2f6;
+    --muted: #aab4c0;
+    --line: #2e3742;
+    --paper: #1a2027;
+    --panel: #122b2a;
+    --panel2: #301b1d;
+    --panel3: #221f38;
+    --panel4: #172916;
+    --dark-band: #080b10;
+    --dark-ink: #f5f7fa;
+    --data: #4fb3ff;
+    --risk: #ff7474;
+    --opp: #4fd89b;
+    --conclusion: #a991ff;
+    --gold: #ffc35a;
+    --shadow: rgba(0, 0, 0, .35);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111417;
+  --ink: #eef2f6;
+  --muted: #aab4c0;
+  --line: #2e3742;
+  --paper: #1a2027;
+  --panel: #122b2a;
+  --panel2: #301b1d;
+  --panel3: #221f38;
+  --panel4: #172916;
+  --dark-band: #080b10;
+  --dark-ink: #f5f7fa;
+  --data: #4fb3ff;
+  --risk: #ff7474;
+  --opp: #4fd89b;
+  --conclusion: #a991ff;
+  --gold: #ffc35a;
+  --shadow: rgba(0, 0, 0, .35);
 }
 * { box-sizing: border-box; }
 body {
@@ -23,87 +70,218 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-  line-height: 1.72;
+  line-height: 1.68;
 }
-main {
-  max-width: 980px;
-  margin: 0 auto;
-  padding: 40px 20px 56px;
-}
+main { overflow: hidden; }
 .hero {
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 24px;
-  margin-bottom: 24px;
+  padding: 72px 8vw 56px;
+  background: linear-gradient(135deg, var(--dark-band), #223344);
+  color: var(--dark-ink);
 }
 .kicker {
-  color: var(--accent);
-  font-size: 14px;
+  color: var(--gold);
   font-weight: 700;
   letter-spacing: .04em;
+  margin-bottom: 18px;
 }
 h1 {
-  margin: 10px 0 14px;
-  font-size: clamp(28px, 4vw, 44px);
-  line-height: 1.18;
+  margin: 0;
+  max-width: 920px;
+  font-size: clamp(34px, 6vw, 74px);
+  line-height: 1.05;
+  letter-spacing: 0;
 }
-.lead {
-  font-size: 20px;
-  color: var(--ink);
-  background: var(--hl);
-  border-left: 5px solid var(--accent);
-  padding: 16px 18px;
-  border-radius: 8px;
+.original {
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 18px;
 }
-.grid {
+.one-line {
+  max-width: 860px;
+  margin-top: 34px;
+  font-size: 22px;
+  color: var(--dark-ink);
+  border-left: 6px solid var(--opp);
+  padding-left: 18px;
+}
+.band {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(4, 1fr);
+  border-bottom: 1px solid var(--line);
+  background: var(--paper);
 }
-section {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 20px;
+.metric {
+  padding: 28px 24px;
+  border-right: 1px solid var(--line);
 }
-section.wide { grid-column: 1 / -1; }
-h2 {
-  margin: 0 0 10px;
-  font-size: 21px;
-  line-height: 1.35;
+.metric strong {
+  display: block;
+  font-size: 32px;
+  color: var(--data);
+  line-height: 1;
 }
-p { margin: 0 0 10px; }
-p:last-child { margin-bottom: 0; }
-.data {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 12px 0;
-}
-.badge {
-  background: var(--hl2);
-  color: var(--accent2);
-  border: 1px solid color-mix(in srgb, var(--accent2) 24%, transparent);
-  border-radius: 999px;
-  padding: 4px 10px;
-  font-weight: 700;
-  font-size: 14px;
-}
-.note {
+.metric span {
+  display: block;
+  margin-top: 10px;
   color: var(--muted);
 }
-.insights {
-  background: linear-gradient(135deg, var(--hl), var(--hl2));
-  border-color: var(--line);
+.split {
+  display: grid;
+  grid-template-columns: 1.1fr .9fr;
+  gap: 42px;
+  padding: 64px 8vw;
+  background: var(--panel);
 }
-ul {
-  margin: 10px 0 0;
-  padding-left: 22px;
+h2 {
+  margin: 0 0 18px;
+  font-size: 30px;
+  line-height: 1.2;
 }
-li { margin: 8px 0; }
-@media (max-width: 760px) {
-  main { padding: 28px 14px 40px; }
-  .grid { grid-template-columns: 1fr; }
-  .lead { font-size: 18px; }
+.lead {
+  font-size: 19px;
+  color: var(--ink);
+}
+.problem-list {
+  display: grid;
+  gap: 14px;
+}
+.problem {
+  padding: 18px;
+  border-left: 5px solid var(--risk);
+  background: var(--paper);
+  box-shadow: 0 10px 24px var(--shadow);
+}
+.problem b { color: var(--risk); }
+.flow {
+  padding: 64px 8vw;
+  background: var(--paper);
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  margin-top: 28px;
+  border-top: 3px solid var(--opp);
+}
+.step {
+  padding: 24px 20px;
+  border-right: 1px solid var(--line);
+  position: relative;
+}
+.step::before {
+  content: attr(data-step);
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 12px;
+  border-radius: 50%;
+  background: var(--opp);
+  color: var(--dark-ink);
+  font-weight: 800;
+}
+.compare {
+  padding: 64px 8vw;
+  background: var(--panel2);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--paper);
+  box-shadow: 0 12px 28px var(--shadow);
+}
+th, td {
+  padding: 18px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  color: var(--conclusion);
+  font-size: 15px;
+}
+.quote {
+  padding: 58px 8vw;
+  background: var(--dark-band);
+  color: var(--dark-ink);
+}
+.quote p {
+  max-width: 920px;
+  font-size: clamp(24px, 4vw, 42px);
+  line-height: 1.25;
+  margin: 0;
+}
+.quote mark {
+  color: var(--gold);
+  background: transparent;
+}
+.mosaic {
+  padding: 64px 8vw;
+  background: var(--panel3);
+}
+.tiles {
+  display: grid;
+  grid-template-columns: 1.2fr .8fr 1fr;
+  gap: 16px;
+  margin-top: 24px;
+}
+.tile {
+  min-height: 150px;
+  padding: 22px;
+  background: var(--paper);
+  border-top: 6px solid var(--conclusion);
+}
+.tile:nth-child(2) { border-color: var(--data); }
+.tile:nth-child(3) { border-color: var(--risk); }
+.tile:nth-child(4) { border-color: var(--opp); }
+.tile:nth-child(5) { border-color: var(--gold); }
+.tile.wide { grid-column: span 2; }
+.next {
+  padding: 64px 8vw;
+  background: var(--panel4);
+}
+.next-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+.badge {
+  display: inline-block;
+  padding: 10px 14px;
+  background: var(--opp);
+  color: var(--dark-ink);
+  font-weight: 800;
+}
+.takeaways {
+  padding: 64px 8vw 80px;
+  background: var(--bg);
+}
+.takeaways ul {
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 14px;
+}
+.takeaways li {
+  padding: 18px 20px;
+  background: var(--paper);
+  border-left: 6px solid var(--data);
+}
+@media (max-width: 820px) {
+  .band, .split, .steps, .tiles, .next-grid {
+    grid-template-columns: 1fr;
+  }
+  .metric, .step {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .tile.wide { grid-column: span 1; }
+  .hero, .split, .flow, .compare, .quote, .mosaic, .next, .takeaways {
+    padding-left: 6vw;
+    padding-right: 6vw;
+  }
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -180,13 +358,6 @@ li { margin: 8px 0; }
     body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
       color: inherit;
     }
-    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
-      border-color: var(--airs-digest-line) !important;
-    }
-    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
-      background: var(--airs-digest-panel) !important;
-      color: var(--airs-digest-ink) !important;
-    }
     body :where(.muted, .meta, .kicker, small) {
       color: var(--airs-digest-muted) !important;
     }
@@ -247,66 +418,107 @@ li { margin: 8px 0; }
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/cursorbench" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
 <main>
-  <header class="hero">
-    <div class="kicker">Cursor · Research · 2026-03-11</div>
-    <h1>CursorBench 的核心贡献不是又造了一个榜单，而是把编码模型评测拉回真实开发工作。</h1>
-    <p class="lead">一句话总括：文章主张，用真实 Cursor 会话构造离线评测，再用线上受控实验校准结果，能比公共 benchmark 更准确地区分哪些模型真的让开发者完成工作。</p>
-  </header>
+  <section class="hero">
+    <div class="kicker">一句话总括</div>
+    <h1>我们如何在 Cursor 中比较模型质量</h1>
+    <div class="original">How we compare model quality in Cursor</div>
+    <p class="one-line">Cursor 的真正贡献不是又发布一个榜单，而是把离线真实任务、线上产品实验和持续刷新机制连成一个闭环，用来衡量编码代理对开发者是否真的有用。</p>
+  </section>
 
-  <div class="grid">
-    <section>
-      <h2>公共 benchmark 正在失去区分度</h2>
-      <p>Cursor 指出，许多公开 SWE 评测仍偏向 bug fixing，Terminal-Bench 则包含棋局推理等 puzzle 式任务，这些都不能很好代表开发者让编码代理处理的多文件、多工具、多步骤工作。</p>
-      <p class="note">这改变了读者对 AI 评测的理解：高分可能只是说明模型适应了某类静态题目，而不一定说明它能处理真实工程需求。</p>
-    </section>
+  <section class="band" aria-label="关键数字">
+    <div class="metric"><strong>3.1</strong><span>CursorBench 当前生产版本。新版问题更难，分数必须在同一版本内比较。</span></div>
+    <div class="metric"><strong>约 2 倍</strong><span>CursorBench-3 相比初始版本，在代码行数和平均文件数上大致翻倍。</span></div>
+    <div class="metric"><strong>近 60%</strong><span>SWE-bench Verified 未解决题目中，OpenAI 发现测试有缺陷的比例。</span></div>
+    <div class="metric"><strong>数月</strong><span>CursorBench 每隔几个月刷新一次，以跟上开发者使用代理的变化。</span></div>
+  </section>
 
-    <section>
-      <h2>污染和评分问题会放大虚假的进步</h2>
-      <p>文章强调，SWE-bench Verified、Pro、Multilingual 来自公开仓库，任务可能进入训练数据；OpenAI 停止报告 SWE-bench Verified 的结果后，还指出前沿模型能从记忆中复现 gold patch，且近 60% 未解决问题有测试缺陷。</p>
-      <p class="note">结论是：当 benchmark 被污染或测试本身有缺陷时，榜单提升可能混入记忆、测试漏洞和奖励投机，而不是能力增长。</p>
-    </section>
+  <section class="split">
+    <div>
+      <h2>公开基准的问题，不只是分数饱和</h2>
+      <p class="lead">文章指出，公共 benchmark 越来越难反映开发者真实体验。许多任务来自公开仓库，问题描述也更像已整理好的工单。真实用户给代理的请求更短、更模糊，也更依赖上下文。</p>
+      <p>这会改变我们理解 AI 能力的方式。一个模型在标准题上拿高分，不等于它能处理多文件、多工具和多步骤的真实开发任务。</p>
+    </div>
+    <div class="problem-list">
+      <div class="problem"><b>对齐风险：</b>许多 SWE 基准仍偏向修 bug，Terminal-Bench 又包含偏谜题式任务。这些并不代表日常编码代理请求。</div>
+      <div class="problem"><b>评分风险：</b>真实需求常常欠规格化。固定答案会惩罚合理替代方案，额外添加要求又会扭曲原问题。</div>
+      <div class="problem"><b>污染风险：</b>公开仓库任务可能进入训练数据。模型可能记住补丁，而不是现场解决问题。</div>
+    </div>
+  </section>
 
-    <section class="wide">
-      <h2>CursorBench 用真实会话重建任务来源</h2>
-      <p>CursorBench 通过 Cursor Blame 把已提交代码追溯到产生它的代理请求，从而得到“开发者查询”和“真实解决方案”的配对；许多任务来自 Cursor 内部代码库和受控来源，以降低模型提前见过任务的风险。</p>
-      <div class="data">
-        <span class="badge">每几个月刷新</span>
-        <span class="badge">真实 Cursor 会话</span>
-        <span class="badge">短而欠规格的任务描述</span>
+  <section class="flow">
+    <h2>CursorBench 的构造方式</h2>
+    <p>Cursor 用 Cursor Blame 把提交代码追溯到产生它的代理请求。这样可以自然得到“开发者请求”和“真实解决方案”的配对。</p>
+    <div class="steps">
+      <div class="step" data-step="1"><b>从真实会话取样。</b><br>任务来自 Cursor 工程团队的真实使用，而不是公开仓库题目。</div>
+      <div class="step" data-step="2"><b>保留短请求。</b><br>任务描述故意保持简短，贴近开发者和代理对话时的模糊表达。</div>
+      <div class="step" data-step="3"><b>使用 agentic graders。</b><br>评分器需要判断多种可能的正确解，而不是只匹配单一补丁。</div>
+      <div class="step" data-step="4"><b>持续刷新。</b><br>套件每几个月更新，避免评价停留在旧工作流上。</div>
+    </div>
+  </section>
+
+  <section class="compare">
+    <h2>它比公开 benchmark 更能拉开前沿模型差距</h2>
+    <table>
+      <thead>
+        <tr><th>比较维度</th><th>公开离线基准</th><th>CursorBench</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>任务来源</td>
+          <td>多来自公开仓库或标准化问题集，存在训练污染风险。</td>
+          <td>来自真实 Cursor 会话、内部代码库和受控来源，污染风险更低。</td>
+        </tr>
+        <tr>
+          <td>任务形态</td>
+          <td>常以详细 GitHub issue 或固定题面出现。</td>
+          <td>更接近开发者对代理说话的方式，短、模糊、依赖上下文。</td>
+        </tr>
+        <tr>
+          <td>模型区分度</td>
+          <td>前沿模型上容易饱和，甚至出现较小模型追平高端模型的现象。</td>
+          <td>在前沿水平上显示更大分离度，更接近开发者实际感受。</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="quote">
+    <p><mark>离线分数必须接受线上体验校验。</mark> 一个答案看起来能通过评分器，不代表它在产品里让开发者更高效。</p>
+  </section>
+
+  <section class="mosaic">
+    <h2>线上评估补上离线盲区</h2>
+    <p>Cursor 通过受控线上实验观察代理改动是否真的改善开发者体验。它不只优化单一指标，而是同时看交互质量和输出质量的代理信号。</p>
+    <div class="tiles">
+      <div class="tile wide"><b>语义搜索实验。</b><br>Cursor 曾在迭代检索能力时移除语义搜索工具做消融实验。结果帮助定位语义搜索最重要的场景，例如大代码库中的仓库问答。</div>
+      <div class="tile"><b>产品体验。</b><br>线上指标能捕捉“评分不错但用起来变差”的回归。</div>
+      <div class="tile"><b>排序可信度。</b><br>CursorBench 排名更接近开发者在 Cursor 中感受到的模型质量。</div>
+      <div class="tile"><b>评估目标。</b><br>真正要测的是代理能否完成实际工作，而不是能否适应某个榜单。</div>
+      <div class="tile"><b>方法结论。</b><br>离线和线上结合，才更能跟上工作流变化。</div>
+    </div>
+  </section>
+
+  <section class="next">
+    <div class="next-grid">
+      <div><span class="badge">下一阶段</span></div>
+      <div>
+        <h2>评估会走向长时间运行的代理</h2>
+        <p>CursorBench-3 的任务已经比公开 benchmark 更长，但仍在单个会话内解决。文章预计未来一年，大多数开发工作会转向在自己电脑上长时间运行的代理。</p>
+        <p>这会带来新的评估难题。评分要更便宜，外部服务交互要可复现，离线评估还要继续缩小与开发者体验之间的距离。</p>
       </div>
-      <p class="note">这种设计说明，好的编码评测不只是找一批题，而是要持续跟随开发者如何实际使用代理。</p>
-    </section>
+    </div>
+  </section>
 
-    <section>
-      <h2>任务规模扩大后，模型差异更明显</h2>
-      <p>从初版到 CursorBench-3，正确性评测的问题规模按代码行数和平均文件数大约翻倍，并覆盖 monorepo、多 workspace、生产日志调查、长时间实验等更复杂场景。</p>
-      <p class="note">这让读者看到：前沿模型的差距常常不会在小题上显现，而是在更长上下文、更模糊目标和更多工具调用中暴露。</p>
-    </section>
-
-    <section>
-      <h2>离线分数必须接受线上体验校准</h2>
-      <p>Cursor 不只看离线 grader，还通过线上受控实验追踪交互质量和输出质量等代理结果信号。例如在语义搜索和检索迭代中，他们做过移除语义搜索工具的 ablation，以定位它对大型代码库问答的价值。</p>
-      <p class="note">结论是：一个答案能骗过离线评分器，不代表开发者会觉得它真的可用，线上评估负责捕捉这种落差。</p>
-    </section>
-
-    <section class="wide">
-      <h2>下一代评测要覆盖长时间运行的代理</h2>
-      <p>CursorBench-3 的任务已经比多个公共 benchmark 更长，但仍主要在单个会话内完成。Cursor 预计未来一年，大部分开发工作会转向在自己电脑上长时间运行的代理。</p>
-      <p>这会带来新的评测难题：评分成本要更低，依赖外部服务的任务要可复现，离线评估和真实开发者体验之间的差距还要继续缩小。</p>
-      <p class="note">最终洞见是：编码代理越接近真实工作流，评测就越不能只像考试，而必须像产品质量系统。</p>
-    </section>
-
-    <section class="wide insights">
-      <h2>最值得带走的洞见</h2>
-      <ul>
-        <li>公开榜单的高分不一定代表真实开发体验更好，尤其在任务污染和评分缺陷存在时。</li>
-        <li>真实会话、真实提交和真实开发者反馈，比静态题库更能衡量编码代理的可用性。</li>
-        <li>模型差距会在多文件、长链路、欠规格任务中被放大，小型 bug-fix benchmark 容易低估这种差异。</li>
-        <li>离线评测适合快速比较模型，但必须用线上实验确认它是否真的改善了开发者结果。</li>
-        <li>未来的关键挑战不是再做一个更难榜单，而是评估能独立运行更久、接触真实环境的开发代理。</li>
-      </ul>
-    </section>
-  </div>
+  <section class="takeaways">
+    <h2>最值得带走的洞见</h2>
+    <ul>
+      <li>编码代理评估不能只看公开题库，因为真实开发请求更长、更模糊，也更依赖上下文。</li>
+      <li>训练污染会让公开基准高估模型能力，尤其是在前沿模型已经能记住部分补丁时。</li>
+      <li>CursorBench 的价值在于用真实会话构造任务，并且定期刷新任务分布。</li>
+      <li>线上实验是必要校验。它能发现离线评分器看不出的产品体验回归。</li>
+      <li>下一代评估会面向长时间运行的代理，核心难点将是低成本评分和可复现环境。</li>
+    </ul>
+  </section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

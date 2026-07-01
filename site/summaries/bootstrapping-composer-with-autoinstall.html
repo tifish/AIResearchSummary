@@ -2,110 +2,252 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>Composer autoinstall：用旧模型给新模型搭训练环境</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>用 autoinstall 引导 Composer</title>
 <style>
 :root {
-  --bg: #f6f7f9;
-  --card: #ffffff;
-  --ink: #1b1f24;
-  --muted: #667085;
-  --line: #d9dee7;
-  --accent: #2563eb;
-  --accent2: #0f766e;
-  --accent3: #b45309;
-  --hl: #e8f1ff;
-  --hl2: #ecfdf5;
+  --bg: #f7f4ee;
+  --ink: #172026;
+  --muted: #66727d;
+  --line: #d8d1c5;
+  --hero-bg: #10222b;
+  --hero-ink: #f6efe2;
+  --surface: #ffffff;
+  --surface-2: #eef6f4;
+  --surface-3: #f8eadf;
+  --surface-4: #eef1fb;
+  --data: #2563eb;
+  --risk: #c2410c;
+  --opportunity: #0f766e;
+  --conclusion: #7c3aed;
+  --soft-data: #dbeafe;
+  --soft-risk: #ffedd5;
+  --soft-opportunity: #ccfbf1;
+  --soft-conclusion: #ede9fe;
+  --dark-panel: #172026;
+  --dark-panel-2: #23323b;
+  --dark-ink: #f8fafc;
+  --shadow: 0 18px 45px rgba(23, 32, 38, 0.12);
+}
+:root[data-theme="dark"] {
+  --bg: #0d1117;
+  --ink: #e6edf3;
+  --muted: #9aa8b5;
+  --line: #2a3440;
+  --hero-bg: #08131a;
+  --hero-ink: #f1f5f9;
+  --surface: #151b23;
+  --surface-2: #102522;
+  --surface-3: #281a12;
+  --surface-4: #171b2d;
+  --data: #60a5fa;
+  --risk: #fb923c;
+  --opportunity: #2dd4bf;
+  --conclusion: #a78bfa;
+  --soft-data: #10233f;
+  --soft-risk: #321b0d;
+  --soft-opportunity: #0c2b27;
+  --soft-conclusion: #23183f;
+  --dark-panel: #05080d;
+  --dark-panel-2: #101822;
+  --dark-ink: #f8fafc;
+  --shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0d1117;
+    --ink: #e6edf3;
+    --muted: #9aa8b5;
+    --line: #2a3440;
+    --hero-bg: #08131a;
+    --hero-ink: #f1f5f9;
+    --surface: #151b23;
+    --surface-2: #102522;
+    --surface-3: #281a12;
+    --surface-4: #171b2d;
+    --data: #60a5fa;
+    --risk: #fb923c;
+    --opportunity: #2dd4bf;
+    --conclusion: #a78bfa;
+    --soft-data: #10233f;
+    --soft-risk: #321b0d;
+    --soft-opportunity: #0c2b27;
+    --soft-conclusion: #23183f;
+    --dark-panel: #05080d;
+    --dark-panel-2: #101822;
+    --dark-ink: #f8fafc;
+    --shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+  }
 }
 * { box-sizing: border-box; }
 body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-  line-height: 1.72;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", sans-serif;
+  line-height: 1.65;
 }
-main {
-  max-width: 920px;
-  margin: 0 auto;
-  padding: 40px 22px 56px;
-}
-header {
-  padding: 28px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: linear-gradient(135deg, var(--hl), var(--card));
+main { overflow: hidden; }
+section { padding: 56px 7vw; }
+.hero {
+  min-height: 72vh;
+  display: grid;
+  align-items: end;
+  background: var(--hero-bg);
+  color: var(--hero-ink);
 }
 .kicker {
-  margin: 0 0 10px;
-  color: var(--accent);
-  font-weight: 700;
-  font-size: 14px;
+  color: var(--opportunity);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 h1 {
-  margin: 0;
-  font-size: 30px;
-  line-height: 1.25;
-  letter-spacing: 0;
+  max-width: 920px;
+  margin: 14px 0 10px;
+  font-size: clamp(38px, 7vw, 86px);
+  line-height: 1.04;
 }
-.subtitle {
-  margin: 16px 0 0;
+.english-title {
   color: var(--muted);
-  font-size: 17px;
+  font-size: 18px;
+  margin-bottom: 28px;
 }
-.grid {
+.one-line {
+  max-width: 850px;
+  padding-left: 18px;
+  border-left: 6px solid var(--opportunity);
+  font-size: 22px;
+}
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(140px, 1fr));
+  gap: 14px;
+  background: var(--surface);
+}
+.stat {
+  border-top: 5px solid var(--data);
+  padding: 22px;
+  background: var(--soft-data);
+}
+.stat:nth-child(2) { border-color: var(--opportunity); background: var(--soft-opportunity); }
+.stat:nth-child(3) { border-color: var(--risk); background: var(--soft-risk); }
+.stat:nth-child(4) { border-color: var(--conclusion); background: var(--soft-conclusion); }
+.num {
+  display: block;
+  font-size: 34px;
+  font-weight: 900;
+  line-height: 1;
+}
+.label { color: var(--muted); margin-top: 10px; }
+.split {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 36px;
+  background: var(--surface-2);
+}
+.split h2, .flow h2, .table-zone h2, .quote-zone h2, .takeaways h2 {
+  margin: 0 0 14px;
+  font-size: 30px;
+}
+.panel {
+  padding: 26px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.panel strong { color: var(--risk); }
+.explain {
+  display: grid;
+  gap: 18px;
+}
+.explain div {
+  padding: 20px;
+  border-left: 6px solid var(--opportunity);
+  background: var(--surface);
+}
+.flow {
+  background: var(--surface-3);
+}
+.steps {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin: 20px 0 28px;
-}
-.metric {
-  background: var(--card);
+  gap: 0;
   border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 16px;
 }
-.metric strong {
-  display: block;
-  color: var(--accent2);
+.step {
+  padding: 26px;
+  background: var(--surface);
+  border-right: 1px solid var(--line);
+}
+.step:last-child { border-right: 0; }
+.badge {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: var(--dark-ink);
+  background: var(--conclusion);
+  font-weight: 900;
+}
+.table-zone {
+  background: var(--dark-panel);
+  color: var(--dark-ink);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  background: var(--dark-panel-2);
+}
+th, td {
+  padding: 18px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+th { color: var(--opportunity); }
+td:last-child { color: var(--dark-ink); }
+.quote-zone {
+  background: var(--surface-4);
+}
+.insight {
+  max-width: 900px;
+  padding: 28px;
+  border-left: 8px solid var(--risk);
+  background: var(--surface);
   font-size: 24px;
+  box-shadow: var(--shadow);
 }
-.metric span {
-  color: var(--muted);
-  font-size: 14px;
+.takeaways {
+  background: var(--bg);
 }
-section {
-  margin-top: 18px;
-  padding: 22px;
-  background: var(--card);
+.mosaic {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 14px;
+}
+.tile {
+  min-height: 150px;
+  padding: 24px;
+  background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 8px;
 }
-h2 {
-  margin: 0 0 10px;
-  font-size: 20px;
-  line-height: 1.35;
+.tile:first-child {
+  grid-row: span 2;
+  background: var(--soft-conclusion);
+  border-color: var(--conclusion);
 }
-p { margin: 0 0 12px; }
-p:last-child { margin-bottom: 0; }
-mark {
-  background: var(--hl2);
-  color: var(--accent2);
-  padding: 1px 4px;
-  border-radius: 4px;
-}
-.insights {
-  border-left: 4px solid var(--accent);
-}
-ul {
-  margin: 10px 0 0;
-  padding-left: 22px;
-}
-li { margin: 8px 0; }
-@media (max-width: 720px) {
-  main { padding: 24px 16px 40px; }
-  header, section { padding: 20px; }
-  h1 { font-size: 25px; }
-  .grid { grid-template-columns: 1fr; }
+.tile:nth-child(2) { background: var(--soft-data); border-color: var(--data); }
+.tile:nth-child(3) { background: var(--soft-opportunity); border-color: var(--opportunity); }
+.tile:nth-child(4) { background: var(--soft-risk); border-color: var(--risk); }
+.tile:nth-child(5) { background: var(--surface); border-color: var(--line); }
+.tile h3 { margin-top: 0; }
+@media (max-width: 820px) {
+  section { padding: 40px 22px; }
+  .stats, .split, .steps, .mosaic { grid-template-columns: 1fr; }
+  .step { border-right: 0; border-bottom: 1px solid var(--line); }
+  .step:last-child { border-bottom: 0; }
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -182,13 +324,6 @@ li { margin: 8px 0; }
     body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
       color: inherit;
     }
-    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
-      border-color: var(--airs-digest-line) !important;
-    }
-    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
-      background: var(--airs-digest-panel) !important;
-      color: var(--airs-digest-ink) !important;
-    }
     body :where(.muted, .meta, .kicker, small) {
       color: var(--airs-digest-muted) !important;
     }
@@ -249,57 +384,129 @@ li { margin: 8px 0; }
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/bootstrapping-composer-with-autoinstall" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
 <main>
-  <header>
-    <p class="kicker">一句话总括</p>
-    <h1>Composer autoinstall 的贡献，是把“让模型先修好训练环境”变成强化学习数据生产的一部分。</h1>
-    <p class="subtitle">文章真正讨论的不是安装脚本，而是如何用上一代模型减少下一代模型训练时的坏环境、无效 token 和低质量奖励信号。</p>
-  </header>
-
-  <div class="grid">
-    <div class="metric"><strong>10 条</strong><span>第一阶段提出候选命令</span></div>
-    <div class="metric"><strong>3 条</strong><span>第二阶段作为目标验证</span></div>
-    <div class="metric"><strong>61.7%</strong><span>Composer 2 的 Terminal-Bench 成绩</span></div>
-  </div>
-
-  <section>
-    <h2>核心问题是环境失败会污染训练信号</h2>
-    <p>强化学习训练需要可运行的仓库环境；如果一开始依赖、配置或服务就是坏的，模型会把大量上下文和工具调用花在排查环境，而不是学习解决真实任务。</p>
-    <p>这改变了对 AI 编程能力评估的理解：模型表现差，有时不是解题能力不足，而是训练或评测环境没有给出可学习的起点。</p>
+  <section class="hero">
+    <div>
+      <div class="kicker">一句话总括</div>
+      <h1>用 autoinstall 引导 Composer</h1>
+      <div class="english-title">Bootstrapping Composer with autoinstall</div>
+      <p class="one-line">Cursor 的核心贡献是把旧模型变成训练管线里的环境工程师，让下一代模型从可运行仓库开始学习，而不是先把算力花在修安装问题上。</p>
+    </div>
   </section>
 
-  <section>
-    <h2>Autoinstall 用两个代理拆分“定义成功”和“实现成功”</h2>
-    <p>第一阶段让 Cursor agent 固定在一个代码检出点，阅读 README、Makefile 和语言生态命令，提出 <mark>10 条</mark>如果环境正确就应该能运行的命令及预期输出。</p>
-    <p>第二阶段给 Composer agent 初始环境和其中 <mark>3 条</mark>目标命令，让它实际安装依赖、补配置、运行检查；若输出不匹配就重试，最多 <mark>5 次</mark>，仍失败则丢弃该环境。关键洞见是：可验证目标比泛泛的“把项目装好”更适合进入训练管线。</p>
+  <section class="stats" aria-label="关键数字">
+    <div class="stat"><span class="num">10</span><div class="label">第一阶段提出 10 条可验证命令。这把“环境是否成功”转成可检查的目标。</div></div>
+    <div class="stat"><span class="num">3</span><div class="label">第二阶段抽取 3 条目标命令运行。训练环境不靠感觉验收。</div></div>
+    <div class="stat"><span class="num">5</span><div class="label">最多重试 5 次。仍不能达标的环境会被丢弃，避免继续浪费训练预算。</div></div>
+    <div class="stat"><span class="num">61.7%</span><div class="label">Composer 2 的 Terminal-Bench 分数高于 Composer 1.5 的 47.9%。更强模型会反过来改进下一轮 autoinstall。</div></div>
   </section>
 
-  <section>
-    <h2>模型不只会执行说明，还会主动模拟缺失世界</h2>
-    <p>文章强调，现代编码模型会为了让项目可运行而创建缺失文件、占位图片、假数据库表，甚至配置 MinIO 或 Docker 容器来模拟 S3、sidecar 等外部依赖。</p>
-    <p>这说明 AI 训练环境的重点不只是复现生产系统，而是构造一个足够真实、能产生奖励信号的 mock base；实践上，这比等待每个开源项目都有完美文档更可扩展。</p>
+  <section class="split">
+    <div class="panel">
+      <h2>坏环境会污染强化学习信号</h2>
+      <p>强化学习需要可运行的开发环境。仓库一开始就坏掉时，模型会把 token 花在依赖、配置和启动问题上。</p>
+      <p><strong>最坏情况不是慢，而是无解。</strong> 任务无法运行时，训练过程可能没有奖励信号，只是在消耗计算资源。</p>
+      <p>因此，环境搭建本身成了训练质量的一部分。</p>
+    </div>
+    <div class="explain">
+      <div>
+        <h2>autoinstall 的位置</h2>
+        <p>它从未配置的代码仓库出发，创建一个可运行的模拟基线环境。这个环境随后用于未来未见过的编码任务。</p>
+        <p>结论：模型训练不只依赖题目质量，也依赖题目前置环境是否可靠。</p>
+      </div>
+      <div>
+        <h2>旧模型的新用途</h2>
+        <p>训练 Composer 2 时，Cursor 使用 Composer 1.5 来执行 autoinstall。旧模型负责安装包、改配置、补 mock，并验证命令是否能跑。</p>
+        <p>结论：上一代模型不只是被替换，还能成为下一代模型的训练基础设施。</p>
+      </div>
+    </div>
   </section>
 
-  <section>
-    <h2>Celo 案例显示真实项目的难点在隐性依赖</h2>
-    <p>在 celo-org/celo-monorepo 这个大型区块链项目中，文档相对稀疏，代理除了读仓库文档和代码，还通过 web 搜索查项目文档站，并发现需要安装 Foundry 等额外组件。</p>
-    <p>最小应用第一次没有跑通，第二次迭代通过创建 mock user 满足本地启动要求。这个案例的意义在于：真实项目失败往往来自认证、外部服务和旁路依赖，而不是单纯缺一个包管理命令。</p>
+  <section class="flow">
+    <h2>两阶段流程把“能运行”变成可判定目标</h2>
+    <div class="steps">
+      <div class="step">
+        <span class="badge">1</span>
+        <h3>定义成功</h3>
+        <p>Cursor agent 阅读 README、Makefile 和项目结构。它提出 10 条命令，并描述正确环境下的预期输出。</p>
+        <p>洞见：成功标准先由一个模型写出来，减少后续执行阶段的含糊空间。</p>
+      </div>
+      <div class="step">
+        <span class="badge">2</span>
+        <h3>尝试达成</h3>
+        <p>另一个 Composer agent 接收初始仓库和 3 条目标命令。它探索代码库并调用工具完成安装、配置和补依赖。</p>
+        <p>洞见：模型不只是照文档执行，而是在真实约束下修出一个可工作的环境。</p>
+      </div>
+      <div class="step">
+        <span class="badge">3</span>
+        <h3>验收或丢弃</h3>
+        <p>系统运行全部 3 条命令，并检查输出是否符合第一阶段描述。最多 5 次仍失败，就丢弃该环境。</p>
+        <p>洞见：自动化训练管线需要明确的淘汰机制，不能让坏环境进入强化学习。</p>
+      </div>
+    </div>
   </section>
 
-  <section>
-    <h2>上一代模型可以成为下一代训练基础设施</h2>
-    <p>Cursor 在训练 Composer 2 时使用 Composer 1.5 做 autoinstall，而 Composer 2 在 Terminal-Bench 上从 <mark>47.9%</mark> 提升到 <mark>61.7%</mark>。该 benchmark 包含开发环境搭建能力，因此新模型也会成为更强的后续 autoinstall 基座。</p>
-    <p>结论是，模型能力提升不只来自更好的数据或架构，也来自把模型本身放进数据预处理、运行管理和训练准备流程中。</p>
+  <section class="table-zone">
+    <h2>模型会补齐真实项目缺口</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>遇到的问题</th>
+          <th>autoinstall 的做法</th>
+          <th>为什么重要</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>缺少文件或静态资源</td>
+          <td>创建 mock 文件或占位图片。</td>
+          <td>训练任务可以触达业务逻辑，而不是卡在资源缺失。</td>
+        </tr>
+        <tr>
+          <td>缺少数据库或外部服务</td>
+          <td>创建假数据库表、MinIO 配置或 Docker sidecar。</td>
+          <td>模型能在隔离环境里近似真实依赖，减少不可控外部因素。</td>
+        </tr>
+        <tr>
+          <td>需要长期运行进程</td>
+          <td>生成启动脚本，在 RL 使用前启动必要服务。</td>
+          <td>环境状态可以复用，未来任务不必重复从零搭建。</td>
+        </tr>
+      </tbody>
+    </table>
   </section>
 
-  <section class="insights">
+  <section class="quote-zone">
+    <h2>Celo 案例说明难点在真实依赖链</h2>
+    <div class="insight">
+      <p>Celo monorepo 是一个大型区块链项目，依赖多，文档相对稀疏，还需要模拟认证流程。autoinstall 先从代码和文档中找安装命令，再通过文档站和 Foundry 等外部依赖补齐缺口。</p>
+      <p>第一次运行最小应用失败后，第二次通过创建 mock 用户让应用本地启动。结论是，自动环境搭建的价值不在完美复刻生产，而在构造足够真实、足够可验证的训练场。</p>
+    </div>
+  </section>
+
+  <section class="takeaways">
     <h2>最值得带走的洞见</h2>
-    <ul>
-      <li>坏环境会让强化学习训练拿不到有效奖励信号，环境搭建本身就是训练质量问题。</li>
-      <li>把成功标准拆成可运行命令和预期输出，可以让“项目是否装好”变成自动验证对象。</li>
-      <li>mock 外部依赖不是作弊，而是在训练中构造可学习任务边界的必要工程手段。</li>
-      <li>上一代模型可以承担下一代模型的数据准备工作，形成可迭代的自举循环。</li>
-      <li>Terminal-Bench 从 47.9% 到 61.7% 的提升提示：环境操作能力正在成为编码模型竞争力的一部分。</li>
-    </ul>
+    <div class="mosaic">
+      <div class="tile">
+        <h3>训练基础设施也可以被模型改进</h3>
+        <p>Composer autoinstall 展示了一条自举路径。旧模型负责准备环境，新模型从更干净的训练信号中学习。</p>
+      </div>
+      <div class="tile">
+        <h3>可运行性是奖励信号的前提</h3>
+        <p>仓库跑不起来时，强化学习可能没有有效反馈。环境质量直接影响训练效率。</p>
+      </div>
+      <div class="tile">
+        <h3>mock 是工程策略</h3>
+        <p>占位文件、假表、MinIO 和 Docker sidecar 让复杂项目在训练沙箱里可操作。</p>
+      </div>
+      <div class="tile">
+        <h3>验收必须具体</h3>
+        <p>10 条候选命令、3 条目标命令和 5 次重试构成了清晰边界。坏环境会被及时淘汰。</p>
+      </div>
+      <div class="tile">
+        <h3>能力提升会形成循环</h3>
+        <p>Composer 2 在 Terminal-Bench 上显著高于 Composer 1.5。更强的模型会成为更好的下一轮环境安装器。</p>
+      </div>
+    </div>
   </section>
 </main>
   <script id="airs-digest-theme-script">

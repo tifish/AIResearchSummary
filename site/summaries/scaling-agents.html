@@ -1,124 +1,272 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>长期自主编码如何规模化</title>
-  <style>
-    :root {
-      --bg: #f7f8fb;
-      --card: #ffffff;
-      --ink: #172033;
-      --muted: #647084;
-      --line: #dde3ee;
-      --accent: #2f6fed;
-      --accent2: #14a085;
-      --accent3: #9a5cff;
-      --hl: #eaf2ff;
-      --hl2: #eefaf6;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-      line-height: 1.72;
-    }
-    main {
-      max-width: 980px;
-      margin: 0 auto;
-      padding: 40px 20px 56px;
-    }
-    header {
-      padding: 28px 0 24px;
-      border-bottom: 1px solid var(--line);
-    }
-    .eyebrow {
-      color: var(--accent);
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: .04em;
-      text-transform: uppercase;
-    }
-    h1 {
-      margin: 8px 0 14px;
-      font-size: clamp(30px, 5vw, 54px);
-      line-height: 1.12;
-      letter-spacing: 0;
-    }
-    .lead {
-      max-width: 800px;
-      margin: 0;
-      font-size: 19px;
-      color: var(--muted);
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      margin: 24px 0 30px;
-    }
-    .stat, section, .takeaways {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-    }
-    .stat {
-      padding: 16px 18px;
-    }
-    .num {
-      display: block;
-      color: var(--accent);
-      font-size: 26px;
-      font-weight: 800;
-      line-height: 1.2;
-    }
-    .label {
-      display: block;
-      margin-top: 6px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-    section {
-      margin-top: 16px;
-      padding: 22px 24px;
-    }
-    h2 {
-      margin: 0 0 10px;
-      font-size: 22px;
-      line-height: 1.35;
-      letter-spacing: 0;
-    }
-    p { margin: 8px 0 0; }
-    .highlight {
-      background: var(--hl);
-      border-left: 4px solid var(--accent);
-      padding: 12px 14px;
-      border-radius: 6px;
-      margin-top: 12px;
-    }
-    .soft {
-      background: var(--hl2);
-      border-left-color: var(--accent2);
-    }
-    .takeaways {
-      margin-top: 22px;
-      padding: 24px;
-    }
-    .takeaways h2 { color: var(--accent3); }
-    ul {
-      margin: 12px 0 0;
-      padding-left: 22px;
-    }
-    li { margin: 8px 0; }
-    strong { color: var(--ink); }
-    @media (max-width: 760px) {
-      main { padding: 28px 16px 42px; }
-      .grid { grid-template-columns: 1fr; }
-      section, .takeaways { padding: 18px; }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>扩展长时间运行的自主编码</title>
+<style>
+:root {
+  --bg: #f7f5ef;
+  --ink: #1d2228;
+  --muted: #66707a;
+  --line: #d8d2c4;
+  --panel: #ffffff;
+  --panel-soft: #f0eee5;
+  --band-data: #eaf4ff;
+  --band-risk: #fff0ec;
+  --band-opportunity: #edf8ef;
+  --band-conclusion: #f2edff;
+  --dark-block: #18212b;
+  --dark-ink: #f5f7fb;
+  --accent-data: #2374ab;
+  --accent-risk: #c2452d;
+  --accent-opportunity: #278557;
+  --accent-conclusion: #7357c8;
+  --accent-neutral: #b47a1f;
+  --shadow: rgba(29, 34, 40, 0.08);
+}
+:root[data-theme="dark"] {
+  --bg: #111418;
+  --ink: #edf0f3;
+  --muted: #a7b0ba;
+  --line: #303842;
+  --panel: #1a2027;
+  --panel-soft: #202833;
+  --band-data: #13293a;
+  --band-risk: #351c18;
+  --band-opportunity: #163024;
+  --band-conclusion: #251d39;
+  --dark-block: #080b10;
+  --dark-ink: #f3f6fb;
+  --accent-data: #55aee8;
+  --accent-risk: #f0715c;
+  --accent-opportunity: #5ed18f;
+  --accent-conclusion: #a992ff;
+  --accent-neutral: #e0ad54;
+  --shadow: rgba(0, 0, 0, 0.32);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111418;
+    --ink: #edf0f3;
+    --muted: #a7b0ba;
+    --line: #303842;
+    --panel: #1a2027;
+    --panel-soft: #202833;
+    --band-data: #13293a;
+    --band-risk: #351c18;
+    --band-opportunity: #163024;
+    --band-conclusion: #251d39;
+    --dark-block: #080b10;
+    --dark-ink: #f3f6fb;
+    --accent-data: #55aee8;
+    --accent-risk: #f0715c;
+    --accent-opportunity: #5ed18f;
+    --accent-conclusion: #a992ff;
+    --accent-neutral: #e0ad54;
+    --shadow: rgba(0, 0, 0, 0.32);
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  line-height: 1.65;
+}
+main { overflow: hidden; }
+.hero {
+  padding: 64px 7vw 48px;
+  background: var(--dark-block);
+  color: var(--dark-ink);
+}
+.kicker {
+  color: var(--accent-neutral);
+  font-weight: 700;
+  letter-spacing: 0;
+  margin-bottom: 18px;
+}
+h1 {
+  margin: 0;
+  font-size: clamp(34px, 6vw, 72px);
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+.original {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 18px;
+}
+.thesis {
+  max-width: 920px;
+  margin-top: 30px;
+  font-size: clamp(20px, 2.4vw, 30px);
+  line-height: 1.35;
+}
+.num-band {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.num {
+  background: var(--band-data);
+  padding: 28px 24px;
+}
+.num strong {
+  display: block;
+  color: var(--accent-data);
+  font-size: clamp(28px, 4vw, 46px);
+  line-height: 1;
+}
+.num span {
+  display: block;
+  margin-top: 10px;
+  color: var(--muted);
+}
+.split {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 42px;
+  padding: 54px 7vw;
+  background: var(--panel);
+}
+.split h2, .timeline h2, .table-wrap h2, .quote-zone h2, .takeaways h2 {
+  margin: 0 0 18px;
+  font-size: clamp(24px, 3vw, 38px);
+  line-height: 1.15;
+}
+.lead {
+  font-size: 20px;
+  color: var(--muted);
+}
+.problem-list {
+  display: grid;
+  gap: 16px;
+}
+.problem {
+  border-left: 5px solid var(--accent-risk);
+  background: var(--band-risk);
+  padding: 18px 20px;
+}
+.problem b { color: var(--accent-risk); }
+.timeline {
+  padding: 56px 7vw;
+  background: var(--panel-soft);
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  position: relative;
+}
+.step {
+  border-top: 6px solid var(--accent-opportunity);
+  padding: 18px 0 0;
+}
+.step .badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--accent-opportunity);
+  color: var(--dark-ink);
+  font-weight: 800;
+}
+.step h3 { margin: 14px 0 8px; }
+.table-wrap {
+  padding: 54px 7vw;
+  background: var(--band-conclusion);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--panel);
+  box-shadow: 0 12px 30px var(--shadow);
+}
+th, td {
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  color: var(--accent-conclusion);
+  font-size: 14px;
+  text-transform: uppercase;
+}
+.quote-zone {
+  padding: 60px 7vw;
+  background: var(--dark-block);
+  color: var(--dark-ink);
+}
+.insight {
+  max-width: 940px;
+  border-left: 8px solid var(--accent-neutral);
+  padding-left: 24px;
+  font-size: clamp(24px, 3vw, 40px);
+  line-height: 1.25;
+}
+.note-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 34px;
+}
+.note {
+  background: var(--panel);
+  color: var(--ink);
+  padding: 20px;
+  border: 1px solid var(--line);
+}
+.note.data { border-top: 5px solid var(--accent-data); }
+.note.risk { border-top: 5px solid var(--accent-risk); }
+.takeaways {
+  padding: 58px 7vw 70px;
+  background: var(--bg);
+}
+.mosaic {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 1fr;
+  gap: 18px;
+}
+.tile {
+  min-height: 150px;
+  padding: 22px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+.tile:nth-child(1) { border-top: 6px solid var(--accent-data); }
+.tile:nth-child(2) { border-top: 6px solid var(--accent-risk); }
+.tile:nth-child(3) { border-top: 6px solid var(--accent-opportunity); }
+.tile:nth-child(4) {
+  grid-column: span 2;
+  border-top: 6px solid var(--accent-conclusion);
+}
+.tile:nth-child(5) { border-top: 6px solid var(--accent-neutral); }
+.tile b {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+@media (max-width: 760px) {
+  .num-band, .split, .steps, .note-grid, .mosaic {
+    grid-template-columns: 1fr;
+  }
+  .tile:nth-child(4) { grid-column: auto; }
+  .hero, .split, .timeline, .table-wrap, .quote-zone, .takeaways {
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+  table { font-size: 14px; }
+  th, td { padding: 12px; }
+}
+</style>
   <script id="airs-digest-theme-boot">
     try {
       var saved = localStorage.getItem("theme");
@@ -193,13 +341,6 @@
     body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
       color: inherit;
     }
-    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
-      border-color: var(--airs-digest-line) !important;
-    }
-    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
-      background: var(--airs-digest-panel) !important;
-      color: var(--airs-digest-ink) !important;
-    }
     body :where(.muted, .meta, .kicker, small) {
       color: var(--airs-digest-muted) !important;
     }
@@ -259,86 +400,110 @@
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/scaling-agents" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
-  <main>
-    <header>
-      <div class="eyebrow">一句话总括</div>
-      <h1>多 agent 编程能长期推进复杂项目，但前提是把“自由协作”改造成“适度分工”。</h1>
-      <p class="lead">Cursor 的核心贡献不是展示 agent 会写很多代码，而是说明在周级自主运行中，真正决定成败的是协作结构、角色边界、模型选择、提示设计和周期性重启。</p>
-    </header>
+<main>
+  <header class="hero">
+    <div class="kicker">一句话总括</div>
+    <h1>扩展长时间运行的自主编码</h1>
+    <div class="original">Scaling long-running autonomous coding</div>
+    <p class="thesis">Cursor 的核心贡献是把多代理编码从“能否并行”推进到“如何长期组织”。实验显示，代理规模能带来真实进展，但前提是角色分工、周期性重启和提示设计足够克制。</p>
+  </header>
 
-    <div class="grid">
-      <div class="stat">
-        <span class="num">数百个</span>
-        <span class="label">并发 agent 在同一项目上工作</span>
-      </div>
-      <div class="stat">
-        <span class="num">100 万+</span>
-        <span class="label">浏览器实验生成代码行数</span>
-      </div>
-      <div class="stat">
-        <span class="num">25x</span>
-        <span class="label">某产品视频渲染优化幅度</span>
-      </div>
+  <section class="num-band" aria-label="关键数字">
+    <div class="num"><strong>数百</strong><span>并发代理在同一项目上工作</span></div>
+    <div class="num"><strong>100万+</strong><span>浏览器实验生成代码行数</span></div>
+    <div class="num"><strong>1000</strong><span>浏览器实验涉及文件数</span></div>
+    <div class="num"><strong>数万亿</strong><span>投入到单一目标的 token 量级</span></div>
+  </section>
+
+  <section class="split">
+    <div>
+      <h2>平级协作不是自然答案</h2>
+      <p class="lead">文章先否定了一个直觉：让代理共享状态并自行抢任务，并不会自动形成高吞吐团队。</p>
+      <p>锁机制让二十个代理退化到两三个代理的有效吞吐。问题不只是工程实现粗糙，而是等待、遗忘释放锁和绕过锁会不断放大系统脆弱性。</p>
     </div>
-
-    <section>
-      <h2>单个 agent 能做聚焦任务，但大型项目的瓶颈很快变成协作</h2>
-      <p>文章先指出，今天的 agent 已经适合完成范围清楚的编码任务，但面对需要人类团队数月完成的工程，单体 agent 会太慢。把多个 agent 并行运行是自然方向，但并行本身不会自动带来效率。</p>
-      <div class="highlight">
-        <p><strong>为什么这改变理解：</strong>AI 编程能力的上限不只取决于单次补全或单个任务成功率，还取决于多个智能体能否在同一代码库中避免重复、冲突和方向漂移。</p>
-      </div>
-    </section>
-
-    <section>
-      <h2>扁平自协调失败在锁、等待和无人负责难题</h2>
-      <p>Cursor 最初让所有 agent 地位相同，通过共享文件认领任务，并用锁避免重复领取。结果是锁经常被长期持有或遗忘释放，即便机制正确，20 个 agent 的吞吐也会退化到大约 2-3 个 agent，大量时间耗在等待上。</p>
-      <p>后来他们尝试乐观并发控制，写入冲突时失败重试，机制更简单也更稳，但仍没解决深层问题：没有层级时，agent 会变得保守，只做小而安全的改动，难题和端到端实现没人真正承担。</p>
-      <div class="highlight soft">
-        <p><strong>结论：</strong>多 agent 系统不能只复制分布式锁或共享状态表；如果没有明确责任分配，系统会忙碌很久却缺少实质进展。</p>
-      </div>
-    </section>
-
-    <section>
-      <h2>Planner、worker、judge 的分工让系统获得可扩展性</h2>
-      <p>更有效的方案是角色分离：planner 持续探索代码库、拆分任务，并能生成子 planner；worker 只专注完成分配任务，不再关心全局协调；每轮结束后由 judge 判断是否继续，并开启新的迭代。</p>
-      <p>这种结构减少了 worker 之间的协商成本，也避免单个 agent 陷入局部视野。它说明长期自主编码需要的不是完全自由的群体智能，而是足够简单、能反复刷新上下文的流水线。</p>
-    </section>
-
-    <section>
-      <h2>周级实验显示规模化可行，但仍需要人工级审查</h2>
-      <p>Cursor 用这个系统从零构建浏览器，运行接近一周，写出超过 100 万行代码，覆盖 1,000 个文件；新 agent 仍能理解代码库并继续推进，数百个 worker 能并发推到同一分支且冲突较少。</p>
-      <p>另一个实验是把 Cursor 代码库中的 Solid 原地迁移到 React，耗时超过三周，产生 +266K/-193K 改动，CI 和早期检查通过，但仍需要细致 review。还有一个产品优化中，长期 agent 用 Rust 版本把视频渲染提升 25x，并加入平滑缩放、平移、弹簧过渡和运动模糊，相关代码已合并。</p>
-      <div class="highlight">
-        <p><strong>为什么重要：</strong>这些例子把 agent 从“完成 issue”推进到“承担大型工程改造”，但通过 CI 不等于生产级可信，审查和质量门禁仍是关键环节。</p>
-      </div>
-    </section>
-
-    <section>
-      <h2>长期运行中，模型角色匹配和提示设计比想象中更关键</h2>
-      <p>文章称他们在单一目标上消耗了 trillions of tokens，并发现 GPT-5.2 更适合长时间自主工作：更能遵循指令、保持专注、避免漂移并完整实现。Opus 4.5 更倾向较早停止或走捷径；GPT-5.2 作为 planner 也优于专门面向编码训练的 GPT-5.1-Codex。</p>
-      <p>他们还发现，减少复杂度常比增加角色更有效。曾经加入的 integrator 角色本想负责质量控制和冲突解决，但实际制造了瓶颈，因为 worker 已能自行处理不少冲突。</p>
-      <div class="highlight soft">
-        <p><strong>洞见：</strong>长期 agent 系统的工程重点会从“选最强模型”转向“把不同模型放在合适角色中，并用提示约束其行为”。</p>
-      </div>
-    </section>
-
-    <section>
-      <h2>仍未解决的问题是漂移、过长运行和下一步规划时机</h2>
-      <p>Cursor 承认当前系统远未最优：planner 应在任务完成时被唤醒以规划下一步，agent 偶尔运行太久，系统仍需要周期性 fresh start 来对抗漂移和隧道视野。</p>
-      <p>这意味着多 agent 编程的未来不是完全无人监管，而是逐步形成更可靠的自治周期：计划、执行、评估、刷新，再进入下一轮。</p>
-    </section>
-
-    <div class="takeaways">
-      <h2>最值得带走的洞见</h2>
-      <ul>
-        <li>多 agent 编程的主要难题不是“让更多 agent 同时写代码”，而是让它们在同一目标下有清晰责任和低摩擦交接。</li>
-        <li>扁平协作会放大等待、冲突和风险规避；planner-worker-judge 这种轻量层级更适合周级任务。</li>
-        <li>大型 agent 工程需要周期性刷新上下文，否则长期运行会出现漂移、局部最优和无人承担难题。</li>
-        <li>模型选择要按角色匹配：规划、执行、审查可能需要不同模型，而不是一个通用最强模型包办。</li>
-        <li>真实影响会先出现在代码迁移、性能重写、原型扩展等工程场景，但生产落地仍离不开 CI、review 和质量控制。</li>
-      </ul>
+    <div class="problem-list">
+      <div class="problem"><b>瓶颈：</b>锁让代理排队，等待时间吞掉并行收益。</div>
+      <div class="problem"><b>脆弱：</b>代理可能持锁失败、重复申请锁，或直接跳过协调协议。</div>
+      <div class="problem"><b>避险：</b>没有层级时，代理倾向挑小任务，困难任务无人负责。</div>
     </div>
-  </main>
+  </section>
+
+  <section class="timeline">
+    <h2>有效结构来自角色拆分</h2>
+    <div class="steps">
+      <article class="step">
+        <span class="badge">1</span>
+        <h3>规划者探索代码库</h3>
+        <p>规划者持续发现工作，并能派生子规划者。规划本身也被并行化。</p>
+      </article>
+      <article class="step">
+        <span class="badge">2</span>
+        <h3>工人只完成任务</h3>
+        <p>工人不负责全局协调。它们领取任务、实现、处理冲突，然后推送结果。</p>
+      </article>
+      <article class="step">
+        <span class="badge">3</span>
+        <h3>评审者决定续跑</h3>
+        <p>每轮结束后由 judge agent 判断是否继续。新一轮可以减少漂移和视野收窄。</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="table-wrap">
+    <h2>实验规模改变了判断标准</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>实验</th>
+          <th>关键数据</th>
+          <th>读者应如何理解</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>从零构建浏览器</td>
+          <td>接近一周，超过 100 万行代码，跨 1000 个文件。</td>
+          <td>重点不是浏览器已经可替代成熟产品，而是新代理仍能理解大代码库并继续推进。</td>
+        </tr>
+        <tr>
+          <td>Solid 到 React 迁移</td>
+          <td>超过三周，+266K/-193K 修改，通过 CI 和早期检查。</td>
+          <td>长周期代理可以承担真实迁移任务，但仍需要严肃人工审查。</td>
+        </tr>
+        <tr>
+          <td>视频渲染优化</td>
+          <td>Rust 版本让渲染快 25 倍，并加入缩放、平移和运动模糊。</td>
+          <td>多代理并不只会生成大量代码，也可能交付可合并的性能改进。</td>
+        </tr>
+        <tr>
+          <td>仍在运行的项目</td>
+          <td>Java LSP 7.4K commits、550K LoC；Windows 7 emulator 14.6K commits、1.2M LoC；Excel 12K commits、1.6M LoC。</td>
+          <td>这些数字显示实验已进入软件工程尺度，而不是短 demo 尺度。</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="quote-zone">
+    <h2>真正的变量不是代理数量</h2>
+    <div class="insight">结构太少会冲突、重复和漂移；结构太多会变脆。长期自主编码需要的是中等约束，而不是完全自治。</div>
+    <div class="note-grid">
+      <div class="note data"><b>模型差异会累积。</b>Cursor 认为 GPT-5.2 更适合长时间自主工作，尤其是在遵守指令、保持焦点和完整实现上。</div>
+      <div class="note risk"><b>复杂角色未必有用。</b>他们曾加入 integrator 做质量控制和冲突解决，但它反而制造瓶颈，最后被移除。</div>
+    </div>
+  </section>
+
+  <section class="takeaways">
+    <h2>最值得带走的洞见</h2>
+    <div class="mosaic">
+      <div class="tile"><b>并行不是免费午餐。</b>共享文件和锁看似简单，但会把代理群变成等待队列。</div>
+      <div class="tile"><b>层级解决责任问题。</b>规划者承担拆解和探索，工人承担交付，困难任务才不容易被绕开。</div>
+      <div class="tile"><b>提示是系统设计的一部分。</b>文章强调，协调、聚焦和避免病态行为，很大程度依赖反复打磨提示。</div>
+      <div class="tile"><b>长期运行需要刷新机制。</b>当前系统仍要周期性 fresh start，避免代理运行过久后漂移或陷入局部视角。</div>
+      <div class="tile"><b>AI 对软件工程的影响更像组织问题。</b>模型能力重要，但把代理组织成可持续推进的流程同样关键。</div>
+    </div>
+  </section>
+</main>
   <script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;

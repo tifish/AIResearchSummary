@@ -1,94 +1,286 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>本地 Agent 沙箱：让自动执行更安全</title>
-  <style>
-    :root {
-      --bg: #f6f7f9;
-      --card: #ffffff;
-      --ink: #17202a;
-      --muted: #5f6b7a;
-      --line: #dfe5ec;
-      --accent: #2563eb;
-      --accent2: #0f766e;
-      --accent3: #9a3412;
-      --hl: #eaf2ff;
-      --hl2: #edf7f4;
-    }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-      line-height: 1.65;
-    }
-    main {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 40px 20px 56px;
-    }
-    header {
-      margin-bottom: 24px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid var(--line);
-    }
-    .meta {
-      color: var(--muted);
-      font-size: 14px;
-      margin-bottom: 10px;
-    }
-    h1 {
-      font-size: 30px;
-      line-height: 1.25;
-      margin: 0 0 14px;
-      letter-spacing: 0;
-    }
-    .lead {
-      background: var(--hl);
-      border-left: 4px solid var(--accent);
-      padding: 16px 18px;
-      border-radius: 8px;
-      font-size: 18px;
-      margin: 0;
-    }
-    section {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 22px;
-      margin: 16px 0;
-    }
-    h2 {
-      font-size: 20px;
-      margin: 0 0 10px;
-      letter-spacing: 0;
-    }
-    p {
-      margin: 0;
-    }
-    .data {
-      display: inline-block;
-      color: var(--accent2);
-      font-weight: 700;
-    }
-    .warn {
-      color: var(--accent3);
-      font-weight: 700;
-    }
-    ul {
-      margin: 10px 0 0;
-      padding-left: 22px;
-    }
-    li {
-      margin: 8px 0;
-    }
-    .takeaways {
-      background: var(--hl2);
-      border-color: color-mix(in srgb, var(--accent2) 35%, var(--line));
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>为本地智能体实现安全沙箱</title>
+<style>
+:root {
+  --bg: #f7f8fb;
+  --paper: #ffffff;
+  --ink: #18202e;
+  --muted: #627084;
+  --line: #d9e0ea;
+  --hero-bg: #142238;
+  --hero-ink: #f4f8ff;
+  --band-bg: #edf5ff;
+  --risk-bg: #fff0f0;
+  --opportunity-bg: #eefbf4;
+  --process-bg: #f5f0ff;
+  --conclusion-bg: #fff7df;
+  --table-bg: #ffffff;
+  --accent-data: #226ce0;
+  --accent-risk: #d64545;
+  --accent-opportunity: #15995f;
+  --accent-process: #7a4dd8;
+  --accent-conclusion: #d18b00;
+  --shadow: 0 14px 40px rgba(24, 32, 46, .10);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f141c;
+    --paper: #171e29;
+    --ink: #e8edf5;
+    --muted: #a9b4c4;
+    --line: #2d3848;
+    --hero-bg: #07101f;
+    --hero-ink: #eef5ff;
+    --band-bg: #101f36;
+    --risk-bg: #2a1518;
+    --opportunity-bg: #10271c;
+    --process-bg: #1d1730;
+    --conclusion-bg: #2b2110;
+    --table-bg: #141b25;
+    --accent-data: #6da6ff;
+    --accent-risk: #ff7777;
+    --accent-opportunity: #54d990;
+    --accent-process: #b194ff;
+    --accent-conclusion: #ffc857;
+    --shadow: 0 18px 42px rgba(0, 0, 0, .32);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f141c;
+  --paper: #171e29;
+  --ink: #e8edf5;
+  --muted: #a9b4c4;
+  --line: #2d3848;
+  --hero-bg: #07101f;
+  --hero-ink: #eef5ff;
+  --band-bg: #101f36;
+  --risk-bg: #2a1518;
+  --opportunity-bg: #10271c;
+  --process-bg: #1d1730;
+  --conclusion-bg: #2b2110;
+  --table-bg: #141b25;
+  --accent-data: #6da6ff;
+  --accent-risk: #ff7777;
+  --accent-opportunity: #54d990;
+  --accent-process: #b194ff;
+  --accent-conclusion: #ffc857;
+  --shadow: 0 18px 42px rgba(0, 0, 0, .32);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  line-height: 1.68;
+}
+main { overflow: hidden; }
+.hero {
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+  padding: 72px 7vw 56px;
+}
+.hero p {
+  max-width: 860px;
+  margin: 0;
+  color: var(--hero-ink);
+}
+.kicker {
+  color: var(--accent-conclusion);
+  font-weight: 700;
+  letter-spacing: .08em;
+  font-size: 13px;
+  margin-bottom: 18px;
+}
+h1 {
+  margin: 0 0 10px;
+  font-size: clamp(32px, 5vw, 58px);
+  line-height: 1.08;
+  letter-spacing: 0;
+}
+.original {
+  font-size: 17px;
+  color: var(--muted);
+  margin-bottom: 26px;
+}
+.hero .original { color: #b8c7dd; }
+.lede {
+  font-size: 22px;
+  max-width: 900px;
+  margin-top: 24px;
+}
+.metric-band {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.metric {
+  background: var(--band-bg);
+  padding: 28px 6vw;
+}
+.metric strong {
+  display: block;
+  color: var(--accent-data);
+  font-size: 32px;
+  line-height: 1.1;
+}
+.metric span {
+  color: var(--muted);
+  font-size: 14px;
+}
+.section {
+  padding: 58px 7vw;
+}
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 34px;
+  align-items: start;
+  background: var(--paper);
+}
+.split h2, .process h2, .compare h2, .takeaways h2 {
+  margin: 0 0 18px;
+  font-size: 28px;
+  line-height: 1.2;
+}
+.panel-risk {
+  border-left: 6px solid var(--accent-risk);
+  background: var(--risk-bg);
+  padding: 26px;
+  box-shadow: var(--shadow);
+}
+.panel-opportunity {
+  border-top: 6px solid var(--accent-opportunity);
+  background: var(--opportunity-bg);
+  padding: 26px;
+}
+.panel-risk h3, .panel-opportunity h3 {
+  margin: 0 0 10px;
+  font-size: 20px;
+}
+.compare {
+  background: var(--table-bg);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--paper);
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+th, td {
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  color: var(--accent-data);
+  font-size: 14px;
+  background: var(--band-bg);
+}
+td:first-child {
+  font-weight: 700;
+}
+.process {
+  background: var(--process-bg);
+}
+.timeline {
+  display: grid;
+  gap: 18px;
+  max-width: 920px;
+}
+.step {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+.badge {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--accent-process);
+  color: var(--hero-ink);
+  font-weight: 800;
+}
+.step p {
+  margin: 0;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+.insight {
+  background: var(--conclusion-bg);
+  padding: 42px 7vw;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.insight blockquote {
+  margin: 0;
+  max-width: 900px;
+  font-size: 25px;
+  line-height: 1.45;
+  color: var(--ink);
+  border-left: 8px solid var(--accent-conclusion);
+  padding-left: 24px;
+}
+.takeaways {
+  background: var(--bg);
+}
+.mosaic {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 16px;
+}
+.tile {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  padding: 22px;
+}
+.tile.big {
+  grid-row: span 2;
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+}
+.tile h3 {
+  margin: 0 0 10px;
+  font-size: 19px;
+}
+.tile p { margin: 0; color: var(--muted); }
+.tile.big p { color: #c8d5e8; }
+.footer-note {
+  color: var(--muted);
+  font-size: 14px;
+  padding: 0 7vw 44px;
+}
+@media (max-width: 820px) {
+  .metric-band, .split, .mosaic {
+    grid-template-columns: 1fr;
+  }
+  .hero {
+    padding-top: 48px;
+  }
+  .section {
+    padding: 42px 6vw;
+  }
+  .metric {
+    padding: 22px 6vw;
+  }
+  table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+</style>
   <script id="airs-digest-theme-boot">
     try {
       var saved = localStorage.getItem("theme");
@@ -163,13 +355,6 @@
     body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
       color: inherit;
     }
-    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
-      border-color: var(--airs-digest-line) !important;
-    }
-    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
-      background: var(--airs-digest-panel) !important;
-      color: var(--airs-digest-ink) !important;
-    }
     body :where(.muted, .meta, .kicker, small) {
       color: var(--airs-digest-muted) !important;
     }
@@ -229,59 +414,122 @@
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/agent-sandboxing" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
-  <main>
-    <header>
-      <div class="meta">Cursor · Research · 2026-02-18</div>
-      <h1>本地 Agent 沙箱：让自动执行更安全</h1>
-      <p class="lead">一句话总括：这篇文章的真正贡献，是把本地 coding agent 的安全重点从“人类反复点批准”转向“默认受限执行、必要时清晰提权”的系统设计。</p>
-    </header>
+<main>
+  <section class="hero">
+    <div class="kicker">一句话总括</div>
+    <h1>为本地智能体实现安全沙箱</h1>
+    <p class="original">Implementing a secure sandbox for local agents</p>
+    <p class="lede">Cursor 的贡献不是单纯加一道权限弹窗，而是把本地编码智能体放进可执行、可解释、跨平台的边界里，让自动化能力增长时，系统风险不随之失控。</p>
+  </section>
 
-    <section>
-      <h2>问题不是权限太多，而是审批会失效</h2>
-      <p>自动批准命令能显著提升 coding agent 的能力，但错误命令可能删除数据库、发布坏代码或泄露密钥；逐条人工批准虽然看似安全，却会在频繁提示中制造 <span class="warn">approval fatigue</span>。这改变了对 AI 影响的理解：风险不只来自模型犯错，也来自人机协作界面让人停止认真审查。</p>
-    </section>
+  <section class="metric-band" aria-label="关键数字">
+    <div class="metric"><strong>40%</strong><span>启用沙箱后，智能体中断次数比未启用时更少。</span></div>
+    <div class="metric"><strong>3 个月</strong><span>Cursor 在 macOS、Linux、Windows 上逐步推出沙箱。</span></div>
+    <div class="metric"><strong>1/3</strong><span>受支持平台上约三分之一请求已在沙箱内运行。</span></div>
+    <div class="metric"><strong>3 类系统</strong><span>同一 API 背后分别使用不同操作系统原语。</span></div>
+  </section>
 
-    <section>
-      <h2>沙箱的目标是减少打断，同时收紧边界</h2>
-      <p>Cursor 在过去 <span class="data">三个月</span>把 agent sandboxing 推到 macOS、Linux 和 Windows：agent 可在受控环境内自由运行，只有需要越界时才请求批准，最常见的是访问互联网。结果是沙箱 agent 比非沙箱 <span class="data">少停止 40%</span>，说明安全边界如果设计得好，不必以明显牺牲效率为代价。</p>
-    </section>
+  <section class="section split">
+    <div class="panel-risk">
+      <h2>问题不是审批太少，而是审批会失效</h2>
+      <p>本地智能体能运行终端命令，就能探索环境、修改代码和执行构建。自动批准会提升效率，但错误命令可能删除数据库、发布损坏代码，或泄露密钥。</p>
+      <p>逐条人工审批只能短期缓解风险。审批越来越多时，用户会停止认真检查。多智能体并行工作会让这种疲劳更明显。</p>
+    </div>
+    <div class="panel-opportunity">
+      <h2>沙箱把自由放在边界内</h2>
+      <p>Cursor 的设计目标是减少打断，同时提高安全性。智能体可以在受控环境中自由工作，只有需要越界时才请求授权。</p>
+      <p>最常见的越界场景是访问互联网。这说明沙箱改变的是默认权限模型，而不只是增加提示文案。</p>
+    </div>
+  </section>
 
-    <section>
-      <h2>统一 API 背后，是三套不同操作系统实现</h2>
-      <p>macOS 评估了 <span class="data">4 种</span>方案：App Sandbox、容器、虚拟机和 Seatbelt，最后选择通过 sandbox-exec 使用 Seatbelt，因为它能约束整个子进程树并按文件、目录和 syscall 细粒度授权。这个选择说明，agent 安全不是抽象策略就能解决，必须贴近操作系统原语和开发工具的真实行为。</p>
-    </section>
+  <section class="section compare">
+    <h2>跨平台实现各不相同</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>平台</th>
+          <th>采用方式</th>
+          <th>关键取舍</th>
+          <th>带来的理解变化</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>macOS</td>
+          <td>使用 Seatbelt，通过 sandbox-exec 运行子进程树。</td>
+          <td>App Sandbox、容器和虚拟机各有成本。Seatbelt 虽已废弃，但仍能细粒度限制系统调用和文件访问。</td>
+          <td>本地 AI 工具的安全工程常常依赖现实可用的系统能力，而不是最理想的抽象。</td>
+        </tr>
+        <tr>
+          <td>Linux</td>
+          <td>直接组合 Landlock 和 seccomp。</td>
+          <td>seccomp 阻止危险系统调用，Landlock 约束文件系统。Cursor 还用 overlay filesystem 处理被忽略文件。</td>
+          <td>安全边界不是一个开关。它需要把内核能力、工作区映射和忽略规则一起编排。</td>
+        </tr>
+        <tr>
+          <td>Windows</td>
+          <td>先在 WSL2 中运行 Linux 沙箱。</td>
+          <td>原生 Windows 沙箱更难，因为现有原语多面向浏览器，不适合通用开发工具。</td>
+          <td>智能体安全会推动操作系统暴露新的开发者级隔离能力。</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
 
-    <section>
-      <h2>Linux 更开放，但组合成本更高</h2>
-      <p>Linux 直接使用 seccomp 和 Landlock：seccomp 阻止危险 syscall，Landlock 限制文件系统访问，并让 .cursorignore 中的文件对沙箱进程不可读、不可改。难点在于查找和重新挂载这些被忽略文件是最慢步骤，这提醒读者：更强的权限控制往往会把复杂性转移到文件系统映射、性能和兼容性上。</p>
-    </section>
+  <section class="section process">
+    <h2>让智能体理解沙箱，和实现沙箱一样重要</h2>
+    <div class="timeline">
+      <div class="step">
+        <div class="badge">1</div>
+        <p>Cursor 先更新 Shell 工具说明，让模型知道文件系统、Git、网络权限会受用户设置影响。这样智能体能预判哪些命令会失败。</p>
+      </div>
+      <div class="step">
+        <div class="badge">2</div>
+        <p>团队用常见 rollout 手工测试提示词。发现异常后调整 harness，再重复执行。这个过程把安全规则变成模型能操作的上下文。</p>
+      </div>
+      <div class="step">
+        <div class="badge">3</div>
+        <p>在 Cursor Bench 中，他们发现智能体会反复重试同一命令，却不改变权限。失败提示随后被改成明确指出是哪条沙箱约束造成了失败。</p>
+      </div>
+      <div class="step">
+        <div class="badge">4</div>
+        <p>上线后，智能体从沙箱失败中恢复得更好，离线评测表现明显改善。生产环境的渐进发布又验证了用户体验没有明显退化。</p>
+      </div>
+    </div>
+  </section>
 
-    <section>
-      <h2>Windows 目前借助 WSL2，而不是原生沙箱</h2>
-      <p>在 Windows 上，Cursor 把 Linux 沙箱运行在 WSL2 内，因为现有 Windows 沙箱原语更多面向浏览器，难以覆盖通用开发工具。这个结论很实际：跨平台 agent 产品不能假设每个系统都有同等成熟的安全基础设施，短期可能需要折中实现。</p>
-    </section>
+  <section class="insight">
+    <blockquote>真正的安全自主权，不是让模型少做事，而是让模型知道自己在哪些边界内可以大胆做事。</blockquote>
+  </section>
 
-    <section>
-      <h2>模型也要学会“沙箱意识”</h2>
-      <p>Cursor 不只改底层隔离，还改了 Shell 工具说明和失败结果展示，让 agent 知道当前是否有文件系统、git 或网络权限，以及何时应请求提权。在 Cursor Bench 中，一个常见失败是 agent 反复重试同一命令却不改变权限；显式提示失败约束后，agent 对沙箱失败的恢复更好。这说明 AI 工具安全不仅是权限系统，也是反馈设计和模型行为训练问题。</p>
-    </section>
+  <section class="section takeaways">
+    <h2>最值得带走的洞见</h2>
+    <div class="mosaic">
+      <div class="tile big">
+        <h3>审批不是长期扩展方案</h3>
+        <p>当智能体数量和命令数量上升时，人类审批会变成噪声。沙箱把注意力留给真正越界的操作。</p>
+      </div>
+      <div class="tile">
+        <h3>安全边界要贴近工作流</h3>
+        <p>如果沙箱阻断测试、构建和常见命令，它会被绕开。可用性本身就是安全设计的一部分。</p>
+      </div>
+      <div class="tile">
+        <h3>平台差异无法被抹平</h3>
+        <p>统一 API 之下仍要分别处理 Seatbelt、Landlock、seccomp 和 WSL2。</p>
+      </div>
+      <div class="tile">
+        <h3>模型也需要权限素养</h3>
+        <p>工具提示和错误渲染会影响智能体是否能正确升级权限，而不是原地重试。</p>
+      </div>
+      <div class="tile">
+        <h3>下一步是沙箱原生智能体</h3>
+        <p>如果训练时就理解环境约束，智能体可以更自由地写脚本和程序，而不只依赖工具调用。</p>
+      </div>
+    </div>
+  </section>
 
-    <section>
-      <h2>生产采用说明沙箱已进入主流程</h2>
-      <p>Cursor 通过离线评测和生产灰度验证体验影响，目前支持平台上约 <span class="data">三分之一</span>请求运行在沙箱中，并已服务 NVIDIA 等企业客户。结论是：当 agent 从生成代码走向操作真实系统，执行边界会成为基础设施，而不是高级可选项。</p>
-    </section>
-
-    <section class="takeaways">
-      <h2>最值得带走的洞见</h2>
-      <ul>
-        <li>审批不是长久安全机制；高频审批会把安全判断变成机械动作。</li>
-        <li>有效沙箱要给 agent 足够自由，否则会破坏构建、测试和调试流程。</li>
-        <li>跨平台安全实现必须尊重系统差异：macOS、Linux、Windows 的最优路径并不相同。</li>
-        <li>工具返回的失败原因会直接影响 agent 行为，好的错误提示本身就是安全能力。</li>
-        <li>未来更强的本地 agent 可能不是被更多工具约束，而是被训练成理解并利用自己的执行边界。</li>
-      </ul>
-    </section>
-  </main>
+  <p class="footer-note">来源：Cursor，Research，2026 年 2 月 18 日。作者：Ani Betts、Yash Gaitonde、Alex Haugland。</p>
+</main>
   <script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;

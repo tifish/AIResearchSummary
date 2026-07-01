@@ -3,112 +3,247 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>单负引力子振幅为什么不一定为零</title>
+<title>将单负螺旋振幅扩展到引力子</title>
 <style>
-:root{
-  --bg:#f6f7fb;
-  --card:#ffffff;
-  --ink:#172033;
-  --muted:#667085;
-  --line:#d9deea;
-  --accent:#3157d5;
-  --accent2:#0f8b8d;
-  --accent3:#8a4fff;
-  --hl:#edf2ff;
-  --hl2:#ecfbf8;
+:root {
+  --bg: #f7f3ea;
+  --ink: #1f2430;
+  --muted: #626a78;
+  --line: #d9d2c3;
+  --card: #fffaf0;
+  --panel: #eef5f1;
+  --panel2: #f3edf7;
+  --panel3: #edf3fb;
+  --dark: #172033;
+  --dark-ink: #f6efe5;
+  --accent: #2563eb;
+  --accent2: #c2410c;
+  --accent3: #15803d;
+  --accent4: #7c3aed;
+  --risk: #b91c1c;
+  --opportunity: #0f766e;
+  --conclusion: #4338ca;
+  --hl: #fff3c4;
+  --hl2: #dff7ee;
+  --shadow: rgba(31, 36, 48, .12);
 }
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif;
-  line-height:1.72;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #11151d;
+    --ink: #f1eadf;
+    --muted: #b8c0cc;
+    --line: #343c4c;
+    --card: #1c2430;
+    --panel: #172821;
+    --panel2: #251c31;
+    --panel3: #162437;
+    --dark: #0b1020;
+    --dark-ink: #f6efe5;
+    --accent: #6ea8ff;
+    --accent2: #ff9b6a;
+    --accent3: #58d68d;
+    --accent4: #b99cff;
+    --risk: #ff7b7b;
+    --opportunity: #5eead4;
+    --conclusion: #a5b4fc;
+    --hl: #493b16;
+    --hl2: #173b31;
+    --shadow: rgba(0, 0, 0, .35);
+  }
 }
-main{
-  max-width:920px;
-  margin:0 auto;
-  padding:42px 20px 56px;
+:root[data-theme="dark"] {
+  --bg: #11151d;
+  --ink: #f1eadf;
+  --muted: #b8c0cc;
+  --line: #343c4c;
+  --card: #1c2430;
+  --panel: #172821;
+  --panel2: #251c31;
+  --panel3: #162437;
+  --dark: #0b1020;
+  --dark-ink: #f6efe5;
+  --accent: #6ea8ff;
+  --accent2: #ff9b6a;
+  --accent3: #58d68d;
+  --accent4: #b99cff;
+  --risk: #ff7b7b;
+  --opportunity: #5eead4;
+  --conclusion: #a5b4fc;
+  --hl: #493b16;
+  --hl2: #173b31;
+  --shadow: rgba(0, 0, 0, .35);
 }
-header{
-  padding:30px;
-  border:1px solid var(--line);
-  background:linear-gradient(135deg,var(--card),var(--hl));
-  border-radius:18px;
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  line-height: 1.72;
 }
-.kicker{
-  margin:0 0 10px;
-  color:var(--accent);
-  font-size:14px;
-  font-weight:700;
+main { max-width: 1120px; margin: 0 auto; }
+.hero {
+  min-height: 56vh;
+  padding: 72px 28px 42px;
+  background: var(--dark);
+  color: var(--dark-ink);
+  display: grid;
+  align-items: end;
 }
-h1{
-  margin:0;
-  font-size:34px;
-  line-height:1.25;
-  letter-spacing:0;
+.kicker {
+  color: var(--accent2);
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
 }
-.lead{
-  margin:18px 0 0;
-  font-size:18px;
-  color:var(--ink);
+h1 {
+  margin: 14px 0 10px;
+  font-size: clamp(36px, 7vw, 76px);
+  line-height: 1.05;
+  letter-spacing: 0;
 }
-.meta{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  margin-top:20px;
+.subtitle {
+  color: var(--muted);
+  max-width: 760px;
+  font-size: 18px;
 }
-.meta span{
-  border:1px solid var(--line);
-  background:var(--card);
-  color:var(--muted);
-  padding:6px 10px;
-  border-radius:999px;
-  font-size:13px;
+.one {
+  margin-top: 28px;
+  max-width: 850px;
+  font-size: 24px;
+  line-height: 1.5;
+  border-left: 6px solid var(--accent);
+  padding-left: 18px;
 }
-section{
-  margin-top:22px;
-  padding:24px;
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:16px;
+.band {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--line);
 }
-h2{
-  margin:0 0 12px;
-  font-size:22px;
-  line-height:1.35;
+.metric {
+  background: var(--card);
+  padding: 26px;
 }
-p{margin:10px 0 0}
-.data{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:12px;
-  margin-top:16px;
+.metric strong {
+  display: block;
+  color: var(--accent);
+  font-size: 32px;
+  line-height: 1.1;
 }
-.data div{
-  padding:14px;
-  border-radius:14px;
-  background:var(--hl2);
-  border:1px solid var(--line);
+.metric span { color: var(--muted); font-size: 14px; }
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 36px;
+  padding: 54px 28px;
+  background: var(--panel);
 }
-.data strong{
-  display:block;
-  color:var(--accent2);
-  font-size:20px;
+.split h2, .flow h2, .table-wrap h2, .quote h2, .takeaways h2 {
+  margin: 0 0 14px;
+  font-size: 28px;
+  line-height: 1.25;
 }
-.note{
-  border-left:4px solid var(--accent3);
-  padding-left:14px;
-  color:var(--muted);
+.note {
+  background: var(--hl2);
+  border-left: 5px solid var(--opportunity);
+  padding: 18px;
+  margin-top: 18px;
 }
-ul{
-  margin:12px 0 0;
-  padding-left:22px;
+.flow {
+  padding: 56px 28px;
+  background: var(--bg);
 }
-li{margin:8px 0}
-.takeaways{
-  background:linear-gradient(135deg,var(--hl),var(--card));
+.steps {
+  display: grid;
+  gap: 18px;
+  margin-top: 22px;
+}
+.step {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+.badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--accent4);
+  color: var(--dark-ink);
+  font-weight: 800;
+}
+.step div:last-child {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 18px;
+}
+.table-wrap {
+  padding: 54px 28px;
+  background: var(--panel2);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--card);
+  box-shadow: 0 12px 30px var(--shadow);
+}
+th, td {
+  text-align: left;
+  padding: 18px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+th { color: var(--accent4); }
+.quote {
+  padding: 56px 28px;
+  background: var(--dark);
+  color: var(--dark-ink);
+}
+.quote blockquote {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.45;
+  border-left: 6px solid var(--accent3);
+  padding-left: 22px;
+}
+.quote p { color: var(--muted); max-width: 780px; }
+.mosaic {
+  display: grid;
+  grid-template-columns: 1.2fr .8fr;
+  gap: 18px;
+  padding: 54px 28px;
+  background: var(--panel3);
+}
+.tile {
+  padding: 22px;
+  background: var(--card);
+  border-top: 5px solid var(--accent2);
+}
+.tile:nth-child(2) { border-top-color: var(--risk); }
+.tile:nth-child(3) { border-top-color: var(--opportunity); }
+.tile:nth-child(4) { border-top-color: var(--conclusion); }
+.takeaways {
+  padding: 56px 28px 70px;
+  background: var(--bg);
+}
+.takeaways ul {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  padding: 0;
+  list-style: none;
+}
+.takeaways li {
+  background: var(--hl);
+  padding: 18px;
+  border-left: 5px solid var(--conclusion);
+}
+@media (max-width: 760px) {
+  .band, .split, .mosaic, .takeaways ul { grid-template-columns: 1fr; }
+  .hero { padding-top: 52px; }
+  .one { font-size: 20px; }
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -185,13 +320,6 @@ li{margin:8px 0}
     body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
       color: inherit;
     }
-    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
-      border-color: var(--airs-digest-line) !important;
-    }
-    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
-      background: var(--airs-digest-panel) !important;
-      color: var(--airs-digest-ink) !important;
-    }
     body :where(.muted, .meta, .kicker, small) {
       color: var(--airs-digest-muted) !important;
     }
@@ -252,55 +380,103 @@ li{margin:8px 0}
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/extending-single-minus-amplitudes-to-gravitons" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
 <main>
-  <header>
-    <p class="kicker">一句话总括</p>
-    <h1>这项工作说明，AI 可以帮助提出新的理论物理构造，但真正让它成为科学结果的是人类随后完成的证明、校验和物理解释。</h1>
-    <p class="lead">文章的核心不是“模型写了论文”，而是一个更具体的结论：在特殊动量条件下，单负引力子树级振幅并不必然为零。</p>
-    <div class="meta">
-      <span>OpenAI Research</span>
-      <span>2026 年 3 月 4 日</span>
-      <span>量子引力</span>
-      <span>GPT-5.2 Pro</span>
-    </div>
-  </header>
-
-  <section>
-    <h2>过去认为为零的单负引力子振幅，在半共线条件下可以非零</h2>
-    <p>单负振幅指一个粒子为负螺旋度，其余粒子为正螺旋度。传统树级论证通常认为这类引力子振幅会消失，因为它默认粒子动量处于一般位置。</p>
-    <p>新预印本指出，当动量进入 half-collinear regime 时，这个默认前提失效，振幅可以作为支撑在受限动量空间上的数学分布存在。这个细节改变了读者对“零结果”的理解：有些消失结论不是绝对物理禁令，而是依赖运动学假设。</p>
-    <div class="data">
-      <div><strong>1 个</strong>负螺旋度粒子</div>
-      <div><strong>树级</strong>不包含量子环修正的近似</div>
-      <div><strong>半共线</strong>让常规消失论证失效</div>
+  <section class="hero">
+    <div>
+      <div class="kicker">OpenAI Research · Mar 4, 2026</div>
+      <h1>将单负螺旋振幅扩展到引力子</h1>
+      <div class="subtitle">Extending single-minus amplitudes to gravitons</div>
+      <p class="one">一句话总括：这项工作把一个曾被认为在树级近似下为零的引力子相互作用，改写为在特定动量区域中非零且可验证的数学对象。</p>
     </div>
   </section>
 
-  <section>
-    <h2>这个结果把胶子中的发现转移到了引力子问题</h2>
-    <p>研究团队先有胶子振幅的相关结果，再把该结果作为上下文交给 GPT-5.2 Pro，请模型构造量子引力中的对应形式。模型给出的方案使用 directed matrix-tree theorem，并产出初步论文草稿。</p>
-    <p>真正重要的趋势是跨领域结构迁移：胶子和引力子描述不同相互作用，但振幅理论中的递归关系和对称性使一个领域的线索能指导另一个领域。AI 的作用更像是加快“候选构造”的产生，而不是替代证明。</p>
+  <section class="band" aria-label="关键数字">
+    <div class="metric"><strong>2026</strong><span>文章发布年份</span></div>
+    <div class="metric"><strong>5</strong><span>论文署名作者</span></div>
+    <div class="metric"><strong>1</strong><span>负螺旋粒子，其余为正螺旋</span></div>
+    <div class="metric"><strong>w-(1+∞)</strong><span>结果关联的无限维对称性</span></div>
   </section>
 
-  <section>
-    <h2>验证工作成为发现流程中的主要负担</h2>
-    <p>文章强调，从胶子结果到引力子结果的时间里，大量精力花在确认推导、检查一致性和准备正式写作，而不是最初猜想本身。最终公式经过解析验证，并与已知物理极限相容。</p>
-    <p class="note">这让 AI 对科研的影响更清晰：模型可能缩短提出思路的时间，但研究质量仍取决于传统的数学证明、物理极限检查和同行可复核表达。</p>
+  <section class="split">
+    <div>
+      <h2>核心发现不是“更会计算”，而是“原假设有边界”</h2>
+      <p>传统教材论证认为，单负螺旋的引力子树振幅应当为零。新预印本指出，这个结论依赖于粒子动量处在一般位置。</p>
+      <p>当动量进入半共线区域时，原来的消失论证不再适用。振幅不再是普通意义上的泛化函数，而是支撑在受限动量空间上的良好数学分布。</p>
+    </div>
+    <div class="note">
+      <strong>为什么这改变理解：</strong>
+      <p>AI 影响科学的关键不只是给出答案。这里更重要的是，它帮助研究者找到一个被旧直觉排除的结构，然后由人类和标准解析方法完成验证。</p>
+    </div>
   </section>
 
-  <section>
-    <h2>Penrose 相关的无限维对称性给结果增加了物理意义</h2>
-    <p>单负引力子振幅实现了 w-(1+∞) 无限维对称性；文章称这一对称性由 Roger Penrose 在约半个世纪前的经典引力背景中研究，并被认为可能与引力量子化有关。</p>
-    <p>因此，这个结果的意义不只是“某个特殊振幅非零”，还在于它把一个老的对称性结构放进最简单的引力量子比特，即引力子的相互作用中观察。它为理解量子力学与广义相对论的衔接提供了一个小但精确的入口。</p>
+  <section class="flow">
+    <h2>从胶子到引力子，是一次跨理论迁移</h2>
+    <div class="steps">
+      <div class="step"><div class="badge">1</div><div><strong>已有锚点。</strong><p>此前胶子研究显示，某些被忽略的螺旋构型在特殊条件下可以产生非零振幅。</p></div></div>
+      <div class="step"><div class="badge">2</div><div><strong>模型扩展。</strong><p>研究者把胶子论文提供给 GPT‑5.2 Pro，要求它构造量子引力中的对应结果。</p></div></div>
+      <div class="step"><div class="badge">3</div><div><strong>意外工具。</strong><p>模型使用 directed matrix-tree theorem 给出推导思路，并生成了初步论文草稿。</p></div></div>
+      <div class="step"><div class="badge">4</div><div><strong>常规验证。</strong><p>最终公式经过解析验证，并检查了递归关系、对称性约束和已知物理极限。</p></div></div>
+    </div>
+  </section>
+
+  <section class="table-wrap">
+    <h2>这项结果解决了什么误解</h2>
+    <table>
+      <thead>
+        <tr><th>原有看法</th><th>新结果</th><th>洞见</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>单负螺旋引力子树振幅在最简单近似下为零。</td>
+          <td>在半共线动量条件下，它们可以非零。</td>
+          <td>“为零”不是绝对命题，而是对一般运动条件的判断。</td>
+        </tr>
+        <tr>
+          <td>胶子和引力子的计算差异很大。</td>
+          <td>两者仍共享可迁移的数学结构。</td>
+          <td>AI 可以帮助探索相邻理论之间的映射。</td>
+        </tr>
+        <tr>
+          <td>AI 生成的理论结果难以直接信任。</td>
+          <td>本文强调解析证明和一致性检查。</td>
+          <td>科学价值来自“生成加验证”，不是只看模型输出。</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="quote">
+    <h2>真正的节奏变化</h2>
+    <blockquote>初始猜想生成变快后，研究瓶颈转向确认推导、检查一致性和正式写作。</blockquote>
+    <p>这点比“AI 写出论文草稿”更重要。它说明 AI 可能改变理论研究的时间分配，但没有取消验证、审稿和共同体反馈。</p>
+  </section>
+
+  <section class="mosaic">
+    <div class="tile">
+      <h2>物理意义</h2>
+      <p>引力子是量子场论中与引力相关的粒子。这个结果展示了最简单场景中，w-(1+∞) 对称性如何作用于引力子的量子自由度。</p>
+    </div>
+    <div class="tile">
+      <h2>风险边界</h2>
+      <p>文章没有声称已经解决量子引力。它只是给出了一个小而明确的数学推进。</p>
+    </div>
+    <div class="tile">
+      <h2>机会</h2>
+      <p>如果相邻领域的结构能被模型更快迁移，理论物理中的“候选公式搜索”会变得更高效。</p>
+    </div>
+    <div class="tile">
+      <h2>结论</h2>
+      <p>AI 在这里更像研究合作者的放大器。它提出可检验路径，人类研究者仍负责证明、解释和定稿。</p>
+    </div>
   </section>
 
   <section class="takeaways">
     <h2>最值得带走的洞见</h2>
     <ul>
-      <li>树级单负引力子振幅并非无条件为零；半共线运动学会改变结论。</li>
-      <li>AI 的关键贡献是帮助快速构造候选公式和草稿，科学可信度仍来自后续验证。</li>
-      <li>胶子到引力子的迁移显示，相邻理论之间的数学结构可以被系统利用。</li>
-      <li>验证、写作和一致性检查可能成为 AI 辅助科研中最耗时的环节。</li>
-      <li>与 w-(1+∞) 对称性的联系，使这个结果超出单个计算技巧，进入量子引力结构问题。</li>
+      <li>单负螺旋引力子树振幅并非总是为零，半共线动量条件改变了结论。</li>
+      <li>这个结果把胶子振幅中的近期发现扩展到引力理论。</li>
+      <li>GPT‑5.2 Pro 的作用集中在构造和推导候选结果，而不是替代验证。</li>
+      <li>理论研究的瓶颈可能从“提出猜想”转向“证明、检查和表达”。</li>
+      <li>AI 辅助科学最稳妥的范式，是让模型生成方向，再用传统数学标准筛选。</li>
     </ul>
   </section>
 </main>

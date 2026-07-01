@@ -3,125 +3,283 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Better MoE model inference with warp decode 中文总结</title>
+<title>用 warp decode 改进 MoE 模型推理</title>
 <style>
 :root {
-  --bg: #f6f8fb;
+  --bg: #f5f7fb;
+  --paper: #ffffff;
+  --ink: #17202a;
+  --muted: #5d6a7a;
+  --line: #d9e0ea;
+  --hero-bg: #102033;
+  --hero-ink: #f7fbff;
+  --hero-muted: #b8c8d9;
+  --band-bg: #eaf3ff;
+  --split-bg: #fff7e8;
+  --flow-bg: #eef8f3;
+  --table-bg: #f7f0ff;
+  --quote-bg: #1c2533;
+  --take-bg: #fff2f2;
   --card: #ffffff;
-  --ink: #172033;
-  --muted: #5e6a7d;
-  --line: #dfe5ee;
-  --accent: #2563eb;
-  --accent2: #0f766e;
-  --accent3: #b45309;
-  --hl: #eaf2ff;
-  --hl2: #ecfdf5;
+  --data: #2563eb;
+  --risk: #dc2626;
+  --opportunity: #059669;
+  --conclusion: #7c3aed;
+  --compute: #d97706;
+  --soft-data: #dbeafe;
+  --soft-risk: #fee2e2;
+  --soft-opportunity: #d1fae5;
+  --soft-conclusion: #ede9fe;
+  --soft-compute: #fef3c7;
+  --shadow: 0 18px 48px rgba(19, 35, 56, 0.12);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b111a;
+    --paper: #111a26;
+    --ink: #e8eef7;
+    --muted: #a9b6c6;
+    --line: #293545;
+    --hero-bg: #08111c;
+    --hero-ink: #f3f7fb;
+    --hero-muted: #9fb2c6;
+    --band-bg: #0f2238;
+    --split-bg: #2a1d0d;
+    --flow-bg: #0d251d;
+    --table-bg: #211631;
+    --quote-bg: #070c14;
+    --take-bg: #2b1417;
+    --card: #121d2a;
+    --data: #60a5fa;
+    --risk: #fb7185;
+    --opportunity: #34d399;
+    --conclusion: #a78bfa;
+    --compute: #fbbf24;
+    --soft-data: #132b45;
+    --soft-risk: #3a171c;
+    --soft-opportunity: #123326;
+    --soft-conclusion: #281b42;
+    --soft-compute: #33240c;
+    --shadow: 0 18px 48px rgba(0, 0, 0, 0.35);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0b111a;
+  --paper: #111a26;
+  --ink: #e8eef7;
+  --muted: #a9b6c6;
+  --line: #293545;
+  --hero-bg: #08111c;
+  --hero-ink: #f3f7fb;
+  --hero-muted: #9fb2c6;
+  --band-bg: #0f2238;
+  --split-bg: #2a1d0d;
+  --flow-bg: #0d251d;
+  --table-bg: #211631;
+  --quote-bg: #070c14;
+  --take-bg: #2b1417;
+  --card: #121d2a;
+  --data: #60a5fa;
+  --risk: #fb7185;
+  --opportunity: #34d399;
+  --conclusion: #a78bfa;
+  --compute: #fbbf24;
+  --soft-data: #132b45;
+  --soft-risk: #3a171c;
+  --soft-opportunity: #123326;
+  --soft-conclusion: #281b42;
+  --soft-compute: #33240c;
+  --shadow: 0 18px 48px rgba(0, 0, 0, 0.35);
 }
 * { box-sizing: border-box; }
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
   background: var(--bg);
   color: var(--ink);
-  line-height: 1.72;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  line-height: 1.65;
 }
-main {
-  max-width: 920px;
-  margin: 0 auto;
-  padding: 36px 18px 48px;
-}
+main { overflow: hidden; }
 .hero {
-  padding: 28px;
-  background: linear-gradient(135deg, var(--card), var(--hl));
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+  padding: 64px 24px 48px;
 }
-.kicker {
-  margin: 0 0 8px;
-  color: var(--accent);
-  font-size: 14px;
+.wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+.eyebrow {
+  color: var(--opportunity);
   font-weight: 700;
+  letter-spacing: 0;
 }
 h1 {
-  margin: 0 0 14px;
-  font-size: 30px;
-  line-height: 1.25;
+  margin: 12px 0 8px;
+  font-size: clamp(34px, 6vw, 68px);
+  line-height: 1.05;
+  letter-spacing: 0;
 }
-.lead {
-  margin: 0;
-  font-size: 19px;
-  color: var(--ink);
-  font-weight: 650;
+.original {
+  color: var(--hero-muted);
+  font-size: 18px;
 }
-.grid {
+.one {
+  max-width: 760px;
+  margin-top: 28px;
+  font-size: 24px;
+  line-height: 1.45;
+}
+.number-band {
+  background: var(--band-bg);
+  padding: 28px 24px;
+  border-bottom: 1px solid var(--line);
+}
+.numbers {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin: 18px 0 0;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
 }
 .metric {
   background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 14px;
+  border-top: 4px solid var(--data);
+  padding: 18px;
+  box-shadow: var(--shadow);
 }
 .metric strong {
   display: block;
-  font-size: 22px;
-  color: var(--accent2);
+  color: var(--data);
+  font-size: 30px;
+  line-height: 1.1;
 }
 .metric span {
-  display: block;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 14px;
 }
-section {
-  margin-top: 18px;
-  padding: 22px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 8px;
+.split {
+  background: var(--split-bg);
+  padding: 56px 24px;
 }
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 34px;
+  align-items: start;
+}
+.panel {
+  background: var(--paper);
+  border-left: 6px solid var(--compute);
+  padding: 24px;
+}
+.panel.alt { border-left-color: var(--opportunity); }
 h2 {
-  margin: 0 0 10px;
-  font-size: 21px;
-  line-height: 1.35;
+  margin: 0 0 14px;
+  font-size: 28px;
+  line-height: 1.25;
 }
-p {
-  margin: 0 0 10px;
+p { margin: 0 0 14px; }
+.flow {
+  background: var(--flow-bg);
+  padding: 58px 24px;
 }
-p:last-child {
-  margin-bottom: 0;
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  border: 1px solid var(--line);
+  background: var(--paper);
 }
-mark {
-  background: var(--hl2);
-  color: var(--accent2);
-  padding: 1px 5px;
-  border-radius: 5px;
+.step {
+  padding: 22px;
+  border-right: 1px solid var(--line);
 }
-.data {
-  border-left: 4px solid var(--accent);
-  padding: 10px 12px;
-  margin: 12px 0;
-  background: var(--hl);
-  color: var(--ink);
+.step:last-child { border-right: 0; }
+.badge {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 12px;
+  border-radius: 50%;
+  background: var(--soft-opportunity);
+  color: var(--opportunity);
+  font-weight: 800;
+}
+.table-section {
+  background: var(--table-bg);
+  padding: 56px 24px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--paper);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+th, td {
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--soft-conclusion);
+  color: var(--conclusion);
+}
+td:first-child {
+  font-weight: 700;
+}
+.insight {
+  background: var(--quote-bg);
+  color: var(--hero-ink);
+  padding: 54px 24px;
+}
+.callout {
+  max-width: 900px;
+  border-left: 8px solid var(--risk);
+  padding-left: 24px;
+  font-size: 25px;
+  line-height: 1.45;
+}
+.callout small {
+  display: block;
+  color: var(--hero-muted);
+  margin-top: 14px;
+  font-size: 16px;
 }
 .takeaways {
-  background: linear-gradient(135deg, var(--card), var(--hl2));
+  background: var(--take-bg);
+  padding: 56px 24px 70px;
 }
-ul {
-  margin: 10px 0 0;
-  padding-left: 22px;
+.mosaic {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr 1fr;
+  gap: 14px;
 }
-li {
-  margin: 8px 0;
+.tile {
+  padding: 22px;
+  background: var(--paper);
+  border: 1px solid var(--line);
 }
-@media (max-width: 720px) {
-  main { padding: 22px 12px 34px; }
-  .hero, section { padding: 18px; }
-  h1 { font-size: 24px; }
-  .lead { font-size: 17px; }
-  .grid { grid-template-columns: 1fr; }
+.tile.data { border-top: 5px solid var(--data); }
+.tile.risk { border-top: 5px solid var(--risk); }
+.tile.opp { border-top: 5px solid var(--opportunity); }
+.tile.final { border-top: 5px solid var(--conclusion); grid-column: span 2; }
+.tile h3 {
+  margin: 0 0 10px;
+  font-size: 20px;
+}
+@media (max-width: 820px) {
+  .numbers, .two-col, .steps, .mosaic {
+    grid-template-columns: 1fr;
+  }
+  .step {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .step:last-child { border-bottom: 0; }
+  .tile.final { grid-column: auto; }
+  .one { font-size: 20px; }
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -198,13 +356,6 @@ li {
     body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
       color: inherit;
     }
-    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
-      border-color: var(--airs-digest-line) !important;
-    }
-    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
-      background: var(--airs-digest-panel) !important;
-      color: var(--airs-digest-ink) !important;
-    }
     body :where(.muted, .meta, .kicker, small) {
       color: var(--airs-digest-muted) !important;
     }
@@ -265,71 +416,89 @@ li {
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/warp-decode" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
 <main>
-  <article>
-    <header class="hero">
-      <p class="kicker">一句话总括</p>
-      <h1>Warp decode 的贡献是把 MoE decode 从“按专家调度”改成“按输出值调度”，在小批量生成阶段同时减少内存搬运、提高吞吐并改善数值精度。</h1>
-      <p class="lead">这篇文章真正说明的是：当 MoE 推理的瓶颈来自数据重排和随机访存时，改变并行粒度比继续沿着专家中心流水线做局部融合更有效。</p>
-      <div class="grid">
-        <div class="metric"><strong>1.84x</strong><span>Blackwell 上端到端 decode 吞吐提升</span></div>
-        <div class="metric"><strong>1.4x</strong><span>输出更接近完整 FP32 参考</span></div>
-        <div class="metric"><strong>3.95 TB/s</strong><span>B=32 时持续带宽，约为峰值 58%</span></div>
+  <section class="hero">
+    <div class="wrap">
+      <div class="eyebrow">一句话总括</div>
+      <h1>用 warp decode 改进 MoE 模型推理</h1>
+      <div class="original">Better MoE model inference with warp decode</div>
+      <p class="one">Cursor 的贡献不是单纯写了更快的 kernel，而是把 MoE 解码从“围绕专家组织”改成“围绕输出值组织”，从源头减少数据搬运，并让每个 warp 独立完成一个标量输出。</p>
+    </div>
+  </section>
+
+  <section class="number-band">
+    <div class="wrap numbers">
+      <div class="metric"><strong>1.84x</strong><span>Blackwell 上的端到端解码吞吐提升</span></div>
+      <div class="metric"><strong>1.4x</strong><span>输出更接近完整 FP32 参考</span></div>
+      <div class="metric"><strong>3.95 TB/s</strong><span>B=32 时持续内存带宽</span></div>
+      <div class="metric"><strong>32+ KB</strong><span>每 token 可移除的中间缓冲流量</span></div>
+    </div>
+  </section>
+
+  <section class="split">
+    <div class="wrap two-col">
+      <div class="panel">
+        <h2>传统路径的问题是组织成本</h2>
+        <p>MoE 通常先按专家收集 token，再运行专家计算，最后把结果重新组合。这个设计适合 prefill 和大 batch。</p>
+        <p>但自回归 decode 一次只生成一个 token。共享工作太少，填充、scatter、combine 等步骤变成不可摊销的开销。</p>
       </div>
-    </header>
+      <div class="panel alt">
+        <h2>warp decode 改变并行对象</h2>
+        <p>新路径让每个 warp 负责一个输出值。它直接读取所需权重，把 8 个路由专家的贡献合并到同一个 FP32 累加器。</p>
+        <p>这改变了读者对 MoE 推理的理解：瓶颈不只在算力，也在是否为小 batch 保留了大 batch 的数据组织方式。</p>
+      </div>
+    </div>
+  </section>
 
-    <section>
-      <h2>传统 MoE decode 的问题不是计算太少，而是为专家视角搬了太多数据</h2>
-      <p>传统 MoE 路径通常先按专家收集 token，再执行专家计算，最后把结果重组回来。这个组织方式在 prefill 和大 batch 下有效，因为很多 token 会共享专家，数据整理成本能被摊薄。</p>
-      <div class="data">文章给出的典型例子是每层从 <mark>128 个专家中选择 8 个</mark>。但在自回归 decode 中，系统常常一次只生成一个 token，传统路径 <mark>8 个阶段里有 5 个</mark>主要是在处理布局，而不是做真正的神经网络计算。</div>
-      <p>这改变了我们对 MoE 推理瓶颈的理解：小批量生成阶段的关键不是让专家 kernel 更漂亮，而是避免为了专家中心布局制造额外工作。</p>
-    </section>
+  <section class="flow">
+    <div class="wrap">
+      <h2>两段 kernel 把路径压短</h2>
+      <div class="steps">
+        <div class="step"><span class="badge">1</span><p><strong>gate/up kernel</strong></p><p>每个 CTA 有 8 个 warp。每个 warp 负责一个中间神经元，读取 gate 和 up 权重行。</p></div>
+        <div class="step"><span class="badge">2</span><p><strong>一次读取激活</strong></p><p>输入激活只读一次，并立即复用于两个投影。MXFP8 权重动态转为 FP32。</p></div>
+        <div class="step"><span class="badge">3</span><p><strong>down kernel</strong></p><p>每个 warp 负责一个输出维度，遍历 top-k 专家，并把路由权重折入累加器。</p></div>
+        <div class="step"><span class="badge">4</span><p><strong>warp 内归约</strong></p><p>__shfl_xor_sync 直接在 lane 间交换寄存器，避开共享内存和显式 barrier。</p></div>
+      </div>
+    </div>
+  </section>
 
-    <section>
-      <h2>Warp decode 的核心是让每个 warp 固定负责一个输出标量</h2>
-      <p>GPU warp 由 32 条并行 lane 组成。Warp decode 不再把 warp 分配给专家，而是让每个 warp 负责一个输出值，直接流式读取所需权重，把 8 个路由专家的贡献折叠到同一个 FP32 累加器中。</p>
-      <div class="data">整个 MoE compute layer 被压缩为两个 kernel：<mark>moe_gate_up_3d_batched</mark> 和 <mark>moe_down_3d_batched</mark>。gate/up 阶段复用同一次读取的激活向量，down 阶段把 top-k 路由权重直接并入投影累加。</div>
-      <p>这个设计的洞见是：当每个 warp 的生命周期都只对应一个稳定输出地址时，跨 warp 同步、中间 staging 和额外 epilogue 都不再是必要结构。</p>
-    </section>
+  <section class="table-section">
+    <div class="wrap">
+      <h2>传统路径与 warp decode 的差异</h2>
+      <table>
+        <thead>
+          <tr><th>维度</th><th>传统专家中心路径</th><th>warp decode</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>并行轴</td><td>按专家组织 token 和计算。</td><td>按输出标量组织 warp。</td></tr>
+          <tr><td>中间数据</td><td>需要 activation gather buffer 和 per-expert output buffer。</td><td>专家贡献保留在寄存器累加器中，最终才写回。</td></tr>
+          <tr><td>调度形态</td><td>专家级 GEMM 需要块内协调。</td><td>warp 之间互不依赖，调度器可用其他 warp 隐藏内存延迟。</td></tr>
+          <tr><td>适用场景</td><td>prefill 和大 batch 仍然有优势。</td><td>小 batch decode 更合适，尤其是共享专家工作不足时。</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
 
-    <section>
-      <h2>主要加速来自删除阶段和缓冲，而不是只靠指令级微优化</h2>
-      <p>Warp decode 删除了传统路径中的 padding、scatter 和 combine。传统方案需要把每个专家的 token 列表补齐到 power-of-2 或 128 byte 边界，还要把每个专家的中间结果写到显存，再由单独步骤合并。</p>
-      <div class="data">对 hidden dimension 2048、8 个专家、BF16 来说，传统 per-expert 输出缓冲为 <mark>8 × 2048 × 2 bytes = 32 KB/token</mark>，这些数据会被写入、读回、再丢弃。Warp decode 让这些中间结果停留在寄存器累加器里，直到最终单标量写出。</div>
-      <p>这说明 MoE decode 的优化收益很大一部分来自减少无效内存流量；省下的 L2 容量可以留给真正影响性能的权重行读取。</p>
-    </section>
+  <section class="insight">
+    <div class="wrap">
+      <div class="callout">
+        性能提升主要来自删除阶段，而不是把旧流水线简单融合。准确率提升来自避免 BF16 激活在中间被量化到 MXFP8 后再还原。
+        <small>这说明推理系统优化会影响模型输出质量，而不只是影响响应速度。</small>
+      </div>
+    </div>
+  </section>
 
-    <section>
-      <h2>独立 warp 让调度器更容易隐藏随机访存延迟</h2>
-      <p>在 warp decode 中，每个 warp 只读取只读激活和自己需要的权重行，累加器在私有寄存器中，输出写入唯一地址。调度器看到的是一批没有依赖边的独立工作项。</p>
-      <div class="data">文章特别提到 B200 有 <mark>148 个 streaming multiprocessors</mark>，当数千个 warp 同时在飞行时，一个 warp 等待内存加载，调度器就可以立刻切换到另一个 warp。输出维度翻倍时，独立 warp 数也翻倍，而不增加同步。</div>
-      <p>这里的关键趋势是：MoE 路由带来的随机权重访问无法完全消除，但可以用更扁平、更独立的工作组织方式把延迟藏到有用计算后面。</p>
-    </section>
-
-    <section>
-      <h2>结果显示它同时改善吞吐、精度和硬件利用率</h2>
-      <p>Cursor 在内部推理系统中，用 Qwen-3 风格模型和 NVIDIA B200 GPU 测试，看到跨上下文长度 bucket 都稳定的吞吐提升。这意味着收益主要发生在生成阶段，而不是依赖 prompt 长度。</p>
-      <div class="data">核心结果包括：<mark>1.84x</mark> decode 吞吐提升；输出比传统路径 <mark>1.4x</mark> 更接近完整 FP32 ground truth；B200 连续读峰值为 <mark>6.8 TB/s</mark>，warp decode 在 B=32 下达到 <mark>3.95 TB/s</mark>，即 <mark>58%</mark>；最小余弦相似度 <mark>&gt;0.999996</mark>，最大绝对误差 <mark>0.001953</mark>。</div>
-      <p>这改变了“更快通常牺牲精度”的直觉：因为它移除了 BF16 激活到 MXFP8 再转回的中间量化步骤，所以速度和精度可以同时受益。</p>
-    </section>
-
-    <section>
-      <h2>它不是 MoE 的通用替代品，而是 decode 场景的专门解法</h2>
-      <p>文章明确说 warp decode 不是专家中心执行的全面替代。prefill 和大批量推理中，许多 token 共享同一个专家，专家打包的组织成本可以被大量计算摊薄，仍然有优势。</p>
-      <div class="data">Warp decode 赢在“每个专家共享工作不够多”的场景，也就是 MoE 自回归 decode 常见的小 batch 生成路径。它面向的是生成速度、延迟和数值误差，而不是所有 MoE 阶段。</div>
-      <p>最终洞见是：AI 系统性能不只由训练数据、RL 或模型结构决定，推理 kernel 的组织方式也会直接影响研究迭代速度和用户感受到的模型质量。</p>
-    </section>
-
-    <section class="takeaways">
+  <section class="takeaways">
+    <div class="wrap">
       <h2>最值得带走的洞见</h2>
-      <ul>
-        <li>MoE decode 的低效常来自专家中心布局的管理成本，而不只是矩阵乘性能不足。</li>
-        <li>把并行轴翻转到输出标量后，可以删除 padding、scatter、combine 和大块中间缓冲。</li>
-        <li>独立 warp 把随机访存变成更容易调度隐藏的延迟问题，而不是全局同步问题。</li>
-        <li>去掉中间激活量化让吞吐和精度同时提升，说明系统优化也可能改善模型输出质量。</li>
-        <li>Warp decode 的适用边界很清楚：它适合小批量 MoE 生成，不应替代 prefill 和大批量专家打包路径。</li>
-      </ul>
-    </section>
-  </article>
+      <div class="mosaic">
+        <div class="tile data"><h3>数据布局决定吞吐</h3><p>1.84 倍提升来自重新组织工作，而不是只调参。MoE decode 的真实成本包含大量数据搬运。</p></div>
+        <div class="tile risk"><h3>传统路径不总是通用最优</h3><p>专家中心执行适合共享工作足够多的场景。小 batch decode 会放大它的管理成本。</p></div>
+        <div class="tile opp"><h3>独立 warp 更容易隐藏延迟</h3><p>B200 有 148 个 SM。大量独立 warp 让调度器在内存等待时切换到其他有用工作。</p></div>
+        <div class="tile final"><h3>速度和精度可以同时改善</h3><p>warp decode 保持 BF16 激活和 FP32 累加，使输出比传统路径接近 FP32 参考 1.4 倍。推理工程因此成为模型质量迭代的一部分。</p></div>
+        <div class="tile data"><h3>边界同样重要</h3><p>作者明确说它不是专家中心执行的全面替代。prefill 和大 batch 仍然适合传统打包方式。</p></div>
+      </div>
+    </div>
+  </section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

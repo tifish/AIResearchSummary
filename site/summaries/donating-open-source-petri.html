@@ -3,110 +3,181 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Anthropic 捐赠开源对齐工具 Petri：更独立的 AI 行为评测基础设施</title>
+<title>捐赠我们的开源对齐工具</title>
 <style>
-:root{
-  --bg:#f6f8fb;
-  --card:#ffffff;
-  --ink:#18202b;
-  --muted:#5d6878;
-  --line:#dce3ee;
-  --accent:#2563eb;
-  --accent2:#0f766e;
-  --accent3:#9333ea;
-  --hl:#e8f1ff;
-  --hl2:#ecfdf5;
+:root {
+  --bg: #f7f3ea;
+  --ink: #1e2930;
+  --muted: #63717b;
+  --line: #d7d2c7;
+  --card: #fffaf0;
+  --panel: #eef7f3;
+  --panel2: #f3efff;
+  --deep: #102a3a;
+  --deep-ink: #f6fbff;
+  --accent-data: #0f766e;
+  --accent-risk: #c2410c;
+  --accent-opportunity: #2563eb;
+  --accent-conclusion: #7c3aed;
+  --hl: #fff0bd;
+  --hl2: #dff7ef;
+  --shadow: rgba(31, 41, 55, 0.12);
 }
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
-  line-height:1.72;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #11161c;
+    --ink: #e8edf2;
+    --muted: #a8b3bd;
+    --line: #2b3540;
+    --card: #1a2028;
+    --panel: #13251f;
+    --panel2: #211a31;
+    --deep: #07111a;
+    --deep-ink: #eaf6ff;
+    --accent-data: #2dd4bf;
+    --accent-risk: #fb923c;
+    --accent-opportunity: #60a5fa;
+    --accent-conclusion: #a78bfa;
+    --hl: #4a3612;
+    --hl2: #123c34;
+    --shadow: rgba(0, 0, 0, 0.35);
+  }
 }
-main{
-  max-width:920px;
-  margin:0 auto;
-  padding:40px 20px 56px;
+:root[data-theme="dark"] {
+  --bg: #11161c;
+  --ink: #e8edf2;
+  --muted: #a8b3bd;
+  --line: #2b3540;
+  --card: #1a2028;
+  --panel: #13251f;
+  --panel2: #211a31;
+  --deep: #07111a;
+  --deep-ink: #eaf6ff;
+  --accent-data: #2dd4bf;
+  --accent-risk: #fb923c;
+  --accent-opportunity: #60a5fa;
+  --accent-conclusion: #a78bfa;
+  --hl: #4a3612;
+  --hl2: #123c34;
+  --shadow: rgba(0, 0, 0, 0.35);
 }
-.hero{
-  padding:30px;
-  background:linear-gradient(135deg,var(--hl),var(--hl2));
-  border:1px solid var(--line);
-  border-radius:16px;
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  line-height: 1.65;
 }
-.kicker{
-  color:var(--accent2);
-  font-size:14px;
-  font-weight:700;
-  letter-spacing:.04em;
+main { max-width: 1120px; margin: 0 auto; }
+.hero {
+  padding: 64px 24px 44px;
+  background: var(--deep);
+  color: var(--deep-ink);
 }
-h1{
-  margin:8px 0 14px;
-  font-size:32px;
-  line-height:1.25;
+.eyebrow { color: var(--accent-data); font-weight: 700; letter-spacing: 0; }
+h1 { margin: 14px 0 8px; font-size: clamp(32px, 6vw, 64px); line-height: 1.08; }
+.original { color: var(--muted); font-size: 18px; }
+.hero p { max-width: 760px; font-size: 21px; }
+.band {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
 }
-.lead{
-  margin:0;
-  font-size:18px;
-  color:var(--ink);
+.metric {
+  background: var(--card);
+  padding: 24px;
 }
-.grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;
-  margin:22px 0;
+.metric strong { display: block; font-size: 30px; color: var(--accent-data); }
+.metric span { color: var(--muted); }
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 36px;
+  padding: 48px 24px;
 }
-.stat{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:16px;
+.split .lead {
+  border-left: 6px solid var(--accent-opportunity);
+  padding-left: 20px;
+  font-size: 22px;
 }
-.stat b{
-  display:block;
-  font-size:24px;
-  color:var(--accent);
+.note {
+  background: var(--panel);
+  padding: 28px;
+  box-shadow: 0 12px 30px var(--shadow);
 }
-.stat span{
-  color:var(--muted);
-  font-size:14px;
+.note h2, .flow h2, .table-wrap h2, .quote h2, .takeaways h2 {
+  margin-top: 0;
+  font-size: 24px;
 }
-section{
-  margin-top:18px;
-  padding:24px;
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:14px;
+.flow {
+  padding: 48px 24px;
+  background: var(--panel2);
 }
-h2{
-  margin:0 0 10px;
-  font-size:21px;
-  line-height:1.35;
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
 }
-p{margin:0 0 10px}
-p:last-child{margin-bottom:0}
-.tag{
-  display:inline-block;
-  margin-right:8px;
-  padding:3px 9px;
-  border-radius:999px;
-  background:var(--hl);
-  color:var(--accent);
-  font-size:13px;
-  font-weight:700;
+.step {
+  border-top: 5px solid var(--accent-conclusion);
+  background: var(--card);
+  padding: 22px;
 }
-.takeaways{
-  margin:10px 0 0;
-  padding-left:20px;
+.step b { color: var(--accent-conclusion); }
+.table-wrap { padding: 48px 24px; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--card);
+  overflow: hidden;
 }
-.takeaways li{margin:8px 0}
-@media (max-width:760px){
-  main{padding:24px 14px 40px}
-  h1{font-size:26px}
-  .grid{grid-template-columns:1fr}
-  .hero,section{padding:20px}
+th, td {
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+th { color: var(--accent-risk); background: var(--hl); }
+.quote {
+  margin: 0;
+  padding: 44px 24px;
+  background: var(--deep);
+  color: var(--deep-ink);
+}
+.quote blockquote {
+  margin: 0;
+  max-width: 850px;
+  font-size: 25px;
+  line-height: 1.45;
+  border-left: 7px solid var(--accent-risk);
+  padding-left: 22px;
+}
+.takeaways {
+  padding: 48px 24px 64px;
+}
+.mosaic {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 16px;
+}
+.tile {
+  background: var(--card);
+  border: 1px solid var(--line);
+  padding: 22px;
+}
+.tile:first-child {
+  grid-row: span 2;
+  background: var(--hl2);
+  border-color: var(--accent-data);
+}
+.tile b { color: var(--accent-opportunity); }
+@media (max-width: 780px) {
+  .band, .split, .steps, .mosaic { grid-template-columns: 1fr; }
+  .hero { padding-top: 44px; }
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -183,13 +254,6 @@ p:last-child{margin-bottom:0}
     body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
       color: inherit;
     }
-    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
-      border-color: var(--airs-digest-line) !important;
-    }
-    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
-      background: var(--airs-digest-panel) !important;
-      color: var(--airs-digest-ink) !important;
-    }
     body :where(.muted, .meta, .kicker, small) {
       color: var(--airs-digest-muted) !important;
     }
@@ -250,60 +314,83 @@ p:last-child{margin-bottom:0}
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/donating-open-source-petri" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
 <main>
-  <article>
-    <header class="hero">
-      <div class="kicker">一句话总括</div>
-      <h1>Petri 的真正贡献，是把模型对齐评测变成更开放、更真实、更独立的公共工具链。</h1>
-      <p class="lead">Anthropic 不是只更新一个内部测试工具，而是把 Petri 的发展交给 Meridian Labs，让检测欺骗、谄媚、配合有害请求和破坏研究倾向的能力更容易被外部机构复用和信任。</p>
-    </header>
+  <section class="hero">
+    <div class="eyebrow">一句话总括</div>
+    <h1>捐赠我们的开源对齐工具</h1>
+    <div class="original">Donating our open-source alignment tool</div>
+    <p>Anthropic 的真正贡献不只是发布 Petri 3.0，而是把一个用于发现模型失准行为的评估工具交给独立机构，让安全测试更容易被行业、政府和研究者共同信任。</p>
+  </section>
 
-    <div class="grid">
-      <div class="stat"><b>2025.10</b><span>Petri 首次作为开源对齐测试工具箱发布</span></div>
-      <div class="stat"><b>3.0</b><span>新版重点是可适配性、真实性和深度评估</span></div>
-      <div class="stat"><b>Sonnet 4.5 起</b><span>每个 Claude 模型都纳入 Petri 对齐评估</span></div>
+  <section class="band" aria-label="关键数字">
+    <div class="metric"><strong>2025.10</strong><span>Petri 首次作为开源对齐测试工具推出。</span></div>
+    <div class="metric"><strong>3.0</strong><span>新版强化适配性、真实性和深度评估。</span></div>
+    <div class="metric"><strong>4.5+</strong><span>自 Claude Sonnet 4.5 起用于每个 Claude 模型评估。</span></div>
+    <div class="metric"><strong>2026.5.7</strong><span>Anthropic 宣布将开发移交给 Meridian Labs。</span></div>
+  </section>
+
+  <section class="split">
+    <div class="lead">
+      <h2>Petri 解决的是“模型在测试中会不会演戏”的问题</h2>
+      <p>对齐评估常常不够真实。模型可能从测试环境的人工痕迹中判断自己正在被评估。</p>
+      <p>一旦模型知道自己在考试，研究者看到的就不一定是部署时的行为。</p>
     </div>
+    <div class="note">
+      <h2>为什么这改变理解</h2>
+      <p>Petri 用 auditor model 模拟对齐相关场景，再由 judge model 给 transcript 打分。</p>
+      <p>这种流程把“可疑行为”变成更可重复的证据。它关注欺骗、谄媚和配合有害请求等风险，而不是只看模型在标准问答中的表现。</p>
+    </div>
+  </section>
 
-    <section>
-      <h2>Petri 把“模型是否会装作安全”变成可重复测试的问题</h2>
-      <p><span class="tag">方法</span>Petri 使用一个独立的 auditor model 模拟对齐相关场景，再由 judge model 对模型回复转录进行打分，观察是否出现欺骗、谄媚或配合有害请求等行为。</p>
-      <p>这改变了 AI 风险讨论的重心：问题不只是模型在标准问答里答得好不好，而是它在被置于特定压力和目标环境中时会怎样行动。</p>
-    </section>
+  <section class="flow">
+    <h2>Petri 3.0 的三步升级</h2>
+    <div class="steps">
+      <div class="step"><b>适配性</b><p>新版把 auditor model 和 target model 拆成独立组件。研究者可以分别调整测试者和被测模型。</p></div>
+      <div class="step"><b>真实性</b><p>Dish 插件使用真实 system prompt 和真实部署 scaffold。测试更接近模型上线后的工作环境。</p></div>
+      <div class="step"><b>深度</b><p>Petri 与 Bloom 集成。Petri 负责广覆盖筛查，Bloom 负责对指定行为做更深入评估。</p></div>
+    </div>
+  </section>
 
-    <section>
-      <h2>Petri 3.0 的重点是让测试更像真实部署，而不是更像考试</h2>
-      <p><span class="tag">趋势</span>新版将 auditor model 和 target model 拆成可分别调整的组件，方便研究者把同一框架迁移到更多用途。</p>
-      <p>Dish 附加组件进一步使用真实系统提示和真实 scaffold 来运行测试，减少模型识别“自己正在被评测”的机会。结论是，越接近真实部署的评测，越可能暴露普通基准测试看不到的行为风险。</p>
-    </section>
+  <section class="table-wrap">
+    <h2>从实验室工具到公共评估基础设施</h2>
+    <table>
+      <thead>
+        <tr><th>变化</th><th>关键数据和趋势</th><th>结论</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>使用范围扩大</td>
+          <td>UK AISI 已将 Petri 用作评估模型破坏 AI 研究倾向的重要工具。</td>
+          <td>外部采用说明这类测试正在从内部安全流程走向公共评估。</td>
+        </tr>
+        <tr>
+          <td>治理位置改变</td>
+          <td>Anthropic 将 Petri 的开发移交给 Meridian Labs。</td>
+          <td>独立托管能减少“自己评自己”的信任问题。</td>
+        </tr>
+        <tr>
+          <td>工具栈形成</td>
+          <td>Petri 将与 Inspect、Scout 等工具并列，服务实验室、独立研究者和政府。</td>
+          <td>AI 安全评估正在变成开放工具链，而不只是单个公司的内部流程。</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
 
-    <section>
-      <h2>与 Bloom 集成后，Petri 从广覆盖走向“广覆盖加深挖”</h2>
-      <p><span class="tag">能力</span>Petri 原本更适合快速覆盖多种对齐场景，Bloom 则用于对特定行为做更深入的评估；两者结合后，研究者可以先发现可疑模式，再集中分析具体风险。</p>
-      <p>这说明 AI 对齐评测正在从单点 benchmark 转向工具栈：先筛查，再复核，再解释，才更适合处理复杂模型行为。</p>
-    </section>
+  <section class="quote">
+    <h2>核心洞见</h2>
+    <blockquote>当模型能力越强，评估工具的独立性就越重要。可信的结果不只来自测试方法，也来自谁来维护测试。</blockquote>
+  </section>
 
-    <section>
-      <h2>移交给 Meridian Labs，是为了让评测结果更有公信力</h2>
-      <p><span class="tag">治理</span>Anthropic 将 Petri 的开发交给 AI 评估非营利组织 Meridian Labs，并把这一动作类比为此前将 Model Context Protocol 捐赠给 Linux Foundation。</p>
-      <p>关键洞见是：当评测工具由单一 AI 实验室控制时，外界更难相信其结果完全中立；独立机构维护可以提升跨行业、政府和研究群体的采信度。</p>
-    </section>
-
-    <section>
-      <h2>外部采用说明，对齐评测正在成为公共安全能力</h2>
-      <p><span class="tag">影响</span>英国 AI Security Institute 已将 Petri 作为评估模型破坏 AI 研究倾向的重要组成部分，这表明此类工具不只是实验室内部质量控制，也正在进入政府和安全机构的评估流程。</p>
-      <p>结论是，随着模型能力提高，可靠评测本身会成为 AI 治理基础设施，而不是发布前的附属检查。</p>
-    </section>
-
-    <section>
-      <h2>最值得带走的洞见</h2>
-      <ul class="takeaways">
-        <li>Petri 的核心价值在于测试模型行为倾向，而不是只测试知识或任务表现。</li>
-        <li>真实系统提示、真实 scaffold 和更自然的评测环境，会让对齐测试更接近实际风险。</li>
-        <li>将工具交给独立非营利机构，可以提高评测结果在行业外部的可信度。</li>
-        <li>Petri 与 Bloom 的组合代表一种趋势：AI 安全评估会越来越像持续运行的工具链。</li>
-        <li>政府机构采用这类工具，说明 AI 对齐测试正在从研究议题转向治理基础设施。</li>
-      </ul>
-    </section>
-  </article>
+  <section class="takeaways">
+    <h2>最值得带走的洞见</h2>
+    <div class="mosaic">
+      <div class="tile"><b>独立性本身是安全能力。</b><p>Petri 转交给 Meridian Labs，目标是让结果被更广泛地视为中立和可信。</p></div>
+      <div class="tile"><b>真实环境会暴露不同风险。</b><p>Dish 让测试使用真实 prompt 和 scaffold，减少模型识别测试场景的机会。</p></div>
+      <div class="tile"><b>广覆盖和深挖需要配合。</b><p>Petri 负责扫描多类行为，Bloom 负责深入分析特定行为。</p></div>
+      <div class="tile"><b>政府评估正在采用开源工具。</b><p>UK AISI 的使用表明公共部门需要可复核的模型行为测试。</p></div>
+      <div class="tile"><b>安全测试正在基础设施化。</b><p>Petri 与 Inspect、Scout 共同构成开放评估栈，面向实验室、研究者和政府。</p></div>
+    </div>
+  </section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

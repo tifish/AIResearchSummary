@@ -3,123 +3,276 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI 模型的“diff”工具：用行为差异审计新风险</title>
+<title>AI 的“diff”工具：寻找新模型中的行为差异</title>
 <style>
-:root{
-  --bg:#f6f7f9;
-  --card:#ffffff;
-  --ink:#172033;
-  --muted:#647084;
-  --line:#d9e0ea;
-  --accent:#2563eb;
-  --accent2:#0f766e;
-  --accent3:#b45309;
-  --hl:#eaf1ff;
-  --hl2:#ecfdf5;
+:root {
+  --bg: #f7f4ee;
+  --ink: #172026;
+  --muted: #61707c;
+  --line: #d8d0c2;
+  --hero: #111820;
+  --hero-ink: #fffaf0;
+  --surface: #ffffff;
+  --surface2: #edf5f1;
+  --surface3: #f5ece2;
+  --surface4: #eef0fb;
+  --surface5: #f7edf1;
+  --data: #1677a3;
+  --risk: #b7472a;
+  --opportunity: #2e7d55;
+  --conclusion: #6f4bb3;
+  --warning: #c08422;
+  --badge-ink: #ffffff;
+  --shadow: 0 18px 50px rgba(23, 32, 38, 0.12);
 }
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif;
-  line-height:1.72;
+:root[data-theme="dark"] {
+  --bg: #0f1317;
+  --ink: #e8edf0;
+  --muted: #a6b2ba;
+  --line: #303942;
+  --hero: #080b0f;
+  --hero-ink: #f2f6f7;
+  --surface: #171d23;
+  --surface2: #12231d;
+  --surface3: #281d15;
+  --surface4: #171a2a;
+  --surface5: #261820;
+  --data: #45b7e5;
+  --risk: #ff7b59;
+  --opportunity: #60d394;
+  --conclusion: #b395ff;
+  --warning: #f0b44c;
+  --badge-ink: #071014;
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
 }
-main{
-  max-width:980px;
-  margin:0 auto;
-  padding:42px 20px 56px;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1317;
+    --ink: #e8edf0;
+    --muted: #a6b2ba;
+    --line: #303942;
+    --hero: #080b0f;
+    --hero-ink: #f2f6f7;
+    --surface: #171d23;
+    --surface2: #12231d;
+    --surface3: #281d15;
+    --surface4: #171a2a;
+    --surface5: #261820;
+    --data: #45b7e5;
+    --risk: #ff7b59;
+    --opportunity: #60d394;
+    --conclusion: #b395ff;
+    --warning: #f0b44c;
+    --badge-ink: #071014;
+    --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  }
 }
-.hero{
-  padding:30px;
-  border:1px solid var(--line);
-  background:linear-gradient(135deg,var(--card),var(--hl));
-  border-radius:14px;
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.72;
 }
-.kicker{
-  color:var(--accent);
-  font-weight:700;
-  font-size:14px;
-  margin-bottom:8px;
+main { overflow: hidden; }
+.hero {
+  background: var(--hero);
+  color: var(--hero-ink);
+  padding: 72px 7vw 48px;
 }
-h1{
-  margin:0 0 14px;
-  font-size:clamp(28px,4vw,44px);
-  line-height:1.18;
-  letter-spacing:0;
+.kicker {
+  color: var(--data);
+  font-weight: 800;
+  letter-spacing: 0;
+  margin: 0 0 12px;
 }
-.lead{
-  margin:0;
-  font-size:19px;
-  color:var(--ink);
+h1 {
+  max-width: 980px;
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 4.6rem);
+  line-height: 1.08;
+  letter-spacing: 0;
 }
-.grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;
-  margin:22px 0;
+.original {
+  max-width: 820px;
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 1.05rem;
 }
-.stat{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:16px;
+.thesis {
+  max-width: 900px;
+  margin: 34px 0 0;
+  padding-left: 18px;
+  border-left: 6px solid var(--opportunity);
+  font-size: clamp(1.2rem, 2.2vw, 1.8rem);
+  color: var(--hero-ink);
 }
-.num{
-  font-size:25px;
-  font-weight:800;
-  color:var(--accent2);
+.band {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(150px, 1fr));
+  gap: 1px;
+  background: var(--line);
 }
-.label{
-  color:var(--muted);
-  font-size:14px;
+.metric {
+  background: var(--surface);
+  padding: 28px 24px;
 }
-section{
-  margin-top:20px;
-  padding:24px;
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:14px;
+.metric strong {
+  display: block;
+  color: var(--data);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 1;
 }
-h2{
-  margin:0 0 10px;
-  font-size:22px;
-  line-height:1.35;
+.metric span {
+  display: block;
+  margin-top: 10px;
+  color: var(--muted);
 }
-p{margin:0 0 12px}
-.tag{
-  display:inline-block;
-  padding:3px 9px;
-  border-radius:999px;
-  background:var(--hl2);
-  color:var(--accent2);
-  font-size:13px;
-  font-weight:700;
-  margin-bottom:10px;
+.section {
+  padding: 58px 7vw;
 }
-.callout{
-  border-left:4px solid var(--accent3);
-  background:color-mix(in srgb,var(--accent3) 10%,var(--card));
-  padding:12px 14px;
-  border-radius:10px;
-  color:var(--ink);
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 36px;
+  background: var(--surface2);
 }
-ul{
-  margin:10px 0 0;
-  padding-left:20px;
+.eyebrow {
+  color: var(--opportunity);
+  font-weight: 800;
+  margin: 0 0 8px;
 }
-li{margin:8px 0}
-.footer{
-  background:var(--ink);
-  color:white;
-  border:0;
+h2 {
+  margin: 0 0 16px;
+  font-size: clamp(1.5rem, 3vw, 2.4rem);
+  line-height: 1.18;
+  letter-spacing: 0;
 }
-.footer h2{color:white}
-.footer li{color:rgba(255,255,255,.9)}
-@media (max-width:760px){
-  main{padding:24px 14px 40px}
-  .hero,section{padding:20px}
-  .grid{grid-template-columns:1fr}
+.lede {
+  font-size: 1.12rem;
+  color: var(--ink);
+}
+.note {
+  padding: 22px;
+  background: var(--surface);
+  border-left: 7px solid var(--risk);
+  box-shadow: var(--shadow);
+}
+.note b { color: var(--risk); }
+.flow {
+  background: var(--surface3);
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 24px;
+}
+.step {
+  border-top: 6px solid var(--warning);
+  padding: 18px 0 0;
+}
+.step .num {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--warning);
+  color: var(--badge-ink);
+  font-weight: 800;
+}
+.step h3 {
+  margin: 14px 0 6px;
+  font-size: 1.15rem;
+}
+.compare {
+  background: var(--surface4);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+th, td {
+  padding: 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+th {
+  color: var(--conclusion);
+  font-size: 0.95rem;
+}
+td:first-child {
+  font-weight: 800;
+}
+.insight {
+  background: var(--hero);
+  color: var(--hero-ink);
+}
+.quote {
+  max-width: 980px;
+  font-size: clamp(1.35rem, 3vw, 2.2rem);
+  line-height: 1.35;
+  border-left: 8px solid var(--conclusion);
+  padding-left: 24px;
+}
+.quote small {
+  display: block;
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 1rem;
+}
+.mosaic {
+  background: var(--surface5);
+}
+.tiles {
+  display: grid;
+  grid-template-columns: 1.2fr 0.9fr 0.9fr;
+  gap: 16px;
+  margin-top: 24px;
+}
+.tile {
+  min-height: 150px;
+  padding: 22px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.tile.big {
+  grid-row: span 2;
+  background: var(--hero);
+  color: var(--hero-ink);
+}
+.tile h3 {
+  margin: 0 0 10px;
+  color: var(--data);
+}
+.tile.big h3 { color: var(--opportunity); }
+.takeaways {
+  background: var(--bg);
+}
+.takeaways ul {
+  max-width: 920px;
+  padding: 0;
+  margin: 22px 0 0;
+  list-style: none;
+}
+.takeaways li {
+  margin: 12px 0;
+  padding: 16px 18px;
+  background: var(--surface);
+  border-left: 6px solid var(--conclusion);
+}
+@media (max-width: 820px) {
+  .band, .split, .steps, .tiles {
+    grid-template-columns: 1fr;
+  }
+  .tile.big {
+    grid-row: auto;
+  }
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -196,13 +349,6 @@ li{margin:8px 0}
     body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
       color: inherit;
     }
-    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
-      border-color: var(--airs-digest-line) !important;
-    }
-    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
-      background: var(--airs-digest-panel) !important;
-      color: var(--airs-digest-ink) !important;
-    }
     body :where(.muted, .meta, .kicker, small) {
       color: var(--airs-digest-muted) !important;
     }
@@ -263,66 +409,135 @@ li{margin:8px 0}
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/diff-tool" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
 <main>
-  <article>
-    <div class="hero">
-      <div class="kicker">一句话总括</div>
-      <h1>这项研究把软件开发里的 diff 思路搬到 AI 审计中，让审计者先看模型之间真正不同的行为，而不是从零猜测所有风险。</h1>
-      <p class="lead">它的贡献不在于提出一个新的分数榜，而在于给安全团队一个高召回筛查入口：先找出某个模型独有的内部特征，再验证这些特征是否会改变输出。</p>
+  <header class="hero">
+    <p class="kicker">一句话总括</p>
+    <h1>AI 的“diff”工具：寻找新模型中的行为差异</h1>
+    <p class="original">A “diff” tool for AI: Finding behavioral differences in new models</p>
+    <p class="thesis">这项工作的真正贡献，是把模型安全审计从“检查所有行为”推进到“自动定位模型之间新增或独有的行为”。</p>
+  </header>
+
+  <section class="band" aria-label="关键数字">
+    <div class="metric"><strong>4</strong><span>研究覆盖的开放权重模型数量。</span></div>
+    <div class="metric"><strong>3</strong><span>被验证的行为开关类型。</span></div>
+    <div class="metric"><strong>5/5</strong><span>中共对齐特征被重复发现的次数。</span></div>
+    <div class="metric"><strong>4/5</strong><span>美国例外论特征被重复发现的次数。</span></div>
+  </section>
+
+  <section class="section split">
+    <div>
+      <p class="eyebrow">为什么需要新工具</p>
+      <h2>传统评测擅长抓已知问题，却难以发现未知变化。</h2>
+      <p class="lede">人类编写的 benchmark 只能测试已经被定义的问题。新模型可能出现新的拒答、宣传、偏向或过度安全行为。</p>
     </div>
-
-    <div class="grid">
-      <div class="stat"><div class="num">4</div><div class="label">个开放模型被比较</div></div>
-      <div class="stat"><div class="num">5/5</div><div class="label">次重新发现 CCP alignment</div></div>
-      <div class="stat"><div class="num">4/5</div><div class="label">次发现 American Exceptionalism</div></div>
+    <div class="note">
+      <p><b>关键改变：</b>模型 diffing 借鉴软件 diff。它不要求审计员从头阅读“百万行代码”，而是把注意力集中到模型之间真正不同的行为特征上。</p>
+      <p>这会改变读者对 AI 风险的理解。风险不只来自模型总体能力，也来自更新后悄悄出现的行为差异。</p>
     </div>
+  </section>
 
-    <section>
-      <span class="tag">方法变化</span>
-      <h2>传统评测只能测已知问题，模型 diff 试图发现未知变化</h2>
-      <p>常规安全 benchmark 由人编写，因此更擅长捕捉已经被定义过的风险；如果新模型出现的是没有被预先命名的行为，测试集可能根本不会问到。</p>
-      <p>模型 diff 的核心判断是：审计更新后的系统时，不应重读“百万行代码”，而应优先检查真正发生变化的部分。这改变了读者对 AI 风险的理解：风险不只是“模型能不能通过测试”，还包括“模型相比另一个版本或同类模型多出了什么行为”。</p>
-    </section>
+  <section class="section flow">
+    <p class="eyebrow">方法</p>
+    <h2>Dedicated Feature Crosscoder 把“共有概念”和“独有概念”分开。</h2>
+    <div class="steps">
+      <div class="step">
+        <span class="num">1</span>
+        <h3>共享字典</h3>
+        <p>它映射两个模型都理解的概念。这样审计员不用反复检查正常共有能力。</p>
+      </div>
+      <div class="step">
+        <span class="num">2</span>
+        <h3>模型 A 独有区</h3>
+        <p>它记录只在一个模型中出现的特征。这里更可能藏着新增风险或策略差异。</p>
+      </div>
+      <div class="step">
+        <span class="num">3</span>
+        <h3>模型 B 独有区</h3>
+        <p>它避免把独有行为强行翻译成共有行为。新东西因此更容易被标出来。</p>
+      </div>
+    </div>
+  </section>
 
-    <section>
-      <span class="tag">技术贡献</span>
-      <h2>Dedicated Feature Crosscoder 用“共享区”和“专属区”避免把独有行为误判成相似行为</h2>
-      <p>文章把跨架构模型比较比作双语词典：普通 crosscoder 太想找对应词，可能把一个语言独有的概念硬翻译成另一个语言里的近似词，从而漏掉真正的新内容。</p>
-      <p>DFC 把特征分成共享字典、模型 A 专属区和模型 B 专属区。这个设计使它更适合发现“只有某个模型有”的行为特征，而这正是安全审计最需要优先看的部分。</p>
-    </section>
+  <section class="section compare">
+    <p class="eyebrow">发现</p>
+    <h2>几个特征像行为开关，可以被压低或放大。</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>比较对象</th>
+          <th>独有特征</th>
+          <th>行为变化</th>
+          <th>洞见</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Qwen3-8B 与 Llama-3.1-8B-Instruct</td>
+          <td>中共对齐</td>
+          <td>压低后更愿意谈论天安门事件。放大后更倾向生成亲政府表述。</td>
+          <td>政治审查可以表现为可定位、可操控的内部特征。</td>
+        </tr>
+        <tr>
+          <td>Llama-3.1-8B-Instruct 与 Qwen3-8B</td>
+          <td>美国例外论</td>
+          <td>放大后回答从平衡表述转向强调美国优越性。压低影响不明显。</td>
+          <td>价值偏向不只存在于特定国家模型，也可能出现在不同训练生态中。</td>
+        </tr>
+        <tr>
+          <td>GPT-OSS-20B 与 DeepSeek-R1-0528-Qwen3-8B</td>
+          <td>版权拒绝机制</td>
+          <td>压低后模型更愿意尝试回应版权材料请求。放大后会过度拒绝普通内容。</td>
+          <td>安全机制本身也可能成为需要审计的行为差异。</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
 
-    <section>
-      <span class="tag">行为证据</span>
-      <h2>政治立场、审查和版权拒答都能表现为可调节的模型特征</h2>
-      <p>在 Llama-3.1-8B-Instruct 与 Qwen3-8B 的比较中，DFC 找到 Qwen 的“CCP alignment”特征；抑制它会让模型更愿意谈论天安门事件，放大它则会增强亲政府表述。</p>
-      <p>同一组比较还发现 Llama 的“American Exceptionalism”特征；放大后，回答会从相对平衡转向更强的美国优越论。这里的重点不是证明某个开发者故意加入了这些行为，而是说明行为差异可以被定位到可干预的内部特征。</p>
-      <p>在 GPT-OSS-20B 与 DeepSeek-R1-0528-Qwen3-8B 的比较中，GPT 模型出现独有的“Copyright Refusal”特征。抑制它会削弱版权拒答，放大它会导致过度拒答，甚至把花生酱果酱三明治食谱误判为不能提供。</p>
-    </section>
+  <section class="section insight">
+    <div class="quote">
+      高召回的 diff 工具不负责直接判定风险来源，但它能告诉审计员该先看哪里。
+      <small>这点很重要。行为可能来自开发者的有意训练，也可能来自数据和训练过程的间接结果。</small>
+    </div>
+  </section>
 
-    <section>
-      <span class="tag">可靠性边界</span>
-      <h2>结果有重复性，但工具仍只是筛查器，不是自动裁判</h2>
-      <p>文章报告，“CCP alignment”在 5 次测试中 5 次被独立重新发现，“American Exceptionalism”在 5 次测试中 4 次被发现。这说明 DFC 不只是一次偶然观察，而有初步稳定性。</p>
-      <p>但一次 diff 可能抛出数千个候选特征，只有少数真正对应有意义的行为风险；工具也不能判断这些行为来自刻意训练、训练数据偏差，还是间接涌现。结论是：它适合缩小审计范围，而不是替代人工判断。</p>
-    </section>
+  <section class="section mosaic">
+    <p class="eyebrow">适用边界</p>
+    <h2>它是筛查工具，不是安全结论机器。</h2>
+    <div class="tiles">
+      <div class="tile big">
+        <h3>数千候选</h3>
+        <p>一次 diff 可能浮出数千个特征。只有少部分会对应真正重要的行为风险。</p>
+        <p>因此它的价值在于缩小搜索空间，而不是替代人工解释和验证。</p>
+      </div>
+      <div class="tile">
+        <h3>转向验证</h3>
+        <p>研究通过压低或放大特征来观察输出变化。这样可以测试特征和行为之间是否存在因果关系。</p>
+      </div>
+      <div class="tile">
+        <h3>开放模型</h3>
+        <p>实验聚焦开放权重模型。作者尚未把方法用于 frontier models。</p>
+      </div>
+      <div class="tile">
+        <h3>更新监控</h3>
+        <p>作者认为它可用于比较新旧版本。类似 GPT-4o 在 2025 年 4 月出现的 sycophancy 变化，可能被提前标出。</p>
+      </div>
+      <div class="tile">
+        <h3>政策意义</h3>
+        <p>审计重点从“模型是否通过既有测试”扩展到“模型新增了什么行为”。这更贴近真实部署风险。</p>
+      </div>
+    </div>
+  </section>
 
-    <section>
-      <span class="tag">实践意义</span>
-      <h2>最有价值的用法可能是监控模型更新，而不是事后解释单个模型</h2>
-      <p>文章提到 2025 年 4 月 GPT-4o 更新中出现的谄媚行为，认为如果能对更新前后模型做 diff，类似工具可能提前标出这种新出现的行为。</p>
-      <p class="callout">这使 AI 治理的重点从“发布后发现问题”前移到“发布前检查行为变化”，尤其适合模型频繁迭代、人工评测难以覆盖全部变化的场景。</p>
-    </section>
-
-    <section class="footer">
-      <h2>最值得带走的洞见</h2>
-      <ul>
-        <li>安全审计不能只依赖人类已经想好的测试题，因为新风险常常没有名字。</li>
-        <li>跨架构模型 diff 的价值在于发现“某个模型独有”的行为，而不只是比较性能高低。</li>
-        <li>DFC 找到的特征可以通过 steering 验证因果影响，因此比普通相关性观察更有审计价值。</li>
-        <li>政治审查、国家叙事和版权拒答这类行为，都可能对应模型内部可放大或抑制的特征。</li>
-        <li>这类工具最现实的定位是高召回预警系统：先指出哪里值得查，再由研究者判断风险和来源。</li>
-      </ul>
-    </section>
-  </article>
+  <section class="section takeaways">
+    <p class="eyebrow">最值得带走的洞见</p>
+    <h2>模型差异本身，是安全审计的高价值入口。</h2>
+    <ul>
+      <li>已知 benchmark 不能覆盖未知行为，模型更新需要差异化审计。</li>
+      <li>Dedicated Feature Crosscoder 的关键设计，是给模型独有特征留下专门空间。</li>
+      <li>政治对齐、国家叙事和版权拒绝都可能表现为可定位的内部行为特征。</li>
+      <li>高召回筛查会带来噪声，但能显著缩小人工安全审计的搜索范围。</li>
+      <li>未来最实用的场景，可能是持续监控模型版本更新中的新增行为。</li>
+    </ul>
+  </section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

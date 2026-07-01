@@ -3,137 +3,346 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>澳大利亚如何使用 Claude：Anthropic Economic Index 摘要</title>
+<title>澳大利亚如何使用 Claude：来自 Anthropic Economic Index 的发现</title>
 <style>
-:root{
-  --bg:#f6f7f9;
-  --card:#ffffff;
-  --ink:#1d2630;
-  --muted:#5b6673;
-  --line:#d9dee6;
-  --accent:#1f6feb;
-  --accent2:#0f8b6f;
-  --accent3:#9a5b00;
-  --hl:#eaf2ff;
-  --hl2:#edf8f4;
+:root {
+  --bg: #f7f5f0;
+  --ink: #20242a;
+  --muted: #626b76;
+  --line: #d9d5ca;
+  --paper: #fffdf7;
+  --card: #ffffff;
+  --soft: #ece8dc;
+  --soft2: #edf4f0;
+  --soft3: #f3e9ee;
+  --soft4: #e9eef7;
+  --deep: #17212f;
+  --deep-ink: #f4f7fb;
+  --accent-data: #2563eb;
+  --accent-risk: #c2410c;
+  --accent-opportunity: #047857;
+  --accent-conclusion: #7c3aed;
+  --accent-neutral: #0f766e;
+  --badge-bg: #eaf1ff;
+  --risk-bg: #fff0e8;
+  --opp-bg: #e9f8f1;
+  --conclusion-bg: #f1eaff;
+  --shadow: rgba(32, 36, 42, 0.08);
 }
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif;
-  line-height:1.72;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111418;
+    --ink: #eceff3;
+    --muted: #aab2bd;
+    --line: #333a44;
+    --paper: #181c22;
+    --card: #1f252d;
+    --soft: #25231d;
+    --soft2: #172520;
+    --soft3: #281c24;
+    --soft4: #192231;
+    --deep: #0b0f16;
+    --deep-ink: #f1f5f9;
+    --accent-data: #6ea8ff;
+    --accent-risk: #fb923c;
+    --accent-opportunity: #34d399;
+    --accent-conclusion: #b892ff;
+    --accent-neutral: #5eead4;
+    --badge-bg: #14233b;
+    --risk-bg: #321d13;
+    --opp-bg: #123226;
+    --conclusion-bg: #24183d;
+    --shadow: rgba(0, 0, 0, 0.32);
+  }
 }
-main{
-  max-width:980px;
-  margin:0 auto;
-  padding:42px 20px 56px;
+:root[data-theme="dark"] {
+  --bg: #111418;
+  --ink: #eceff3;
+  --muted: #aab2bd;
+  --line: #333a44;
+  --paper: #181c22;
+  --card: #1f252d;
+  --soft: #25231d;
+  --soft2: #172520;
+  --soft3: #281c24;
+  --soft4: #192231;
+  --deep: #0b0f16;
+  --deep-ink: #f1f5f9;
+  --accent-data: #6ea8ff;
+  --accent-risk: #fb923c;
+  --accent-opportunity: #34d399;
+  --accent-conclusion: #b892ff;
+  --accent-neutral: #5eead4;
+  --badge-bg: #14233b;
+  --risk-bg: #321d13;
+  --opp-bg: #123226;
+  --conclusion-bg: #24183d;
+  --shadow: rgba(0, 0, 0, 0.32);
 }
-.hero{
-  background:linear-gradient(135deg,var(--hl),var(--hl2));
-  border:1px solid var(--line);
-  border-radius:18px;
-  padding:30px;
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  line-height: 1.65;
 }
-.kicker{
-  color:var(--accent);
-  font-size:14px;
-  font-weight:700;
-  margin:0 0 8px;
+main { overflow: hidden; }
+.wrap { width: min(1120px, calc(100% - 36px)); margin: 0 auto; }
+.hero {
+  background: linear-gradient(135deg, var(--deep), var(--soft4));
+  color: var(--deep-ink);
+  padding: 64px 0 42px;
 }
-h1{
-  font-size:clamp(28px,4vw,46px);
-  line-height:1.15;
-  margin:0 0 16px;
-  letter-spacing:0;
+.kicker {
+  color: var(--accent-neutral);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
 }
-.lead{
-  font-size:20px;
-  margin:0;
-  color:var(--ink);
+h1 {
+  margin: 14px 0 10px;
+  font-size: clamp(34px, 6vw, 64px);
+  line-height: 1.08;
+  letter-spacing: 0;
 }
-.meta{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  margin-top:22px;
+.original {
+  margin: 0 0 28px;
+  color: var(--muted);
+  font-size: 17px;
 }
-.meta span{
-  border:1px solid var(--line);
-  background:var(--card);
-  border-radius:999px;
-  padding:6px 12px;
-  color:var(--muted);
-  font-size:14px;
+.thesis {
+  max-width: 850px;
+  margin: 0;
+  padding: 20px 24px;
+  border-left: 6px solid var(--accent-conclusion);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 21px;
+  font-weight: 700;
+  box-shadow: 0 18px 50px var(--shadow);
 }
-.grid{
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:14px;
-  margin:22px 0;
+.stats-band {
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
 }
-.stat{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:18px;
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  padding: 0;
 }
-.num{
-  display:block;
-  font-size:30px;
-  line-height:1.1;
-  font-weight:800;
-  color:var(--accent);
+.stat {
+  min-height: 150px;
+  padding: 26px 22px;
+  background: var(--card);
 }
-.label{
-  display:block;
-  margin-top:8px;
-  color:var(--muted);
-  font-size:14px;
+.stat b {
+  display: block;
+  color: var(--accent-data);
+  font-size: 36px;
+  line-height: 1.1;
 }
-section{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:24px;
-  margin-top:18px;
+.stat span {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 15px;
 }
-h2{
-  font-size:22px;
-  line-height:1.3;
-  margin:0 0 12px;
+.split {
+  padding: 54px 0;
+  background: var(--soft2);
 }
-p{margin:0 0 12px}
-p:last-child{margin-bottom:0}
-mark{
-  background:var(--hl);
-  color:var(--ink);
-  padding:1px 5px;
-  border-radius:6px;
+.two-col {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 36px;
+  align-items: start;
 }
-.insight{
-  border-left:4px solid var(--accent2);
-  padding-left:14px;
-  color:var(--ink);
-  font-weight:650;
+h2 {
+  margin: 0 0 14px;
+  font-size: 28px;
+  line-height: 1.2;
+  letter-spacing: 0;
 }
-.list{
-  display:grid;
-  gap:10px;
-  margin-top:12px;
+.lead { font-size: 18px; margin: 0 0 18px; }
+.note {
+  padding: 20px;
+  border-left: 5px solid var(--accent-opportunity);
+  background: var(--opp-bg);
 }
-.takeaway{
-  background:var(--hl2);
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:13px 15px;
+.note strong { color: var(--accent-opportunity); }
+.state-bars {
+  padding: 22px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: 0 14px 38px var(--shadow);
 }
-@media (max-width:760px){
-  main{padding:24px 14px 40px}
-  .hero{padding:22px}
-  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  section{padding:20px}
+.bar-row { margin: 16px 0; }
+.bar-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.track {
+  height: 12px;
+  margin-top: 7px;
+  border-radius: 999px;
+  background: var(--soft);
+  overflow: hidden;
+}
+.fill { height: 100%; background: var(--accent-data); border-radius: 999px; }
+.w372 { width: 37.2%; }
+.w308 { width: 30.8%; }
+.w177 { width: 17.7%; }
+.w140 { width: 14%; }
+.dark-block {
+  background: var(--deep);
+  color: var(--deep-ink);
+  padding: 58px 0;
+}
+.matrix {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 24px;
+}
+.matrix article {
+  padding: 24px;
+  border-top: 5px solid var(--accent-data);
+  background: var(--paper);
+  color: var(--ink);
+}
+.matrix article:nth-child(2) { border-top-color: var(--accent-risk); }
+.matrix article:nth-child(3) { border-top-color: var(--accent-conclusion); }
+.matrix h3 { margin: 0 0 10px; font-size: 21px; }
+.matrix p { margin: 0; color: var(--muted); }
+.compare {
+  padding: 56px 0;
+  background: var(--soft3);
+}
+.table {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  border: 1px solid var(--line);
+  background: var(--card);
+  box-shadow: 0 14px 38px var(--shadow);
+}
+.cell {
+  padding: 18px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.cell:nth-child(3n) { border-right: 0; }
+.head {
+  background: var(--deep);
+  color: var(--deep-ink);
+  font-weight: 800;
+}
+.good { color: var(--accent-opportunity); font-weight: 800; }
+.warn { color: var(--accent-risk); font-weight: 800; }
+.flow {
+  padding: 56px 0;
+  background: var(--paper);
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  margin-top: 26px;
+}
+.step {
+  position: relative;
+  padding: 24px 18px 20px;
+  border-top: 4px solid var(--accent-neutral);
+  background: var(--soft4);
+}
+.step:nth-child(2) { background: var(--soft2); border-top-color: var(--accent-data); }
+.step:nth-child(3) { background: var(--risk-bg); border-top-color: var(--accent-risk); }
+.step:nth-child(4) { background: var(--conclusion-bg); border-top-color: var(--accent-conclusion); }
+.step b {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 12px;
+  border-radius: 50%;
+  background: var(--deep);
+  color: var(--deep-ink);
+}
+.insight {
+  padding: 52px 0;
+  background: var(--soft);
+}
+.quote {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 30px;
+  border-left: 8px solid var(--accent-conclusion);
+  background: var(--card);
+  box-shadow: 0 14px 38px var(--shadow);
+  font-size: 22px;
+  font-weight: 800;
+}
+.quote small {
+  display: block;
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 500;
+}
+.takeaways {
+  padding: 58px 0 72px;
+  background: var(--bg);
+}
+.mosaic {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 1fr;
+  gap: 16px;
+  margin-top: 24px;
+}
+.tile {
+  min-height: 150px;
+  padding: 22px;
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+.tile:nth-child(1) {
+  grid-row: span 2;
+  background: var(--badge-bg);
+  border-color: var(--accent-data);
+}
+.tile:nth-child(2) {
+  background: var(--opp-bg);
+  border-color: var(--accent-opportunity);
+}
+.tile:nth-child(3) {
+  background: var(--risk-bg);
+  border-color: var(--accent-risk);
+}
+.tile:nth-child(4) {
+  background: var(--conclusion-bg);
+  border-color: var(--accent-conclusion);
+}
+.tile:nth-child(5) {
+  grid-column: span 2;
+  background: var(--soft4);
+  border-color: var(--accent-neutral);
+}
+.tile b {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 20px;
+}
+@media (max-width: 820px) {
+  .stats, .two-col, .matrix, .steps, .mosaic { grid-template-columns: 1fr; }
+  .table { grid-template-columns: 1fr; }
+  .cell, .cell:nth-child(3n) { border-right: 0; }
+  .tile:nth-child(1), .tile:nth-child(5) { grid-row: auto; grid-column: auto; }
+  .hero { padding-top: 44px; }
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -210,13 +419,6 @@ mark{
     body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
       color: inherit;
     }
-    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
-      border-color: var(--airs-digest-line) !important;
-    }
-    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
-      background: var(--airs-digest-panel) !important;
-      color: var(--airs-digest-ink) !important;
-    }
     body :where(.muted, .meta, .kicker, small) {
       color: var(--airs-digest-muted) !important;
     }
@@ -277,78 +479,131 @@ mark{
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/how-australia-uses-claude" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
 <main>
-  <article>
-    <header class="hero">
-      <p class="kicker">一句话总括</p>
-      <h1>澳大利亚不是简单地“多用 AI”，而是在高教育水平、短任务、低委托和广泛非编程场景中把 Claude 变成协作工具。</h1>
-      <p class="lead">这篇文章的贡献，是把澳大利亚的 Claude 使用从国家总量拆成地区、任务、用途和自主性，让“AI 采用率”变成可比较的经济行为画像。</p>
-      <div class="meta">
-        <span>Anthropic</span>
-        <span>Economic Research</span>
-        <span>2026-03-31</span>
-      </div>
-    </header>
-
-    <div class="grid" aria-label="关键数据">
-      <div class="stat"><span class="num">1.6%</span><span class="label">全球 Claude.ai 流量占比</span></div>
-      <div class="stat"><span class="num">4.1</span><span class="label">澳大利亚 AUI，人均采用超预期 4 倍</span></div>
-      <div class="stat"><span class="num">3.38/5</span><span class="label">AI 自主性得分，偏协作</span></div>
-      <div class="stat"><span class="num">47.3%</span><span class="label">前 100 个任务覆盖率，低于全球 52.3%</span></div>
+  <section class="hero">
+    <div class="wrap">
+      <div class="kicker">Economic Research · Anthropic · Mar 31, 2026</div>
+      <h1>澳大利亚如何使用 Claude：来自 Anthropic Economic Index 的发现</h1>
+      <p class="original">How Australia Uses Claude: Findings from the Anthropic Economic Index</p>
+      <p class="thesis">一句话总括：这篇文章的贡献，是用 Claude 使用数据说明澳大利亚的 AI 采用已经很强，但真正决定差异的是职业结构、任务类型和协作方式，而不只是国家或地区收入。</p>
     </div>
+  </section>
 
-    <section>
-      <h2>澳大利亚是高人均采用市场，但采用集中在少数州</h2>
-      <p>在 2026 年 2 月样本中，澳大利亚贡献了 <mark>1.6%</mark> 的全球 Claude.ai 流量，国家排名第 11；按劳动年龄人口调整后，AUI 为 <mark>4.1</mark>，人均采用排名第 7。</p>
-      <p>国内分布并不平均：新南威尔士占 <mark>37.2%</mark> 对话，维多利亚占 <mark>30.8%</mark>，昆士兰占 <mark>17.7%</mark>，其他州和领地合计约 <mark>14%</mark>。调整人口后，只有新南威尔士和维多利亚高于预期。</p>
-      <p class="insight">这说明 AI 扩散不是自动按人口铺开，而是先落在更接近专业服务、金融和科技工作流的地区。</p>
-    </section>
+  <section class="stats-band">
+    <div class="wrap stats">
+      <div class="stat"><b>1.6%</b><span>澳大利亚占全球 Claude.ai 流量。它在 2026 年 2 月样本中排名第 11。</span></div>
+      <div class="stat"><b>4.1</b><span>AUI 指数显示，使用量是工作年龄人口预测值的 4 倍多。</span></div>
+      <div class="stat"><b>3.38</b><span>AI 自主性得分较低。用户更常保留判断权。</span></div>
+      <div class="stat"><b>47.3%</b><span>前 100 个任务占使用量。这个比例越低，说明用途越分散。</span></div>
+    </div>
+  </section>
 
-    <section>
-      <h2>州际差异更像由职业结构解释，而不是收入解释</h2>
-      <p>文章指出，跨国家比较中收入和 Claude 人均使用常相关，但在澳大利亚 8 个州和领地之间，这种关系并不明显。西澳和北领地人均 GSP 较高，却有较低 AUI；西澳为 <mark>0.68</mark>，塔斯马尼亚为 <mark>0.32</mark>，北领地仅 <mark>0.12</mark>。</p>
-      <p>可能原因是矿业和稀疏人口地区的职业结构，不如金融、专业服务和科技岗位密集地区容易吸收 Claude。澳大利亚首都领地收入较高但采用低于预期，也可能与公共部门采用障碍有关。</p>
-      <p class="insight">这改变了一个常见直觉：AI 采用不是“越富越多用”的单线关系，工作内容是否适合 AI 更关键。</p>
-    </section>
-
-    <section>
-      <h2>澳大利亚用法接近英语圈高收入经济体：工作和个人使用多，课程作业少</h2>
-      <p>澳大利亚 Claude 对话中，<mark>46%</mark> 属于工作相关，<mark>7%</mark> 属于课程作业，<mark>47%</mark> 属于个人使用。这一组合接近美国、英国、加拿大等英语圈高采用经济体。</p>
-      <p>课程作业占比较低，符合 Anthropic 之前观察到的跨国趋势：更高收入、更高采用率国家通常课程用途占比更低，个人用途占比更高。</p>
-      <p class="insight">这意味着在成熟市场里，AI 的影响不只发生在学校或编程场景，而是进入日常工作、个人管理和非技术事务。</p>
-    </section>
-
-    <section>
-      <h2>澳大利亚用户给出更复杂的提示，但任务本身更短</h2>
-      <p>澳大利亚提示被估计需要 <mark>11.9 年</mark> 教育水平才能理解，高于全球中位水平并接近其他英语圈国家；但这些任务如果没有 AI，熟练专业人士预计只需 <mark>2.7 小时</mark> 完成，低于跨国平均 <mark>3.3 小时</mark>。</p>
-      <p>这组数据表明，澳大利亚用户并不是主要把 Claude 用来处理超长任务，而是把较复杂、需要清晰表达和判断的短任务交给 AI 协作。</p>
-      <p class="insight">AI 在这里更像提高知识工作周转速度的工具，而不是单纯替代长周期项目执行。</p>
-    </section>
-
-    <section>
-      <h2>低自主性得分显示用户更常协作，而不是完全委托</h2>
-      <p>澳大利亚 AI 自主性得分为 <mark>3.38/5</mark>，处在较低区间，和其他英语圈国家相近。较低自主性意味着用户保留更多决策控制，而不是让模型独立完成任务。</p>
-      <p>这种模式与高采用经济体的共同特征一致：越成熟的使用者，越倾向把 Claude 当作互动伙伴，而不是简单命令执行器。</p>
-      <p class="insight">高采用并不必然意味着高自动化；它也可能意味着更频繁、更细致的人机共同决策。</p>
-    </section>
-
-    <section>
-      <h2>澳大利亚的任务组合更广，主要因为编程占比更低</h2>
-      <p>澳大利亚前 100 个任务只覆盖 <mark>47.3%</mark> 使用量，低于美国 <mark>47.7%</mark>、英国 <mark>48.3%</mark>、加拿大 <mark>50.2%</mark> 和全球 <mark>52.3%</mark>。覆盖率越低，说明使用场景越分散。</p>
-      <p>差异主要来自编程相关任务占比低：计算机与数学任务比全球基线低 <mark>8.0 个百分点</mark>，通用编程辅助占澳大利亚使用的 <mark>13.5%</mark>，低于全球 <mark>16.8%</mark>。填补空缺的是管理、办公室行政、个人生活管理、健康支持、职场通信、商业文档和金融指导等更分散的用途。</p>
-      <p class="insight">这让澳大利亚成为一个重要样本：AI 的下一阶段扩散，可能来自非编程知识工作和生活管理，而不只是代码生成。</p>
-    </section>
-
-    <section>
-      <h2>最值得带走的洞见</h2>
-      <div class="list">
-        <div class="takeaway">澳大利亚是 Claude 的高人均采用国家，但国内采用高度集中在新南威尔士和维多利亚。</div>
-        <div class="takeaway">州际差异更像由职业结构驱动，而不是由人均收入直接决定。</div>
-        <div class="takeaway">澳大利亚用户更常把 Claude 用于工作和个人事务，课程作业占比只有 7%。</div>
-        <div class="takeaway">高采用并不等于高委托；3.38/5 的自主性得分显示用户仍保留较多判断权。</div>
-        <div class="takeaway">澳大利亚的独特之处在于任务更分散、编程占比更低，显示 AI 正进入更广泛的非技术工作流。</div>
+  <section class="split">
+    <div class="wrap two-col">
+      <div>
+        <h2>采用很高，但不是全国均匀扩散</h2>
+        <p class="lead">澳大利亚是 Claude 的高人均采用市场。更重要的是，使用集中在新南威尔士州和维多利亚州。</p>
+        <p>新南威尔士州占 37.2% 的对话。维多利亚州占 30.8%。昆士兰州占 17.7%。其他州和领地合计约 14%。</p>
+        <div class="note"><strong>结论和洞见：</strong>AI 采用不是自然按人口或收入铺开。它更依赖哪些地区拥有更多金融、专业服务和科技岗位。</div>
       </div>
-    </section>
-  </article>
+      <div class="state-bars">
+        <div class="bar-row">
+          <div class="bar-label"><span>新南威尔士州</span><span>37.2%</span></div>
+          <div class="track"><div class="fill w372"></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label"><span>维多利亚州</span><span>30.8%</span></div>
+          <div class="track"><div class="fill w308"></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label"><span>昆士兰州</span><span>17.7%</span></div>
+          <div class="track"><div class="fill w177"></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label"><span>其他州和领地</span><span>14%</span></div>
+          <div class="track"><div class="fill w140"></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="dark-block">
+    <div class="wrap">
+      <h2>使用画像更像高收入英语圈经济体</h2>
+      <p>澳大利亚的用途分布接近美国、英国和加拿大。工作和个人用途占主导，课程作业占比偏低。</p>
+      <div class="matrix">
+        <article>
+          <h3>工作用途是主轴</h3>
+          <p>46% 的对话被归为工作相关。这说明 Claude 已经进入日常生产流程，而不是只停留在试用阶段。</p>
+        </article>
+        <article>
+          <h3>课程作业占比低</h3>
+          <p>课程作业只占 7%。低采用国家的课程作业占比通常是它的两到三倍。</p>
+        </article>
+        <article>
+          <h3>个人用途很高</h3>
+          <p>个人用途达到 47%。这表明高采用市场会把 AI 从工作工具扩展成生活助手。</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="compare">
+    <div class="wrap">
+      <h2>澳大利亚任务更复杂，但未必更耗时</h2>
+      <p>文章把复杂性拆成两层。一个是任务如果没有 AI 需要多久。另一个是理解提示词需要多少教育年限。</p>
+      <div class="table">
+        <div class="cell head">指标</div>
+        <div class="cell head">澳大利亚</div>
+        <div class="cell head">含义</div>
+        <div class="cell">无 AI 任务耗时</div>
+        <div class="cell"><span class="good">2.7 小时</span></div>
+        <div class="cell">低于跨国平均 3.3 小时。澳大利亚用户处理的任务较短。</div>
+        <div class="cell">理解提示词所需教育年限</div>
+        <div class="cell"><span class="good">11.9 年</span></div>
+        <div class="cell">高于全球中位水平。提示词本身更成熟。</div>
+        <div class="cell">AI 自主性</div>
+        <div class="cell"><span class="warn">3.38 / 5</span></div>
+        <div class="cell">用户更倾向和 Claude 协作，而不是把决策完全交给模型。</div>
+      </div>
+      <p>结论和洞见：高采用并不意味着用户把更大任务交给 AI。它也可能意味着用户把 AI 嵌入更频繁、更短、更专业的判断过程。</p>
+    </div>
+  </section>
+
+  <section class="flow">
+    <div class="wrap">
+      <h2>任务组合更分散，核心差异是编码占比更低</h2>
+      <p>澳大利亚前 100 个任务只覆盖 47.3% 的使用量。全球对应数字是 52.3%。这说明澳大利亚的 Claude 用途更广。</p>
+      <div class="steps">
+        <div class="step"><b>1</b><strong>编码少一些</strong><p>计算机与数学任务比全球基线低 8.0 个百分点。一般编码辅助占 13.5%，全球为 16.8%。</p></div>
+        <div class="step"><b>2</b><strong>办公多一些</strong><p>办公和行政支持高出 1.3 个百分点。工作通信和商业文档也更突出。</p></div>
+        <div class="step"><b>3</b><strong>管理更多</strong><p>管理类任务高出 2.3 个百分点。这个增幅大于英语圈同行平均水平。</p></div>
+        <div class="step"><b>4</b><strong>生活场景扩张</strong><p>个人生活管理高出 1.9 个百分点。健康与福祉支持高出 1.8 个百分点。</p></div>
+      </div>
+      <p>结论和洞见：AI 的主流化会降低编码在总使用中的相对占比。真正的扩散发生在普通办公、管理和个人生活任务里。</p>
+    </div>
+  </section>
+
+  <section class="insight">
+    <div class="wrap">
+      <div class="quote">
+        澳大利亚的特别之处，不是它比别人更爱编码，而是它把 Claude 用到了更多非技术场景。
+        <small>这改变了一个常见理解：AI 影响经济的路径不只经过软件开发，也经过办公室、管理层和个人决策。</small>
+      </div>
+    </div>
+  </section>
+
+  <section class="takeaways">
+    <div class="wrap">
+      <h2>最值得带走的洞见</h2>
+      <div class="mosaic">
+        <div class="tile"><b>高采用不等于高委托</b>澳大利亚用户使用很多，但 AI 自主性只有 3.38。协作式使用可能是成熟市场的典型形态。</div>
+        <div class="tile"><b>职业结构比收入更能解释州际差异</b>西澳和北领地收入高，但 AUI 低。采矿等行业的 Claude 适配度较低。</div>
+        <div class="tile"><b>课程作业不是主场景</b>课程作业只占 7%。高收入高采用经济体更常把 AI 用在工作和个人事务上。</div>
+        <div class="tile"><b>更复杂的提示词配更短任务</b>11.9 年教育年限和 2.7 小时任务耗时同时出现。AI 正在进入高频专业小任务。</div>
+        <div class="tile"><b>编码之外才是扩散的关键</b>澳大利亚计算机与数学任务低于全球基线 8.0 个百分点。办公、管理、销售和生活任务共同填补了差额。</div>
+      </div>
+    </div>
+  </section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

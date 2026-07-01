@@ -3,102 +3,285 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Claude 与属性测试如何在 Python 生态中发现真实 bug</title>
+<title>用 Claude 和基于性质的测试在 Python 生态系统中发现缺陷</title>
 <style>
-:root{
-  --bg:#f6f8fb;
-  --card:#ffffff;
-  --ink:#18202a;
-  --muted:#607086;
-  --line:#dce3ec;
-  --accent:#1769aa;
-  --accent2:#0f8b6f;
-  --accent3:#9b5de5;
-  --hl:#e8f3ff;
-  --hl2:#edf9f4;
+:root {
+  --bg: #f7f8fb;
+  --ink: #172033;
+  --muted: #667085;
+  --line: #d9deea;
+  --card: #ffffff;
+  --hero-bg: #101828;
+  --hero-ink: #f9fafb;
+  --panel-blue: #e9f2ff;
+  --panel-green: #eaf8ef;
+  --panel-amber: #fff4dc;
+  --panel-red: #fff0f0;
+  --panel-violet: #f1ebff;
+  --band-bg: #eaf8ef;
+  --table-head: #eef3fb;
+  --quote-bg: #fff7e8;
+  --mosaic-bg: #edf7f2;
+  --accent-data: #2563eb;
+  --accent-risk: #dc2626;
+  --accent-opportunity: #16a34a;
+  --accent-conclusion: #7c3aed;
+  --accent-warning: #d97706;
+  --shadow: 0 18px 50px rgba(23, 32, 51, 0.10);
 }
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
-  line-height:1.72;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b1020;
+    --ink: #e6eaf2;
+    --muted: #a6adbd;
+    --line: #2a3448;
+    --card: #141b2d;
+    --hero-bg: #070b16;
+    --hero-ink: #f3f6fb;
+    --panel-blue: #10233f;
+    --panel-green: #10291d;
+    --panel-amber: #33240b;
+    --panel-red: #331315;
+    --panel-violet: #21163c;
+    --band-bg: #10291d;
+    --table-head: #192238;
+    --quote-bg: #2b210f;
+    --mosaic-bg: #10241d;
+    --accent-data: #60a5fa;
+    --accent-risk: #f87171;
+    --accent-opportunity: #4ade80;
+    --accent-conclusion: #a78bfa;
+    --accent-warning: #fbbf24;
+    --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  }
 }
-main{
-  max-width:960px;
-  margin:0 auto;
-  padding:40px 20px 56px;
+:root[data-theme="dark"] {
+  --bg: #0b1020;
+  --ink: #e6eaf2;
+  --muted: #a6adbd;
+  --line: #2a3448;
+  --card: #141b2d;
+  --hero-bg: #070b16;
+  --hero-ink: #f3f6fb;
+  --panel-blue: #10233f;
+  --panel-green: #10291d;
+  --panel-amber: #33240b;
+  --panel-red: #331315;
+  --panel-violet: #21163c;
+  --band-bg: #10291d;
+  --table-head: #192238;
+  --quote-bg: #2b210f;
+  --mosaic-bg: #10241d;
+  --accent-data: #60a5fa;
+  --accent-risk: #f87171;
+  --accent-opportunity: #4ade80;
+  --accent-conclusion: #a78bfa;
+  --accent-warning: #fbbf24;
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
 }
-header{
-  padding:28px;
-  background:linear-gradient(135deg,var(--hl),var(--hl2));
-  border:1px solid var(--line);
-  border-radius:16px;
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  line-height: 1.65;
 }
-h1{
-  margin:0 0 14px;
-  font-size:30px;
-  line-height:1.25;
+main { overflow: hidden; }
+.hero {
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+  padding: 64px 7vw 48px;
 }
-.lead{
-  margin:0;
-  font-size:18px;
-  color:var(--ink);
+.hero-inner { max-width: 1120px; margin: 0 auto; }
+.kicker {
+  color: var(--accent-opportunity);
+  font-weight: 700;
+  letter-spacing: .08em;
+  font-size: 13px;
+  text-transform: uppercase;
 }
-.meta{
-  margin-top:16px;
-  color:var(--muted);
-  font-size:14px;
+h1 {
+  margin: 14px 0 10px;
+  font-size: clamp(32px, 6vw, 62px);
+  line-height: 1.08;
+  letter-spacing: 0;
 }
-section{
-  margin-top:18px;
-  padding:24px;
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:14px;
+.original {
+  color: var(--muted);
+  max-width: 820px;
+  font-size: 17px;
 }
-h2{
-  margin:0 0 12px;
-  font-size:21px;
-  line-height:1.35;
-  color:var(--accent);
+.thesis {
+  margin-top: 28px;
+  padding: 18px 22px;
+  border-left: 6px solid var(--accent-conclusion);
+  background: rgba(255,255,255,.07);
+  max-width: 900px;
+  font-size: 20px;
 }
-p{margin:0 0 12px}
-p:last-child{margin-bottom:0}
-.data{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:12px;
-  margin:16px 0;
+.section {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 54px 7vw;
 }
-.stat{
-  padding:14px;
-  border-radius:12px;
-  background:var(--hl);
-  border:1px solid var(--line);
+.stats-band {
+  background: var(--band-bg);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
 }
-.stat b{
-  display:block;
-  font-size:24px;
-  color:var(--accent2);
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 30px 7vw;
 }
-.stat span{
-  display:block;
-  color:var(--muted);
-  font-size:14px;
+.stat {
+  border-left: 5px solid var(--accent-data);
+  padding: 12px 14px;
+  background: var(--card);
+  box-shadow: var(--shadow);
 }
-.callout{
-  padding:14px 16px;
-  border-left:4px solid var(--accent3);
-  background:var(--hl2);
-  border-radius:10px;
+.stat strong {
+  display: block;
+  color: var(--accent-data);
+  font-size: 32px;
+  line-height: 1.1;
 }
-ul{
-  margin:10px 0 0;
-  padding-left:22px;
+.stat span { color: var(--muted); font-size: 14px; }
+.split {
+  display: grid;
+  grid-template-columns: 1.05fr .95fr;
+  gap: 28px;
+  align-items: stretch;
 }
-li{margin:8px 0}
+.explain {
+  background: var(--card);
+  border: 1px solid var(--line);
+  padding: 28px;
+}
+.explain h2, .timeline h2, .table-wrap h2, .takeaways h2 {
+  margin: 0 0 14px;
+  font-size: 26px;
+}
+.side-note {
+  background: var(--panel-blue);
+  border-left: 6px solid var(--accent-data);
+  padding: 26px;
+}
+.side-note b { color: var(--accent-data); }
+.process-zone {
+  background: var(--panel-violet);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.timeline {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 54px 7vw;
+}
+.step {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 16px;
+  margin: 18px 0;
+}
+.badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--accent-conclusion);
+  color: var(--hero-ink);
+  font-weight: 800;
+}
+.step p {
+  margin: 0;
+  padding: 12px 0 18px 18px;
+  border-left: 2px solid var(--line);
+}
+.quote {
+  background: var(--quote-bg);
+  border-top: 2px solid var(--accent-warning);
+  border-bottom: 2px solid var(--accent-warning);
+  padding: 34px 7vw;
+}
+.quote-inner {
+  max-width: 980px;
+  margin: 0 auto;
+  font-size: 24px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+.table-section { background: var(--bg); }
+.table-wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 54px 7vw;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+th, td {
+  text-align: left;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+th { background: var(--table-head); color: var(--ink); }
+td.result-ok { color: var(--accent-opportunity); font-weight: 700; }
+td.result-risk { color: var(--accent-risk); font-weight: 700; }
+.insight-strip {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+.insight {
+  padding: 42px 7vw;
+}
+.insight.data { background: var(--panel-green); }
+.insight.risk { background: var(--panel-red); }
+.insight h2 { margin-top: 0; }
+.insight.data h2 { color: var(--accent-opportunity); }
+.insight.risk h2 { color: var(--accent-risk); }
+.takeaways {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 58px 7vw 70px;
+}
+.mosaic {
+  display: grid;
+  grid-template-columns: 1.2fr .8fr 1fr;
+  gap: 16px;
+}
+.tile {
+  background: var(--mosaic-bg);
+  border: 1px solid var(--line);
+  padding: 22px;
+  min-height: 150px;
+}
+.tile:nth-child(2) { background: var(--panel-amber); border-color: var(--accent-warning); }
+.tile:nth-child(3) { background: var(--panel-blue); border-color: var(--accent-data); }
+.tile:nth-child(4) { background: var(--panel-violet); border-color: var(--accent-conclusion); grid-column: span 2; }
+.tile strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--accent-conclusion);
+  font-size: 18px;
+}
+@media (max-width: 820px) {
+  .stats, .split, .insight-strip, .mosaic { grid-template-columns: 1fr; }
+  .tile:nth-child(4) { grid-column: auto; }
+  .hero { padding-top: 44px; }
+  .quote-inner { font-size: 20px; }
+}
 </style>
   <script id="airs-digest-theme-boot">
     try {
@@ -174,13 +357,6 @@ li{margin:8px 0}
     body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
       color: inherit;
     }
-    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
-      border-color: var(--airs-digest-line) !important;
-    }
-    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
-      background: var(--airs-digest-panel) !important;
-      color: var(--airs-digest-ink) !important;
-    }
     body :where(.muted, .meta, .kicker, small) {
       color: var(--airs-digest-muted) !important;
     }
@@ -241,62 +417,123 @@ li{margin:8px 0}
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/property-based-testing" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
 <main>
-  <header>
-    <h1>Claude 与属性测试把自动查错推向真实开源项目</h1>
-    <p class="lead">一句话总括：这项工作真正的贡献，是让 LLM 不只是写测试样例，而是从代码语义中推断不变量，再用属性测试系统性寻找反例，并用人工与维护者反馈验证哪些发现是真的。</p>
-    <p class="meta">Anthropic，2026 年 1 月 14 日；研究来自 2025 NeurIPS Deep Learning for Code Workshop 相关项目。</p>
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="kicker">Anthropic · Frontier Red Team · Jan 14, 2026</div>
+      <h1>用 Claude 和基于性质的测试在 Python 生态系统中发现缺陷</h1>
+      <div class="original">Finding bugs across the Python ecosystem with Claude and property-based testing</div>
+      <div class="thesis">一句话总括：这项工作把 LLM 的代码理解能力和基于性质的测试结合起来，让模型不只生成测试用例，而是主动提出“代码应始终满足的性质”，并在真实 Python 生态中找到可验证、可修复的缺陷。</div>
+    </div>
   </header>
 
-  <section>
-    <h2>核心方法不是“多写测试”，而是让模型找出应当永远成立的性质</h2>
-    <p>传统单元测试依赖开发者提前想到具体输入，而属性测试要求写出更一般的规则，例如“序列化再反序列化应还原对象”或“Wald 分布采样应为正数”。Claude 代理会阅读代码、文档、类型标注和调用关系，提出这些规则，再用 Hypothesis 自动生成大量输入寻找反例。</p>
-    <p class="callout">这改变了 AI 测试的角色：模型不只是补充边角测试，而是在帮助开发者把隐含语义转成可执行的检查。</p>
-  </section>
-
-  <section>
-    <h2>大规模运行显示，LLM 生成的 bug 报告已有相当比例可用</h2>
-    <p>研究团队在超过 100 个流行 Python 包上运行代理，覆盖数值计算、解析、数据库等场景。第一阶段产生 984 份 bug 报告，并从中人工抽样审查 50 份。</p>
-    <div class="data">
-      <div class="stat"><b>984</b><span>第一阶段生成的 bug 报告</span></div>
-      <div class="stat"><b>56%</b><span>抽样报告被判定为有效 bug</span></div>
-      <div class="stat"><b>32%</b><span>既有效又值得向维护者报告</span></div>
+  <section class="stats-band">
+    <div class="stats">
+      <div class="stat"><strong>100+</strong><span>热门 Python 包被纳入搜索范围</span></div>
+      <div class="stat"><strong>984</strong><span>第一阶段生成的 bug 报告数量</span></div>
+      <div class="stat"><strong>56%</strong><span>人工抽查报告被判定为有效 bug</span></div>
+      <div class="stat"><strong>81%</strong><span>最高分报告中有效且值得报告的比例</span></div>
     </div>
-    <p>这些数字说明，自动化发现还不能直接无审查地灌给维护者，但它已经能提供高密度候选问题，值得进入人工筛选流程。</p>
   </section>
 
-  <section>
-    <h2>排序和自我反思显著提升了报告质量</h2>
-    <p>为了减少误报，代理会在测试失败后反思：失败是真 bug，还是测试假设写错了；测试通过后也会检查测试是否过于平凡。团队还用 Opus 4.1 按 15 分规则给报告排序，优先审查高分报告。</p>
-    <div class="data">
-      <div class="stat"><b>86%</b><span>最高分报告中的有效比例</span></div>
-      <div class="stat"><b>81%</b><span>最高分报告中既有效又可报告的比例</span></div>
-      <div class="stat"><b>3 人</b><span>专家人工审查高严重性问题</span></div>
+  <section class="section split">
+    <div class="explain">
+      <h2>核心贡献是让模型寻找“性质”，不是只补测试</h2>
+      <p>普通单元测试验证几个具体例子。它容易漏掉开发者没有想到的边界条件。</p>
+      <p>基于性质的测试换了一个层次。开发者或代理先描述代码应该一直满足的规律，再让测试框架自动生成输入去寻找反例。</p>
+      <p>Claude 的价值在于读上下文。它会看类型标注、文档字符串、函数名、注释和调用方式，然后写出 Hypothesis 测试。</p>
     </div>
-    <p>关键趋势是，LLM 不仅能生成测试，还能参与筛选和解释；真正有价值的系统会把生成、运行、反思、排序和人工确认连成闭环。</p>
+    <aside class="side-note">
+      <p><b>这改变了对 AI 编程影响的理解。</b></p>
+      <p>模型不只是代码生成器。它可以参与软件质量保障中的语义判断：这个函数到底承诺了什么，什么输入会打破承诺。</p>
+    </aside>
   </section>
 
-  <section>
-    <h2>维护者验证把演示结果变成真实工程成果</h2>
-    <p>团队手动上报了多个具体问题：NumPy 的 <code>numpy.random.wald</code> 有时返回负数，aws-lambda-powertools 的字典切片会重复返回第一块，tokenizers 的颜色字符串缺少右括号导致无效 HSL CSS。部分补丁已经合并。</p>
-    <p>NumPy 案例尤其说明问题的深度：代理发现的是“分布采样不应为负”的性质，团队随后追踪到数值不稳定，并提交更稳定的公式；维护者显示新算法相对误差降低近 10 个数量级。</p>
-    <p>这说明 AI 查错最有价值的地方不只是报错，而是把维护者引向可复现、可解释、可修复的边界条件。</p>
+  <section class="process-zone">
+    <div class="timeline">
+      <h2>代理的工作流程是一个反复校验的闭环</h2>
+      <div class="step"><div class="badge">1</div><p>先阅读目标代码和相关文档，理解函数、模块或文件在项目中的位置。</p></div>
+      <div class="step"><div class="badge">2</div><p>提出应当成立的性质。性质必须来自代码和文档，而不是凭空猜测。</p></div>
+      <div class="step"><div class="badge">3</div><p>用 Hypothesis 写基于性质的测试，并运行测试寻找反例。</p></div>
+      <div class="step"><div class="badge">4</div><p>测试失败后，代理会反思是发现了真实 bug，还是测试写错了。这个环节用于降低误报。</p></div>
+      <div class="step"><div class="badge">5</div><p>当代理认为问题可信时，它输出结构化 bug 报告，供人工和维护者继续验证。</p></div>
+    </div>
   </section>
 
-  <section>
-    <h2>复杂语义仍是边界，维护者仍是最终裁判</h2>
-    <p>python-dateutil 的 <code>easter()</code> 案例被维护者判定为无效问题，因为 Julian calendar 下的语义比“复活节应为星期日”更微妙。代理能从常识或文档中推断性质，但当代码背后有历史、标准或隐含约定时，它可能选错要验证的规则。</p>
-    <p class="callout">因此，这类工具短期内更适合作为高质量 bug 候选生成器，而不是完全自动的维护者替代品。</p>
+  <section class="quote">
+    <div class="quote-inner">关键洞见：如果 AI 能更准确地描述代码的正确性边界，那么发现 bug 和生成补丁都会变得更接近工程流程，而不是一次性猜答案。</div>
   </section>
 
-  <section>
+  <section class="table-section">
+    <div class="table-wrap">
+      <h2>真实项目验证显示：有效性来自筛选和人工复核</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>阶段</th>
+            <th>做法</th>
+            <th>结果</th>
+            <th>对 AI 影响的含义</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>第一阶段</td>
+            <td>Claude Opus 4.1 在每个包上运行，收集全部报告。</td>
+            <td>984 份报告中人工抽查 50 份，56% 有效，32% 有效且值得报告。</td>
+            <td>模型可以大规模发现候选问题，但原始输出仍需要过滤。</td>
+          </tr>
+          <tr>
+            <td>排序阶段</td>
+            <td>用 15 分规则对报告打分，优先查看高分项。</td>
+            <td class="result-ok">最高分报告中 86% 有效，81% 有效且值得报告。</td>
+            <td>“生成加筛选”比单纯生成更接近可用开发工具。</td>
+          </tr>
+          <tr>
+            <td>第二阶段</td>
+            <td>Sonnet 4.5 在 10 个重要包上重复运行，并加入评估代理和专家审查。</td>
+            <td>重点转向高严重性 bug 的正确性和影响评估。</td>
+            <td>AI 测试工具要进入真实维护流程，必须解释严重性而不只是报错。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="insight-strip">
+    <div class="insight data">
+      <h2>已确认案例说明它能抓住真实边界错误</h2>
+      <p>NumPy 的 numpy.random.wald 有时返回负数，而 Wald 分布样本应为正数。团队追踪到数值不稳定，并提交了更稳定的实现。</p>
+      <p>NumPy 维护者显示，新算法相对误差降低了接近 10 个数量级。这说明代理发现的不是格式瑕疵，而是会影响数值正确性的深层问题。</p>
+    </div>
+    <div class="insight risk">
+      <h2>失败案例说明语义仍是难点</h2>
+      <p>python-dateutil 的 easter() 在 Julian calendar 下返回非星期日日期。维护者认为这是预期行为，因为历法语义更细微。</p>
+      <p>这暴露了边界：当正确性依赖隐含领域知识时，模型推断的性质可能看似合理，却不是维护者认可的契约。</p>
+    </div>
+  </section>
+
+  <section class="section split">
+    <div class="explain">
+      <h2>为什么这比传统自动测试更有潜力</h2>
+      <p>传统测试自动化经常停留在生成更多例子。例子多了，仍可能没有覆盖真正的异常输入。</p>
+      <p>这项工作把重点放在性质上。性质一旦写对，就能让测试框架系统性地搜索反例。</p>
+      <p>LLM 正适合做前半段工作：从上下文中推断不变量。Hypothesis 负责后半段工作：高强度生成输入并缩小失败样本。</p>
+    </div>
+    <div class="side-note">
+      <p><b>实践意义：</b></p>
+      <p>未来的软件质量工具可能不是单独的 linter、fuzzer 或聊天助手，而是能读代码、提假设、运行实验、过滤误报并生成报告的代理。</p>
+    </div>
+  </section>
+
+  <section class="takeaways">
     <h2>最值得带走的洞见</h2>
-    <ul>
-      <li>LLM 与属性测试互补：LLM 擅长从上下文提出语义性质，Hypothesis 擅长系统性寻找反例。</li>
-      <li>可用性来自筛选闭环：自我反思、排序、人类审查和维护者反馈，比单次生成更重要。</li>
-      <li>真实开源项目已经出现收益：多个主流包的问题被确认或修复，说明这不是玩具 benchmark。</li>
-      <li>误报不会消失：复杂日历、标准兼容和领域语义仍需要维护者判断。</li>
-      <li>未来方向是从“发现 bug”走向“提出可信补丁”，但前提是先把正确性性质描述清楚。</li>
-    </ul>
+    <div class="mosaic">
+      <div class="tile"><strong>AI 的测试价值来自语义抽象</strong>真正有价值的部分不是写测试语法，而是提出可验证的不变量。</div>
+      <div class="tile"><strong>误报控制决定工具能否被维护者接受</strong>Anthropic 采用多轮人工复核，是为了避免把不确定报告转嫁给开源维护者。</div>
+      <div class="tile"><strong>筛选比海量生成更关键</strong>原始报告有效率有限，但高分报告的有效率提升到 86%。</div>
+      <div class="tile"><strong>领域语义仍需要人类裁决</strong>dateutil 案例说明，模型能提出合理性质，但不能替代维护者定义真实契约。</div>
+      <div class="tile"><strong>下一步可能是补丁生成</strong>如果性质能接近完整描述正确性，自动修复会更容易被验证，也更可能进入真实开发流程。</div>
+    </div>
   </section>
 </main>
   <script id="airs-digest-theme-script">

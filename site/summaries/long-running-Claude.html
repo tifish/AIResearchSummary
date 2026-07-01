@@ -1,114 +1,261 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Long-running Claude for scientific computing 中文总结</title>
-  <style>
-    :root {
-      --bg: #f6f7f8;
-      --card: #ffffff;
-      --ink: #18202a;
-      --muted: #5f6b7a;
-      --line: #dfe4ea;
-      --accent: #2563eb;
-      --accent2: #0f766e;
-      --accent3: #b45309;
-      --hl: #eef4ff;
-      --hl2: #f0fdfa;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-      line-height: 1.72;
-    }
-    main {
-      max-width: 920px;
-      margin: 0 auto;
-      padding: 42px 20px 56px;
-    }
-    header {
-      padding: 28px;
-      background: linear-gradient(135deg, var(--hl), var(--hl2));
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      margin-bottom: 18px;
-    }
-    h1 {
-      margin: 0 0 14px;
-      font-size: 28px;
-      line-height: 1.25;
-      letter-spacing: 0;
-    }
-    .meta {
-      color: var(--muted);
-      font-size: 14px;
-      margin-bottom: 18px;
-    }
-    .one {
-      margin: 0;
-      font-size: 18px;
-      font-weight: 650;
-    }
-    section {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 24px;
-      margin-top: 16px;
-    }
-    h2 {
-      margin: 0 0 12px;
-      font-size: 21px;
-      line-height: 1.35;
-      color: var(--ink);
-      letter-spacing: 0;
-    }
-    p { margin: 0 0 12px; }
-    p:last-child { margin-bottom: 0; }
-    .data {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 12px;
-    }
-    .stat {
-      background: var(--hl);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 14px;
-    }
-    .num {
-      display: block;
-      color: var(--accent);
-      font-size: 22px;
-      font-weight: 750;
-      line-height: 1.2;
-    }
-    .label {
-      color: var(--muted);
-      font-size: 14px;
-    }
-    .takeaways {
-      border-left: 4px solid var(--accent2);
-    }
-    ul {
-      margin: 10px 0 0;
-      padding-left: 22px;
-    }
-    li { margin: 8px 0; }
-    strong { color: var(--accent3); }
-    @media (max-width: 720px) {
-      main { padding: 24px 14px 40px; }
-      header, section { padding: 20px; }
-      h1 { font-size: 24px; }
-      .one { font-size: 16px; }
-      .data { grid-template-columns: 1fr; }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>用于科学计算的长时运行 Claude</title>
+<style>
+:root {
+  --bg: #f7f3ec;
+  --ink: #1d2430;
+  --muted: #667085;
+  --line: #d8d0c2;
+  --card: #fffaf1;
+  --panel: #ffffff;
+  --deep: #17202d;
+  --deep-ink: #f5f7fb;
+  --data: #2563eb;
+  --data-bg: #eaf1ff;
+  --risk: #c2410c;
+  --risk-bg: #fff0e8;
+  --opportunity: #0f766e;
+  --opportunity-bg: #e7f7f3;
+  --conclusion: #7c3aed;
+  --conclusion-bg: #f1e9ff;
+  --memory: #b45309;
+  --memory-bg: #fff6dc;
+  --shadow: rgba(24, 32, 45, .12);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #101418;
+    --ink: #eef2f7;
+    --muted: #a8b3c2;
+    --line: #34404d;
+    --card: #181f27;
+    --panel: #141a21;
+    --deep: #06090d;
+    --deep-ink: #f4f7fb;
+    --data: #7aa7ff;
+    --data-bg: #14233d;
+    --risk: #ff9b72;
+    --risk-bg: #321a12;
+    --opportunity: #5ee0cf;
+    --opportunity-bg: #102c29;
+    --conclusion: #c4a7ff;
+    --conclusion-bg: #241a3a;
+    --memory: #f4c46b;
+    --memory-bg: #30240f;
+    --shadow: rgba(0, 0, 0, .35);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101418;
+  --ink: #eef2f7;
+  --muted: #a8b3c2;
+  --line: #34404d;
+  --card: #181f27;
+  --panel: #141a21;
+  --deep: #06090d;
+  --deep-ink: #f4f7fb;
+  --data: #7aa7ff;
+  --data-bg: #14233d;
+  --risk: #ff9b72;
+  --risk-bg: #321a12;
+  --opportunity: #5ee0cf;
+  --opportunity-bg: #102c29;
+  --conclusion: #c4a7ff;
+  --conclusion-bg: #241a3a;
+  --memory: #f4c46b;
+  --memory-bg: #30240f;
+  --shadow: rgba(0, 0, 0, .35);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  line-height: 1.65;
+}
+main { overflow: hidden; }
+.hero {
+  background: var(--deep);
+  color: var(--deep-ink);
+  padding: 56px 7vw 46px;
+}
+.eyebrow {
+  color: var(--opportunity);
+  font-weight: 700;
+  margin: 0 0 14px;
+}
+h1 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 4.2rem);
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+.original {
+  margin: 14px 0 28px;
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+.lede {
+  max-width: 880px;
+  font-size: clamp(1.2rem, 2.2vw, 1.65rem);
+  margin: 0;
+}
+.num-band {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(150px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.num {
+  background: var(--data-bg);
+  padding: 26px 7vw 24px;
+}
+.num strong {
+  display: block;
+  color: var(--data);
+  font-size: 2rem;
+  line-height: 1;
+}
+.num span {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+}
+.split {
+  display: grid;
+  grid-template-columns: 1.05fr .95fr;
+  gap: 34px;
+  padding: 52px 7vw;
+  background: var(--panel);
+}
+.text-block h2, .flow h2, .table-wrap h2, .takeaways h2 {
+  margin: 0 0 14px;
+  font-size: 1.65rem;
+}
+.text-block p, .flow p, .takeaways p {
+  margin: 0 0 14px;
+}
+.callout {
+  border-left: 6px solid var(--opportunity);
+  background: var(--opportunity-bg);
+  padding: 20px;
+  align-self: start;
+  box-shadow: 0 12px 28px var(--shadow);
+}
+.callout b {
+  color: var(--opportunity);
+}
+.flow {
+  background: var(--card);
+  padding: 50px 7vw;
+}
+.steps {
+  display: grid;
+  gap: 18px;
+  margin-top: 24px;
+}
+.step {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+.badge {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--memory-bg);
+  color: var(--memory);
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  border: 1px solid var(--memory);
+}
+.step div:last-child {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 16px;
+}
+.insight {
+  background: var(--conclusion-bg);
+  border-top: 1px solid var(--conclusion);
+  border-bottom: 1px solid var(--conclusion);
+  padding: 34px 7vw;
+  color: var(--ink);
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+.table-wrap {
+  padding: 52px 7vw;
+  background: var(--panel);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--card);
+  overflow: hidden;
+  box-shadow: 0 10px 26px var(--shadow);
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 18px;
+  border-bottom: 1px solid var(--line);
+}
+th {
+  color: var(--deep-ink);
+  background: var(--deep);
+}
+td:first-child {
+  color: var(--risk);
+  font-weight: 700;
+}
+.risk-strip {
+  background: var(--risk-bg);
+  border-left: 8px solid var(--risk);
+  padding: 32px 7vw;
+}
+.risk-strip h2 {
+  margin: 0 0 10px;
+  color: var(--risk);
+}
+.mosaic {
+  display: grid;
+  grid-template-columns: 1.2fr .8fr 1fr;
+  gap: 16px;
+  padding: 52px 7vw;
+  background: var(--deep);
+}
+.tile {
+  padding: 22px;
+  min-height: 150px;
+  color: var(--deep-ink);
+  border: 1px solid var(--line);
+}
+.tile.data { background: var(--data-bg); color: var(--ink); }
+.tile.risk { background: var(--risk-bg); color: var(--ink); }
+.tile.opp { background: var(--opportunity-bg); color: var(--ink); }
+.tile.done { background: var(--conclusion-bg); color: var(--ink); }
+.tile h3 {
+  margin: 0 0 10px;
+  font-size: 1.1rem;
+}
+.tile p { margin: 0; }
+@media (max-width: 820px) {
+  .num-band, .split, .mosaic {
+    grid-template-columns: 1fr;
+  }
+  .num { padding-left: 7vw; padding-right: 7vw; }
+  th, td { display: block; width: 100%; }
+  tr { border-bottom: 1px solid var(--line); }
+}
+</style>
   <script id="airs-digest-theme-boot">
     try {
       var saved = localStorage.getItem("theme");
@@ -183,13 +330,6 @@
     body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
       color: inherit;
     }
-    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
-      border-color: var(--airs-digest-line) !important;
-    }
-    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
-      background: var(--airs-digest-panel) !important;
-      color: var(--airs-digest-ink) !important;
-    }
     body :where(.muted, .meta, .kicker, small) {
       color: var(--airs-digest-muted) !important;
     }
@@ -249,65 +389,104 @@
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/long-running-Claude" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
-  <main>
-    <header>
-      <h1>把科研编程任务交给长期运行的 AI 代理</h1>
-      <div class="meta">Anthropic Research · 2026-03-23 · Science</div>
-      <p class="one">一句话总括：这篇文章的真正贡献不是证明 Claude 会写科学代码，而是提出了一套让代理在多日尺度上持续推进、可验证、可恢复的科研软件工作流。</p>
-    </header>
+<main>
+  <section class="hero">
+    <p class="eyebrow">一句话总括</p>
+    <h1>用于科学计算的长时运行 Claude</h1>
+    <p class="original">Long-running Claude for scientific computing</p>
+    <p class="lede">文章真正的贡献，是把多日自主代理从“能写代码”推进到“能被科研工作流约束地推进复杂数值项目”。关键不只是模型能力，而是目标、测试、记忆和调度方式。</p>
+  </section>
 
-    <section>
-      <h2>适合长期代理的科研任务，必须有清晰目标和可检验终点</h2>
-      <p>作者认为，AI 代理正在从“逐步聊天辅助”转向“给定目标后自主推进”。适合这种模式的科学计算任务包括重写数值求解器、迁移老旧 Fortran 科研软件、用参考实现调试大型代码库。</p>
-      <p>这些任务的共同点是边界清楚、成功标准明确、人工监督可以低频进行。结论是：代理最先改变的不是开放式科学发现，而是那些已有明确验证标准的科研工程劳动。</p>
-    </section>
+  <section class="num-band" aria-label="关键数字">
+    <div class="num"><strong>0.1%</strong><span>主要科学输出对 CLASS 的目标精度。</span></div>
+    <div class="num"><strong>数天</strong><span>Claude 从零推进到多个输出的亚百分比一致性。</span></div>
+    <div class="num"><strong>约 2,000</strong><span>C 编译器项目中的 Claude 会话数量。</span></div>
+    <div class="num"><strong>20 轮</strong><span>Ralph loop 示例中的最大反复验收次数。</span></div>
+  </section>
 
-    <section>
-      <h2>核心案例是用 Claude 从零实现可微 Boltzmann 求解器</h2>
-      <p>示例任务是让 Claude Opus 4.6 用 JAX 实现一个可微宇宙学 Boltzmann solver，用来预测 CMB 等早期宇宙观测量，并支持梯度传播。类似 CLASS 和 CAMB 的求解器是宇宙学参数估计的基础设施，而可微版本能让梯度推断方法更快。</p>
-      <p>作者并非该细分领域专家，因此这个案例测试的是：非领域专家能否用代理推动一个高度专业的科研代码项目。结论是：AI 代理可以显著降低跨领域科研软件原型的启动门槛，但不能消除对验证和专业判断的需求。</p>
-    </section>
+  <section class="split">
+    <div class="text-block">
+      <h2>科研代理需要可判定的成功标准</h2>
+      <p>作者选择了一个可微分宇宙学 Boltzmann 求解器作为案例。它要预测 CMB 等早期宇宙观测量，并与 CLASS 这样的参考实现对齐。</p>
+      <p>0.1% 不是随意数字。CLASS 与 CAMB 这两个经典代码之间的典型一致性也在这个量级。</p>
+      <p>这改变了读者对 AI 科研影响的理解：代理最适合先进入边界清晰、指标可测、参考实现存在的科学工程问题。</p>
+    </div>
+    <aside class="callout">
+      <b>核心洞见</b>
+      <p>长时运行不是让模型自由发挥。它是把模型放进一个有实验记录、有回归测试、有版本历史的科研机器里。</p>
+    </aside>
+  </section>
 
-    <section>
-      <h2>工作流的关键不是提示词，而是长期记忆、测试 oracle 和协调机制</h2>
-      <p>项目根目录中的 <strong>CLAUDE.md</strong> 保存目标、规则和设计取舍，<strong>CHANGELOG.md</strong> 记录进度、失败尝试、精度表和已知限制。对科研代码来说，参考实现、量化目标或现有测试套件构成 test oracle，让代理知道自己是否真的变好。</p>
-      <p>Git 则用于低成本监督：每个有意义的工作单元提交和推送，提交前运行测试，便于恢复和查看进展。结论是：长期代理需要的是实验室制度化流程，而不是一次性的“聪明 prompt”。</p>
-    </section>
+  <section class="flow">
+    <h2>工作流的关键不是提示词，而是闭环</h2>
+    <p>文章给出的流程更像实验室制度，而不是单次聊天技巧。每一步都减少代理跑偏后的恢复成本。</p>
+    <div class="steps">
+      <div class="step"><div class="badge">1</div><div><strong>CLAUDE.md 写清目标。</strong><br>它保存交付物、约束和设计选择。Claude 会持续参考，也可以更新它。</div></div>
+      <div class="step"><div class="badge">2</div><div><strong>CHANGELOG.md 充当长期记忆。</strong><br>它记录成功、失败、精度表和限制。失败路径尤其重要，可以避免新会话重复走死路。</div></div>
+      <div class="step"><div class="badge">3</div><div><strong>测试 oracle 判断进展。</strong><br>在科学代码里，oracle 可以是参考实现、量化目标或现有测试套件。</div></div>
+      <div class="step"><div class="badge">4</div><div><strong>Git 协调和恢复。</strong><br>每个有意义单元提交并推送，既能观察进度，也能避免计算资源中断造成损失。</div></div>
+    </div>
+  </section>
 
-    <section>
-      <h2>数字显示它很有用，但还没有达到生产级可靠性</h2>
-      <p>文章给出的目标是主要科学输出相对 CLASS 达到 <strong>0.1%</strong> 精度，因为 CLASS 与 CAMB 的典型一致性约为 <strong>0.1%</strong>；Claude 在几天内把多个输出推进到 <strong>sub-percent agreement</strong>。Anthropic 此前 C 编译器项目曾使用约 <strong>2,000</strong> 个会话，说明这类长期代理工作已经从演示走向复杂工程。</p>
-      <div class="data">
-        <div class="stat"><span class="num">0.1%</span><span class="label">主要科学输出的目标精度</span></div>
-        <div class="stat"><span class="num">几天</span><span class="label">从零推进到亚百分比一致性</span></div>
-        <div class="stat"><span class="num">20 次</span><span class="label">Ralph loop 示例最大迭代数</span></div>
-      </div>
-      <p>但代理也暴露出测试覆盖不足、误解规范、长时间追逐领域专家一眼能看出的错误等问题。结论是：它能压缩研发时间，却不能替代科学软件中的精度审查和领域验收。</p>
-    </section>
+  <section class="insight">
+    代理压缩的不是科学判断本身，而是大量可验证的工程迭代。人类价值从逐行控制，转向定义问题、设计验收和识别异常。
+  </section>
 
-    <section>
-      <h2>Ralph loop 解决的是代理过早停工，而不是科学判断</h2>
-      <p>文章提到当前模型在复杂任务中可能出现“agentic laziness”：没有真正达标却声称完成。Ralph loop 的做法是当代理说完成时再次把它拉回上下文，追问是否真的符合规格，直到它继续修复或明确给出完成信号。</p>
-      <p>这类编排能提高长期任务的完成度，但它依赖清晰规格和可运行测试。结论是：循环督促可以减少半成品，但不能让模糊目标自动变成正确科研成果。</p>
-    </section>
+  <section class="table-wrap">
+    <h2>案例显示了机会，也暴露了边界</h2>
+    <table>
+      <thead>
+        <tr><th>观察</th><th>关键数据和趋势</th><th>结论</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>速度显著提高</td>
+          <td>类似 JAX 可微分 Boltzmann 求解器通常代表数月到数年研究时间。Claude 在数天内达到多个输出的亚百分比一致性。</td>
+          <td>AI 代理能显著压缩科研软件原型期。</td>
+        </tr>
+        <tr>
+          <td>质量仍需审查</td>
+          <td>结果不是生产级。它并未在所有 regime 中达到可接受精度。</td>
+          <td>快并不等于可靠。科研代码仍需要专家验算和更宽测试覆盖。</td>
+        </tr>
+        <tr>
+          <td>长链错误更难调试</td>
+          <td>Boltzmann 求解器是深度耦合管线。早期重组模型的小误差会影响下游所有结果。</td>
+          <td>这类任务更适合单个顺序代理配合子代理，而不是完全并行拆分。</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
 
-    <section>
-      <h2>真正的变化是科研空闲时间也变成了可计算资源</h2>
-      <p>作者把长期运行代理类比为夜间训练实验：如果有算力、有清晰目标、有可验证终点，那么不让代理在后台推进也会产生机会成本。对实验室来说，这意味着“等待时间”可以被转化为代码迁移、测试补齐、参考实现对齐和原型探索。</p>
-      <p>结论是：AI 对科学计算的影响不只是单次加速，而是改变了研究团队安排后台工作的方式。</p>
-    </section>
+  <section class="risk-strip">
+    <h2>风险：代理会显得忙碌，但测试面可能很窄</h2>
+    <p>作者指出，Claude 一度只在单个 fiducial 参数点测试代码。这会大幅降低发现 bug 的机会。</p>
+    <p>它还会犯基础错误，例如混淆 gauge convention，或在领域专家能快速定位的问题上花费数小时。结论是：长期代理需要持续扩大测试覆盖，而不是只追求当前指标变好。</p>
+  </section>
 
-    <section class="takeaways">
-      <h2>最值得带走的洞见</h2>
-      <ul>
-        <li>长期科研代理最适合有参考实现、测试套件或量化指标的任务。</li>
-        <li>CLAUDE.md、CHANGELOG.md、Git 和测试 oracle 共同构成代理的“实验室操作系统”。</li>
-        <li>几天达到亚百分比精度很有意义，但距离生产级科研软件仍有明确差距。</li>
-        <li>AI 代理会放大非专家的执行能力，同时也放大验证体系的重要性。</li>
-        <li>未来实验室的机会成本可能包括：夜里没有让代理继续推进那些可验证的工程任务。</li>
-      </ul>
-    </section>
-  </main>
+  <section class="mosaic">
+    <div class="tile data">
+      <h3>最值得带走的洞见 1</h3>
+      <p>可量化 oracle 是当前自主科研代理的核心前提。没有它，模型很难知道自己是否真的进步。</p>
+    </div>
+    <div class="tile opp">
+      <h3>最值得带走的洞见 2</h3>
+      <p>CHANGELOG 不是文档负担。它是跨会话延续实验记忆的最小基础设施。</p>
+    </div>
+    <div class="tile risk">
+      <h3>最值得带走的洞见 3</h3>
+      <p>亚百分比结果证明了潜力，但生产级科学软件仍需要专家审查和更全面验证。</p>
+    </div>
+    <div class="tile done">
+      <h3>最值得带走的洞见 4</h3>
+      <p>Ralph loop 这类反复验收机制，能对抗代理过早宣布完成的倾向。</p>
+    </div>
+    <div class="tile data">
+      <h3>最值得带走的洞见 5</h3>
+      <p>当项目有清晰成功标准和可用计算资源时，不运行代理本身也开始形成机会成本。</p>
+    </div>
+  </section>
+</main>
   <script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;

@@ -3,19 +3,72 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Improving instruction hierarchy in frontier LLMs 中文总结</title>
+<title>改进前沿 LLM 的指令层级</title>
 <style>
 :root {
-  --bg: #f7f8fb;
-  --card: #ffffff;
-  --ink: #1f2937;
-  --muted: #64748b;
-  --line: #dbe3ee;
-  --accent: #2563eb;
-  --accent2: #0f766e;
-  --accent3: #b45309;
-  --hl: #e8f1ff;
-  --hl2: #ecfdf5;
+  --bg: #f7f4ee;
+  --ink: #172026;
+  --muted: #5b6872;
+  --line: #d7d0c4;
+  --surface: #ffffff;
+  --surface-soft: #fff8e7;
+  --surface-blue: #e9f2ff;
+  --surface-green: #eaf7ef;
+  --surface-red: #fff0ef;
+  --surface-dark: #14202b;
+  --ink-on-dark: #f4f7fa;
+  --muted-on-dark: #b8c3cc;
+  --accent-data: #2563eb;
+  --accent-risk: #dc2626;
+  --accent-opportunity: #059669;
+  --accent-conclusion: #7c3aed;
+  --accent-warm: #d97706;
+  --shadow: 0 20px 50px rgba(31, 41, 55, 0.12);
+  --shadow-soft: 0 10px 28px rgba(31, 41, 55, 0.08);
+}
+:root[data-theme="dark"] {
+  --bg: #0d1117;
+  --ink: #edf2f7;
+  --muted: #aab6c3;
+  --line: #2a3441;
+  --surface: #151b23;
+  --surface-soft: #2b2416;
+  --surface-blue: #13243a;
+  --surface-green: #10291f;
+  --surface-red: #321a1a;
+  --surface-dark: #070b10;
+  --ink-on-dark: #f5f7fb;
+  --muted-on-dark: #aeb8c4;
+  --accent-data: #60a5fa;
+  --accent-risk: #fb7185;
+  --accent-opportunity: #34d399;
+  --accent-conclusion: #a78bfa;
+  --accent-warm: #fbbf24;
+  --shadow: 0 20px 50px rgba(0, 0, 0, 0.38);
+  --shadow-soft: 0 10px 28px rgba(0, 0, 0, 0.28);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0d1117;
+    --ink: #edf2f7;
+    --muted: #aab6c3;
+    --line: #2a3441;
+    --surface: #151b23;
+    --surface-soft: #2b2416;
+    --surface-blue: #13243a;
+    --surface-green: #10291f;
+    --surface-red: #321a1a;
+    --surface-dark: #070b10;
+    --ink-on-dark: #f5f7fb;
+    --muted-on-dark: #aeb8c4;
+    --accent-data: #60a5fa;
+    --accent-risk: #fb7185;
+    --accent-opportunity: #34d399;
+    --accent-conclusion: #a78bfa;
+    --accent-warm: #fbbf24;
+    --shadow: 0 20px 50px rgba(0, 0, 0, 0.38);
+    --shadow-soft: 0 10px 28px rgba(0, 0, 0, 0.28);
+  }
 }
 * { box-sizing: border-box; }
 body {
@@ -23,97 +76,197 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-  line-height: 1.72;
+  line-height: 1.65;
 }
-main {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 36px 20px 48px;
+main { overflow: hidden; }
+.hero {
+  background: var(--surface-dark);
+  color: var(--ink-on-dark);
+  padding: 72px 7vw 56px;
 }
-header {
-  padding: 30px;
-  background: linear-gradient(135deg, var(--hl), var(--card));
-  border: 1px solid var(--line);
-  border-radius: 18px;
-}
+.hero-inner { max-width: 1080px; margin: 0 auto; }
 .kicker {
-  color: var(--accent);
+  color: var(--accent-warm);
   font-weight: 700;
-  letter-spacing: .02em;
-  margin: 0 0 8px;
+  letter-spacing: 0;
+  margin: 0 0 16px;
 }
 h1 {
-  margin: 0 0 16px;
-  font-size: clamp(28px, 4vw, 44px);
-  line-height: 1.18;
-}
-.lead {
+  font-size: clamp(34px, 5vw, 64px);
+  line-height: 1.08;
   margin: 0;
+}
+.original {
+  color: var(--muted-on-dark);
   font-size: 18px;
-  color: var(--ink);
+  margin: 14px 0 28px;
 }
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-  margin: 22px 0;
-}
-.stat {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 18px;
-}
-.stat strong {
-  display: block;
-  font-size: 26px;
-  color: var(--accent2);
-  line-height: 1.2;
-}
-.stat span {
-  color: var(--muted);
-  font-size: 14px;
-}
-section {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  padding: 24px;
-  margin-top: 18px;
-}
-h2 {
-  margin: 0 0 12px;
+.one-line {
+  max-width: 780px;
   font-size: 22px;
-  line-height: 1.35;
+  margin: 0;
+  border-left: 5px solid var(--accent-opportunity);
+  padding-left: 18px;
 }
-p { margin: 0 0 12px; }
-p:last-child { margin-bottom: 0; }
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(160px, 1fr));
+  gap: 1px;
+  max-width: 1080px;
+  margin: -28px auto 0;
+  box-shadow: var(--shadow);
+}
+.metric {
+  background: var(--surface);
+  padding: 24px;
+  min-height: 150px;
+}
+.metric b {
+  color: var(--accent-data);
+  display: block;
+  font-size: 34px;
+  line-height: 1;
+}
+.metric span { color: var(--muted); font-size: 14px; }
+.split {
+  max-width: 1080px;
+  margin: 64px auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 36px;
+  align-items: start;
+}
+.panel-note {
+  background: var(--surface-soft);
+  border-left: 6px solid var(--accent-warm);
+  padding: 28px;
+  box-shadow: var(--shadow-soft);
+}
+.panel-note h2, .text-block h2, .timeline h2, .takeaways h2 { margin-top: 0; line-height: 1.25; }
+.ladder {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 26px;
+}
+.step {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+.step:last-child { border-bottom: 0; }
 .badge {
-  display: inline-block;
-  margin: 4px 8px 4px 0;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: var(--hl2);
-  color: var(--accent2);
-  font-weight: 700;
-  font-size: 14px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  background: var(--accent-conclusion);
+  color: var(--ink-on-dark);
+  font-weight: 800;
+  flex: 0 0 auto;
 }
-.callout {
-  border-left: 4px solid var(--accent3);
-  background: color-mix(in srgb, var(--accent3) 10%, var(--card));
+.flow {
+  background: var(--surface-blue);
+  padding: 56px 7vw;
+}
+.flow-inner { max-width: 1080px; margin: 0 auto; }
+.timeline {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+.node {
+  background: var(--surface);
+  border-top: 5px solid var(--accent-data);
+  padding: 22px;
+}
+.node:nth-child(2) { border-top-color: var(--accent-risk); }
+.node:nth-child(3) { border-top-color: var(--accent-opportunity); }
+.table-zone {
+  max-width: 1080px;
+  margin: 64px auto;
+  padding: 0 24px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+}
+th, td {
   padding: 14px 16px;
-  border-radius: 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+th {
+  background: var(--surface-dark);
+  color: var(--ink-on-dark);
+}
+td:last-child { color: var(--accent-opportunity); font-weight: 700; }
+.insight {
+  background: var(--surface-green);
+  border-block: 1px solid var(--line);
+  padding: 44px 7vw;
+}
+.insight p {
+  max-width: 900px;
+  margin: 0 auto;
+  font-size: 24px;
+  line-height: 1.45;
   color: var(--ink);
 }
-ul {
-  margin: 10px 0 0;
-  padding-left: 22px;
+.risk-grid {
+  max-width: 1080px;
+  margin: 64px auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
 }
-li { margin: 8px 0; }
-@media (max-width: 720px) {
-  main { padding: 22px 14px 36px; }
-  header, section { padding: 20px; border-radius: 14px; }
-  .grid { grid-template-columns: 1fr; }
+.risk-box {
+  background: var(--surface-red);
+  border: 1px solid var(--line);
+  padding: 26px;
+}
+.risk-box strong { color: var(--accent-risk); }
+.op-box {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: 6px solid var(--accent-opportunity);
+  padding: 26px;
+}
+.takeaways {
+  background: var(--surface-dark);
+  color: var(--ink-on-dark);
+  padding: 58px 7vw 72px;
+}
+.mosaic {
+  max-width: 1080px;
+  margin: 24px auto 0;
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 1fr;
+  gap: 16px;
+}
+.tile {
+  background: var(--surface);
+  color: var(--ink);
+  padding: 22px;
+  min-height: 140px;
+  border-top: 5px solid var(--accent-conclusion);
+}
+.tile:nth-child(2) { border-top-color: var(--accent-data); }
+.tile:nth-child(3) { border-top-color: var(--accent-risk); }
+.tile:nth-child(4) { border-top-color: var(--accent-opportunity); grid-column: span 2; }
+.tile:nth-child(5) { border-top-color: var(--accent-warm); }
+@media (max-width: 800px) {
+  .metrics, .timeline, .split, .risk-grid, .mosaic {
+    grid-template-columns: 1fr;
+  }
+  .metrics { margin: 0; }
+  .tile:nth-child(4) { grid-column: auto; }
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -190,13 +343,6 @@ li { margin: 8px 0; }
     body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
       color: inherit;
     }
-    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
-      border-color: var(--airs-digest-line) !important;
-    }
-    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
-      background: var(--airs-digest-panel) !important;
-      color: var(--airs-digest-ink) !important;
-    }
     body :where(.muted, .meta, .kicker, small) {
       color: var(--airs-digest-muted) !important;
     }
@@ -257,58 +403,99 @@ li { margin: 8px 0; }
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/instruction-hierarchy-challenge" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
 <main>
-  <header>
-    <p class="kicker">一句话总括</p>
-    <h1>OpenAI把“指令层级”变成可训练能力，让模型在冲突指令、恶意工具输出和安全规范之间更稳定地服从高可信来源。</h1>
-    <p class="lead">这篇文章的真正贡献不只是提出一个数据集，而是展示：只要训练任务足够简单、可客观判分且避免拒绝捷径，模型学到的层级服从能力可以迁移到更真实的安全与攻击场景。</p>
-  </header>
-
-  <div class="grid">
-    <div class="stat"><strong>0.76 → 0.91</strong><span>TensorTrust dev-user 指令层级鲁棒性</span></div>
-    <div class="stat"><strong>0.84 → 0.95</strong><span>内部 System 与 User 冲突测试</span></div>
-    <div class="stat"><strong>0.79 → 1.00</strong><span>IH-Challenge 过度拒绝控制</span></div>
-    <div class="stat"><strong>0.83 → 0.83</strong><span>GPQA Diamond 能力基本不变</span></div>
-  </div>
-
-  <section>
-    <h2>核心问题不是模型会不会听话，而是它该听谁的话</h2>
-    <p>文章把AI系统中的指令来源排成明确层级：<span class="badge">system</span><span class="badge">developer</span><span class="badge">user</span><span class="badge">tool</span>。当这些来源冲突时，模型必须优先服从更高可信来源。</p>
-    <p>这改变了对AI安全的理解：越是会联网、读文件、调用工具的模型，越不能把所有文本都当成同等权威的命令。</p>
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="kicker">一句话总括</p>
+      <h1>改进前沿 LLM 的指令层级</h1>
+      <p class="original">Improving instruction hierarchy in frontier LLMs</p>
+      <p class="one-line">OpenAI 的贡献不是只提出一个新榜单，而是把“模型该听谁的”变成可训练、可自动评分、并能提升真实安全性的任务设计。</p>
+    </div>
   </section>
 
-  <section>
-    <h2>IH-Challenge用简单任务训练复杂安全行为</h2>
-    <p>OpenAI设计的IH-Challenge让高权限消息给出约束，低权限消息尝试诱导模型违反约束，再用简单Python脚本判断模型是否遵守高权限指令。</p>
-    <p>这种设计绕开了三个常见陷阱：复杂任务导致的普通指令失败、LLM裁判的不稳定、以及模型靠一味拒绝拿高分。结论是，好的安全训练环境不一定复杂，但必须让正确行为可验证。</p>
+  <section class="metrics" aria-label="关键数字">
+    <div class="metric"><b>0.76→0.91</b><span>TensorTrust dev-user 提升 0.15，说明开发者指令更能压过低权限诱导。</span></div>
+    <div class="metric"><b>0.83→0.95</b><span>Developer &lt;&gt; User Conflict 提升 0.12，冲突解决更稳定。</span></div>
+    <div class="metric"><b>1.00</b><span>IH-Challenge overrefusal 达到 1.00，模型没有靠一味拒绝取巧。</span></div>
+    <div class="metric"><b>0.83</b><span>GPQA Diamond 保持 0.83，核心能力没有被明显牺牲。</span></div>
   </section>
 
-  <section>
-    <h2>基准结果显示层级能力可以迁移</h2>
-    <p>GPT-5 Mini-R在多个外部和内部测试上优于基线：TensorTrust sys-user从0.86升至0.94，dev-user从0.76升至0.91；RealGuardrails两个子集分别从0.88升至0.95、从0.82升至0.89；System IFEval从0.92升至0.96。</p>
-    <p>内部冲突测试也有明显提升：System<>User从0.84升至0.95，Developer<>User从0.83升至0.95。这说明训练到的不是单个题库技巧，而是更通用的“冲突解析”行为。</p>
+  <section class="split">
+    <div class="panel-note">
+      <h2>真正的问题是权限判断</h2>
+      <p>AI 系统会同时看到系统政策、开发者规则、用户请求和工具输出。安全失败常常不是模型不会回答，而是它把低可信来源当成了命令。</p>
+      <p>这改变了安全训练的视角。重点不只是拒绝危险请求，而是在冲突中稳定识别哪条指令有更高优先级。</p>
+    </div>
+    <div class="ladder">
+      <h2>OpenAI 采用的层级</h2>
+      <div class="step"><span class="badge">1</span><p><strong>System</strong>：最高优先级，承载安全政策和全局约束。</p></div>
+      <div class="step"><span class="badge">2</span><p><strong>Developer</strong>：产品或应用规则，低于系统但高于用户。</p></div>
+      <div class="step"><span class="badge">3</span><p><strong>User</strong>：用户目标，只有不冲突时才应执行。</p></div>
+      <div class="step"><span class="badge">4</span><p><strong>Tool</strong>：工具返回的数据最不可信，尤其容易夹带恶意指令。</p></div>
+    </div>
   </section>
 
-  <section>
-    <h2>安全提升不等于简单地更爱拒绝</h2>
-    <p>文章特别检查了过度拒绝和能力退化：IH-Challenge overrefusal从0.79升至1.00，TensorTrust overrefusal几乎不变，为0.91到0.90；GPQA Diamond保持0.83，AIME 2024从0.93小升至0.94。</p>
-    <p>不过偏好类指标有所下降，Chat WinRate vs. o1从0.71降至0.66，Preference Score从0.46降至0.40。洞见是，指令层级训练能增强安全性，但仍需要在用户体验和风格偏好上继续调校。</p>
+  <section class="flow">
+    <div class="flow-inner">
+      <h2>IH-Challenge 的设计避开三类捷径</h2>
+      <div class="timeline">
+        <div class="node">
+          <h3>任务要简单</h3>
+          <p>指令本身不能太复杂。否则失败可能只是普通指令跟随失败，而不是层级判断失败。</p>
+        </div>
+        <div class="node">
+          <h3>评分要客观</h3>
+          <p>每个环境都能用简单 Python 脚本检查结果。这样减少了 LLM judge 的主观误差。</p>
+        </div>
+        <div class="node">
+          <h3>不能靠拒绝刷分</h3>
+          <p>任务设计避免“一律拒绝”成为高分策略。安全训练因此更接近真实使用需求。</p>
+        </div>
+      </div>
+    </div>
   </section>
 
-  <section>
-    <h2>提示注入防护的关键是把工具输出降级为不可信内容</h2>
-    <p>文章把提示注入看成指令层级失败：恶意文本藏在网页、文档或工具结果里，诱导模型忽略系统或开发者约束。IH训练后的模型在CyberSecEval 2和OpenAI内部提示注入评测上都有提升。</p>
-    <p>这改变了读者对AI代理风险的判断：防护重点不只是过滤坏字符串，而是让模型稳定理解“工具结果可以提供信息，但不能发布命令”。</p>
+  <section class="table-zone">
+    <h2>训练后的收益不是单点提升</h2>
+    <table>
+      <thead>
+        <tr><th>评测</th><th>GPT-5 Mini</th><th>GPT-5 Mini-R</th><th>变化</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>TensorTrust sys-user</td><td>0.86</td><td>0.94</td><td>+0.08</td></tr>
+        <tr><td>TensorTrust dev-user</td><td>0.76</td><td>0.91</td><td>+0.15</td></tr>
+        <tr><td>System IFEval</td><td>0.92</td><td>0.96</td><td>+0.04</td></tr>
+        <tr><td>TutorJailbreak sys-user</td><td>0.96</td><td>0.99</td><td>+0.03</td></tr>
+        <tr><td>Developer &lt;&gt; User Conflict</td><td>0.83</td><td>0.95</td><td>+0.12</td></tr>
+      </tbody>
+    </table>
   </section>
 
-  <section>
+  <section class="insight">
+    <p>最重要的信号是泛化：一个看似简单的训练集，让模型在留出测试、对抗测试、安全规范执行和 prompt injection 防御上都更稳。这说明指令层级可能是一种底层安全能力，而不是某个榜单技巧。</p>
+  </section>
+
+  <section class="risk-grid">
+    <div class="risk-box">
+      <h2>为什么这会影响 prompt injection</h2>
+      <p><strong>风险来自工具输出。</strong> 网页、文档或外部工具可能包含“忽略之前指令”之类的恶意文本。模型如果把这些文本当成命令，就会泄露信息或执行错误动作。</p>
+      <p>IH 训练让模型更倾向于把工具内容视为数据，而不是高权限指令。这直接提升了面对恶意工具指令时的鲁棒性。</p>
+    </div>
+    <div class="op-box">
+      <h2>为什么这会改善安全可控性</h2>
+      <p>OpenAI 在系统提示中加入特定类别的安全规范，再用生产安全 benchmark 观察模型行为。IH 训练后的模型在违规类别上有更高的拒绝和安全完成率。</p>
+      <p>关键点是有用性没有同步下降。模型不是简单变得更保守，而是更会在冲突中执行上级安全规范。</p>
+    </div>
+  </section>
+
+  <section class="takeaways">
     <h2>最值得带走的洞见</h2>
-    <ul>
-      <li>指令层级是AI安全、可靠性和工具使用安全的共同基础。</li>
-      <li>训练任务越可客观判分，越能减少裁判偏差和奖励投机。</li>
-      <li>模型抵抗提示注入，本质上是在拒绝低可信来源越权。</li>
-      <li>安全能力可以在不明显牺牲推理基准的情况下提升，但偏好体验仍可能受影响。</li>
-      <li>随着模型更具代理性，区分可信指令与不可信内容会变成核心部署能力。</li>
-    </ul>
+    <div class="mosaic">
+      <div class="tile">指令层级是安全、可靠性和产品控制的共同基础。模型越像代理，越需要稳定判断信息来源的可信度。</div>
+      <div class="tile">好数据集不一定复杂。IH-Challenge 的价值在于任务简单、评分明确、难以靠拒绝取巧。</div>
+      <div class="tile">prompt injection 防御不能只靠过滤文本。模型本身必须学会把工具输出当作低权限信息。</div>
+      <div class="tile">安全训练的理想结果不是“更多拒绝”，而是在应该拒绝时拒绝，在安全请求中保持帮助能力。</div>
+      <div class="tile">这些结果支持一个更广的判断：未来 AI 安全需要训练模型理解权限边界，而不只是识别危险内容。</div>
+    </div>
   </section>
 </main>
   <script id="airs-digest-theme-script">

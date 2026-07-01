@@ -2,19 +2,70 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>AI 如何改变真实软件漏洞防御</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>与 Mozilla 合作提升 Firefox 的安全性</title>
 <style>
 :root {
-  --bg: #f6f8fb;
+  --bg: #f7f4ef;
+  --ink: #1d2430;
+  --muted: #657081;
+  --line: #d9d2c7;
   --card: #ffffff;
-  --ink: #172033;
-  --muted: #607086;
-  --line: #dce4ef;
-  --accent: #2563eb;
-  --accent2: #0f766e;
-  --accent3: #b45309;
-  --hl: #eaf2ff;
-  --hl2: #ecfdf5;
+  --hero-bg: #122033;
+  --hero-ink: #f6f2ea;
+  --data-bg: #e7f0ff;
+  --risk-bg: #fff0e8;
+  --opportunity-bg: #e8f6ef;
+  --conclusion-bg: #f1e9ff;
+  --process-bg: #fff8dc;
+  --accent: #2f6fed;
+  --accent2: #d45b2c;
+  --accent3: #15946b;
+  --accent4: #7b4bd6;
+  --warn: #b72f2f;
+  --shadow: 0 18px 50px rgba(25, 32, 44, 0.12);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #101419;
+    --ink: #e9edf3;
+    --muted: #a8b1bf;
+    --line: #2b3441;
+    --card: #171d25;
+    --hero-bg: #0b111b;
+    --hero-ink: #f3f6fb;
+    --data-bg: #12223b;
+    --risk-bg: #2c1a14;
+    --opportunity-bg: #10281e;
+    --conclusion-bg: #211735;
+    --process-bg: #2a2410;
+    --accent: #6ea0ff;
+    --accent2: #ff9168;
+    --accent3: #42d49b;
+    --accent4: #b692ff;
+    --warn: #ff7373;
+    --shadow: 0 18px 50px rgba(0, 0, 0, 0.42);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101419;
+  --ink: #e9edf3;
+  --muted: #a8b1bf;
+  --line: #2b3441;
+  --card: #171d25;
+  --hero-bg: #0b111b;
+  --hero-ink: #f3f6fb;
+  --data-bg: #12223b;
+  --risk-bg: #2c1a14;
+  --opportunity-bg: #10281e;
+  --conclusion-bg: #211735;
+  --process-bg: #2a2410;
+  --accent: #6ea0ff;
+  --accent2: #ff9168;
+  --accent3: #42d49b;
+  --accent4: #b692ff;
+  --warn: #ff7373;
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.42);
 }
 * { box-sizing: border-box; }
 body {
@@ -24,93 +75,187 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
   line-height: 1.72;
 }
-main {
-  max-width: 980px;
-  margin: 0 auto;
-  padding: 40px 20px 56px;
-}
+main { overflow: hidden; }
+section { padding: 56px 7vw; }
 .hero {
-  border-left: 6px solid var(--accent);
-  background: var(--card);
-  padding: 26px 28px;
-  margin-bottom: 22px;
+  min-height: 56vh;
+  display: grid;
+  align-items: end;
+  background: var(--hero-bg);
+  color: var(--hero-ink);
 }
+.hero-inner { max-width: 980px; }
 .kicker {
-  color: var(--accent);
-  font-size: 14px;
+  color: var(--accent3);
   font-weight: 700;
-  margin-bottom: 8px;
+  letter-spacing: 0;
 }
 h1 {
-  font-size: 30px;
-  line-height: 1.25;
-  margin: 0 0 14px;
+  margin: 14px 0 8px;
+  font-size: clamp(34px, 6vw, 72px);
+  line-height: 1.05;
 }
-.lead {
+.original {
+  margin: 0 0 28px;
+  color: var(--muted);
   font-size: 18px;
-  margin: 0;
-  color: var(--ink);
 }
-.grid {
+.lede {
+  max-width: 820px;
+  font-size: clamp(20px, 2.2vw, 30px);
+  line-height: 1.45;
+}
+.number-band {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  margin: 22px 0;
+  grid-template-columns: repeat(4, minmax(140px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  padding: 1px;
 }
 .metric {
-  background: var(--card);
-  border: 1px solid var(--line);
-  padding: 18px;
+  background: var(--data-bg);
+  padding: 28px;
 }
-.metric strong {
+.metric b {
   display: block;
-  font-size: 28px;
-  color: var(--accent2);
-  line-height: 1.1;
+  color: var(--accent);
+  font-size: clamp(30px, 5vw, 52px);
+  line-height: 1;
 }
 .metric span {
+  display: block;
+  margin-top: 10px;
   color: var(--muted);
-  font-size: 14px;
 }
-section {
+.split {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 34px;
+  align-items: center;
+  background: var(--card);
+}
+.split h2, .flow h2, .compare h2, .quote h2, .takeaways h2 {
+  margin: 0 0 16px;
+  font-size: clamp(26px, 3vw, 40px);
+  line-height: 1.18;
+}
+.explain {
+  border-left: 6px solid var(--accent);
+  padding-left: 22px;
+}
+.side-note {
+  background: var(--opportunity-bg);
+  border: 1px solid var(--line);
+  padding: 28px;
+  box-shadow: var(--shadow);
+}
+.flow {
+  background: var(--process-bg);
+}
+.timeline {
+  display: grid;
+  gap: 18px;
+  max-width: 900px;
+}
+.step {
+  display: grid;
+  grid-template-columns: 54px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+.badge {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent4);
+  color: var(--hero-ink);
+  font-weight: 800;
+}
+.step-content {
+  padding: 0 0 22px;
+  border-bottom: 1px solid var(--line);
+}
+.compare {
+  background: var(--risk-bg);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+th, td {
+  padding: 18px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+th {
+  color: var(--accent2);
+  font-size: 15px;
+}
+.quote {
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+}
+.insight {
+  max-width: 920px;
+  border-left: 8px solid var(--warn);
+  padding: 10px 0 10px 28px;
+  font-size: clamp(22px, 2.6vw, 34px);
+  line-height: 1.38;
+}
+.insight small {
+  display: block;
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 16px;
+}
+.patch {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  background: var(--card);
+}
+.patch-item {
+  padding: 24px;
+  border-top: 5px solid var(--accent3);
+  background: var(--opportunity-bg);
+}
+.patch-item:nth-child(2) { border-color: var(--accent); background: var(--data-bg); }
+.patch-item:nth-child(3) { border-color: var(--accent4); background: var(--conclusion-bg); }
+.takeaways {
+  background: var(--conclusion-bg);
+}
+.mosaic {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 18px;
+}
+.tile {
+  padding: 24px;
   background: var(--card);
   border: 1px solid var(--line);
-  padding: 24px 26px;
-  margin-top: 16px;
 }
-h2 {
-  font-size: 20px;
-  margin: 0 0 10px;
+.tile.large {
+  grid-row: span 2;
+  background: var(--hero-bg);
+  color: var(--hero-ink);
 }
-p { margin: 0 0 12px; }
-mark {
-  background: var(--hl);
-  color: var(--ink);
-  padding: 2px 5px;
+.tile b {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--accent4);
 }
-.note {
-  background: var(--hl2);
-  border-left: 4px solid var(--accent2);
-  padding: 14px 16px;
-  color: var(--ink);
-}
-.takeaways {
-  background: var(--ink);
-  color: white;
-  padding: 26px;
-  margin-top: 18px;
-}
-.takeaways h2 { color: white; }
-.takeaways ul {
-  padding-left: 20px;
-  margin: 10px 0 0;
-}
-.takeaways li { margin: 8px 0; }
-@media (max-width: 760px) {
-  main { padding: 24px 14px 40px; }
-  .grid { grid-template-columns: 1fr; }
-  h1 { font-size: 24px; }
-  section, .hero { padding: 20px; }
+.tile.large b { color: var(--accent3); }
+p { margin: 0 0 14px; }
+@media (max-width: 820px) {
+  section { padding: 40px 22px; }
+  .number-band, .split, .patch, .mosaic { grid-template-columns: 1fr; }
+  .metric { padding: 22px; }
+  th, td { padding: 14px; }
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -187,13 +332,6 @@ mark {
     body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
       color: inherit;
     }
-    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
-      border-color: var(--airs-digest-line) !important;
-    }
-    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
-      background: var(--airs-digest-panel) !important;
-      color: var(--airs-digest-ink) !important;
-    }
     body :where(.muted, .meta, .kicker, small) {
       color: var(--airs-digest-muted) !important;
     }
@@ -254,68 +392,147 @@ mark {
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/news/mozilla-firefox-security" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
 <main>
-  <article>
-    <header class="hero">
+  <section class="hero">
+    <div class="hero-inner">
       <div class="kicker">一句话总括</div>
-      <h1>Claude 在真实 Firefox 代码库中快速发现高危漏洞，说明 AI 已开始改变防御方寻找和修复漏洞的速度。</h1>
-      <p class="lead">这篇文章的真正贡献不是宣布一个新 benchmark，而是展示 AI 安全研究如何进入真实开源项目：模型发现问题，研究员验证，维护者批量 triage，并最终把修复交付给数亿用户。</p>
-    </header>
-
-    <div class="grid">
-      <div class="metric"><strong>22</strong><span>两周内发现的 Firefox 漏洞</span></div>
-      <div class="metric"><strong>14</strong><span>被 Mozilla 评为高危</span></div>
-      <div class="metric"><strong>112</strong><span>最终提交的独立报告</span></div>
+      <h1>与 Mozilla 合作提升 Firefox 的安全性</h1>
+      <p class="original">Partnering with Mozilla to improve Firefox’s security</p>
+      <p class="lede">Anthropic 的核心贡献不是证明 Claude 会“谈论安全”，而是展示它能在 Firefox 这样成熟、复杂、真实使用的软件中快速发现高严重性漏洞，并推动修复流程进入产品发布。</p>
     </div>
+  </section>
 
-    <section>
-      <h2>AI 已能在高质量代码库里找到严重漏洞</h2>
-      <p>Anthropic 称 Claude Opus 4.6 在与 Mozilla 的合作中，两周发现 22 个 Firefox 漏洞，其中 14 个是高危，约等于 2025 年 Firefox 已修复高危漏洞数量的近五分之一。</p>
-      <p>这改变了一个常见判断：AI 不只是能在练习题里复现旧漏洞，也能在复杂、成熟、测试充分的浏览器代码中发现新问题。</p>
-    </section>
+  <section class="number-band" aria-label="关键数字">
+    <div class="metric"><b>22</b><span>Claude Opus 4.6 在两周内发现的 Firefox 漏洞。</span></div>
+    <div class="metric"><b>14</b><span>被 Mozilla 评为高严重性漏洞。</span></div>
+    <div class="metric"><b>112</b><span>Anthropic 向 Mozilla 提交的唯一报告数量。</span></div>
+    <div class="metric"><b>$4,000</b><span>用于 exploit 评估的 API credits 约数。</span></div>
+  </section>
 
-    <section>
-      <h2>速度优势来自“模型探索 + 人类验证 + 维护者 triage”</h2>
-      <p>Claude 在约 20 分钟探索后报告了 JavaScript 引擎中的 Use After Free；Anthropic 研究员在独立虚拟机中验证后提交到 Bugzilla，并附上说明和候选补丁。</p>
-      <p>在团队验证第一例漏洞期间，模型已经产生 50 个额外独立崩溃输入；最后研究覆盖近 <mark>6,000 个 C++ 文件</mark>，提交 112 份独立报告，多数问题已在 Firefox 148 修复。</p>
-      <p class="note">关键变化是流程：当发现速度远超人工验证速度时，维护者需要可复现测试、详细 PoC 和候选补丁来提高 triage 效率。</p>
-    </section>
+  <section class="split">
+    <div class="explain">
+      <h2>真实代码库让结果更有分量</h2>
+      <p>团队先让 Claude 复现历史 Firefox CVE，再转向当前版本中尚未报告的新漏洞。这个切换很重要。</p>
+      <p>历史漏洞可能出现在训练数据里。当前版本的新漏洞则更能衡量模型是否真的具备发现能力。</p>
+      <p>Firefox 是高价值目标。它每天处理不可信网页内容，也服务数亿用户。因此，这里的发现比普通开源项目更能说明 AI 对现实安全工作的影响。</p>
+    </div>
+    <div class="side-note">
+      <h2>第一处信号来得很快</h2>
+      <p>Claude Opus 4.6 在约 20 分钟探索后，报告了 JavaScript 引擎中的 Use After Free。Anthropic 研究员在独立虚拟机中验证后，又交叉验证并提交到 Bugzilla。</p>
+      <p>这改变了读者对 AI 安全能力的判断：模型不只是辅助阅读代码，它已经能生成需要维护者认真处理的漏洞线索。</p>
+    </div>
+  </section>
 
-    <section>
-      <h2>发现漏洞比利用漏洞便宜得多</h2>
-      <p>Anthropic 又测试 Claude 是否能把这些漏洞变成 exploit：数百次运行、约 4,000 美元 API 成本后，只成功了 2 次，并且只是能在目标系统读写本地文件的粗糙攻击。</p>
-      <p>这些 exploit 依赖去除现代浏览器部分安全防护的测试环境，尤其是没有完整沙箱；因此 Firefox 的纵深防御仍能缓解这些样例。</p>
-      <p>结论是防御方暂时仍有优势：当前模型更擅长发现和修复漏洞，而不是稳定武器化漏洞。</p>
-    </section>
+  <section class="flow">
+    <h2>合作流程从单点验证转为批量分诊</h2>
+    <div class="timeline">
+      <div class="step">
+        <div class="badge">1</div>
+        <div class="step-content">
+          <p><strong>从 JavaScript 引擎开始。</strong>这是浏览器中攻击面很大的部分，因为它会处理来自网页的外部代码。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="badge">2</div>
+        <div class="step-content">
+          <p><strong>扩展到更大范围。</strong>团队最终扫描近 6,000 个 C++ 文件，并提交 112 份唯一报告。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="badge">3</div>
+        <div class="step-content">
+          <p><strong>Mozilla 调整提交方式。</strong>在技术沟通后，Mozilla 鼓励 Anthropic 批量提交发现，而不是逐个完全验证安全影响。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="badge">4</div>
+        <div class="step-content">
+          <p><strong>修复进入发布链路。</strong>多数问题已在 Firefox 148.0 修复，其余问题计划在后续版本处理。</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <section>
-      <h2>任务验证器会成为 AI 修复漏洞的核心工具</h2>
-      <p>文章强调，Claude 在能“检查自己工作”的工具旁边表现最好。所谓任务验证器，就是可信地判断模型输出是否真的达成目标的机制。</p>
-      <p>对补丁代理来说，至少要验证两件事：漏洞是否被移除，以及原有功能是否没有回归。这个要求把 AI 生成补丁从“看起来合理”推进到“具备最低合并可信度”。</p>
-    </section>
+  <section class="compare">
+    <h2>发现漏洞和利用漏洞不是同一件事</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>能力</th>
+          <th>文章中的表现</th>
+          <th>为什么重要</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>发现漏洞</td>
+          <td>两周发现 22 个漏洞，其中 14 个为高严重性。</td>
+          <td>防御者可以更快扩大审计覆盖面，尤其是在维护者资源有限时。</td>
+        </tr>
+        <tr>
+          <td>生成 exploit</td>
+          <td>数百次测试中，只有 2 个案例转化为可用的原始 exploit。</td>
+          <td>当前模型更偏向防御侧能力，但自动攻击能力已经出现早期信号。</td>
+        </tr>
+        <tr>
+          <td>真实攻击可用性</td>
+          <td>这些 exploit 只在移除部分浏览器防护的测试环境中工作。</td>
+          <td>Firefox 的 sandbox 等纵深防御仍然有效，但未来能力差距可能缩小。</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
 
-    <section>
-      <h2>安全披露流程需要跟上模型能力</h2>
-      <p>Mozilla 认为 Anthropic 报告中最有助于建立信任的三类材料是：最小测试用例、详细 PoC、候选补丁。</p>
-      <p>这说明 AI 漏洞报告不能只给结论；它必须给维护者足够证据，让对方能快速复现、判断严重性并部署修复。</p>
-    </section>
+  <section class="quote">
+    <h2>真正的政策含义是时间窗口</h2>
+    <div class="insight">
+      当前模型更擅长找漏洞和辅助修复，而不是稳定利用漏洞。这个差距给防御者留下了窗口。
+      <small>文章的警告是：随着模型进步，这个窗口不一定会持续很久。</small>
+    </div>
+  </section>
 
-    <section>
-      <h2>窗口期不会一直存在</h2>
-      <p>Anthropic 认为 Opus 4.6 当前仍明显更擅长发现和修复漏洞，而不是开发 exploit，但这种能力差距可能不会持续太久。</p>
-      <p>因此文章的政策含义很直接：现在应利用 AI 帮助开源维护者扩大漏洞发现、triage 和修复能力，同时为未来更强的自动化利用能力准备新的防护和使用限制。</p>
-    </section>
+  <section class="patch">
+    <div class="patch-item">
+      <h2>报告要可复现</h2>
+      <p>Firefox 团队重视最小测试用例、详细 proof-of-concept 和候选补丁。</p>
+      <p>这些材料让维护者能验证报告，而不是只相信模型判断。</p>
+    </div>
+    <div class="patch-item">
+      <h2>补丁要能自检</h2>
+      <p>Anthropic 强调 task verifier。它让 agent 能确认漏洞是否被移除，也能检查功能是否回归。</p>
+      <p>这让 AI 生成补丁更接近可审查的工程产物。</p>
+    </div>
+    <div class="patch-item">
+      <h2>披露要有流程</h2>
+      <p>AI 会提高漏洞报告速度。维护者和研究者都需要协调披露机制来消化这种速度。</p>
+      <p>流程本身会成为 AI 安全时代的防线。</p>
+    </div>
+  </section>
 
-    <footer class="takeaways">
-      <h2>最值得带走的洞见</h2>
-      <ul>
-        <li>AI 安全能力已经进入真实复杂软件，而不只是 benchmark。</li>
-        <li>漏洞发现正在变得更便宜、更快，维护者的 triage 能力会成为瓶颈。</li>
-        <li>自动化 exploit 仍困难，但已经出现早期成功信号。</li>
-        <li>高质量 AI 漏洞报告应包含最小复现、PoC 和候选补丁。</li>
-        <li>防御方应趁模型仍更擅长发现而非攻击时，加速修复体系建设。</li>
-      </ul>
-    </footer>
-  </article>
+  <section class="takeaways">
+    <h2>最值得带走的洞见</h2>
+    <div class="mosaic">
+      <div class="tile large">
+        <b>AI 安全能力已进入真实维护流程</b>
+        <p>这不是只在 benchmark 上成立的结果。Firefox 的复杂度、用户规模和安全成熟度，让这次合作更接近未来软件维护的真实样貌。</p>
+      </div>
+      <div class="tile">
+        <b>防御者暂时占优</b>
+        <p>Claude 明显更擅长发现和修复漏洞，而不是构造稳定 exploit。</p>
+      </div>
+      <div class="tile">
+        <b>批量发现会改变维护压力</b>
+        <p>AI 能让报告数量快速上升。维护者需要更好的分诊、验证和优先级机制。</p>
+      </div>
+      <div class="tile">
+        <b>证据比模型结论更重要</b>
+        <p>最小复现、proof-of-concept 和候选补丁，是让 AI 报告可被信任的关键。</p>
+      </div>
+      <div class="tile">
+        <b>安全窗口需要被主动利用</b>
+        <p>在自动利用能力成熟前，开发者应尽快用 AI 加速漏洞发现、补丁验证和协调披露。</p>
+      </div>
+    </div>
+  </section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

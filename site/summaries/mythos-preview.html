@@ -3,120 +3,287 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Claude Mythos Preview 网络安全能力摘要</title>
+<title>评估 Claude Mythos Preview 的网络安全能力</title>
 <style>
-:root{
-  --bg:#f6f7fb;
-  --card:#ffffff;
-  --ink:#172033;
-  --muted:#5f6b80;
-  --line:#dfe4ee;
-  --accent:#2f6fed;
-  --accent2:#0f9f8f;
-  --accent3:#c05a14;
-  --hl:#eef4ff;
-  --hl2:#fff3e8;
+:root {
+  --bg: #f7f8fb;
+  --ink: #171b22;
+  --muted: #5c6675;
+  --line: #d8dee8;
+  --surface: #ffffff;
+  --surface-alt: #eef3f8;
+  --hero-bg: #101820;
+  --hero-ink: #f6f8fb;
+  --panel: #fdfefe;
+  --soft-data: #e8f3ff;
+  --soft-risk: #ffecef;
+  --soft-opportunity: #eaf7ef;
+  --soft-conclusion: #fff4d8;
+  --soft-neutral: #edf0f5;
+  --data: #1976d2;
+  --risk: #d73a49;
+  --opportunity: #238a4b;
+  --conclusion: #b77900;
+  --accent: #6d5dfc;
+  --code: #263241;
+  --shadow: 0 18px 40px rgba(20, 35, 55, 0.10);
 }
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
-  line-height:1.7;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #101318;
+    --ink: #edf1f7;
+    --muted: #a8b2c1;
+    --line: #303846;
+    --surface: #171c24;
+    --surface-alt: #1d2530;
+    --hero-bg: #080c10;
+    --hero-ink: #f3f6fa;
+    --panel: #151a21;
+    --soft-data: #12263a;
+    --soft-risk: #351820;
+    --soft-opportunity: #13291d;
+    --soft-conclusion: #302713;
+    --soft-neutral: #202733;
+    --data: #6bb8ff;
+    --risk: #ff7b8a;
+    --opportunity: #67d890;
+    --conclusion: #ffd166;
+    --accent: #a79cff;
+    --code: #d8e2ef;
+    --shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  }
 }
-main{
-  max-width:980px;
-  margin:0 auto;
-  padding:40px 20px 56px;
+:root[data-theme="dark"] {
+  --bg: #101318;
+  --ink: #edf1f7;
+  --muted: #a8b2c1;
+  --line: #303846;
+  --surface: #171c24;
+  --surface-alt: #1d2530;
+  --hero-bg: #080c10;
+  --hero-ink: #f3f6fa;
+  --panel: #151a21;
+  --soft-data: #12263a;
+  --soft-risk: #351820;
+  --soft-opportunity: #13291d;
+  --soft-conclusion: #302713;
+  --soft-neutral: #202733;
+  --data: #6bb8ff;
+  --risk: #ff7b8a;
+  --opportunity: #67d890;
+  --conclusion: #ffd166;
+  --accent: #a79cff;
+  --code: #d8e2ef;
+  --shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
 }
-header{
-  margin-bottom:24px;
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  line-height: 1.72;
 }
-.kicker{
-  color:var(--accent);
-  font-weight:700;
-  font-size:14px;
-  letter-spacing:0;
+main { overflow: hidden; }
+.hero {
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+  padding: 72px 22px 56px;
 }
-h1{
-  margin:8px 0 12px;
-  font-size:32px;
-  line-height:1.25;
+.wrap {
+  max-width: 1120px;
+  margin: 0 auto;
 }
-.lead{
-  background:linear-gradient(135deg,var(--hl),var(--card));
-  border:1px solid var(--line);
-  border-left:6px solid var(--accent);
-  padding:18px 20px;
-  border-radius:8px;
-  font-size:18px;
+.kicker {
+  color: var(--conclusion);
+  font-weight: 700;
+  letter-spacing: 0;
 }
-.grid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:16px;
-  margin:22px 0;
+h1 {
+  margin: 16px 0 10px;
+  font-size: clamp(32px, 5vw, 62px);
+  line-height: 1.08;
+  letter-spacing: 0;
 }
-.card{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:8px;
-  padding:18px;
+.subtitle {
+  color: var(--muted);
+  font-size: 18px;
 }
-.card h2{
-  margin:0 0 8px;
-  font-size:20px;
+.hero .subtitle { color: #c5cfdb; }
+.one {
+  margin-top: 30px;
+  max-width: 860px;
+  font-size: 22px;
+  line-height: 1.55;
+  border-left: 6px solid var(--data);
+  padding-left: 18px;
 }
-.card p{margin:0;color:var(--muted)}
-.metric{
-  display:inline-block;
-  margin:4px 6px 4px 0;
-  padding:3px 8px;
-  border-radius:6px;
-  background:var(--hl);
-  color:var(--accent);
-  font-weight:700;
+.stats {
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
 }
-.section{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:8px;
-  padding:22px;
-  margin:16px 0;
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--line);
 }
-.section h2{
-  margin:0 0 10px;
-  font-size:22px;
+.stat {
+  background: var(--soft-data);
+  padding: 26px;
+  min-height: 150px;
 }
-.section p{margin:8px 0}
-.note{
-  border-left:4px solid var(--accent2);
-  padding-left:12px;
-  color:var(--muted);
+.stat:nth-child(2) { background: var(--soft-risk); }
+.stat:nth-child(3) { background: var(--soft-opportunity); }
+.stat:nth-child(4) { background: var(--soft-conclusion); }
+.num {
+  display: block;
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--code);
 }
-.warning{
-  background:var(--hl2);
-  border-color:color-mix(in srgb,var(--accent3) 35%,var(--line));
+.label {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
 }
-.takeaways{
-  display:grid;
-  gap:10px;
-  padding:0;
-  margin:12px 0 0;
-  list-style:none;
+.section {
+  padding: 58px 22px;
 }
-.takeaways li{
-  background:var(--hl);
-  border:1px solid var(--line);
-  border-radius:8px;
-  padding:12px 14px;
+.split {
+  background: var(--surface-alt);
 }
-@media (max-width:720px){
-  main{padding:28px 14px 42px}
-  h1{font-size:26px}
-  .grid{grid-template-columns:1fr}
-  .lead{font-size:16px}
+.two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 34px;
+  align-items: start;
+}
+h2 {
+  margin: 0 0 18px;
+  font-size: 28px;
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+.lead {
+  font-size: 18px;
+  color: var(--ink);
+}
+.note {
+  background: var(--surface);
+  border-left: 6px solid var(--risk);
+  padding: 20px 22px;
+  box-shadow: var(--shadow);
+}
+.process {
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-top: 24px;
+}
+.step {
+  border-top: 4px solid var(--opportunity);
+  padding-top: 16px;
+}
+.step b {
+  color: var(--conclusion);
+  font-size: 24px;
+}
+.table-zone {
+  background: var(--bg);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+th, td {
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--soft-neutral);
+  color: var(--code);
+}
+td:first-child {
+  color: var(--data);
+  font-weight: 700;
+}
+.insight {
+  background: var(--soft-conclusion);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.quote {
+  max-width: 920px;
+  font-size: 26px;
+  line-height: 1.45;
+  color: var(--code);
+}
+.quote strong { color: var(--risk); }
+.actions {
+  background: var(--surface);
+}
+.action-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 28px;
+}
+.action-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.action-list li {
+  margin: 0 0 14px;
+  padding: 14px 16px;
+  border-left: 5px solid var(--accent);
+  background: var(--soft-neutral);
+}
+.mosaic {
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+}
+.tiles {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 16px;
+}
+.tile {
+  padding: 22px;
+  min-height: 150px;
+  background: var(--surface-alt);
+  color: var(--ink);
+}
+.tile.big {
+  grid-row: span 2;
+  background: var(--soft-data);
+}
+.tile.risk { background: var(--soft-risk); }
+.tile.opp { background: var(--soft-opportunity); }
+.tile.done { background: var(--soft-conclusion); }
+.badge {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 3px 9px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 13px;
+}
+@media (max-width: 820px) {
+  .stats-grid, .two, .steps, .action-grid, .tiles {
+    grid-template-columns: 1fr;
+  }
+  .hero { padding-top: 48px; }
+  .one { font-size: 19px; }
+  .quote { font-size: 22px; }
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -193,13 +360,6 @@ h1{
     body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
       color: inherit;
     }
-    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
-      border-color: var(--airs-digest-line) !important;
-    }
-    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
-      background: var(--airs-digest-panel) !important;
-      color: var(--airs-digest-ink) !important;
-    }
     body :where(.muted, .meta, .kicker, small) {
       color: var(--airs-digest-muted) !important;
     }
@@ -260,69 +420,114 @@ h1{
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/mythos-preview" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
 <main>
-<header>
-  <div class="kicker">Anthropic · Frontier Red Team · 2026-04-07</div>
-  <h1>Mythos Preview 显示出可规模化的漏洞发现与利用能力</h1>
-  <div class="lead"><strong>一句话总括：</strong>这篇文章的真正贡献，是用真实零日、N-day、开源基准和人工复核结果说明，前沿语言模型已经从“辅助找漏洞”跨入“自动发现并利用复杂漏洞”的阶段，安全行业必须按更快节奏组织防御。</div>
-</header>
+  <section class="hero">
+    <div class="wrap">
+      <div class="kicker">Frontier Red Team · Anthropic · Apr 7, 2026</div>
+      <h1>评估 Claude Mythos Preview 的网络安全能力</h1>
+      <div class="subtitle">Assessing Claude Mythos Preview’s cybersecurity capabilities</div>
+      <p class="one">一句话总括：这篇文章的真正贡献，是用真实漏洞发现、自动利用和披露流程说明，前沿语言模型已经把网络安全从“辅助审计”推向“可规模化漏洞研究”。</p>
+    </div>
+  </section>
 
-<div class="grid">
-  <div class="card">
-    <h2>能力跃迁不是单点突破</h2>
-    <p><span class="metric">181</span><span class="metric">29</span>在Firefox 147 JavaScript引擎实验中，Mythos生成181个可用shell exploit，并另有29次取得寄存器控制；Opus 4.6此前数百次只有2次成功。这说明模型差距不只是“更会写代码”，而是能把漏洞理解、调试和利用链组合起来。</p>
-  </div>
-  <div class="card">
-    <h2>公开内容只是下限</h2>
-    <p><span class="metric">&gt;99%</span><span class="metric">&lt;1%</span>Anthropic称超过99%的发现仍未修补，能公开讨论的不足1%。这意味着文章中的案例不是完整清单，而是对未来披露规模的保守样本。</p>
-  </div>
-</div>
+  <section class="stats">
+    <div class="wrap stats-grid">
+      <div class="stat"><span class="num">181</span><span class="label">在Firefox 147实验中生成可用JavaScript shell exploit。</span></div>
+      <div class="stat"><span class="num">&gt;99%</span><span class="label">Anthropic称发现的漏洞尚未完成修补，因此不能披露细节。</span></div>
+      <div class="stat"><span class="num">10</span><span class="label">在已完全打补丁目标上达到完整控制流劫持。</span></div>
+      <div class="stat"><span class="num">89%</span><span class="label">198份人工复核报告中，专家与模型严重性评级完全一致。</span></div>
+    </div>
+  </section>
 
-<section class="section">
-  <h2>零日发现：模型把“全面审计”变得可并行</h2>
-  <p>Anthropic使用隔离容器和简单agent脚手架，让模型阅读代码、提出假设、运行程序、调试验证，并输出漏洞报告与复现步骤；为了覆盖更多文件，还先让模型按风险给文件打分，再并行搜索。</p>
-  <p class="note">关键变化在于成本结构：人类专家通常会优先检查“看起来最危险”的路径，而模型可以把大量边缘文件也系统性扫过，从而发现长期被忽视的问题。</p>
-</section>
+  <section class="section split">
+    <div class="wrap two">
+      <div>
+        <h2>能力变化不只是“更会找漏洞”</h2>
+        <p class="lead">文章强调，Mythos Preview能发现零日漏洞，也能把漏洞转化为可运行利用。这个变化改变了风险判断。过去很多缓解措施依赖攻击步骤繁琐。模型可以用时间和并行度磨穿这些摩擦。</p>
+      </div>
+      <div class="note">
+        <p>Anthropic称，模型在每个主要操作系统和主要浏览器中都能找到并利用零日漏洞。案例包括OpenBSD的27年旧SACK漏洞、FFmpeg的16年旧H.264问题、FreeBSD NFS远程root漏洞，以及浏览器JIT heap spray链。</p>
+      </div>
+    </div>
+  </section>
 
-<section class="section">
-  <h2>案例显示老漏洞并不等于容易漏洞</h2>
-  <p><span class="metric">27年</span>OpenBSD SACK漏洞涉及边界检查、链表状态和32位序列号溢出的组合，最终可导致远程崩溃；文章称该问题来自1998年加入的实现路径。</p>
-  <p><span class="metric">16年</span>FFmpeg H.264漏洞源于16位表项、32位slice计数和哨兵值碰撞，长期绕过了fuzzer和人工审查。这改变了一个常见直觉：成熟项目中剩下的问题不一定稀少，只是需要跨文件、跨语义的耐心推理。</p>
-</section>
+  <section class="section process">
+    <div class="wrap">
+      <h2>Anthropic如何评估它</h2>
+      <div class="steps">
+        <div class="step"><b>1</b><p>把项目源码和可运行环境放进隔离容器。提示模型寻找安全漏洞。</p></div>
+        <div class="step"><b>2</b><p>模型阅读代码、运行程序、添加调试逻辑，并输出PoC和复现步骤。</p></div>
+        <div class="step"><b>3</b><p>为了提高覆盖率，多个代理分别聚焦不同文件，并先按漏洞可能性给文件排序。</p></div>
+        <div class="step"><b>4</b><p>最后再用一个模型代理复核报告，过滤低价值或不重要的问题。</p></div>
+      </div>
+    </div>
+  </section>
 
-<section class="section">
-  <h2>利用能力比发现能力更改变风险模型</h2>
-  <p><span class="metric">CVE-2026-4747</span><span class="metric">17年</span>文章称Mythos自主发现并利用FreeBSD NFS远程代码执行漏洞，可从未认证网络访问获得root；更重要的是，人类没有在发现后继续手把手指导利用过程。</p>
-  <p>这说明漏洞评级不能只靠“看起来是否可利用”。当模型能快速尝试真实利用链时，过去依赖攻击开发难度形成的缓冲时间会缩短。</p>
-</section>
+  <section class="section table-zone">
+    <div class="wrap">
+      <h2>几个案例说明了不同风险</h2>
+      <table>
+        <thead>
+          <tr><th>案例</th><th>关键事实</th><th>改变理解的地方</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>OpenBSD SACK</td>
+            <td>模型发现一个27年旧漏洞。它组合了SACK状态链表处理和有符号整数溢出，导致远程崩溃。</td>
+            <td>安全声誉高、代码历史久，并不等于剩余漏洞已经足够浅。模型规模化搜索会重新打开旧代码。</td>
+          </tr>
+          <tr>
+            <td>FFmpeg H.264</td>
+            <td>16位表项与32位slice计数器冲突。65536个slice可触发哨兵值碰撞并导致越界写。</td>
+            <td>模糊测试覆盖很强的项目，仍可能遗漏需要语义理解和边界推理的缺陷。</td>
+          </tr>
+          <tr>
+            <td>FreeBSD NFS</td>
+            <td>CVE-2026-4747允许未认证远程攻击者通过ROP链获得root。模型自主完成发现和利用。</td>
+            <td>漏洞严重性不能只看源码模式。实际构造exploit能揭示防护是否真的生效。</td>
+          </tr>
+          <tr>
+            <td>Linux N-day</td>
+            <td>模型从CVE和补丁提交出发，在半天到一天内构造本地提权链，成本低于数千美元。</td>
+            <td>公开补丁到实际攻击之间的时间差会变短。补丁周期本身成为核心防线。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
 
-<section class="section">
-  <h2>基准结果显示防御摩擦正在贬值</h2>
-  <p><span class="metric">约1000仓库</span><span class="metric">约7000入口点</span>在OSS-Fuzz语料上，Sonnet 4.6和Opus 4.6主要达到tier 1/2，且各只有1个tier 3；Mythos达到595个tier 1/2、若干tier 3/4，并在10个完整修补目标上达到tier 5控制流劫持。</p>
-  <p class="note">文章的核心安全判断是：让攻击“繁琐”的缓解措施会变弱，因为模型擅长机械化地磨过复杂步骤；真正的硬边界仍然重要。</p>
-</section>
+  <section class="section insight">
+    <div class="wrap">
+      <p class="quote"><strong>核心洞见：</strong>这不是一个“攻击者是否会用AI”的假设问题，而是防守方是否能更快把AI变成审计、修补、分诊和响应流水线的问题。</p>
+    </div>
+  </section>
 
-<section class="section">
-  <h2>人工复核给了严重性判断一个参照</h2>
-  <p><span class="metric">198份</span><span class="metric">89%</span><span class="metric">98%</span>在198份人工复核漏洞报告中，专家有89%完全同意Claude的严重性评级，98%与模型评级相差不超过一个等级。</p>
-  <p>这并不证明每个待披露发现都成立，但说明模型输出已经足够接近专业 triage，可用于放大安全团队的初筛、去重和复现能力。</p>
-</section>
+  <section class="section actions">
+    <div class="wrap action-grid">
+      <div>
+        <h2>防守建议的重点是缩短循环</h2>
+        <p class="lead">文章给出的建议很直接。现在就用可用前沿模型做漏洞发现、报告分诊、复现步骤、补丁草案和云环境检查。更重要的是，把安全更新从例行维护提升为紧急交付能力。</p>
+      </div>
+      <ul class="action-list">
+        <li>缩短安全补丁部署窗口，并尽量启用自动更新。</li>
+        <li>重新审视漏洞披露流程，准备处理更大规模的报告。</li>
+        <li>为遗留系统和已停止维护系统设计应急修补方案。</li>
+        <li>让模型承担告警分诊、事件摘要、调查记录和初步根因分析。</li>
+      </ul>
+    </div>
+  </section>
 
-<section class="section warning">
-  <h2>防守建议：补丁窗口必须缩短</h2>
-  <p>N-day部分尤其重要：文章称从CVE编号和补丁提交出发，Mythos可在半天到一天内生成本地提权exploit，成本低于1000到2000美元级别。</p>
-  <p>这改变了披露后的风险曲线：补丁发布不再意味着风险下降，反而可能成为攻击者自动化生成exploit的路线图，因此自动更新、紧急依赖升级和更快发布流程会变成基础能力。</p>
-</section>
-
-<section class="section">
-  <h2>最值得带走的洞见</h2>
-  <ul class="takeaways">
-    <li>前沿模型的网络安全能力已经同时覆盖漏洞发现、复现、评级和部分利用开发，不能再只按“代码助手”理解。</li>
-    <li>成熟、被反复审计的基础软件仍可能隐藏高影响漏洞；模型的优势来自规模化、耐心和跨语义推理。</li>
-    <li>防守方短期要把模型用于triage、复现、补丁建议、配置审查和事件响应，先建立流程比等待更强模型更现实。</li>
-    <li>N-day风险会显著上升，因为公开补丁与CVE足以成为自动生成exploit的输入。</li>
-    <li>长期看模型可能让软件更安全，但过渡期会更危险，安全工程需要围绕更高漏洞流量和更短攻击窗口重建。</li>
-  </ul>
-</section>
+  <section class="section mosaic">
+    <div class="wrap">
+      <h2>最值得带走的洞见</h2>
+      <div class="tiles">
+        <div class="tile big"><span class="badge">结论</span><p>Mythos Preview显示，语言模型已经能把“发现漏洞”和“写出利用链”连成一个自动化流程。安全行业需要按这个新基线重新规划防御。</p></div>
+        <div class="tile risk"><span class="badge">风险</span><p>依赖攻击成本高、步骤繁琐、人工稀缺的防线会变弱。模型能并行、耐心地完成这些步骤。</p></div>
+        <div class="tile opp"><span class="badge">机会</span><p>同样的能力也能帮助维护者更早发现和修复漏洞。长期优势可能属于更会组织自动化防御的一方。</p></div>
+        <div class="tile"><span class="badge">数据</span><p>Firefox实验、OSS-Fuzz内部基准和198份人工复核结果，都指向能力跃迁，而不是单个演示。</p></div>
+        <div class="tile done"><span class="badge">行动</span><p>补丁速度、披露吞吐量和事件响应自动化，需要从现在开始升级。</p></div>
+      </div>
+    </div>
+  </section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

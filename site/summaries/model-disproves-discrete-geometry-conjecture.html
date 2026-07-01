@@ -2,106 +2,289 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>AI 推翻单位距离问题旧猜想的意义</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>一个 OpenAI 模型推翻了离散几何中的一个核心猜想</title>
 <style>
-:root{
-  --bg:#f6f7f4;
-  --card:#ffffff;
-  --ink:#17201b;
-  --muted:#5d6a63;
-  --line:#dfe5df;
-  --accent:#2f6f5e;
-  --accent2:#8b4e2f;
-  --accent3:#315f8a;
-  --hl:#eef7f2;
-  --hl2:#fff1e8;
+:root {
+  --bg: #f7f4ef;
+  --paper: #fffdf8;
+  --ink: #1d1f24;
+  --muted: #626873;
+  --line: #d9d2c4;
+  --hero-bg: #20242c;
+  --hero-ink: #f8f1e4;
+  --soft-data: #e7f0ff;
+  --soft-risk: #ffe9e2;
+  --soft-opportunity: #e8f6ec;
+  --soft-conclusion: #f3e9ff;
+  --band-bg: #101820;
+  --card: #ffffff;
+  --accent-data: #2563eb;
+  --accent-risk: #d9480f;
+  --accent-opportunity: #168044;
+  --accent-conclusion: #7c3aed;
+  --accent-warm: #c47a00;
+  --shadow: 0 18px 45px rgba(25, 28, 34, 0.12);
 }
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
-  line-height:1.75;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #101216;
+    --paper: #171a20;
+    --ink: #ece7dd;
+    --muted: #a9adba;
+    --line: #343844;
+    --hero-bg: #080b10;
+    --hero-ink: #f4ead8;
+    --soft-data: #13223d;
+    --soft-risk: #351b14;
+    --soft-opportunity: #11291b;
+    --soft-conclusion: #241934;
+    --band-bg: #070a0f;
+    --card: #1c2028;
+    --accent-data: #76a7ff;
+    --accent-risk: #ff8b63;
+    --accent-opportunity: #5dde8d;
+    --accent-conclusion: #b899ff;
+    --accent-warm: #f1b64b;
+    --shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+  }
 }
-main{
-  max-width:920px;
-  margin:0 auto;
-  padding:42px 22px 56px;
+:root[data-theme="dark"] {
+  --bg: #101216;
+  --paper: #171a20;
+  --ink: #ece7dd;
+  --muted: #a9adba;
+  --line: #343844;
+  --hero-bg: #080b10;
+  --hero-ink: #f4ead8;
+  --soft-data: #13223d;
+  --soft-risk: #351b14;
+  --soft-opportunity: #11291b;
+  --soft-conclusion: #241934;
+  --band-bg: #070a0f;
+  --card: #1c2028;
+  --accent-data: #76a7ff;
+  --accent-risk: #ff8b63;
+  --accent-opportunity: #5dde8d;
+  --accent-conclusion: #b899ff;
+  --accent-warm: #f1b64b;
+  --shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
 }
-header{
-  border-bottom:1px solid var(--line);
-  padding-bottom:24px;
-  margin-bottom:28px;
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  line-height: 1.68;
 }
-.kicker{
-  color:var(--accent);
-  font-size:14px;
-  font-weight:700;
-  letter-spacing:0;
+main { overflow: hidden; }
+section { padding: 56px max(22px, calc((100vw - 1120px) / 2)); }
+.hero {
+  min-height: 58vh;
+  display: grid;
+  align-content: center;
+  gap: 22px;
+  background:
+    radial-gradient(circle at 18% 18%, color-mix(in srgb, var(--accent-data) 28%, transparent), transparent 32%),
+    linear-gradient(135deg, var(--hero-bg), var(--band-bg));
+  color: var(--hero-ink);
 }
-h1{
-  font-size:34px;
-  line-height:1.25;
-  margin:10px 0 14px;
+.kicker {
+  color: var(--accent-warm);
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  font-size: 13px;
 }
-.lead{
-  font-size:20px;
-  background:var(--hl);
-  border-left:5px solid var(--accent);
-  padding:16px 18px;
-  margin:18px 0 0;
+h1 {
+  margin: 0;
+  max-width: 900px;
+  font-size: clamp(34px, 6vw, 72px);
+  line-height: 1.08;
+  letter-spacing: 0;
 }
-.meta{
-  color:var(--muted);
-  font-size:14px;
+.original {
+  margin: 0;
+  max-width: 820px;
+  color: color-mix(in srgb, var(--hero-ink) 72%, transparent);
+  font-size: 18px;
 }
-section{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:8px;
-  padding:22px;
-  margin:18px 0;
+.lead {
+  max-width: 820px;
+  font-size: 22px;
+  color: color-mix(in srgb, var(--hero-ink) 88%, transparent);
 }
-h2{
-  font-size:22px;
-  line-height:1.35;
-  margin:0 0 10px;
-  color:var(--accent);
+.metrics {
+  background: var(--paper);
+  padding-top: 28px;
+  padding-bottom: 28px;
 }
-p{margin:10px 0}
-.data{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:12px;
-  margin:16px 0 4px;
+.metric-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
 }
-.metric{
-  background:var(--hl2);
-  border:1px solid var(--line);
-  border-radius:8px;
-  padding:14px;
+.metric {
+  padding: 24px;
+  border-right: 1px solid var(--line);
+  background: var(--card);
 }
-.metric strong{
-  display:block;
-  font-size:22px;
-  color:var(--accent2);
+.metric:last-child { border-right: 0; }
+.metric b {
+  display: block;
+  color: var(--accent-data);
+  font-size: clamp(26px, 4vw, 44px);
+  line-height: 1.1;
 }
-.note{
-  color:var(--muted);
+.metric span { color: var(--muted); font-size: 14px; }
+.split {
+  display: grid;
+  grid-template-columns: 1.05fr .95fr;
+  gap: 34px;
+  background: var(--soft-data);
 }
-.takeaways{
-  background:linear-gradient(180deg,var(--card),var(--hl));
+.panel-plain h2, .panel-plain h3, .timeline h2, .compare h2, .quote h2, .takeaways h2 {
+  margin: 0 0 14px;
+  font-size: 30px;
+  line-height: 1.2;
 }
-ul{
-  padding-left:22px;
-  margin:10px 0 0;
+.panel-plain p, .timeline p, .compare p, .quote p, .takeaways p { margin: 0 0 14px; }
+.explain-box {
+  padding: 28px;
+  background: var(--paper);
+  border-left: 8px solid var(--accent-data);
+  box-shadow: var(--shadow);
 }
-li{margin:8px 0}
-code{
-  background:var(--hl);
-  padding:1px 5px;
-  border-radius:4px;
+.explain-box strong { color: var(--accent-data); }
+.timeline {
+  background: var(--paper);
+}
+.flow {
+  display: grid;
+  gap: 18px;
+  margin-top: 24px;
+}
+.step {
+  display: grid;
+  grid-template-columns: 86px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+.year {
+  color: var(--accent-warm);
+  font-weight: 900;
+  border-top: 3px solid var(--accent-warm);
+  padding-top: 8px;
+}
+.step div:last-child {
+  padding: 0 0 20px 22px;
+  border-left: 2px solid var(--line);
+}
+.compare {
+  background: var(--band-bg);
+  color: var(--hero-ink);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 22px;
+  background: color-mix(in srgb, var(--band-bg) 84%, var(--paper));
+}
+th, td {
+  padding: 18px;
+  text-align: left;
+  border-bottom: 1px solid color-mix(in srgb, var(--hero-ink) 18%, transparent);
+  vertical-align: top;
+}
+th { color: var(--accent-opportunity); }
+td:first-child { color: var(--accent-warm); font-weight: 800; }
+.quote {
+  background: var(--soft-opportunity);
+}
+.insight {
+  max-width: 900px;
+  padding: 30px;
+  border-left: 10px solid var(--accent-opportunity);
+  background: var(--paper);
+  font-size: 22px;
+  box-shadow: var(--shadow);
+}
+.insight cite {
+  display: block;
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 15px;
+  font-style: normal;
+}
+.risk-opportunity {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  padding: 0;
+}
+.half {
+  padding: 54px max(24px, calc((100vw - 1120px) / 2));
+}
+.half.risk { background: var(--soft-risk); }
+.half.opportunity { background: var(--soft-conclusion); }
+.half h2 { margin: 0 0 12px; font-size: 28px; }
+.half.risk h2 { color: var(--accent-risk); }
+.half.opportunity h2 { color: var(--accent-conclusion); }
+.takeaways {
+  background: var(--paper);
+}
+.mosaic {
+  display: grid;
+  grid-template-columns: 1.2fr .8fr 1fr;
+  gap: 14px;
+  margin-top: 24px;
+}
+.tile {
+  min-height: 150px;
+  padding: 22px;
+  color: var(--ink);
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+.tile:nth-child(1) {
+  grid-row: span 2;
+  background: var(--soft-data);
+  border-color: var(--accent-data);
+}
+.tile:nth-child(2) {
+  background: var(--soft-risk);
+  border-color: var(--accent-risk);
+}
+.tile:nth-child(3) {
+  background: var(--soft-opportunity);
+  border-color: var(--accent-opportunity);
+}
+.tile:nth-child(4) {
+  grid-column: span 2;
+  background: var(--soft-conclusion);
+  border-color: var(--accent-conclusion);
+}
+.tile b {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 18px;
+}
+.footer-note {
+  color: var(--muted);
+  font-size: 14px;
+  margin-top: 28px;
+}
+@media (max-width: 820px) {
+  section { padding: 42px 20px; }
+  .metric-row, .split, .risk-opportunity, .mosaic { grid-template-columns: 1fr; }
+  .metric { border-right: 0; border-bottom: 1px solid var(--line); }
+  .metric:last-child { border-bottom: 0; }
+  .step { grid-template-columns: 1fr; }
+  .step div:last-child { padding-left: 0; border-left: 0; }
+  .half { padding: 42px 20px; }
+  .tile:nth-child(1), .tile:nth-child(4) { grid-row: auto; grid-column: auto; }
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -178,13 +361,6 @@ code{
     body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
       color: inherit;
     }
-    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
-      border-color: var(--airs-digest-line) !important;
-    }
-    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
-      background: var(--airs-digest-panel) !important;
-      color: var(--airs-digest-ink) !important;
-    }
     body :where(.muted, .meta, .kicker, small) {
       color: var(--airs-digest-muted) !important;
     }
@@ -245,61 +421,137 @@ code{
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/model-disproves-discrete-geometry-conjecture" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
 <main>
-<header>
-  <div class="kicker">一句话总括</div>
-  <h1>AI 不只是加速证明检查，而是在一个经典几何问题上给出了改变下界格局的新构造。</h1>
-  <div class="meta">来源：OpenAI；文章日期：2026 年 5 月 20 日；主题：离散几何、代数数论、AI 数学推理</div>
-  <p class="lead">这篇文章的核心贡献不是“AI 写出了一篇数学证明”这么简单，而是它让一个被长期相信的结构性猜想失效，并暴露出离散几何和深层代数数论之间此前未被充分利用的连接。</p>
-</header>
+  <section class="hero">
+    <div class="kicker">一句话总括</div>
+    <h1>一个 OpenAI 模型推翻了离散几何中的一个核心猜想</h1>
+    <p class="original">An OpenAI model has disproved a central conjecture in discrete geometry</p>
+    <p class="lead">真正的贡献不只是给出一个反例，而是显示通用 AI 推理模型能把深层代数数论工具带进离散几何，并产出经专家核验的前沿数学发现。</p>
+  </section>
 
-<section>
-  <h2>旧直觉：平方网格几乎最优</h2>
-  <p>单位距离问题问的是：在平面上放置 <code>n</code> 个点，最多能有多少对点的距离正好等于 1。直线排布只能给出 <code>n-1</code> 对，平方网格约给出 <code>2n</code> 对，而重缩放平方网格长期提供最强的已知下界。</p>
-  <p>关键趋势是，旧构造的增长率约为 <code>n^(1+C/log log n)</code>，指数中多出来的部分会随 <code>n</code> 变大而趋近 0。因此数学界长期相信真正答案可能只有略高于线性，也就是 <code>n^(1+o(1))</code>。</p>
-  <p class="note">这个背景很重要：AI 的结果不是在小常数上改进，而是挑战了几十年来关于“什么样的几何结构能产生最多单位距离”的主导判断。</p>
-</section>
+  <section class="metrics">
+    <div class="metric-row">
+      <div class="metric"><b>1946</b><span>Erdős 提出平面单位距离问题。</span></div>
+      <div class="metric"><b>近 80 年</b><span>主流预期认为方格类构造基本最优。</span></div>
+      <div class="metric"><b>n^{1+δ}</b><span>新构造在无穷多个 n 上达到固定多项式改进。</span></div>
+      <div class="metric"><b>0.014</b><span>Will Sawin 后续 refinement 给出的可取指数。</span></div>
+    </div>
+  </section>
 
-<section>
-  <h2>新结果：存在多项式级改进</h2>
-  <p>OpenAI 称其内部模型构造出无穷多组 <code>n</code> 点配置，使单位距离对至少达到 <code>n^(1+δ)</code>，其中 <code>δ&gt;0</code> 是固定常数。后续由 Will Sawin 给出的改进显示可以取 <code>δ=0.014</code>。</p>
-  <div class="data">
-    <div class="metric"><strong>1946</strong>Paul Erdős 提出平面单位距离问题</div>
-    <div class="metric"><strong>1984</strong>已知上界 <code>O(n^(4/3))</code> 的来源年份</div>
-    <div class="metric"><strong>δ=0.014</strong>后续改进给出的具体指数增益</div>
-  </div>
-  <p>这改变读者对 AI 影响的理解：模型不是只在已有路径上补全细节，而是选择了构造反例这条高风险路线，并找到了足以推翻旧猜想的结构。</p>
-</section>
+  <section class="split">
+    <div class="panel-plain">
+      <h2>问题简单，直觉长期误导</h2>
+      <p>单位距离问题问的是：在平面上放置 n 个点，最多有多少对点距离正好为 1。</p>
+      <p>直线和普通方格都能给出线性数量的单位距离对。经过缩放的方格能略微超过线性。</p>
+      <p>长期猜想认为这种“略微超过”已经接近极限。新结果说明，这个直觉是错的。</p>
+    </div>
+    <div class="explain-box">
+      <p><strong>为什么改变理解：</strong>过去的信念是，欧氏平面中的单位距离结构很难系统性地超过方格。</p>
+      <p>AI 找到的构造把增长率提升到 n 的 1 加固定正数次方。这不是微小优化，而是量级认识的变化。</p>
+    </div>
+  </section>
 
-<section>
-  <h2>方法新意：从代数数论借力</h2>
-  <p>Erdős 的旧构造可以通过高斯整数来理解，也就是形如 <code>a+bi</code> 的数。新证明沿着这个方向继续推进，但不再停留在高斯整数，而是使用更复杂的代数数域来制造更多单位长度差。</p>
-  <p>文章提到的关键工具包括无限类域塔和 Golod-Shafarevich 理论。它们原本属于代数数论中的深层技术，却在这里被用来回答欧氏平面中的几何计数问题。</p>
-  <p class="note">真正的洞见在于：单位距离问题并不只是“平面点怎么摆”的问题，它可能依赖于数域中因子分解、对称性和结构增长的性质。</p>
-</section>
+  <section class="timeline">
+    <h2>这条问题线索如何被改写</h2>
+    <p>这篇文章的重点不是单个技巧，而是一个长期停滞问题突然出现新的构造路线。</p>
+    <div class="flow">
+      <div class="step">
+        <div class="year">1946</div>
+        <div>
+          <strong>Erdős 提出问题。</strong>
+          <p>他研究 n 个平面点能产生多少个单位距离对，并给出经典下界构造。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="year">1984</div>
+        <div>
+          <strong>最好上界基本固定。</strong>
+          <p>Spencer、Szemerédi 和 Trotter 给出 O(n^{4/3}) 上界。后来虽有结构性进展，但主阶没有被根本改变。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="year">2026</div>
+        <div>
+          <strong>AI 给出反例族。</strong>
+          <p>OpenAI 内部模型构造出比 n^{1+o(1)} 更强的例子，并由外部数学家核验。</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<section>
-  <h2>AI 意义：可核验的原创数学想法</h2>
-  <p>文章强调，这个证明来自一个通用推理模型，而不是专门为单位距离问题训练或脚手架化搜索的数学系统。证明随后由外部数学家检查，并由他们撰写伴随论文解释背景和意义。</p>
-  <p>Tim Gowers、Noga Alon、Arul Shankar、Jacob Tsimerman 等数学家的评论共同指向一点：如果这项工作由人类提交，它会被视为重要的数学论文，而不只是一次 AI 演示。</p>
-  <p>这改变了“AI 作为研究助手”的边界。它显示模型可能提出专家未优先尝试的路径，并把跨领域工具执行到足以经受同行审查的程度。</p>
-</section>
+  <section class="compare">
+    <h2>旧信念与新结果的差别</h2>
+    <p>关键变化在于，增长率从“几乎线性”变成了“固定多项式超过线性”。</p>
+    <table>
+      <thead>
+        <tr>
+          <th>维度</th>
+          <th>此前理解</th>
+          <th>新结果</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>构造来源</td>
+          <td>主要来自方格和高斯整数相关思想。</td>
+          <td>使用更复杂的代数数域、无限类域塔和 Golod-Shafarevich 理论。</td>
+        </tr>
+        <tr>
+          <td>增长率</td>
+          <td>约为 n^{1+C/log log(n)}，指数中的额外项会趋近 0。</td>
+          <td>至少达到 n^{1+δ}，δ 是固定正数。</td>
+        </tr>
+        <tr>
+          <td>数学含义</td>
+          <td>支持 Erdős 的 n^{1+o(1)} 上界猜想。</td>
+          <td>直接证伪该猜想，并打开数论构造进入离散几何的新路线。</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
 
-<section>
-  <h2>更大的影响：人类判断仍是中心</h2>
-  <p>文章把这个案例放到更广的科研图景中：如果模型能维持长链条推理、连接遥远领域并产出可检查结果，那么类似能力也可能影响生物、物理、材料、工程和医学研究。</p>
-  <p>但结论并不是人类数学家变得不重要。相反，外部数学家的验证、解释和扩展让原始证明的价值变得更清楚，说明专家判断仍然决定问题选择、意义解释和后续方向。</p>
-</section>
+  <section class="quote">
+    <h2>专家验证让 AI 发现变成数学结果</h2>
+    <div class="insight">
+      外部数学家的角色不是装饰性的。他们核验了证明，解释了背景，并把原始解法放进更大的数学图景。
+      <cite>文章引用 Tim Gowers、Noga Alon、Arul Shankar、Jacob Tsimerman 等人的评价，强调该结果在 AI 数学中的里程碑意义。</cite>
+    </div>
+  </section>
 
-<section class="takeaways">
-  <h2>最值得带走的洞见</h2>
-  <ul>
-    <li>单位距离问题的旧下界直觉被推翻：平方网格不是本质最优。</li>
-    <li>新构造给出 <code>n^(1+δ)</code> 级别增长，后续改进给出 <code>δ=0.014</code>。</li>
-    <li>离散几何中的一个初等问题，可能需要深层代数数论工具才能看清。</li>
-    <li>AI 的角色正在从“辅助计算和检查”扩展到“提出原创研究路径”。</li>
-    <li>最有价值的模式不是 AI 替代专家，而是 AI 发现连接，专家验证、解释并扩展这些连接。</li>
-  </ul>
-</section>
+  <section class="risk-opportunity">
+    <div class="half risk">
+      <h2>风险：不能把一次成功误读成全面替代</h2>
+      <p>文章反复强调证明需要专家检查。数学上的“可验证性”让这次结果更容易被确认。</p>
+      <p>这意味着 AI 的研究能力已经值得认真对待，但人类判断仍然决定问题选择、结果解释和后续研究方向。</p>
+    </div>
+    <div class="half opportunity">
+      <h2>机会：AI 可能擅长寻找冷门路径</h2>
+      <p>模型没有沿着主流猜想去证明上界，而是持续尝试构造反例。</p>
+      <p>这说明先进模型可能会把专家认为希望不大的方向重新纳入搜索空间，并在跨领域连接中发现突破口。</p>
+    </div>
+  </section>
+
+  <section class="takeaways">
+    <h2>最值得带走的洞见</h2>
+    <div class="mosaic">
+      <div class="tile">
+        <b>数学结论被改写</b>
+        平面单位距离问题的经典猜想被证伪。方格构造不再是增长率意义上的终点。
+      </div>
+      <div class="tile">
+        <b>数据点很硬</b>
+        新下界达到 n^{1+δ}。后续 refinement 给出 δ=0.014，足以说明改进不是渐近符号里的细节。
+      </div>
+      <div class="tile">
+        <b>跨领域连接是核心</b>
+        代数数论工具进入离散几何，改变了研究者对该问题可用技术的判断。
+      </div>
+      <div class="tile">
+        <b>AI 的角色更接近研究合作者</b>
+        这次案例展示了 AI 可以提出原创构造，人类数学家则负责核验、阐释和扩展意义。
+      </div>
+    </div>
+    <p class="footer-note">结论：这篇文章最重要的信息不是“AI 做对了一道题”，而是 AI 已经能在某些精确、可验证的前沿问题上提出改变学科理解的新思路。</p>
+  </section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

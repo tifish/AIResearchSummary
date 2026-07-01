@@ -3,115 +3,283 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI 代理自主性正在增长，但监督方式也在变化</title>
+<title>实践中衡量 AI agent 自主性</title>
 <style>
-:root{
-  --bg:#f6f7f9;
-  --card:#ffffff;
-  --ink:#17202a;
-  --muted:#5d6978;
-  --line:#dfe5ec;
-  --accent:#2563eb;
-  --accent2:#0f766e;
-  --accent3:#b45309;
-  --hl:#eaf2ff;
-  --hl2:#fff4db;
+:root {
+  --bg: #f7f4ee;
+  --ink: #17202a;
+  --muted: #657080;
+  --line: #d9d2c5;
+  --card: #ffffff;
+  --card-soft: #fbefe2;
+  --band: #182233;
+  --band-ink: #f8fbff;
+  --data: #2563eb;
+  --data-bg: #e7efff;
+  --risk: #dc2626;
+  --risk-bg: #ffe8e5;
+  --opportunity: #0f8b6f;
+  --opportunity-bg: #def7ed;
+  --conclusion: #7c3aed;
+  --conclusion-bg: #eee7ff;
+  --warning: #b45309;
+  --warning-bg: #fff3cf;
+  --shadow: rgba(23, 32, 42, 0.12);
 }
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
-  line-height:1.72;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #101318;
+    --ink: #edf2f7;
+    --muted: #a7b2c2;
+    --line: #303946;
+    --card: #171d25;
+    --card-soft: #211c17;
+    --band: #080b10;
+    --band-ink: #f4f7fb;
+    --data: #6ea8ff;
+    --data-bg: #14233b;
+    --risk: #ff7b72;
+    --risk-bg: #351918;
+    --opportunity: #54d6ad;
+    --opportunity-bg: #123228;
+    --conclusion: #b69cff;
+    --conclusion-bg: #281f3d;
+    --warning: #f4bf5f;
+    --warning-bg: #342810;
+    --shadow: rgba(0, 0, 0, 0.35);
+  }
 }
-main{
-  max-width:980px;
-  margin:0 auto;
-  padding:42px 20px 56px;
+:root[data-theme="dark"] {
+  --bg: #101318;
+  --ink: #edf2f7;
+  --muted: #a7b2c2;
+  --line: #303946;
+  --card: #171d25;
+  --card-soft: #211c17;
+  --band: #080b10;
+  --band-ink: #f4f7fb;
+  --data: #6ea8ff;
+  --data-bg: #14233b;
+  --risk: #ff7b72;
+  --risk-bg: #351918;
+  --opportunity: #54d6ad;
+  --opportunity-bg: #123228;
+  --conclusion: #b69cff;
+  --conclusion-bg: #281f3d;
+  --warning: #f4bf5f;
+  --warning-bg: #342810;
+  --shadow: rgba(0, 0, 0, 0.35);
 }
-.hero{
-  border-bottom:1px solid var(--line);
-  padding-bottom:28px;
-  margin-bottom:26px;
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  line-height: 1.65;
 }
-.kicker{
-  color:var(--accent2);
-  font-weight:700;
-  font-size:14px;
-  letter-spacing:.02em;
+main { overflow: hidden; }
+.hero {
+  background: var(--band);
+  color: var(--band-ink);
+  padding: 64px 7vw 48px;
 }
-h1{
-  margin:8px 0 14px;
-  font-size:34px;
-  line-height:1.22;
+.hero .eyebrow {
+  color: var(--opportunity);
+  font-weight: 700;
+  letter-spacing: 0;
 }
-.lead{
-  font-size:19px;
-  color:var(--ink);
-  background:var(--hl);
-  border-left:5px solid var(--accent);
-  padding:16px 18px;
-  border-radius:8px;
+.hero h1 {
+  margin: 14px 0 8px;
+  font-size: clamp(2rem, 5vw, 4.4rem);
+  line-height: 1.08;
 }
-.grid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:16px;
-  margin:24px 0;
+.hero .original {
+  color: var(--muted);
+  font-size: 1rem;
 }
-.card{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:8px;
-  padding:18px;
+.hero .lede {
+  max-width: 850px;
+  margin-top: 28px;
+  font-size: clamp(1.15rem, 2.2vw, 1.55rem);
 }
-.card h2{
-  margin:0 0 8px;
-  font-size:20px;
-  line-height:1.35;
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--card);
 }
-.card p{margin:0;color:var(--muted)}
-.metric{
-  display:inline-block;
-  color:var(--accent);
-  font-weight:800;
+.metric {
+  padding: 26px 24px;
+  border-right: 1px solid var(--line);
 }
-.section{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:8px;
-  padding:22px;
-  margin:16px 0;
+.metric:last-child { border-right: 0; }
+.metric b {
+  display: block;
+  color: var(--data);
+  font-size: 2rem;
+  line-height: 1.1;
 }
-.section h2{
-  margin:0 0 10px;
-  font-size:22px;
-  line-height:1.35;
+.metric span {
+  display: block;
+  color: var(--muted);
+  margin-top: 8px;
 }
-.section p{margin:8px 0}
-.note{
-  background:var(--hl2);
-  border-left:5px solid var(--accent3);
-  padding:14px 16px;
-  border-radius:8px;
-  color:var(--ink);
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 42px;
+  padding: 54px 7vw;
+  background: var(--bg);
 }
-.takeaways{
-  margin-top:24px;
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:8px;
-  padding:22px;
+.split h2, .timeline h2, .risk h2, .table-wrap h2, .takeaways h2 {
+  margin: 0 0 16px;
+  font-size: 1.55rem;
 }
-.takeaways h2{margin:0 0 12px;font-size:22px}
-.takeaways ul{margin:0;padding-left:22px}
-.takeaways li{margin:8px 0}
-@media (max-width:760px){
-  main{padding:28px 16px 42px}
-  h1{font-size:28px}
-  .lead{font-size:17px}
-  .grid{grid-template-columns:1fr}
+.panel {
+  background: var(--card);
+  border-left: 6px solid var(--opportunity);
+  padding: 28px;
+  box-shadow: 0 12px 30px var(--shadow);
+}
+.note {
+  background: var(--warning-bg);
+  border: 1px solid var(--warning);
+  padding: 24px;
+}
+.note strong { color: var(--warning); }
+.timeline {
+  padding: 56px 7vw;
+  background: var(--card-soft);
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  margin-top: 28px;
+}
+.step {
+  position: relative;
+  padding: 24px 22px 22px;
+  border-top: 5px solid var(--data);
+  background: var(--card);
+}
+.step:nth-child(2) { border-top-color: var(--opportunity); }
+.step:nth-child(3) { border-top-color: var(--conclusion); }
+.step .num {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--data-bg);
+  color: var(--data);
+  font-weight: 800;
+}
+.risk {
+  padding: 58px 7vw;
+  background: var(--band);
+  color: var(--band-ink);
+}
+.risk-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 30px;
+  align-items: stretch;
+}
+.risk-box {
+  background: var(--risk-bg);
+  color: var(--ink);
+  border: 1px solid var(--risk);
+  padding: 28px;
+}
+.risk-box b { color: var(--risk); }
+.safeguards {
+  display: grid;
+  gap: 16px;
+}
+.guard {
+  padding: 18px 20px;
+  background: var(--card);
+  color: var(--ink);
+  border-left: 5px solid var(--opportunity);
+}
+.guard:nth-child(2) { border-left-color: var(--data); }
+.guard:nth-child(3) { border-left-color: var(--risk); }
+.table-wrap {
+  padding: 56px 7vw;
+  background: var(--bg);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--card);
+  box-shadow: 0 10px 26px var(--shadow);
+}
+th, td {
+  text-align: left;
+  padding: 18px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+th {
+  background: var(--conclusion-bg);
+  color: var(--conclusion);
+}
+.quote {
+  margin: 0;
+  padding: 34px 7vw;
+  background: var(--opportunity-bg);
+  border-top: 1px solid var(--opportunity);
+  border-bottom: 1px solid var(--opportunity);
+  font-size: 1.35rem;
+  color: var(--ink);
+}
+.takeaways {
+  padding: 58px 7vw 70px;
+  background: var(--card);
+}
+.mosaic {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 18px;
+}
+.tile {
+  min-height: 150px;
+  padding: 24px;
+  background: var(--data-bg);
+  border: 1px solid var(--data);
+}
+.tile:nth-child(2) {
+  background: var(--risk-bg);
+  border-color: var(--risk);
+}
+.tile:nth-child(3) {
+  background: var(--opportunity-bg);
+  border-color: var(--opportunity);
+}
+.tile:nth-child(4) {
+  grid-column: span 2;
+  background: var(--conclusion-bg);
+  border-color: var(--conclusion);
+}
+.tile b {
+  display: block;
+  margin-bottom: 8px;
+}
+@media (max-width: 820px) {
+  .metrics, .split, .steps, .risk-grid, .mosaic {
+    grid-template-columns: 1fr;
+  }
+  .metric {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .tile:nth-child(4) { grid-column: auto; }
+  th, td { display: block; }
+  th { display: none; }
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -188,13 +356,6 @@ h1{
     body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
       color: inherit;
     }
-    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
-      border-color: var(--airs-digest-line) !important;
-    }
-    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
-      background: var(--airs-digest-panel) !important;
-      color: var(--airs-digest-ink) !important;
-    }
     body :where(.muted, .meta, .kicker, small) {
       color: var(--airs-digest-muted) !important;
     }
@@ -255,68 +416,112 @@ h1{
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/measuring-agent-autonomy" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
 <main>
-  <header class="hero">
-    <div class="kicker">一句话总括</div>
-    <h1>现实中的 AI 代理自主性正在变强，但关键变量是监督结构，而不只是模型能力。</h1>
-    <p class="lead">Anthropic 的贡献在于用 Claude Code 和公共 API 的真实使用数据，把“代理能做什么”拆成了“用户给它多少空间、模型何时主动停下、产品如何让人介入”这三个可观察问题。</p>
-  </header>
+  <section class="hero">
+    <div class="eyebrow">一句话总括</div>
+    <h1>实践中衡量 AI agent 自主性</h1>
+    <div class="original">Measuring AI agent autonomy in practice</div>
+    <p class="lede">Anthropic 的真正贡献不是证明 agent 已经高度自主，而是给出了一套观察真实部署的测量框架：看用户给了多少自由度，模型何时主动停下，产品如何改变监督方式，以及风险是否正在向高影响领域扩散。</p>
+  </section>
 
-  <section class="grid" aria-label="核心数字">
-    <div class="card">
-      <h2>最长尾任务显示自主运行时间明显拉长</h2>
-      <p>Claude Code 的 99.9 分位单轮时长从 2025 年 10 月到 2026 年 1 月由 <span class="metric">不到 25 分钟</span> 增至 <span class="metric">超过 45 分钟</span>，而中位数仍约 <span class="metric">45 秒</span>。这说明变化主要发生在最复杂、最雄心勃勃的用法上。</p>
+  <section class="metrics" aria-label="关键数字">
+    <div class="metric"><b>&gt;45 分钟</b><span>Claude Code 第 99.9 百分位自主工作时长在 2026 年 1 月超过这个水平。</span></div>
+    <div class="metric"><b>约 45 秒</b><span>中位 turn duration 仍很短，说明多数使用还不是长时间放手。</span></div>
+    <div class="metric"><b>40%+</b><span>750 次会话经验用户使用 full auto-approve 的比例超过 40%。</span></div>
+    <div class="metric"><b>0.8%</b><span>公共 API 中似乎不可逆的 agent 行动占比很低。</span></div>
+  </section>
+
+  <section class="split">
+    <div class="panel">
+      <h2>自主性在尾部增长，而不是在日常任务中爆发</h2>
+      <p>大多数 Claude Code turn 很短。中位数约为 45 秒，低于第 99 百分位的区间也基本稳定。</p>
+      <p>真正变化发生在最长的任务。2025 年 10 月到 2026 年 1 月，第 99.9 百分位 turn duration 从不到 25 分钟升至超过 45 分钟。</p>
+      <p>这改变了一个常见理解：agent 自主性不是所有使用场景一起跃升，而是先在最有经验、最复杂、最愿意放手的使用中拉开距离。</p>
     </div>
-    <div class="card">
-      <h2>用户经验让监督从逐步批准转向按需干预</h2>
-      <p>新用户约 <span class="metric">20%</span> 会话全自动批准，到约 750 次会话经验后超过 <span class="metric">40%</span>；同时打断率从约 <span class="metric">5%</span> 升至 <span class="metric">9%</span>。这不是放弃监督，而是把监督从“每步盖章”改成“持续观察并在关键处介入”。</p>
+    <div class="note">
+      <h2>能力评测不能替代部署测量</h2>
+      <p><strong>METR</strong> 估计 Claude Opus 4.5 能以 50% 成功率完成相当于人类近 5 小时的任务。</p>
+      <p>Claude Code 的实际第 99.9 百分位约 42 分钟，中位数更短。两者不是矛盾。</p>
+      <p>评测衡量模型在理想条件下能做什么。真实部署衡量用户、产品和模型共同允许它做多久。</p>
     </div>
   </section>
 
-  <section class="section">
-    <h2>代理自主性是部署结果，不是模型的单一属性</h2>
-    <p>文章把代理定义为能使用工具采取行动的 AI 系统，并分别用 Claude Code 的完整会话和公共 API 的单个工具调用观察现实行为。Claude Code 能看到任务从开始到停止的全过程，API 则覆盖数千个客户场景。</p>
-    <p>这个方法改变了读者对 AI 影响的理解：评估代理不能只看基准测试中的最大能力，还要看真实用户愿意给它多少权限、它是否会主动请求澄清、以及产品是否能支持人类及时介入。</p>
+  <section class="timeline">
+    <h2>用户监督从逐步批准转向持续监控</h2>
+    <p>经验越多，用户越少逐个批准动作，越多让 Claude 先做，再在需要时干预。</p>
+    <div class="steps">
+      <div class="step">
+        <span class="num">1</span>
+        <h3>新用户更保守</h3>
+        <p>少于 50 次会话的新用户，约 20% 会话使用 full auto-approve。默认设置也鼓励他们逐步批准。</p>
+      </div>
+      <div class="step">
+        <span class="num">2</span>
+        <h3>经验带来放手</h3>
+        <p>到 750 次会话时，full auto-approve 超过 40%。这说明信任是逐步积累出来的。</p>
+      </div>
+      <div class="step">
+        <span class="num">3</span>
+        <h3>放手不等于不管</h3>
+        <p>新用户约 5% 的 turn 会打断 Claude，经验用户约 9%。监督变成了监控和及时纠偏。</p>
+      </div>
+    </div>
   </section>
 
-  <section class="section">
-    <h2>长任务变长并不等于能力突然跃迁</h2>
-    <p>最长尾时长的增长跨模型发布过程较平滑，没有随着每次模型发布出现突变；内部使用中，高难任务成功率从 8 月到 12 月翻倍，同时每会话人工干预从 <span class="metric">5.4</span> 次降到 <span class="metric">3.3</span> 次。</p>
-    <p>结论是存在“部署滞后”：模型在理想环境下能处理的自主性，高于用户和产品在现实工作流中实际释放的自主性。</p>
+  <section class="risk">
+    <h2>风险目前可控，但边界已经出现</h2>
+    <div class="risk-grid">
+      <div class="risk-box">
+        <p><b>公共 API 的多数 agent 行动低风险、可逆。</b> 80% 工具调用似乎至少有一种保护措施，73% 似乎有人类参与。</p>
+        <p>但 Anthropic 也观察到医疗、金融、网络安全等高影响领域的早期使用。很多高风险样本可能是评估或红队测试，却仍说明边界正在扩张。</p>
+        <p>这让读者看到一个政策重点：不能只看平均风险。少量高自主、高风险部署也可能带来严重后果。</p>
+      </div>
+      <div class="safeguards">
+        <div class="guard"><b>保护措施：</b>权限限制、人类批准或其他约束在多数工具调用中可见。</div>
+        <div class="guard"><b>人类参与：</b>估计 73% 有某种 human-in-the-loop，但该数字可能偏高。</div>
+        <div class="guard"><b>不可逆行动：</b>仅 0.8% 似乎不可逆，例如向客户发送邮件。</div>
+      </div>
+    </div>
   </section>
 
-  <section class="section">
-    <h2>有经验的用户不是更少监督，而是换了一种监督</h2>
-    <p>Claude Code 默认要求用户逐步批准操作，因此新用户更常停留在审批式监督；经验增加后，用户更常开启自动批准，并在代理偏离目标时打断。公共 API 也有类似趋势：极简任务约 <span class="metric">87%</span> 工具调用有人类参与，高复杂任务为 <span class="metric">67%</span>。</p>
-    <p>这提醒产品和政策设计者，要求每一步都人工批准可能制造摩擦，却未必带来更好安全性；更重要的是让人看得见代理在做什么，并能快速纠偏。</p>
+  <section class="table-wrap">
+    <h2>不同角色应该关注什么</h2>
+    <table>
+      <tr>
+        <th>对象</th>
+        <th>文章给出的信号</th>
+        <th>应得到的结论</th>
+      </tr>
+      <tr>
+        <td>模型开发者</td>
+        <td>Claude Code 在复杂任务中主动澄清的频率高于人类打断。</td>
+        <td>让模型识别自身不确定性，是和权限系统同等重要的安全能力。</td>
+      </tr>
+      <tr>
+        <td>产品开发者</td>
+        <td>经验用户更常自动批准，也更常打断。</td>
+        <td>好监督不是强制每步审批，而是让用户看得见、插得进、改得动。</td>
+      </tr>
+      <tr>
+        <td>政策制定者</td>
+        <td>高风险领域尚未规模化，但正在出现。</td>
+        <td>现在不宜规定单一交互模式，更应要求可监测、可追踪、可干预。</td>
+      </tr>
+    </table>
   </section>
 
-  <section class="section">
-    <h2>模型主动停下也是一种安全机制</h2>
-    <p>在更复杂任务中，Claude Code 主动请求澄清的频率上升，并且在最复杂任务上比人类打断更常见。文章承认这不代表每次停下都正确，但它表明模型自身的不确定性感知可以成为监督的一部分。</p>
-    <p>洞见在于，代理安全不只依赖外部权限墙和人工审批，也依赖模型在不确定、目标含糊或风险升高时主动把控制权交回给人。</p>
-  </section>
-
-  <section class="section">
-    <h2>当前总体低风险，但高风险边界已经出现</h2>
-    <p>公共 API 中多数工具调用低风险且可逆：约 <span class="metric">80%</span> 看似至少有一种防护，<span class="metric">73%</span> 有某种人在环，只有 <span class="metric">0.8%</span> 看似不可逆。软件工程占近 <span class="metric">50%</span> 的代理活动，医疗、金融和网络安全等更高风险领域仍处于早期试验。</p>
-    <p>结论是平均风险数字让人相对安心，但治理不能只看平均值；真正值得监测的是高自主、高风险的小规模前沿用例如何扩张。</p>
-  </section>
-
-  <section class="section">
-    <h2>这项研究的限制同样重要</h2>
-    <p>数据只来自 Anthropic，Claude Code 主要是软件工程场景，API 分析只能看单个工具调用，风险和自主性分类由 Claude 推断，且时间窗口集中在 2025 年末到 2026 年初。</p>
-    <p class="note">因此，文章更像是一套早期测量框架，而不是关于所有 AI 代理的最终结论；它的政策价值在于指出应该持续监测哪些信号。</p>
-  </section>
+  <blockquote class="quote">
+    自主性不是模型的固定属性。它来自模型是否会停下、用户是否愿意放手，以及产品是否让人能在关键时刻介入。
+  </blockquote>
 
   <section class="takeaways">
     <h2>最值得带走的洞见</h2>
-    <ul>
-      <li>现实中的代理自主性正在增长，尤其体现在最长尾、最复杂任务上。</li>
-      <li>有效监督不等于逐步批准；资深用户更常让代理先做，再在关键节点介入。</li>
-      <li>模型主动请求澄清是重要安全能力，应该与权限控制和人类监督一起设计。</li>
-      <li>当前大多数代理行为低风险，但医疗、金融、网络安全等领域的前沿用例需要部署后监测。</li>
-      <li>政策不宜过早规定固定交互模式，应优先要求可见性、可干预性和隐私保护下的真实使用监测。</li>
-    </ul>
+    <div class="mosaic">
+      <div class="tile"><b>真实部署比榜单更关键。</b> 预部署评测告诉我们模型能做什么，部署数据告诉我们人们实际让它做什么。</div>
+      <div class="tile"><b>风险不能只看平均值。</b> 大部分使用低风险，并不排除少数高影响场景需要更强监测。</div>
+      <div class="tile"><b>监督正在换形态。</b> 经验用户不是退出监督，而是从审批者变成监控者。</div>
+      <div class="tile"><b>软件工程是先行样本。</b> 它占 agentic 活动近 50%，但其他行业的验证成本更高，信任曲线可能不同。</div>
+      <div class="tile"><b>下一步是监测基础设施。</b> 要理解 agent，就要能在保护隐私的前提下连接会话、识别风险、观察干预。</div>
+    </div>
   </section>
 </main>
   <script id="airs-digest-theme-script">

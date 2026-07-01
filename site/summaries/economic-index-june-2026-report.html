@@ -1,306 +1,304 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Anthropic 经济指数报告：节奏</title>
-  <style>
-    :root {
-      --bg: #f6f4ef;
-      --ink: #192126;
-      --muted: #65727b;
-      --line: #d9d5ca;
-      --surface: #ffffff;
-      --surface-alt: #ece7db;
-      --hero-bg: #142129;
-      --hero-ink: #f8f5ec;
-      --hero-muted: #c8d2d8;
-      --data: #2563eb;
-      --risk: #c2410c;
-      --opportunity: #0f766e;
-      --conclusion: #7c3aed;
-      --accent: #d97706;
-      --data-bg: #e8f0ff;
-      --risk-bg: #fff0e8;
-      --opportunity-bg: #e5f5f1;
-      --conclusion-bg: #f0e9ff;
-      --quote-bg: #101820;
-      --quote-ink: #f6fbff;
-      --table-head: #e2ded2;
-      --tile-a: #eef6ff;
-      --tile-b: #fff4e8;
-      --tile-c: #ecfdf5;
-      --tile-d: #f3e8ff;
-      --shadow: 0 18px 50px rgba(30, 33, 36, 0.12);
-    }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #0f1417;
-        --ink: #e8edf0;
-        --muted: #9aa8b0;
-        --line: #2a343a;
-        --surface: #171e22;
-        --surface-alt: #20292e;
-        --hero-bg: #081014;
-        --hero-ink: #f2f7f8;
-        --hero-muted: #9fb0ba;
-        --data: #6ea2ff;
-        --risk: #ff9b73;
-        --opportunity: #55d6c2;
-        --conclusion: #b69cff;
-        --accent: #f2b35d;
-        --data-bg: #13243f;
-        --risk-bg: #351c13;
-        --opportunity-bg: #11302c;
-        --conclusion-bg: #261b3d;
-        --quote-bg: #060b0e;
-        --quote-ink: #eff7fb;
-        --table-head: #222c31;
-        --tile-a: #12263b;
-        --tile-b: #302112;
-        --tile-c: #123026;
-        --tile-d: #261b3b;
-        --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
-      }
-    }
-
-    :root[data-theme="dark"] {
-      --bg: #0f1417;
-      --ink: #e8edf0;
-      --muted: #9aa8b0;
-      --line: #2a343a;
-      --surface: #171e22;
-      --surface-alt: #20292e;
-      --hero-bg: #081014;
-      --hero-ink: #f2f7f8;
-      --hero-muted: #9fb0ba;
-      --data: #6ea2ff;
-      --risk: #ff9b73;
-      --opportunity: #55d6c2;
-      --conclusion: #b69cff;
-      --accent: #f2b35d;
-      --data-bg: #13243f;
-      --risk-bg: #351c13;
-      --opportunity-bg: #11302c;
-      --conclusion-bg: #261b3d;
-      --quote-bg: #060b0e;
-      --quote-ink: #eff7fb;
-      --table-head: #222c31;
-      --tile-a: #12263b;
-      --tile-b: #302112;
-      --tile-c: #123026;
-      --tile-d: #261b3b;
-      --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
-    }
-
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-      line-height: 1.7;
-    }
-    main { overflow: hidden; }
-    section { padding: 56px 7vw; }
-    .hero {
-      min-height: 72vh;
-      background: var(--hero-bg);
-      color: var(--hero-ink);
-      display: grid;
-      align-items: end;
-      padding-top: 80px;
-    }
-    .hero-inner { max-width: 1040px; }
-    .kicker {
-      color: var(--accent);
-      font-weight: 700;
-      letter-spacing: 0;
-      margin-bottom: 18px;
-    }
-    h1 {
-      font-size: clamp(2.2rem, 6vw, 5.5rem);
-      line-height: 1.05;
-      margin: 0 0 14px;
-      letter-spacing: 0;
-    }
-    .original {
-      color: var(--hero-muted);
-      font-size: clamp(1rem, 2vw, 1.3rem);
-      margin: 0 0 34px;
-    }
-    .one-line {
-      max-width: 780px;
-      font-size: clamp(1.2rem, 2.4vw, 1.7rem);
-      line-height: 1.45;
-      margin: 0;
-      border-left: 5px solid var(--accent);
-      padding-left: 18px;
-    }
-    .metrics {
-      background: var(--surface);
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 1px;
-      padding: 0;
-      border-top: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
-    }
-    .metric {
-      padding: 34px 28px;
-      min-height: 180px;
-    }
-    .metric:nth-child(1) { background: var(--data-bg); }
-    .metric:nth-child(2) { background: var(--risk-bg); }
-    .metric:nth-child(3) { background: var(--opportunity-bg); }
-    .metric:nth-child(4) { background: var(--conclusion-bg); }
-    .num {
-      display: block;
-      font-size: clamp(2rem, 4vw, 3.5rem);
-      font-weight: 800;
-      line-height: 1;
-      margin-bottom: 12px;
-    }
-    .metric:nth-child(1) .num { color: var(--data); }
-    .metric:nth-child(2) .num { color: var(--risk); }
-    .metric:nth-child(3) .num { color: var(--opportunity); }
-    .metric:nth-child(4) .num { color: var(--conclusion); }
-    .metric p { margin: 0; color: var(--ink); }
-    .split {
-      background: var(--surface-alt);
-      display: grid;
-      grid-template-columns: 0.9fr 1.1fr;
-      gap: 42px;
-      align-items: start;
-    }
-    h2 {
-      font-size: clamp(1.7rem, 3vw, 2.6rem);
-      line-height: 1.18;
-      margin: 0 0 18px;
-      letter-spacing: 0;
-    }
-    .lead { color: var(--muted); font-size: 1.08rem; }
-    .explain-grid {
-      display: grid;
-      gap: 18px;
-    }
-    .explain {
-      background: var(--surface);
-      border-left: 6px solid var(--data);
-      padding: 20px 22px;
-      box-shadow: var(--shadow);
-    }
-    .explain:nth-child(2) { border-left-color: var(--opportunity); }
-    .explain:nth-child(3) { border-left-color: var(--risk); }
-    .explain h3, .flow h3, .quote h3 { margin: 0 0 8px; font-size: 1.05rem; }
-    .explain p, .flow p, .quote p { margin: 0; }
-    .timeline {
-      background: var(--bg);
-    }
-    .flowline {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 18px;
-      margin-top: 26px;
-    }
-    .flow {
-      position: relative;
-      padding: 22px;
-      background: var(--surface);
-      border-top: 5px solid var(--accent);
-    }
-    .flow:nth-child(2) { border-top-color: var(--data); }
-    .flow:nth-child(3) { border-top-color: var(--opportunity); }
-    .flow:nth-child(4) { border-top-color: var(--risk); }
-    .badge {
-      display: inline-grid;
-      place-items: center;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: var(--ink);
-      color: var(--bg);
-      font-weight: 800;
-      margin-bottom: 14px;
-    }
-    .table-zone {
-      background: var(--quote-bg);
-      color: var(--quote-ink);
-    }
-    .table-zone h2, .table-zone .lead { color: var(--quote-ink); }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 26px;
-      background: var(--surface);
-      color: var(--ink);
-      overflow: hidden;
-    }
-    th, td {
-      text-align: left;
-      padding: 18px;
-      border-bottom: 1px solid var(--line);
-      vertical-align: top;
-    }
-    th { background: var(--table-head); color: var(--ink); }
-    td strong { color: var(--conclusion); }
-    .quote-band {
-      background: var(--opportunity-bg);
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 28px;
-      align-items: center;
-    }
-    .quote {
-      background: var(--quote-bg);
-      color: var(--quote-ink);
-      padding: 34px;
-      box-shadow: var(--shadow);
-    }
-    .quote-mark {
-      font-size: 3rem;
-      line-height: 1;
-      color: var(--opportunity);
-    }
-    .takeaways {
-      background: var(--surface);
-    }
-    .mosaic {
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr 1fr;
-      gap: 16px;
-      margin-top: 24px;
-    }
-    .tile {
-      padding: 24px;
-      min-height: 170px;
-      border: 1px solid var(--line);
-    }
-    .tile:nth-child(1) { background: var(--tile-a); }
-    .tile:nth-child(2) { background: var(--tile-b); }
-    .tile:nth-child(3) { background: var(--tile-c); }
-    .tile:nth-child(4) {
-      background: var(--tile-d);
-      grid-column: span 2;
-    }
-    .tile h3 { margin: 0 0 10px; font-size: 1.05rem; }
-    .tile p { margin: 0; color: var(--ink); }
-    footer {
-      padding: 34px 7vw 48px;
-      color: var(--muted);
-      border-top: 1px solid var(--line);
-      background: var(--bg);
-    }
-    @media (max-width: 860px) {
-      .metrics, .split, .flowline, .quote-band, .mosaic {
-        grid-template-columns: 1fr;
-      }
-      .tile:nth-child(4) { grid-column: auto; }
-      section { padding: 42px 22px; }
-      .metric { min-height: auto; }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anthropic 经济指数报告：节奏</title>
+<style>
+:root {
+  --bg: #f7f4ee;
+  --paper: #fffdf8;
+  --ink: #1f2623;
+  --muted: #66706b;
+  --line: #d8d0c2;
+  --hero-bg: #13231f;
+  --hero-ink: #f8f3e8;
+  --card: #ffffff;
+  --soft-data: #e8f3ff;
+  --soft-risk: #ffe8df;
+  --soft-opportunity: #eaf7e6;
+  --soft-conclusion: #f0e8ff;
+  --soft-neutral: #f3eee5;
+  --accent-data: #2374ab;
+  --accent-risk: #c44b34;
+  --accent-opportunity: #2f8f5b;
+  --accent-conclusion: #7b55c7;
+  --accent-warn: #d29422;
+  --shadow: 0 18px 50px rgba(28, 38, 34, 0.12);
+}
+:root[data-theme="dark"] {
+  --bg: #111716;
+  --paper: #18211f;
+  --ink: #ece7dc;
+  --muted: #a9b3ad;
+  --line: #34423d;
+  --hero-bg: #07100e;
+  --hero-ink: #f3ecdf;
+  --card: #1d2926;
+  --soft-data: #10283a;
+  --soft-risk: #351b16;
+  --soft-opportunity: #15301f;
+  --soft-conclusion: #211a35;
+  --soft-neutral: #24231f;
+  --accent-data: #6db7f2;
+  --accent-risk: #ff8b70;
+  --accent-opportunity: #75d69a;
+  --accent-conclusion: #b89cff;
+  --accent-warn: #efc15b;
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111716;
+    --paper: #18211f;
+    --ink: #ece7dc;
+    --muted: #a9b3ad;
+    --line: #34423d;
+    --hero-bg: #07100e;
+    --hero-ink: #f3ecdf;
+    --card: #1d2926;
+    --soft-data: #10283a;
+    --soft-risk: #351b16;
+    --soft-opportunity: #15301f;
+    --soft-conclusion: #211a35;
+    --soft-neutral: #24231f;
+    --accent-data: #6db7f2;
+    --accent-risk: #ff8b70;
+    --accent-opportunity: #75d69a;
+    --accent-conclusion: #b89cff;
+    --accent-warn: #efc15b;
+    --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  line-height: 1.7;
+}
+main { overflow: hidden; }
+section { padding: 56px 6vw; }
+.hero {
+  min-height: 72vh;
+  display: grid;
+  align-items: center;
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+  position: relative;
+}
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 8px;
+  background: linear-gradient(90deg, var(--accent-data), var(--accent-opportunity), var(--accent-warn), var(--accent-risk), var(--accent-conclusion));
+}
+.hero-inner { max-width: 980px; position: relative; }
+.eyebrow {
+  color: var(--accent-warn);
+  font-weight: 700;
+  letter-spacing: 0;
+  margin-bottom: 14px;
+}
+h1 {
+  font-size: clamp(38px, 7vw, 82px);
+  line-height: 1.05;
+  margin: 0;
+  letter-spacing: 0;
+}
+.subtitle {
+  color: var(--muted);
+  margin-top: 14px;
+  font-size: 18px;
+}
+.hero .subtitle { color: var(--hero-ink); opacity: 0.78; }
+.lede {
+  max-width: 820px;
+  font-size: 24px;
+  margin-top: 34px;
+  border-left: 6px solid var(--accent-opportunity);
+  padding-left: 22px;
+}
+.stats {
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(150px, 1fr));
+  gap: 18px;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+.stat {
+  padding: 22px;
+  border-top: 5px solid var(--accent-data);
+  background: var(--soft-data);
+}
+.stat:nth-child(2) { border-color: var(--accent-risk); background: var(--soft-risk); }
+.stat:nth-child(3) { border-color: var(--accent-opportunity); background: var(--soft-opportunity); }
+.stat:nth-child(4) { border-color: var(--accent-conclusion); background: var(--soft-conclusion); }
+.num {
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
+}
+.label {
+  margin-top: 10px;
+  color: var(--muted);
+}
+.split {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 34px;
+  align-items: center;
+  background: var(--soft-neutral);
+}
+.kicker {
+  color: var(--accent-data);
+  font-weight: 800;
+}
+h2 {
+  font-size: 30px;
+  line-height: 1.2;
+  margin: 8px 0 16px;
+}
+.panel {
+  background: var(--card);
+  border: 1px solid var(--line);
+  padding: 28px;
+  box-shadow: var(--shadow);
+}
+.panel p { margin: 0 0 14px; }
+.timeline {
+  background: var(--paper);
+}
+.timeline-wrap {
+  max-width: 940px;
+  margin: 0 auto;
+  border-left: 4px solid var(--accent-warn);
+  padding-left: 24px;
+}
+.moment {
+  position: relative;
+  margin: 0 0 30px;
+}
+.moment::before {
+  content: "";
+  position: absolute;
+  left: -35px;
+  top: 8px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent-warn);
+}
+.moment h3, .compare h3, .takeaways h3 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+.moment p { margin: 0; color: var(--muted); }
+.compare {
+  background: var(--soft-data);
+}
+.table-wrap {
+  max-width: 1040px;
+  margin: 0 auto;
+  overflow-x: auto;
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px;
+}
+th, td {
+  text-align: left;
+  padding: 18px;
+  border-bottom: 1px solid var(--line);
+}
+th {
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+}
+td strong { color: var(--accent-conclusion); }
+.quote-band {
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+}
+.quote {
+  max-width: 980px;
+  margin: 0 auto;
+  font-size: 27px;
+  line-height: 1.45;
+  border-left: 8px solid var(--accent-opportunity);
+  padding-left: 26px;
+}
+.quote small {
+  display: block;
+  color: var(--hero-ink);
+  opacity: 0.72;
+  font-size: 15px;
+  margin-top: 16px;
+}
+.survey {
+  background: var(--soft-opportunity);
+}
+.survey-grid {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+}
+.tile {
+  padding: 26px;
+  background: var(--card);
+  border-left: 6px solid var(--accent-opportunity);
+}
+.tile.risk { border-color: var(--accent-risk); }
+.tile.data { border-color: var(--accent-data); }
+.tile.conclusion { border-color: var(--accent-conclusion); }
+.takeaways {
+  background: var(--paper);
+}
+.mosaic {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 1fr;
+  gap: 16px;
+}
+.take {
+  min-height: 150px;
+  padding: 24px;
+  background: var(--soft-conclusion);
+  border: 1px solid var(--line);
+}
+.take:nth-child(2) { background: var(--soft-risk); }
+.take:nth-child(3) { background: var(--soft-data); }
+.take:nth-child(4) { background: var(--soft-opportunity); grid-column: span 2; }
+.take strong {
+  display: block;
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+footer {
+  padding: 26px 6vw 42px;
+  color: var(--muted);
+  background: var(--bg);
+  border-top: 1px solid var(--line);
+}
+@media (max-width: 760px) {
+  section { padding: 38px 20px; }
+  .stats-grid, .split, .survey-grid, .mosaic { grid-template-columns: 1fr; }
+  .take:nth-child(4) { grid-column: auto; }
+  .lede, .quote { font-size: 20px; }
+}
+</style>
   <script id="airs-digest-theme-boot">
     try {
       var saved = localStorage.getItem("theme");
@@ -434,176 +432,161 @@
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/economic-index-june-2026-report" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
-  <main>
-    <section class="hero">
-      <div class="hero-inner">
-        <div class="kicker">Anthropic Economic Index · June 26, 2026</div>
-        <h1>Anthropic 经济指数报告：节奏</h1>
-        <p class="original">Anthropic Economic Index report: Cadences</p>
-        <p class="one-line">一句话总括：这份报告把 Claude 的真实使用节奏、产出形态和用户预期放在一起，显示代理式 AI 正在从聊天工具变成嵌入工作日、夜晚、周末和关键截止期的经济基础设施。</p>
-      </div>
-    </section>
+<main>
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">Anthropic · Economic Research · Jun 26, 2026</div>
+      <h1>Anthropic 经济指数报告：节奏</h1>
+      <div class="subtitle">Anthropic Economic Index report: Cadences</div>
+      <p class="lede">一句话总括：这份报告把 Claude 的使用节奏、产出形态和用户预期连在一起，说明 AI 正在从“聊天工具”变成嵌入工作流的代理型生产系统。</p>
+    </div>
+  </section>
 
-    <section class="metrics" aria-label="关键数字">
-      <div class="metric">
-        <span class="num">35%→50%</span>
-        <p>聊天和 Cowork 中，个人用途从工作日约 35% 上升到周末接近 50%。AI 使用不是脱离生活的曲线，而是跟随工作周摆动。</p>
+  <section class="stats">
+    <div class="stats-grid">
+      <div class="stat">
+        <div class="num">35% → 近50%</div>
+        <div class="label">聊天和 Cowork 中，个人用途从工作日约 35% 升至周末接近 50%。AI 使用明显贴近日常生活节奏。</div>
       </div>
-      <div class="metric">
-        <span class="num">8倍</span>
-        <p>4 月 14 日，报税相关请求达到 5 月平均日的 8 倍。AI 需求会被真实制度截止期突然放大。</p>
+      <div class="stat">
+        <div class="num">8倍</div>
+        <div class="label">4 月 14 日税务相关请求达到 5 月平均日的 8 倍。现实截止日期会直接塑造 AI 需求。</div>
       </div>
-      <div class="metric">
-        <span class="num">93%</span>
-        <p>Claude 对话中有 93% 产生可识别 artifact。研究对象不再只是问答，而是用户真正带走的产出。</p>
+      <div class="stat">
+        <div class="num">93%</div>
+        <div class="label">Claude 对话中有 93% 被识别为产生了某种 artifact。观察 AI 影响不能只看聊天内容。</div>
       </div>
-      <div class="metric">
-        <span class="num">9,700</span>
-        <p>调查把约 9,700 名受访者的回答与使用数据连接起来。报告开始比较“怎么用 AI”和“怎么看 AI”。</p>
+      <div class="stat">
+        <div class="num">9,700</div>
+        <div class="label">约 9,700 名调查受访者被链接到使用数据。报告开始把行为日志和主观预期放在一起读。</div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section class="split">
-      <div>
-        <h2>节奏说明 AI 已经进入日常经济生活</h2>
-        <p class="lead">报告新增更高频的隐私保护抽样，可以看到小时级变化。结果很直观，也很重要：Claude 的请求像日程表一样反映现实世界。</p>
-      </div>
-      <div class="explain-grid">
-        <article class="explain">
-          <h3>工作周塑造用途</h3>
-          <p>周末个人请求上升，商务邮件、营销文案和幻灯片减少。情感支持、医疗问题和投资建议更常出现。这说明 AI 同时在工作和私人生活中扩散。</p>
-        </article>
-        <article class="explain">
-          <h3>一天中的需求各有峰值</h3>
-          <p>新闻请求集中在早上 7 点。商务沟通在上午 10 点到 11 点略有峰值。食谱请求在下午 6 点达到平均值的 2.3 倍。</p>
-        </article>
-        <article class="explain">
-          <h3>非传统时段的工作更偏高薪任务</h3>
-          <p>夜晚和周末仍然出现的工作请求，更常映射到高工资职业。删除计算机和数学职业后，这个趋势仍然存在。</p>
-        </article>
-      </div>
-    </section>
+  <section class="split">
+    <div>
+      <div class="kicker">节奏不是噪声</div>
+      <h2>Claude 的使用像经济生活的心电图</h2>
+      <p>报告的新采样管线能观察到小时级变化。它不只显示人们在用 AI，还显示他们在什么时候、为了什么使用 AI。</p>
+      <p>新闻请求集中在早晨。商业邮件在工作时段上升。食谱请求在傍晚 6 点达到平均水平的 2.3 倍。睡眠建议则在凌晨前后更集中。</p>
+    </div>
+    <div class="panel">
+      <p><strong>这改变了一个常见理解：</strong>AI 使用不是均匀扩散的技术曲线，而是被工作周、家庭生活、税务期限和当地时间持续塑形。</p>
+      <p>周末工作任务减少，但夜晚和周末仍出现的工作请求更偏向高薪职业。这说明高价值知识工作更容易越过传统工时边界。</p>
+    </div>
+  </section>
 
-    <section class="timeline">
-      <h2>从聊天到产出，研究对象变了</h2>
-      <p class="lead">Claude Code 和 Cowork 让会话变成长时间代理式任务。报告因此不只看对话内容，还开始分类用户最终拿到的 artifact。</p>
-      <div class="flowline">
-        <article class="flow">
-          <span class="badge">1</span>
-          <h3>采样更密</h3>
-          <p>数据管线提升采样率，使研究者能观察小时级使用模式。AI 对经济生活的嵌入因此更可见。</p>
-        </article>
-        <article class="flow">
-          <span class="badge">2</span>
-          <h3>产出被分类</h3>
-          <p>解释占 17%，文档和报告占 15%，指导占 11%。这揭示 Claude 最常交付的是知识说明、写作成果和建议。</p>
-        </article>
-        <article class="flow">
-          <span class="badge">3</span>
-          <h3>成本跟价值一起上升</h3>
-          <p>高工资职业映射的任务通常消耗更多 tokens。营销经理相关任务约为编辑任务的 2.5 倍 tokens。</p>
-        </article>
-        <article class="flow">
-          <span class="badge">4</span>
-          <h3>自主性随工具增强</h3>
-          <p>31 类输出中有 26 类在 Claude Code 上自主性更高。差异不仅来自模型，也来自产品形态鼓励更多委托。</p>
-        </article>
+  <section class="timeline">
+    <div class="timeline-wrap">
+      <div class="kicker">一天与一周</div>
+      <h2>同一个模型，在不同时间承担不同角色</h2>
+      <div class="moment">
+        <h3>早晨：信息入口</h3>
+        <p>当地时间 7 点，新闻请求更常见。Claude 在这里像一个解释器，帮助用户整理当天的信息环境。</p>
       </div>
-    </section>
+      <div class="moment">
+        <h3>工作日：办公生产</h3>
+        <p>商业通信、营销文案、幻灯片和报告更常出现。AI 的角色更接近办公协作者。</p>
+      </div>
+      <div class="moment">
+        <h3>傍晚：生活助手</h3>
+        <p>食谱请求在 18 点明显上升。模型开始进入家庭决策和日常安排。</p>
+      </div>
+      <div class="moment">
+        <h3>周末：个人用途和新尝试</h3>
+        <p>个人请求上升。创业相关对话在周六和周日最高，但求职活动随其他工作任务下降。</p>
+      </div>
+    </div>
+  </section>
 
-    <section class="table-zone">
-      <h2>不同表面带来不同协作方式</h2>
-      <p class="lead">同样是让 Claude 产出内容，聊天、Cowork 和 Claude Code 的分工方式并不一样。这改变了“AI 在做多少判断”的判断。</p>
+  <section class="compare">
+    <div class="table-wrap">
       <table>
         <thead>
           <tr>
             <th>观察对象</th>
             <th>关键数据</th>
-            <th>改变理解的地方</th>
+            <th>经济含义</th>
           </tr>
         </thead>
         <tbody>
           <tr>
+            <td>Artifact 类型</td>
+            <td>解释占 <strong>17%</strong>，文档和报告占 <strong>15%</strong>，指导占 <strong>11%</strong></td>
+            <td>AI 的产出已经不仅是回答，而是可带走、可交付的工作成果。</td>
+          </tr>
+          <tr>
+            <td>工作与个人用途</td>
+            <td>营销内容、博客文章和数据库查询超过 <strong>80%</strong> 更偏工作用途</td>
+            <td>同样的模型在不同任务中进入了不同生产链条。</td>
+          </tr>
+          <tr>
+            <td>Token 与工资</td>
+            <td>营销经理任务工资约为编辑的两倍，相关对话 token 约为 <strong>2.5 倍</strong></td>
+            <td>更高价值的产出往往需要更多计算，也需要更多人类参与。</td>
+          </tr>
+          <tr>
             <td>Claude Code</td>
-            <td><strong>自主性平均高 0.37 分</strong>，脚本和代码片段高 0.53 分。</td>
-            <td>代理式工具不只是更会写代码。它让用户更愿意把目标交出去，让 AI 自己决定路径。</td>
-          </tr>
-          <tr>
-            <td>高价值任务</td>
-            <td><strong>高工资任务消耗更多 tokens</strong>，用户轮次也更多。</td>
-            <td>更高产出并不等于人类退出。报告看到的是更强的人机共同投入。</td>
-          </tr>
-          <tr>
-            <td>阅读水平</td>
-            <td><strong>Claude 输出平均比提示高约 1 年教育水平</strong>。</td>
-            <td>AI 往往把简短、非正式需求转成更正式的成果。差距在图像、游戏、应用和网站类任务中最大。</td>
+            <td>同类输出在 Claude Code 上平均自治程度高 <strong>0.37</strong> 分</td>
+            <td>产品形态本身会改变委托程度，不只是模型能力在变化。</td>
           </tr>
         </tbody>
       </table>
-    </section>
+    </div>
+  </section>
 
-    <section class="quote-band">
-      <div>
-        <h2>用户既看到风险，也看到机会</h2>
-        <p class="lead">调查结果没有给出单一情绪。早期职业者更担心岗位替代，但更常自动化使用 Claude 的人反而更乐观看待薪酬、就业安全和技能价值。</p>
-      </div>
-      <aside class="quote">
-        <div class="quote-mark">“</div>
-        <h3>委托更多，不一定意味着更悲观。</h3>
-        <p>自动化使用比例越高，受访者越认为 AI 明年能承担更多任务。同时，他们对自己的未来劳动市场结果也更乐观。这让“更多委托必然导致更强替代焦虑”的直觉变得不够完整。</p>
-      </aside>
-    </section>
+  <section class="quote-band">
+    <div class="quote">
+      更高自动化并没有对应更强悲观。最常把任务交给 Claude 的用户，反而更期待 AI 改善薪酬、就业安全和工作的意义。
+      <small>这不证明自动化一定带来好结果，但它提醒读者：真实使用者的体验比“替代或增强”的二分法更复杂。</small>
+    </div>
+  </section>
 
-    <section class="split">
-      <div>
-        <h2>暴露度不是一个简单的职业标签</h2>
-        <p class="lead">报告比较了观察到的 AI 暴露度、理论暴露度和用户自己报告的暴露度。用户通常认为 AI 当前能做的任务，比使用日志显示的更多。</p>
+  <section class="survey">
+    <div class="survey-grid">
+      <div class="tile data">
+        <h3>用户认为能力会继续上升</h3>
+        <p>近 6 成受访者认为，未来一年 AI 能独立完成的工作任务比例会进入更高档位。超过三分之一预计 AI 明年能完成其大部分或几乎全部工作任务。</p>
       </div>
-      <div class="explain-grid">
-        <article class="explain">
-          <h3>未来进步预期很一致</h3>
-          <p>接近 6 成受访者预计，未来 12 个月 AI 能完成的工作任务比例会上升。不同职业的人都预期类似幅度的进步。</p>
-        </article>
-        <article class="explain">
-          <h3>经验越多，当前能力评分越低</h3>
-          <p>至少 15 年经验的人，对 AI 当前能完成任务比例的估计，比第一年工作者低约 10 个百分点。他们更强调判断、背景意识和人际关系。</p>
-        </article>
-        <article class="explain">
-          <h3>低收入国家的替代感更强</h3>
-          <p>高收入国家受访者报告的 AI 当前任务能力低约 10 个百分点。报告提示，缺少互补技能和基础设施时，AI 更可能被感知为替代而非增强。</p>
-        </article>
+      <div class="tile risk">
+        <h3>风险感并不平均分布</h3>
+        <p>10% 的受访者认为自己未来一年失业可能性较高。初级同事被认为更脆弱，早期职业者也更担忧岗位流失。</p>
       </div>
-    </section>
+      <div class="tile opportunity">
+        <h3>生产率收益很普遍</h3>
+        <p>86% 报告工作速度提升，82% 报告工作范围扩大，69% 报告质量提升。AI 的当下影响首先表现为工作能力边界扩大。</p>
+      </div>
+      <div class="tile conclusion">
+        <h3>委托不等于停止学习</h3>
+        <p>68% 表示用 AI 学到更多，57% 认为 AI 让自己的技能更有市场价值。重度委托者报告的学习率并没有下降。</p>
+      </div>
+    </div>
+  </section>
 
-    <section class="takeaways">
-      <h2>最值得带走的洞见</h2>
-      <div class="mosaic">
-        <article class="tile">
-          <h3>AI 使用有社会节律</h3>
-          <p>周末、晚餐时间、清晨和报税截止期都会改变 Claude 的需求结构。AI 的影响要放回真实时间表里理解。</p>
-        </article>
-        <article class="tile">
-          <h3>artifact 比聊天记录更重要</h3>
-          <p>用户带走的是文档、代码、解释、计划和建议。衡量 AI 经济影响时，产出类型比单纯对话更接近真实价值。</p>
-        </article>
-        <article class="tile">
-          <h3>高价值任务仍需要人类参与</h3>
-          <p>高工资任务中，Claude 产出更多，用户交互也更多。这更像增强劳动，而不是简单替代劳动。</p>
-        </article>
-        <article class="tile">
-          <h3>自动化使用者并不最悲观</h3>
-          <p>更常把任务交给 Claude 的人，更期待 AI 承担更多工作，也更看好薪酬、就业安全和技能价值。真正的问题不是是否自动化，而是谁能把自动化转化为能力。</p>
-        </article>
-        <article class="tile">
-          <h3>未来测量会更困难</h3>
-          <p>代理式 AI 可能长时间运行，并与其他 AI 交互。传统分类器会更难看清工作内容，但使用日志仍是观察早期经济影响的重要窗口。</p>
-        </article>
+  <section class="takeaways">
+    <div class="mosaic">
+      <div class="take">
+        <strong>AI 影响有时间纹理</strong>
+        Claude 的日志反映工作周、晚餐时间、凌晨焦虑和税务截止日。经济影响不是抽象平均值。
       </div>
-    </section>
-  </main>
-  <footer>
-    基于 Anthropic 2026 年 6 月 26 日发布的 Economic Index report: Cadences 摘写。本文为中文独立总结页，保留原报告的关键数字和主要结论。
-  </footer>
+      <div class="take">
+        <strong>代理产品改变委托边界</strong>
+        Claude Code 让同类任务更自动化。界面和工作流会改变人愿意交给 AI 的判断空间。
+      </div>
+      <div class="take">
+        <strong>高价值任务并未排除人类</strong>
+        高工资任务消耗更多 token，也伴随更多用户回合。至少在这些数据中，增强信号强于纯替代信号。
+      </div>
+      <div class="take">
+        <strong>用户最希望的是协作型经济</strong>
+        超过半数受访者希望 AI 保留有意义的工作，同时自动化繁琐任务。约三分之一明确期待 AI 收益被广泛分享。
+      </div>
+    </div>
+  </section>
+</main>
+<footer>
+  来源：Anthropic，Anthropic Economic Index report: Cadences。本文为中文摘要页，保留原文关键数据和结论。
+</footer>
   <script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;

@@ -3,19 +3,72 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BioMysteryBench：Claude 的生物信息学研究能力到了哪一步</title>
+<title>使用 BioMysteryBench 评估 Claude 的生物信息学研究能力</title>
 <style>
 :root {
-  --bg: #f6f7f9;
+  --bg: #f7f5ef;
+  --ink: #182026;
+  --muted: #66717c;
+  --line: #d8d2c4;
   --card: #ffffff;
-  --ink: #1c2430;
-  --muted: #607080;
-  --line: #d9e0e7;
-  --accent: #2f6f73;
-  --accent2: #9a5b2f;
-  --accent3: #4b5fb8;
-  --hl: #e7f3f2;
-  --hl2: #fff2df;
+  --hero: #172033;
+  --hero-ink: #f7f7f2;
+  --soft-data: #e7f1ff;
+  --soft-risk: #ffe8df;
+  --soft-opportunity: #e8f7ef;
+  --soft-conclusion: #f2e9ff;
+  --band: #fff4c9;
+  --table-head: #e9edf5;
+  --accent-data: #2563eb;
+  --accent-risk: #d9480f;
+  --accent-opportunity: #16824a;
+  --accent-conclusion: #7c3aed;
+  --accent-warn: #c2410c;
+  --shadow: 0 18px 50px rgba(24, 32, 38, .12);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111418;
+    --ink: #e8edf2;
+    --muted: #a5b0bb;
+    --line: #333b45;
+    --card: #1a2027;
+    --hero: #080d16;
+    --hero-ink: #f0f4f8;
+    --soft-data: #10233f;
+    --soft-risk: #331a12;
+    --soft-opportunity: #0f2a1b;
+    --soft-conclusion: #211733;
+    --band: #342b12;
+    --table-head: #202936;
+    --accent-data: #6ea8ff;
+    --accent-risk: #ff8a5c;
+    --accent-opportunity: #58d68d;
+    --accent-conclusion: #b794f4;
+    --accent-warn: #ff9b64;
+    --shadow: 0 18px 50px rgba(0, 0, 0, .38);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111418;
+  --ink: #e8edf2;
+  --muted: #a5b0bb;
+  --line: #333b45;
+  --card: #1a2027;
+  --hero: #080d16;
+  --hero-ink: #f0f4f8;
+  --soft-data: #10233f;
+  --soft-risk: #331a12;
+  --soft-opportunity: #0f2a1b;
+  --soft-conclusion: #211733;
+  --band: #342b12;
+  --table-head: #202936;
+  --accent-data: #6ea8ff;
+  --accent-risk: #ff8a5c;
+  --accent-opportunity: #58d68d;
+  --accent-conclusion: #b794f4;
+  --accent-warn: #ff9b64;
+  --shadow: 0 18px 50px rgba(0, 0, 0, .38);
 }
 * { box-sizing: border-box; }
 body {
@@ -23,95 +76,238 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-  line-height: 1.7;
+  line-height: 1.68;
 }
-main {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 40px 20px 56px;
+main { overflow: hidden; }
+.hero {
+  background: var(--hero);
+  color: var(--hero-ink);
+  padding: 72px 7vw 54px;
 }
-header {
-  padding: 28px;
-  background: linear-gradient(135deg, var(--hl), var(--hl2));
-  border: 1px solid var(--line);
-  border-radius: 8px;
-}
-.kicker {
-  margin: 0 0 8px;
-  color: var(--accent);
+.hero small {
+  display: block;
+  color: var(--accent-data);
   font-weight: 700;
-  letter-spacing: 0;
+  letter-spacing: .04em;
+  margin-bottom: 18px;
 }
-h1 {
+.hero h1 {
   margin: 0;
-  font-size: clamp(28px, 4vw, 44px);
-  line-height: 1.18;
+  max-width: 980px;
+  font-size: clamp(34px, 6vw, 68px);
+  line-height: 1.08;
   letter-spacing: 0;
 }
-.lead {
-  margin: 18px 0 0;
+.hero .original {
+  margin-top: 18px;
+  color: var(--muted);
   font-size: 18px;
-  color: var(--ink);
 }
-.grid {
+.hero .thesis {
+  margin-top: 34px;
+  max-width: 820px;
+  font-size: 24px;
+  line-height: 1.45;
+  color: var(--hero-ink);
+  border-left: 6px solid var(--accent-opportunity);
+  padding-left: 20px;
+}
+.metrics {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  margin: 22px 0 0;
+  grid-template-columns: repeat(5, minmax(150px, 1fr));
+  gap: 1px;
+  background: var(--line);
 }
 .metric {
-  background: rgba(255,255,255,.68);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 14px;
+  background: var(--band);
+  padding: 28px 24px;
 }
-.metric strong {
+.metric b {
   display: block;
-  font-size: 26px;
-  line-height: 1.15;
-  color: var(--accent3);
+  font-size: 34px;
+  line-height: 1;
+  color: var(--accent-data);
 }
 .metric span {
   display: block;
-  margin-top: 4px;
+  margin-top: 10px;
   color: var(--muted);
   font-size: 14px;
 }
-section {
-  margin-top: 18px;
-  padding: 24px 26px;
+.split {
+  display: grid;
+  grid-template-columns: 1.05fr .95fr;
+  gap: 42px;
+  padding: 64px 7vw;
   background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 8px;
 }
-h2 {
-  margin: 0 0 10px;
-  font-size: 22px;
-  line-height: 1.3;
-  letter-spacing: 0;
+.split h2, .process h2, .table-wrap h2, .takeaways h2 {
+  margin: 0 0 18px;
+  font-size: 30px;
+  line-height: 1.2;
 }
-p { margin: 0 0 12px; }
-p:last-child { margin-bottom: 0; }
-mark {
-  background: var(--hl2);
-  color: var(--ink);
-  padding: 1px 5px;
-  border-radius: 4px;
+.split p, .process p, .table-wrap p {
+  margin: 0 0 16px;
 }
+.reason-list {
+  display: grid;
+  gap: 14px;
+}
+.reason {
+  border-left: 5px solid var(--accent-risk);
+  background: var(--soft-risk);
+  padding: 18px 20px;
+}
+.reason:nth-child(2) {
+  border-left-color: var(--accent-data);
+  background: var(--soft-data);
+}
+.reason:nth-child(3) {
+  border-left-color: var(--accent-conclusion);
+  background: var(--soft-conclusion);
+}
+.reason strong { display: block; margin-bottom: 6px; }
+.process {
+  padding: 64px 7vw;
+  background: var(--soft-opportunity);
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-top: 28px;
+}
+.step {
+  position: relative;
+  padding: 22px;
+  background: var(--card);
+  border-top: 5px solid var(--accent-opportunity);
+  box-shadow: var(--shadow);
+}
+.step em {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--accent-opportunity);
+  color: var(--hero-ink);
+  font-style: normal;
+  font-weight: 800;
+  margin-bottom: 14px;
+}
+.step strong { display: block; margin-bottom: 8px; }
 .insight {
-  border-left: 4px solid var(--accent);
-  padding-left: 14px;
-  color: var(--muted);
+  padding: 44px 7vw;
+  background: var(--hero);
+  color: var(--hero-ink);
+}
+.insight blockquote {
+  margin: 0;
+  max-width: 1000px;
+  font-size: clamp(24px, 3vw, 38px);
+  line-height: 1.35;
+  border-left: 8px solid var(--accent-conclusion);
+  padding-left: 24px;
+}
+.table-wrap {
+  padding: 64px 7vw;
+  background: var(--bg);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 18px;
+  border-bottom: 1px solid var(--line);
+}
+th {
+  background: var(--table-head);
+  color: var(--ink);
+}
+td:first-child {
+  font-weight: 700;
+  color: var(--accent-data);
+}
+.patterns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+.pattern {
+  padding: 54px 7vw;
+}
+.pattern.know {
+  background: var(--soft-data);
+}
+.pattern.layer {
+  background: var(--soft-conclusion);
+}
+.pattern h2 {
+  margin: 0 0 14px;
+  font-size: 28px;
+}
+.badge {
+  display: inline-block;
+  margin-bottom: 16px;
+  padding: 6px 12px;
+  border: 1px solid currentColor;
+  color: var(--accent-warn);
+  font-weight: 800;
+  font-size: 13px;
 }
 .takeaways {
-  margin: 10px 0 0;
-  padding-left: 20px;
+  padding: 64px 7vw 78px;
+  background: var(--card);
 }
-.takeaways li { margin: 8px 0; }
-@media (max-width: 760px) {
-  main { padding: 24px 14px 40px; }
-  header, section { padding: 20px; }
-  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.mosaic {
+  display: grid;
+  grid-template-columns: 1.2fr .8fr 1fr;
+  gap: 16px;
+}
+.tile {
+  min-height: 150px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+}
+.tile:nth-child(1) {
+  grid-row: span 2;
+  background: var(--soft-data);
+  border-color: var(--accent-data);
+}
+.tile:nth-child(2) {
+  background: var(--soft-risk);
+  border-color: var(--accent-risk);
+}
+.tile:nth-child(3) {
+  background: var(--soft-opportunity);
+  border-color: var(--accent-opportunity);
+}
+.tile:nth-child(4) {
+  background: var(--soft-conclusion);
+  border-color: var(--accent-conclusion);
+}
+.tile strong {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 19px;
+}
+@media (max-width: 900px) {
+  .metrics, .steps, .split, .patterns, .mosaic {
+    grid-template-columns: 1fr;
+  }
+  .hero, .split, .process, .insight, .table-wrap, .pattern, .takeaways {
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+  table { font-size: 14px; }
+  th, td { padding: 12px; }
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -188,13 +384,6 @@ mark {
     body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
       color: inherit;
     }
-    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
-      border-color: var(--airs-digest-line) !important;
-    }
-    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
-      background: var(--airs-digest-panel) !important;
-      color: var(--airs-digest-ink) !important;
-    }
     body :where(.muted, .meta, .kicker, small) {
       color: var(--airs-digest-muted) !important;
     }
@@ -255,67 +444,110 @@ mark {
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/Evaluating-Claude-For-Bioinformatics-With-BioMysteryBench" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
 <main>
-  <header>
-    <p class="kicker">一句话总括</p>
-    <h1>BioMysteryBench 的真正贡献，是用真实生物数据和客观答案测试 AI 是否能完成接近科研现场的开放式分析。</h1>
-    <p class="lead">这不是又一个问答考试，而是让 Claude 在容器里查数据库、装工具、写代码、分析测序数据，并最终给出可验证答案的评测。</p>
-    <div class="grid" aria-label="关键数字">
-      <div class="metric"><strong>99</strong><span>个生物信息学问题</span></div>
-      <div class="metric"><strong>76</strong><span>个人类专家可解任务</span></div>
-      <div class="metric"><strong>23</strong><span>个人类困难任务</span></div>
-      <div class="metric"><strong>30%</strong><span>Mythos Preview 在困难集最高解题率</span></div>
+  <section class="hero">
+    <small>一句话总括</small>
+    <h1>使用 BioMysteryBench 评估 Claude 的生物信息学研究能力</h1>
+    <div class="original">Evaluating Claude’s bioinformatics research capabilities with BioMysteryBench</div>
+    <p class="thesis">Anthropic 的真正贡献，是把 AI 科研评估从“会不会答题”推进到“能不能在真实生物数据中找到可验证答案”。这让模型能力第一次更接近研究现场，而不是考试现场。</p>
+  </section>
+
+  <section class="metrics" aria-label="关键数字">
+    <div class="metric"><b>99</b><span>个 BioMysteryBench 问题，来自多个生物信息学领域。</span></div>
+    <div class="metric"><b>76</b><span>题至少被一名领域专家解出，归为 human-solvable。</span></div>
+    <div class="metric"><b>23</b><span>题经质检后仍属于 human-difficult。</span></div>
+    <div class="metric"><b>30%</b><span>Claude Mythos Preview 在 human-difficult 集合上的最高解题率。</span></div>
+    <div class="metric"><b>81%</b><span>Claude Opus 4.6 在 CompBioBench 的总体成绩。</span></div>
+  </section>
+
+  <section class="split">
+    <div>
+      <h2>为什么旧基准不够</h2>
+      <p>科学任务不只需要知识和推理。真实研究还要读论文、查数据库、运行工具、写代码、处理噪声数据。</p>
+      <p>MMLU-Pro、GPQA 和 LAB-Bench 能测试专家知识。BLADE、BixBench 和 SciGym 更接近工作流。但它们仍难以覆盖生物学研究里的开放性、主观性和不可解问题。</p>
+      <p>这改变了读者对 AI 影响的判断。AI 的科学价值不在于背出答案，而在于能否在不整洁的数据环境里形成可检查的结论。</p>
     </div>
-  </header>
-
-  <section>
-    <h2>真正难测的不是知识，而是科研中的开放选择。</h2>
-    <p>传统科学 benchmark 常测试知识和推理，但真实生物研究还需要读论文、查数据库、处理噪声数据、写分析管线，并在多条合理路径之间做选择。生物学尤其难评估，因为同一个问题可能有多种正确方法，个体研究决策会改变结论，而且很多问题连人类专家也还没有答案。</p>
-    <p class="insight">这改变了读者对 AI 科学能力的理解：模型是否“懂生物学”不只看它会不会答题，而要看它能否在不确定、开放、工具密集的流程中产出可验证结果。</p>
+    <div class="reason-list">
+      <div class="reason"><strong>方法不唯一</strong>同一生物问题可以用 GWAS、微生物组测序或其他路线处理。只奖励某条路线会误判能力。</div>
+      <div class="reason"><strong>数据有噪声</strong>小的研究选择可能改变结论。真实生物数据比模拟环境更难评估。</div>
+      <div class="reason"><strong>人类也未必知道答案</strong>最有价值的科研问题，往往正是专家还没有解决的问题。</div>
+    </div>
   </section>
 
-  <section>
-    <h2>BioMysteryBench 把开放科研任务变成了可打分的问题。</h2>
-    <p>BioMysteryBench 由领域专家设计 <mark>99 个问题</mark>，主要来自 DNA/RNA 测序、单细胞 RNA-seq、甲基化、ChIP-seq、宏基因组、Hi-C、蛋白质组和代谢组等数据。问题答案来自数据的受控属性、临床或实验验证结果，而不是某位科学家的主观结论。</p>
-    <p>Claude 被放进一个带有常用生物信息学工具的容器，可以通过 pip 和 conda 安装额外工具，也能访问 NCBI、Ensembl 等数据库下载参考基因组等资源。评测看最终答案，不限定方法。</p>
-    <p class="insight">关键洞见是：这种设计保留了科研的自由度，却用客观 ground truth 防止评测被主观研究品味污染。</p>
+  <section class="process">
+    <h2>BioMysteryBench 怎样避开评估陷阱</h2>
+    <p>这个基准使用真实、凌乱的生物信息学数据，但答案来自可控数据属性、临床元数据或独立验证结果。模型可以自由选择工具和路线，评分只看最终答案。</p>
+    <div class="steps">
+      <div class="step"><em>1</em><strong>专家出题</strong>领域专家收集数据，并围绕客观属性设计问题。</div>
+      <div class="step"><em>2</em><strong>验证信号</strong>每题作者提交验证 notebook，证明答案信号确实存在。</div>
+      <div class="step"><em>3</em><strong>模型研究</strong>Claude 在容器中使用常见生物信息学工具，也可安装 pip 和 conda 包。</div>
+      <div class="step"><em>4</em><strong>只判答案</strong>评估不要求复制人类方法。不同路线只要到达正确结论，就被认可。</div>
+    </div>
   </section>
 
-  <section>
-    <h2>人类基线显示，评测同时覆盖专家可解题和专家困难题。</h2>
-    <p>每道题最多交给 <mark>5 名领域专家</mark>从零作答；只要至少一名专家答对，就被归为 human-solvable。最终有 <mark>76 题</mark>属于这个集合。另有一批专家组未能解决的题，经质控后移除 <mark>4 个</mark>有问题题目，剩下 <mark>23 个</mark> human-difficult 任务。</p>
-    <p>这些困难题并不等于无解，因为作者要求出题者提交验证 notebook，证明数据中确实有信号。区别在于：信号存在，不代表人类或模型能从零找到它。</p>
-    <p class="insight">这让 benchmark 能观察“超越当前专家面板”的能力，而不是只测试模型是否模仿已知的人类流程。</p>
+  <section class="insight">
+    <blockquote>关键变化是：模型不再只是追随训练有素的科学家。在部分生物信息学任务上，它已经能用不同策略超过专家小组。</blockquote>
   </section>
 
-  <section>
-    <h2>Claude 的强项不只是执行流程，还包括组合证据。</h2>
-    <p>文章观察到，Claude 有时会沿用人类专家常见策略，有时会走完全不同的路径。特别是在困难题上，Opus 4.6 的轨迹显示两类优势：一是模型内部知识覆盖了大量结构生物学、分子谱系和文献元分析信息；二是在不确定时会叠加多种方法，让不同证据线收敛到同一个答案。</p>
-    <p>这种行为不是简单检索或套模板，而更像研究中的“证据三角测量”：当单一方法不稳时，用多个弱信号互相校验。</p>
-    <p class="insight">这改变了 AI 对科研影响的判断：模型的价值可能不只是加速已有管线，而是提供不同于人类直觉的搜索路径和证据组合方式。</p>
+  <section class="table-wrap">
+    <h2>任务设计与结果说明了什么</h2>
+    <p>BioMysteryBench 的题目多来自原始或少量处理过的 DNA、RNA 和组学数据。这接近许多真实分析流程的起点。</p>
+    <table>
+      <thead>
+        <tr>
+          <th>观察</th>
+          <th>关键数据和趋势</th>
+          <th>对 AI 影响的理解</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>真实数据任务</td>
+          <td>题目覆盖 WGS、scRNA-seq、methylation、ChIP-seq、metagenomics、Hi-C、蛋白质组和代谢组。</td>
+          <td>模型能力不再只体现在封闭问答，而是进入真实数据分析流程。</td>
+        </tr>
+        <tr>
+          <td>人类基线</td>
+          <td>每题最多由 5 名领域专家作答。至少 1 人答对的 76 题被视为人类可解。</td>
+          <td>这让“达到专家水平”有了具体参照，而不是主观印象。</td>
+        </tr>
+        <tr>
+          <td>专家困难集</td>
+          <td>移除 4 个质量问题后，保留 23 个 human-difficult 问题。</td>
+          <td>AI 的潜在价值集中在这里，因为它可能发现人类暂时没有找到的路线。</td>
+        </tr>
+        <tr>
+          <td>前沿模型成绩</td>
+          <td>Claude Mythos Preview 在 human-difficult 集合上最高解出 30%。CompBioBench 中 Claude Opus 4.6 总体 81%，最难题 69%。</td>
+          <td>这表明前沿模型已经是生物信息学研究的有用合作者，而不只是辅助搜索工具。</td>
+        </tr>
+      </tbody>
+    </table>
   </section>
 
-  <section>
-    <h2>结果显示，前沿模型已经在部分生物信息学任务上超过专家组。</h2>
-    <p>Claude 的能力随代际提升明显。最新模型能可靠解决多数 human-solvable 任务；在 human-difficult 集合中，Claude Sonnet 4.6 及更强模型解决了显著比例，Claude Mythos Preview 最高达到 <mark>30%</mark> 解题率。</p>
-    <p>同期 Genentech 和 Roche 发布的 CompBioBench 提供了外部参照：该 benchmark 含 <mark>100 个</mark>计算生物学任务，要求多步推理、工具使用、定制代码和外部资源交互；Claude Opus 4.6 达到 <mark>81%</mark>总体成绩，在最难问题上达到 <mark>69%</mark>。</p>
-    <p class="insight">结论不是 AI 已经替代科学家，而是它在可验证的生物信息学子任务上已经能成为真实协作者，且在某些专家未解题上领先。</p>
+  <section class="patterns">
+    <div class="pattern know">
+      <span class="badge">策略一</span>
+      <h2>模型把大量先验知识带进分析</h2>
+      <p>Claude 在一些专家困难题中，利用了结构生物学、分子谱系、机制和本体知识。对人类来说，这可能需要重新做元分析或拼接多个数据库。</p>
+      <p>结论是，LLM 的“记忆”不只是背景知识。它可以成为分析真实数据时的搜索捷径。</p>
+    </div>
+    <div class="pattern layer">
+      <span class="badge">策略二</span>
+      <h2>不确定时叠加多条证据</h2>
+      <p>Opus 4.6 在不够确信时，常会尝试多种分析方法，再选择多条路径共同指向的答案。</p>
+      <p>这比单一路径更接近稳健研究习惯。它提示人类科学家也可以从模型的证据整合方式中学习。</p>
+    </div>
   </section>
 
-  <section>
-    <h2>限制同样重要：没被解出的题仍可能只是太难。</h2>
-    <p>BioMysteryBench 的限制在于：对于人类和模型都没解出的任务，很难完全判断它是不可解，还是只是当前能力不够。验证 notebook 能证明信号存在、数据成形，但不能保证任何主体都能从零发现答案。</p>
-    <p class="insight">这个限制反而说明了评测的价值：它保留了一片未知区域，未来更强模型可能首先破解今天无人能解的可验证科研问题。</p>
-  </section>
-
-  <section>
+  <section class="takeaways">
     <h2>最值得带走的洞见</h2>
-    <ul class="takeaways">
-      <li>AI 科学评测正在从“回答专业题”转向“完成带工具、数据和不确定性的研究流程”。</li>
-      <li>BioMysteryBench 的关键设计是方法无关、答案客观，让模型可以自由选择路径，但最终必须被事实约束。</li>
-      <li>Claude 的进步体现在两方面：多数专家可解题更稳定，一部分专家困难题也能被解出。</li>
-      <li>模型可能通过大规模知识整合和多证据收敛，找到不同于人类专家的有效路线。</li>
-      <li>对科研工作的现实影响不是立即自动化全部发现，而是让 AI 成为能处理数据、生成假设、交叉验证证据的研究伙伴。</li>
-    </ul>
+    <div class="mosaic">
+      <div class="tile"><strong>科研评估正在换对象</strong>重点从静态知识题转向真实数据、工具使用和可验证答案。这更接近 AI 真正进入科研流程后的影响。</div>
+      <div class="tile"><strong>方法自由很重要</strong>生物学没有唯一正确路线。BioMysteryBench 只看结论，减少了对某个研究者方法偏好的依赖。</div>
+      <div class="tile"><strong>专家困难题最有信号</strong>模型能解出一部分专家小组未解任务，说明它可能在知识整合和模式识别上形成新优势。</div>
+      <div class="tile"><strong>可靠性仍是核心问题</strong>验证 notebook 能证明信号存在，但不能保证所有未解题都可解。困难和不可能之间仍有灰区。</div>
+      <div class="tile"><strong>AI 更像合作者</strong>前沿模型已经能提出不同策略、运行分析并整合证据。它的价值不是替代科学判断，而是扩展可探索的路线。</div>
+    </div>
   </section>
 </main>
   <script id="airs-digest-theme-script">

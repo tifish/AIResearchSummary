@@ -1,110 +1,273 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Building a better Bugbot 中文总结</title>
-  <style>
-    :root {
-      --bg: #f6f7f4;
-      --card: #ffffff;
-      --ink: #18201f;
-      --muted: #66706d;
-      --line: #dfe5df;
-      --accent: #1f7a6b;
-      --accent2: #b95c2b;
-      --accent3: #4b63a8;
-      --hl: #e8f4ef;
-      --hl2: #fff1df;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-      line-height: 1.72;
-    }
-    main {
-      max-width: 920px;
-      margin: 0 auto;
-      padding: 36px 20px 48px;
-    }
-    header {
-      padding: 28px 0 22px;
-      border-bottom: 1px solid var(--line);
-    }
-    .meta {
-      color: var(--muted);
-      font-size: 14px;
-      margin-bottom: 10px;
-    }
-    h1 {
-      margin: 0 0 14px;
-      font-size: clamp(28px, 5vw, 44px);
-      line-height: 1.15;
-      letter-spacing: 0;
-    }
-    .lead {
-      background: var(--hl);
-      border-left: 5px solid var(--accent);
-      padding: 16px 18px;
-      font-size: 18px;
-      border-radius: 8px;
-    }
-    section {
-      margin-top: 22px;
-      padding: 22px;
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-    }
-    h2 {
-      margin: 0 0 10px;
-      font-size: 21px;
-      line-height: 1.35;
-    }
-    p { margin: 8px 0 0; }
-    .data {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 12px;
-      margin-top: 14px;
-    }
-    .stat {
-      padding: 14px;
-      background: var(--hl2);
-      border-radius: 8px;
-      border: 1px solid var(--line);
-    }
-    .num {
-      display: block;
-      color: var(--accent2);
-      font-weight: 750;
-      font-size: 24px;
-      line-height: 1.2;
-    }
-    .label {
-      display: block;
-      color: var(--muted);
-      font-size: 14px;
-      margin-top: 4px;
-    }
-    .note {
-      color: var(--muted);
-      font-size: 15px;
-    }
-    .insights {
-      background: linear-gradient(180deg, var(--card), var(--hl));
-      border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
-    }
-    ul {
-      margin: 10px 0 0;
-      padding-left: 20px;
-    }
-    li { margin: 8px 0; }
-    strong { color: var(--accent); }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>构建更好的 Bugbot</title>
+<style>
+:root {
+  --bg: #f6f3ec;
+  --surface: #fffaf0;
+  --panel: #ffffff;
+  --band: #e8f1ff;
+  --soft-data: #e5f5ff;
+  --soft-risk: #ffe9e3;
+  --soft-opportunity: #e9f7ec;
+  --soft-conclusion: #f3e9ff;
+  --deep: #18212f;
+  --deep-2: #243044;
+  --ink: #18202a;
+  --muted: #5d6673;
+  --line: #d9d1c3;
+  --accent-data: #1677b8;
+  --accent-risk: #d34a2c;
+  --accent-opportunity: #218a52;
+  --accent-conclusion: #7b3fc8;
+  --accent-warm: #b26a00;
+  --white-soft: #fffaf0;
+  --shadow: 0 18px 45px rgba(24, 32, 42, 0.12);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #10141a;
+    --surface: #171d25;
+    --panel: #1d2430;
+    --band: #14253a;
+    --soft-data: #102738;
+    --soft-risk: #341b17;
+    --soft-opportunity: #123020;
+    --soft-conclusion: #27183a;
+    --deep: #080b10;
+    --deep-2: #111823;
+    --ink: #e8edf3;
+    --muted: #aab4c2;
+    --line: #354052;
+    --accent-data: #4db8ff;
+    --accent-risk: #ff7f66;
+    --accent-opportunity: #66d48f;
+    --accent-conclusion: #b88cff;
+    --accent-warm: #ffbf4f;
+    --white-soft: #e8edf3;
+    --shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10141a;
+  --surface: #171d25;
+  --panel: #1d2430;
+  --band: #14253a;
+  --soft-data: #102738;
+  --soft-risk: #341b17;
+  --soft-opportunity: #123020;
+  --soft-conclusion: #27183a;
+  --deep: #080b10;
+  --deep-2: #111823;
+  --ink: #e8edf3;
+  --muted: #aab4c2;
+  --line: #354052;
+  --accent-data: #4db8ff;
+  --accent-risk: #ff7f66;
+  --accent-opportunity: #66d48f;
+  --accent-conclusion: #b88cff;
+  --accent-warm: #ffbf4f;
+  --white-soft: #e8edf3;
+  --shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  line-height: 1.65;
+}
+main { overflow: hidden; }
+.hero {
+  min-height: 64vh;
+  padding: 64px 6vw 42px;
+  background: linear-gradient(135deg, var(--deep), var(--deep-2));
+  color: var(--white-soft);
+  display: grid;
+  align-items: end;
+}
+.hero-inner { max-width: 1080px; }
+.kicker {
+  color: var(--accent-warm);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+h1 {
+  margin: 10px 0 8px;
+  font-size: clamp(34px, 7vw, 76px);
+  line-height: 1.04;
+}
+.english {
+  margin: 0 0 28px;
+  color: var(--muted);
+  font-size: 18px;
+}
+.one-line {
+  max-width: 820px;
+  padding-left: 18px;
+  border-left: 5px solid var(--accent-data);
+  font-size: 22px;
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--line);
+}
+.metric {
+  background: var(--soft-data);
+  padding: 28px 24px;
+}
+.metric strong {
+  display: block;
+  color: var(--accent-data);
+  font-size: 34px;
+  line-height: 1;
+}
+.metric span {
+  display: block;
+  margin-top: 10px;
+  color: var(--muted);
+}
+.split {
+  padding: 70px 6vw;
+  background: var(--surface);
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 44px;
+  align-items: start;
+}
+.split h2, .flow h2, .table-zone h2, .future h2, .takeaways h2 {
+  margin: 0 0 18px;
+  font-size: 30px;
+  line-height: 1.2;
+}
+.lead { font-size: 19px; color: var(--muted); }
+.note-box {
+  background: var(--panel);
+  border-left: 6px solid var(--accent-risk);
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+.note-box h3 { margin: 0 0 10px; color: var(--accent-risk); }
+.flow {
+  padding: 70px 6vw;
+  background: var(--band);
+}
+.steps {
+  max-width: 980px;
+  display: grid;
+  gap: 18px;
+}
+.step {
+  display: grid;
+  grid-template-columns: 58px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+.badge {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--accent-conclusion);
+  color: var(--white-soft);
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+}
+.step-content {
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+.step-content h3 { margin: 0 0 6px; }
+.step-content p { margin: 0; color: var(--muted); }
+.table-zone {
+  padding: 70px 6vw;
+  background: var(--soft-opportunity);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+th, td {
+  padding: 18px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  color: var(--accent-opportunity);
+  background: var(--surface);
+}
+.quote {
+  padding: 48px 6vw;
+  background: var(--deep);
+  color: var(--white-soft);
+}
+.quote blockquote {
+  max-width: 980px;
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.35;
+  border-left: 7px solid var(--accent-warm);
+  padding-left: 24px;
+}
+.future {
+  padding: 70px 6vw;
+  background: var(--soft-risk);
+}
+.future-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+.future-item {
+  background: var(--panel);
+  padding: 22px;
+  border-top: 6px solid var(--accent-risk);
+}
+.future-item h3 { margin: 0 0 8px; }
+.future-item p { margin: 0; color: var(--muted); }
+.takeaways {
+  padding: 70px 6vw;
+  background: var(--soft-conclusion);
+}
+.mosaic {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 1fr;
+  gap: 16px;
+}
+.tile {
+  min-height: 150px;
+  padding: 24px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+.tile strong {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--accent-conclusion);
+}
+.tile.large {
+  grid-row: span 2;
+  background: var(--deep-2);
+  color: var(--white-soft);
+}
+.tile.large strong { color: var(--accent-warm); }
+@media (max-width: 760px) {
+  .metrics, .split, .future-grid, .mosaic {
+    grid-template-columns: 1fr;
+  }
+  .hero { min-height: 58vh; padding-top: 42px; }
+  .quote blockquote { font-size: 22px; }
+}
+</style>
   <script id="airs-digest-theme-boot">
     try {
       var saved = localStorage.getItem("theme");
@@ -179,13 +342,6 @@
     body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
       color: inherit;
     }
-    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
-      border-color: var(--airs-digest-line) !important;
-    }
-    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
-      background: var(--airs-digest-panel) !important;
-      color: var(--airs-digest-ink) !important;
-    }
     body :where(.muted, .meta, .kicker, small) {
       color: var(--airs-digest-muted) !important;
     }
@@ -245,65 +401,125 @@
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/building-bugbot" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
-  <main>
-    <header>
-      <div class="meta">Cursor Research · 2026-01-15 · Jon Kaplan</div>
-      <h1>Bugbot 的真正进展，是把代码审查做成可度量、可实验、可迭代的系统</h1>
-      <p class="lead"><strong>一句话总括：</strong>这篇文章的贡献不在于宣称 AI 能审查代码，而在于说明 Cursor 如何用“作者是否真的修复了问题”作为核心指标，把一个代码审查 agent 从经验调参推进到生产级持续优化。</p>
-    </header>
+<main>
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="kicker">一句话总括</div>
+      <h1>构建更好的 Bugbot</h1>
+      <p class="english">Building a better Bugbot</p>
+      <p class="one-line">Cursor 的真正贡献不是又做了一个代码审查机器人，而是把 AI 审查质量转化为可测量、可实验、可持续改进的生产系统。</p>
+    </div>
+  </section>
 
-    <section>
-      <h2>质量提升来自真实反馈，而不是只看评论反应</h2>
-      <p>Cursor 为 Bugbot 定义了 resolution rate：在 PR 合并时，用 AI 判断 Bugbot 提出的 bug 是否已经被作者在最终代码中修复。团队还与 PR 作者一起抽查样例，确认该分类在内部验证中几乎都能正确判断。</p>
-      <p>这改变了对 AI 代码审查价值的理解：真正有用的审查，不是发出更多评论，而是提出工程师会采纳并修掉的问题。</p>
-    </section>
+  <section class="metrics" aria-label="关键数字">
+    <div class="metric"><strong>40</strong><span>发布后运行的主要实验数量。</span></div>
+    <div class="metric"><strong>52% → 70%+</strong><span>resolution rate 的提升，说明更多报告最终被作者修复。</span></div>
+    <div class="metric"><strong>0.4 → 0.7</strong><span>单次运行平均标记 bug 数提高。</span></div>
+    <div class="metric"><strong>200万+</strong><span>Bugbot 当前每月审查的客户 PR 数量。</span></div>
+  </section>
 
-    <section>
-      <h2>40 次主要实验把 Bugbot 从“可用”推向“明显更有用”</h2>
-      <div class="data">
-        <div class="stat"><span class="num">52% → 70%+</span><span class="label">resolution rate</span></div>
-        <div class="stat"><span class="num">0.4 → 0.7</span><span class="label">每次运行平均标记 bug 数</span></div>
-        <div class="stat"><span class="num">0.2 → 0.5</span><span class="label">每个 PR 被解决的 bug 数</span></div>
-        <div class="stat"><span class="num">40</span><span class="label">上线后的主要实验数</span></div>
+  <section class="split">
+    <div>
+      <h2>指标改变了产品方向</h2>
+      <p class="lead">早期 Bugbot 依靠工程师主观判断来减少误报。后来 Cursor 定义了 resolution rate：在 PR 合并时，用 AI 判断报告的 bug 是否真的被作者解决。</p>
+      <p>这个指标把“评论看起来有用”变成了“工程师是否采纳并修复”。它让团队能在线观察真实使用效果，也能离线用 BugBench 对真实 diff 和人工标注 bug 做对比。</p>
+    </div>
+    <div class="note-box">
+      <h3>为什么这很关键</h3>
+      <p>AI 代码审查最容易被表面活跃度误导。评论多不等于有价值，点赞也不等于发现了真实缺陷。resolution rate 直接看最终代码是否改变，因此更接近业务价值。</p>
+    </div>
+  </section>
+
+  <section class="flow">
+    <h2>从固定流水线到 agentic 架构</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="badge">1</div>
+        <div class="step-content">
+          <h3>早期靠多轮并行审查</h3>
+          <p>Bugbot 会用随机 diff 顺序运行八个并行 pass，再合并相似问题，用多数投票过滤只出现一次的发现。这降低了偶然误报。</p>
+        </div>
       </div>
-      <p>这些数字说明，Bugbot 的进步同时来自召回更多真实问题和过滤更少有价值的误报。对读者来说，这意味着 AI 工具的影响应看“最终改变了多少代码质量”，而不是看模型输出本身有多像审查意见。</p>
-    </section>
+      <div class="step">
+        <div class="badge">2</div>
+        <div class="step-content">
+          <h3>生产化补上基础设施</h3>
+          <p>Cursor 重写 Rust Git 集成，减少抓取数据，并加入速率限制监控、请求批处理和代理基础设施。没有这些工程层，模型能力无法稳定服务真实仓库。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="badge">3</div>
+        <div class="step-content">
+          <h3>最大增益来自代理式审查</h3>
+          <p>新的 Bugbot 能围绕 diff 推理、调用工具、决定深入哪里。它不再只按固定流程走，而是在运行时拉取所需上下文。</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <section>
-      <h2>早期有效方法是多路并行审查加投票过滤</h2>
-      <p>早期版本会运行 8 个并行 bug-finding pass，并给每个 pass 不同的 diff 顺序；随后把相似 bug 聚类，用多数投票过滤只有一次出现的问题，再经过描述合并、类别过滤、验证模型和历史去重。</p>
-      <p>这个流程的洞见是：同一个模型在不同上下文顺序下会走出不同推理路径，多次独立发现同一问题时，信号强度更高。</p>
-    </section>
+  <section class="table-zone">
+    <h2>旧方法和新方法的差别</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>维度</th>
+          <th>早期 Bugbot</th>
+          <th>agentic Bugbot</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>上下文</td>
+          <td>更多依赖预先塞入的静态上下文。</td>
+          <td>按需调用工具，运行时补足动态上下文。</td>
+        </tr>
+        <tr>
+          <td>提示词</td>
+          <td>主要约束模型，避免误报。</td>
+          <td>鼓励更积极调查可疑模式，避免过度保守。</td>
+        </tr>
+        <tr>
+          <td>优化方式</td>
+          <td>依靠内部质检和直觉迭代。</td>
+          <td>用真实 resolution rate 和 BugBench 做爬坡实验。</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
 
-    <section>
-      <h2>生产可用性依赖底层系统，而不只是审查逻辑</h2>
-      <p>Cursor 为 Bugbot 重建了 Rust 版 Git 集成，减少仓库数据获取，并增加 GitHub 约束下所需的限流监控、请求批处理和代理基础设施。随着客户采用增长，Bugbot rules 又让团队能表达代码库特定规则，例如危险迁移或内部 API 误用。</p>
-      <p>这说明 AI agent 要进入真实研发流程，必须同时解决权限、速度、规模、限流和团队自定义知识的问题。</p>
-    </section>
+  <section class="quote">
+    <blockquote>真正影响 AI 审查质量的，不只是模型本身，也包括它能调用什么工具、何时获取上下文，以及团队用什么信号判断它是否有效。</blockquote>
+  </section>
 
-    <section>
-      <h2>最大的跃迁来自 agentic 架构和动态上下文</h2>
-      <p>Cursor 在秋季把 Bugbot 切换为完全 agentic 的设计：agent 不再只按固定步骤跑 pass，而是能围绕 diff 推理、调用工具，并决定哪里需要深入调查。团队还发现，agent 版本反而过于谨慎，因此提示词要更鼓励它调查可疑模式并报告潜在问题。</p>
-      <p>动态上下文也变得更重要：模型不必一开始拿到所有信息，而是在运行时主动拉取需要的上下文。结论是，agent 的能力很大程度上由它能调用的工具和工具界面塑造。</p>
-    </section>
+  <section class="future">
+    <h2>下一步从发现走向验证和修复</h2>
+    <div class="future-grid">
+      <div class="future-item">
+        <h3>Bugbot Autofix Beta</h3>
+        <p>发现 PR bug 后自动启动 Cloud Agent 修复问题。这把审查从提醒推进到执行。</p>
+      </div>
+      <div class="future-item">
+        <h3>运行代码验证报告</h3>
+        <p>未来 Bugbot 将能运行代码验证自己的 bug 报告。它有机会减少误报，并提高开发者信任。</p>
+      </div>
+      <div class="future-item">
+        <h3>常驻扫描代码库</h3>
+        <p>Cursor 还在实验 always-on 版本。审查不再只等待 PR，而是持续观察代码库风险。</p>
+      </div>
+    </div>
+  </section>
 
-    <section>
-      <h2>下一步是从“指出 bug”走向“验证并修复 bug”</h2>
-      <p>Bugbot 目前每月为客户审查超过 200 万个 PR，客户包括 Rippling、Discord、Samsara、Airtable 和 Sierra AI，Cursor 也把它用于内部所有代码。Cursor 已推出 Bugbot Autofix Beta，让 Cloud Agent 自动修复 PR 审查中发现的问题。</p>
-      <p>后续方向包括让 Bugbot 运行代码验证自己的报告、遇到复杂问题时做深度研究，以及持续扫描代码库的 always-on 版本。这意味着 AI 代码审查可能从被动评论逐步变成持续质量维护系统。</p>
-    </section>
-
-    <section class="insights">
-      <h2>最值得带走的洞见</h2>
-      <ul>
-        <li>AI 代码审查的核心指标应接近真实工程结果：问题是否被作者修复。</li>
-        <li>模型能力只是基础，评估指标、上下文管理、工具接口和生产基础设施共同决定最终质量。</li>
-        <li>多路并行和多数投票能提高早期系统可靠性，但 agentic 架构为更深层推理和动态探索打开空间。</li>
-        <li>很多看似合理的改动会让指标回退，所以在线真实数据和离线人工标注 benchmark 都不可缺。</li>
-        <li>AI 研发工具的下一阶段不只是发现问题，而是验证问题、修复问题，并持续守护代码库。</li>
-      </ul>
-    </section>
-  </main>
+  <section class="takeaways">
+    <h2>最值得带走的洞见</h2>
+    <div class="mosaic">
+      <div class="tile large"><strong>一</strong>AI 代码审查的核心指标应接近真实修复行为，而不是评论数量或主观反馈。</div>
+      <div class="tile"><strong>二</strong>40 次主要实验把每个 PR 解决的 bug 数从约 0.2 推到约 0.5，说明系统性爬坡能产生复利。</div>
+      <div class="tile"><strong>三</strong>agentic 架构让模型从被动读上下文，变成主动寻找证据。</div>
+      <div class="tile"><strong>四</strong>工具接口本身会塑造模型行为，小改动也可能影响结果。</div>
+      <div class="tile"><strong>五</strong>下一阶段的竞争点会从“发现问题”扩展到“验证问题并自动修复”。</div>
+    </div>
+  </section>
+</main>
   <script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;

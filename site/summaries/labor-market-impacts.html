@@ -3,112 +3,308 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI劳动力市场影响：新指标与早期证据</title>
+<title>AI 对劳动力市场的影响：一种新测量方法和早期证据</title>
 <style>
-:root{
-  --bg:#f6f7f9;
-  --card:#ffffff;
-  --ink:#17202a;
-  --muted:#5d6673;
-  --line:#dfe4ea;
-  --accent:#2f6fed;
-  --accent2:#0f8f7a;
-  --accent3:#b45f06;
-  --hl:#eaf1ff;
-  --hl2:#fff4df;
+:root {
+  --bg: #f6f4ef;
+  --paper: #fffdf8;
+  --ink: #1d2430;
+  --muted: #667085;
+  --line: #d9d6cc;
+  --panel: #ffffff;
+  --panel2: #eef6ff;
+  --panel3: #fff2e3;
+  --strip: #e9f7ef;
+  --deep: #182230;
+  --deep-ink: #f8fafc;
+  --soft-data: #e7f0ff;
+  --soft-risk: #ffe8e8;
+  --soft-opportunity: #e8f8ef;
+  --soft-conclusion: #fff3c4;
+  --accent-data: #2563eb;
+  --accent-risk: #dc2626;
+  --accent-opportunity: #0f9f6e;
+  --accent-conclusion: #b7791f;
+  --accent-theory: #7c3aed;
+  --shadow: 0 18px 50px rgba(24, 34, 48, 0.12);
 }
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
-  line-height:1.72;
+:root[data-theme="dark"] {
+  --bg: #111318;
+  --paper: #181b22;
+  --ink: #edf2f7;
+  --muted: #a9b2c3;
+  --line: #303641;
+  --panel: #1f2430;
+  --panel2: #162233;
+  --panel3: #2a2117;
+  --strip: #12261d;
+  --deep: #090b10;
+  --deep-ink: #f8fafc;
+  --soft-data: #10213f;
+  --soft-risk: #341616;
+  --soft-opportunity: #0f2a20;
+  --soft-conclusion: #33280d;
+  --accent-data: #6ea8ff;
+  --accent-risk: #ff7979;
+  --accent-opportunity: #4ade80;
+  --accent-conclusion: #facc15;
+  --accent-theory: #c4a1ff;
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
 }
-main{
-  max-width:920px;
-  margin:0 auto;
-  padding:32px 18px 48px;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111318;
+    --paper: #181b22;
+    --ink: #edf2f7;
+    --muted: #a9b2c3;
+    --line: #303641;
+    --panel: #1f2430;
+    --panel2: #162233;
+    --panel3: #2a2117;
+    --strip: #12261d;
+    --deep: #090b10;
+    --deep-ink: #f8fafc;
+    --soft-data: #10213f;
+    --soft-risk: #341616;
+    --soft-opportunity: #0f2a20;
+    --soft-conclusion: #33280d;
+    --accent-data: #6ea8ff;
+    --accent-risk: #ff7979;
+    --accent-opportunity: #4ade80;
+    --accent-conclusion: #facc15;
+    --accent-theory: #c4a1ff;
+    --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  }
 }
-.header{
-  background:linear-gradient(135deg,var(--hl),var(--card));
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:26px;
-  margin-bottom:18px;
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  line-height: 1.65;
 }
-.kicker{
-  color:var(--accent);
-  font-size:14px;
-  font-weight:700;
-  margin:0 0 8px;
+main { overflow: hidden; }
+.hero {
+  background: linear-gradient(135deg, var(--deep), #243247);
+  color: var(--deep-ink);
+  padding: 64px 22px 46px;
 }
-h1{
-  margin:0 0 14px;
-  font-size:30px;
-  line-height:1.25;
-  letter-spacing:0;
+.wrap {
+  width: min(1120px, calc(100% - 36px));
+  margin: 0 auto;
 }
-.lead{
-  margin:0;
-  font-size:18px;
-  color:var(--ink);
+.kicker {
+  color: var(--accent-opportunity);
+  font-weight: 700;
+  letter-spacing: 0;
 }
-.card{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:22px;
-  margin:14px 0;
+h1 {
+  margin: 14px 0 8px;
+  font-size: clamp(32px, 5vw, 58px);
+  line-height: 1.12;
+  letter-spacing: 0;
 }
-h2{
-  margin:0 0 12px;
-  font-size:21px;
-  line-height:1.35;
+.original {
+  color: #cbd5e1;
+  font-size: 17px;
+  margin: 0 0 28px;
 }
-p{margin:10px 0}
-.data{
-  border-left:4px solid var(--accent);
-  background:var(--hl);
-  padding:10px 14px;
-  border-radius:8px;
-  color:var(--ink);
+.thesis {
+  max-width: 840px;
+  font-size: clamp(20px, 2.4vw, 30px);
+  line-height: 1.45;
+  margin: 0;
 }
-.note{
-  color:var(--muted);
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 30px;
 }
-.grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:12px;
-  margin:14px 0 4px;
+.meta span {
+  border: 1px solid rgba(255,255,255,0.24);
+  border-radius: 999px;
+  padding: 6px 12px;
+  color: #e2e8f0;
 }
-.metric{
-  background:var(--hl2);
-  border:1px solid var(--line);
-  border-radius:10px;
-  padding:14px;
+.number-band {
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
 }
-.metric strong{
-  display:block;
-  font-size:24px;
-  color:var(--accent3);
+.numbers {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1px;
+  background: var(--line);
+  box-shadow: var(--shadow);
+  transform: translateY(-22px);
 }
-ul{
-  margin:8px 0 0;
-  padding-left:22px;
+.num {
+  background: var(--panel);
+  padding: 22px;
+  min-height: 148px;
 }
-li{margin:8px 0}
-.footer{
-  border-top:1px solid var(--line);
-  margin-top:22px;
-  padding-top:18px;
+.num strong {
+  display: block;
+  color: var(--accent-data);
+  font-size: 34px;
+  line-height: 1;
+  margin-bottom: 10px;
 }
-@media (max-width:720px){
-  main{padding:20px 14px 36px}
-  h1{font-size:25px}
-  .lead{font-size:16px}
-  .grid{grid-template-columns:1fr}
+.num:nth-child(2) strong { color: var(--accent-theory); }
+.num:nth-child(3) strong { color: var(--accent-opportunity); }
+.num:nth-child(4) strong { color: var(--accent-conclusion); }
+.num:nth-child(5) strong { color: var(--accent-risk); }
+.section {
+  padding: 54px 0;
+}
+.section h2 {
+  margin: 0 0 16px;
+  font-size: 28px;
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+.section p {
+  margin: 0 0 12px;
+}
+.two-col {
+  background: var(--panel2);
+}
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 26px;
+}
+.explain {
+  background: var(--paper);
+  border-left: 6px solid var(--accent-data);
+  padding: 28px;
+}
+.explain.alt {
+  border-left-color: var(--accent-theory);
+}
+.badge {
+  display: inline-block;
+  margin-bottom: 12px;
+  color: var(--accent-data);
+  font-weight: 800;
+}
+.flow {
+  background: var(--paper);
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  margin-top: 24px;
+}
+.step {
+  position: relative;
+  border-top: 5px solid var(--accent-opportunity);
+  background: var(--strip);
+  padding: 18px;
+}
+.step b {
+  display: block;
+  margin-bottom: 8px;
+}
+.contrast {
+  background: var(--deep);
+  color: var(--deep-ink);
+}
+.compare {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 22px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+.compare th,
+.compare td {
+  padding: 16px;
+  border: 1px solid rgba(255,255,255,0.16);
+  text-align: left;
+  vertical-align: top;
+}
+.compare th {
+  color: var(--accent-conclusion);
+  font-size: 15px;
+}
+.compare td {
+  color: #e5e7eb;
+}
+.signal {
+  background: var(--panel3);
+}
+.signal-layout {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 28px;
+  align-items: stretch;
+}
+.quote {
+  background: var(--soft-conclusion);
+  border-left: 8px solid var(--accent-conclusion);
+  padding: 30px;
+  font-size: 24px;
+  line-height: 1.45;
+  font-weight: 800;
+}
+.risk-list {
+  display: grid;
+  gap: 14px;
+}
+.risk-item {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 18px;
+}
+.risk-item b {
+  color: var(--accent-risk);
+}
+.takeaways {
+  background: var(--paper);
+}
+.mosaic {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 1fr;
+  gap: 14px;
+  margin-top: 24px;
+}
+.tile {
+  min-height: 150px;
+  padding: 22px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+}
+.tile.data { background: var(--soft-data); border-color: var(--accent-data); }
+.tile.risk { background: var(--soft-risk); border-color: var(--accent-risk); }
+.tile.opp { background: var(--soft-opportunity); border-color: var(--accent-opportunity); }
+.tile.conclusion { background: var(--soft-conclusion); border-color: var(--accent-conclusion); grid-column: span 2; }
+.tile b {
+  display: block;
+  margin-bottom: 8px;
+}
+.footer-note {
+  color: var(--muted);
+  font-size: 14px;
+  margin-top: 28px;
+}
+@media (max-width: 860px) {
+  .numbers,
+  .grid2,
+  .steps,
+  .signal-layout,
+  .mosaic {
+    grid-template-columns: 1fr;
+  }
+  .tile.conclusion {
+    grid-column: auto;
+  }
+  .hero {
+    padding-top: 44px;
+  }
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -185,13 +381,6 @@ li{margin:8px 0}
     body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
       color: inherit;
     }
-    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
-      border-color: var(--airs-digest-line) !important;
-    }
-    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
-      background: var(--airs-digest-panel) !important;
-      color: var(--airs-digest-ink) !important;
-    }
     body :where(.muted, .meta, .kicker, small) {
       color: var(--airs-digest-muted) !important;
     }
@@ -252,67 +441,131 @@ li{margin:8px 0}
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/labor-market-impacts" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
 <main>
-  <section class="header">
-    <p class="kicker">一句话总括</p>
-    <h1>这篇文章的真正贡献，是把AI“能不能做”从“已经在多大程度上用于工作自动化”中拆开，并用早期就业数据检验两者是否已经转化为劳动力市场冲击。</h1>
-    <p class="lead">Anthropic没有直接宣称AI正在造成大规模失业，而是提出一个可反复更新的测量框架：先看任务是否理论上可由LLM提速，再看Claude真实流量中是否出现了工作相关、偏自动化的使用。</p>
-  </section>
-
-  <section class="card">
-    <h2>真实暴露度比理论能力更接近就业风险</h2>
-    <p>文章的新指标叫“observed exposure”，它结合O*NET约800个美国职业的任务、Anthropic Economic Index中的Claude使用数据，以及Eloundou等人对LLM理论能力的任务评分。</p>
-    <p class="data">关键区别是权重：工作相关使用比泛用使用更重要，自动化用途比辅助用途更重要，且任务会按其在职业中占用的时间汇总到职业层面。</p>
-    <p>这改变了对AI影响的理解：不能只问AI理论上能替代哪些任务，还要问这些任务是否已经在真实工作流程中被自动化。</p>
-  </section>
-
-  <section class="card">
-    <h2>AI可做的任务很多，但真实覆盖仍然有限</h2>
-    <p>理论能力与真实使用高度相关：过去四份Economic Index报告中观察到的任务，97%落在理论上可由LLM提速的类别里。</p>
-    <div class="grid">
-      <div class="metric"><strong>94%</strong>Computer &amp; Math任务理论可覆盖</div>
-      <div class="metric"><strong>90%</strong>Office &amp; Admin任务理论可覆盖</div>
-      <div class="metric"><strong>33%</strong>Claude对Computer &amp; Math任务的实际覆盖</div>
+  <header class="hero">
+    <div class="wrap">
+      <div class="kicker">一句话总括</div>
+      <h1>AI 对劳动力市场的影响：一种新测量方法和早期证据</h1>
+      <p class="original">Labor market impacts of AI: A new measure and early evidence</p>
+      <p class="thesis">这项研究的真正贡献，是把 AI 的理论能力和真实工作场景中的自动化使用合并成一个可持续追踪的职业暴露指标。</p>
+      <div class="meta">
+        <span>Anthropic</span>
+        <span>Economic Research</span>
+        <span>2026-03-05</span>
+      </div>
     </div>
-    <p>因此，AI能力已经覆盖很多“可能性”，但真实部署离理论边界还有距离；这说明就业冲击可能不是瞬间发生，而是随着采用、合规、软件集成和工作流重组逐步显现。</p>
+  </header>
+
+  <section class="number-band">
+    <div class="wrap">
+      <div class="numbers">
+        <div class="num"><strong>97%</strong>已观测 Claude 任务落在理论可由 LLM 加速的类别中。</div>
+        <div class="num"><strong>33%</strong>Computer & Math 任务被 Claude 当前实际覆盖。</div>
+        <div class="num"><strong>75%</strong>Computer Programmers 是观测暴露度最高的职业。</div>
+        <div class="num"><strong>-0.6pp</strong>覆盖率每高 10 个百分点，BLS 增长预测低 0.6 个百分点。</div>
+        <div class="num"><strong>-14%</strong>22-25 岁年轻人进入高暴露职业的入职率相对下降。</div>
+      </div>
+    </div>
   </section>
 
-  <section class="card">
-    <h2>最高暴露职业集中在可数字化和可流程化岗位</h2>
-    <p>计算机程序员在新指标下排在最前，任务覆盖率为75%；客服代表也高度暴露，原因是API流量中越来越多出现相关任务；数据录入员覆盖率为67%，因为读文件并录入数据这类核心任务已经显著自动化。</p>
-    <p class="data">相反，30%的劳动者处于零覆盖职业，包括厨师、摩托车修理工、救生员、酒保、洗碗工和试衣间服务员等。</p>
-    <p>这说明AI冲击并不是均匀落在所有劳动者身上，而是优先落在文本、代码、客服、金融分析和数据处理等更容易数字化的工作环节。</p>
+  <section class="section two-col">
+    <div class="wrap grid2">
+      <div class="explain">
+        <span class="badge">测量创新</span>
+        <h2>“能做”不等于“正在替代”</h2>
+        <p>传统暴露指标多看任务是否理论上可被 LLM 加速。Anthropic 新指标还要求这些任务在 Claude 使用数据中出现，并且更重视工作场景和自动化用途。</p>
+        <p>这会把宽泛的技术潜力收窄成更接近现实部署的信号。结论是，AI 影响就业的判断应从实际覆盖率开始，而不是只看模型能力上限。</p>
+      </div>
+      <div class="explain alt">
+        <span class="badge">关键差距</span>
+        <h2>理论覆盖远大于真实覆盖</h2>
+        <p>在 Computer & Math 职业中，理论上 94% 的任务有 LLM 渗透空间。但 Claude 当前实际覆盖只有 33%。</p>
+        <p>差距来自模型限制、法律约束、专用软件需求和人工验证流程。洞见是，技术可行性会高估短期就业冲击。</p>
+      </div>
+    </div>
   </section>
 
-  <section class="card">
-    <h2>高暴露职业的长期增长预期略弱，但关系不强</h2>
-    <p>文章把observed exposure与美国劳工统计局2025年发布的2024-2034职业就业预测进行比较，发现暴露度越高，预测增长越弱。</p>
-    <p class="data">在按当前就业规模加权的职业层面回归中，覆盖率每提高10个百分点，BLS就业增长预测低0.6个百分点；仅使用理论暴露指标时没有这种相关性。</p>
-    <p>这为新指标提供了一点外部验证：真实使用数据比单纯理论能力更能捕捉劳动市场分析师已经感受到的职业增长压力。</p>
+  <section class="section flow">
+    <div class="wrap">
+      <h2>观测暴露度把任务、使用和职业连接起来</h2>
+      <p>研究把 O*NET 的职业任务、Eloundou 等人的理论暴露分数，以及 Anthropic Economic Index 的 Claude 使用数据合并。自动化用途给满权重，辅助用途给半权重，再按任务耗时汇总到职业。</p>
+      <p>这个流程的价值在于可更新。随着模型能力和企业部署变化，同一框架可以继续追踪红色的真实覆盖是否逼近蓝色的理论覆盖。</p>
+      <div class="steps">
+        <div class="step"><b>1. 职业任务</b>O*NET 提供约 800 个美国职业的任务清单。</div>
+        <div class="step"><b>2. 理论能力</b>β 标记 LLM 是否能让任务至少快一倍。</div>
+        <div class="step"><b>3. 真实使用</b>Claude 数据显示哪些任务已被实际调用。</div>
+        <div class="step"><b>4. 工作权重</b>工作相关和自动化用途被赋予更高权重。</div>
+        <div class="step"><b>5. 职业暴露</b>按任务耗时加权，形成职业层面的观测暴露度。</div>
+      </div>
+    </div>
   </section>
 
-  <section class="card">
-    <h2>高暴露劳动者不是低薪边缘群体，而更偏高教育和高收入</h2>
-    <p>文章用ChatGPT发布前的Current Population Survey数据比较高暴露组和零暴露组，发现两组人口结构差异很大。</p>
-    <p class="data">最高暴露组女性比例高16个百分点，白人比例高11个百分点，平均收入高47%；研究生学历占比为17.4%，而零暴露组为4.5%。</p>
-    <p>这改变了常见自动化叙事：这一次被优先影响的可能不是传统低教育、低薪体力岗位，而是更高教育、更高收入的白领职业。</p>
+  <section class="section contrast">
+    <div class="wrap">
+      <h2>高暴露职业更像白领、受教育程度高、收入也更高</h2>
+      <p>高暴露组比零暴露组更可能是女性、白人或亚裔，平均收入高 47%，教育程度也更高。研究还发现，研究生学历在零暴露组占 4.5%，在最高暴露组占 17.4%。</p>
+      <p>这改变了常见直觉。AI 的早期就业风险不只是低薪重复劳动问题，也可能集中在高教育、高收入的专业岗位。</p>
+      <table class="compare">
+        <thead>
+          <tr>
+            <th>观察维度</th>
+            <th>高暴露职业</th>
+            <th>理解变化</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>代表职业</td>
+            <td>程序员、客服代表、金融分析师、数据录入员。</td>
+            <td>AI 暴露既包括编码，也包括面向客户和文档处理的自动化。</td>
+          </tr>
+          <tr>
+            <td>BLS 增长预测</td>
+            <td>覆盖率每提高 10 个百分点，2034 年前增长预测低 0.6 个百分点。</td>
+            <td>关系存在但不强，说明暴露指标有信号，但不能单独预测岗位消失。</td>
+          </tr>
+          <tr>
+            <td>理论指标对比</td>
+            <td>单用 Eloundou 理论暴露度没有同样相关性。</td>
+            <td>真实使用数据可能比纯能力评估更接近劳动市场变化。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </section>
 
-  <section class="card">
-    <h2>失业率还没有明显上升，年轻人的入职可能先变慢</h2>
-    <p>研究把职业暴露度匹配到Current Population Survey中的劳动者，比较高暴露组与低暴露组自2016年以来的失业率趋势。疫情期间低暴露、线下岗位失业冲击更大；ChatGPT发布后，两组趋势大体相似。</p>
-    <p class="data">核心差分中的高暴露组失业率变化小且不显著；但22-25岁年轻人进入高暴露职业的月度入职率在2024年前后出现分化，后ChatGPT时期相对2022年下降约14%，且统计显著性很弱。</p>
-    <p>这意味着AI早期影响如果存在，可能先表现为“少招新人”而不是“集中裁员”；不过作者也强调，年轻人可能留在原工作、转向其他职业或回到学校，因此证据仍是提示性而非定论。</p>
+  <section class="section signal">
+    <div class="wrap signal-layout">
+      <div class="quote">目前没有看到高暴露职业失业率系统性上升，但年轻人的入职信号值得继续盯住。</div>
+      <div class="risk-list">
+        <div class="risk-item">
+          <b>失业率主结果：</b>自 ChatGPT 发布后，高暴露组和低暴露组的失业趋势大体相似。差分估计很小，且无法与零区分。
+        </div>
+        <div class="risk-item">
+          <b>可检测规模：</b>研究认为约 1 个百分点量级的差异性失业上升应能被框架捕捉。类似白领版“大衰退”的变化也应可见。
+        </div>
+        <div class="risk-item">
+          <b>年轻人信号：</b>22-25 岁 workers 进入高暴露职业的月度 job finding rate 在 2024 年后相对走弱，估计相对 2022 年下降 14%。
+        </div>
+        <div class="risk-item">
+          <b>谨慎解释：</b>这可能是 AI 的早期影响，也可能是年轻人留在原岗位、转向其他工作、返校，或调查数据误差造成的。
+        </div>
+      </div>
+    </div>
   </section>
 
-  <section class="card footer">
-    <h2>最值得带走的洞见</h2>
-    <ul>
-      <li>衡量AI就业风险不能只看模型理论能力，真实工作场景中的自动化使用才更接近经济影响。</li>
-      <li>AI覆盖的“蓝色理论空间”很大，但当前“红色真实使用空间”仍小得多，劳动力冲击可能是渐进扩散。</li>
-      <li>高暴露岗位集中在高教育、高收入白领职业，这使AI政策讨论不能只沿用传统自动化框架。</li>
-      <li>目前没有清晰证据显示高暴露职业失业率已经系统性上升，但年轻人进入这些职业的速度值得持续追踪。</li>
-      <li>这套框架最大的价值在于可重复更新：当AI使用数据和就业数据继续积累，它能帮助区分真实信号和短期噪音。</li>
-    </ul>
+  <section class="section takeaways">
+    <div class="wrap">
+      <h2>最值得带走的洞见</h2>
+      <p>这篇文章没有宣称 AI 已经造成大规模失业。它更重要的作用，是给未来的就业冲击建立一个可重复、可更新、能区分信号和噪声的测量底座。</p>
+      <div class="mosaic">
+        <div class="tile data"><b>1. 看真实覆盖，不只看理论能力。</b>理论上可加速的任务很多，但实际进入工作自动化的比例仍低得多。</div>
+        <div class="tile risk"><b>2. 当前失业数据还没有强信号。</b>高暴露职业没有出现系统性失业率上升。</div>
+        <div class="tile opp"><b>3. 招聘可能比裁员更早变化。</b>年轻人进入高暴露职业的速度放缓，可能是早期预警。</div>
+        <div class="tile conclusion"><b>4. AI 冲击可能先重塑职业入口。</b>如果企业先减少初级岗位招聘，劳动力市场的变化会先出现在入职和职业起点，而不是整体失业率。</div>
+        <div class="tile data"><b>5. 高暴露不等于低技能。</b>高教育、高收入岗位也处在观测暴露前列，政策讨论需要覆盖白领转型。</div>
+      </div>
+      <p class="footer-note">核心结论：AI 对劳动市场的影响目前仍不清晰，但“观测暴露度”让未来的证据更容易被及时识别。</p>
+    </div>
   </section>
 </main>
   <script id="airs-digest-theme-script">

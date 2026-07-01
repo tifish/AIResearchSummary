@@ -2,102 +2,275 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>GPT-5.2 与单负螺旋度胶子振幅</title>
+<title>GPT-5.2 推导出理论物理学中的一项新结果</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-:root{
-  --bg:#f6f7f9;
-  --card:#ffffff;
-  --ink:#18202a;
-  --muted:#687382;
-  --line:#d9e0e8;
-  --accent:#2864d8;
-  --accent2:#0f8a72;
-  --accent3:#8a5a14;
-  --hl:#e9f1ff;
-  --hl2:#edf8f5;
+:root {
+  --bg: #f7f4ee;
+  --ink: #17202a;
+  --muted: #5e6672;
+  --line: #d8d1c5;
+  --surface: #fffaf1;
+  --hero-bg: #152238;
+  --hero-ink: #f7f1e6;
+  --soft-data: #e8f4ff;
+  --soft-risk: #fff0ec;
+  --soft-opportunity: #eef8ed;
+  --soft-conclusion: #f0ecff;
+  --band-bg: #20324f;
+  --table-bg: #fff7e8;
+  --quote-bg: #1e293b;
+  --mosaic-bg: #f1eadf;
+  --data: #1677b9;
+  --risk: #d45b35;
+  --opportunity: #2f8a4d;
+  --conclusion: #7258d4;
+  --accent: #c9881a;
+  --shadow: rgba(30, 41, 59, 0.13);
 }
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif;
-  line-height:1.72;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #10141b;
+    --ink: #ece7dc;
+    --muted: #b8b1a6;
+    --line: #394150;
+    --surface: #181e28;
+    --hero-bg: #0b1220;
+    --hero-ink: #f0eadf;
+    --soft-data: #10283b;
+    --soft-risk: #351b17;
+    --soft-opportunity: #142b1d;
+    --soft-conclusion: #241d3c;
+    --band-bg: #111b2b;
+    --table-bg: #231d13;
+    --quote-bg: #0f1724;
+    --mosaic-bg: #171d26;
+    --data: #58b8f6;
+    --risk: #ff8a66;
+    --opportunity: #6fce8f;
+    --conclusion: #a997ff;
+    --accent: #f0b647;
+    --shadow: rgba(0, 0, 0, 0.35);
+  }
 }
-main{
-  max-width:920px;
-  margin:0 auto;
-  padding:42px 20px 56px;
+:root[data-theme="dark"] {
+  --bg: #10141b;
+  --ink: #ece7dc;
+  --muted: #b8b1a6;
+  --line: #394150;
+  --surface: #181e28;
+  --hero-bg: #0b1220;
+  --hero-ink: #f0eadf;
+  --soft-data: #10283b;
+  --soft-risk: #351b17;
+  --soft-opportunity: #142b1d;
+  --soft-conclusion: #241d3c;
+  --band-bg: #111b2b;
+  --table-bg: #231d13;
+  --quote-bg: #0f1724;
+  --mosaic-bg: #171d26;
+  --data: #58b8f6;
+  --risk: #ff8a66;
+  --opportunity: #6fce8f;
+  --conclusion: #a997ff;
+  --accent: #f0b647;
+  --shadow: rgba(0, 0, 0, 0.35);
 }
-header{
-  border-bottom:1px solid var(--line);
-  padding-bottom:22px;
-  margin-bottom:24px;
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  line-height: 1.65;
 }
-.kicker{
-  color:var(--accent);
-  font-weight:700;
-  font-size:14px;
-  letter-spacing:.02em;
+main { overflow: hidden; }
+.hero {
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+  padding: 64px 7vw 52px;
 }
-h1{
-  margin:8px 0 14px;
-  font-size:34px;
-  line-height:1.2;
+.kicker {
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
 }
-.lede{
-  font-size:20px;
-  background:var(--hl);
-  border-left:5px solid var(--accent);
-  padding:16px 18px;
-  margin:0;
+h1 {
+  max-width: 980px;
+  margin: 12px 0 10px;
+  font-size: clamp(34px, 5vw, 64px);
+  line-height: 1.08;
 }
-.meta{
-  margin-top:12px;
-  color:var(--muted);
-  font-size:14px;
+.english-title {
+  max-width: 860px;
+  color: var(--muted);
+  color: color-mix(in srgb, var(--hero-ink) 68%, var(--data));
+  font-size: 18px;
 }
-section{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:8px;
-  padding:22px;
-  margin:18px 0;
+.lede {
+  max-width: 880px;
+  margin-top: 30px;
+  font-size: 24px;
+  line-height: 1.45;
+  border-left: 6px solid var(--accent);
+  padding-left: 20px;
 }
-h2{
-  margin:0 0 12px;
-  font-size:22px;
-  line-height:1.35;
+.numbers {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--line);
 }
-p{margin:10px 0}
-.data{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  margin:14px 0;
+.num {
+  background: var(--band-bg);
+  color: var(--hero-ink);
+  padding: 28px 7vw 28px;
 }
-.badge{
-  background:var(--hl2);
-  color:var(--accent2);
-  border:1px solid color-mix(in srgb,var(--accent2) 28%,transparent);
-  border-radius:999px;
-  padding:6px 10px;
-  font-weight:700;
-  font-size:14px;
+.num strong {
+  display: block;
+  color: var(--data);
+  font-size: 34px;
+  line-height: 1;
 }
-.note{
-  color:var(--muted);
+.num span {
+  display: block;
+  margin-top: 10px;
+  color: var(--hero-ink);
 }
-.insights{
-  background:linear-gradient(180deg,var(--card),var(--hl));
-  border-color:color-mix(in srgb,var(--accent) 25%,var(--line));
+.split {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 36px;
+  padding: 56px 7vw;
+  background: var(--surface);
 }
-ul{
-  margin:10px 0 0;
-  padding-left:22px;
+.split h2, .flow h2, .table-wrap h2, .takeaways h2 {
+  margin: 0 0 16px;
+  font-size: 28px;
+  line-height: 1.2;
 }
-li{margin:8px 0}
-strong{color:var(--accent3)}
+.panel-data {
+  background: var(--soft-data);
+  border-left: 8px solid var(--data);
+  padding: 24px;
+}
+.panel-risk {
+  background: var(--soft-risk);
+  border-left: 8px solid var(--risk);
+  padding: 24px;
+}
+.flow {
+  padding: 58px 7vw;
+  background: var(--soft-opportunity);
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-top: 28px;
+}
+.step {
+  position: relative;
+  padding: 22px;
+  border-top: 5px solid var(--opportunity);
+  background: var(--bg);
+  box-shadow: 0 12px 30px var(--shadow);
+}
+.badge {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--opportunity);
+  color: var(--hero-ink);
+  font-weight: 800;
+}
+.step h3 { margin: 14px 0 8px; }
+.table-wrap {
+  padding: 58px 7vw;
+  background: var(--table-bg);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  box-shadow: 0 14px 34px var(--shadow);
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 18px;
+  border-bottom: 1px solid var(--line);
+}
+th {
+  color: var(--hero-ink);
+  background: var(--risk);
+}
+td:first-child {
+  font-weight: 800;
+  color: var(--risk);
+  width: 26%;
+}
+.quote {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 30px;
+  align-items: center;
+  padding: 58px 7vw;
+  background: var(--quote-bg);
+  color: var(--hero-ink);
+}
+.quote-mark {
+  font-size: clamp(58px, 10vw, 130px);
+  color: var(--accent);
+  line-height: 1;
+}
+.quote p {
+  margin: 0;
+  font-size: 23px;
+  line-height: 1.45;
+}
+.conclusion-strip {
+  padding: 34px 7vw;
+  background: var(--soft-conclusion);
+  border-top: 6px solid var(--conclusion);
+  border-bottom: 6px solid var(--conclusion);
+  font-size: 22px;
+}
+.takeaways {
+  padding: 58px 7vw 70px;
+  background: var(--mosaic-bg);
+}
+.mosaic {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+}
+.tile {
+  min-height: 170px;
+  padding: 20px;
+  background: var(--surface);
+  border-bottom: 6px solid var(--conclusion);
+}
+.tile:nth-child(2) { border-bottom-color: var(--data); }
+.tile:nth-child(3) { border-bottom-color: var(--opportunity); }
+.tile:nth-child(4) { border-bottom-color: var(--risk); }
+.tile strong {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+@media (max-width: 860px) {
+  .numbers, .split, .steps, .quote, .mosaic {
+    grid-template-columns: 1fr;
+  }
+  .num { padding: 24px 7vw; }
+  .lede { font-size: 20px; }
+  th, td { display: block; width: 100%; }
+  td:first-child { width: 100%; }
+}
 </style>
   <script id="airs-digest-theme-boot">
     try {
@@ -173,13 +346,6 @@ strong{color:var(--accent3)}
     body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
       color: inherit;
     }
-    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
-      border-color: var(--airs-digest-line) !important;
-    }
-    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
-      background: var(--airs-digest-panel) !important;
-      color: var(--airs-digest-ink) !important;
-    }
     body :where(.muted, .meta, .kicker, small) {
       color: var(--airs-digest-muted) !important;
     }
@@ -240,58 +406,77 @@ strong{color:var(--accent3)}
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/new-result-theoretical-physics" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
 <main>
-<header>
-  <div class="kicker">一句话总括</div>
-  <h1>GPT-5.2 把一个被长期视为“应当为零”的胶子振幅，改写成可证明、可检验的新公式。</h1>
-  <p class="lede">这篇文章真正的贡献不是宣称 AI 替代物理学家，而是展示 AI 如何在专家给出的复杂低阶结果中发现简洁结构，再进入严格证明和物理一致性验证流程。</p>
-  <div class="meta">OpenAI Research，2026 年 2 月 13 日；主题为单负螺旋度 gluon tree amplitudes。</div>
-</header>
+  <section class="hero">
+    <div class="kicker">OpenAI Research · 2026-02-13</div>
+    <h1>GPT-5.2 推导出理论物理学中的一项新结果</h1>
+    <div class="english-title">GPT-5.2 derives a new result in theoretical physics</div>
+    <p class="lede">一句话总括：这项工作最重要的贡献，是把一个被教科书论证排除的胶子树级振幅重新打开，并展示 AI 可以从复杂基例中提出可证明的物理通式。</p>
+  </section>
 
-<section>
-  <h2>原本被当作零的振幅，在半共线区域不为零。</h2>
-  <p>文章讨论的是胶子散射振幅，也就是计算粒子相互作用概率的核心对象。传统课本论证认为，当一个胶子为负螺旋度、其余 n−1 个胶子为正螺旋度时，树级振幅应为零。</p>
-  <p>新结果指出，这个结论依赖“动量足够一般”的假设；在一个特殊但数学上明确的半共线动量区域，原有论证不再适用，振幅可以非零。</p>
-  <p><strong>洞见：</strong>AI 影响科学的关键不只是加速计算，而是帮助研究者重新审视“通常为真”的条件边界。</p>
-</section>
+  <section class="numbers" aria-label="关键数字">
+    <div class="num"><strong>Eq. 39</strong><span>GPT-5.2 Pro 首先猜出的总公式。</span></div>
+    <div class="num"><strong>n≤6</strong><span>人类作者手算出的基例范围。</span></div>
+    <div class="num"><strong>12 小时</strong><span>内部脚手架模型用于推理和证明的时间量级。</span></div>
+    <div class="num"><strong>2 项检验</strong><span>通过 Berends-Giele 递归和 soft theorem 验证。</span></div>
+  </section>
 
-<section>
-  <h2>GPT-5.2 从 n≤6 的复杂公式中归纳出全 n 通式。</h2>
-  <p>人类作者先手工算出整数 n 到 n=6 的振幅，得到的是复杂的 Feynman 图展开；文章称其复杂度随 n 超指数增长。GPT-5.2 Pro 将这些低阶表达式大幅简化，并从中识别模式，提出适用于所有 n 的 Eq. (39)。</p>
-  <div class="data">
-    <span class="badge">人工基例：n≤6</span>
-    <span class="badge">目标公式：Eq. (39)</span>
-    <span class="badge">复杂度趋势：超指数增长</span>
-  </div>
-  <p><strong>洞见：</strong>这里的 AI 价值更接近“简单公式模式识别器”，能把人类难以看清的结构从计算噪声中提取出来。</p>
-</section>
+  <section class="split">
+    <div class="panel-data">
+      <h2>物理结论不是“所有情况下都为零”</h2>
+      <p>文章研究的是 single-minus gluon tree amplitude。传统论证认为，一个负螺旋度胶子加上其余正螺旋度胶子的树级振幅应为零。</p>
+      <p>新结果指出，这个结论依赖“普通动量”的假设。在半共线动量区域中，这个假设失效。振幅可以非零。</p>
+    </div>
+    <div class="panel-risk">
+      <h2>真正改变理解的是适用条件</h2>
+      <p>这不是说教科书方法整体错误。它说明一个常用零结论有边界。</p>
+      <p>对 AI 影响的理解也因此更具体：模型不是只复述已知物理，而是在一个被忽略的特殊区域里帮助发现可计算对象。</p>
+    </div>
+  </section>
 
-<section>
-  <h2>公式不是停在猜想，而是经过证明和物理检验。</h2>
-  <p>一个内部 scaffolded GPT-5.2 版本又花约 12 小时独立推理，得到同一公式并生成形式证明。随后，作者解析验证该公式满足 Berends-Giele recursion relation，并用 soft theorem 检查其极限行为。</p>
-  <div class="data">
-    <span class="badge">AI 推理时间：约 12 小时</span>
-    <span class="badge">验证一：Berends-Giele 递归</span>
-    <span class="badge">验证二：soft theorem</span>
-  </div>
-  <p><strong>洞见：</strong>这让案例从“模型提出有趣答案”上升到“模型参与可审计的科学发现流程”。</p>
-</section>
+  <section class="flow">
+    <h2>发现路径是一条人机协作链</h2>
+    <div class="steps">
+      <div class="step"><span class="badge">1</span><h3>人工算基例</h3><p>作者先算到 n=6。原始表达式对应 Feynman 图展开，复杂度随 n 超指数增长。</p></div>
+      <div class="step"><span class="badge">2</span><h3>模型做化简</h3><p>GPT-5.2 Pro 把复杂表达式压缩成更简单的形式。这一步让隐藏模式变得可见。</p></div>
+      <div class="step"><span class="badge">3</span><h3>提出通式</h3><p>模型从 Eqs. (35)--(38) 的基例中归纳出适用于所有 n 的 Eq. (39)。</p></div>
+      <div class="step"><span class="badge">4</span><h3>证明与验证</h3><p>内部模型给出证明。作者随后用标准递归关系和软定理做解析检验。</p></div>
+    </div>
+  </section>
 
-<section>
-  <h2>物理意义延伸到更广泛的散射结构。</h2>
-  <p>文章称，在 GPT-5.2 帮助下，相关振幅已经从胶子扩展到引力子，并且更多推广正在进行。对理论物理来说，简洁公式常常是发现更深层结构的入口，而不是单个计算技巧的终点。</p>
-  <p class="note">外部评论者强调，这类结果可能影响高能理论物理研究，并提供一种由领域专家与语言模型共同生成、验证新知识的模板。</p>
-  <p><strong>洞见：</strong>如果这种模式成立，AI 对基础科学的影响会集中在“发现隐藏结构”和“缩短从猜想到证明的路径”。</p>
-</section>
+  <section class="table-wrap">
+    <h2>它和普通“AI 辅助科研”有何不同</h2>
+    <table>
+      <thead>
+        <tr><th>维度</th><th>普通辅助</th><th>这项工作的信号</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>任务类型</td><td>整理文献、解释概念、生成草稿。</td><td>从具体高能物理计算中提出新的振幅公式。</td></tr>
+        <tr><td>关键难点</td><td>信息检索和表达质量。</td><td>在超指数增长的表达式中识别简洁结构。</td></tr>
+        <tr><td>可靠性来源</td><td>人工审阅输出。</td><td>人类专家、模型证明、递归关系和 soft theorem 共同约束。</td></tr>
+        <tr><td>科学意义</td><td>提高工作效率。</td><td>帮助打开一个过去被视为零的物理配置。</td></tr>
+      </tbody>
+    </table>
+  </section>
 
-<section class="insights">
-  <h2>最值得带走的洞见</h2>
-  <ul>
-    <li>“振幅为零”的传统结论并非无条件成立，半共线动量区域提供了例外。</li>
-    <li>GPT-5.2 的关键作用是从 n≤6 的复杂表达式中发现简洁的全 n 公式。</li>
-    <li>结果经过约 12 小时 AI 推理、形式证明、递归关系验证和软定理检查，而不是只停留在直觉猜测。</li>
-    <li>这个案例显示，AI 辅助科学最有价值的方向可能是模式识别、公式压缩和可验证推理。</li>
-  </ul>
-</section>
+  <section class="quote">
+    <div class="quote-mark">“</div>
+    <p>最重要的信号不是模型“会算题”，而是它能把丑陋表达式变成简单公式。理论物理经常从这种简洁性出发，继续寻找更深的结构。</p>
+  </section>
+
+  <section class="conclusion-strip">
+    <strong>结论：</strong>这项结果的科学价值在于修正一个振幅为零的默认判断；方法价值在于展示 AI 可以参与“发现公式、形成猜想、推进证明、接受检验”的完整链条。
+  </section>
+
+  <section class="takeaways">
+    <h2>最值得带走的洞见</h2>
+    <div class="mosaic">
+      <div class="tile"><strong>零结论有边界</strong>single-minus 胶子树级振幅在半共线区域中可以非零。</div>
+      <div class="tile"><strong>复杂式子可能藏着简单结构</strong>AI 的价值首先体现在模式识别和化简上。</div>
+      <div class="tile"><strong>验证链条仍然关键</strong>公式必须接受递归关系、软定理和专家审查。</div>
+      <div class="tile"><strong>风险在于外推</strong>这个案例不能自动证明所有科学领域都能被同样方式推进。</div>
+      <div class="tile"><strong>机会在于新工作流</strong>人类专家提出问题，模型寻找结构，双方共同验证结果。</div>
+    </div>
+  </section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

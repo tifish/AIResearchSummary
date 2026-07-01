@@ -3,119 +3,403 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Fast regex search: indexing text for agent tools 摘要</title>
+<title>快速正则搜索：为 Agent 工具索引文本</title>
 <style>
-:root{
-  --bg:#f6f7fb;
-  --card:#ffffff;
-  --ink:#182033;
-  --muted:#667085;
-  --line:#d9dee8;
-  --accent:#2563eb;
-  --accent2:#0f766e;
-  --accent3:#b45309;
-  --hl:#eaf1ff;
-  --hl2:#ecfdf5;
+:root {
+  --bg: #f7f3ec;
+  --ink: #1f2428;
+  --muted: #667085;
+  --line: #d8d1c6;
+  --panel: #ffffff;
+  --panel-soft: #fff7e8;
+  --band: #17202a;
+  --band-ink: #f8fafc;
+  --data: #1769aa;
+  --data-bg: #e8f3ff;
+  --risk: #b42318;
+  --risk-bg: #ffe9e6;
+  --opportunity: #0f7b62;
+  --opportunity-bg: #e6f6ef;
+  --conclusion: #7a4cc2;
+  --conclusion-bg: #f0e9ff;
+  --warn: #9a6700;
+  --warn-bg: #fff2cc;
+  --code-bg: #edf0f3;
+  --shadow: 0 18px 48px rgba(31, 36, 40, .12);
+  --radius: 8px;
 }
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
-  line-height:1.72;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111418;
+    --ink: #e8edf2;
+    --muted: #a8b3bf;
+    --line: #323a45;
+    --panel: #191f26;
+    --panel-soft: #241c12;
+    --band: #080b0f;
+    --band-ink: #f4f7fb;
+    --data: #65b8ff;
+    --data-bg: #102337;
+    --risk: #ff897d;
+    --risk-bg: #351512;
+    --opportunity: #54d6b2;
+    --opportunity-bg: #102a23;
+    --conclusion: #b89cff;
+    --conclusion-bg: #221936;
+    --warn: #ffd166;
+    --warn-bg: #30250e;
+    --code-bg: #202833;
+    --shadow: 0 18px 48px rgba(0, 0, 0, .38);
+  }
 }
-main{
-  max-width:980px;
-  margin:0 auto;
-  padding:40px 20px 56px;
+:root[data-theme="dark"] {
+  --bg: #111418;
+  --ink: #e8edf2;
+  --muted: #a8b3bf;
+  --line: #323a45;
+  --panel: #191f26;
+  --panel-soft: #241c12;
+  --band: #080b0f;
+  --band-ink: #f4f7fb;
+  --data: #65b8ff;
+  --data-bg: #102337;
+  --risk: #ff897d;
+  --risk-bg: #351512;
+  --opportunity: #54d6b2;
+  --opportunity-bg: #102a23;
+  --conclusion: #b89cff;
+  --conclusion-bg: #221936;
+  --warn: #ffd166;
+  --warn-bg: #30250e;
+  --code-bg: #202833;
+  --shadow: 0 18px 48px rgba(0, 0, 0, .38);
 }
-.hero{
-  padding:28px;
-  border:1px solid var(--line);
-  border-radius:8px;
-  background:linear-gradient(135deg,var(--card),var(--hl));
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.65;
 }
-.kicker{
-  margin:0 0 10px;
-  color:var(--accent);
-  font-weight:700;
+main { overflow: hidden; }
+.hero {
+  background: var(--band);
+  color: var(--band-ink);
+  padding: 58px 7vw 46px;
 }
-h1{
-  margin:0 0 14px;
-  font-size:30px;
-  line-height:1.25;
-  letter-spacing:0;
+.hero-inner {
+  max-width: 1120px;
+  margin: 0 auto;
 }
-.lead{
-  margin:0;
-  font-size:18px;
-  color:var(--ink);
+.kicker {
+  color: var(--opportunity);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0;
+  margin-bottom: 18px;
 }
-.grid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:16px;
-  margin-top:18px;
+h1 {
+  max-width: 900px;
+  margin: 0;
+  font-size: clamp(34px, 5vw, 68px);
+  line-height: 1.08;
+  letter-spacing: 0;
 }
-.stat{
-  padding:14px 16px;
-  border:1px solid var(--line);
-  border-radius:8px;
-  background:var(--card);
+.original {
+  max-width: 760px;
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 18px;
 }
-.stat strong{
-  display:block;
-  font-size:22px;
-  color:var(--accent2);
+.thesis {
+  max-width: 880px;
+  margin-top: 30px;
+  padding-left: 18px;
+  border-left: 5px solid var(--opportunity);
+  font-size: 22px;
+  line-height: 1.45;
 }
-section{
-  margin-top:22px;
-  padding:22px;
-  border:1px solid var(--line);
-  border-radius:8px;
-  background:var(--card);
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(130px, 1fr));
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
 }
-h2{
-  margin:0 0 10px;
-  font-size:22px;
-  line-height:1.35;
-  letter-spacing:0;
+.metric {
+  padding: 26px 22px;
+  border-right: 1px solid var(--line);
 }
-p{
-  margin:0 0 12px;
+.metric:last-child { border-right: 0; }
+.metric strong {
+  display: block;
+  color: var(--data);
+  font-size: 32px;
+  line-height: 1;
 }
-p:last-child{margin-bottom:0}
-mark{
-  background:var(--hl2);
-  color:var(--ink);
-  padding:1px 5px;
-  border-radius:4px;
+.metric span {
+  display: block;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 14px;
 }
-.badge{
-  display:inline-block;
-  margin-right:8px;
-  padding:2px 8px;
-  border-radius:999px;
-  background:var(--hl);
-  color:var(--accent);
-  font-size:13px;
-  font-weight:700;
+.split {
+  display: grid;
+  grid-template-columns: 1.1fr .9fr;
+  gap: 36px;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 56px 7vw;
 }
-.insights{
-  border-left:4px solid var(--accent3);
+.split h2,
+.timeline h2,
+.compare h2,
+.local h2,
+.takeaways h2 {
+  margin: 0 0 16px;
+  font-size: 28px;
+  line-height: 1.2;
 }
-ul{
-  margin:10px 0 0;
-  padding-left:22px;
+.problem {
+  background: var(--risk-bg);
+  border-left: 6px solid var(--risk);
+  padding: 28px;
 }
-li{margin:8px 0}
-@media (max-width:720px){
-  main{padding:24px 14px 40px}
-  .hero,section{padding:18px}
-  h1{font-size:25px}
-  .lead{font-size:16px}
-  .grid{grid-template-columns:1fr}
+.problem p,
+.answer p,
+.local p,
+.timeline p,
+.compare p {
+  margin: 0 0 14px;
+}
+.answer {
+  padding: 28px 0;
+}
+.answer .tag {
+  display: inline-block;
+  margin-bottom: 14px;
+  padding: 5px 10px;
+  border: 1px solid var(--opportunity);
+  color: var(--opportunity);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.flow-band {
+  background: var(--data-bg);
+  padding: 54px 7vw;
+}
+.timeline {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(120px, 1fr));
+  gap: 14px;
+  margin-top: 24px;
+}
+.step {
+  position: relative;
+  padding: 18px;
+  background: var(--panel);
+  border-top: 5px solid var(--data);
+  box-shadow: var(--shadow);
+  min-height: 180px;
+}
+.step b {
+  color: var(--data);
+  font-size: 22px;
+}
+.step h3 {
+  margin: 10px 0 8px;
+  font-size: 16px;
+}
+.step p {
+  color: var(--muted);
+  font-size: 14px;
+}
+.compare {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 58px 7vw;
+}
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+}
+th, td {
+  padding: 16px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+th {
+  background: var(--code-bg);
+  color: var(--ink);
+}
+td:nth-child(2) { color: var(--opportunity); }
+td:nth-child(3) { color: var(--risk); }
+td:nth-child(4) { color: var(--conclusion); }
+.insight {
+  background: var(--conclusion-bg);
+  border-block: 1px solid var(--line);
+  padding: 42px 7vw;
+}
+.insight-inner {
+  max-width: 940px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  gap: 22px;
+  align-items: start;
+}
+.quote-mark {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--conclusion);
+  color: var(--band-ink);
+  font-size: 34px;
+  font-weight: 900;
+}
+.insight p {
+  margin: 0;
+  font-size: 23px;
+  line-height: 1.45;
+}
+.local {
+  background: var(--band);
+  color: var(--band-ink);
+  padding: 58px 7vw;
+}
+.local-grid {
+  max-width: 1120px;
+  margin: 26px auto 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+.local h2 {
+  max-width: 1120px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.local-lead {
+  max-width: 1120px;
+  margin: 0 auto;
+  color: var(--muted);
+}
+.local-item {
+  border: 1px solid var(--line);
+  padding: 22px;
+}
+.local-item b {
+  color: var(--opportunity);
+}
+.local-item p {
+  color: var(--band-ink);
+  margin-top: 10px;
+}
+.pipeline {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 56px 7vw;
+  display: grid;
+  grid-template-columns: .9fr 1.1fr;
+  gap: 28px;
+  align-items: center;
+}
+.pipeline-title {
+  background: var(--warn-bg);
+  border-left: 6px solid var(--warn);
+  padding: 26px;
+}
+.pipeline-list {
+  display: grid;
+  gap: 12px;
+}
+.pipe-row {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 14px;
+  align-items: start;
+}
+.badge {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  background: var(--warn);
+  color: var(--band-ink);
+  border-radius: 50%;
+  font-weight: 900;
+}
+.pipe-row p {
+  margin: 0;
+  padding: 12px 0 16px;
+  border-bottom: 1px solid var(--line);
+}
+.takeaways {
+  padding: 58px 7vw 70px;
+}
+.takeaways-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+.mosaic {
+  display: grid;
+  grid-template-columns: 1.2fr .8fr 1fr;
+  gap: 14px;
+  margin-top: 22px;
+}
+.tile {
+  min-height: 150px;
+  padding: 22px;
+  color: var(--ink);
+}
+.tile h3 {
+  margin: 0 0 10px;
+  font-size: 18px;
+}
+.tile p { margin: 0; }
+.tile.data { background: var(--data-bg); border-top: 5px solid var(--data); }
+.tile.risk { background: var(--risk-bg); border-top: 5px solid var(--risk); }
+.tile.opp { background: var(--opportunity-bg); border-top: 5px solid var(--opportunity); }
+.tile.final {
+  background: var(--conclusion-bg);
+  border-top: 5px solid var(--conclusion);
+  grid-column: span 2;
+}
+@media (max-width: 900px) {
+  .metrics,
+  .split,
+  .steps,
+  .local-grid,
+  .pipeline,
+  .mosaic {
+    grid-template-columns: 1fr;
+  }
+  .metric {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .metric:last-child { border-bottom: 0; }
+  .insight-inner {
+    grid-template-columns: 1fr;
+  }
+  .tile.final {
+    grid-column: auto;
+  }
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -192,13 +476,6 @@ li{margin:8px 0}
     body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
       color: inherit;
     }
-    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
-      border-color: var(--airs-digest-line) !important;
-    }
-    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
-      background: var(--airs-digest-panel) !important;
-      color: var(--airs-digest-ink) !important;
-    }
     body :where(.muted, .meta, .kicker, small) {
       color: var(--airs-digest-muted) !important;
     }
@@ -259,70 +536,170 @@ li{margin:8px 0}
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/fast-regex-search" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
 <main>
-  <article>
-    <header class="hero">
-      <p class="kicker">一句话总括</p>
-      <h1>正则搜索正在从“扫完整个仓库”变成 AI 代理的本地索引能力</h1>
-      <p class="lead">文章真正的贡献，是把代理编程中的 grep 延迟问题具体化：大型代码库里，正则搜索已经是模型工作流的核心瓶颈，因此需要专门为代理构建低延迟、可更新、隐私友好的本地文本索引。</p>
-      <div class="grid">
-        <div class="stat"><strong>&gt;15 秒</strong><span>Cursor 在大型 monorepo 中经常观察到的 rg 调用耗时。</span></div>
-        <div class="stat"><strong>2 字节</strong><span>Blackbird 风格方案中每个 posting 用两个 8-bit 掩码增强过滤能力。</span></div>
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="kicker">Cursor Research · Mar 23, 2026</div>
+      <h1>快速正则搜索：为 Agent 工具索引文本</h1>
+      <div class="original">Fast regex search: indexing text for agent tools</div>
+      <p class="thesis">一句话总括：文章的真正贡献，是把 Agent 常用的正则搜索从“每次扫完整个仓库”转向“本地、可更新、面向代码查询的文本索引”。</p>
+    </div>
+  </section>
+
+  <section class="metrics" aria-label="关键数字">
+    <div class="metric"><strong>1973</strong><span>grep 最早发布，正则文件搜索成为基础工具。</span></div>
+    <div class="metric"><strong>15s+</strong><span>Cursor 经常看到大型 monorepo 中的 rg 调用超过 15 秒。</span></div>
+    <div class="metric"><strong>1993</strong><span>n-gram 倒排索引用于部分指定词搜索的论文发表。</span></div>
+    <div class="metric"><strong>2B</strong><span>概率掩码方案每个 posting 只增加两个 8-bit 掩码。</span></div>
+    <div class="metric"><strong>2 files</strong><span>本地索引拆成 posting 文件和 mmap 查找表。</span></div>
+  </section>
+
+  <section class="split">
+    <div class="problem">
+      <h2>问题不是 ripgrep 慢，而是扫描范围太大</h2>
+      <p>ripgrep 的正则匹配非常快。它的问题在于必须查看所有文件。</p>
+      <p>在小项目里，这通常可以接受。在大型企业 monorepo 中，搜索延迟会直接阻塞人与 Agent 的交互。</p>
+      <p>这改变了读者对 AI 工具性能的理解：瓶颈不只在模型推理，也在模型每一步拿上下文的系统路径上。</p>
+    </div>
+    <div class="answer">
+      <span class="tag">核心判断</span>
+      <h2>正则搜索已成为 Agentic 开发的基础操作</h2>
+      <p>Agent 经常需要查找具体文本、符号片段、错误信息和代码模式。语义索引适合许多上下文检索任务，但不能替代所有正则查询。</p>
+      <p>因此，Cursor 把正则搜索视为类似 Go To Definition 的基础能力。它需要专门的本地索引，而不是每次退回全仓库扫描。</p>
+    </div>
+  </section>
+
+  <section class="flow-band">
+    <div class="timeline">
+      <h2>技术路线是一条逐步收窄候选文件的历史</h2>
+      <p>这些方案的共同目标很直接：先用索引找到“可能匹配”的文件，再用确定性的正则匹配确认结果。</p>
+      <div class="steps">
+        <div class="step"><b>1973</b><h3>grep</h3><p>逐文件匹配正则。简单可靠，但延迟随代码库规模增长。</p></div>
+        <div class="step"><b>1993</b><h3>n-gram 倒排索引</h3><p>把文本切成固定宽度片段，用 posting list 快速缩小范围。</p></div>
+        <div class="step"><b>2012</b><h3>Code Search 思路普及</h3><p>Russ Cox 的文章让三元组索引成为很多工程师熟悉的方案。</p></div>
+        <div class="step"><b>2015</b><h3>livegrep 后缀数组</h3><p>把源码拼成可二分查找的后缀数组，查询快但动态更新困难。</p></div>
+        <div class="step"><b>2B</b><h3>概率掩码</h3><p>用 nextMask 和 locMask 增强三元组，降低候选文件数量。</p></div>
+        <div class="step"><b>Now</b><h3>Sparse N-grams</h3><p>索引时多做工作，查询时只取最少且高区分度的 n-gram。</p></div>
       </div>
-    </header>
+    </div>
+  </section>
 
-    <section>
-      <h2>ripgrep 很快，但代理的问题是它仍要扫描全部文件</h2>
-      <p><span class="badge">背景</span>grep 从 1973 年开始就是文本匹配工具，ripgrep 已经把正则匹配本身做得很快，但它在大仓库中仍然需要遍历大量文件。Cursor 提到，大型企业 monorepo 里 rg 调用超过 15 秒并不少见。</p>
-      <p>这改变了对 AI 编程效率的理解：瓶颈不只在模型推理速度，也在模型为了找上下文而反复调用工具的延迟。结论是，正则搜索应被视为代理基础设施，而不是普通命令行工具调用。</p>
-    </section>
+  <section class="compare">
+    <h2>四类索引的取舍</h2>
+    <p>文章最有价值的部分，是没有把某一种结构包装成银弹，而是展示了每种结构为什么会在规模、更新和查询之间付出代价。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>方案</th>
+            <th>优势</th>
+            <th>代价</th>
+            <th>对 Agent 的意义</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>经典三元组倒排索引</td>
+            <td>实现清晰，可复用搜索引擎结构。</td>
+            <td>索引不小，复杂正则可能需要加载大量 posting list。</td>
+            <td>能避免全仓库扫描，但查询分解质量决定收益。</td>
+          </tr>
+          <tr>
+            <td>后缀数组</td>
+            <td>可用二分搜索定位文字片段。</td>
+            <td>需要把语料拼成一个大字符串，增量更新昂贵。</td>
+            <td>适合静态语料，不适合频繁变化的工作区。</td>
+          </tr>
+          <tr>
+            <td>带概率掩码的三元组</td>
+            <td>用少量位信息模拟更强的四元组过滤。</td>
+            <td>Bloom filter 会饱和，原地更新会变痛苦。</td>
+            <td>说明“允许假阳性”是搜索加速的关键工程自由度。</td>
+          </tr>
+          <tr>
+            <td>Sparse N-grams</td>
+            <td>查询时只查少量高信息量片段。</td>
+            <td>索引构建更重，需要确定性权重函数。</td>
+            <td>更接近 Agent 工具需要的低延迟、高选择性检索。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
 
-    <section>
-      <h2>三元组倒排索引是可行基线，但查询和存储会拉扯</h2>
-      <p><span class="badge">方法</span>经典方案来自 1993 年的 n-gram 倒排索引思想：把文档切成重叠的 3 字符片段，查询时把正则表达式分解成可查的三元组，先用 posting list 找候选文件，再对候选文件做确定性的正则匹配。</p>
-      <p>bigram 键数少，最多约 <mark>64k</mark>，但 posting list 太大；quadgram 候选更精确，却可能产生数十亿个键；trigram 是折中。结论是，索引不替代正则匹配，而是减少必须扫描的文件数量。</p>
-    </section>
+  <section class="insight">
+    <div class="insight-inner">
+      <div class="quote-mark">!</div>
+      <p>关键洞见：索引不需要直接给出最终答案。它只需要以很低的成本排除大多数不可能匹配的文件，然后把剩下的少量文件交给确定性正则匹配。</p>
+    </div>
+  </section>
 
-    <section>
-      <h2>后缀数组展示了另一条路，但动态更新成本太高</h2>
-      <p><span class="badge">对比</span>2015 年 livegrep 使用后缀数组，把语料拼成一个大字符串并保存所有后缀的排序偏移，查询时可通过二分搜索定位文字片段或字符范围。</p>
-      <p>它适合较静态、范围受控的语料，例如 livegrep 只索引最新 Linux Kernel；但对多仓库、大仓库和频繁变更的本地工作区，拼接、映射回文件和增量更新都会复杂化。结论是，理论上优雅的结构未必适合代理不断读写代码的场景。</p>
-    </section>
+  <section class="local">
+    <h2>为什么索引要放在用户机器上</h2>
+    <p class="local-lead">Cursor 的选择不是把所有代码送到服务器，而是在本机建立和查询索引。这一决定同时影响延迟、隐私和新写入代码的可见性。</p>
+    <div class="local-grid">
+      <div class="local-item">
+        <b>延迟</b>
+        <p>Agent 会频繁并行调用搜索。网络往返会放大等待时间，尤其会削弱快速模型的交互优势。</p>
+      </div>
+      <div class="local-item">
+        <b>隐私</b>
+        <p>服务器端搜索要同步文件或反复回传内容。本地扫描避免了额外的数据存储风险。</p>
+      </div>
+      <div class="local-item">
+        <b>新鲜度</b>
+        <p>正则索引必须读到 Agent 刚写下的文本。否则模型会误判不存在，继续浪费 token 搜索。</p>
+      </div>
+    </div>
+  </section>
 
-    <section>
-      <h2>概率掩码让三元组更接近 3.5-gram，但会遇到饱和问题</h2>
-      <p><span class="badge">优化</span>GitHub Project Blackbird 的思路是在 trigram posting 上增加信息：一个 8-bit nextMask 记录三元组后续字符的哈希，一个 8-bit locMask 记录位置 mod 8。这样只用约 <mark>2 字节</mark>额外数据，就能用三元组索引模拟更接近 quadgram 的过滤效果。</p>
-      <p>这些掩码允许误报，因为最终仍会扫描文本做确定性匹配；问题是 Bloom filter 可能饱和，饱和后过滤能力下降。结论是，压缩索引能显著减少候选文件，但原地更新和长期新鲜度仍是硬约束。</p>
-    </section>
+  <section class="pipeline">
+    <div class="pipeline-title">
+      <h2>本地实现的关键设计</h2>
+      <p>Cursor 用 Git commit 作为基础层，用户和 Agent 的修改作为覆盖层。这样启动同步和增量更新都更轻。</p>
+    </div>
+    <div class="pipeline-list">
+      <div class="pipe-row">
+        <div class="badge">1</div>
+        <p>posting 列表顺序写入磁盘，构建时不需要把全部 posting 留在编辑器内存中。</p>
+      </div>
+      <div class="pipe-row">
+        <div class="badge">2</div>
+        <p>查找表保存 n-gram 哈希和 posting 文件偏移量，并按哈希排序。</p>
+      </div>
+      <div class="pipe-row">
+        <div class="badge">3</div>
+        <p>编辑器只 mmap 查找表。查询时二分找到偏移，再从 posting 文件读取对应列表。</p>
+      </div>
+      <div class="pipe-row">
+        <div class="badge">4</div>
+        <p>哈希碰撞最多让候选集合变宽，不会产生错误结果。最终匹配仍由原始文本上的正则确认。</p>
+      </div>
+    </div>
+  </section>
 
-    <section>
-      <h2>Sparse N-grams 用更高建索引成本换更少查询读取</h2>
-      <p><span class="badge">核心</span>Sparse N-grams 不再抽取所有连续三元组，而是用确定性权重选择变长 n-gram：只有边界权重大于内部权重的片段才进入索引。查询时不必生成全部片段，只用覆盖算法取最少的必要 n-gram。</p>
-      <p>如果权重来自源码字符对频率表，稀有字符对权重更高，查询会优先选择更有区分度的片段。结论是，代理搜索更需要“少读 posting、快缩候选”，因此愿意把更多成本放到建索引阶段。</p>
-    </section>
-
-    <section>
-      <h2>本地索引比服务器索引更适合代理的低延迟和新鲜度需求</h2>
-      <p><span class="badge">部署</span>Cursor 选择在用户机器上构建和查询索引，而不是把正则搜索索引放到服务器。原因包括：最终匹配仍要读本地文件；服务器方案会带来同步或往返开销；本地处理还能减少代码存储的安全和隐私风险。</p>
-      <p>更关键的是，正则索引必须非常新鲜，尤其要让模型能搜索到自己刚写入的文本。结论是，语义索引可以稍微陈旧，正则索引不行，因为一次“找不到”就可能让代理浪费大量 token 走错方向。</p>
-    </section>
-
-    <section>
-      <h2>Cursor 的工程落点是 Git 基线、增量层和 mmap 小表</h2>
-      <p><span class="badge">实现</span>Cursor 以底层 Git commit 控制索引状态，把用户和代理的修改放在上层增量层，从而让启动同步和更新更快。为降低编辑器内存占用，索引拆成两个文件：posting lists 顺序写入一个文件，n-gram hash 与 posting offset 的有序查找表写入另一个文件。</p>
-      <p>编辑器进程只 mmap 查找表，用二分搜索得到 offset，再从 posting 文件对应位置读取。结论是，这套设计把索引能力做成了轻量本地运行时组件，而不是一个沉重的搜索服务。</p>
-    </section>
-
-    <section class="insights">
+  <section class="takeaways">
+    <div class="takeaways-inner">
       <h2>最值得带走的洞见</h2>
-      <ul>
-        <li>AI 代理的工具延迟会被模型反复放大；搜索慢几秒，可能意味着整个交互节奏被打断。</li>
-        <li>正则搜索索引的目标不是直接给出最终答案，而是把候选文件缩到足够小。</li>
-        <li>三元组、概率掩码和 Sparse N-grams 的差异，本质上是在存储、查询读取量、误报和更新成本之间取舍。</li>
-        <li>对代理来说，索引新鲜度和低延迟与模型能力同样重要，尤其是在模型需要读取自己刚写入代码时。</li>
-        <li>大型仓库中的 AI 编程体验，很大一部分会取决于本地上下文基础设施，而不只是云端模型本身。</li>
-      </ul>
-    </section>
-  </article>
+      <div class="mosaic">
+        <div class="tile data">
+          <h3>搜索延迟会塑造 Agent 行为</h3>
+          <p>当 rg 一次超过 15 秒时，问题已经不是工具小优化，而是交互循环被打断。</p>
+        </div>
+        <div class="tile risk">
+          <h3>语义索引不能替代正则</h3>
+          <p>具体文本、错误字符串和代码模式仍需要精确查找。Agent 工具链必须同时支持两类检索。</p>
+        </div>
+        <div class="tile opp">
+          <h3>假阳性可以接受</h3>
+          <p>索引阶段只负责缩小候选集。只要最后一步是确定性匹配，宽一点不会损害正确性。</p>
+        </div>
+        <div class="tile final">
+          <h3>本地索引是产品判断</h3>
+          <p>它同时服务于低延迟、隐私和读写一致性。对大型仓库中的 Agentic 开发来说，这比单纯追求服务器端集中索引更贴近工作流。</p>
+        </div>
+      </div>
+    </div>
+  </section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

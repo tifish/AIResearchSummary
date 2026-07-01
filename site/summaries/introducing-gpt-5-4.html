@@ -1,115 +1,227 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>GPT-5.4 中文总结</title>
-  <style>
-    :root {
-      --bg: #f6f7f9;
-      --card: #ffffff;
-      --ink: #16202a;
-      --muted: #5e6b78;
-      --line: #d9e0e7;
-      --accent: #1f7a8c;
-      --accent2: #7a4eab;
-      --accent3: #c26a2e;
-      --hl: #e8f5f7;
-      --hl2: #f3ecfb;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-      line-height: 1.7;
-    }
-    main {
-      max-width: 980px;
-      margin: 0 auto;
-      padding: 42px 20px 56px;
-    }
-    header {
-      padding: 30px;
-      background: linear-gradient(135deg, var(--hl), var(--hl2));
-      border: 1px solid var(--line);
-      border-radius: 18px;
-    }
-    h1 {
-      margin: 0 0 14px;
-      font-size: clamp(28px, 4vw, 44px);
-      line-height: 1.15;
-      letter-spacing: 0;
-    }
-    .dek {
-      margin: 0;
-      font-size: 18px;
-      color: var(--muted);
-    }
-    section {
-      margin-top: 22px;
-      padding: 24px;
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-    }
-    h2 {
-      margin: 0 0 12px;
-      font-size: 22px;
-      line-height: 1.3;
-    }
-    p { margin: 0 0 12px; }
-    p:last-child { margin-bottom: 0; }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-      margin: 18px 0 4px;
-    }
-    .metric {
-      padding: 16px;
-      border-radius: 14px;
-      background: var(--hl);
-      border: 1px solid var(--line);
-    }
-    .metric b {
-      display: block;
-      font-size: 24px;
-      color: var(--accent);
-      line-height: 1.2;
-    }
-    .metric span {
-      display: block;
-      margin-top: 6px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-    .callout {
-      margin-top: 16px;
-      padding: 16px 18px;
-      border-left: 4px solid var(--accent3);
-      background: color-mix(in srgb, var(--hl) 70%, transparent);
-      border-radius: 12px;
-    }
-    ul {
-      margin: 12px 0 0;
-      padding-left: 20px;
-    }
-    li { margin: 8px 0; }
-    .tag {
-      display: inline-block;
-      margin-bottom: 10px;
-      color: var(--accent2);
-      font-weight: 700;
-      font-size: 14px;
-    }
-    @media (max-width: 760px) {
-      main { padding: 24px 14px 40px; }
-      header, section { padding: 20px; border-radius: 14px; }
-      .grid { grid-template-columns: 1fr; }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Introducing GPT-5.4</title>
+<style>
+:root {
+  --bg: #f7f4ee;
+  --surface: #fffaf0;
+  --surface-2: #edf7f2;
+  --surface-3: #eef2ff;
+  --surface-4: #fff1f2;
+  --ink: #1d2430;
+  --muted: #5e6775;
+  --line: #d9d2c4;
+  --data: #2563eb;
+  --risk: #dc2626;
+  --opportunity: #059669;
+  --conclusion: #7c3aed;
+  --cost: #b45309;
+  --dark: #162033;
+  --on-dark: #f8fafc;
+  --shadow: 0 18px 50px rgba(29, 36, 48, .10);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #101318;
+    --surface: #181f2a;
+    --surface-2: #13241f;
+    --surface-3: #171d33;
+    --surface-4: #2a171b;
+    --ink: #edf2f7;
+    --muted: #a7b0bd;
+    --line: #2e3746;
+    --data: #60a5fa;
+    --risk: #fb7185;
+    --opportunity: #34d399;
+    --conclusion: #a78bfa;
+    --cost: #f59e0b;
+    --dark: #0b1020;
+    --on-dark: #f8fafc;
+    --shadow: 0 18px 50px rgba(0, 0, 0, .35);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101318;
+  --surface: #181f2a;
+  --surface-2: #13241f;
+  --surface-3: #171d33;
+  --surface-4: #2a171b;
+  --ink: #edf2f7;
+  --muted: #a7b0bd;
+  --line: #2e3746;
+  --data: #60a5fa;
+  --risk: #fb7185;
+  --opportunity: #34d399;
+  --conclusion: #a78bfa;
+  --cost: #f59e0b;
+  --dark: #0b1020;
+  --on-dark: #f8fafc;
+  --shadow: 0 18px 50px rgba(0, 0, 0, .35);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", sans-serif;
+  line-height: 1.72;
+}
+main { overflow: hidden; }
+section { padding: 48px 22px; }
+.wrap { max-width: 1120px; margin: 0 auto; }
+.hero {
+  min-height: 72vh;
+  display: grid;
+  align-items: center;
+  background: var(--dark);
+  color: var(--on-dark);
+}
+.kicker { color: var(--opportunity); font-weight: 700; letter-spacing: .02em; }
+h1 { font-size: clamp(2.4rem, 6vw, 5.8rem); line-height: 1.02; margin: 18px 0 10px; }
+.original { color: #b9c4d6; font-size: 1.05rem; }
+.lead { max-width: 780px; font-size: clamp(1.1rem, 2vw, 1.5rem); color: #dbe4f0; }
+.hero-note {
+  margin-top: 28px;
+  padding: 18px 20px;
+  border-left: 5px solid var(--conclusion);
+  background: rgba(255,255,255,.07);
+  max-width: 760px;
+}
+.metrics {
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+.metric-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+.metric {
+  padding: 18px;
+  border-top: 4px solid var(--data);
+  background: var(--bg);
+}
+.metric:nth-child(2) { border-color: var(--opportunity); }
+.metric:nth-child(3) { border-color: var(--conclusion); }
+.metric:nth-child(4) { border-color: var(--cost); }
+.metric:nth-child(5) { border-color: var(--risk); }
+.num { font-size: 2rem; font-weight: 800; line-height: 1; }
+.label { color: var(--muted); margin-top: 8px; font-size: .95rem; }
+.split {
+  background: var(--surface-2);
+}
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 34px;
+  align-items: start;
+}
+h2 { font-size: clamp(1.7rem, 3vw, 2.6rem); line-height: 1.15; margin: 0 0 16px; }
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+.panel strong { color: var(--opportunity); }
+.timeline {
+  background: var(--surface-3);
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+.step {
+  padding: 24px;
+  border-right: 1px solid var(--line);
+  position: relative;
+}
+.step:last-child { border-right: 0; }
+.badge {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: var(--conclusion);
+  color: var(--on-dark);
+  font-weight: 800;
+}
+.table-zone {
+  background: var(--surface);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg);
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+th, td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+th { color: var(--muted); font-size: .92rem; }
+td.win { color: var(--opportunity); font-weight: 800; }
+td.warn { color: var(--risk); font-weight: 800; }
+.insight {
+  background: var(--dark);
+  color: var(--on-dark);
+}
+.quote {
+  font-size: clamp(1.35rem, 3vw, 2.4rem);
+  line-height: 1.35;
+  max-width: 900px;
+  border-left: 6px solid var(--opportunity);
+  padding-left: 24px;
+}
+.quote small { display: block; color: #b9c4d6; margin-top: 16px; font-size: 1rem; }
+.flow {
+  background: var(--surface-4);
+}
+.flow-grid {
+  display: grid;
+  grid-template-columns: 1.2fr .8fr;
+  gap: 24px;
+}
+.lane {
+  border-left: 6px solid var(--cost);
+  padding: 8px 0 8px 22px;
+}
+.lane + .lane { margin-top: 18px; border-color: var(--risk); }
+.mosaic {
+  background: var(--bg);
+}
+.tiles {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 14px;
+}
+.tile {
+  min-height: 150px;
+  padding: 22px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.tile:first-child {
+  grid-row: span 2;
+  background: var(--dark);
+  color: var(--on-dark);
+}
+.tile h3 { margin: 0 0 10px; font-size: 1.2rem; }
+@media (max-width: 820px) {
+  .metric-row, .two-col, .steps, .flow-grid, .tiles { grid-template-columns: 1fr; }
+  .step { border-right: 0; border-bottom: 1px solid var(--line); }
+  .step:last-child { border-bottom: 0; }
+}
+</style>
   <script id="airs-digest-theme-boot">
     try {
       var saved = localStorage.getItem("theme");
@@ -184,13 +296,6 @@
     body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
       color: inherit;
     }
-    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
-      border-color: var(--airs-digest-line) !important;
-    }
-    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
-      background: var(--airs-digest-panel) !important;
-      color: var(--airs-digest-ink) !important;
-    }
     body :where(.muted, .meta, .kicker, small) {
       color: var(--airs-digest-muted) !important;
     }
@@ -250,77 +355,111 @@
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/introducing-gpt-5-4" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
-  <main>
-    <header>
-      <h1>GPT-5.4 的真正变化：从模型能力到可执行工作流</h1>
-      <p class="dek">一句话总括：GPT-5.4 的贡献在于把推理、编码、电脑操作、工具搜索和长上下文整合成更可靠的“专业工作代理”，让 AI 更接近在真实软件环境中完成端到端任务。</p>
-    </header>
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div class="kicker">一句话总括</div>
+      <h1>Introducing GPT-5.4</h1>
+      <div class="original">Original title: Introducing GPT-5.4</div>
+      <p class="lead">GPT-5.4 的真正贡献，是把推理、编码、视觉、电脑操作、工具选择和长上下文整合成一个更能完成专业工作的代理模型。</p>
+      <div class="hero-note">它不是只让回答更聪明。它试图让模型更少来回确认，更会调用工具，更能在真实软件环境里执行、检查和交付。</div>
+    </div>
+  </section>
 
-    <section>
-      <span class="tag">专业知识工作</span>
-      <h2>它把“生成答案”推进到“交付工作成品”</h2>
-      <p>GPT-5.4 在 GDPval 中达到 83.0% wins or ties，高于 GPT-5.2 的 70.9%。这个指标覆盖 44 个职业和美国 GDP 贡献最高的 9 个行业，任务包括销售演示、会计表格、排班、制造图和短视频等真实工作产物。</p>
-      <p>内部投行表格建模任务中，GPT-5.4 得分 87.3%，而 GPT-5.2 为 68.4%；演示文稿评测中，人类 68.0% 的时间更偏好 GPT-5.4 输出。结论是，模型升级的重点正在从知识问答转向可审阅、可交付、可迭代的办公成果。</p>
-    </section>
-
-    <section>
-      <span class="tag">事实性</span>
-      <h2>更强的专业能力必须同时降低错误成本</h2>
-      <p>OpenAI 称，在用户标记过事实错误的去标识化提示集合上，GPT-5.4 的单条 claim 相对 GPT-5.2 少 33% 虚假，完整回答含错率少 18%。这类改进对法律、财务、研究和文档密集型场景尤其重要，因为错误不是小瑕疵，而会直接影响交付可信度。</p>
-      <p>这改变了读者对 AI 影响的理解：更有价值的模型不是更会“自信表达”，而是能在复杂材料中维持准确性，并减少人工复核负担。</p>
-    </section>
-
-    <section>
-      <span class="tag">电脑使用与视觉</span>
-      <h2>原生电脑使用让代理能力进入真实界面</h2>
-      <p>GPT-5.4 是 OpenAI 首个具备原生计算机使用能力的通用模型。它可以通过截图、鼠标键盘动作、Playwright 等方式操作网页和软件，并允许开发者通过确认策略调整不同风险级别的安全行为。</p>
-      <div class="grid">
-        <div class="metric"><b>75.0%</b><span>OSWorld-Verified，超过 GPT-5.2 的 47.3%</span></div>
-        <div class="metric"><b>67.3%</b><span>WebArena-Verified 浏览器任务成功率</span></div>
-        <div class="metric"><b>92.8%</b><span>Online-Mind2Web 截图观察成功率</span></div>
+  <section class="metrics">
+    <div class="wrap">
+      <h2>关键数字先看结果</h2>
+      <div class="metric-row">
+        <div class="metric"><div class="num">83.0%</div><div class="label">GDPval 胜出或打平专业人士</div></div>
+        <div class="metric"><div class="num">75.0%</div><div class="label">OSWorld-Verified 成功率，高于人类 72.4%</div></div>
+        <div class="metric"><div class="num">57.7%</div><div class="label">SWE-Bench Pro，略高于 GPT-5.3-Codex</div></div>
+        <div class="metric"><div class="num">47%</div><div class="label">工具搜索在 MCP Atlas 中减少总 token 用量</div></div>
+        <div class="metric"><div class="num">1M</div><div class="label">Codex 中实验性上下文窗口</div></div>
       </div>
-      <p class="callout">OSWorld-Verified 中，GPT-5.4 还超过了论文报告的人类表现 72.4%。这说明 AI 代理的瓶颈正在从“理解任务”转向“稳定地看见界面、点击正确位置、跨应用完成流程”。</p>
-    </section>
+    </div>
+  </section>
 
-    <section>
-      <span class="tag">工具生态</span>
-      <h2>工具搜索解决了大工具集的上下文浪费</h2>
-      <p>过去，系统会把所有工具定义一次性塞进提示词；当工具很多时，这会带来数千甚至数万 token 的成本和上下文污染。GPT-5.4 的 tool search 改为先给轻量工具列表，模型需要时再检索具体工具定义。</p>
-      <p>在 250 个 MCP Atlas 任务、36 个 MCP server 全开的测试中，工具搜索配置减少 47% 总 token 使用量，同时保持相同准确率。这个结果的含义是，大规模工具生态不再只能靠更长上下文硬塞进去，而可以靠按需检索降低成本与延迟。</p>
-    </section>
+  <section class="split">
+    <div class="wrap two-col">
+      <div>
+        <h2>专业工作能力的变化，不只是跑分上涨</h2>
+        <p>GPT-5.4 在 GDPval 上达到 83.0%。这个评测覆盖 44 个职业，任务包括销售演示、会计表格、排班、制造图和短视频。</p>
+        <p>这改变了读者对 AI 影响的理解：模型正在从“写答案”进入“产出可交付物”。评估对象也从单题正确率转向真实工作产品。</p>
+      </div>
+      <div class="panel">
+        <p><strong>文档、表格、演示</strong> 是文章反复强调的核心场景。</p>
+        <p>内部投行建模任务中，GPT-5.4 平均得分 87.3%，GPT-5.2 为 68.4%。演示文稿评估中，人类 68.0% 的时间偏好 GPT-5.4 的输出。</p>
+        <p>这说明改进集中在专业交付的完整度、审美和结构稳定性上。</p>
+      </div>
+    </div>
+  </section>
 
-    <section>
-      <span class="tag">编码与网页研究</span>
-      <h2>编码、搜索和长流程能力被合并进同一个主线模型</h2>
-      <p>GPT-5.4 在 SWE-Bench Pro Public 达到 57.7%，略高于 GPT-5.3-Codex 的 56.8% 和 GPT-5.2 的 55.6%。它还支持 Codex 中实验性的 1M token 上下文，适合长时间规划、执行和验证任务。</p>
-      <p>网页研究方面，GPT-5.4 在 BrowseComp 达到 82.7%，高于 GPT-5.2 的 65.8%；GPT-5.4 Pro 达到 89.3%。这表明模型不仅更会写代码，也更能在多轮搜索中坚持查找难定位信息，并整合成可用答案。</p>
-    </section>
+  <section class="timeline">
+    <div class="wrap">
+      <h2>代理工作流被拆成四个能力环节</h2>
+      <div class="steps">
+        <div class="step"><span class="badge">1</span><h3>规划</h3><p>ChatGPT 中的 GPT-5.4 Thinking 可先给出工作计划。用户可以在生成途中调整方向。</p></div>
+        <div class="step"><span class="badge">2</span><h3>执行</h3><p>API 和 Codex 中加入原生电脑使用能力。模型可以通过截图、鼠标、键盘和 Playwright 完成任务。</p></div>
+        <div class="step"><span class="badge">3</span><h3>找工具</h3><p>工具搜索让模型不必一次塞入全部工具定义。需要时再查工具，可降低成本和上下文压力。</p></div>
+        <div class="step"><span class="badge">4</span><h3>验证</h3><p>更长上下文和更强视觉能力让模型能跨长流程保持状态，并检查页面、文档和软件环境。</p></div>
+      </div>
+    </div>
+  </section>
 
-    <section>
-      <span class="tag">部署与成本</span>
-      <h2>价格更高，但目标是用效率抵消总成本</h2>
-      <p>GPT-5.4 已在 ChatGPT、API 和 Codex 推出，API 模型名为 gpt-5.4，Pro 版本为 gpt-5.4-pro。ChatGPT Plus、Team、Pro 用户可使用 GPT-5.4 Thinking，GPT-5.2 Thinking 将在 Legacy Models 中保留三个月，并于 2026 年 6 月 5 日退役。</p>
-      <p>API 标准价格方面，gpt-5.4 为输入 $2.50/M tokens、缓存输入 $0.25/M tokens、输出 $15/M tokens；gpt-5.4-pro 为输入 $30/M tokens、输出 $180/M tokens。结论是，OpenAI 把 GPT-5.4 作为更贵但更省步骤、更省 token 的专业工作模型来定位。</p>
-    </section>
+  <section class="table-zone">
+    <div class="wrap">
+      <h2>几个基准揭示了重点转移</h2>
+      <table>
+        <thead>
+          <tr><th>能力</th><th>GPT-5.4</th><th>对照</th><th>读者应如何理解</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>知识工作</td><td class="win">GDPval 83.0%</td><td>GPT-5.2 70.9%</td><td>AI 更接近专业交付，而非只答题。</td></tr>
+          <tr><td>电脑使用</td><td class="win">OSWorld 75.0%</td><td>人类 72.4%，GPT-5.2 47.3%</td><td>代理进入真实桌面环境的能力明显增强。</td></tr>
+          <tr><td>网页检索</td><td class="win">BrowseComp 82.7%</td><td>GPT-5.2 65.8%</td><td>模型更擅长多轮搜索和难找信息汇总。</td></tr>
+          <tr><td>工具生态</td><td class="win">Toolathlon 54.6%</td><td>GPT-5.2 45.7%</td><td>工具调用准确性和效率成为核心竞争点。</td></tr>
+          <tr><td>成本结构</td><td class="warn">单 token 更贵</td><td>gpt-5.4 输入 $2.50/M，输出 $15/M</td><td>OpenAI 认为更少 token 和更快流程可抵消部分成本。</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
 
-    <section>
-      <span class="tag">安全</span>
-      <h2>更强代理能力也带来更高网络安全要求</h2>
-      <p>OpenAI 继续按 Preparedness Framework 中的 High cyber capability 部署 GPT-5.4，并配套网络安全监控、可信访问控制，以及部分 ZDR 场景的请求级阻断。文章也承认分类器仍可能带来误报，并会继续校准拒绝和拦截策略。</p>
-      <p>同时，OpenAI 发布 CoT controllability 开源评测，用于衡量模型是否能故意隐藏推理以逃避监控；文章称 GPT-5.4 Thinking 控制自身 CoT 的能力较低。这里的关键洞见是，代理越能操作真实系统，安全设计越需要进入模型能力本身和部署流程。</p>
-    </section>
+  <section class="insight">
+    <div class="wrap">
+      <div class="quote">
+        “工具搜索”的意义，是让模型面对大型工具生态时不再被全部说明书淹没。
+        <small>在 250 个 MCP Atlas 任务、36 个 MCP server 上，工具搜索减少 47% 总 token 用量，同时保持相同准确率。</small>
+      </div>
+    </div>
+  </section>
 
-    <section>
+  <section class="flow">
+    <div class="wrap flow-grid">
+      <div>
+        <h2>安全和可用性也说明模型走向更高风险场景</h2>
+        <p>OpenAI 将 GPT-5.4 按 Preparedness Framework 视为 High cyber capability。这意味着更强能力也带来更严格的监控、访问控制和高风险请求处理。</p>
+        <p>文章还提到 CoT controllability 评估。GPT-5.4 Thinking 控制或隐藏推理链的能力较低，被视为有利于安全监控的性质。</p>
+      </div>
+      <div>
+        <div class="lane"><strong>可用性：</strong>GPT-5.4 在 ChatGPT、API 和 Codex 推出。API 模型名为 gpt-5.4，Pro 版本为 gpt-5.4-pro。</div>
+        <div class="lane"><strong>迁移：</strong>GPT-5.2 Thinking 会在付费用户的 Legacy Models 中保留三个月，并于 2026 年 6 月 5 日退役。</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mosaic">
+    <div class="wrap">
       <h2>最值得带走的洞见</h2>
-      <ul>
-        <li>GPT-5.4 的核心不是单一榜单领先，而是把编码、办公文档、网页研究、电脑操作和工具调用合成一个面向真实工作的模型。</li>
-        <li>GDPval、表格建模、演示文稿和事实性数据说明，AI 对知识工作的影响正在从辅助写作转向交付可用成果。</li>
-        <li>原生电脑使用和 1M 上下文让代理能处理更长链路，但也让验证、权限和安全确认变得更重要。</li>
-        <li>工具搜索的 47% token 降幅提示未来代理系统的关键架构：不是把所有工具塞给模型，而是让模型按需发现工具。</li>
-        <li>GPT-5.4 更贵，但 OpenAI 的论点是通过更少轮次、更少 token、更高成功率来降低整体工作成本。</li>
-      </ul>
-    </section>
-  </main>
+      <div class="tiles">
+        <div class="tile"><h3>1. 代理式 AI 的瓶颈正在从模型智力转向工作流完整性。</h3><p>GPT-5.4 强调电脑使用、工具搜索、长上下文和验证。它要解决的是“能否完成任务”，不只是“能否回答问题”。</p></div>
+        <div class="tile"><h3>2. 专业交付物成为新战场。</h3><p>表格、演示和文档的评估被放到核心位置。AI 产品价值更接近办公室里的实际产出。</p></div>
+        <div class="tile"><h3>3. 工具搜索会影响成本结构。</h3><p>大型 MCP 生态下，少放工具定义本身就是能力提升。省 token 也能降低延迟。</p></div>
+        <div class="tile"><h3>4. 视觉和电脑使用让模型更接近操作系统层代理。</h3><p>OSWorld 75.0% 是重要信号。它意味着模型开始能在界面中看、点、输入和修正。</p></div>
+        <div class="tile"><h3>5. 更强模型也需要更明确的安全边界。</h3><p>High cyber capability 的部署方式说明，越能执行真实任务，越需要细粒度确认和风险控制。</p></div>
+      </div>
+    </div>
+  </section>
+</main>
   <script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;
