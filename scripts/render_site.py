@@ -286,16 +286,18 @@ def render_summary(summary: str, value: str) -> str:
         combined = f"{summary} 价值：{value}"
     else:
         combined = summary
-    parts = []
     labels = ("结论：", "关键数据：", "价值：")
-    for index, label in enumerate(labels):
-        start = combined.find(label)
-        if start < 0:
-            continue
-        end_candidates = [combined.find(next_label, start + len(label)) for next_label in labels[index + 1 :]]
-        end_candidates = [candidate for candidate in end_candidates if candidate >= 0]
-        end = min(end_candidates) if end_candidates else len(combined)
+    positions = sorted((combined.find(label), label) for label in labels if combined.find(label) >= 0)
+    sections: dict[str, str] = {}
+    for index, (start, label) in enumerate(positions):
+        end = positions[index + 1][0] if index + 1 < len(positions) else len(combined)
         body = combined[start + len(label) : end].strip()
+        if body:
+            sections[label] = body
+
+    parts = []
+    for label in ("价值：", "结论：", "关键数据："):
+        body = sections.get(label)
         if body:
             parts.append(f'<p class="summary-line"><strong>{esc(label[:-1])}</strong><span>{esc(body)}</span></p>')
     if parts:
@@ -714,7 +716,7 @@ def render_page(articles: list[dict[str, Any]], site_dir: Path | None = None) ->
     <header>
       <div>
         <h1>AI Research 中文简介</h1>
-        <p class="lede">每篇文章保留一段中文简介，包含结论、关键数据和阅读价值；点击“阅读原文”可打开对应来源原文。</p>
+        <p class="lede">每篇文章先给阅读价值，再给结论和关键数据；点击“阅读原文”可打开对应来源原文。</p>
         <p class="stats">共 {total} 篇文章 · 可见 <span id="visible-count">{total}</span> 篇 · {source_summary} · 更新于 {esc(updated_at)}</p>
       </div>
       <div class="tools">
