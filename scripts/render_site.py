@@ -319,7 +319,11 @@ def render_article(record: dict[str, Any], site_dir: Path) -> str:
         for key in ("source", "source_name", "title", "title_zh", "date", "category", "summary_zh", "value_zh")
     )
     summary_html = render_summary(summary, value)
-    title_zh_html = f'<p class="title-zh" lang="zh-CN">{esc(title_zh)}</p>' if title_zh else ""
+    title = str(record.get("title", "")).strip()
+    if title_zh:
+        title_html = f'<h2 lang="zh-CN">{esc(title_zh)}</h2>\n          <p class="title-en" lang="en">{esc(title)}</p>'
+    else:
+        title_html = f"<h2>{esc(title)}</h2>"
     local_summary_href = summary_href(record, site_dir)
     summary_link = (
         f'<a class="source-link summary-link" href="{esc(local_summary_href)}" target="_blank" rel="noopener noreferrer">阅读总结</a>'
@@ -334,8 +338,7 @@ def render_article(record: dict[str, Any], site_dir: Path) -> str:
           <span>{esc(record.get("category"))}</span>
         </div>
         <div class="title-block">
-          <h2>{esc(record.get("title"))}</h2>
-          {title_zh_html}
+          {title_html}
         </div>
         <div class="summary">
         {summary_html}
@@ -645,7 +648,7 @@ def render_page(articles: list[dict[str, Any]], site_dir: Path | None = None) ->
       display: grid;
       gap: 4px;
     }}
-    .title-zh {{
+    .title-en {{
       margin: 0;
       color: var(--muted);
       font-size: 20px;
