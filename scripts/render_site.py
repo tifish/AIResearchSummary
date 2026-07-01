@@ -151,13 +151,6 @@ DIGEST_THEME_HEAD = """  <script id="airs-digest-theme-boot">
     body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
       color: inherit;
     }
-    body :where(section, article, .wrap, .container, .content, .card, .panel, .lede, .lead, .callout, .insight, .takeaways, .final, .pill, .chip) {
-      border-color: var(--airs-digest-line) !important;
-    }
-    body :where(section, article, .card, .panel, .lede, .lead, .callout, .pill, .chip, .takeaways, .final) {
-      background: var(--airs-digest-panel) !important;
-      color: var(--airs-digest-ink) !important;
-    }
     body :where(.muted, .meta, .kicker, small) {
       color: var(--airs-digest-muted) !important;
     }
@@ -296,10 +289,14 @@ def render_summary(summary: str, value: str) -> str:
             sections[label] = body
 
     parts = []
+    class_names = {"价值：": "summary-value", "结论：": "summary-conclusion", "关键数据：": "summary-data"}
     for label in ("价值：", "结论：", "关键数据："):
         body = sections.get(label)
         if body:
-            parts.append(f'<p class="summary-line"><strong>{esc(label[:-1])}</strong><span>{esc(body)}</span></p>')
+            parts.append(
+                f'<p class="summary-line {class_names[label]}">'
+                f"<strong>{esc(label[:-1])}</strong><span>{esc(body)}</span></p>"
+            )
     if parts:
         return "\n        ".join(parts)
     return f"<p>{esc(combined)}</p>"
@@ -433,6 +430,18 @@ def render_page(articles: list[dict[str, Any]], site_dir: Path | None = None) ->
       --badge-openai: #eef2ff;
       --badge-cursor: #e9e7f3;
       --summary-link: #8a4b10;
+      --summary-value-bg: #fff5e4;
+      --summary-value-line: #ead4aa;
+      --summary-value-chip: #f3ddba;
+      --summary-value-accent: #8a4b10;
+      --summary-conclusion-bg: #edf7f3;
+      --summary-conclusion-line: #cbe3da;
+      --summary-conclusion-chip: #d9eee7;
+      --summary-conclusion-accent: #1f6f5b;
+      --summary-data-bg: #eef2ff;
+      --summary-data-line: #d6dcf5;
+      --summary-data-chip: #dfe6ff;
+      --summary-data-accent: #4552a3;
     }}
     @media (prefers-color-scheme: dark) {{
       :root:not([data-theme="light"]) {{
@@ -451,6 +460,18 @@ def render_page(articles: list[dict[str, Any]], site_dir: Path | None = None) ->
         --badge-openai: #20243a;
         --badge-cursor: #2a2740;
         --summary-link: #e0a063;
+        --summary-value-bg: #2d2418;
+        --summary-value-line: #49371f;
+        --summary-value-chip: #3a2c1e;
+        --summary-value-accent: #e0a063;
+        --summary-conclusion-bg: #1b2a24;
+        --summary-conclusion-line: #2f4a3f;
+        --summary-conclusion-chip: #22372f;
+        --summary-conclusion-accent: #8fd8c0;
+        --summary-data-bg: #20243a;
+        --summary-data-line: #34395c;
+        --summary-data-chip: #292e48;
+        --summary-data-accent: #a8b5ff;
       }}
     }}
     :root[data-theme="dark"] {{
@@ -469,6 +490,18 @@ def render_page(articles: list[dict[str, Any]], site_dir: Path | None = None) ->
       --badge-openai: #20243a;
       --badge-cursor: #2a2740;
       --summary-link: #e0a063;
+      --summary-value-bg: #2d2418;
+      --summary-value-line: #49371f;
+      --summary-value-chip: #3a2c1e;
+      --summary-value-accent: #e0a063;
+      --summary-conclusion-bg: #1b2a24;
+      --summary-conclusion-line: #2f4a3f;
+      --summary-conclusion-chip: #22372f;
+      --summary-conclusion-accent: #8fd8c0;
+      --summary-data-bg: #20243a;
+      --summary-data-line: #34395c;
+      --summary-data-chip: #292e48;
+      --summary-data-accent: #a8b5ff;
     }}
     * {{ box-sizing: border-box; }}
     body {{
@@ -640,37 +673,81 @@ def render_page(articles: list[dict[str, Any]], site_dir: Path | None = None) ->
     .source-cursor .source-badge {{ background: var(--badge-cursor); }}
     h2 {{
       margin: 0;
-      font-size: 20px;
-      line-height: 1.3;
+      color: var(--ink);
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.24;
       letter-spacing: 0;
     }}
     .title-block {{
       display: grid;
-      gap: 4px;
+      gap: 5px;
+      padding: 2px 0 8px;
+      border-bottom: 1px solid var(--line);
     }}
     .title-en {{
       margin: 0;
       color: var(--muted);
-      font-size: 20px;
-      font-weight: 700;
-      line-height: 1.3;
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.35;
     }}
     p {{
       margin: 0;
     }}
     .summary {{
       display: grid;
-      gap: 6px;
+      gap: 7px;
     }}
     .summary-line {{
       display: grid;
-      grid-template-columns: 76px 1fr;
-      gap: 8px;
+      grid-template-columns: 82px 1fr;
+      gap: 12px;
+      align-items: start;
       margin: 0;
+      padding: 10px 12px 10px 14px;
+      border: 1px solid var(--summary-line-border);
+      border-radius: 7px;
+      background: var(--summary-line-bg);
+      box-shadow: inset 4px 0 0 var(--summary-line-accent);
     }}
     .summary-line strong {{
-      color: var(--emphasis);
-      font-weight: 700;
+      width: fit-content;
+      min-width: 68px;
+      border-radius: 999px;
+      padding: 2px 8px;
+      background: var(--summary-label-bg);
+      color: var(--summary-line-accent);
+      font-size: 12px;
+      font-weight: 750;
+      line-height: 1.6;
+      text-align: center;
+      white-space: nowrap;
+    }}
+    .summary-line span {{
+      color: var(--ink);
+    }}
+    .summary-value {{
+      --summary-line-bg: var(--summary-value-bg);
+      --summary-line-border: var(--summary-value-line);
+      --summary-line-accent: var(--summary-value-accent);
+      --summary-label-bg: var(--summary-value-chip);
+    }}
+    .summary-value span {{
+      font-weight: 620;
+    }}
+    .summary-conclusion {{
+      --summary-line-bg: var(--summary-conclusion-bg);
+      --summary-line-border: var(--summary-conclusion-line);
+      --summary-line-accent: var(--summary-conclusion-accent);
+      --summary-label-bg: var(--summary-conclusion-chip);
+    }}
+    .summary-data {{
+      --summary-line-bg: var(--summary-data-bg);
+      --summary-line-border: var(--summary-data-line);
+      --summary-line-accent: var(--summary-data-accent);
+      --summary-label-bg: var(--summary-data-chip);
+      font-variant-numeric: tabular-nums;
     }}
     .article-actions {{
       display: flex;
@@ -708,8 +785,8 @@ def render_page(articles: list[dict[str, Any]], site_dir: Path | None = None) ->
         padding: 16px;
       }}
       .summary-line {{
-        grid-template-columns: 1fr;
-        gap: 2px;
+        grid-template-columns: 78px 1fr;
+        gap: 8px;
       }}
     }}
   </style>
