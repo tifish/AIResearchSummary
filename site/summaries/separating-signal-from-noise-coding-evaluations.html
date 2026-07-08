@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>在编码评估中区分信号与噪声</title>
+<style>
+:root {
+  --bg: #f7f4ef;
+  --ink: #18202a;
+  --muted: #66717f;
+  --line: #d7d0c5;
+  --panel: #ffffff;
+  --panel-soft: #f0ebe3;
+  --panel-cool: #e7f0f3;
+  --panel-warm: #fff0d9;
+  --panel-risk: #ffe2df;
+  --panel-dark: #18202a;
+  --ink-on-dark: #f7f4ef;
+  --accent-data: #2166a5;
+  --accent-risk: #c43d32;
+  --accent-opportunity: #2d8a62;
+  --accent-conclusion: #8a4fd1;
+  --accent-warning: #d28217;
+  --shadow: 0 18px 50px rgba(24, 32, 42, .10);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111417;
+    --ink: #ece8df;
+    --muted: #a9b1bb;
+    --line: #303841;
+    --panel: #1b2026;
+    --panel-soft: #20242a;
+    --panel-cool: #16262d;
+    --panel-warm: #2b2318;
+    --panel-risk: #2d1b1b;
+    --panel-dark: #080a0d;
+    --ink-on-dark: #f3efe7;
+    --accent-data: #66b7ff;
+    --accent-risk: #ff7f76;
+    --accent-opportunity: #63d894;
+    --accent-conclusion: #b78cff;
+    --accent-warning: #ffbd5a;
+    --shadow: 0 18px 50px rgba(0, 0, 0, .35);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111417;
+  --ink: #ece8df;
+  --muted: #a9b1bb;
+  --line: #303841;
+  --panel: #1b2026;
+  --panel-soft: #20242a;
+  --panel-cool: #16262d;
+  --panel-warm: #2b2318;
+  --panel-risk: #2d1b1b;
+  --panel-dark: #080a0d;
+  --ink-on-dark: #f3efe7;
+  --accent-data: #66b7ff;
+  --accent-risk: #ff7f76;
+  --accent-opportunity: #63d894;
+  --accent-conclusion: #b78cff;
+  --accent-warning: #ffbd5a;
+  --shadow: 0 18px 50px rgba(0, 0, 0, .35);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  line-height: 1.68;
+}
+main { max-width: 1120px; margin: 0 auto; }
+.hero {
+  padding: 64px 24px 36px;
+  display: grid;
+  grid-template-columns: 1.25fr .75fr;
+  gap: 32px;
+  align-items: end;
+}
+.kicker {
+  color: var(--accent-data);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+h1 {
+  margin: 10px 0 8px;
+  font-size: clamp(34px, 6vw, 68px);
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+.original {
+  color: var(--muted);
+  font-size: 18px;
+}
+.one-line {
+  background: var(--panel-dark);
+  color: var(--ink-on-dark);
+  padding: 24px;
+  border-left: 6px solid var(--accent-conclusion);
+  box-shadow: var(--shadow);
+}
+.one-line strong {
+  display: block;
+  color: var(--accent-warning);
+  margin-bottom: 8px;
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+}
+.metric {
+  padding: 24px;
+  border-right: 1px solid var(--line);
+}
+.metric:last-child { border-right: 0; }
+.metric b {
+  display: block;
+  font-size: 34px;
+  color: var(--accent-data);
+  line-height: 1;
+}
+.metric span {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.split {
+  padding: 44px 24px;
+  display: grid;
+  grid-template-columns: .9fr 1.1fr;
+  gap: 36px;
+  background: var(--panel-soft);
+}
+.section-title {
+  margin: 0 0 12px;
+  font-size: 26px;
+  line-height: 1.2;
+}
+.lede {
+  color: var(--muted);
+  margin: 0;
+}
+.issue-list {
+  display: grid;
+  gap: 14px;
+}
+.issue {
+  background: var(--panel);
+  padding: 16px 18px;
+  border-left: 5px solid var(--accent-risk);
+}
+.issue:nth-child(2) { border-left-color: var(--accent-warning); }
+.issue:nth-child(3) { border-left-color: var(--accent-data); }
+.issue:nth-child(4) { border-left-color: var(--accent-conclusion); }
+.issue b { display: block; margin-bottom: 4px; }
+.timeline {
+  padding: 48px 24px;
+  background: var(--panel);
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 22px;
+}
+.step {
+  position: relative;
+  padding: 20px;
+  border-top: 4px solid var(--accent-opportunity);
+  background: var(--panel-cool);
+}
+.step .num {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent-opportunity);
+  color: var(--panel-dark);
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+.compare {
+  padding: 44px 24px;
+  background: var(--panel-risk);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+th, td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+th {
+  color: var(--accent-risk);
+  font-size: 14px;
+}
+td:first-child { font-weight: 700; }
+.callout {
+  margin: 0;
+  padding: 34px 24px;
+  background: var(--panel-dark);
+  color: var(--ink-on-dark);
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 24px;
+  align-items: center;
+}
+.callout b {
+  color: var(--accent-warning);
+  font-size: 28px;
+  line-height: 1.2;
+}
+.takeaways {
+  padding: 48px 24px 64px;
+  background: var(--bg);
+}
+.mosaic {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 20px;
+}
+.tile {
+  padding: 20px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+.tile:nth-child(1) { border-top: 6px solid var(--accent-data); }
+.tile:nth-child(2) { border-top: 6px solid var(--accent-risk); }
+.tile:nth-child(3) { border-top: 6px solid var(--accent-opportunity); }
+.tile:nth-child(4) { border-top: 6px solid var(--accent-conclusion); }
+.tile b { display: block; margin-bottom: 6px; }
+@media (max-width: 760px) {
+  .hero, .split, .callout { grid-template-columns: 1fr; }
+  .metrics, .steps, .mosaic { grid-template-columns: 1fr; }
+  .metric { border-right: 0; border-bottom: 1px solid var(--line); }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/separating-signal-from-noise-coding-evaluations" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+  <header class="hero">
+    <div>
+      <div class="kicker">OpenAI Research · 2026-07-08</div>
+      <h1>在编码评估中区分信号与噪声</h1>
+      <div class="original">Separating signal from noise in coding evaluations</div>
+    </div>
+    <div class="one-line">
+      <strong>一句话总括</strong>
+      这项审计显示，SWE-Bench Pro 的一大部分任务并不能可靠衡量模型的软件工程能力，而是在把测试缺陷误记为模型失败。
+    </div>
+  </header>
+
+  <section class="metrics">
+    <div class="metric"><b>731</b><span>SWE-Bench Pro 公共拆分任务数</span></div>
+    <div class="metric"><b>27.4%</b><span>数据点分析流水线确认的破坏性任务比例</span></div>
+    <div class="metric"><b>34.1%</b><span>人工标注活动确认的破坏性任务比例</span></div>
+    <div class="metric"><b>~30%</b><span>OpenAI 对整体破坏性任务比例的估计</span></div>
+  </section>
+
+  <section class="split">
+    <div>
+      <h2 class="section-title">基准分数上升，不等于信号可靠</h2>
+      <p class="lede">前沿模型在 8 个月内从 23.3% 通过率升至 80.3%。这个变化看起来像能力跃迁，但前提是任务本身必须公平。</p>
+      <p class="lede">审计发现，许多失败可能来自题目、测试和提示之间的不一致。这改变了读者对 AI 编码进展的理解：分数不仅测模型，也测数据集质量。</p>
+    </div>
+    <div class="issue-list">
+      <div class="issue"><b>过严测试</b>隐藏测试要求特定实现细节。功能正确的提交也可能失败。</div>
+      <div class="issue"><b>提示不完整</b>题目没有写出隐藏测试会检查的要求。模型无法合理推断。</div>
+      <div class="issue"><b>测试覆盖不足</b>不完整修复也能通过。高分可能夸大真实能力。</div>
+      <div class="issue"><b>误导性提示</b>题目把模型引向错误行为。失败不再代表能力不足。</div>
+    </div>
+  </section>
+
+  <section class="timeline">
+    <h2 class="section-title">审计流程把“疑似坏题”逐层压实</h2>
+    <p class="lede">初始自动过滤器先检查提示、模型尝试和评分测试，并标记 286 个疑似问题任务。随后，研究者用代理审计和人工标注两条路径复核。</p>
+    <div class="steps">
+      <div class="step"><span class="num">1</span><b>自动过滤</b><p>系统先寻找可能的提示、测试和失败轨迹异常。这一步扩大覆盖面。</p></div>
+      <div class="step"><span class="num">2</span><b>Codex 调查代理</b><p>代理进入任务仓库运行测试和读代码。它们区分合理歧义和真正的题目缺陷。</p></div>
+      <div class="step"><span class="num">3</span><b>五人工程师复审</b><p>每个任务由 5 名有经验的软件工程师审查。低信心和分歧案例会升级。</p></div>
+    </div>
+  </section>
+
+  <section class="compare">
+    <h2 class="section-title">人工审查比代理更常发现重叠问题</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>观察点</th>
+          <th>关键数据</th>
+          <th>说明了什么</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>破坏性任务比例</td>
+          <td>流水线为 27.4%，人工为 34.1%</td>
+          <td>自动方法能发现大量问题，但仍可能低估基准缺陷。</td>
+        </tr>
+        <tr>
+          <td>类别重合</td>
+          <td>人工判断与代理流水线重合率为 74%</td>
+          <td>两条路径抓到相同主要失效模式，但边界判断并不完全一致。</td>
+        </tr>
+        <tr>
+          <td>低覆盖测试</td>
+          <td>人工标为 9.4%，代理流水线为 4.1%</td>
+          <td>人类更容易发现“能过但没真正完成任务”的情况。</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="callout">
+    <b>一个字符也会扭曲评估。</b>
+    <p>OpenLibrary 示例中，提示给出的 Markdown 间距和隐藏测试要求不一致。模型如果严格遵循提示，仍会因为一个空格差异被判错。这个案例说明，编码评估的噪声可能非常细小，却会直接改变结果。</p>
+  </section>
+
+  <section class="split">
+    <div>
+      <h2 class="section-title">政策含义是：先验证评估，再相信排名</h2>
+      <p class="lede">OpenAI 表示，这类结果会影响部署、安全和研究优先级。坏任务会制造错误的安全感，也会误导模型能力判断。</p>
+    </div>
+    <div>
+      <p>文章最后撤回了此前建议采用 SWE-Bench Pro 的立场。它并不是否定高难度真实任务，而是强调基准必须由有经验的开发者专门设计，并配套更强的人类监督。</p>
+      <p>结论很直接：可靠评估要难以投机，也要容易信任。否则，分数越精确，误导也可能越精确。</p>
+    </div>
+  </section>
+
+  <section class="takeaways">
+    <h2 class="section-title">最值得带走的洞见</h2>
+    <div class="mosaic">
+      <div class="tile"><b>坏题会伪装成模型失败</b>当提示和隐藏测试不一致时，低分不能说明模型没有能力。</div>
+      <div class="tile"><b>高分也可能被低覆盖测试放大</b>如果测试没有覆盖关键行为，模型可能通过却没有真正解决问题。</div>
+      <div class="tile"><b>代理可以扩展数据质检</b>更强模型能检查提示、测试、补丁和失败轨迹，降低大规模审计成本。</div>
+      <div class="tile"><b>软件工程基准需要专门设计</b>真实仓库历史很有价值，但不能直接等同于干净、公平、可解释的评估任务。</div>
+    </div>
+  </section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

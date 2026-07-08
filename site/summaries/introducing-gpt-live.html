@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>介绍 GPT-Live</title>
+<style>
+:root{
+  --bg:#f6f4ef;
+  --ink:#17191f;
+  --muted:#5f6572;
+  --line:#d8d2c4;
+  --hero:#17202a;
+  --hero-ink:#f7f2e8;
+  --card:#ffffff;
+  --soft:#ece7dc;
+  --data:#2563eb;
+  --data-bg:#e8f0ff;
+  --risk:#c2410c;
+  --risk-bg:#fff0e8;
+  --opportunity:#0f766e;
+  --opportunity-bg:#e4f7f3;
+  --conclusion:#7c3aed;
+  --conclusion-bg:#f1e8ff;
+  --accent:#d97706;
+  --shadow:0 18px 50px rgba(23,25,31,.10);
+}
+:root[data-theme="dark"]{
+  --bg:#101215;
+  --ink:#f1f3f5;
+  --muted:#aab1bd;
+  --line:#303744;
+  --hero:#080b10;
+  --hero-ink:#f4efe4;
+  --card:#191d24;
+  --soft:#1f242c;
+  --data:#6ea8ff;
+  --data-bg:#172337;
+  --risk:#ff9a6b;
+  --risk-bg:#321c15;
+  --opportunity:#5eead4;
+  --opportunity-bg:#12312e;
+  --conclusion:#c4a1ff;
+  --conclusion-bg:#261a3d;
+  --accent:#fbbf24;
+  --shadow:0 18px 50px rgba(0,0,0,.35);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#101215;
+    --ink:#f1f3f5;
+    --muted:#aab1bd;
+    --line:#303744;
+    --hero:#080b10;
+    --hero-ink:#f4efe4;
+    --card:#191d24;
+    --soft:#1f242c;
+    --data:#6ea8ff;
+    --data-bg:#172337;
+    --risk:#ff9a6b;
+    --risk-bg:#321c15;
+    --opportunity:#5eead4;
+    --opportunity-bg:#12312e;
+    --conclusion:#c4a1ff;
+    --conclusion-bg:#261a3d;
+    --accent:#fbbf24;
+    --shadow:0 18px 50px rgba(0,0,0,.35);
+  }
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+  line-height:1.65;
+}
+main{overflow:hidden}
+.hero{
+  background:var(--hero);
+  color:var(--hero-ink);
+  padding:56px 22px 42px;
+}
+.wrap{max-width:1080px;margin:0 auto}
+.kicker{
+  color:var(--accent);
+  font-size:14px;
+  font-weight:700;
+  letter-spacing:.04em;
+}
+h1{
+  margin:12px 0 6px;
+  font-size:clamp(34px,6vw,72px);
+  line-height:1.05;
+  letter-spacing:0;
+}
+.original{
+  margin:0 0 28px;
+  color:var(--muted);
+  font-size:18px;
+}
+.lead{
+  max-width:760px;
+  font-size:24px;
+  line-height:1.45;
+  margin:0;
+}
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:1px;
+  background:var(--line);
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+}
+.stat{
+  background:var(--data-bg);
+  padding:24px;
+}
+.stat strong{
+  display:block;
+  color:var(--data);
+  font-size:30px;
+  line-height:1;
+  margin-bottom:8px;
+}
+.stat span{color:var(--muted);font-size:14px}
+.split{
+  display:grid;
+  grid-template-columns:1.1fr .9fr;
+  gap:34px;
+  padding:56px 22px;
+  align-items:center;
+}
+.panel{
+  background:var(--card);
+  border:1px solid var(--line);
+  box-shadow:var(--shadow);
+  padding:28px;
+  border-radius:8px;
+}
+h2{font-size:28px;line-height:1.2;margin:0 0 14px}
+p{margin:0 0 14px}
+.flow{
+  background:var(--soft);
+  padding:52px 22px;
+}
+.steps{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+  margin-top:24px;
+}
+.step{
+  border-left:5px solid var(--opportunity);
+  background:var(--opportunity-bg);
+  padding:22px;
+}
+.step b{display:block;color:var(--opportunity);margin-bottom:8px}
+.compare{
+  padding:56px 22px;
+  background:var(--card);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:20px;
+  overflow:hidden;
+  border:1px solid var(--line);
+}
+th,td{
+  text-align:left;
+  padding:16px;
+  border-bottom:1px solid var(--line);
+  vertical-align:top;
+}
+th{background:var(--soft)}
+td:first-child{font-weight:700}
+.eval{
+  padding:52px 22px;
+  background:var(--data-bg);
+}
+.eval-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:16px;
+  margin-top:22px;
+}
+.badge{
+  background:var(--card);
+  border-top:6px solid var(--data);
+  padding:22px;
+  border-radius:8px;
+}
+.safety{
+  padding:56px 22px;
+  background:var(--risk-bg);
+}
+.safety .quote{
+  border-left:6px solid var(--risk);
+  padding:18px 22px;
+  background:var(--card);
+  font-size:21px;
+  line-height:1.45;
+}
+.avail{
+  padding:48px 22px;
+}
+.timeline{
+  display:grid;
+  grid-template-columns:120px 1fr;
+  gap:18px;
+  margin-top:20px;
+}
+.time{
+  color:var(--conclusion);
+  font-weight:800;
+}
+.item{
+  border-bottom:1px solid var(--line);
+  padding-bottom:18px;
+  margin-bottom:18px;
+}
+.takeaways{
+  background:var(--hero);
+  color:var(--hero-ink);
+  padding:54px 22px;
+}
+.mosaic{
+  display:grid;
+  grid-template-columns:1.2fr 1fr 1fr;
+  gap:14px;
+  margin-top:24px;
+}
+.tile{
+  padding:22px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.06);
+  min-height:140px;
+}
+.tile:nth-child(1){border-top:6px solid var(--opportunity)}
+.tile:nth-child(2){border-top:6px solid var(--data)}
+.tile:nth-child(3){border-top:6px solid var(--risk)}
+.tile:nth-child(4){border-top:6px solid var(--conclusion)}
+.tile:nth-child(5){border-top:6px solid var(--accent);grid-column:span 2}
+.tile b{display:block;margin-bottom:8px}
+@media (max-width:760px){
+  .stats,.steps,.eval-grid,.split,.mosaic{grid-template-columns:1fr}
+  .timeline{grid-template-columns:1fr}
+  .tile:nth-child(5){grid-column:auto}
+  .lead{font-size:20px}
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/introducing-gpt-live" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div class="kicker">Product · OpenAI · 2026-07-08</div>
+      <h1>介绍 GPT-Live</h1>
+      <p class="original">Introducing GPT-Live</p>
+      <p class="lead">一句话总括：GPT-Live 的真正贡献，是把语音 AI 从“等你说完再回答”改造成可连续感知、实时回应，并把复杂任务交给后台模型处理的交互系统。</p>
+    </div>
+  </section>
+
+  <section class="stats">
+    <div class="stat"><strong>全双工</strong><span>同时听和说，不再只按回合切换。</span></div>
+    <div class="stat"><strong>GPT-5.5</strong><span>上线时负责后台搜索、推理和复杂任务。</span></div>
+    <div class="stat"><strong>5-10 分钟</strong><span>人类偏好评估使用匹配时长对话。</span></div>
+    <div class="stat"><strong>1.5 亿+</strong><span>每周使用 ChatGPT Voice 和 Dictation 的人数。</span></div>
+  </section>
+
+  <section class="split wrap">
+    <div>
+      <h2>核心变化不是声音更像人，而是交互节奏变了</h2>
+      <p>旧的级联系统要先转文字，再由语言模型回答，最后转成语音。信息会在模型之间流失，停顿也更明显。</p>
+      <p>Advanced Voice Mode 已经把音频处理放进单一模型，但仍然依赖“用户停止说话”来判断轮次。短暂停顿和环境噪声都可能触发误判。</p>
+      <p>GPT-Live 的全双工架构让模型可以持续处理输入，同时生成输出。它能选择继续听、插话、暂停、回应，或调用工具。</p>
+    </div>
+    <div class="panel">
+      <h2>结论</h2>
+      <p>语音 AI 的瓶颈不只是延迟。更大的问题是它是否理解对话正在发生。</p>
+      <p>GPT-Live 把“轮次识别”变成“连续交互决策”。这会让 AI 更适合陪练、翻译、支持服务和长时间协作。</p>
+    </div>
+  </section>
+
+  <section class="flow">
+    <div class="wrap">
+      <h2>新架构把交流和深度工作拆开</h2>
+      <div class="steps">
+        <div class="step"><b>1. 持续监听</b>模型在你说话时持续接收音频。它可以用“mhmm”或“got it”表示正在跟随，也可以安静等待。</div>
+        <div class="step"><b>2. 实时互动</b>它每秒多次判断是否发声、是否打断、是否暂停。语音体验因此更接近自然对话。</div>
+        <div class="step"><b>3. 后台委托</b>搜索、深度推理和代理型任务交给 GPT-5.5 等模型。前台对话仍然保持流动。</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="compare">
+    <div class="wrap">
+      <h2>三代语音系统的差异</h2>
+      <table>
+        <thead><tr><th>方式</th><th>工作方式</th><th>用户感受</th><th>限制</th></tr></thead>
+        <tbody>
+          <tr><td>级联语音系统</td><td>语音转文字、语言模型、文字转语音依次工作。</td><td>能接入前沿模型，但回答慢。</td><td>跨模型传递会丢信息，停顿显得生硬。</td></tr>
+          <tr><td>回合式语音模型</td><td>单一模型处理和生成音频，但仍按回合运行。</td><td>更顺滑，延迟更低。</td><td>必须等用户停下，容易误判短暂停顿。</td></tr>
+          <tr><td>GPT-Live</td><td>连续处理输入和输出，并可后台委托任务。</td><td>能被打断，能等待，也能边聊边做事。</td><td>视频和屏幕共享上线时暂不支持。</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="eval">
+    <div class="wrap">
+      <h2>评估显示，它不只是更自然，也更能处理复杂任务</h2>
+      <p>OpenAI 新建了面向愉悦度和对话流的人工评估。GPT-Live-1 和 GPT-Live-1 mini 在匹配的 5-10 分钟对话中，相比 Advanced Voice Mode 获得更强偏好。</p>
+      <div class="eval-grid">
+        <div class="badge"><b>GPQA</b><p>GPT-Live-1 在专家级科学推理测试上明显优于 Advanced Voice Mode。语音入口不再意味着推理能力下降。</p></div>
+        <div class="badge"><b>BrowseComp</b><p>它在困难网页搜索任务上有提升。意义在于，用户可以用口头方式发起需要搜索的复杂问题。</p></div>
+        <div class="badge"><b>τ³-Voice Telecom</b><p>内部电信客服任务显示它更适合多轮支持流程。语音代理开始接近真实业务场景。</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="safety">
+    <div class="wrap">
+      <h2>声音带来新的安全边界</h2>
+      <p class="quote">当 AI 可以实时说话，安全机制也必须能在它说话时生效。</p>
+      <p>OpenAI 扩展了音频原生安全评估，并针对自伤、精神病性风险、躁狂、情感依赖、暴力和性内容做了合成评估。内部专家也测试了语音特有风险。</p>
+      <p>文章称 GPT-Live 在几乎所有测试领域都达到或优于 Advanced Voice Mode。系统还能在检测到潜在不安全输出时调整回应、显示安全资源，或在高风险情况下结束语音对话。</p>
+      <p>这改变了读者对语音 AI 的理解。语音不是普通文本输出的外壳，而是一个更即时、更情绪化，也更需要实时保护的交互通道。</p>
+    </div>
+  </section>
+
+  <section class="avail">
+    <div class="wrap">
+      <h2>上线范围和现实限制</h2>
+      <div class="timeline">
+        <div class="time">现在</div>
+        <div class="item">GPT-Live 面向全球 ChatGPT 用户在 iOS、Android 和 ChatGPT.com 推出。Go、Plus 和 Pro 用户默认使用 GPT-Live-1，Free 用户默认使用 GPT-Live-1 mini。</div>
+        <div class="time">很快</div>
+        <div class="item">OpenAI 计划把 GPT-Live 带到 API。开发者和企业可以登记通知。</div>
+        <div class="time">仍有限制</div>
+        <div class="item">部分语言可能有非母语口音或流利度缺口。上线时不支持 ChatGPT 中带视频或屏幕共享的语音。</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="takeaways">
+    <div class="wrap">
+      <h2>最值得带走的洞见</h2>
+      <div class="mosaic">
+        <div class="tile"><b>语音 AI 的下一步是连续性</b>真正的突破不是更像真人发音，而是系统能在对话中持续判断时机。</div>
+        <div class="tile"><b>前台互动和后台推理会分工</b>GPT-Live 负责交流流畅度，GPT-5.5 负责更深任务。这可能成为多模态代理的常见架构。</div>
+        <div class="tile"><b>安全必须实时化</b>语音输出不能只靠生成后审查。系统需要在说话过程中干预。</div>
+        <div class="tile"><b>语音会进入更复杂工作流</b>搜索、客服、语言练习和长任务协作都会受影响。</div>
+        <div class="tile"><b>限制同样重要</b>视频、屏幕共享和跨语言流利度仍未完全解决。GPT-Live 是方向明确的发布，不是语音交互的终点。</div>
+      </div>
+    </div>
+  </section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

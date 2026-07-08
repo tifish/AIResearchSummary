@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>介绍 Grok 4.5</title>
+<style>
+:root {
+  --bg: #f6f3ee;
+  --ink: #172026;
+  --muted: #64707a;
+  --line: #d8d1c8;
+  --surface: #fffaf2;
+  --surface-2: #eef7f4;
+  --surface-3: #f4eefb;
+  --surface-4: #fff1e8;
+  --dark-band: #172026;
+  --dark-band-ink: #f7efe4;
+  --accent-data: #1677ff;
+  --accent-risk: #d94f2b;
+  --accent-opportunity: #178a5f;
+  --accent-conclusion: #7b4cc2;
+  --accent-cost: #c78312;
+  --badge-bg: #e7f0ff;
+  --risk-bg: #ffe9df;
+  --opportunity-bg: #e5f6ee;
+  --conclusion-bg: #efe7ff;
+  --cost-bg: #fff0cf;
+  --shadow: 0 18px 50px rgba(23, 32, 38, 0.12);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111417;
+    --ink: #f2eee7;
+    --muted: #a7b0b8;
+    --line: #323a42;
+    --surface: #1b2025;
+    --surface-2: #13231f;
+    --surface-3: #211a2c;
+    --surface-4: #2a1d18;
+    --dark-band: #080a0c;
+    --dark-band-ink: #f3eadf;
+    --accent-data: #65a7ff;
+    --accent-risk: #ff876a;
+    --accent-opportunity: #4bd08f;
+    --accent-conclusion: #b99aff;
+    --accent-cost: #f3bd4e;
+    --badge-bg: #142844;
+    --risk-bg: #3a1d16;
+    --opportunity-bg: #123327;
+    --conclusion-bg: #2a2040;
+    --cost-bg: #352912;
+    --shadow: 0 18px 50px rgba(0, 0, 0, 0.38);
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #111417;
+  --ink: #f2eee7;
+  --muted: #a7b0b8;
+  --line: #323a42;
+  --surface: #1b2025;
+  --surface-2: #13231f;
+  --surface-3: #211a2c;
+  --surface-4: #2a1d18;
+  --dark-band: #080a0c;
+  --dark-band-ink: #f3eadf;
+  --accent-data: #65a7ff;
+  --accent-risk: #ff876a;
+  --accent-opportunity: #4bd08f;
+  --accent-conclusion: #b99aff;
+  --accent-cost: #f3bd4e;
+  --badge-bg: #142844;
+  --risk-bg: #3a1d16;
+  --opportunity-bg: #123327;
+  --conclusion-bg: #2a2040;
+  --cost-bg: #352912;
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.38);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  line-height: 1.7;
+}
+
+main {
+  overflow: hidden;
+}
+
+.hero {
+  min-height: 72vh;
+  display: grid;
+  align-items: end;
+  padding: 8vw;
+  background: var(--dark-band);
+  color: var(--dark-band-ink);
+}
+
+.kicker {
+  color: var(--accent-opportunity);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+h1 {
+  margin: 0.4rem 0 0.2rem;
+  font-size: clamp(2.5rem, 8vw, 6.5rem);
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.original-title {
+  color: var(--muted);
+  font-size: clamp(1rem, 2vw, 1.35rem);
+}
+
+.lede {
+  max-width: 820px;
+  margin-top: 2rem;
+  font-size: clamp(1.25rem, 2.6vw, 2rem);
+  line-height: 1.35;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.metric {
+  padding: 2rem;
+  border-right: 1px solid var(--line);
+}
+
+.metric:last-child {
+  border-right: 0;
+}
+
+.metric b {
+  display: block;
+  color: var(--accent-data);
+  font-size: clamp(1.6rem, 4vw, 3rem);
+  line-height: 1.1;
+}
+
+.metric span {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+
+.panel {
+  padding: 5vw;
+}
+
+.panel.foundation {
+  background: var(--surface-2);
+}
+
+.panel.scope {
+  background: var(--surface-3);
+}
+
+h2 {
+  margin: 0 0 1rem;
+  font-size: clamp(1.6rem, 3vw, 2.6rem);
+  line-height: 1.15;
+  letter-spacing: 0;
+}
+
+.panel p,
+.timeline p,
+.note p,
+.takeaway p {
+  margin: 0.7rem 0 0;
+}
+
+.process {
+  padding: 5vw 8vw;
+  background: var(--bg);
+}
+
+.timeline {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  margin-top: 2rem;
+  background: var(--line);
+}
+
+.step {
+  background: var(--surface);
+  padding: 1.5rem;
+  min-height: 210px;
+  border-top: 5px solid var(--accent-opportunity);
+}
+
+.step:nth-child(2) {
+  border-top-color: var(--accent-data);
+}
+
+.step:nth-child(3) {
+  border-top-color: var(--accent-risk);
+}
+
+.step:nth-child(4) {
+  border-top-color: var(--accent-conclusion);
+}
+
+.step strong {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  margin-bottom: 1rem;
+  color: var(--dark-band-ink);
+  background: var(--dark-band);
+  border-radius: 999px;
+}
+
+.pricing {
+  padding: 5vw 8vw;
+  background: var(--surface-4);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+th,
+td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+
+th {
+  color: var(--accent-cost);
+  font-size: 0.95rem;
+}
+
+td:first-child {
+  font-weight: 700;
+}
+
+.insight {
+  padding: 5vw 8vw;
+  background: var(--dark-band);
+  color: var(--dark-band-ink);
+}
+
+.quote {
+  max-width: 900px;
+  border-left: 8px solid var(--accent-risk);
+  padding-left: 2rem;
+  font-size: clamp(1.35rem, 3vw, 2.5rem);
+  line-height: 1.35;
+}
+
+.caveat {
+  margin-top: 2rem;
+  display: inline-block;
+  padding: 0.8rem 1rem;
+  background: var(--risk-bg);
+  color: var(--ink);
+  border: 1px solid var(--accent-risk);
+}
+
+.grid {
+  padding: 5vw 8vw;
+  background: var(--bg);
+}
+
+.takeaways {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  grid-auto-rows: minmax(170px, auto);
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.takeaway {
+  padding: 1.4rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.takeaway.big {
+  grid-row: span 2;
+  background: var(--conclusion-bg);
+  border-color: var(--accent-conclusion);
+}
+
+.takeaway.data {
+  background: var(--badge-bg);
+  border-color: var(--accent-data);
+}
+
+.takeaway.risk {
+  background: var(--risk-bg);
+  border-color: var(--accent-risk);
+}
+
+.takeaway.opportunity {
+  background: var(--opportunity-bg);
+  border-color: var(--accent-opportunity);
+}
+
+.takeaway.cost {
+  background: var(--cost-bg);
+  border-color: var(--accent-cost);
+}
+
+.label {
+  display: inline-block;
+  margin-bottom: 0.7rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+@media (max-width: 850px) {
+  .metrics,
+  .split,
+  .timeline,
+  .takeaways {
+    grid-template-columns: 1fr;
+  }
+
+  .metric {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .takeaway.big {
+    grid-row: auto;
+  }
+
+  .hero,
+  .panel,
+  .process,
+  .pricing,
+  .insight,
+  .grid {
+    padding: 2rem;
+  }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/grok-4-5" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+  <section class="hero">
+    <div>
+      <div class="kicker">一句话总括</div>
+      <h1>介绍 Grok 4.5</h1>
+      <div class="original-title">Introducing Grok 4.5</div>
+      <p class="lede">Cursor 把新模型的核心能力放在真实工具环境里的长时任务上，而不是只展示代码生成能力。</p>
+    </div>
+  </section>
+
+  <section class="metrics" aria-label="关键数字">
+    <div class="metric">
+      <b>数万亿</b>
+      <span>Cursor 数据 token 被用于训练，覆盖代码库、工具交互和开发者代理行为。</span>
+    </div>
+    <div class="metric">
+      <b>首周 2 倍</b>
+      <span>个人和团队订阅可获得 Grok 4.5 用量翻倍。</span>
+    </div>
+    <div class="metric">
+      <b>$2 / $6</b>
+      <span>基础版每百万输入 token 2 美元，每百万输出 token 6 美元。</span>
+    </div>
+    <div class="metric">
+      <b>$4 / $18</b>
+      <span>快速版每百万输入 token 4 美元，每百万输出 token 18 美元。</span>
+    </div>
+  </section>
+
+  <section class="split">
+    <div class="panel foundation">
+      <span class="label">模型基础</span>
+      <h2>它不是只为写代码而训练</h2>
+      <p>Grok 4.5 是 Cursor 与 SpaceXAI 联合训练的 MoE 模型。训练数据仍深度包含 Cursor 的代码和工具使用轨迹。</p>
+      <p>变化在于数据配比更宽。文章提到 STEM 任务、研究论文和其他知识工作被纳入训练。读者应把它理解为从编程助手向通用电脑任务代理的扩展。</p>
+    </div>
+    <div class="panel scope">
+      <span class="label">能力边界</span>
+      <h2>重点是持续调查、使用工具和验证</h2>
+      <p>文章强调长时任务，而不是一次性回答。模型需要在软件工程、数据科学、金融和法律等任务中调用工具、修正错误并验证结果。</p>
+      <p>这改变了评估 AI 的角度。真正重要的不是单轮语言能力，而是能否在复杂环境中把工作推进到可检查的结果。</p>
+    </div>
+  </section>
+
+  <section class="process">
+    <span class="label">训练流程</span>
+    <h2>强化学习环境本身成为核心资产</h2>
+    <div class="timeline">
+      <div class="step">
+        <strong>1</strong>
+        <h3>定义问题</h3>
+        <p>工程师先指定任务和验证方式。这样模型训练不只依赖主观偏好，而是围绕可检验结果展开。</p>
+      </div>
+      <div class="step">
+        <strong>2</strong>
+        <h3>代理构建环境</h3>
+        <p>分布式代理系统批量构造、测试和打磨任务环境。文章称部分环境若由人工完成，可能需要数百名工程师数月。</p>
+      </div>
+      <div class="step">
+        <strong>3</strong>
+        <h3>保持难度</h3>
+        <p>任务必须足够难，难到前沿模型也会失败。否则模型进步后，旧任务就不再提供有效学习信号。</p>
+      </div>
+      <div class="step">
+        <strong>4</strong>
+        <h3>训练下一代</h3>
+        <p>Cursor 用上一代模型加速下一代模型的数据环境建设。这说明模型迭代正在进入自我放大的工程循环。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="pricing">
+    <span class="label">可用性与成本</span>
+    <h2>发布策略把模型直接放进 Cursor 工作流</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>项目</th>
+          <th>文章给出的信息</th>
+          <th>读者应如何理解</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>平台</td>
+          <td>桌面、Web、iOS、CLI 和 SDK 均可使用</td>
+          <td>Cursor 希望它覆盖从编辑器到自动化接口的完整工作链路。</td>
+        </tr>
+        <tr>
+          <td>基础版</td>
+          <td>$2/M 输入 token，$6/M 输出 token</td>
+          <td>更适合常规长任务，成本结构偏向输出用量。</td>
+        </tr>
+        <tr>
+          <td>快速版</td>
+          <td>$4/M 输入 token，$18/M 输出 token</td>
+          <td>速度溢价明显，输出成本是基础版的 3 倍。</td>
+        </tr>
+        <tr>
+          <td>Composer 2.5</td>
+          <td>继续提供，属于不同权重级别</td>
+          <td>Cursor 没有用新模型替代旧模型，而是保留不同规模的选择。</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="insight">
+    <span class="label">评估提醒</span>
+    <div class="quote">文章没有提供可核验的具体 benchmark 分数。它还说明 Grok 4.5 在 CursorBench 上存在训练数据污染优势，因此被排除。</div>
+    <div class="caveat">这点很关键：如果评测集进入训练数据，分数就不再能可靠代表泛化能力。Cursor 把问题公开写出，反而提示读者要更谨慎看待内部评测。</div>
+  </section>
+
+  <section class="grid">
+    <span class="label">最值得带走的洞见</span>
+    <h2>这次发布真正透露的是模型产品化方向</h2>
+    <div class="takeaways">
+      <div class="takeaway big">
+        <h3>模型能力正在从回答问题转向完成工作</h3>
+        <p>Grok 4.5 的叙事核心是长时任务、工具调用、错误恢复和验证。这比单次生成代码更接近真实办公场景。</p>
+      </div>
+      <div class="takeaway data">
+        <h3>Cursor 数据成为训练优势</h3>
+        <p>数万亿 token 的真实工具交互让模型学习开发者和代理如何在环境中行动。这类数据比普通文本更贴近任务执行。</p>
+      </div>
+      <div class="takeaway opportunity">
+        <h3>知识工作边界被重新定义</h3>
+        <p>文章把数据科学、金融和法律放进同一能力框架。AI 影响不再局限于 IDE，而是扩展到所有可由电脑工具完成的复杂工作。</p>
+      </div>
+      <div class="takeaway risk">
+        <h3>评测污染仍是硬问题</h3>
+        <p>CursorBench 被排除说明内部基准很容易被训练数据影响。读者需要区分真实泛化和训练记忆。</p>
+      </div>
+      <div class="takeaway cost">
+        <h3>价格透露使用场景</h3>
+        <p>快速版输出价格明显更高。高价值、时间敏感的任务可能适合它，普通批量任务则需要更谨慎控制成本。</p>
+      </div>
+    </div>
+  </section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
