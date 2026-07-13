@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude 玩转机器人学</title>
+<style>
+:root {
+  --bg: #f7f4ee;
+  --ink: #17191d;
+  --muted: #5c6470;
+  --surface: #ffffff;
+  --surface-2: #eef6f4;
+  --surface-3: #f5edf7;
+  --surface-4: #fff4df;
+  --line: #d8d2c8;
+  --deep: #16202a;
+  --deep-ink: #f4f7f8;
+  --data: #0f7c8c;
+  --data-soft: #dff5f7;
+  --risk: #c63f3f;
+  --risk-soft: #ffe7e1;
+  --opportunity: #277a45;
+  --opportunity-soft: #e4f6e8;
+  --conclusion: #7154b8;
+  --conclusion-soft: #eee8ff;
+  --warn: #b67610;
+  --warn-soft: #fff0ca;
+  --shadow: rgba(24, 27, 31, 0.12);
+}
+:root[data-theme="dark"] {
+  --bg: #101316;
+  --ink: #e8ecef;
+  --muted: #a8b0ba;
+  --surface: #171c21;
+  --surface-2: #10252a;
+  --surface-3: #21192b;
+  --surface-4: #2a2112;
+  --line: #303842;
+  --deep: #080b0f;
+  --deep-ink: #f3f6f8;
+  --data: #34c2d2;
+  --data-soft: #102f35;
+  --risk: #ff796c;
+  --risk-soft: #351b18;
+  --opportunity: #66d586;
+  --opportunity-soft: #142f1d;
+  --conclusion: #a997ff;
+  --conclusion-soft: #241f3b;
+  --warn: #f3b64e;
+  --warn-soft: #35270e;
+  --shadow: rgba(0, 0, 0, 0.38);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #101316;
+    --ink: #e8ecef;
+    --muted: #a8b0ba;
+    --surface: #171c21;
+    --surface-2: #10252a;
+    --surface-3: #21192b;
+    --surface-4: #2a2112;
+    --line: #303842;
+    --deep: #080b0f;
+    --deep-ink: #f3f6f8;
+    --data: #34c2d2;
+    --data-soft: #102f35;
+    --risk: #ff796c;
+    --risk-soft: #351b18;
+    --opportunity: #66d586;
+    --opportunity-soft: #142f1d;
+    --conclusion: #a997ff;
+    --conclusion-soft: #241f3b;
+    --warn: #f3b64e;
+    --warn-soft: #35270e;
+    --shadow: rgba(0, 0, 0, 0.38);
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  line-height: 1.65;
+}
+main { overflow: hidden; }
+.hero {
+  background: var(--deep);
+  color: var(--deep-ink);
+  padding: 64px 22px 52px;
+}
+.wrap {
+  width: min(1120px, calc(100% - 36px));
+  margin: 0 auto;
+}
+.kicker {
+  color: var(--data);
+  font-weight: 700;
+  letter-spacing: 0;
+  margin-bottom: 14px;
+}
+h1 {
+  margin: 0;
+  font-size: clamp(34px, 6vw, 68px);
+  line-height: 1.06;
+  letter-spacing: 0;
+}
+.original {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 18px;
+}
+.hero .original { color: var(--deep-ink); opacity: 0.72; }
+.lede {
+  max-width: 850px;
+  margin-top: 28px;
+  font-size: 22px;
+  color: var(--deep-ink);
+}
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 28px;
+}
+.pill {
+  border: 1px solid var(--line);
+  color: var(--deep-ink);
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 14px;
+}
+.metrics {
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--line);
+}
+.metric {
+  background: var(--surface);
+  padding: 24px;
+  min-height: 150px;
+}
+.metric strong {
+  display: block;
+  color: var(--data);
+  font-size: 34px;
+  line-height: 1;
+}
+.metric span {
+  display: block;
+  margin-top: 12px;
+  color: var(--muted);
+}
+.split {
+  padding: 56px 0;
+  background: var(--surface-2);
+}
+.two-col {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 34px;
+  align-items: start;
+}
+.section-title {
+  margin: 0 0 14px;
+  font-size: 30px;
+  line-height: 1.18;
+}
+.note {
+  border-left: 6px solid var(--opportunity);
+  background: var(--opportunity-soft);
+  padding: 20px 22px;
+  font-size: 18px;
+}
+.stack {
+  display: grid;
+  gap: 14px;
+}
+.row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 18px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+.tag {
+  color: var(--conclusion);
+  font-weight: 800;
+}
+.band {
+  background: var(--risk-soft);
+  padding: 46px 0;
+}
+.quote {
+  max-width: 940px;
+  font-size: 26px;
+  line-height: 1.35;
+  border-left: 8px solid var(--risk);
+  padding-left: 24px;
+}
+.timeline {
+  padding: 58px 0;
+  background: var(--surface);
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-top: 24px;
+}
+.step {
+  border-top: 5px solid var(--data);
+  padding: 18px 0 0;
+}
+.step:nth-child(2) { border-color: var(--opportunity); }
+.step:nth-child(3) { border-color: var(--warn); }
+.step:nth-child(4) { border-color: var(--risk); }
+.step b {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 18px;
+}
+.table-zone {
+  background: var(--surface-3);
+  padding: 56px 0;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  box-shadow: 0 18px 42px var(--shadow);
+}
+th, td {
+  text-align: left;
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+th {
+  color: var(--conclusion);
+  font-size: 14px;
+}
+td:first-child {
+  font-weight: 800;
+}
+.insight-strip {
+  background: var(--deep);
+  color: var(--deep-ink);
+  padding: 54px 0;
+}
+.strip-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 22px;
+}
+.strip-item {
+  border: 1px solid var(--line);
+  padding: 20px;
+}
+.strip-item b {
+  color: var(--warn);
+}
+.mosaic {
+  background: var(--surface-4);
+  padding: 58px 0 70px;
+}
+.tiles {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 1fr;
+  gap: 16px;
+  margin-top: 24px;
+}
+.tile {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 22px;
+  min-height: 150px;
+}
+.tile.data { border-top: 7px solid var(--data); }
+.tile.risk { border-top: 7px solid var(--risk); }
+.tile.opp { border-top: 7px solid var(--opportunity); }
+.tile.final { border-top: 7px solid var(--conclusion); grid-column: span 2; }
+.tile b {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 18px;
+}
+@media (max-width: 820px) {
+  .metric-grid, .two-col, .steps, .strip-grid, .tiles {
+    grid-template-columns: 1fr;
+  }
+  .row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .tile.final {
+    grid-column: auto;
+  }
+  .hero {
+    padding-top: 44px;
+  }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/claude-plays-robotics" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div class="kicker">一句话总括</div>
+      <h1>Claude 玩转机器人学</h1>
+      <div class="original">Claude plays robotics</div>
+      <p class="lede">这项研究真正的贡献，是把语言模型的机器人能力拆成可比较的系统问题：模型、身体、控制接口、视觉工具和预训练策略共同决定它能否影响物理世界。</p>
+      <div class="meta">
+        <span class="pill">Anthropic</span>
+        <span class="pill">2026-07-09</span>
+        <span class="pill">Frontier Red Team</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="metrics">
+    <div class="wrap metric-grid">
+      <div class="metric"><strong>12</strong><span>个模型参与评测，来自 5 家提供商。</span></div>
+      <div class="metric"><strong>4</strong><span>类控制接口：直接控制、代码控制、策略控制、强化学习监督。</span></div>
+      <div class="metric"><strong>0-5.5%</strong><span>低层机械臂操作的完整任务成功率仍然很低。</span></div>
+      <div class="metric"><strong>83 Hz</strong><span>腿式机器人实时控制约需这个频率，当前模型推理慢约两个数量级。</span></div>
+    </div>
+  </section>
+
+  <section class="split">
+    <div class="wrap two-col">
+      <div>
+        <h2 class="section-title">能力不是单纯来自模型更聪明</h2>
+        <p>同一个模型，换一种控制接口，表现会完全不同。让它直接输出力矩时，它往往无法稳定控制身体。让它监督预训练策略时，它可以完成更有意义的行动。</p>
+      </div>
+      <div class="note">这改变了评估方式。真实部署中的模型通常不会裸手控制关节。它会接入传感器、控制器和机器人策略。安全评估必须评估这个完整组合。</div>
+    </div>
+  </section>
+
+  <section class="timeline">
+    <div class="wrap">
+      <h2 class="section-title">从低层控制到高层监督，难度快速下降</h2>
+      <div class="steps">
+        <div class="step"><b>直接控制</b><span>模型自己选择力矩或末端执行器动作。它暴露了物理控制的短板，也显示新模型在逐步改善。</span></div>
+        <div class="step"><b>写控制器</b><span>模型写 Python 控制逻辑。许多模型在四足机器人平衡任务上明显强于逐步直接控制。</span></div>
+        <div class="step"><b>训练策略</b><span>模型设计奖励、网络和训练流程。GPT-5.4 与 Mythos Preview 在若干 RL 单元中表现突出。</span></div>
+        <div class="step"><b>监督预训练策略</b><span>模型发高层指令或判断 VLA 动作。能力提升最大，也最接近实际部署形态。</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <div class="quote">最关键的风险点不是“模型今天能不能单独控制人形机器人”，而是“它接入一个足够好的控制器后，能力会被放大多少”。</div>
+    </div>
+  </section>
+
+  <section class="table-zone">
+    <div class="wrap">
+      <h2 class="section-title">哪些能力在进步，哪些仍是瓶颈</h2>
+      <table>
+        <thead>
+          <tr><th>能力面</th><th>关键数据和趋势</th><th>结论</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>低层步态</td>
+            <td>Go2 四足机器人上，Opus 4.6、4.7 和 Mythos Preview 能用代码控制接近平衡两秒。G1 人形机器人没有模型能从倒地姿态站起。</td>
+            <td>模型开始有全身控制迹象，但复杂身体仍远未可靠。</td>
+          </tr>
+          <tr>
+            <td>低层操作</td>
+            <td>Franka Panda 机械臂任务中，更新模型更会接近物体、接触和抓取。完整成功率仍只有 0-5.5%。</td>
+            <td>局部物理行为在出现，但长任务链条很容易被一个小错误打断。</td>
+          </tr>
+          <tr>
+            <td>高层导航</td>
+            <td>11 个导航任务显示两次代际跃迁。指南针比深度热图、十字准星和第三人称视角更稳定地提升表现。</td>
+            <td>瓶颈常常是方位和自定位，不只是看不清场景。</td>
+          </tr>
+          <tr>
+            <td>VLA 监督</td>
+            <td>MolmoAct 让操作能力远超直接控制。较新的 Claude 模型更能判断何时听从策略，何时不要盲从。</td>
+            <td>预训练机器人策略是主要能力放大器。模型的价值在于监督和纠错。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="insight-strip">
+    <div class="wrap">
+      <h2 class="section-title">视觉、推理和记忆的真实作用</h2>
+      <div class="strip-grid">
+        <div class="strip-item"><b>视觉</b><p>新模型从原始图像中提取空间信息的能力更强。旧模型有时换成文字描述反而更好，这说明它们读图不够精确。</p></div>
+        <div class="strip-item"><b>推理</b><p>额外推理预算多数时候帮助有限。有些任务甚至会被过度规划拖累。能力跃迁更可能来自视觉、数值稳定性和 3D 理解。</p></div>
+        <div class="strip-item"><b>记忆</b><p>模型能从失败中短期调整。长上下文并不总是有用。截断早期交互后，很多设置没有明显变差。</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="split">
+    <div class="wrap two-col">
+      <div>
+        <h2 class="section-title">现实机器人暴露了同一个问题</h2>
+        <p>在真实 Unitree Go2 上，模型能看见目标并向它移动。失败也很直观。它们会停得太远，误判走廊转弯，或者把玻璃门反射里的目标当成真实方向。</p>
+      </div>
+      <div class="stack">
+        <div class="row"><span class="tag">find_x</span><span>约 25 英尺外的蓝色 X 目标能被发现，但许多模型无法稳定走到 1 米以内。</span></div>
+        <div class="row"><span class="tag">办公室绕行</span><span>只靠视觉完成走廊一圈时，所有测试模型都失败。主要原因是空间记忆和自定位错误。</span></div>
+        <div class="row"><span class="tag">视觉工具</span><span>准星和深度热图偶尔有帮助，也会制造错误信心。模型会解释工具，但不一定正确使用它。</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mosaic">
+    <div class="wrap">
+      <h2 class="section-title">最值得带走的洞见</h2>
+      <div class="tiles">
+        <div class="tile data"><b>评测对象应是系统，不只是模型</b><span>机器人身体、控制接口和工具会显著改变能力边界。只测裸模型会低估部署风险。</span></div>
+        <div class="tile risk"><b>低层控制仍不可靠</b><span>力矩级控制、长链条操作和人形机器人平衡依然很难。当前模型还不能稳定完成通用机器人控制。</span></div>
+        <div class="tile opp"><b>预训练策略显著放大能力</b><span>VLA 和步态策略让模型从“不会动”变成“能监督行动”。这也是现实系统最可能采用的路径。</span></div>
+        <div class="tile final"><b>方向感比更多画面更重要</b><span>指南针和交互式光标的提升说明，模型缺的常常是可操作的空间参照。更复杂的视觉叠加不一定更好。</span></div>
+        <div class="tile data"><b>进步主要来自短期纠错</b><span>新模型更会从刚刚失败的动作中调整策略。它们还没有表现出可靠的长程空间规划能力。</span></div>
+      </div>
+    </div>
+  </section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

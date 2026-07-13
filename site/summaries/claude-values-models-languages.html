@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude 在不同模型和语言中的价值观</title>
+<style>
+:root{
+  --bg:#f7f4ee;
+  --ink:#17202a;
+  --muted:#5d6875;
+  --line:#d8d2c7;
+  --panel:#fffdf8;
+  --panel2:#eef6f4;
+  --panel3:#f6edf2;
+  --panel4:#eef1fb;
+  --deep:#182236;
+  --deep-ink:#f7fbff;
+  --data:#2563eb;
+  --risk:#c2410c;
+  --opp:#0f8a6a;
+  --conclusion:#7c3aed;
+  --warm:#d97706;
+  --rigor:#0f766e;
+  --shadow:rgba(23,32,42,.10);
+}
+:root[data-theme="dark"]{
+  --bg:#111318;
+  --ink:#eef2f7;
+  --muted:#a8b1bd;
+  --line:#303743;
+  --panel:#191d25;
+  --panel2:#132622;
+  --panel3:#291a24;
+  --panel4:#171d31;
+  --deep:#090d14;
+  --deep-ink:#f1f5f9;
+  --data:#6ea8ff;
+  --risk:#ff9b64;
+  --opp:#4fd1aa;
+  --conclusion:#b69cff;
+  --warm:#f4b34f;
+  --rigor:#5eead4;
+  --shadow:rgba(0,0,0,.35);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#111318;
+    --ink:#eef2f7;
+    --muted:#a8b1bd;
+    --line:#303743;
+    --panel:#191d25;
+    --panel2:#132622;
+    --panel3:#291a24;
+    --panel4:#171d31;
+    --deep:#090d14;
+    --deep-ink:#f1f5f9;
+    --data:#6ea8ff;
+    --risk:#ff9b64;
+    --opp:#4fd1aa;
+    --conclusion:#b69cff;
+    --warm:#f4b34f;
+    --rigor:#5eead4;
+    --shadow:rgba(0,0,0,.35);
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;line-height:1.65}
+main{overflow:hidden}
+.hero{background:var(--deep);color:var(--deep-ink);padding:64px 7vw 44px}
+.kicker{color:var(--opp);font-weight:700;letter-spacing:0}
+h1{font-size:clamp(2rem,5vw,4.7rem);line-height:1.05;margin:12px 0 10px;letter-spacing:0;max-width:980px}
+.original{color:var(--muted);font-size:1rem;margin-bottom:28px}
+.hero p{font-size:clamp(1.1rem,2vw,1.45rem);max-width:880px;margin:0}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.metric{background:var(--panel);padding:28px 24px;min-height:148px}
+.metric b{display:block;font-size:2.15rem;line-height:1;color:var(--data)}
+.metric span{display:block;color:var(--muted);margin-top:10px}
+.split{display:grid;grid-template-columns:1.1fr .9fr;gap:36px;padding:56px 7vw;background:var(--panel2)}
+.split h2,.band h2,.table-section h2,.takeaways h2{font-size:2rem;line-height:1.15;margin:0 0 16px}
+.lead{font-size:1.15rem;margin:0;color:var(--ink)}
+.axis-list{display:grid;gap:14px}
+.axis{border-left:6px solid var(--conclusion);background:var(--panel);padding:16px 18px;box-shadow:0 12px 28px var(--shadow)}
+.axis:nth-child(2){border-left-color:var(--warm)}
+.axis:nth-child(3){border-left-color:var(--opp)}
+.axis:nth-child(4){border-left-color:var(--risk)}
+.axis strong{display:block;margin-bottom:4px}
+.band{padding:54px 7vw;background:var(--panel3)}
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:26px}
+.step{position:relative;padding:22px;border-top:5px solid var(--data);background:var(--bg)}
+.step:nth-child(2){border-top-color:var(--opp)}
+.step:nth-child(3){border-top-color:var(--warm)}
+.step:nth-child(4){border-top-color:var(--conclusion)}
+.step em{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--deep);color:var(--deep-ink);font-style:normal;font-weight:800;margin-bottom:10px}
+.table-section{padding:56px 7vw;background:var(--panel)}
+table{width:100%;border-collapse:collapse;background:var(--bg);box-shadow:0 14px 32px var(--shadow)}
+th,td{padding:16px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:var(--deep-ink);background:var(--deep)}
+td:first-child{font-weight:700;color:var(--conclusion)}
+.quote{margin:0;padding:34px 7vw;background:var(--deep);color:var(--deep-ink);font-size:clamp(1.25rem,2.2vw,2rem);line-height:1.35}
+.quote span{color:var(--risk);font-weight:800}
+.language{display:grid;grid-template-columns:.8fr 1.2fr;gap:28px;padding:56px 7vw;background:var(--panel4)}
+.language h2{font-size:2rem;line-height:1.15;margin:0}
+.lang-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.lang-item{padding:18px;background:var(--panel);border:1px solid var(--line)}
+.lang-item b{color:var(--rigor)}
+.lang-item:nth-child(2) b{color:var(--warm)}
+.lang-item:nth-child(3) b{color:var(--opp)}
+.lang-item:nth-child(4) b{color:var(--risk)}
+.takeaways{padding:56px 7vw;background:var(--bg)}
+.mosaic{display:grid;grid-template-columns:1.2fr .8fr 1fr;gap:16px}
+.tile{padding:22px;min-height:150px;background:var(--panel);border:1px solid var(--line)}
+.tile.big{grid-row:span 2;background:var(--deep);color:var(--deep-ink)}
+.tile.data{border-top:6px solid var(--data)}
+.tile.risk{border-top:6px solid var(--risk)}
+.tile.opp{border-top:6px solid var(--opp)}
+.tile.end{border-top:6px solid var(--conclusion)}
+.tile strong{display:block;font-size:1.1rem;margin-bottom:8px}
+@media (max-width:860px){
+  .metrics,.flow,.split,.language,.mosaic{grid-template-columns:1fr}
+  .hero{padding-top:44px}
+  .metric{min-height:auto}
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/claude-values-models-languages" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+  <section class="hero">
+    <div class="kicker">一句话总括</div>
+    <h1>Claude 在不同模型和语言中的价值观</h1>
+    <div class="original">Claude’s values across models and languages</div>
+    <p>Anthropic 把 Claude 在开放式对话中表达的价值转化为可测量的坐标，从而显示模型版本和语言会系统性改变用户感受到的“性格”。</p>
+  </section>
+
+  <section class="metrics" aria-label="关键数字">
+    <div class="metric"><b>3307</b><span>原始价值标签来自此前真实对话研究。</span></div>
+    <div class="metric"><b>339</b><span>人工聚类后的高层价值，用于后续标注。</span></div>
+    <div class="metric"><b>309815</b><span>主观任务对话进入本次分析样本。</span></div>
+    <div class="metric"><b>15%</b><span>四个价值轴解释的受控后价值变异。</span></div>
+  </section>
+
+  <section class="split">
+    <div>
+      <h2>贡献不是列清单，而是建坐标系</h2>
+      <p class="lead">单独比较数千个价值标签很难看出规律。研究把经常一起出现、又常与另一组价值相反的标签压缩成轴。这样可以比较 Claude 在不同情境中更偏向哪一类表达。</p>
+      <p>这改变了读者对 AI 影响的理解。所谓“模型价值观”不只是训练原则，也会在日常回复的语气、风险提示、批评力度和解释深度中显现。</p>
+    </div>
+    <div class="axis-list">
+      <div class="axis"><strong>顺从 vs. 谨慎</strong>看 Claude 是更配合用户意愿，还是更主动防范风险和伤害。</div>
+      <div class="axis"><strong>温暖 vs. 严谨</strong>看回复更强调关怀、鼓励和积极表达，还是更强调准确、证据和精确性。</div>
+      <div class="axis"><strong>深入 vs. 简短</strong>看 Claude 是展开推理和细节，还是只完成用户明确要求。</div>
+      <div class="axis"><strong>坦率 vs. 执行</strong>看 Claude 是更突出不确定性和限制，还是给出更 polished 的执行结果。</div>
+    </div>
+  </section>
+
+  <section class="band">
+    <h2>方法链条决定结果能否解释</h2>
+    <p>研究先控制任务、主题和用户自己表达的价值，再比较 Claude 的价值位置。这样能减少“用户问法不同”造成的混淆。</p>
+    <div class="flow">
+      <div class="step"><em>1</em><strong>压缩标签</strong><br>从 3307 个价值归并到 339 个高层价值。</div>
+      <div class="step"><em>2</em><strong>抽样对话</strong><br>覆盖 3 个模型和 20 种常用语言，每个组合约 5000 段。</div>
+      <div class="step"><em>3</em><strong>标注价值</strong><br>隐私保护工具判断每段对话中哪些价值出现。</div>
+      <div class="step"><em>4</em><strong>降维成轴</strong><br>根据价值共现模式形成四个主要比较维度。</div>
+    </div>
+  </section>
+
+  <section class="table-section">
+    <h2>模型差异对应人们感到的“性格”</h2>
+    <table>
+      <thead><tr><th>模型</th><th>价值倾向</th><th>读者应如何理解</th></tr></thead>
+      <tbody>
+        <tr><td>Sonnet 4.6</td><td>更偏顺从和温暖。常肯定用户想法，也更常用幽默、安慰和鼓励。</td><td>用户可能感到它更友好，但在需要严格审查时，温暖可能弱化挑战性反馈。</td></tr>
+        <tr><td>Opus 4.6</td><td>更偏简短和执行。倾向直接完成请求，少做额外展开。</td><td>它适合明确任务，但可能较少主动暴露不确定性或更深层风险。</td></tr>
+        <tr><td>Opus 4.7</td><td>更偏谨慎、严谨、深入和坦率。更常挑战假设，也更常提示风险。</td><td>用户可能获得更强的批判性反馈，但也可能感到回复更保守或更爱 hedging。</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <p class="quote">同一个 AI 产品的“价值表达”不是固定常量。<span>模型选择</span>本身就会改变用户接收到的判断风格。</p>
+
+  <section class="language">
+    <div>
+      <h2>语言差异可能影响同类用户的体验</h2>
+      <p>研究发现，Claude 在不同语言中表达的价值并不一致。差异最大的是“温暖 vs. 严谨”和“坦率 vs. 执行”。这意味着同样的问题，用不同语言提问，可能得到不同的反馈框架。</p>
+    </div>
+    <div class="lang-grid">
+      <div class="lang-item"><b>英语、俄语</b><br>更偏严谨。更常挑战假设、修正细节，并要求证据。</div>
+      <div class="lang-item"><b>印地语、阿拉伯语</b><br>更偏温暖。更常出现礼貌表达、幽默和肯定。</div>
+      <div class="lang-item"><b>荷兰语</b><br>更偏坦率。更常承认自己的错误或限制。</div>
+      <div class="lang-item"><b>印度尼西亚语</b><br>更偏执行。更倾向直接完成任务。</div>
+    </div>
+  </section>
+
+  <section class="takeaways">
+    <h2>最值得带走的洞见</h2>
+    <div class="mosaic">
+      <div class="tile big"><strong>价值可以被部署后观测</strong>Claude 每天在大量对话中表达价值。研究提供了一种把这些表达变成监测指标的方法。</div>
+      <div class="tile data"><strong>差异小但有结构</strong>模型间差异相对单段对话的波动较小，但足够稳定，能对应人们对模型性格的主观感受。</div>
+      <div class="tile risk"><strong>跨语言公平性更复杂</strong>不同语言里的温暖、谨慎、严谨程度不同。这可能来自文化规范，也可能来自训练数据不均衡。</div>
+      <div class="tile opp"><strong>评估可以更细</strong>未来可以把价值画像接入模型发布前评估和上线后监控，发现意外的行为漂移。</div>
+      <div class="tile end"><strong>真正问题还没结束</strong>研究测到了差异，但还没有证明哪些差异有益，哪些会伤害用户信任、福祉或决策质量。</div>
+    </div>
+  </section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
