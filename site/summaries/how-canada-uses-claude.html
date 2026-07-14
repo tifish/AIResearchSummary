@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>加拿大如何使用 Claude：Anthropic Economic Index 的发现</title>
+<style>
+:root {
+  --bg: #f7f3ea;
+  --surface: #fffaf0;
+  --surface2: #e8f3f0;
+  --surface3: #f2e8fb;
+  --ink: #1f2528;
+  --muted: #667074;
+  --line: #d7cec0;
+  --data: #126d7a;
+  --risk: #a33d2d;
+  --opp: #5b6f1d;
+  --concl: #6b4bb8;
+  --data-bg: #dff3f4;
+  --risk-bg: #f7dfd8;
+  --opp-bg: #e8f0c8;
+  --concl-bg: #eadffc;
+  --darkband: #17252a;
+  --darkband-ink: #f3efe4;
+  --table-head: #efe2c8;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #101314;
+    --surface: #1a1e20;
+    --surface2: #122626;
+    --surface3: #241b2d;
+    --ink: #ece8dc;
+    --muted: #a8b0ae;
+    --line: #343b3d;
+    --data: #35c7d4;
+    --risk: #ff8069;
+    --opp: #b7d65a;
+    --concl: #b79cff;
+    --data-bg: #0e353a;
+    --risk-bg: #3a1b16;
+    --opp-bg: #273410;
+    --concl-bg: #2c2042;
+    --darkband: #070909;
+    --darkband-ink: #f0eadb;
+    --table-head: #2b261d;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101314;
+  --surface: #1a1e20;
+  --surface2: #122626;
+  --surface3: #241b2d;
+  --ink: #ece8dc;
+  --muted: #a8b0ae;
+  --line: #343b3d;
+  --data: #35c7d4;
+  --risk: #ff8069;
+  --opp: #b7d65a;
+  --concl: #b79cff;
+  --data-bg: #0e353a;
+  --risk-bg: #3a1b16;
+  --opp-bg: #273410;
+  --concl-bg: #2c2042;
+  --darkband: #070909;
+  --darkband-ink: #f0eadb;
+  --table-head: #2b261d;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  line-height: 1.65;
+}
+main { overflow: hidden; }
+.hero {
+  padding: 64px 7vw 48px;
+  background: var(--darkband);
+  color: var(--darkband-ink);
+}
+.eyebrow {
+  color: var(--data);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
+  margin: 0 0 16px;
+}
+h1 {
+  font-size: clamp(34px, 6vw, 68px);
+  line-height: 1.05;
+  margin: 0;
+  max-width: 980px;
+}
+.original {
+  margin: 18px 0 28px;
+  color: var(--muted);
+  font-size: 18px;
+}
+.lede {
+  max-width: 820px;
+  font-size: 22px;
+  margin: 0;
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(160px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.metric {
+  background: var(--surface);
+  padding: 28px 7vw 28px;
+}
+.metric strong {
+  display: block;
+  color: var(--data);
+  font-size: clamp(28px, 4vw, 46px);
+  line-height: 1;
+}
+.metric span {
+  display: block;
+  margin-top: 10px;
+  color: var(--muted);
+}
+.split {
+  display: grid;
+  grid-template-columns: 1.1fr .9fr;
+  gap: 40px;
+  padding: 56px 7vw;
+  background: var(--surface2);
+}
+h2 {
+  font-size: 30px;
+  line-height: 1.2;
+  margin: 0 0 18px;
+}
+.note {
+  border-left: 6px solid var(--opp);
+  padding: 18px 22px;
+  background: var(--opp-bg);
+}
+.timeline {
+  padding: 56px 7vw;
+  background: var(--surface);
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  counter-reset: step;
+}
+.step {
+  position: relative;
+  padding-top: 42px;
+}
+.step:before {
+  counter-increment: step;
+  content: counter(step);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--concl);
+  color: var(--darkband-ink);
+  font-weight: 800;
+}
+.step h3, .compare h3, .tile h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+.compare {
+  padding: 56px 7vw;
+  background: var(--surface3);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+th, td {
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  background: var(--table-head);
+  color: var(--ink);
+}
+td:first-child { font-weight: 700; }
+.callout {
+  padding: 42px 7vw;
+  background: var(--risk-bg);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.callout p {
+  max-width: 920px;
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.45;
+}
+.callout strong { color: var(--risk); }
+.mosaic {
+  padding: 56px 7vw 70px;
+  background: var(--bg);
+}
+.tiles {
+  display: grid;
+  grid-template-columns: 1.2fr .8fr 1fr;
+  gap: 18px;
+}
+.tile {
+  padding: 22px;
+  min-height: 150px;
+  border: 1px solid var(--line);
+}
+.tile.data { background: var(--data-bg); }
+.tile.risk { background: var(--risk-bg); }
+.tile.opp { background: var(--opp-bg); }
+.tile.concl { background: var(--concl-bg); }
+.footer {
+  padding: 36px 7vw;
+  background: var(--darkband);
+  color: var(--darkband-ink);
+}
+.footer ul {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px 28px;
+  padding-left: 20px;
+  margin: 18px 0 0;
+}
+@media (max-width: 820px) {
+  .metrics, .split, .steps, .tiles, .footer ul {
+    grid-template-columns: 1fr;
+  }
+  .hero { padding-top: 44px; }
+  .metric { padding: 24px 7vw; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/how-canada-uses-claude" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+  <section class="hero">
+    <p class="eyebrow">一句话总括</p>
+    <h1>加拿大如何使用 Claude：Anthropic Economic Index 的发现</h1>
+    <p class="original">How Canada uses Claude: Findings from the Anthropic Economic Index</p>
+    <p class="lede">这篇文章的真正贡献，是把加拿大的 Claude 使用从“高采用率”拆解为省级产业结构、公共部门翻译需求和教育求职场景三条更具体的经济线索。</p>
+  </section>
+
+  <section class="metrics" aria-label="关键数字">
+    <div class="metric"><strong>2.6%</strong><span>加拿大占全球 Claude.ai 流量。</span></div>
+    <div class="metric"><strong>第 8</strong><span>加拿大按总使用量排名全球第八。</span></div>
+    <div class="metric"><strong>4.4</strong><span>AUI 表示人均使用量超过人口预期四倍。</span></div>
+    <div class="metric"><strong>约 94%</strong><span>使用量集中在安大略、魁北克、不列颠哥伦比亚和阿尔伯塔。</span></div>
+  </section>
+
+  <section class="split">
+    <div>
+      <h2>高收入解释一部分，但不是加拿大内部差异的答案</h2>
+      <p>加拿大的 Claude 采用率符合高收入经济体的总体规律。它甚至高于按收入水平本应预期的采用程度。</p>
+      <p>但进入省级比较后，收入和人均使用量的关系变弱。更有解释力的是劳动力结构。</p>
+    </div>
+    <aside class="note">
+      <p>专业、科学和技术服务业占比越高的省份，人均 Claude 使用量越高。这说明 AI 采用不是抽象地随财富上升，而是取决于模型能力是否正好匹配当地工作内容。</p>
+    </aside>
+  </section>
+
+  <section class="timeline">
+    <h2>省级采用呈现清晰的集中路径</h2>
+    <div class="steps">
+      <div class="step">
+        <h3>总量先集中</h3>
+        <p>安大略占 43.9% 的加拿大对话。魁北克、不列颠哥伦比亚和阿尔伯塔再贡献约 50%。</p>
+      </div>
+      <div class="step">
+        <h3>人口调整后换位</h3>
+        <p>不列颠哥伦比亚达到预期人口水平的 1.4 倍，安大略为 1.1 倍。其他省份低于平价。</p>
+      </div>
+      <div class="step">
+        <h3>产业结构成为线索</h3>
+        <p>纽芬兰与拉布拉多 AUI 只有 0.2。差异指向本地工作结构，而不是单纯的省级收入。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="compare">
+    <h2>用途相似，但特色用例暴露了经济结构</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>观察维度</th>
+          <th>关键数据和趋势</th>
+          <th>改变理解的地方</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>日常用途结构</td>
+          <td>各省个人用途占 44% 到 51%，工作用途占 34% 到 40%，课程用途占 13% 到 18%。</td>
+          <td>采用率差异很大，但人们把 Claude 用在什么大类上并没有剧烈分化。</td>
+        </tr>
+        <tr>
+          <td>翻译需求</td>
+          <td>新不伦瑞克、新斯科舍和魁北克同时拥有较高公共行政就业占比和较高翻译对话占比。</td>
+          <td>AI 用例会被制度环境塑造。加拿大官方双语政策让文档翻译成为真实高频需求。</td>
+        </tr>
+        <tr>
+          <td>国际比较</td>
+          <td>相对澳大利亚、英国和美国，文档翻译是加拿大最具辨识度的 Claude 用例。</td>
+          <td>同属英语圈，高使用量国家的 AI 使用也会因公共制度和劳动力入口不同而分化。</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="callout">
+    <p><strong>最重要的风险提示：</strong>如果只用国家收入或总流量判断 AI 影响，会错过省级产业结构和公共部门需求。真正的采用强度，取决于模型能力与本地工作任务的贴合度。</p>
+  </section>
+
+  <section class="mosaic">
+    <h2>教育和求职场景让加拿大画像更年轻</h2>
+    <div class="tiles">
+      <article class="tile data">
+        <h3>课程任务更突出</h3>
+        <p>数学、STEM 和学业相关使用相对英语圈同行更高。Claude 在加拿大更像学习辅助工具。</p>
+      </article>
+      <article class="tile opp">
+        <h3>编程帮助被高估值</h3>
+        <p>编码辅助同样过度代表。它与技术服务业和早期职业技能建设相互呼应。</p>
+      </article>
+      <article class="tile concl">
+        <h3>简历写作上升</h3>
+        <p>简历起草更常见，说明一部分使用来自劳动力市场入口，而不是成熟职场流程。</p>
+      </article>
+      <article class="tile risk">
+        <h3>职场沟通偏低</h3>
+        <p>工作邮件、营销内容和法律辅助低于同行国家。加拿大的 Claude 使用并不只是办公室自动化。</p>
+      </article>
+      <article class="tile data">
+        <h3>日常个人任务偏低</h3>
+        <p>烹饪、家居维护和健康问题也相对不足。高采用率没有简单转化为所有生活任务的高使用。</p>
+      </article>
+      <article class="tile opp">
+        <h3>结论</h3>
+        <p>加拿大案例显示，AI 扩散不是平均发生的。它沿着教育、技术服务、公共翻译和求职入口先形成高密度使用。</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="footer">
+    <h2>最值得带走的洞见</h2>
+    <ul>
+      <li>加拿大是 Claude 高采用国家，但“高”主要体现在人均强度，而不仅是总量。</li>
+      <li>省级差异更像产业结构问题，不像收入问题。</li>
+      <li>公共行政和官方双语制度让文档翻译成为加拿大最独特的 Claude 用例。</li>
+      <li>课程、编码和简历起草显示，加拿大使用更偏教育和劳动力市场入口。</li>
+      <li>AI 影响评估需要下钻到地区和任务层面，否则会误读采用背后的经济原因。</li>
+    </ul>
+  </section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
