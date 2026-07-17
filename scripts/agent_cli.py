@@ -3,10 +3,14 @@
 Three backends, all reusing an existing local login:
   - codex   : OpenAI Codex SDK (`openai-codex`) over the Codex CLI login.
               AIRS_CODEX_MODEL picks a model (default = account default).
+              AIRS_CODEX_REASONING_EFFORT picks its reasoning effort.
+              AIRS_CODEX_BIN can override the Codex CLI executable.
   - claude  : Claude Agent SDK (`claude-agent-sdk`) over the Claude Code login.
               AIRS_CLAUDE_MODEL picks a model (default = account default).
+              AIRS_CLAUDE_EFFORT picks its effort level.
   - grok    : Grok Build CLI in supported headless JSON mode.
               AIRS_GROK_MODEL picks a model (default = account default).
+              AIRS_GROK_REASONING_EFFORT picks its reasoning effort.
 
 All return the model's final text (the generate flow then splits it on the
 ===SUMMARY===/===VALUE===/===DIGEST=== markers). The generate_* test scripts use
@@ -19,6 +23,7 @@ import asyncio
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -73,6 +78,7 @@ def _run_claude_sdk(prompt: str) -> str:
 
     options = ClaudeAgentOptions(
         model=os.environ.get("AIRS_CLAUDE_MODEL") or None,  # None -> account default
+        effort=os.environ.get("AIRS_CLAUDE_EFFORT") or None,
         allowed_tools=[],            # pure LLM call: no filesystem/tool access
         permission_mode="dontAsk",   # headless: never block on a permission prompt
         max_turns=1,                 # single shot
@@ -113,21 +119,24 @@ def _run_codex_sdk(prompt: str) -> str:
     it's transient.
     """
     try:
-        from openai_codex import ApprovalMode, Codex, CodexError, Sandbox
+        from openai_codex import ApprovalMode, Codex, CodexConfig, CodexError, Sandbox
     except ImportError as exc:
         raise RuntimeError(
             "openai-codex not installed. Run: python -m pip install openai-codex"
         ) from exc
 
     model = os.environ.get("AIRS_CODEX_MODEL") or None  # None -> account default
+    effort = os.environ.get("AIRS_CODEX_REASONING_EFFORT") or None
+    codex_bin = os.environ.get("AIRS_CODEX_BIN") or shutil.which("codex")
+    codex_config = CodexConfig(codex_bin=codex_bin) if codex_bin else CodexConfig()
     try:
-        with Codex() as codex:
+        with Codex(codex_config) as codex:
             thread = codex.thread_start(
                 sandbox=Sandbox.read_only,
                 approval_mode=ApprovalMode.deny_all,
                 model=model,
             )
-            result = thread.run(prompt)
+            result = thread.run(prompt, effort=effort)
     except CodexError as exc:
         raise RuntimeError(f"codex error ({type(exc).__name__}): {exc}") from exc
 
@@ -177,6 +186,9 @@ def _run_grok_cli(prompt: str) -> str:
         model = os.environ.get("AIRS_GROK_MODEL")
         if model:
             command.extend(["--model", model])
+        effort = os.environ.get("AIRS_GROK_REASONING_EFFORT")
+        if effort:
+            command.extend(["--reasoning-effort", effort])
 
         try:
             result = subprocess.run(
