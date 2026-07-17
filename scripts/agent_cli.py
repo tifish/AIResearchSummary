@@ -1,13 +1,14 @@
 """Drive the configured agent for a single generation step.
 
-Two SDK backends, both reusing your existing login (no per-token API key, no CLI
-subprocess + stdout scraping):
+Three backends, all reusing an existing local login:
   - codex   : OpenAI Codex SDK (`openai-codex`) over the Codex CLI login.
               AIRS_CODEX_MODEL picks a model (default = account default).
   - claude  : Claude Agent SDK (`claude-agent-sdk`) over the Claude Code login.
               AIRS_CLAUDE_MODEL picks a model (default = account default).
+  - grok    : Grok Build CLI in supported headless JSON mode.
+              AIRS_GROK_MODEL picks a model (default = account default).
 
-Both return the model's final text (the generate flow then splits it on the
+All return the model's final text (the generate flow then splits it on the
 ===SUMMARY===/===VALUE===/===DIGEST=== markers). The generate_* test scripts use
 these helpers to produce one article's summary/digest the same way Refresh does.
 """
@@ -18,7 +19,9 @@ import asyncio
 import json
 import os
 import re
+import subprocess
 import sys
+import tempfile
 import time
 from pathlib import Path
 
@@ -136,8 +139,84 @@ def _run_codex_sdk(prompt: str) -> str:
     return text
 
 
+def _run_grok_cli(prompt: str) -> str:
+    """One headless Grok Build call over the user's existing login.
+
+    The prompt goes through a temporary UTF-8 file instead of the command line,
+    because an extracted article can exceed Windows' command-line length limit.
+    JSON output gives us a stable final-text field and keeps diagnostics separate.
+    Tools, web search, memory, and subagents are disabled for this pure generation
+    step; ``dontAsk`` prevents a headless run from waiting for approval.
+    """
+    prompt_path: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w", encoding="utf-8", suffix=".md", delete=False
+        ) as prompt_file:
+            prompt_file.write(prompt)
+            prompt_path = Path(prompt_file.name)
+
+        command = [
+            "grok",
+            "--no-auto-update",
+            "--prompt-file",
+            str(prompt_path),
+            "--output-format",
+            "json",
+            "--permission-mode",
+            "dontAsk",
+            "--max-turns",
+            "1",
+            "--no-memory",
+            "--no-subagents",
+            "--disable-web-search",
+            "--tools",
+            "",
+            "--verbatim",
+        ]
+        model = os.environ.get("AIRS_GROK_MODEL")
+        if model:
+            command.extend(["--model", model])
+
+        try:
+            result = subprocess.run(
+                command,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                check=False,
+            )
+        except FileNotFoundError as exc:
+            raise RuntimeError(
+                "Grok Build CLI not found. Install it and run `grok login` once."
+            ) from exc
+
+        if result.returncode != 0:
+            detail = (result.stderr or result.stdout).strip()
+            raise RuntimeError(
+                f"Grok Build exited with code {result.returncode}: {detail[:800]}"
+            )
+
+        try:
+            payload = json.loads(extract_json(result.stdout))
+        except (ValueError, json.JSONDecodeError) as exc:
+            raise RuntimeError(
+                f"Grok Build returned invalid JSON: {result.stdout[:800]}"
+            ) from exc
+
+        text = str(payload.get("text") or "").replace("\r\n", "\n").replace("\r", "\n").strip()
+        if not text:
+            reason = payload.get("stopReason") or "unknown"
+            raise RuntimeError(f"Grok Build returned no text (stopReason={reason})")
+        return text
+    finally:
+        if prompt_path is not None:
+            prompt_path.unlink(missing_ok=True)
+
+
 def run_agent(prompt: str, agent: str = "codex", retries: int = 3) -> str:
-    """Run one generation step through the chosen SDK backend and return its text.
+    """Run one generation step through the chosen backend and return its text.
 
     Transient errors (rate limit / overload / 5xx / timeout) are retried with
     exponential backoff, so higher --jobs concurrency doesn't drop articles on a
@@ -147,8 +226,10 @@ def run_agent(prompt: str, agent: str = "codex", retries: int = 3) -> str:
         attempt_fn = _run_codex_sdk
     elif agent == "claude":
         attempt_fn = _run_claude_sdk
+    elif agent == "grok":
+        attempt_fn = _run_grok_cli
     else:
-        raise ValueError(f"Unknown agent '{agent}'. Use 'codex' or 'claude'.")
+        raise ValueError(f"Unknown agent '{agent}'. Use 'codex', 'claude', or 'grok'.")
 
     detail = ""
     for attempt in range(1, retries + 1):
