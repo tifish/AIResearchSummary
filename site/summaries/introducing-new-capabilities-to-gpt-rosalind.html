@@ -1,268 +1,366 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>为 GPT-Rosalind 引入新能力</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>GPT‑Rosalind 新能力介绍</title>
 <style>
 :root {
-  --bg: #f7f4ef;
-  --ink: #18202b;
-  --muted: #667085;
-  --line: #d9d2c6;
-  --panel: #ffffff;
-  --panel-soft: #efe8dc;
-  --panel-blue: #e8f0ff;
-  --panel-green: #e9f7ef;
-  --panel-red: #fff0ee;
-  --panel-gold: #fff4d7;
-  --dark-block: #162033;
-  --dark-ink: #f6efe4;
-  --accent-data: #2563eb;
-  --accent-risk: #dc3f2f;
-  --accent-opportunity: #0f8a5f;
-  --accent-conclusion: #8b5cf6;
-  --accent-warm: #b7791f;
-  --shadow: rgba(24, 32, 43, 0.12);
-  --white: #ffffff;
+  color-scheme: light dark;
+  --bg: #f5f1e9;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #17211d;
+  --muted: #66716b;
+  --line: #d8ddd7;
+  --accent: #006c67;
+  --accent2: #6a4bc3;
+  --accent3: #c54f32;
+  --accent4: #9a6b00;
+  --deep: #102c29;
+  --deep-ink: #f1fffb;
+  --hl: #d9f3e8;
+  --hl2: #eadfff;
+  --hl3: #ffe1d8;
+  --hl4: #f7e7ad;
+  --data-bg: #e2f5ef;
+  --risk-bg: #ffe7df;
+  --opportunity-bg: #eee7ff;
+  --conclusion-bg: #f7edc5;
+  --quote-bg: #e8f0ed;
+  --translation-bg: #fffdf8;
+  --shadow: 0 18px 50px rgba(23,33,29,.09);
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #111418;
-    --ink: #ece7dc;
-    --muted: #a8b0bd;
-    --line: #303845;
-    --panel: #1b2028;
-    --panel-soft: #242018;
-    --panel-blue: #172338;
-    --panel-green: #13261e;
-    --panel-red: #2b1818;
-    --panel-gold: #2a2416;
-    --dark-block: #0b0f17;
-    --dark-ink: #f2eadc;
-    --accent-data: #6ea8ff;
-    --accent-risk: #ff7768;
-    --accent-opportunity: #47d18c;
-    --accent-conclusion: #b79cff;
-    --accent-warm: #f2c35b;
-    --shadow: rgba(0, 0, 0, 0.36);
-    --white: #f2eadc;
+    --bg: #0c1210;
+    --surface: #121a17;
+    --card: #18231f;
+    --ink: #e7eee9;
+    --muted: #a9b7b0;
+    --line: #35443d;
+    --accent: #55d4c8;
+    --accent2: #b79aff;
+    --accent3: #ff8b70;
+    --accent4: #e8bd55;
+    --deep: #071c1a;
+    --deep-ink: #dcfff7;
+    --hl: #17483e;
+    --hl2: #392c59;
+    --hl3: #562d27;
+    --hl4: #4d3d17;
+    --data-bg: #123b34;
+    --risk-bg: #482620;
+    --opportunity-bg: #30264b;
+    --conclusion-bg: #443716;
+    --quote-bg: #1b302a;
+    --translation-bg: #111815;
+    --shadow: 0 18px 50px rgba(0,0,0,.3);
   }
 }
 :root[data-theme="dark"] {
-  --bg: #111418;
-  --ink: #ece7dc;
-  --muted: #a8b0bd;
-  --line: #303845;
-  --panel: #1b2028;
-  --panel-soft: #242018;
-  --panel-blue: #172338;
-  --panel-green: #13261e;
-  --panel-red: #2b1818;
-  --panel-gold: #2a2416;
-  --dark-block: #0b0f17;
-  --dark-ink: #f2eadc;
-  --accent-data: #6ea8ff;
-  --accent-risk: #ff7768;
-  --accent-opportunity: #47d18c;
-  --accent-conclusion: #b79cff;
-  --accent-warm: #f2c35b;
-  --shadow: rgba(0, 0, 0, 0.36);
-  --white: #f2eadc;
+  --bg: #0c1210;
+  --surface: #121a17;
+  --card: #18231f;
+  --ink: #e7eee9;
+  --muted: #a9b7b0;
+  --line: #35443d;
+  --accent: #55d4c8;
+  --accent2: #b79aff;
+  --accent3: #ff8b70;
+  --accent4: #e8bd55;
+  --deep: #071c1a;
+  --deep-ink: #dcfff7;
+  --hl: #17483e;
+  --hl2: #392c59;
+  --hl3: #562d27;
+  --hl4: #4d3d17;
+  --data-bg: #123b34;
+  --risk-bg: #482620;
+  --opportunity-bg: #30264b;
+  --conclusion-bg: #443716;
+  --quote-bg: #1b302a;
+  --translation-bg: #111815;
+  --shadow: 0 18px 50px rgba(0,0,0,.3);
 }
 * { box-sizing: border-box; }
 body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  line-height: 1.65;
+  font-family: "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.78;
 }
-main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+a { color: var(--accent); }
 .hero {
-  padding: 64px 0 36px;
-  border-bottom: 1px solid var(--line);
+  padding: clamp(3rem, 9vw, 7rem) max(6vw, calc((100vw - 1180px)/2));
+  background: var(--deep);
+  color: var(--deep-ink);
+  position: relative;
+  overflow: hidden;
 }
-.kicker {
-  color: var(--accent-opportunity);
+.hero::after {
+  content: "";
+  position: absolute;
+  width: 28rem;
+  height: 28rem;
+  right: -8rem;
+  top: -12rem;
+  border: 5rem solid var(--accent2);
+  border-radius: 50%;
+  opacity: .25;
+}
+.eyebrow {
+  color: var(--accent);
   font-weight: 800;
-  letter-spacing: 0;
+  letter-spacing: .14em;
+  text-transform: uppercase;
 }
-h1 {
-  margin: 12px 0 8px;
-  font-size: clamp(34px, 6vw, 68px);
-  line-height: 1.05;
-  letter-spacing: 0;
+.hero h1 {
+  max-width: 900px;
+  margin: .4rem 0;
+  font-size: clamp(2.6rem, 7vw, 6.4rem);
+  line-height: 1.02;
+  letter-spacing: -.055em;
 }
-.english-title {
+.original-title {
+  max-width: 760px;
   color: var(--muted);
-  font-size: 18px;
+  font-size: 1.05rem;
 }
-.lede {
-  margin-top: 28px;
-  max-width: 820px;
-  font-size: 23px;
-  line-height: 1.45;
-  color: var(--ink);
+.hero .original-title { color: var(--deep-ink); opacity: .7; }
+.one-line {
+  max-width: 850px;
+  margin-top: 2.2rem;
+  padding-left: 1rem;
+  border-left: .35rem solid var(--accent3);
+  font-size: clamp(1.15rem, 2.4vw, 1.55rem);
 }
-.metric-band {
+main > section:not(#translation) {
+  width: min(1180px, 90vw);
+  margin: 3.5rem auto;
+}
+.stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  margin: 34px 0;
+  gap: 2px;
   background: var(--line);
-  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
 }
-.metric {
-  background: var(--panel);
-  padding: 26px;
+.stat {
+  background: var(--data-bg);
+  padding: 2rem;
 }
-.metric strong {
+.stat:nth-child(2) { background: var(--opportunity-bg); }
+.stat:nth-child(3) { background: var(--conclusion-bg); }
+.stat strong {
   display: block;
-  color: var(--accent-data);
-  font-size: 42px;
+  color: var(--accent);
+  font-size: clamp(2rem, 5vw, 4rem);
   line-height: 1;
 }
-.metric span {
-  display: block;
-  margin-top: 10px;
-  color: var(--muted);
-}
+.stat:nth-child(2) strong { color: var(--accent2); }
+.stat:nth-child(3) strong { color: var(--accent4); }
 .split {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 28px;
-  align-items: stretch;
-  margin: 42px 0;
-}
-.explain {
-  padding: 32px;
-  background: var(--panel-soft);
-  border-left: 8px solid var(--accent-conclusion);
-}
-.explain h2, .workflow h2, .access h2, .takeaways h2 {
-  margin: 0 0 14px;
-  font-size: 28px;
-  line-height: 1.2;
-}
-.callout {
-  padding: 32px;
-  background: var(--dark-block);
-  color: var(--dark-ink);
-  box-shadow: 0 18px 50px var(--shadow);
-}
-.callout b { color: var(--accent-warm); }
-.bench-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 42px 0;
-  overflow: hidden;
-  background: var(--panel);
-  border: 1px solid var(--line);
-}
-.bench-table caption {
-  text-align: left;
-  padding: 18px 0;
-  font-weight: 800;
-  font-size: 24px;
-}
-.bench-table th, .bench-table td {
-  padding: 16px;
-  border-bottom: 1px solid var(--line);
-  text-align: left;
-  vertical-align: top;
-}
-.bench-table th {
-  background: var(--panel-blue);
-  color: var(--ink);
-}
-.gain { color: var(--accent-opportunity); font-weight: 800; }
-.risk { color: var(--accent-risk); font-weight: 800; }
-.workflow {
-  margin: 42px 0;
-  padding: 34px;
-  background: var(--panel-green);
-}
-.steps {
-  display: grid;
-  gap: 18px;
-  margin-top: 22px;
-}
-.step {
-  display: grid;
-  grid-template-columns: 44px 1fr;
-  gap: 16px;
+  grid-template-columns: .9fr 1.35fr;
+  gap: 3rem;
   align-items: start;
 }
-.badge {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: var(--accent-opportunity);
-  color: var(--white);
-  font-weight: 900;
+.split h2 {
+  margin-top: 0;
+  color: var(--accent2);
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 1.08;
 }
-.step div:last-child {
+.benchmark-list {
+  border-top: 3px solid var(--accent);
+}
+.benchmark-item {
+  padding: 1.3rem 0;
   border-bottom: 1px solid var(--line);
-  padding-bottom: 18px;
 }
-.insight-strip {
-  margin: 42px 0;
-  padding: 24px 28px;
-  background: var(--panel-gold);
-  border-left: 10px solid var(--accent-warm);
-  font-size: 21px;
-  line-height: 1.45;
+.benchmark-item b { color: var(--accent3); }
+.workflow {
+  width: 100% !important;
+  padding: 4rem max(5vw, calc((100vw - 1180px)/2));
+  background: var(--deep);
+  color: var(--deep-ink);
 }
-.access {
-  margin: 42px 0;
-  display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  gap: 0;
-  border: 1px solid var(--line);
-}
-.access .side {
-  padding: 30px;
-  background: var(--panel-red);
-}
-.access .main {
-  padding: 30px;
-  background: var(--panel);
-}
-.access ul {
-  margin: 14px 0 0;
-  padding-left: 20px;
-}
-.takeaways {
-  margin: 42px 0 70px;
-}
-.mosaic {
+.workflow h2 { color: var(--accent); }
+.flow {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin-top: 20px;
+  gap: 1.5rem;
+  counter-reset: step;
+}
+.flow article {
+  counter-increment: step;
+  padding-top: 1.2rem;
+  border-top: 4px solid var(--accent);
+}
+.flow article:nth-child(2) { border-color: var(--accent2); }
+.flow article:nth-child(3) { border-color: var(--accent3); }
+.flow article:nth-child(4) { border-color: var(--accent4); }
+.flow article::before {
+  content: "0" counter(step);
+  color: var(--muted);
+  font-size: .85rem;
+  font-weight: 800;
+}
+.risk-opportunity {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+.risk, .opportunity {
+  padding: 2rem;
+  border-left: 7px solid var(--accent3);
+  background: var(--risk-bg);
+}
+.opportunity {
+  border-color: var(--accent2);
+  background: var(--opportunity-bg);
+}
+.insight-bar {
+  padding: 2rem 2.4rem;
+  background: var(--quote-bg);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  font-size: 1.2rem;
+}
+.takeaways h2 { color: var(--accent4); }
+.mosaic {
+  display: grid;
+  grid-template-columns: 1.25fr .75fr 1fr;
+  gap: 1rem;
 }
 .tile {
-  min-height: 150px;
-  padding: 20px;
-  background: var(--panel);
+  min-height: 12rem;
+  padding: 1.6rem;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+.tile:nth-child(1) {
+  grid-row: span 2;
+  background: var(--deep);
+  color: var(--deep-ink);
+}
+.tile:nth-child(2) { background: var(--data-bg); }
+.tile:nth-child(3) { background: var(--risk-bg); }
+.tile:nth-child(4) { background: var(--opportunity-bg); }
+.tile:nth-child(5) { background: var(--conclusion-bg); }
+.tile .num {
+  color: var(--accent3);
+  font-size: 2.5rem;
+  font-weight: 900;
+}
+.hl { background: var(--hl); color: var(--ink); padding: .05em .22em; }
+.hl2 { background: var(--hl2); color: var(--ink); padding: .05em .22em; }
+.hl3 { background: var(--hl3); color: var(--ink); padding: .05em .22em; }
+.hl4 { background: var(--hl4); color: var(--ink); padding: .05em .22em; }
+#translation {
+  margin-top: 5rem;
+  padding: 4rem max(5vw, calc((100vw - 850px)/2));
+  background: var(--translation-bg);
+  border-top: 8px solid var(--accent);
+}
+#translation h2 {
+  margin-top: 0;
+  font-size: clamp(2.3rem, 5vw, 4rem);
+  line-height: 1.1;
+}
+#translation h3 {
+  margin-top: 3rem;
+  color: var(--accent);
+  font-size: 1.65rem;
+}
+#translation h4 {
+  margin-top: 2.2rem;
+  color: var(--accent2);
+  font-size: 1.25rem;
+}
+#translation p, #translation li { font-size: 1.05rem; }
+.contents {
+  padding: 1.2rem 1.5rem;
+  border-left: 4px solid var(--accent2);
+  background: var(--opportunity-bg);
+}
+table {
+  width: 100%;
+  margin: 1.8rem 0;
+  border-collapse: collapse;
+  font-size: .96rem;
+}
+th, td {
+  padding: .9rem;
   border: 1px solid var(--line);
+  vertical-align: top;
+  text-align: left;
 }
-.tile:nth-child(1) { border-top: 8px solid var(--accent-data); }
-.tile:nth-child(2) { border-top: 8px solid var(--accent-risk); }
-.tile:nth-child(3) { border-top: 8px solid var(--accent-opportunity); }
-.tile:nth-child(4) { border-top: 8px solid var(--accent-conclusion); }
-.tile b {
+th {
+  background: var(--deep);
+  color: var(--deep-ink);
+}
+tr:nth-child(even) td { background: var(--surface); }
+blockquote {
+  margin: 2rem 0;
+  padding: 1.2rem 1.5rem;
+  background: var(--quote-bg);
+  border-left: 5px solid var(--accent4);
+}
+.source-figure {
+  margin: 3.2rem 0;
+}
+.source-figure img {
   display: block;
-  margin-bottom: 8px;
+  max-width: 100%;
+  height: auto;
+  border-radius: .6rem;
+  box-shadow: var(--shadow);
 }
-@media (max-width: 820px) {
-  main { width: min(100% - 24px, 1120px); }
-  .metric-band, .split, .access, .mosaic { grid-template-columns: 1fr; }
-  .hero { padding-top: 42px; }
-  .lede { font-size: 20px; }
+.source-figure figcaption {
+  margin-top: .8rem;
+  color: var(--muted);
+  font-size: .92rem;
+  line-height: 1.55;
+}
+.meta { color: var(--muted); }
+@media (max-width: 760px) {
+  .stats, .split, .flow, .risk-opportunity, .mosaic {
+    grid-template-columns: 1fr;
+  }
+  .tile:nth-child(1) { grid-row: auto; }
+  table { display: block; overflow-x: auto; }
+  .hero { padding-top: 3.5rem; }
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+--bg: #f5f1e9;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #17211d;
+  --muted: #66716b;
+  --line: #d8ddd7;
+  --accent: #006c67;
+  --accent2: #6a4bc3;
+  --accent3: #c54f32;
+  --accent4: #9a6b00;
+  --deep: #102c29;
+  --deep-ink: #f1fffb;
+  --hl: #d9f3e8;
+  --hl2: #eadfff;
+  --hl3: #ffe1d8;
+  --hl4: #f7e7ad;
+  --data-bg: #e2f5ef;
+  --risk-bg: #ffe7df;
+  --opportunity-bg: #eee7ff;
+  --conclusion-bg: #f7edc5;
+  --quote-bg: #e8f0ed;
+  --translation-bg: #fffdf8;
+  --shadow: 0 18px 50px rgba(23,33,29,.09);
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -394,139 +492,325 @@ h1 {
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/introducing-new-capabilities-to-gpt-rosalind" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<header class="hero">
+<div class="eyebrow">OpenAI · Product · 2026 年 6 月 3 日</div>
+<h1>GPT‑Rosalind 新能力介绍</h1>
+<p class="original-title" lang="en">Introducing new capabilities to GPT-Rosalind</p>
+<p class="one-line"><strong>一句话总括：</strong>新版 GPT‑Rosalind 不只是提高生命科学问答得分，还把证据检索、科学推理、生物信息分析和结果审查连接成可执行、可追溯的科研工作流。</p>
+</header>
 <main>
-  <header class="hero">
-    <div class="kicker">一句话总括</div>
-    <h1>为 GPT-Rosalind 引入新能力</h1>
-    <div class="english-title">Introducing new capabilities to GPT-Rosalind</div>
-    <p class="lede">这次更新的真正贡献，是把生命科学专用模型推进为可接入工具、处理证据、执行分析并保留审查痕迹的科研工作台。</p>
-  </header>
-
-  <section class="metric-band" aria-label="关键数字">
-    <div class="metric">
-      <strong>27.5%</strong>
-      <span>MedChemBench 得分，高于 GPT-5.5 的 25.1%。这说明模型在药物化学推理和多参数优化上有小幅但明确的领先。</span>
-    </div>
-    <div class="metric">
-      <strong>31%</strong>
-      <span>GeneBench 中 token 使用量下降幅度，同时准确率从 20.4% 升至 21.6%。效率提升和准确率提升同时出现。</span>
-    </div>
-    <div class="metric">
-      <strong>63.2%</strong>
-      <span>LabWorkBench 得分，高于 GPT-5.5 的 55.8%。这把评估从书面知识推进到真实湿实验协议辅助。</span>
-    </div>
+<section aria-label="关键数据" class="stats">
+<article class="stat">
+<strong>27.5%</strong>
+<p>MedChemBench 得分。GPT‑5.5 为 <b>25.1%</b>，新版同时少用 <b>7.2%</b> 的 token。</p>
+</article>
+<article class="stat">
+<strong>21.6%</strong>
+<p>GeneBench 准确率。GPT‑5.5 为 <b>20.4%</b>，新版少用 <b>31%</b> 的 token。</p>
+</article>
+<article class="stat">
+<strong>63.2%</strong>
+<p>LabWorkBench 得分。GPT‑5.5 为 <b>55.8%</b>，新版少用 <b>5.3%</b> 的 token。</p>
+</article>
+</section>
+<section class="split">
+<div>
+<div class="eyebrow">01 · 衡量真实科研价值</div>
+<h2>评价对象从单项能力，转向完整科研工作</h2>
+<p>OpenAI 为此设计了 <span class="hl">LifeSciBench</span>。它不是只测一个生物学领域，也不是只测模型的一项能力。</p>
+<p>它覆盖从证据处理到科研沟通的完整链路。这让评价更接近生命科学研究者真正面对的任务。</p>
+</div>
+<div class="benchmark-list">
+<div class="benchmark-item"><b>证据处理：</b>从论文、图、表和实验记录中提取、核对并审计证据。</div>
+<div class="benchmark-item"><b>分析与推理：</b>处理定量生物学、复杂药物化学问题和跨模态信息。</div>
+<div class="benchmark-item"><b>设计与优化：</b>支持 SAR、多参数先导化合物优化、实验设计和故障排查。</div>
+<div class="benchmark-item"><b>验证与运营：</b>保留分析产物、过程依据和限制条件，方便专家复核。</div>
+<div class="benchmark-item"><b>转化与沟通：</b>把分散证据整理成能够支持研究决策的结论。</div>
+<p><strong>结论：</strong>新版的核心主张不是“知道更多事实”，而是能更完整地处理具有科学价值的工作。</p>
+</div>
+</section>
+<section class="workflow">
+<div class="eyebrow">02 · 从推理到执行</div>
+<h2>插件把模型能力接入真实工作流</h2>
+<div class="flow">
+<article>
+<h3>读取证据</h3>
+<p>Life Sciences Research 插件检索带来源的外部证据，并补充靶点、抑制剂和耐药背景。</p>
+</article>
+<article>
+<h3>执行分析</h3>
+<p>Life Sciences NGS Analysis 插件处理 ctDNA、单细胞 RNA 测序和 bulk RNA-seq 等数据。</p>
+</article>
+<article>
+<h3>交互检查</h3>
+<p>序列、比对和结构查看器让研究者留在原始证据附近，并继续追问当前视图中的内容。</p>
+</article>
+<article>
+<h3>保留依据</h3>
+<p>工作流保存分析产物与来源信息，使每一步都能交给专家复核。</p>
+</article>
+</div>
+<p><strong>洞见：</strong>科研 AI 的价值正在从生成答案，转向生成一条<span class="hl3">可检查、可修改、可重复执行</span>的证据链。</p>
+</section>
+<section class="risk-opportunity">
+<article class="risk">
+<div class="eyebrow">风险与边界</div>
+<h2>benchmark 提升不等于科研结论自动可靠</h2>
+<p>文章展示的 GeneBench 准确率仍只有 <strong>21.6%</strong>。LifeSciBench 示例也强调，模型需要质疑检测方法、统计设计、替代终点、耐久性和样本代表性。</p>
+<p>这说明模型更适合辅助专家审查，而不是替代临床、监管或实验判断。</p>
+</article>
+<article class="opportunity">
+<div class="eyebrow">实际机会</div>
+<h2>效率提升与准确率提升可以同时发生</h2>
+<p>三个公开结果都显示 token 使用量下降。其中 GeneBench 的降幅达到 <span class="hl2"><strong>31%</strong></span>。</p>
+<p>这改变了“更强推理必然更昂贵”的直觉。对长流程科研任务而言，执行效率本身就是规模化应用的重要条件。</p>
+</article>
+</section>
+<section class="insight-bar">
+<strong>部署结论：</strong>GPT‑Rosalind 仍处于研究预览阶段。全球符合条件的机构需要通过可信访问结构使用。申请方必须开展具有明确公共利益的合法科研，并具备治理、安全监督、受控访问和企业级安全能力。
   </section>
-
-  <section class="split">
-    <div class="explain">
-      <h2>评估重点从单点能力转向完整科研任务</h2>
-      <p>OpenAI 设计了 LifeSciBench，用外部专家评审生命科学研究中的端到端任务。它覆盖证据处理、分析、设计优化、科学推理、验证运营、转译沟通六类工作流。</p>
-      <p>这改变了读者对 AI 科研能力的理解。模型不再只是在单个生物学问答上得分，而是要处理论文、图表、实验记录和监管推理中的复杂证据链。</p>
-    </div>
-    <aside class="callout">
-      <p><b>核心洞见：</b>生命科学 AI 的价值不只来自“知道更多”，还来自能否把证据、工具、实验约束和审查要求放在同一个流程里。</p>
-      <p>文章中的 DMD 基因疗法示例显示，强模型需要识别 assay 特异性、替代终点、年龄混杂、安全性和可推广性等多层问题。</p>
-    </aside>
-  </section>
-
-  <table class="bench-table">
-    <caption>三个 benchmark 说明了不同方向的进步</caption>
-    <thead>
-      <tr>
-        <th>评估</th>
-        <th>关注任务</th>
-        <th>GPT-Rosalind 结果</th>
-        <th>对 AI 影响的含义</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>MedChemBench</td>
-        <td>结构理解、SAR、毒性、ADME、先导化合物优化、逆合成。</td>
-        <td><span class="gain">27.5%</span>，GPT-5.5 为 25.1%，少用 7.2% token。</td>
-        <td>模型在药物发现中更接近真实决策问题，而不是只回答孤立化学知识。</td>
-      </tr>
-      <tr>
-        <td>GeneBench</td>
-        <td>长程基因组学和定量生物学分析，包括 QC、建模和修正。</td>
-        <td><span class="gain">21.6%</span>，GPT-5.5 为 20.4%，少用 31% token。</td>
-        <td>长流程科学分析的瓶颈不只是准确率，也包括规划成本和执行效率。</td>
-      </tr>
-      <tr>
-        <td>LabWorkBench</td>
-        <td>真实湿实验协议中的扰动、结果关联、故障排查和优化。</td>
-        <td><span class="gain">63.2%</span>，GPT-5.5 为 55.8%，少用 5.3% token。</td>
-        <td>实验室辅助开始被纳入评估，但仍需要专家监督和安全边界。</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <section class="workflow">
-    <h2>从推理到可执行工作流</h2>
-    <p>文章强调 Codex 中的 Life Sciences Research 和 Life Sciences NGS Analysis 插件。它们把来源化证据检索、生物学解释和生信执行放在同一工作区。</p>
-    <div class="steps">
-      <div class="step">
-        <div class="badge">1</div>
-        <div><b>读取证据。</b>研究者可以把文献、ctDNA 记录或 omics 结果接入工作流。模型需要引用来源，并保留可审查产物。</div>
-      </div>
-      <div class="step">
-        <div class="badge">2</div>
-        <div><b>执行分析。</b>NGS 插件可生成 notebook、QC 结果、矩阵、UMAP 和 provenance。关键变化是分析过程不再停留在自然语言建议。</div>
-      </div>
-      <div class="step">
-        <div class="badge">3</div>
-        <div><b>贴近证据查看。</b>序列、比对和结构查看器让科学家直接检查突变位点、保守性和结合口袋。模型回答可以基于当前视图上下文。</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="insight-strip">
-    更值得注意的不是某一个分数领先，而是 OpenAI 把“模型智能、工具执行、来源保留、专家审查”放进同一产品叙事。这是生命科学 AI 从演示走向企业流程的关键门槛。
-  </section>
-
-  <section class="access">
-    <div class="side">
-      <h2>开放方式很谨慎</h2>
-      <p>GPT-Rosalind 以 research preview 形式向全球合格组织开放。条件包括合法科学研究、明确公共利益、强治理、安全监督和企业级访问控制。</p>
-      <p><span class="risk">风险点：</span>生命科学模型能处理高影响生物能力，因此部署方式本身就是产品的一部分。</p>
-    </div>
-    <div class="main">
-      <h2>企业落地指向真实研发组织</h2>
-      <p>文章提到 Novo Nordisk 正在利用 GPT-Rosalind 帮助研究人员分析复杂数据、发现模式并更快测试假设。</p>
-      <ul>
-        <li>适用场景包括文献、基因组学、转录组学、序列、结构和实验结果的连接。</li>
-        <li>OpenAI 还提供 managed workspace，面向没有 Enterprise 账户的合格组织。</li>
-        <li>后续方向包括药物发现、转化医学、公共卫生、准备工作和生物防御。</li>
-      </ul>
-    </div>
-  </section>
-
-  <section class="takeaways">
-    <h2>最值得带走的洞见</h2>
-    <div class="mosaic">
-      <div class="tile">
-        <b>评估正在变复杂。</b>
-        生命科学 AI 需要通过端到端科研任务证明价值，而不是只在单一知识题上得分。
-      </div>
-      <div class="tile">
-        <b>安全不是附录。</b>
-        trusted-access、治理和监督决定了这类模型能否进入真实组织。
-      </div>
-      <div class="tile">
-        <b>工具层很关键。</b>
-        插件、查看器和 provenance 让模型输出更接近可复核的科研工作。
-      </div>
-      <div class="tile">
-        <b>结论仍需克制。</b>
-        benchmark 提升明确，但分数并不等同于临床或实验成功，专家审查仍是核心环节。
-      </div>
-    </div>
-  </section>
+<section class="takeaways">
+<div class="eyebrow">03 · 最值得带走的洞见</div>
+<h2>五个判断，抓住全文真正的信息量</h2>
+<div class="mosaic">
+<article class="tile">
+<div class="num">01</div>
+<h3>端到端能力比孤立得分更重要</h3>
+<p>LifeSciBench 把六类科研工作流放在同一评价框架中。真正的进步标准，是模型能否把证据、分析、设计、验证和沟通连接起来。</p>
+</article>
+<article class="tile">
+<div class="num">02</div>
+<h3>药物化学表现领先</h3>
+<p><strong>27.5% 对 25.1%</strong>。提升不算巨大，但同时减少了 token。</p>
+</article>
+<article class="tile">
+<div class="num">03</div>
+<h3>实验支持的提升最明显</h3>
+<p>LabWorkBench 从 <strong>55.8%</strong> 提升至 <strong>63.2%</strong>。其专有实验协议未受训练数据污染，因此更能检验真实泛化能力。</p>
+</article>
+<article class="tile">
+<div class="num">04</div>
+<h3>插件让结论可复核</h3>
+<p>分析产物、来源和限制条件会被保留下来。研究者可以检查结果，而不是只接收一段答案。</p>
+</article>
+<article class="tile">
+<div class="num">05</div>
+<h3>能力扩张伴随访问控制</h3>
+<p>OpenAI 把生命科学能力与可信部署绑定。这反映了生物领域在公共利益与安全风险之间的特殊平衡。</p>
+</article>
+</div>
+</section>
 </main>
+<section id="translation">
+<h2>完整译文</h2>
+<p class="meta">以真实科学工作流为基础，为生命科学行业带来更强的智能。</p>
+<nav aria-label="文章目录" class="contents">
+<p><strong>提升具有科学价值的任务表现</strong></p>
+<p>更强的科学推理</p>
+<p>从推理走向工作流执行</p>
+<p>扩大可信机构的访问范围</p>
+<p>下一步</p>
+</nav>
+<nav aria-label="重复目录" class="contents">
+<p><strong>提升具有科学价值的任务表现</strong></p>
+<p>更强的科学推理</p>
+<p>从推理走向工作流执行</p>
+<p>扩大可信机构的访问范围</p>
+<p>下一步</p>
+</nav>
+<p>我们正在为 GPT‑Rosalind 系列推出一次模型更新。该系列专为企业规模的生命科学研究打造。</p>
+<p>新版结合了 GPT‑5.5 的智能体编程和工具调用能力。它还强化了药物化学与基因组学等药物发现核心领域的模型智能，并提升了模型在生命科学分析、设计和实验工作流中的整体表现。</p>
+<p>生命科学的进步，需要研究者综合不同尺度、不同模态的数据和证据。这些信息可能来自分子、基因、通路和生命系统。</p>
+<p>我们的评估显示，新版 GPT‑Rosalind 在多类研究任务上取得了普遍提升。这些任务包括生物学专家提出的问题、复杂的药物化学查询、定量生物学，以及湿实验故障排查。</p>
+<p>GPT‑Rosalind 现已通过可信访问部署结构，面向全球符合条件的机构提供研究预览。</p>
+<h3>提升具有科学价值的任务表现</h3>
+<p>为了衡量并持续提升 GPT‑Rosalind 在现实世界中的影响，我们设计了 LifeSciBench。这项 benchmark 由外部专家评判，重点考察生命科学研究的基础环节。</p>
+<p>现有 benchmark 通常只评估模型表现的某个组成部分，或单独评估某个生物学领域。LifeSciBench 则从端到端角度审视具有科学价值的工作。</p>
+<p>它从生命科学研究的六类核心工作流中选取任务。这六类工作流是：证据处理、分析、设计与优化、科学推理、验证与运营，以及转化与沟通。</p>
+<p>我们使用这项 benchmark，使模型进步与生命科学研究的实际需求和现实条件保持一致。</p>
+<p><strong>在行业与学术专家认定的具有科学价值的任务上，GPT‑Rosalind 的整体表现领先。</strong></p>
+<p>从论文、图、表和实验记录中提取、核对并审计科学证据。</p>
+<h4>评估示例</h4>
+<p>我们正在准备一次关于 AAV9-microDys-X 的 FDA Type B 会议。AAV9-microDys-X 是一种治疗 Duchenne 肌营养不良症的 AAV9 微型抗肌萎缩蛋白基因疗法。它使用 MCK 启动子表达一个 138 kDa 的构建体。</p>
+<p>我们希望对现有资料包进行严格批判，判断它是否真的足以支持加速批准。拟采用的替代终点是微型抗肌萎缩蛋白表达量。我们需要判断，该终点是否可以被视为“合理可能预测临床获益”的替代终点。</p>
+<p><strong>研究背景：</strong>一项开放标签的 1b/2 期研究，共纳入 12 名仍可行走的男孩。年龄为 4 至 7 岁，均已确诊 DMD，并存在导致移码的杆状结构域缺失。资料包包括：</p>
+<ul>
+<li>治疗前对股外侧肌进行活检。使用 MANEX1A 对 N 端肌动蛋白结合域进行定量 Western blot 检测。结果为健康对照抗肌萎缩蛋白水平的 0% 至 3%。</li>
+<li>治疗后第 12 周，对另一侧股外侧肌进行活检。使用相同的 Western blot 检测后，微型抗肌萎缩蛋白的平均值为健康对照的 38%，范围为 18% 至 61%。通过考马斯染色，以总蛋白进行归一化。</li>
+<li>治疗后的免疫荧光检测使用多克隆抗肌萎缩蛋白 C 端抗体。75% 至 95% 的肌纤维显示肌膜信号。</li>
+<li>第 48 周的功能结果显示，NSAA 较基线平均增加 1.4 分。外部已发表自然病史登记队列则下降 0.6 分。使用非配对 t 检验得到 p = 0.03。</li>
+<li>安全性方面，12 名患者中有 8 名出现一过性转氨酶升高，并通过逐渐减量的类固醇治疗控制。1 例心肌炎已经缓解。无死亡病例。</li>
+<li>生物分布和持久性方面，第 12 周仍可在肌肉中检测到 AAV9 载体基因组。平均每个细胞核有 2.3 个载体基因组。</li>
+<li>入组条件要求患者基线时不存在抗 AAV9 中和抗体，滴度低于 1:400，同时排除外显子 44 缺失患者。</li>
+</ul>
+<p>请逐项严格检验这份资料包。FDA 或持怀疑态度的审评人员会认为哪些现有证据不足以支持我们的结论？如果可能，需要补充哪些数据、分析或设计变更，才能弥补这些缺口？</p>
+<p>对于没有明确说明的事项，请假定截至 2025 年 12 月 31 日，其他临床级 138 kDa 微型抗肌萎缩蛋白项目和相关临床试验中的已知信息同样适用。</p>
+<h4>候选回答</h4>
+<p><strong>核心结论：</strong>按当前形式，这份资料包不足以支持基于微型抗肌萎缩蛋白表达量获得加速批准。它还不能证明该指标是一个合理可能预测临床获益的替代终点。</p>
+<p>持怀疑态度的 FDA 审评人员很可能认为，生物标志物、功能、持久性、安全性和普适性证据都存在实质性不足。</p>
+<table>
+<thead>
+<tr>
+<th>资料项目</th>
+<th>主要失效点</th>
+<th>需要补充的内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Western blot 定量</td>
+<td>MANEX1A 结合的是一个 N 端表位。内源性的全长抗肌萎缩蛋白和转基因表达的微型抗肌萎缩蛋白都包含这一表位，因此该检测无法清楚区分转基因蛋白与残余或回复突变产生的抗肌萎缩蛋白。用健康人的全长抗肌萎缩蛋白作为标准，对 138 kDa 微型抗肌萎缩蛋白进行定量，也是不成立的。</td>
+<td>应使用重组微型抗肌萎缩蛋白标准品，并增加一种能够区分转基因蛋白与内源性抗肌萎缩蛋白的正交方法。例如靶向质谱，或转基因特异性、表位特异性检测。</td>
+</tr>
+<tr>
+<td>免疫荧光</td>
+<td>该 138 kDa 构建体缺少 C 端结构域，因此多克隆 C 端抗体并不合适。许多 DMD 患者存在回复肌纤维，而且回复产生的抗肌萎缩蛋白可能保留 C 端表位。回复肌纤维还可能随年龄发生克隆性扩增，进而使免疫荧光信号产生偏差，尤其是在年龄较大的男孩中。</td>
+<td>应使用针对转基因蛋白所含表位、但无法识别回复抗肌萎缩蛋白的抗体，重新进行免疫荧光检测。应分别定量转基因阳性肌纤维与回复肌纤维。</td>
+</tr>
+<tr>
+<td>替代终点的有效性</td>
+<td>资料包混淆了蛋白数量和临床功能。“健康对照蛋白质量的 38%”并不等于正常抗肌萎缩蛋白功能的 38%，因为微型抗肌萎缩蛋白在结构上经过截短。</td>
+<td>在把表达量作为替代终点之前，需要通过实证确认微型抗肌萎缩蛋白的质量百分比、肌膜定位、下游功能恢复和临床获益之间的关系。</td>
+</tr>
+<tr>
+<td>活检设计</td>
+<td>治疗前后分别对左右两侧股外侧肌进行活检，会引入左右侧差异和肌肉内部的空间差异。疾病进展以及纤维脂肪替代，也可能改变以总蛋白归一化后的信号。</td>
+<td>应使用一致的解剖标志来规范活检位置。应以肌肉特异性蛋白进行归一化，并同步测量纤维脂肪成分。</td>
+</tr>
+<tr>
+<td>NSAA 对照和统计方法</td>
+<td>外部自然病史队列不是随机、同期对照。试验入组标准、支持治疗、参与试验产生的效应、基线 NSAA、类固醇方案、年龄和外显子类别，都可能使比较产生偏差。仅使用非配对 t 检验并不充分。此外，对这一年龄组来说，NSAA 增加 1.4 分仍在重测变异范围内。</td>
+<td>应开展具有同期安慰剂对照的随机研究。最低限度也应使用校正分析，纳入基线 NSAA、年龄、类固醇方案、外显子类别和其他混杂因素。</td>
+</tr>
+<tr>
+<td>年龄窗口造成的混杂</td>
+<td>4 至 7 岁男孩正处于一个发育窗口。在疾病恶化成为主导因素之前，未经治疗且仍可行走的 DMD 患者也可能出现运动功能提升。因此，第 48 周的 NSAA 变化混合了发育带来的增长、疾病进展和潜在治疗效果。</td>
+<td>应设置同期随机对照，并按年龄分层，从而把发育轨迹与治疗效果区分开。</td>
+</tr>
+<tr>
+<td>既往临床先例</td>
+<td>开放标签研究中观察到的微型抗肌萎缩蛋白功能信号，并不能稳定预测验证性获益。已发表的先例包括：微型抗肌萎缩蛋白基因疗法的验证性试验未能重复开放标签研究中的 NSAA 改善。</td>
+<td>不能把开放标签研究中的 NSAA 变化作为决定性支持证据。必须提供受控的功能证据。</td>
+</tr>
+<tr>
+<td>构建体的结构限制</td>
+<td>该 138 kDa 构建体删除了含有 nNOS 结合位点的血影蛋白重复结构域 R16/17。失去 nNOS 募集能力，可能削弱运动期间的功能性交感抑制和缺血保护。无论表达量多高，这都可能给功能恢复设置一个机制性上限。</td>
+<td>应增加机制研究，证明这一特定构建体能否恢复抗肌萎缩蛋白相关复合体的有关功能、nNOS 定位、运动生理和肌肉保护。</td>
+</tr>
+<tr>
+<td>AAV 持久性</td>
+<td>第 12 周仍有载体基因组，不能证明表达具有持久性。AAV9 基因组大多以不整合的附加体形式存在，数量可能随时间下降。载体基因组持续存在，也不等于蛋白持续表达。</td>
+<td>应对转基因蛋白表达和功能生物标志物进行超过 12 周的纵向持久性测量。</td>
+</tr>
+<tr>
+<td>免疫与安全性特征</td>
+<td>12 名患者中有 8 名出现转氨酶升高，这与针对 AAV 转导细胞的免疫反应相符，但具体机制尚未确定。考虑到 AAV9 的心脏嗜性，1 例心肌炎值得警惕。</td>
+<td>应提供更深入的免疫监测、肝脏和心脏安全性评估，并加强心脏随访。</td>
+</tr>
+<tr>
+<td>患者选择与普适性</td>
+<td>排除抗 AAV9 中和抗体阳性患者，会限制结果的普适性。排除外显子 44 缺失患者，也会限制结果对这一 DMD 亚组的适用性。样本量只有 12 人，不足以描述更广泛 DMD 人群中的安全性和有效性。</td>
+<td>应在可能的情况下扩大入组范围。或者在使用结果支持广泛批准之前，预先规定按抗体状态、基因型或外显子类别、年龄和基线功能进行分层分析。</td>
+</tr>
+</tbody>
+</table>
+<p><strong>监管结论：</strong>这份资料包可能显示了生物学活性，但尚未证明所测得的微型抗肌萎缩蛋白表达量，是一个能够合理预测临床获益的可靠替代终点。</p>
+<p>主要缺口包括：检测缺乏特异性、定量标准无效、可能受到回复肌纤维干扰、缺少随机对照、NSAA 受到年龄影响、持久性不确定，以及安全性和普适性问题尚未解决。</p>
+<p>为了弥补这些缺口，该项目需要采用受控且按年龄分层的临床设计。它还需要转基因特异性表达检测、正交蛋白定量、组织成分控制、纵向持久性数据，以及针对截短构建体的机制性功能检测。</p>
+<p>安全监测也需要加强，尤其是肝脏和心脏方面。</p>
+<h4>评分标准与等级</h4>
+<h3>更强的科学推理</h3>
+<h4>药物化学</h4>
+<p>GPT‑Rosalind 在药物化学领域取得了行业领先的表现。该领域致力于把分子转化为有用的药物。</p>
+<p>我们设计了 MedChemBench，使其能够反映真实的药物化学工作流。它评估多模态化学结构理解、构效关系（SAR）、药物效力预测、毒性预测、吸收、分布、代谢与排泄（ADME）预测、多参数先导化合物优化决策，以及逆合成。</p>
+<p>GPT‑Rosalind 在 MedChemBench 上的得分为 <strong>27.5%</strong>，高于 GPT‑5.5 的 <strong>25.1%</strong>。与此同时，它使用的 token 减少了 <strong>7.2%</strong>。</p>
+<p><strong>GPT‑Rosalind 在药物化学的多模态综合和机制推理方面表现更好。</strong></p>
+<h4>基因组学与定量生物学</h4>
+<p>GeneBench 是我们针对基因组学和定量生物学设计的智能体评估，用于考察长周期、端到端分析能力。</p>
+<p>在 GeneBench 上，GPT‑Rosalind 比 GPT‑5.5 少用 <strong>31%</strong> 的 token，同时把准确率从 <strong>20.4%</strong> 提高到 <strong>21.6%</strong>。</p>
+<p>GeneBench 评估智能体处理长周期定量任务的能力。面对真实的科学数据，智能体能否制定有效的分析、质量控制、建模和校正方案，并最终得到与决策相关的答案？</p>
+<p>其中的问题覆盖多个领域，包括功能基因组学、空间转录组学、蛋白质组学、表观基因组学和应用遗传学。</p>
+<p><strong>GPT‑Rosalind 比 GPT‑5.5 少用 31% 的 token，同时提高了准确率。</strong></p>
+<h4>协助现实世界中的实验室工作</h4>
+<p>我们推出了一项新评估，用来测试 GPT‑Rosalind 帮助科学家开展现实实验室工作的能力。</p>
+<p>LabWorkBench 检验模型能否在科学家实际使用的湿实验协议中，把实验扰动与实验结果联系起来。这些能力可以用于故障排查和实验优化等工作。</p>
+<p>LabWorkBench 使用专有数据，因此这些数据未受到训练数据污染。</p>
+<p>GPT‑Rosalind 的得分为 <strong>63.2%</strong>，GPT‑5.5 为 <strong>55.8%</strong>。与此同时，GPT‑Rosalind 使用的 token 减少了 <strong>5.3%</strong>。</p>
+<p><strong>在协助真实湿实验协议方面，GPT‑Rosalind 相比 GPT‑5.5 有显著提升，同时也提高了 token 效率。</strong></p>
+<h3>从推理走向工作流执行</h3>
+<p>我们开发了 <a href="https://openai.com/">Life Sciences Research</a> 和 <a href="https://openai.com/">Life Sciences NGS Analysis</a> 插件，为 GPT‑Rosalind 更强的智能增加一个实用执行层，从而支持可重复的科学工作流。</p>
+<p>两款插件把有来源依据的证据检索、生物学解释和生物信息学执行带入同一个工作区。它们可以帮助研究者连接外部证据和内部组学分析，同时保留分析产物和来源信息。</p>
+<p>现在，所有用户都可以通过 Codex 使用这两款插件。符合条件的 GPT‑Rosalind 企业用户，还可以使用 GPT‑Rosalind 驱动这些插件。</p>
+<p>为了让 Codex 更好地成为科学家的动态工作台，我们为生物学原生文件类型增加了交互式查看器。</p>
+<p>首批查看器支持序列、比对和结构数据。它们让科学家在 GPT‑Rosalind 对工作流进行推理时始终贴近证据，并能直接结合当前查看器中的内容提出后续问题。</p>
+<p>00:00</p>
+<p>上方演示展示了由 GPT‑Rosalind 编排的这些能力。</p>
+<p>演示中的科学家正在研究一份液体肿瘤活检，希望找出可能影响治疗选择的突变和其他分子变化。</p>
+<p>Life Sciences NGS Analysis 插件把对已处理 ctDNA 记录的审查转换成交互式 notebook。它呈现反复出现的变异、低频检出结果和样本变化轨迹，从而把调查重点引向 KRAS G12C。</p>
+<p>随后，Life Sciences Research 插件补充带来源依据的靶点、抑制剂和耐药背景。原生的序列、比对和结构查看器，则让科学家直接检查第 12 位突变残基、该位置在 RAS 家族中的保守性，以及与抑制剂结合的口袋。</p>
+<p>工作流最后把这些证据转化为具体的后续选项。每一个步骤和分析产物都可供专家审查。</p>
+<figure class="source-figure" data-source-image="0"><img alt='A computer screen shows a workspace instructing the use of an NGS Analysis plugin to explore ctDNA mutation data. The screen includes several bar charts labeled "Top detailed histologies" and "Top altered genes by mutated cfDNA samples," displaying data on cancer types and gene alterations. Text describes the dataset, key findings, and analysis parameters.' decoding="async" height="2160" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/1dnSr1zzUcQuhNIOhqRnWC/fb69d717b0141f89edb5f5a48fa66692/Rosalind-55-Layout-Article-Plugin-Figure-NGS-Analysis.png?w=3840&amp;q=90&amp;fm=webp" width="3840"/>
+<figcaption>Life Sciences NGS Analysis 插件</figcaption>
+</figure>
+<h4>Life Sciences NGS Analysis 插件</h4>
+<h4>scRNA-seq 质量控制与注释</h4>
+<p>把 10x 风格的矩阵文件包转换为经过质量控制筛选的单细胞分析产物、注释和 UMAP。你可以在 Codex 中检查并修改这些结果。</p>
+<p>Life Sciences NGS Analysis 插件会把请求路由到 scrna-seq-qc，根据数据选择质量控制阈值，并保留筛选和注释过程中的来源信息。它还会显示缺少双细胞检测依赖项等阻碍因素。</p>
+<figure class="source-figure" data-source-image="1"><img alt="Screenshot of a split-screen bioinformatics workflow. The left panel shows an AI assistant summarizing a completed single-cell RNA sequencing (scRNA-seq) quality-control analysis, including generated files, QC metrics, UMAP visualizations, and cell-type annotations. The right panel displays an “scRNA QC Review” report with histograms for total counts, detected genes, and mitochondrial percentage, alongside bar charts showing QC pass/fail counts and filtered cell populations. The interface is displayed against a blue-and-green gradient background." decoding="async" height="1080" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/3kELBgyLQu8SKx7vfwyv9g/6703dd86fd1a6f0e1307dea674aee42e/Rosalind5.5_scRNA_UseCase.png?w=3840&amp;q=90&amp;fm=webp" width="1920"/>
+<figcaption>把 10x 风格的矩阵文件包转换为经过质量控制筛选的单细胞分析产物、注释和 UMAP，并在 Codex 中检查和修改。Life Sciences NGS Analysis 插件会把请求路由到 scrna-seq-qc，根据数据选择质量控制阈值，保留筛选和注释过程中的来源信息，并显示缺少双细胞检测依赖项等阻碍因素。</figcaption>
+</figure>
+<h4>Bulk RNA-seq FASTQ 质量控制</h4>
+<p>把 bulk RNA-seq 样本表、FASTQ 文件包和参考文件转换为经过质量控制审查的计数文件包。你可以在 Codex 中检查并重复使用这些结果。</p>
+<p>Life Sciences NGS Analysis 插件会路由请求、验证输入，并返回可审计的运行记录。其中包括 MultiQC、Salmon 矩阵、来源信息和明确的限制说明。</p>
+<figure class="source-figure" data-source-image="2"><img alt="Split-screen view of an RNA-seq workflow: an AI assistant summarizes completed bulk RNA-seq quality-control results on the left, while an interactive MultiQC report with sequencing statistics and Salmon metrics is displayed on the right." decoding="async" height="2160" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/2fAmR7xZ8JhGsUz4DMA5ir/695bc7f91e6b7696afa6316dd60c74eb/Rosalind5.5_bulkRNA_UseCase.png?w=3840&amp;q=90&amp;fm=webp" width="3840"/>
+<figcaption>把 bulk RNA-seq 样本表、FASTQ 文件包和参考文件转换为经过质量控制审查的计数文件包，并在 Codex 中检查和重复使用。Life Sciences NGS Analysis 插件会路由请求、验证输入，并返回包含 MultiQC、Salmon 矩阵、来源信息和明确限制说明的可审计运行记录。</figcaption>
+</figure>
+<h3>扩大可信机构的访问范围</h3>
+<p>我们正在把 GPT‑Rosalind 系列的访问范围扩大到全球符合条件的机构。</p>
+<p>GPT‑Rosalind 将通过我们的可信访问部署结构提供研究预览。适用对象是开展具有明确公共利益的合法科学研究、拥有强有力的治理和安全监督机制，并具备受控访问和企业级安全能力的机构。</p>
+<p>在此次全球扩展中，我们很高兴能够支持 Novo Nordisk 的使命，通过扩大 GPT‑Rosalind 在医学研究中的应用，帮助其更快地为患者带来创新治疗选择。</p>
+<p>Novo Nordisk 正在利用前沿 AI 能力，帮助研究人员分析复杂数据集、发现有用模式，并更快检验假设。</p>
+<p>GPT‑Rosalind 更强的生物学理解能力，将帮助团队连接文献、基因组学、转录组学、序列、结构和实验结果中的证据。这让研究人员更容易从数据走向更清晰的研究决策。</p>
+<blockquote>
+<p>“生命科学研究复杂、数据密集，而且具有跨学科特征。先进 AI 模型若要为研究人员带来真正的价值，就必须以可信的科学数据为基础，与经过验证的工具连接，并融入研究人员每天实际使用的工作流。”</p>
+<p>“我们对与 OpenAI 的合作感到满意，也很高兴有机会探索 GPT‑Rosalind 如何为药物发现提供更严谨、更实用的方法。”</p>
+</blockquote>
+<p><strong>Mishal Patel，Novo Nordisk 研发部门 AI 与数字创新集团副总裁</strong></p>
+<p>我们现在还为没有 Enterprise 账户、但符合条件的机构提供由 OpenAI 管理的工作区。</p>
+<p><strong>申请访问</strong></p>
+<h3>下一步</h3>
+<p>新版 GPT‑Rosalind 是我们践行更广泛承诺的下一步。我们希望构建能够加速科学发现的 AI 系统，同时确保先进生物能力在适当的安全保障下部署。</p>
+<p>我们将继续提升模型的生物学推理能力，扩大对工具密集型和长周期研究工作流的支持，并与不同地区符合条件的机构合作，评估其现实影响。</p>
+<p>这也意味着把生命科学 AI 用于具有重大影响和公共利益的工作。这些工作覆盖药物发现、转化医学、公共卫生、应急准备和生物防御。</p>
+<p>通过 Rosalind Biodefense 和可信访问部署模式，我们希望把前沿生物能力交给致力于改善人类健康、增强社会韧性的研究人员、机构和防御者。</p>
+<p>我们将继续建设 GPT‑Rosalind，使它成为覆盖科学研究完整生命周期、能力更强的合作伙伴。</p>
+<p>它将帮助科学家从提出正确问题，更快地走向更清晰的证据、更好的实验，并最终为患者带来新的治疗方法。</p>
+<h3>继续阅读</h3>
+<figure class="source-figure" data-source-image="3"><img alt="GPT-5.6 is now the preferred model in Microsoft 365 Copilot &gt; Cover image" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/3MPipvFMxS8m3kTyCtwFgj/015747dcd34cb667a221688cfca64e0f/Frame.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="4"><img alt="GPT 5-6 &gt; Card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/1a9IPPV5nXWydTBosgmgYI/8e03f28ca04f26edc8bc81cdba387df1/5-6.jpg?w=3840&amp;q=90&amp;fm=webp"/></figure>
+</section>
   <script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;

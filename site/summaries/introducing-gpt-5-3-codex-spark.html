@@ -1,340 +1,448 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>推出 GPT-5.3-Codex-Spark</title>
-  <style>
-    :root {
-      --bg: #f7f3ea;
-      --surface: #fffaf0;
-      --card: #ffffff;
-      --ink: #1c2430;
-      --muted: #657080;
-      --line: #d8d1c4;
-      --accent-data: #1667c7;
-      --accent-risk: #c2410c;
-      --accent-opportunity: #16855f;
-      --accent-conclusion: #6d3bd1;
-      --accent-speed: #0f8fa8;
-      --soft-data: #e8f1ff;
-      --soft-risk: #fff0e8;
-      --soft-opportunity: #e8f8f1;
-      --soft-conclusion: #f1ecff;
-      --soft-speed: #e6f7fa;
-      --dark-band: #172033;
-      --dark-band-ink: #f7f9ff;
-      --shadow: 0 18px 45px rgba(24, 34, 48, 0.12);
-    }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #11151c;
-        --surface: #171d27;
-        --card: #1d2531;
-        --ink: #eef2f7;
-        --muted: #a8b2c1;
-        --line: #343d4c;
-        --accent-data: #66a8ff;
-        --accent-risk: #ff9a6b;
-        --accent-opportunity: #5ee0a6;
-        --accent-conclusion: #b79cff;
-        --accent-speed: #5fd4e8;
-        --soft-data: #132740;
-        --soft-risk: #351d14;
-        --soft-opportunity: #143226;
-        --soft-conclusion: #241b3d;
-        --soft-speed: #123039;
-        --dark-band: #0b0f18;
-        --dark-band-ink: #f3f7ff;
-        --shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
-      }
-    }
-
-    :root[data-theme="dark"] {
-      --bg: #11151c;
-      --surface: #171d27;
-      --card: #1d2531;
-      --ink: #eef2f7;
-      --muted: #a8b2c1;
-      --line: #343d4c;
-      --accent-data: #66a8ff;
-      --accent-risk: #ff9a6b;
-      --accent-opportunity: #5ee0a6;
-      --accent-conclusion: #b79cff;
-      --accent-speed: #5fd4e8;
-      --soft-data: #132740;
-      --soft-risk: #351d14;
-      --soft-opportunity: #143226;
-      --soft-conclusion: #241b3d;
-      --soft-speed: #123039;
-      --dark-band: #0b0f18;
-      --dark-band-ink: #f3f7ff;
-      --shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-      line-height: 1.7;
-    }
-
-    .page {
-      max-width: 1120px;
-      margin: 0 auto;
-      padding: 28px 20px 52px;
-    }
-
-    .hero {
-      min-height: 46vh;
-      display: grid;
-      align-items: end;
-      padding: 56px 0 34px;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .label {
-      color: var(--accent-speed);
-      font-size: 0.82rem;
-      font-weight: 800;
-      letter-spacing: 0;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      max-width: 900px;
-      margin: 12px 0 8px;
-      font-size: clamp(2.2rem, 6vw, 5.4rem);
-      line-height: 1.02;
-      letter-spacing: 0;
-    }
-
-    .english-title {
-      margin: 0 0 22px;
-      color: var(--muted);
-      font-size: 1.05rem;
-    }
-
-    .one-line {
-      max-width: 820px;
-      margin: 0;
-      font-size: 1.32rem;
-      color: var(--ink);
-    }
-
-    .metrics {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1px;
-      margin: 28px 0;
-      background: var(--line);
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow);
-    }
-
-    .metric {
-      background: var(--surface);
-      padding: 22px;
-    }
-
-    .metric strong {
-      display: block;
-      font-size: 2rem;
-      line-height: 1;
-      color: var(--accent-data);
-    }
-
-    .metric span {
-      display: block;
-      margin-top: 9px;
-      color: var(--muted);
-      font-size: 0.92rem;
-    }
-
-    .split {
-      display: grid;
-      grid-template-columns: 1.05fr 0.95fr;
-      gap: 34px;
-      padding: 38px 0;
-    }
-
-    .split h2,
-    .timeline h2,
-    .compare h2,
-    .takeaways h2 {
-      margin: 0 0 14px;
-      font-size: 1.55rem;
-      line-height: 1.25;
-    }
-
-    .panel-note {
-      border-left: 6px solid var(--accent-opportunity);
-      background: var(--soft-opportunity);
-      padding: 18px 20px;
-    }
-
-    .panel-note p,
-    .quote p,
-    .timeline p,
-    .compare p {
-      margin: 0;
-    }
-
-    .quote {
-      margin: 8px 0 34px;
-      padding: 28px;
-      background: var(--dark-band);
-      color: var(--dark-band-ink);
-      display: grid;
-      grid-template-columns: 110px 1fr;
-      gap: 22px;
-      align-items: center;
-    }
-
-    .quote .mark {
-      color: var(--accent-speed);
-      font-size: 3.8rem;
-      line-height: 1;
-      font-weight: 900;
-    }
-
-    .timeline {
-      padding: 34px 0;
-    }
-
-    .steps {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 18px;
-      margin-top: 20px;
-    }
-
-    .step {
-      position: relative;
-      padding: 18px 18px 18px 22px;
-      border-top: 5px solid var(--accent-speed);
-      background: var(--soft-speed);
-    }
-
-    .step:nth-child(2) { border-top-color: var(--accent-data); background: var(--soft-data); }
-    .step:nth-child(3) { border-top-color: var(--accent-risk); background: var(--soft-risk); }
-    .step:nth-child(4) { border-top-color: var(--accent-conclusion); background: var(--soft-conclusion); }
-
-    .step b {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 1.05rem;
-    }
-
-    .compare {
-      padding: 34px 26px;
-      background: var(--card);
-      border: 1px solid var(--line);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 18px;
-      font-size: 0.96rem;
-    }
-
-    th, td {
-      padding: 14px 12px;
-      border-bottom: 1px solid var(--line);
-      text-align: left;
-      vertical-align: top;
-    }
-
-    th {
-      color: var(--accent-conclusion);
-      background: var(--soft-conclusion);
-    }
-
-    .insight-strip {
-      margin: 32px 0;
-      padding: 22px 24px;
-      background: var(--soft-risk);
-      border-left: 7px solid var(--accent-risk);
-      font-size: 1.08rem;
-    }
-
-    .takeaways {
-      padding: 34px 0 0;
-    }
-
-    .mosaic {
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr 1fr;
-      gap: 16px;
-      margin-top: 18px;
-    }
-
-    .tile {
-      min-height: 145px;
-      padding: 20px;
-      color: var(--ink);
-      border: 1px solid var(--line);
-    }
-
-    .tile:nth-child(1) {
-      grid-row: span 2;
-      background: var(--soft-data);
-      border-color: var(--accent-data);
-    }
-
-    .tile:nth-child(2) {
-      background: var(--soft-opportunity);
-      border-color: var(--accent-opportunity);
-    }
-
-    .tile:nth-child(3) {
-      background: var(--soft-conclusion);
-      border-color: var(--accent-conclusion);
-    }
-
-    .tile:nth-child(4) {
-      background: var(--soft-speed);
-      border-color: var(--accent-speed);
-    }
-
-    .tile:nth-child(5) {
-      background: var(--soft-risk);
-      border-color: var(--accent-risk);
-    }
-
-    .tile b {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 1.05rem;
-    }
-
-    @media (max-width: 820px) {
-      .metrics,
-      .split,
-      .steps,
-      .mosaic,
-      .quote {
-        grid-template-columns: 1fr;
-      }
-
-      .tile:nth-child(1) {
-        grid-row: auto;
-      }
-
-      h1 {
-        font-size: 2.6rem;
-      }
-
-      .one-line {
-        font-size: 1.12rem;
-      }
-    }
-  </style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>推出 GPT-5.3-Codex-Spark</title>
+<style>
+:root,
+:root[data-theme="light"] {
+  --bg: #f5f2ea;
+  --card: #fffdf8;
+  --ink: #17201e;
+  --muted: #68716e;
+  --line: #d8d7ce;
+  --accent: #5b45d6;
+  --accent2: #007f78;
+  --accent3: #d85b35;
+  --accent4: #a66a00;
+  --data: #006fbd;
+  --risk: #bd3f61;
+  --opportunity: #13815d;
+  --conclusion: #6c4dd4;
+  --hero-bg: #172a2a;
+  --hero-ink: #f7fff9;
+  --hero-muted: #b9d0ca;
+  --data-bg: #e1f2ff;
+  --risk-bg: #ffe7ed;
+  --opportunity-bg: #ddf6e9;
+  --conclusion-bg: #ede7ff;
+  --warm-bg: #fff0d0;
+  --translation-bg: #fffdf8;
+  --quote-bg: #e8f0ee;
+  --nav-bg: #ece9df;
+  --code-bg: #202a29;
+  --code-ink: #e9f7f1;
+  --shadow: rgba(30, 43, 40, 0.12);
+  --white-line: rgba(255, 255, 255, 0.18);
+  --white-soft: rgba(255, 255, 255, 0.08);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101514;
+    --card: #18201e;
+    --ink: #e6efeb;
+    --muted: #a6b3ae;
+    --line: #35423e;
+    --accent: #a998ff;
+    --accent2: #49c9ba;
+    --accent3: #ff8a65;
+    --accent4: #eab754;
+    --data: #58b6f4;
+    --risk: #ff7899;
+    --opportunity: #50d39c;
+    --conclusion: #ad98ff;
+    --hero-bg: #091c1b;
+    --hero-ink: #eafff7;
+    --hero-muted: #9dbcb5;
+    --data-bg: #102b3d;
+    --risk-bg: #351923;
+    --opportunity-bg: #112d23;
+    --conclusion-bg: #251d40;
+    --warm-bg: #322713;
+    --translation-bg: #151c1a;
+    --quote-bg: #1c2c28;
+    --nav-bg: #202825;
+    --code-bg: #090d0c;
+    --code-ink: #d9eee7;
+    --shadow: rgba(0, 0, 0, 0.35);
+    --white-line: rgba(255, 255, 255, 0.15);
+    --white-soft: rgba(255, 255, 255, 0.06);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101514;
+  --card: #18201e;
+  --ink: #e6efeb;
+  --muted: #a6b3ae;
+  --line: #35423e;
+  --accent: #a998ff;
+  --accent2: #49c9ba;
+  --accent3: #ff8a65;
+  --accent4: #eab754;
+  --data: #58b6f4;
+  --risk: #ff7899;
+  --opportunity: #50d39c;
+  --conclusion: #ad98ff;
+  --hero-bg: #091c1b;
+  --hero-ink: #eafff7;
+  --hero-muted: #9dbcb5;
+  --data-bg: #102b3d;
+  --risk-bg: #351923;
+  --opportunity-bg: #112d23;
+  --conclusion-bg: #251d40;
+  --warm-bg: #322713;
+  --translation-bg: #151c1a;
+  --quote-bg: #1c2c28;
+  --nav-bg: #202825;
+  --code-bg: #090d0c;
+  --code-ink: #d9eee7;
+  --shadow: rgba(0, 0, 0, 0.35);
+  --white-line: rgba(255, 255, 255, 0.15);
+  --white-soft: rgba(255, 255, 255, 0.06);
+}
+* {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.75;
+}
+a {
+  color: var(--accent2);
+  text-underline-offset: 0.2em;
+}
+#summary {
+  overflow: hidden;
+}
+.hero {
+  padding: clamp(4rem, 10vw, 8rem) max(6vw, calc((100vw - 1180px) / 2));
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+  border-bottom: 6px solid var(--accent2);
+}
+.eyebrow {
+  margin: 0 0 1rem;
+  color: var(--hero-muted);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.hero h1 {
+  max-width: 900px;
+  margin: 0;
+  font-size: clamp(2.5rem, 7vw, 6rem);
+  line-height: 1.03;
+  letter-spacing: -0.055em;
+}
+.original-title {
+  margin: 1.2rem 0 0;
+  color: var(--hero-muted);
+  font-size: clamp(1rem, 2vw, 1.35rem);
+}
+.one-line {
+  max-width: 900px;
+  margin: 3rem 0 0;
+  padding: 1.4rem 0 1.4rem 1.4rem;
+  border-left: 5px solid var(--accent4);
+  font-size: clamp(1.25rem, 2.8vw, 2rem);
+  line-height: 1.45;
+}
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  color: var(--hero-muted);
+}
+.meta span {
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--white-line);
+  border-radius: 999px;
+  background: var(--white-soft);
+}
+.stat-band {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  max-width: 1180px;
+  margin: -1.8rem auto 0;
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: 0 18px 45px var(--shadow);
+}
+.stat {
+  padding: 2rem 1.4rem;
+  border-right: 1px solid var(--line);
+}
+.stat:last-child {
+  border-right: 0;
+}
+.stat strong {
+  display: block;
+  color: var(--data);
+  font-size: clamp(1.8rem, 4vw, 3.2rem);
+  line-height: 1;
+}
+.stat span {
+  display: block;
+  margin-top: 0.7rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+.summary-wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 5rem 1.4rem;
+}
+.split {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 3rem;
+  align-items: start;
+}
+.kicker {
+  color: var(--accent3);
+  font-weight: 800;
+}
+.split h2,
+.dark-panel h2,
+.timeline-wrap h2,
+.takeaways h2 {
+  margin-top: 0;
+  font-size: clamp(1.8rem, 4vw, 3.2rem);
+  line-height: 1.15;
+}
+.explain {
+  padding: 1.6rem;
+  background: var(--opportunity-bg);
+  border-top: 5px solid var(--opportunity);
+}
+.explain h3 {
+  color: var(--opportunity);
+}
+.hl {
+  padding: 0.08em 0.28em;
+  background: var(--data-bg);
+  color: var(--data);
+  font-weight: 800;
+  border-radius: 0.25em;
+}
+.hl2 {
+  padding: 0.08em 0.28em;
+  background: var(--conclusion-bg);
+  color: var(--conclusion);
+  font-weight: 800;
+  border-radius: 0.25em;
+}
+.dark-panel {
+  padding: 5rem max(6vw, calc((100vw - 1180px) / 2));
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+}
+.latency-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  margin-top: 2rem;
+  background: var(--white-line);
+}
+.latency-item {
+  padding: 2rem;
+  background: var(--hero-bg);
+}
+.latency-item strong {
+  color: var(--accent4);
+  font-size: clamp(2.5rem, 6vw, 4.6rem);
+  line-height: 1;
+}
+.latency-item h3 {
+  margin-bottom: 0.4rem;
+}
+.latency-item p {
+  color: var(--hero-muted);
+}
+.timeline-wrap {
+  padding: 5rem max(6vw, calc((100vw - 1000px) / 2));
+  background: var(--warm-bg);
+}
+.timeline {
+  position: relative;
+  margin-top: 2.5rem;
+  padding-left: 2rem;
+  border-left: 4px solid var(--accent3);
+}
+.timeline article {
+  position: relative;
+  margin-bottom: 2.5rem;
+}
+.timeline article::before {
+  position: absolute;
+  top: 0.45rem;
+  left: calc(-2rem - 0.62rem);
+  width: 0.9rem;
+  height: 0.9rem;
+  content: "";
+  background: var(--accent3);
+  border: 3px solid var(--warm-bg);
+  border-radius: 50%;
+}
+.timeline h3 {
+  margin-bottom: 0.4rem;
+  color: var(--accent3);
+}
+.limit-note {
+  padding: 1.4rem 1.6rem;
+  background: var(--risk-bg);
+  border-left: 5px solid var(--risk);
+}
+.takeaways {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 5rem 1.4rem 6rem;
+}
+.mosaic {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 0.8fr;
+  gap: 1rem;
+}
+.tile {
+  min-height: 180px;
+  padding: 1.6rem;
+  border: 1px solid var(--line);
+}
+.tile:nth-child(1) {
+  grid-row: span 2;
+  background: var(--conclusion-bg);
+  border-top: 6px solid var(--conclusion);
+}
+.tile:nth-child(2) {
+  background: var(--data-bg);
+  border-top: 6px solid var(--data);
+}
+.tile:nth-child(3) {
+  background: var(--opportunity-bg);
+  border-top: 6px solid var(--opportunity);
+}
+.tile:nth-child(4) {
+  grid-column: span 2;
+  background: var(--risk-bg);
+  border-top: 6px solid var(--risk);
+}
+.tile b {
+  display: block;
+  margin-bottom: 0.65rem;
+  font-size: 1.12rem;
+}
+#translation {
+  background: var(--translation-bg);
+  border-top: 1px solid var(--line);
+}
+.translation-inner {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 6rem 1.4rem;
+}
+#translation h2 {
+  margin: 0 0 3rem;
+  font-size: clamp(2.2rem, 6vw, 4.5rem);
+  line-height: 1.1;
+}
+#translation h3 {
+  margin: 3.5rem 0 1rem;
+  padding-bottom: 0.5rem;
+  color: var(--accent);
+  font-size: 1.8rem;
+  border-bottom: 2px solid var(--line);
+}
+#translation p,
+#translation li {
+  font-family: "Noto Serif SC", "Songti SC", SimSun, serif;
+  font-size: 1.08rem;
+}
+.translation-deck {
+  color: var(--muted);
+  font-size: 1.3rem !important;
+}
+.contents {
+  margin: 2rem 0;
+  padding: 1.2rem 1.5rem;
+  background: var(--nav-bg);
+  border-left: 4px solid var(--accent2);
+}
+.contents ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  columns: 2;
+}
+.timecode {
+  display: inline-block;
+  padding: 0.25rem 0.65rem;
+  background: var(--code-bg);
+  color: var(--code-ink);
+  border-radius: 0.4rem;
+  font-family: ui-monospace, monospace;
+}
+blockquote {
+  margin: 2.5rem 0;
+  padding: 1.5rem 1.8rem;
+  background: var(--quote-bg);
+  border-left: 6px solid var(--accent4);
+  font-size: 1.2rem;
+}
+.source-figure {
+  margin: 3.5rem 0;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  background: var(--card);
+}
+.source-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.source-figure figcaption {
+  margin-top: 0.8rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.footer-fragments {
+  margin-top: 4rem;
+  padding-top: 2rem;
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+}
+@media (max-width: 780px) {
+  .stat-band,
+  .split,
+  .latency-grid,
+  .mosaic {
+    grid-template-columns: 1fr;
+  }
+  .stat-band {
+    margin: 0;
+  }
+  .stat {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .tile:nth-child(1),
+  .tile:nth-child(4) {
+    grid-row: auto;
+    grid-column: auto;
+  }
+  .contents ul {
+    columns: 1;
+  }
+}
+</style>
   <script id="airs-digest-theme-boot">
     try {
       var saved = localStorage.getItem("theme");
@@ -464,150 +572,199 @@
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/introducing-gpt-5-3-codex-spark" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
-  <main class="page">
-    <header class="hero">
-      <div>
-        <div class="label">Product · OpenAI · Feb 12, 2026</div>
-        <h1>推出 GPT-5.3-Codex-Spark</h1>
-        <p class="english-title">Introducing GPT-5.3-Codex-Spark</p>
-        <p class="one-line">一句话总括：Codex-Spark 的真正贡献，是把 AI 编程从“等待模型完成任务”推进到“边改边看结果”的实时协作回路。</p>
-      </div>
-    </header>
-
-    <section class="metrics" aria-label="关键数字">
-      <div class="metric">
-        <strong>1000+</strong>
-        <span>tokens/s，强调近乎即时的输出体验。</span>
-      </div>
-      <div class="metric">
-        <strong>128k</strong>
-        <span>文本上下文窗口，适合较大的代码上下文。</span>
-      </div>
-      <div class="metric">
-        <strong>-80%</strong>
-        <span>每次客户端/服务器往返开销，来自端到端链路优化。</span>
-      </div>
-      <div class="metric">
-        <strong>-50%</strong>
-        <span>首 token 时间，让开发者更快看到模型开始工作。</span>
-      </div>
-    </section>
-
-    <section class="split">
-      <div>
-        <h2>定位不是最强，而是最快进入反馈</h2>
-        <p>GPT-5.3-Codex-Spark 是 GPT-5.3-Codex 的较小版本。它面向实时编码，而不是长时间自主执行。</p>
-        <p>这改变了对 AI 编程助手的理解。模型能力仍重要，但交互速度开始成为产品体验的核心变量。</p>
-      </div>
-      <div class="panel-note">
-        <p>默认工作方式也被调轻。它更倾向于做最小、定向的代码修改，并且不会自动跑测试，除非用户明确要求。</p>
-      </div>
-    </section>
-
-    <section class="quote">
-      <div class="mark">“</div>
-      <p>OpenAI 把它称为与 Cerebras 合作的第一个里程碑。重点不是单次回答更完整，而是探索高速推理会带来哪些新的交互方式和产品形态。</p>
-    </section>
-
-    <section class="timeline">
-      <h2>速度提升来自完整链路，而不只是模型本身</h2>
-      <p>文章强调，实时协作需要压缩从客户端到服务器、再回到用户界面的整条路径。</p>
-      <div class="steps">
-        <div class="step">
-          <b>模型侧</b>
-          <p>Codex-Spark 被调优为高速推理小模型，在真实编码任务上保持可用能力。</p>
-        </div>
-        <div class="step">
-          <b>传输侧</b>
-          <p>默认启用持久 WebSocket 路径，减少请求往返中的固定开销。</p>
-        </div>
-        <div class="step">
-          <b>系统侧</b>
-          <p>推理栈和会话初始化被重写或重构，让第一段可见输出更早出现。</p>
-        </div>
-        <div class="step">
-          <b>体验侧</b>
-          <p>开发者可以中断、改向和快速迭代。AI 更像实时搭档，而不是后台任务队列。</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="compare">
-      <h2>两种 Codex 工作模式开始分工</h2>
-      <p>这不是单一模型路线，而是把长任务和短反馈分成互补模式。</p>
-      <table>
-        <thead>
-          <tr>
-            <th>维度</th>
-            <th>长时间前沿模型</th>
-            <th>Codex-Spark</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>主要目标</td>
-            <td>自主执行数小时、数天或更久的复杂任务。</td>
-            <td>快速完成定向编辑、逻辑调整和界面微调。</td>
-          </tr>
-          <tr>
-            <td>体验重点</td>
-            <td>可靠推进大目标。</td>
-            <td>降低等待感，保持开发者在紧密循环中。</td>
-          </tr>
-          <tr>
-            <td>使用限制</td>
-            <td>按常规模型配额和能力边界运行。</td>
-            <td>研究预览期有独立速率限制，高需求时可能排队。</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section class="insight-strip">
-      <strong>风险与边界：</strong>Codex-Spark 当前仅支持文本，研究预览先面向 ChatGPT Pro 用户，并只向少量 API 设计伙伴开放。它经过标准部署评估，OpenAI 称其没有达到网络安全或生物领域高能力阈值的可信可能性。
-    </section>
-
-    <section class="split">
-      <div class="panel-note">
-        <p>机会在于工作流重组。未来 Codex 可以让用户留在实时交互中，同时把长任务交给后台子代理，或并行分发给多个模型。</p>
-      </div>
-      <div>
-        <h2>硬件路线也在分层</h2>
-        <p>Cerebras 的 Wafer Scale Engine 3 提供低延迟推理层。GPU 仍负责广泛训练和推理中的成本效率。</p>
-        <p>这说明 AI 产品可能不再只按“模型大小”分层。不同硬件会服务不同交互场景。</p>
-      </div>
-    </section>
-
-    <section class="takeaways">
-      <h2>最值得带走的洞见</h2>
-      <div class="mosaic">
-        <div class="tile">
-          <b>速度正在成为能力的一部分</b>
-          <p>当模型能在编码中被打断和重定向，用户会用它做更多小步试探。AI 的价值不只来自最终答案，也来自迭代频率。</p>
-        </div>
-        <div class="tile">
-          <b>实时模式有自己的产品逻辑</b>
-          <p>少做、快做、可中断，比一次性规划完整任务更适合界面和局部代码修改。</p>
-        </div>
-        <div class="tile">
-          <b>系统优化放大模型体验</b>
-          <p>80% 往返开销下降和 50% 首 token 时间下降，说明基础设施优化会直接改变用户感知。</p>
-        </div>
-        <div class="tile">
-          <b>硬件会影响交互形态</b>
-          <p>Cerebras 提供低延迟路径，GPU 继续承担广泛成本效率。未来产品可能混合使用两类计算。</p>
-        </div>
-        <div class="tile">
-          <b>结论</b>
-          <p>Codex-Spark 的意义不在于替代所有模型，而在于证明 AI 编程助手需要同时支持长程执行和即时协作。</p>
-        </div>
-      </div>
-    </section>
-  </main>
+<section id="summary">
+<header class="hero">
+<p class="eyebrow">OpenAI · Product · 2026 年 2 月 12 日</p>
+<h1>推出 GPT-5.3-Codex-Spark</h1>
+<p class="original-title" lang="en">Introducing GPT-5.3-Codex-Spark</p>
+<p class="one-line">一句话总括：OpenAI 用小型模型、专用低延迟硬件和端到端传输优化，把 Codex 的编程协作速度提升到接近即时响应。</p>
+<div class="meta">
+<span>研究预览</span>
+<span>ChatGPT Pro</span>
+<span>Codex</span>
+<span>Cerebras</span>
+</div>
+</header>
+<div aria-label="关键数据" class="stat-band">
+<div class="stat">
+<strong>&gt;1000</strong>
+<span>每秒生成的 token 数</span>
+</div>
+<div class="stat">
+<strong>128k</strong>
+<span>上下文窗口</span>
+</div>
+<div class="stat">
+<strong>−80%</strong>
+<span>客户端与服务器每次往返的额外开销</span>
+</div>
+<div class="stat">
+<strong>−50%</strong>
+<span>首个 token 的等待时间</span>
+</div>
+</div>
+<div class="summary-wrap">
+<div class="split">
+<div>
+<p class="kicker">真正的变化不是单纯“跑得更快”</p>
+<h2>Codex 多了一种实时协作模式</h2>
+<p>主线模型擅长持续数小时、数天甚至数周的自主任务。Codex-Spark 面向另一类工作：小范围改代码、调整逻辑、打磨界面，并立即看到结果。</p>
+<p>它允许用户在执行过程中随时打断或改变方向。延迟降低后，人与模型之间的循环更像结对编程，而不是提交任务后等待结果。</p>
+<p><span class="hl2">结论：</span>Codex-Spark 没有取代长时间自主执行。它补上了快速试验和即时反馈这一种工作方式。</p>
+</div>
+<aside class="explain">
+<h3>速度也改变了默认行为</h3>
+<p>模型默认采用轻量工作方式。它倾向于进行最少且有针对性的修改。</p>
+<p>除非用户明确提出要求，否则它<span class="hl">不会自动运行测试</span>。这能减少交互等待，但也意味着开发者需要主动要求验证。</p>
+<p>因此，速度优势伴随着新的使用习惯：快速迭代之后，仍要安排测试和完整检查。</p>
+</aside>
+</div>
+</div>
+<div class="dark-panel">
+<p class="eyebrow">端到端延迟优化</p>
+<h2>模型速度只是实时体验的一部分</h2>
+<p>OpenAI 同时优化了客户端、服务器、推理栈和会话初始化。相关改进会惠及所有模型，而不仅是 Codex-Spark。</p>
+<div class="latency-grid">
+<article class="latency-item">
+<strong>80%</strong>
+<h3>往返开销下降</h3>
+<p>持久 WebSocket 连接减少了每次客户端与服务器通信的固定成本。</p>
+</article>
+<article class="latency-item">
+<strong>30%</strong>
+<h3>单 token 开销下降</h3>
+<p>推理栈和流式响应路径的改写，让连续输出更顺畅。</p>
+</article>
+<article class="latency-item">
+<strong>50%</strong>
+<h3>首个 token 更快出现</h3>
+<p>会话初始化被重新设计，用户更早看到模型开始响应。</p>
+</article>
+</div>
+</div>
+<div class="timeline-wrap">
+<p class="kicker">产品定位与开放节奏</p>
+<h2>先验证实时编程，再逐步扩展能力</h2>
+<div class="timeline">
+<article>
+<h3>研究预览</h3>
+<p>最新版 Codex 应用、CLI 和 VS Code 扩展首先向 ChatGPT Pro 用户开放。API 仅向少量设计合作伙伴提供。</p>
+</article>
+<article>
+<h3>当前能力</h3>
+<p>模型仅支持文本，拥有 <span class="hl">128k 上下文窗口</span>。使用量采用独立速率限制，不计入标准限制。</p>
+</article>
+<article>
+<h3>后续扩展</h3>
+<p>OpenAI 计划增加更大的模型、更长的上下文和多模态输入。开放范围也会随数据中心容量和真实负载调优逐步扩大。</p>
+</article>
+</div>
+<div class="limit-note">
+<strong>限制与风险：</strong>专用低延迟硬件的容量仍有限。高需求期间可能出现访问受限或临时排队，独立速率限制也会根据需求调整。
+    </div>
+</div>
+<div class="takeaways">
+<p class="kicker">最值得带走的洞见</p>
+<h2>速度正在成为模型能力的一部分</h2>
+<div class="mosaic">
+<article class="tile">
+<b>两种 Codex 模式将并存并融合</b>
+<p>一种模式负责长周期推理和执行。另一种负责实时协作和快速迭代。未来，前台互动可以与后台子代理的长任务同时进行。</p>
+</article>
+<article class="tile">
+<b>超高速推理改变交互方式</b>
+<p>超过每秒 1000 个 token 的速度，让打断、改向和连续试验更自然。</p>
+</article>
+<article class="tile">
+<b>专用硬件补充 GPU</b>
+<p>Cerebras 面向极低延迟场景。GPU 仍是大规模训练和推理的基础，两者可以在同一工作负载中组合。</p>
+</article>
+<article class="tile">
+<b>基准表现不能脱离时间成本解读</b>
+<p>文章称模型在 SWE-Bench Pro 和 Terminal-Bench 2.0 上表现强劲，并以 GPT-5.3-Codex 的一小部分时间完成任务。但原文没有给出具体分数，因此不能进一步量化差距。</p>
+</article>
+</div>
+</div>
+</section><section id="translation">
+<div class="translation-inner">
+<h2>完整译文</h2>
+<p class="translation-deck">一款面向 Codex 实时编程的超高速模型。</p>
+<nav aria-label="文章目录" class="contents">
+<ul>
+<li>速度与智能</li>
+<li>编程</li>
+<li>所有模型的延迟改进</li>
+<li>由 Cerebras 提供算力支持</li>
+<li>使用范围与详情</li>
+<li>下一步</li>
+</ul>
+</nav>
+<nav aria-label="重复的文章目录" class="contents">
+<ul>
+<li>速度与智能</li>
+<li>编程</li>
+<li>所有模型的延迟改进</li>
+<li>由 Cerebras 提供算力支持</li>
+<li>使用范围与详情</li>
+<li>下一步</li>
+</ul>
+</nav>
+<p>今天，我们发布 GPT‑5.3‑Codex‑Spark 的研究预览版。它是 GPT‑5.3‑Codex 的较小版本，也是我们首个专为实时编程设计的模型。Codex-Spark 是我们与 Cerebras 合作的首个里程碑。这项合作已于今年 1 月公布。Codex-Spark 针对超低延迟硬件进行了优化，力求带来接近即时响应的体验。它每秒可以生成超过 1000 个 token，同时仍能胜任真实的软件开发任务。</p>
+<p>我们通过 Cerebras 向 ChatGPT Pro 用户提供 Codex-Spark 研究预览版，让开发者尽早开始试用。与此同时，我们将与 Cerebras 一起扩大数据中心容量，增强端到端用户体验的稳定性，并部署规模更大的前沿模型。</p>
+<p>我们最新的前沿模型特别擅长执行长时间任务。它们可以在无人干预的情况下自主工作数小时、数天，甚至数周。Codex-Spark 则是我们首个专门面向 Codex 实时协作的模型。用户可以让它进行有针对性的修改、重塑逻辑或打磨界面，并立即看到结果。有了 Codex-Spark，Codex 既能承担长期而宏大的任务，也能处理当下需要立即完成的工作。我们希望了解开发者会如何使用它，并在持续扩大开放范围的过程中吸收反馈。</p>
+<p>Codex-Spark 首发时提供 128k 上下文窗口，并且仅支持文本。在研究预览期间，它采用独立的速率限制。相关使用量不会计入标准速率限制。不过，当需求较高时，我们为了平衡所有用户的使用可靠性，可能会限制访问或临时安排排队。</p>
+<h3>速度与智能</h3>
+<p>Codex-Spark 针对交互式工作进行了优化。在这类工作中，延迟和智能同样重要。你可以实时与模型协作，在它工作时打断它或改变方向，并通过接近即时的响应迅速迭代。由于模型以速度为优化目标，Codex-Spark 的默认工作方式较为轻量。它会进行最少且有针对性的修改，也不会自动运行测试，除非你明确提出要求。</p>
+<p><span class="timecode">00:00</span></p>
+<h3>编程</h3>
+<p>Codex-Spark 是一款能力很强的小型模型，针对快速推理进行了优化。SWE-Bench Pro 和 Terminal-Bench 2.0 是两个评估代理式软件工程能力的基准测试。GPT‑5.3‑Codex‑Spark 在这两项测试中展现出强劲表现，同时只用了 GPT‑5.3‑Codex 完成相同任务所需时间的一小部分。</p>
+<p>持续时间估算包含四部分：第一，输出生成时间，也就是输出 token 数除以采样速度；第二，预填充时间，也就是预填充 token 数除以预填充速度；第三，工具执行的总时间；第四，网络额外开销的总时间。</p>
+<h3>所有模型的延迟改进</h3>
+<p>在训练 Codex-Spark 的过程中，我们发现，模型速度只是实时协作的一部分。我们还需要降低整个请求与响应链路的延迟。为此，我们在运行框架中实施了端到端延迟优化。这些改进将惠及所有模型。具体来说，我们简化了响应在客户端与服务器之间的双向流式传输方式，重写了推理栈的关键部分，并重新设计了会话初始化流程。这样可以让第一个可见 token 更早出现，也能让 Codex 在连续迭代时保持响应灵敏。通过引入持久 WebSocket 连接，并对 Responses API 进行有针对性的优化，我们把每次客户端与服务器往返的额外开销降低了 80%，把单 token 的额外开销降低了 30%，并把首个 token 的等待时间降低了 50%。Codex-Spark 默认启用 WebSocket 通道。它很快也会成为所有模型的默认通道。</p>
+<h3>由 Cerebras 提供算力支持</h3>
+<p>Codex-Spark 运行在 Cerebras 的 Wafer Scale Engine 3 上。这是一款专为高速推理打造的 AI 加速器，为 Codex 提供以延迟为优先的服务层。我们与 Cerebras 合作，把这条低延迟通道加入与其他算力资源相同的生产服务栈。因此，它可以无缝用于 Codex，也为支持未来的模型奠定基础。</p>
+<blockquote>“GPT-5.3-Codex-Spark 最令我们兴奋的地方，是能够与 OpenAI 和开发者社区携手探索快速推理带来的可能性。这包括新的交互模式、新的使用场景，以及一种根本不同的模型体验。这次预览只是开始。”</blockquote>
+<p>GPU 仍是我们训练和推理管线的基础。在面向广泛用户提供服务时，GPU 也能以最具成本效益的方式生成 token。Cerebras 是对这一基础的补充。它擅长处理要求极低延迟的工作流，可以缩短端到端反馈循环，让你在迭代时感到 Codex 的响应更加灵敏。GPU 和 Cerebras 也可以在同一个工作负载中组合使用，以取得最佳性能。</p>
+<h3>使用范围与详情</h3>
+<p>Codex-Spark 于今天开始以研究预览形式逐步开放。ChatGPT Pro 用户可以在最新版 Codex 应用、CLI 和 VS Code 扩展中使用它。由于模型运行在专用低延迟硬件上，其使用量采用独立的速率限制。在研究预览期间，该限制可能根据需求进行调整。此外，我们还通过 API 向少量设计合作伙伴提供 Codex-Spark，以了解开发者希望如何把它集成到自己的产品中。未来几周，我们会继续在真实工作负载下调优集成方案，并逐步扩大开放范围。</p>
+<p>Codex-Spark 目前仅支持文本，并提供 128k 上下文窗口。它是超高速模型系列中的第一款产品。随着我们和开发者社区进一步了解快速模型最适合哪些编程场景，我们将引入更多能力。这些能力包括更大的模型、更长的上下文窗口和多模态输入。</p>
+<p>Codex-Spark 采用与主线模型相同的安全训练，其中包括与网络安全相关的训练。我们按照标准部署流程对 Codex-Spark 进行了评估。该流程包含针对网络安全和其他能力的基线评估。评估结果表明，它没有合理可能达到《Preparedness Framework》中有关网络安全或生物领域高能力的门槛。</p>
+<h3>下一步</h3>
+<p>Codex-Spark 是迈向双模式 Codex 的第一步。这两种模式可以相互补充：一种负责更长周期的推理和执行，另一种负责实时协作与快速迭代。随着时间推移，两种模式会逐渐融合。Codex 可以让你保持紧密的互动循环，同时把耗时更长的工作交给后台子代理。需要兼顾覆盖面和速度时，它也可以把任务分发给许多模型并行处理。这样一来，你不必事先只选择一种模式。</p>
+<p>随着模型能力不断增强，交互速度正成为一个明显的瓶颈。超高速推理可以缩短反馈循环，让 Codex 用起来更加自然，也能为每一位希望把想法变成可用软件的人拓展可能性。</p>
+<div class="footer-fragments">
+<p>2026</p>
+<p>Codex</p>
+<p>作者</p>
+<p>继续阅读</p>
+</div>
+<figure class="source-figure" data-source-image="0"><img alt="Codex Landing Page SEO" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/7E1L5KrvfinYdmBBNDPhf5/710a8a46258bafe8fe2d26f31ff242c0/Codex_Landing_Page_SEO.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="1"><img alt="GPT-5.3-Codex Artcard 1x1" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/xLTdc1cB9MjP3XZpAdE8D/263f939a44396dbd30d914b074a8af35/GPT-5.3-Codex_Artcard_1x1.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="2"><img alt="System Card Art" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/3kfYeisRWae4jKIMSphLhU/0e06a3ac9f3a42b91d6cc7bba01c2e8c/System_Card_Art.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+</div>
+</section>
   <script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;

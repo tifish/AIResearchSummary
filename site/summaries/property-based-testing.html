@@ -1,286 +1,452 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>用 Claude 和基于性质的测试在 Python 生态系统中发现缺陷</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>用 Claude 和基于属性的测试在 Python 生态系统中寻找缺陷</title>
 <style>
 :root {
-  --bg: #f7f8fb;
-  --ink: #172033;
-  --muted: #667085;
-  --line: #d9deea;
-  --card: #ffffff;
-  --hero-bg: #101828;
-  --hero-ink: #f9fafb;
-  --panel-blue: #e9f2ff;
-  --panel-green: #eaf8ef;
-  --panel-amber: #fff4dc;
-  --panel-red: #fff0f0;
-  --panel-violet: #f1ebff;
-  --band-bg: #eaf8ef;
-  --table-head: #eef3fb;
-  --quote-bg: #fff7e8;
-  --mosaic-bg: #edf7f2;
-  --accent-data: #2563eb;
-  --accent-risk: #dc2626;
-  --accent-opportunity: #16a34a;
-  --accent-conclusion: #7c3aed;
-  --accent-warning: #d97706;
-  --shadow: 0 18px 50px rgba(23, 32, 51, 0.10);
+  color-scheme: light dark;
+  --bg: #f5f1e8;
+  --surface: #fffdf8;
+  --surface-alt: #e8f1f0;
+  --surface-warm: #fff0d7;
+  --surface-risk: #fbe5e5;
+  --surface-opportunity: #e5f3e8;
+  --surface-conclusion: #e8e7f8;
+  --deep: #17252a;
+  --deep-ink: #f7faf8;
+  --ink: #1d2829;
+  --muted: #5e6b6c;
+  --line: #cbd5d2;
+  --accent: #087f8c;
+  --accent2: #c45d20;
+  --accent3: #8d3c65;
+  --accent4: #477a39;
+  --data: #087f8c;
+  --risk: #b43b4c;
+  --opportunity: #387d3a;
+  --conclusion: #6546a8;
+  --hl: #ffe29a;
+  --hl2: #bde9df;
+  --code-bg: #e8ece9;
+  --quote-bg: #243a40;
+  --quote-ink: #f5fbf8;
+  --shadow: rgba(27, 47, 48, 0.13);
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f5f1e8;
+  --surface: #fffdf8;
+  --surface-alt: #e8f1f0;
+  --surface-warm: #fff0d7;
+  --surface-risk: #fbe5e5;
+  --surface-opportunity: #e5f3e8;
+  --surface-conclusion: #e8e7f8;
+  --deep: #17252a;
+  --deep-ink: #f7faf8;
+  --ink: #1d2829;
+  --muted: #5e6b6c;
+  --line: #cbd5d2;
+  --accent: #087f8c;
+  --accent2: #c45d20;
+  --accent3: #8d3c65;
+  --accent4: #477a39;
+  --data: #087f8c;
+  --risk: #b43b4c;
+  --opportunity: #387d3a;
+  --conclusion: #6546a8;
+  --hl: #ffe29a;
+  --hl2: #bde9df;
+  --code-bg: #e8ece9;
+  --quote-bg: #243a40;
+  --quote-ink: #f5fbf8;
+  --shadow: rgba(27, 47, 48, 0.13);
 }
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0b1020;
-    --ink: #e6eaf2;
-    --muted: #a6adbd;
-    --line: #2a3448;
-    --card: #141b2d;
-    --hero-bg: #070b16;
-    --hero-ink: #f3f6fb;
-    --panel-blue: #10233f;
-    --panel-green: #10291d;
-    --panel-amber: #33240b;
-    --panel-red: #331315;
-    --panel-violet: #21163c;
-    --band-bg: #10291d;
-    --table-head: #192238;
-    --quote-bg: #2b210f;
-    --mosaic-bg: #10241d;
-    --accent-data: #60a5fa;
-    --accent-risk: #f87171;
-    --accent-opportunity: #4ade80;
-    --accent-conclusion: #a78bfa;
-    --accent-warning: #fbbf24;
-    --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #101719;
+    --surface: #192225;
+    --surface-alt: #173033;
+    --surface-warm: #342819;
+    --surface-risk: #351d24;
+    --surface-opportunity: #1c3224;
+    --surface-conclusion: #28233e;
+    --deep: #0b1113;
+    --deep-ink: #e9f3ef;
+    --ink: #e2ece8;
+    --muted: #a8b7b3;
+    --line: #3a4a4b;
+    --accent: #48c8d0;
+    --accent2: #f29a5b;
+    --accent3: #e58ab7;
+    --accent4: #8fd17e;
+    --data: #48c8d0;
+    --risk: #f17888;
+    --opportunity: #84cf83;
+    --conclusion: #b49aef;
+    --hl: #594615;
+    --hl2: #174e45;
+    --code-bg: #263235;
+    --quote-bg: #081012;
+    --quote-ink: #e9f3ef;
+    --shadow: rgba(0, 0, 0, 0.32);
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0b1020;
-  --ink: #e6eaf2;
-  --muted: #a6adbd;
-  --line: #2a3448;
-  --card: #141b2d;
-  --hero-bg: #070b16;
-  --hero-ink: #f3f6fb;
-  --panel-blue: #10233f;
-  --panel-green: #10291d;
-  --panel-amber: #33240b;
-  --panel-red: #331315;
-  --panel-violet: #21163c;
-  --band-bg: #10291d;
-  --table-head: #192238;
-  --quote-bg: #2b210f;
-  --mosaic-bg: #10241d;
-  --accent-data: #60a5fa;
-  --accent-risk: #f87171;
-  --accent-opportunity: #4ade80;
-  --accent-conclusion: #a78bfa;
-  --accent-warning: #fbbf24;
-  --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  color-scheme: dark;
+  --bg: #101719;
+  --surface: #192225;
+  --surface-alt: #173033;
+  --surface-warm: #342819;
+  --surface-risk: #351d24;
+  --surface-opportunity: #1c3224;
+  --surface-conclusion: #28233e;
+  --deep: #0b1113;
+  --deep-ink: #e9f3ef;
+  --ink: #e2ece8;
+  --muted: #a8b7b3;
+  --line: #3a4a4b;
+  --accent: #48c8d0;
+  --accent2: #f29a5b;
+  --accent3: #e58ab7;
+  --accent4: #8fd17e;
+  --data: #48c8d0;
+  --risk: #f17888;
+  --opportunity: #84cf83;
+  --conclusion: #b49aef;
+  --hl: #594615;
+  --hl2: #174e45;
+  --code-bg: #263235;
+  --quote-bg: #081012;
+  --quote-ink: #e9f3ef;
+  --shadow: rgba(0, 0, 0, 0.32);
 }
 * { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-  line-height: 1.65;
+  font-family: "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.78;
 }
-main { overflow: hidden; }
+a { color: var(--accent); text-underline-offset: 0.2em; }
+code {
+  padding: 0.12em 0.34em;
+  border-radius: 0.35em;
+  background: var(--code-bg);
+  font-family: Consolas, monospace;
+}
 .hero {
-  background: var(--hero-bg);
-  color: var(--hero-ink);
-  padding: 64px 7vw 48px;
+  padding: clamp(3.5rem, 9vw, 8rem) max(6vw, calc((100vw - 1120px) / 2));
+  background: var(--deep);
+  color: var(--deep-ink);
+  border-bottom: 0.5rem solid var(--accent2);
 }
-.hero-inner { max-width: 1120px; margin: 0 auto; }
-.kicker {
-  color: var(--accent-opportunity);
-  font-weight: 700;
-  letter-spacing: .08em;
-  font-size: 13px;
-  text-transform: uppercase;
+.eyebrow {
+  margin: 0 0 1rem;
+  color: var(--accent);
+  font-weight: 800;
+  letter-spacing: 0.14em;
 }
-h1 {
-  margin: 14px 0 10px;
-  font-size: clamp(32px, 6vw, 62px);
+.hero h1 {
+  max-width: 920px;
+  margin: 0;
+  font-size: clamp(2.35rem, 6vw, 5.6rem);
   line-height: 1.08;
-  letter-spacing: 0;
+  letter-spacing: -0.045em;
 }
-.original {
+.original-title {
+  max-width: 850px;
+  margin: 1.2rem 0 0;
   color: var(--muted);
-  max-width: 820px;
-  font-size: 17px;
+  font-family: Georgia, serif;
+  font-size: clamp(1rem, 2vw, 1.35rem);
 }
-.thesis {
-  margin-top: 28px;
-  padding: 18px 22px;
-  border-left: 6px solid var(--accent-conclusion);
-  background: rgba(255,255,255,.07);
-  max-width: 900px;
-  font-size: 20px;
+.byline {
+  margin: 2.1rem 0 0;
+  color: var(--deep-ink);
+  opacity: 0.8;
 }
-.section {
+.summary {
   max-width: 1120px;
   margin: 0 auto;
-  padding: 54px 7vw;
+  padding: 3.5rem 1.25rem 5rem;
 }
-.stats-band {
-  background: var(--band-bg);
+.one-line {
+  margin: -5.2rem 0 3.5rem;
+  padding: 1.65rem 2rem;
+  background: var(--surface-warm);
+  border: 1px solid var(--line);
+  border-left: 0.55rem solid var(--accent2);
+  box-shadow: 0 1rem 2.5rem var(--shadow);
+  font-size: clamp(1.15rem, 2.3vw, 1.55rem);
+  font-weight: 700;
+}
+.one-line strong { color: var(--accent2); }
+.metric-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 0 0 3.5rem;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 }
-.stats {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 18px;
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 30px 7vw;
+.metric {
+  padding: 1.4rem;
+  border-right: 1px solid var(--line);
 }
-.stat {
-  border-left: 5px solid var(--accent-data);
-  padding: 12px 14px;
-  background: var(--card);
-  box-shadow: var(--shadow);
-}
-.stat strong {
+.metric:last-child { border-right: 0; }
+.metric b {
   display: block;
-  color: var(--accent-data);
-  font-size: 32px;
+  color: var(--data);
+  font-size: clamp(2rem, 4vw, 3.4rem);
   line-height: 1.1;
 }
-.stat span { color: var(--muted); font-size: 14px; }
+.metric span {
+  display: block;
+  margin-top: 0.5rem;
+  color: var(--muted);
+}
 .split {
   display: grid;
-  grid-template-columns: 1.05fr .95fr;
-  gap: 28px;
-  align-items: stretch;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 2rem;
+  margin: 3.5rem 0;
 }
-.explain {
-  background: var(--card);
-  border: 1px solid var(--line);
-  padding: 28px;
+.split-intro {
+  padding: 2rem;
+  background: var(--surface-alt);
+  border-top: 0.45rem solid var(--accent);
 }
-.explain h2, .timeline h2, .table-wrap h2, .takeaways h2 {
-  margin: 0 0 14px;
-  font-size: 26px;
+.split-intro h2,
+.workflow h2,
+.evidence h2,
+.takeaways h2 {
+  margin-top: 0;
+  line-height: 1.25;
 }
-.side-note {
-  background: var(--panel-blue);
-  border-left: 6px solid var(--accent-data);
-  padding: 26px;
-}
-.side-note b { color: var(--accent-data); }
-.process-zone {
-  background: var(--panel-violet);
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-}
-.timeline {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 54px 7vw;
+.steps {
+  padding: 0.4rem 0 0 2.4rem;
+  border-left: 0.22rem solid var(--accent3);
 }
 .step {
-  display: grid;
-  grid-template-columns: 44px 1fr;
-  gap: 16px;
-  margin: 18px 0;
+  position: relative;
+  margin: 0 0 1.8rem;
 }
-.badge {
-  width: 44px;
-  height: 44px;
+.step::before {
+  content: "";
+  position: absolute;
+  left: -2.82rem;
+  top: 0.45rem;
+  width: 0.75rem;
+  height: 0.75rem;
   border-radius: 50%;
+  background: var(--accent3);
+}
+.step h3 { margin: 0 0 0.3rem; }
+.step p { margin: 0; color: var(--muted); }
+.workflow {
+  margin: 3.5rem 0;
+  padding: 2.4rem;
+  background: var(--deep);
+  color: var(--deep-ink);
+}
+.workflow ol {
   display: grid;
-  place-items: center;
-  background: var(--accent-conclusion);
-  color: var(--hero-ink);
-  font-weight: 800;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.8rem;
+  padding: 0;
+  list-style: none;
+  counter-reset: process;
 }
-.step p {
-  margin: 0;
-  padding: 12px 0 18px 18px;
-  border-left: 2px solid var(--line);
-}
-.quote {
+.workflow li {
+  counter-increment: process;
+  padding: 1rem;
+  border-top: 0.25rem solid var(--accent);
   background: var(--quote-bg);
-  border-top: 2px solid var(--accent-warning);
-  border-bottom: 2px solid var(--accent-warning);
-  padding: 34px 7vw;
 }
-.quote-inner {
-  max-width: 980px;
-  margin: 0 auto;
-  font-size: 24px;
-  line-height: 1.45;
-  color: var(--ink);
+.workflow li::before {
+  content: "0" counter(process);
+  display: block;
+  margin-bottom: 0.7rem;
+  color: var(--accent);
+  font-weight: 900;
 }
-.table-section { background: var(--bg); }
-.table-wrap {
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 54px 7vw;
+.workflow .insight {
+  margin: 1.5rem 0 0;
+  color: var(--deep-ink);
+  font-weight: 700;
 }
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--card);
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow);
+.evidence {
+  margin: 3.5rem 0;
+  padding: 2.5rem;
+  background: var(--surface-opportunity);
+  border-radius: 1.5rem 0 1.5rem 0;
 }
-th, td {
-  text-align: left;
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--line);
-  vertical-align: top;
-}
-th { background: var(--table-head); color: var(--ink); }
-td.result-ok { color: var(--accent-opportunity); font-weight: 700; }
-td.result-risk { color: var(--accent-risk); font-weight: 700; }
-.insight-strip {
+.score-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0;
+  gap: 1.2rem;
 }
-.insight {
-  padding: 42px 7vw;
+.score {
+  padding: 1.4rem;
+  background: var(--surface);
+  border-bottom: 0.35rem solid var(--opportunity);
 }
-.insight.data { background: var(--panel-green); }
-.insight.risk { background: var(--panel-red); }
-.insight h2 { margin-top: 0; }
-.insight.data h2 { color: var(--accent-opportunity); }
-.insight.risk h2 { color: var(--accent-risk); }
+.score.risk { border-color: var(--risk); }
+.score b {
+  color: var(--opportunity);
+  font-size: 2rem;
+}
+.score.risk b { color: var(--risk); }
+.case-table {
+  width: 100%;
+  margin: 3rem 0;
+  border-collapse: collapse;
+  background: var(--surface);
+}
+.case-table caption {
+  padding: 1rem;
+  background: var(--surface-conclusion);
+  color: var(--conclusion);
+  font-size: 1.3rem;
+  font-weight: 800;
+  text-align: left;
+}
+.case-table th,
+.case-table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+.case-table th { color: var(--accent3); }
+.limit {
+  margin: 3.5rem 0;
+  padding: 2rem 2rem 2rem 2.4rem;
+  background: var(--surface-risk);
+  border-left: 0.5rem solid var(--risk);
+}
+.limit h2 { margin-top: 0; color: var(--risk); }
+.pullquote {
+  margin: 3.5rem 0;
+  padding: 2.5rem;
+  background: var(--quote-bg);
+  color: var(--quote-ink);
+  font-size: clamp(1.25rem, 2.6vw, 1.75rem);
+  font-weight: 700;
+}
+.pullquote em { color: var(--accent4); font-style: normal; }
 .takeaways {
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 58px 7vw 70px;
+  margin-top: 3.5rem;
+  padding: 2.6rem;
+  background: var(--surface-conclusion);
 }
-.mosaic {
+.takeaway-grid {
   display: grid;
-  grid-template-columns: 1.2fr .8fr 1fr;
-  gap: 16px;
+  grid-template-columns: 1.2fr 0.8fr 1fr;
+  gap: 1rem;
 }
-.tile {
-  background: var(--mosaic-bg);
+.takeaway {
+  min-height: 10rem;
+  padding: 1.4rem;
+  background: var(--surface);
+  border-top: 0.3rem solid var(--conclusion);
+}
+.takeaway:nth-child(2) { border-color: var(--data); }
+.takeaway:nth-child(3) { border-color: var(--risk); }
+.takeaway:nth-child(4) {
+  grid-column: span 2;
+  border-color: var(--opportunity);
+}
+.takeaway h3 { margin-top: 0; }
+.hl {
+  padding: 0 0.15em;
+  background: var(--hl);
+  font-weight: 800;
+}
+.hl2 {
+  padding: 0 0.15em;
+  background: var(--hl2);
+  font-weight: 800;
+}
+#translation {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 5rem 1.4rem 7rem;
+}
+#translation > h2 {
+  margin: 0 0 2.5rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 0.35rem solid var(--accent2);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.15;
+}
+#translation h3 {
+  margin: 3.2rem 0 1rem;
+  color: var(--accent);
+  font-size: 1.65rem;
+  line-height: 1.3;
+}
+#translation h4 {
+  margin: 2.4rem 0 0.8rem;
+  color: var(--accent3);
+  font-size: 1.3rem;
+}
+#translation p { margin: 0 0 1.25rem; }
+#translation ul,
+#translation ol { padding-left: 1.4rem; }
+#translation li { margin-bottom: 0.8rem; }
+.translation-meta {
+  margin-bottom: 2.5rem;
+  padding: 1.25rem;
+  background: var(--surface-alt);
+  border-left: 0.35rem solid var(--accent);
+  color: var(--muted);
+}
+.source-figure {
+  margin: 3rem 0;
+  padding: 1rem;
+  background: var(--surface);
   border: 1px solid var(--line);
-  padding: 22px;
-  min-height: 150px;
+  box-shadow: 0 0.8rem 2rem var(--shadow);
 }
-.tile:nth-child(2) { background: var(--panel-amber); border-color: var(--accent-warning); }
-.tile:nth-child(3) { background: var(--panel-blue); border-color: var(--accent-data); }
-.tile:nth-child(4) { background: var(--panel-violet); border-color: var(--accent-conclusion); grid-column: span 2; }
-.tile strong {
+.source-figure img {
   display: block;
-  margin-bottom: 8px;
-  color: var(--accent-conclusion);
-  font-size: 18px;
+  width: 100%;
+  height: auto;
 }
-@media (max-width: 820px) {
-  .stats, .split, .insight-strip, .mosaic { grid-template-columns: 1fr; }
-  .tile:nth-child(4) { grid-column: auto; }
-  .hero { padding-top: 44px; }
-  .quote-inner { font-size: 20px; }
+.source-figure figcaption {
+  margin-top: 0.8rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+.link-list {
+  padding: 1rem 1.2rem;
+  background: var(--surface-warm);
+  border-left: 0.3rem solid var(--accent2);
+}
+@media (max-width: 780px) {
+  .metric-strip,
+  .split,
+  .score-grid,
+  .takeaway-grid {
+    grid-template-columns: 1fr;
+  }
+  .workflow ol { grid-template-columns: 1fr; }
+  .metric {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .metric:last-child { border-bottom: 0; }
+  .takeaway:nth-child(4) { grid-column: auto; }
+  .case-table {
+    display: block;
+    overflow-x: auto;
+  }
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -412,129 +578,260 @@ td.result-risk { color: var(--accent-risk); font-weight: 700; }
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/property-based-testing" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<header class="hero">
+<p class="eyebrow">FRONTIER RED TEAM · 2026 年 1 月 14 日</p>
+<h1>用 Claude 和基于属性的测试在 Python 生态系统中寻找缺陷</h1>
+<p class="original-title" lang="en">Finding bugs across the Python ecosystem with Claude and property-based testing</p>
+<p class="byline">Muhammad Maaz、Liam DeVoe、Zac Hatfield-Dodds、Nicholas Carlini · Anthropic</p>
+</header>
 <main>
-  <header class="hero">
-    <div class="hero-inner">
-      <div class="kicker">Anthropic · Frontier Red Team · Jan 14, 2026</div>
-      <h1>用 Claude 和基于性质的测试在 Python 生态系统中发现缺陷</h1>
-      <div class="original">Finding bugs across the Python ecosystem with Claude and property-based testing</div>
-      <div class="thesis">一句话总括：这项工作把 LLM 的代码理解能力和基于性质的测试结合起来，让模型不只生成测试用例，而是主动提出“代码应始终满足的性质”，并在真实 Python 生态中找到可验证、可修复的缺陷。</div>
-    </div>
-  </header>
-
-  <section class="stats-band">
-    <div class="stats">
-      <div class="stat"><strong>100+</strong><span>热门 Python 包被纳入搜索范围</span></div>
-      <div class="stat"><strong>984</strong><span>第一阶段生成的 bug 报告数量</span></div>
-      <div class="stat"><strong>56%</strong><span>人工抽查报告被判定为有效 bug</span></div>
-      <div class="stat"><strong>81%</strong><span>最高分报告中有效且值得报告的比例</span></div>
-    </div>
-  </section>
-
-  <section class="section split">
-    <div class="explain">
-      <h2>核心贡献是让模型寻找“性质”，不是只补测试</h2>
-      <p>普通单元测试验证几个具体例子。它容易漏掉开发者没有想到的边界条件。</p>
-      <p>基于性质的测试换了一个层次。开发者或代理先描述代码应该一直满足的规律，再让测试框架自动生成输入去寻找反例。</p>
-      <p>Claude 的价值在于读上下文。它会看类型标注、文档字符串、函数名、注释和调用方式，然后写出 Hypothesis 测试。</p>
-    </div>
-    <aside class="side-note">
-      <p><b>这改变了对 AI 编程影响的理解。</b></p>
-      <p>模型不只是代码生成器。它可以参与软件质量保障中的语义判断：这个函数到底承诺了什么，什么输入会打破承诺。</p>
-    </aside>
-  </section>
-
-  <section class="process-zone">
-    <div class="timeline">
-      <h2>代理的工作流程是一个反复校验的闭环</h2>
-      <div class="step"><div class="badge">1</div><p>先阅读目标代码和相关文档，理解函数、模块或文件在项目中的位置。</p></div>
-      <div class="step"><div class="badge">2</div><p>提出应当成立的性质。性质必须来自代码和文档，而不是凭空猜测。</p></div>
-      <div class="step"><div class="badge">3</div><p>用 Hypothesis 写基于性质的测试，并运行测试寻找反例。</p></div>
-      <div class="step"><div class="badge">4</div><p>测试失败后，代理会反思是发现了真实 bug，还是测试写错了。这个环节用于降低误报。</p></div>
-      <div class="step"><div class="badge">5</div><p>当代理认为问题可信时，它输出结构化 bug 报告，供人工和维护者继续验证。</p></div>
-    </div>
-  </section>
-
-  <section class="quote">
-    <div class="quote-inner">关键洞见：如果 AI 能更准确地描述代码的正确性边界，那么发现 bug 和生成补丁都会变得更接近工程流程，而不是一次性猜答案。</div>
-  </section>
-
-  <section class="table-section">
-    <div class="table-wrap">
-      <h2>真实项目验证显示：有效性来自筛选和人工复核</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>阶段</th>
-            <th>做法</th>
-            <th>结果</th>
-            <th>对 AI 影响的含义</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>第一阶段</td>
-            <td>Claude Opus 4.1 在每个包上运行，收集全部报告。</td>
-            <td>984 份报告中人工抽查 50 份，56% 有效，32% 有效且值得报告。</td>
-            <td>模型可以大规模发现候选问题，但原始输出仍需要过滤。</td>
-          </tr>
-          <tr>
-            <td>排序阶段</td>
-            <td>用 15 分规则对报告打分，优先查看高分项。</td>
-            <td class="result-ok">最高分报告中 86% 有效，81% 有效且值得报告。</td>
-            <td>“生成加筛选”比单纯生成更接近可用开发工具。</td>
-          </tr>
-          <tr>
-            <td>第二阶段</td>
-            <td>Sonnet 4.5 在 10 个重要包上重复运行，并加入评估代理和专家审查。</td>
-            <td>重点转向高严重性 bug 的正确性和影响评估。</td>
-            <td>AI 测试工具要进入真实维护流程，必须解释严重性而不只是报错。</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="insight-strip">
-    <div class="insight data">
-      <h2>已确认案例说明它能抓住真实边界错误</h2>
-      <p>NumPy 的 numpy.random.wald 有时返回负数，而 Wald 分布样本应为正数。团队追踪到数值不稳定，并提交了更稳定的实现。</p>
-      <p>NumPy 维护者显示，新算法相对误差降低了接近 10 个数量级。这说明代理发现的不是格式瑕疵，而是会影响数值正确性的深层问题。</p>
-    </div>
-    <div class="insight risk">
-      <h2>失败案例说明语义仍是难点</h2>
-      <p>python-dateutil 的 easter() 在 Julian calendar 下返回非星期日日期。维护者认为这是预期行为，因为历法语义更细微。</p>
-      <p>这暴露了边界：当正确性依赖隐含领域知识时，模型推断的性质可能看似合理，却不是维护者认可的契约。</p>
-    </div>
-  </section>
-
-  <section class="section split">
-    <div class="explain">
-      <h2>为什么这比传统自动测试更有潜力</h2>
-      <p>传统测试自动化经常停留在生成更多例子。例子多了，仍可能没有覆盖真正的异常输入。</p>
-      <p>这项工作把重点放在性质上。性质一旦写对，就能让测试框架系统性地搜索反例。</p>
-      <p>LLM 正适合做前半段工作：从上下文中推断不变量。Hypothesis 负责后半段工作：高强度生成输入并缩小失败样本。</p>
-    </div>
-    <div class="side-note">
-      <p><b>实践意义：</b></p>
-      <p>未来的软件质量工具可能不是单独的 linter、fuzzer 或聊天助手，而是能读代码、提假设、运行实验、过滤误报并生成报告的代理。</p>
-    </div>
-  </section>
-
-  <section class="takeaways">
-    <h2>最值得带走的洞见</h2>
-    <div class="mosaic">
-      <div class="tile"><strong>AI 的测试价值来自语义抽象</strong>真正有价值的部分不是写测试语法，而是提出可验证的不变量。</div>
-      <div class="tile"><strong>误报控制决定工具能否被维护者接受</strong>Anthropic 采用多轮人工复核，是为了避免把不确定报告转嫁给开源维护者。</div>
-      <div class="tile"><strong>筛选比海量生成更关键</strong>原始报告有效率有限，但高分报告的有效率提升到 86%。</div>
-      <div class="tile"><strong>领域语义仍需要人类裁决</strong>dateutil 案例说明，模型能提出合理性质，但不能替代维护者定义真实契约。</div>
-      <div class="tile"><strong>下一步可能是补丁生成</strong>如果性质能接近完整描述正确性，自动修复会更容易被验证，也更可能进入真实开发流程。</div>
-    </div>
-  </section>
+<article aria-label="中文总结" class="summary">
+<div class="one-line"><strong>一句话总括：</strong>研究团队让 Claude 自动推断代码应满足的性质，再把这些性质变成可执行的 Hypothesis 测试，从真实 Python 项目中筛出维护者认可的缺陷。</div>
+<div aria-label="关键数字" class="metric-strip">
+<div class="metric"><b>100+</b><span>覆盖的流行 Python 包</span></div>
+<div class="metric"><b>984</b><span>第一阶段生成的缺陷报告</span></div>
+<div class="metric"><b>86%</b><span>最高分报告中的有效缺陷比例</span></div>
+<div class="metric"><b>81%</b><span>最高分报告中有效且值得报告的比例</span></div>
+</div>
+<div class="split">
+<section class="split-intro">
+<h2>测试的不只是几个例子</h2>
+<p>传统单元测试依赖开发者提前想到具体输入。遗漏的边界条件往往正是缺陷藏身之处。</p>
+<p>基于属性的测试换了一个问题：无论输入如何变化，代码都应该始终满足什么规则？</p>
+<p><span class="hl2">Claude 擅长从上下文中提出这些规则</span>。Hypothesis 则负责主动寻找反例。</p>
+</section>
+<div aria-label="研究逻辑" class="steps">
+<div class="step">
+<h3>从语义出发</h3>
+<p>代理阅读类型标注、文档字符串、函数名、注释、已有测试和调用关系。</p>
+</div>
+<div class="step">
+<h3>把理解变成性质</h3>
+<p>例如，Wald 分布的采样结果必须为正，字典切片后重新组合应还原原字典。</p>
+</div>
+<div class="step">
+<h3>让生成器寻找反例</h3>
+<p>代理编写并运行 Hypothesis 测试，再判断失败来自真实缺陷还是测试假设错误。</p>
+</div>
+<div class="step">
+<h3>结论</h3>
+<p>LLM 的价值不只在生成测试代码，更在于把散落的代码语义提炼成可验证约束。</p>
+</div>
+</div>
+</div>
+<section class="workflow">
+<h2>代理如何完成一次缺陷搜索</h2>
+<ol>
+<li>阅读目标代码及相关文档。</li>
+<li>提出有明确依据的代码性质。</li>
+<li>编写 Hypothesis 测试。</li>
+<li>运行测试并自我反思。</li>
+<li>确认后生成规范的缺陷报告。</li>
+</ol>
+<p class="insight">自我反思并非装饰。一次运行中，代理发现自己用 <code>try-catch</code> 包住了整个测试。移除它后，测试才暴露出真实缺陷。团队还观察到，Opus 4.1 和 Sonnet 4.5 的反思能力明显优于 Sonnet 4。</p>
+</section>
+<section class="evidence">
+<h2>排序显著提高了有效报告的密度</h2>
+<div class="score-grid">
+<div class="score risk">
+<b>56% / 32%</b>
+<p>团队从 984 份报告中人工抽查 50 份。56% 是有效缺陷，32% 同时达到了值得向维护者报告的标准。</p>
+</div>
+<div class="score">
+<b>86% / 81%</b>
+<p>研究人员建立 15 分量表，并让 Opus 4.1 为全部报告评分。最高分报告中，86% 有效，81% 既有效又值得报告。</p>
+</div>
+</div>
+<p><span class="hl">这改变了对 AI 缺陷发现工具的评价重点。</span>原始产量并不是最重要的指标。更关键的是，能否通过排序和复核，把维护者真正需要查看的问题集中到队列前端。</p>
+</section>
+<table class="case-table">
+<caption>维护者验证：从真实缺陷到语义误判</caption>
+<thead>
+<tr>
+<th>项目</th>
+<th>代理发现</th>
+<th>结果与启示</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NumPy</td>
+<td><code>numpy.random.wald</code> 有时返回负数。</td>
+<td>补丁已合并。新公式的相对误差比旧算法低<span class="hl">近 10 个数量级</span>。简单性质可以揭开深层数值稳定性问题。</td>
+</tr>
+<tr>
+<td>aws-lambda-powertools</td>
+<td><code>slice_dictionary()</code> 因未递增迭代器而反复返回第一个分块。</td>
+<td>补丁已合并。重构不变量能够有效发现状态推进错误。</td>
+</tr>
+<tr>
+<td>cloudformation-cli-java-plugin</td>
+<td><code>item_hash()</code> 对所有列表都生成 <code>hash(None)</code>。</td>
+<td>补丁已提交。原因是原地 <code>.sort()</code> 返回 <code>None</code>。</td>
+</tr>
+<tr>
+<td>tokenizers</td>
+<td>颜色函数缺少右括号，输出无效的 HSL CSS。</td>
+<td>补丁已合并。格式约束也能成为有价值的测试性质。</td>
+</tr>
+<tr>
+<td>python-dateutil</td>
+<td><code>easter()</code> 在儒略历的部分年份返回非星期日日期。</td>
+<td>维护者认定行为符合设计。这个案例暴露了隐含语义带来的误报风险。</td>
+</tr>
+</tbody>
+</table>
+<section class="limit">
+<h2>真正的瓶颈仍是“什么才算正确”</h2>
+<p>团队对高优先级候选问题安排了 3 名专家复核。每个问题平均审核约 1 小时。只要任何一名审核者不确定，该问题就会被淘汰。作者随后还会再审一次。</p>
+<p>这套流程刻意追求低误报，但成本很高。<span class="hl">当代码依赖隐含假设、历法差异或复杂领域语义时，维护者仍是最终裁判。</span></p>
+</section>
+<aside class="pullquote">基于属性的测试让模型在更高的抽象层工作：先问清楚“什么必须始终成立”，再让工具寻找能够推翻它的输入。<em>这比盲目增加测试数量更接近缺陷的本质。</em></aside>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="takeaway-grid">
+<div class="takeaway">
+<h3>语义理解可以转化为测试</h3>
+<p>函数名、文档和调用关系不只是辅助信息。它们可以成为生成不变量的直接依据。</p>
+</div>
+<div class="takeaway">
+<h3>筛选质量重于报告数量</h3>
+<p>排序后，最高分报告的有效率从抽查结果中的 56% 提升到 86%。</p>
+</div>
+<div class="takeaway">
+<h3>误报无法只靠模型消除</h3>
+<p>复杂语义可能让看似合理的性质变成错误假设。维护者判断不可替代。</p>
+</div>
+<div class="takeaway">
+<h3>缺陷可能从简单性质通向深层原因</h3>
+<p>“采样值必须为正”最终揭示了灾难性消减，并促成精度提升近 10 个数量级的 NumPy 修复。</p>
+</div>
+<div class="takeaway">
+<h3>下一步是高质量自动修复</h3>
+<p>一旦正确性性质能够被较完整地描述，提出可靠补丁就会容易得多。</p>
+</div>
+</div>
+</section>
+</article><section id="translation">
+<h2>完整译文</h2>
+<div class="translation-meta">
+<p><strong>作者：</strong>Muhammad Maaz<sup>1,2</sup>、Liam DeVoe<sup>3</sup>、Zac Hatfield-Dodds<sup>2</sup>、Nicholas Carlini<sup>2</sup></p>
+<p><sup>1</sup> MATS，<sup>2</sup> Anthropic，<sup>3</sup> Northeastern University</p>
+</div>
+<p>我们开发了一种代理，能够高效识别大型软件项目中的缺陷。代理会推断代码通常应当满足的性质。随后，我们应用基于属性的测试。这是一种与模糊测试相似的技术。借助这种方法，我们在 NumPy、SciPy 和 Pandas 等主流 Python 包中发现了缺陷。</p>
+<p>经过大量人工验证后，我们正在向开发者报告这些问题。其中几个缺陷已经得到修复。</p>
+<p>如需了解更多信息，可以阅读完整论文、查看 GitHub 仓库，或在我们的网站上浏览发现的缺陷。</p>
+<h3>引言</h3>
+<p>确保程序没有缺陷，是软件工程中最具挑战性的工作之一。即使开发者付出了最大努力，缺陷仍常常潜伏在代码中。</p>
+<p>最常见的代码测试方法是基于示例的测试（example-based tests）。开发者先写出一个具体用例，再验证实际输出是否符合预期。例如，开发者可以检查：对列表 <code>[2, 10, 5, 4]</code> 调用排序函数后，是否会返回 <code>[2, 4, 5, 10]</code>。</p>
+<p>然而，仅靠这类测试很难覆盖整个程序。缺陷经常藏在开发者没有测试的边界情况中。毕竟，如果开发者没有想到要测试某个边界情况，那么在实现代码时，他也很可能没有考虑过这种情况。</p>
+<p>相比之下，基于属性的测试（property-based testing）关注的是：某项代码性质能否对全部输入，或大多数输入成立。</p>
+<p>开发者需要为程序指定一种性质或不变量。例如，JSON 反序列化应当是序列化的逆过程。开发者还需要描述该性质接受哪些输入，例如任何可以序列化为 JSON 的对象。</p>
+<p>基于属性的测试框架随后会自动寻找反例。它使用类似模糊测试的技术生成有效输入，并把这些输入作为测试用例。开发者只需指定总体输入域，无须逐个列出测试用例。这样一来，他们就不用设法想到每一种边界情况，可以在更高的抽象层上工作。</p>
+<p>在一项源自 MATS 项目的研究中，我们开发了一个能够为现有代码自主编写基于属性测试的 AI 代理。相关论文已在 2025 年 NeurIPS Deep Learning for Code Workshop 上发表。</p>
+<p>我们要求代理通过阅读类型标注、文档字符串、函数名和注释来发现代码性质。随后，代理使用 Hypothesis 编写对应的基于属性测试。</p>
+<p>这项工作关注的是一般意义上的缺陷识别，而不只是安全漏洞。许多可能造成安全漏洞的逻辑缺陷，都适合通过基于属性的测试发现。</p>
+<p>例如，我们最近在一篇博客文章中重点介绍了如何识别智能合约中的缺陷。那些漏洞几乎全都源于逻辑错误。我们设想，未来可以使用本文介绍的技术，在软件部署前主动发现缺陷。</p>
+<p>我们使用这一代理，在 NumPy、SciPy 和 Pandas 等热门开源 Python 仓库中发现了数百个潜在缺陷。为了负责任地披露这些问题，同时避免给维护者带来不必要的负担，我们仔细审核了每一个缺陷。</p>
+<p>我们的审核流程比内部代码审查通常采用的流程更费力，但我们更希望尽量减少误报。</p>
+<p>具体流程如下。首先，我们只选择优先级最高的缺陷进行审核。然后，我们把每个潜在缺陷交给 3 名人类专家审核。每个缺陷平均需要 1 小时。如果 3 名审核者中有任何一人无法确认问题有效，我们就会将其舍弃。</p>
+<p>最后，我们这些博客作者还会亲自审核每个候选缺陷。只有当我们也确信判断正确时，才会手动向对应仓库的维护者提交问题。目前，我们已经提交了几份缺陷报告，并正在继续报告更多问题。</p>
+<p>我们公开了全部数据。其中包括尚未验证的缺陷，也包括经判断无效的缺陷，以便维护者在网站上查看。未来几周，我们计划在完成进一步验证后，继续报告许多剩余问题。我们还将把项目扩展到更多 PyPI 项目。</p>
+<p><strong>图 1。</strong>测试代码的两种方式。基于示例的单元测试会验证人工指定的具体输入。基于属性的测试则指定一种通用性质，例如有序列表的定义，再由框架自动构造可能违反该性质的输入。</p>
+<h3>我们的基于属性测试代理</h3>
+<p>我们的基于属性测试代理以自定义 Claude Code 命令的形式实现。代理只接受一个参数，用来指定测试目标。</p>
+<p>目标可以是单个 Python 文件，例如 <code>normalizers.py</code>；也可以是模块，例如 <code>numpy</code> 或 <code>scipy.signal</code>；还可以是函数，例如 <code>requests.get</code> 或 <code>json.loads</code>。</p>
+<p>随后，代理按照以下流程寻找潜在缺陷：</p>
+<ol>
+<li>阅读并理解目标。代理会阅读代码、获取相关文档，并探索目标与代码库其他部分的关系。</li>
+<li>根据这些发现提出有明确依据的性质。</li>
+<li>使用 Hypothesis 编写对应的基于属性测试。</li>
+<li>运行测试并进行反思。如果测试失败，它会判断自己是否真的发现了缺陷，还是测试本身需要调整。如果测试成功，它会判断测试是否真正有价值，还是只验证了一个无关紧要的性质。</li>
+<li>如果代理确信自己发现了真实缺陷，就会生成一份格式规范的缺陷报告。</li>
+</ol>
+<p>为了帮助代理完成长距离、多步骤推理，我们要求它使用待办事项列表跟踪进度。</p>
+<figure class="source-figure" data-source-image="0"><img alt="" decoding="async" height="1126" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/2cac5914e526becbfb506a035f11f758b9f10010-1999x1126.png" width="1999"/>
+<figcaption>图 2：代理的工作流程。</figcaption>
+</figure>
+<p>设计代理时，我们优先考虑的是减少误报。根据我们的亲身经验，真正有用的开发工具，应当尽量减少呈现给开发者的错误报告。</p>
+<p>自我反思循环有助于减少误报。要求所有性质都以目标的明确用法和文档为依据，也能达到同样的效果。</p>
+<p>例如，在一次运行中，代理编写的性质测试最初通过了。但经过自我反思，代理意识到自己用 <code>try-catch</code> 块包住了整个测试。移除这个结构后，测试失败了，代理由此发现了一个缺陷。</p>
+<p>我们还观察到，与 Sonnet 4 相比，Opus 4.1 和 Sonnet 4.5 的自我反思能力有明显提升。</p>
+<h3>运行示例</h3>
+<p>为了展示代理如何测试目标，我们给出了一份经过转述的运行记录。在这个例子中，Claude 发现了 <code>numpy.random.wald</code> 实现中的一个缺陷。</p>
+<p>代理先调查该函数、函数签名和文档字符串，甚至检查已有测试。</p>
+<p>需要注意的是，记录中提出的修复并不正确。我们真正修复该缺陷时，将错误追溯到一项数值不稳定的计算。可以参阅我们已经合并的修复。</p>
+<h3>在真实 PyPI 包中寻找缺陷</h3>
+<p>为了在真实环境中测试代理的能力，我们整理了一组多样化的流行 Python 包，总数超过 100 个。这些库覆盖多个领域，包括数值计算、解析和数据库。</p>
+<p>我们让代理分别处理每个包，并收集它生成的全部缺陷报告。</p>
+<h3>评估代理</h3>
+<p>在论文介绍的第一阶段评估中，我们使用 Claude Opus 4.1，让代理分别处理每个软件包，并收集生成的全部缺陷报告。</p>
+<p>评估这些报告时，我们采用了两项标准。第一项是：“这是不是一个有效缺陷？”第二项是：“它是否既是有效缺陷，又值得我们向库维护者报告？”</p>
+<p>第二项标准比第一项更严格。例如，一个缺陷可能确实存在，但问题过于轻微，不值得专门提交报告。</p>
+<p>代理总共生成了 984 份缺陷报告。我们从中人工选出 50 份进行审核。结果显示，其中 56% 是有效缺陷，32% 既是有效缺陷，也是我们愿意报告的问题。</p>
+<p>根据这次人工审核，我们制定了一套满分 15 分的评分标准。其目标是优先呈现最有可能真实存在、也最值得开发者修复的缺陷。</p>
+<p>我们使用 Opus 4.1，按照这套标准为所有缺陷报告评分。结果表明，排序步骤相当有效。在得分最高的缺陷报告中，86% 是有效缺陷，81% 既有效又值得报告。</p>
+<p>在第二阶段评估中，我们使用 Sonnet 4.5 测试了 10 个重要软件包。每个软件包都运行了多次。</p>
+<p>我们还开发了一个评估代理。它使用 Sonnet 4.5 阅读代码和缺陷报告，再检查问题是否正确，并判断严重程度。与第一阶段的评分标准相比，这个评估代理更加复杂。</p>
+<p>最后，我们付费请 3 名人类专家审核高严重性缺陷，判断这些问题是否成立。</p>
+<p>如需阅读代理发现的全部缺陷报告，请访问 <a href="https://mmaaz-git.github.io/agentic-pbt-site/">https://mmaaz-git.github.io/agentic-pbt-site/</a>。</p>
+<h3>维护者验证</h3>
+<p>评估任何代码缺陷发现工具的有效性都很困难。虽然我们会尽力验证缺陷报告是否正确，但软件包维护者才是最终的裁判。</p>
+<p>为了确认代理发现的问题确实会被维护者视为有效且值得修复，我们选出了 5 个特别有意思的缺陷。我们把这些问题连同建议补丁一起，手动报告到了对应项目的 GitHub 仓库。</p>
+<p>未来几周，我们计划在完成验证后继续报告其他缺陷。</p>
+<h4>numpy</h4>
+<p><code>numpy.random.wald</code> 有时会返回负数。这是一个缺陷，因为从 Wald 分布采样时，只应该得到正数。</p>
+<p>这正是前面运行示例中展示的问题。Claude 知道 Wald 分布应当满足这一性质，因此编写了一个简单的基于属性测试，检查所有生成的样本是否都为正。</p>
+<p>我们将错误追溯到代码中发生的灾难性消减（catastrophic cancellation）。提交拉取请求时，我们设计了一种数值上更稳定的表达式。</p>
+<p>正如 NumPy 维护者在拉取请求中展示的那样，新表达式的相对误差比旧算法低近 10 个数量级。</p>
+<p class="link-list">补丁已合并：<a href="https://github.com/numpy/numpy/pull/29609">https://github.com/numpy/numpy/pull/29609</a></p>
+<h4>aws-lambda-powertools</h4>
+<p><code>slice_dictionary()</code> 会反复返回第一个分块，因为代码没有递增迭代器。</p>
+<p>代理发现，字典经过切分再重新组合后，应该还原为原始字典。它通过这一性质捕获了问题。</p>
+<p class="link-list">补丁已合并：<a href="https://github.com/aws-powertools/powertools-lambda-python/pull/7246">https://github.com/aws-powertools/powertools-lambda-python/pull/7246</a></p>
+<h4>cloudformation-cli-java-plugin</h4>
+<p><code>item_hash()</code> 对所有列表都会生成相同的 <code>hash(None)</code> 值。原因是代码使用了原地执行的 <code>.sort()</code> 方法，而该方法返回 <code>None</code>。</p>
+<p>代理通过检查“不同输入的哈希值应当不同”这一性质发现了问题。</p>
+<p class="link-list">补丁已提交：<a href="https://github.com/aws-cloudformation/cloudformation-cli/pull/1106">https://github.com/aws-cloudformation/cloudformation-cli/pull/1106</a></p>
+<h4>tokenizers</h4>
+<p><code>EncodingVisualizer.calculate_label_colors()</code> 缺少一个右括号，因此会返回无效的 HSL CSS。</p>
+<p>代理通过测试输出是否符合 HSL 颜色代码的正则表达式发现了问题。</p>
+<p class="link-list">补丁已合并：<a href="https://github.com/huggingface/tokenizers/pull/1853">https://github.com/huggingface/tokenizers/pull/1853</a></p>
+<h4>python-dateutil</h4>
+<p>使用儒略历时，<code>easter()</code> 会在部分年份返回一个不是星期日的日期。维护者认为这种行为符合设计，因为不同历法系统之间存在差异。他们也承认其中的语义十分微妙。</p>
+<p class="link-list">问题无效：<a href="https://github.com/dateutil/dateutil/issues/1437">https://github.com/dateutil/dateutil/issues/1437</a></p>
+<p>向 python-dateutil 提交的这份报告揭示了代理的一项重要局限：当代码具有微妙或复杂的语义时，很难推导出正确的性质。</p>
+<p>如果代码依赖某项隐含假设，那么只有库维护者能够决定真正应该测试什么性质。</p>
+<h3>结论</h3>
+<p>随着语言模型持续进步，我们认为，代理式基于属性测试可以成为人工编写测试日益重要的补充。</p>
+<p>基于属性的测试关注高层语义保证，因此天然适合在开发过程中与语言模型配合。我们发现，LLM 尤其擅长根据上下文识别一段代码应当满足的性质。相关上下文包括函数名、文档字符串，以及其他函数调用它的方式。</p>
+<p>借助这些信息，LLM 可以有效编写高质量的基于属性测试。</p>
+<p>展望未来，我们认为，将 LLM 用于测试和缺陷发现是一项重要研究方向。尤其是当 LLM 越来越善于利用漏洞时，我们有必要抢在使用 LLM 发动攻击的攻击者前面。</p>
+<p>这项工作并未重点研究自动生成补丁，但这是一个明确的未来方向。</p>
+<p>如果我们能够近乎完整地描述一段代码的正确性性质，修复缺陷就会容易得多。我们相信，在不久的将来，LLM 将能够有效提出高质量补丁。这些补丁将值得维护者认真考虑。</p>
+</section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

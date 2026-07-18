@@ -1,266 +1,313 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>推出 OpenAI Privacy Filter</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>OpenAI Privacy Filter 正式发布</title>
 <style>
-:root {
-  --bg: #f7f4ee;
-  --ink: #18202a;
-  --muted: #5f6772;
-  --line: #d9d0c3;
-  --card: #ffffff;
-  --hero: #102033;
-  --hero-ink: #f5f8fb;
-  --soft-data: #e8f2ff;
-  --soft-risk: #fff0e6;
-  --soft-opp: #e9f7ef;
-  --soft-conclusion: #f1ecff;
-  --soft-neutral: #f4efe6;
-  --accent-data: #1d65d8;
-  --accent-risk: #c24a1a;
-  --accent-opp: #14844a;
-  --accent-conclusion: #6b42d8;
-  --accent-secret: #a11657;
-  --badge: #ffd166;
-  --shadow: rgba(24, 32, 42, 0.12);
+:root{
+  color-scheme:light dark;
+  --bg:#f7f5ef;
+  --surface:#fffdf8;
+  --card:#ffffff;
+  --ink:#17202a;
+  --muted:#65717e;
+  --line:#d8d4ca;
+  --accent:#1769aa;
+  --accent-soft:#dceeff;
+  --accent2:#087f5b;
+  --accent2-soft:#dff5eb;
+  --accent3:#9c5a00;
+  --accent3-soft:#fff0cf;
+  --risk:#b33a4b;
+  --risk-soft:#ffe4e7;
+  --conclusion:#6941c6;
+  --conclusion-soft:#eee7ff;
+  --deep:#16263b;
+  --deep-ink:#f3f7fc;
+  --hl:#ffe08a;
+  --hl2:#bfe8ff;
+  --shadow:0 18px 45px rgba(31,42,55,.1);
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #111417;
-    --ink: #edf1f5;
-    --muted: #aeb7c1;
-    --line: #303943;
-    --card: #1a2027;
-    --hero: #07111f;
-    --hero-ink: #f0f5fb;
-    --soft-data: #10243d;
-    --soft-risk: #321b12;
-    --soft-opp: #10291d;
-    --soft-conclusion: #21183b;
-    --soft-neutral: #24211b;
-    --accent-data: #6aa7ff;
-    --accent-risk: #ff8b5c;
-    --accent-opp: #5bd18f;
-    --accent-conclusion: #a78bfa;
-    --accent-secret: #ff6aa2;
-    --badge: #d5a92f;
-    --shadow: rgba(0, 0, 0, 0.35);
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0e1319;
+    --surface:#151c24;
+    --card:#1a222c;
+    --ink:#e7edf4;
+    --muted:#aab5c1;
+    --line:#34404d;
+    --accent:#65b6f3;
+    --accent-soft:#142f45;
+    --accent2:#58d3a5;
+    --accent2-soft:#13382f;
+    --accent3:#f0b45d;
+    --accent3-soft:#3d2c13;
+    --risk:#ff8290;
+    --risk-soft:#411d25;
+    --conclusion:#bda4ff;
+    --conclusion-soft:#302554;
+    --deep:#09111d;
+    --deep-ink:#eaf2fb;
+    --hl:#624d17;
+    --hl2:#164562;
+    --shadow:0 18px 45px rgba(0,0,0,.28);
   }
 }
-:root[data-theme="dark"] {
-  --bg: #111417;
-  --ink: #edf1f5;
-  --muted: #aeb7c1;
-  --line: #303943;
-  --card: #1a2027;
-  --hero: #07111f;
-  --hero-ink: #f0f5fb;
-  --soft-data: #10243d;
-  --soft-risk: #321b12;
-  --soft-opp: #10291d;
-  --soft-conclusion: #21183b;
-  --soft-neutral: #24211b;
-  --accent-data: #6aa7ff;
-  --accent-risk: #ff8b5c;
-  --accent-opp: #5bd18f;
-  --accent-conclusion: #a78bfa;
-  --accent-secret: #ff6aa2;
-  --badge: #d5a92f;
-  --shadow: rgba(0, 0, 0, 0.35);
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0e1319;
+  --surface:#151c24;
+  --card:#1a222c;
+  --ink:#e7edf4;
+  --muted:#aab5c1;
+  --line:#34404d;
+  --accent:#65b6f3;
+  --accent-soft:#142f45;
+  --accent2:#58d3a5;
+  --accent2-soft:#13382f;
+  --accent3:#f0b45d;
+  --accent3-soft:#3d2c13;
+  --risk:#ff8290;
+  --risk-soft:#411d25;
+  --conclusion:#bda4ff;
+  --conclusion-soft:#302554;
+  --deep:#09111d;
+  --deep-ink:#eaf2fb;
+  --hl:#624d17;
+  --hl2:#164562;
+  --shadow:0 18px 45px rgba(0,0,0,.28);
 }
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-  line-height: 1.65;
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
+  line-height:1.75;
 }
-main { overflow: hidden; }
-.hero {
-  background: var(--hero);
-  color: var(--hero-ink);
-  padding: 56px 7vw 48px;
+a{color:var(--accent)}
+.hero{
+  padding:72px max(24px,calc((100vw - 1120px)/2));
+  background:var(--deep);
+  color:var(--deep-ink);
+  border-bottom:6px solid var(--accent2);
 }
-.hero .eyebrow {
-  color: var(--badge);
-  font-weight: 700;
-  letter-spacing: 0;
+.eyebrow{
+  margin:0 0 12px;
+  color:var(--accent2);
+  font-size:.82rem;
+  font-weight:800;
+  letter-spacing:.16em;
+  text-transform:uppercase;
 }
-h1 {
-  margin: 10px 0 8px;
-  font-size: clamp(34px, 6vw, 68px);
-  line-height: 1.05;
-  letter-spacing: 0;
+.hero h1{
+  max-width:900px;
+  margin:0;
+  font-size:clamp(2.5rem,7vw,5.8rem);
+  line-height:1.04;
+  letter-spacing:-.045em;
 }
-.original {
-  color: var(--muted);
-  background: var(--card);
-  display: inline-block;
-  padding: 6px 12px;
-  border-radius: 6px;
-  margin-top: 10px;
+.original-title{
+  margin:18px 0 0;
+  color:var(--muted);
+  font-size:clamp(1rem,2.2vw,1.35rem);
 }
-.hero .summary {
-  max-width: 900px;
-  margin-top: 28px;
-  font-size: clamp(18px, 2.2vw, 26px);
+.hero-summary{
+  max-width:820px;
+  margin:34px 0 0;
+  padding-left:18px;
+  border-left:4px solid var(--accent3);
+  font-size:1.22rem;
 }
-.stat-band {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  background: var(--line);
+.wrap{width:min(1120px,calc(100% - 40px));margin:auto}
+.metric-strip{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  margin:-32px auto 58px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:var(--card);
+  box-shadow:var(--shadow);
 }
-.stat {
-  background: var(--soft-data);
-  padding: 28px 24px;
+.metric{padding:26px 22px;border-right:1px solid var(--line)}
+.metric:last-child{border-right:0}
+.metric strong{display:block;color:var(--accent);font-size:2rem;line-height:1.1}
+.metric:nth-child(2) strong{color:var(--accent2)}
+.metric:nth-child(3) strong{color:var(--accent3)}
+.metric:nth-child(4) strong{color:var(--conclusion)}
+.metric span{display:block;margin-top:8px;color:var(--muted);font-size:.9rem}
+.split{
+  display:grid;
+  grid-template-columns:1.05fr .95fr;
+  gap:26px;
+  margin:54px 0;
 }
-.stat:nth-child(2) { background: var(--soft-opp); }
-.stat:nth-child(3) { background: var(--soft-conclusion); }
-.stat:nth-child(4) { background: var(--soft-risk); }
-.stat b {
-  display: block;
-  font-size: clamp(28px, 4vw, 46px);
-  line-height: 1;
+.explainer{
+  padding:34px;
+  border-left:6px solid var(--accent);
+  background:var(--accent-soft);
+  border-radius:4px 20px 20px 4px;
 }
-.stat span {
-  display: block;
-  color: var(--muted);
-  margin-top: 10px;
+.explainer h2,.contrast h2,.takeaways h2{margin-top:0}
+.explainer p:last-child{margin-bottom:0}
+.contrast{
+  padding:34px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:20px;
 }
-.split {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 42px;
-  padding: 56px 7vw;
-  background: var(--card);
+.contrast table{width:100%;border-collapse:collapse}
+.contrast th,.contrast td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.contrast th{color:var(--muted);font-size:.85rem}
+.flow{
+  margin:62px 0;
+  padding:40px;
+  color:var(--deep-ink);
+  background:var(--deep);
+  border-radius:24px;
 }
-.split h2, .timeline h2, .matrix h2, .limits h2, .takeaways h2 {
-  margin: 0 0 16px;
-  font-size: clamp(24px, 3vw, 38px);
-  line-height: 1.15;
+.flow h2{margin-top:0;color:var(--accent2)}
+.flow ol{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;padding:0;list-style:none;counter-reset:step}
+.flow li{position:relative;padding:48px 20px 20px;border-top:2px solid var(--accent)}
+.flow li::before{
+  counter-increment:step;
+  content:counter(step);
+  position:absolute;
+  top:10px;
+  left:20px;
+  color:var(--accent3);
+  font-size:1.5rem;
+  font-weight:900;
 }
-.panel-line {
-  border-left: 6px solid var(--accent-data);
-  padding-left: 20px;
+.insight-bar{
+  margin:54px 0;
+  padding:28px 34px;
+  background:var(--conclusion-soft);
+  border-top:4px solid var(--conclusion);
+  border-bottom:4px solid var(--conclusion);
+  font-size:1.18rem;
 }
-.panel-line.risk { border-left-color: var(--accent-risk); }
-.flow {
-  padding: 56px 7vw;
-  background: var(--soft-neutral);
+.risk{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:22px;
+  align-items:start;
+  margin:54px 0;
+  padding:30px;
+  background:var(--risk-soft);
+  border-radius:18px;
 }
-.timeline {
-  display: grid;
-  gap: 18px;
-  max-width: 980px;
+.risk-badge{
+  padding:8px 12px;
+  color:var(--risk);
+  border:2px solid var(--risk);
+  border-radius:999px;
+  font-weight:900;
 }
-.step {
-  display: grid;
-  grid-template-columns: 56px 1fr;
-  gap: 18px;
-  align-items: start;
+.takeaways{margin:60px 0 80px}
+.mosaic{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+.tile{padding:24px;border-radius:18px;background:var(--card);border:1px solid var(--line)}
+.tile:nth-child(1),.tile:nth-child(4){grid-column:span 3;border-top:5px solid var(--accent)}
+.tile:nth-child(2){grid-column:span 2;border-top:5px solid var(--accent2)}
+.tile:nth-child(3){grid-column:span 4;border-top:5px solid var(--accent3)}
+.tile:nth-child(4){border-top-color:var(--risk)}
+mark,.hl{padding:.05em .22em;color:inherit;background:var(--hl);border-radius:.2em}
+.hl2{padding:.05em .22em;background:var(--hl2);border-radius:.2em;font-weight:700}
+#translation{
+  padding:76px max(24px,calc((100vw - 820px)/2));
+  background:var(--surface);
+  border-top:1px solid var(--line);
 }
-.step .num {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: var(--accent-conclusion);
-  color: var(--hero-ink);
-  display: grid;
-  place-items: center;
-  font-weight: 800;
+#translation h2{
+  margin:0 0 8px;
+  font-size:clamp(2rem,5vw,3.3rem);
+  line-height:1.15;
 }
-.step strong { color: var(--accent-conclusion); }
-.matrix {
-  padding: 56px 7vw;
-  background: var(--soft-data);
+#translation h3{margin:2.7em 0 .7em;color:var(--accent);font-size:1.55rem}
+#translation h4{margin:2em 0 .6em;color:var(--accent2);font-size:1.2rem}
+#translation p{margin:1.05em 0}
+#translation ul{padding-left:1.4em}
+#translation li{margin:.55em 0}
+.kicker{color:var(--muted);font-size:1.15rem}
+.toc{
+  margin:28px 0 42px;
+  padding:22px 26px;
+  background:var(--accent-soft);
+  border-left:4px solid var(--accent);
 }
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--card);
-  box-shadow: 0 12px 30px var(--shadow);
+.example{
+  margin:26px 0;
+  padding:24px;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  color:var(--deep-ink);
+  background:var(--deep);
+  border-radius:14px;
+  font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+  line-height:1.65;
 }
-th, td {
-  text-align: left;
-  padding: 18px;
-  border-bottom: 1px solid var(--line);
-  vertical-align: top;
+.label-list{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px 18px;
+  padding:18px 24px 18px 42px;
+  background:var(--accent2-soft);
+  border-radius:14px;
+  font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
 }
-th {
-  color: var(--accent-data);
-  font-size: 15px;
+.source-figure{
+  margin:42px 0;
+  padding:14px;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:16px;
 }
-.insight {
-  padding: 38px 7vw;
-  background: var(--hero);
-  color: var(--hero-ink);
+.source-figure img{display:block;width:100%;height:auto;border-radius:10px}
+.source-figure figcaption{margin-top:10px;color:var(--muted);font-size:.9rem;text-align:center}
+.meta{color:var(--muted);font-size:.9rem}
+.footer-note{
+  margin-top:50px;
+  padding-top:20px;
+  color:var(--muted);
+  border-top:1px solid var(--line);
 }
-.insight blockquote {
-  margin: 0;
-  max-width: 980px;
-  font-size: clamp(22px, 3vw, 36px);
-  line-height: 1.25;
+@media (max-width:780px){
+  .metric-strip{grid-template-columns:repeat(2,1fr)}
+  .metric:nth-child(2){border-right:0}
+  .metric:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .split{grid-template-columns:1fr}
+  .flow ol{grid-template-columns:1fr}
+  .mosaic{grid-template-columns:1fr}
+  .tile:nth-child(n){grid-column:span 1}
 }
-.limits {
-  padding: 56px 7vw;
-  background: var(--soft-risk);
-}
-.limit-grid {
-  display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
-  gap: 28px;
-  align-items: stretch;
-}
-.limit-box {
-  background: var(--card);
-  border-top: 6px solid var(--accent-risk);
-  padding: 24px;
-}
-.limit-note {
-  background: var(--soft-conclusion);
-  border: 1px solid var(--accent-conclusion);
-  padding: 24px;
-}
-.takeaways {
-  padding: 56px 7vw 72px;
-  background: var(--bg);
-}
-.mosaic {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr 1fr;
-  gap: 16px;
-}
-.tile {
-  padding: 24px;
-  min-height: 150px;
-  background: var(--card);
-  border: 1px solid var(--line);
-}
-.tile:first-child {
-  grid-row: span 2;
-  background: var(--soft-opp);
-  border-color: var(--accent-opp);
-}
-.tile:nth-child(2) { border-color: var(--accent-data); }
-.tile:nth-child(3) { border-color: var(--accent-secret); }
-.tile:nth-child(4) { border-color: var(--accent-risk); }
-.tile:nth-child(5) { background: var(--soft-conclusion); border-color: var(--accent-conclusion); }
-.tile b {
-  display: block;
-  margin-bottom: 8px;
-  color: var(--accent-opp);
-}
-@media (max-width: 800px) {
-  .stat-band, .split, .limit-grid, .mosaic {
-    grid-template-columns: 1fr;
-  }
-  .step {
-    grid-template-columns: 44px 1fr;
-  }
+
+:root[data-theme="light"] {
+  color-scheme: light;
+--bg:#f7f5ef;
+  --surface:#fffdf8;
+  --card:#ffffff;
+  --ink:#17202a;
+  --muted:#65717e;
+  --line:#d8d4ca;
+  --accent:#1769aa;
+  --accent-soft:#dceeff;
+  --accent2:#087f5b;
+  --accent2-soft:#dff5eb;
+  --accent3:#9c5a00;
+  --accent3-soft:#fff0cf;
+  --risk:#b33a4b;
+  --risk-soft:#ffe4e7;
+  --conclusion:#6941c6;
+  --conclusion-soft:#eee7ff;
+  --deep:#16263b;
+  --deep-ink:#f3f7fc;
+  --hl:#ffe08a;
+  --hl2:#bfe8ff;
+  --shadow:0 18px 45px rgba(31,42,55,.1);
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -392,92 +439,233 @@ th {
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/introducing-openai-privacy-filter" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<header class="hero">
+<p class="eyebrow">OpenAI · Research · 2026</p>
+<h1>OpenAI Privacy Filter 正式发布</h1>
+<p class="original-title">Introducing OpenAI Privacy Filter</p>
+<p class="hero-summary">一句话总括：OpenAI 把具有前沿个人数据识别能力的模型压缩到可在本地高吞吐运行的规模，并以开放权重方式提供给开发者。</p>
+</header>
 <main>
-  <section class="hero">
-    <div class="eyebrow">一句话总括</div>
-    <h1>推出 OpenAI Privacy Filter</h1>
-    <div class="original">Introducing OpenAI Privacy Filter</div>
-    <p class="summary">OpenAI 的真正贡献不是又发布一个脱敏工具，而是把个人信息识别做成一个可本地运行、可微调、可评估的小模型基础设施。</p>
-  </section>
-
-  <section class="stat-band" aria-label="关键数字">
-    <div class="stat"><b>97.43%</b><span>修正标注后的 PII-Masking-300k F1</span></div>
-    <div class="stat"><b>128k</b><span>最长上下文 token 数</span></div>
-    <div class="stat"><b>50M</b><span>活跃参数，1.5B 总参数</span></div>
-    <div class="stat"><b>8 类</b><span>隐私标签覆盖人员、地址、账号和密钥等</span></div>
-  </section>
-
-  <section class="split">
-    <div class="panel-line">
-      <h2>隐私过滤从格式规则变成上下文判断</h2>
-      <p>传统工具擅长找邮箱、电话这类固定格式。它们容易漏掉需要语境才能判断的私人信息。</p>
-      <p>Privacy Filter 使用双向 token 分类和 span 解码。它能在一次前向传播中标注文本，并把 token 结果合并成更完整的隐私片段。</p>
-      <p>这改变了读者对 AI 隐私影响的理解：隐私保护不只是事后合规检查，也可以成为模型管线里的基础组件。</p>
+<div class="wrap">
+<div aria-label="关键数字" class="metric-strip">
+<div class="metric"><strong>97.43%</strong><span>修正标注问题后的 F1</span></div>
+<div class="metric"><strong>128K</strong><span>支持的最大上下文 token 数</span></div>
+<div class="metric"><strong>1.5B / 50M</strong><span>总参数量 / 激活参数量</span></div>
+<div class="metric"><strong>8 类</strong><span>可预测的隐私信息类别</span></div>
+</div>
+<div class="split">
+<section class="explainer">
+<h2>真正的变化：从格式匹配走向语境判断</h2>
+<p>传统工具擅长识别电话号码和电子邮件等固定格式，却容易漏掉依赖上下文才能判断的私人信息。</p>
+<p>Privacy Filter 使用语言模型的语境理解能力。它能区分应当保留的公开信息，以及与私人个体相关、需要遮蔽的信息。</p>
+<p><strong>这改变了隐私过滤的能力边界：</strong>判断依据不再只是字符长什么样，还包括信息在当前语境中意味着什么。</p>
+</section>
+<section class="contrast">
+<h2>生产环境中的取舍</h2>
+<table>
+<thead><tr><th>能力</th><th>实践意义</th></tr></thead>
+<tbody>
+<tr><td>本地运行</td><td>尚未过滤的数据可以留在设备上，降低传输暴露风险。</td></tr>
+<tr><td>单次前向传播</td><td>全部 token 一次完成标注，适合高吞吐流程。</td></tr>
+<tr><td>可配置阈值</td><td>团队可按业务风险权衡召回率与精确率。</td></tr>
+<tr><td>开放权重</td><td>开发者可以检查、部署并针对自身数据微调。</td></tr>
+</tbody>
+</table>
+</section>
+</div>
+<section class="flow">
+<h2>模型如何形成隐私跨度</h2>
+<ol>
+<li><strong>建立分类体系</strong><br/>定义个人身份、联系方式、账户号码和密钥等需要识别的信息。</li>
+<li><strong>改造预训练模型</strong><br/>把自回归语言模型转换为双向 token 分类器，再进行监督式后训练。</li>
+<li><strong>约束式跨度解码</strong><br/>用 BIOES 标签和受约束的 Viterbi 程序，把逐 token 预测组合成连贯边界。</li>
+</ol>
+</section>
+<div class="insight-bar">
+<strong>数据告诉我们什么：</strong>在 PII-Masking-300k 上，原始评估的 F1 为 <span class="hl2">96%</span>。修正评估中发现的标注问题后，F1 达到 <mark>97.43%</mark>。这说明模型表现很强，也提醒读者：benchmark 的标注质量会直接影响结论。
     </div>
-    <div class="panel-line risk">
-      <h2>本地运行降低了未过滤数据外泄面</h2>
-      <p>模型可以在开发者自己的环境中运行。未脱敏文本不必先发往外部服务器。</p>
-      <p>这对日志、索引、训练数据清洗和审查流程很关键。越早过滤，后续系统接触原始 PII 的机会越少。</p>
-      <p>结论是，本地小模型让隐私保护更接近数据源，而不是依赖末端补救。</p>
-    </div>
-  </section>
+<div class="split">
+<section class="contrast">
+<h2>少量微调带来的跃升</h2>
+<p>在领域适配 benchmark 上，加入少量数据便能把 F1 从 <strong class="hl">54%</strong> 提高到 <strong class="hl2">96%</strong>，随后逐渐接近饱和。</p>
+<p>这意味着通用隐私模型不必覆盖每家机构的全部政策。团队可以在通用能力之上，用自己的术语、格式和决策边界完成适配。</p>
+</section>
+<section class="explainer">
+<h2>小模型并不等于低能力</h2>
+<p>模型共有 <strong>15 亿</strong>个参数，但每次仅激活 <strong>5,000 万</strong>个参数。它仍支持最长 <strong>128,000 token</strong> 的输入。</p>
+<p>这种设计把前沿能力放进更容易本地部署的体量中。隐私基础设施因此可以更快、更靠近数据源。</p>
+</section>
+</div>
+<aside class="risk">
+<div class="risk-badge">边界</div>
+<div>
+<strong>它不是匿名化工具，也不是合规认证。</strong>
+<p>模型可能漏掉罕见标识符，也可能在上下文不足时过度或不足遮蔽。语言、文字系统、命名习惯和领域分布的变化也会影响表现。法律、医疗和金融等高敏感场景仍需要领域评估、针对性微调和人工审核。</p>
+</div>
+</aside>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="mosaic">
+<article class="tile"><strong>隐私识别正在语境化。</strong><br/>新一代工具不仅匹配格式，还要判断一段信息是否指向私人个体。</article>
+<article class="tile"><strong>本地推理本身就是保护措施。</strong><br/>数据可在离开设备之前完成过滤。</article>
+<article class="tile"><strong>评估集也需要审查。</strong><br/>修正标注后，F1 从 96% 变为 97.43%。benchmark 分数不能脱离数据质量解读。</article>
+<article class="tile"><strong>强模型仍需治理体系。</strong><br/>Privacy Filter 是隐私设计中的一个组件，不能替代政策、合规判断和人工复核。</article>
+</div>
+</section>
+</div>
+<section id="translation">
+<h2>完整译文</h2>
+<p class="kicker">用于遮蔽文本中个人身份信息（PII）的先进模型</p>
+<p class="meta">来源：OpenAI　日期：2026 年 4 月 22 日　分类：研究</p>
+<h3>拥有前沿个人数据检测能力的小型模型</h3>
+<nav aria-label="文章目录" class="toc">
+<strong>文章目录</strong>
+<ul>
+<li>模型概览</li>
+<li>构建过程</li>
+<li>Privacy Filter 的表现</li>
+<li>局限性</li>
+<li>获取方式</li>
+<li>未来展望</li>
+</ul>
+</nav>
+<h3>拥有前沿个人数据检测能力的小型模型</h3>
+<nav aria-label="重复的文章目录" class="toc">
+<strong>文章目录</strong>
+<ul>
+<li>模型概览</li>
+<li>构建过程</li>
+<li>Privacy Filter 的表现</li>
+<li>局限性</li>
+<li>获取方式</li>
+<li>未来展望</li>
+</ul>
+</nav>
+<p>今天，我们发布 OpenAI Privacy Filter。这是一款开放权重模型，用于检测并遮蔽文本中的个人身份信息（PII）。</p>
+<p>此次发布是 OpenAI 建设更具韧性的软件生态系统这项长期工作的一部分。我们希望为开发者提供实用的基础设施，帮助他们安全地使用 AI。这些基础设施包括工具和模型，让开发者从一开始就能更轻松地落实有力的隐私与安全保护。</p>
+<p>Privacy Filter 是一款拥有前沿个人数据检测能力的小型模型。它面向高吞吐量的隐私工作流设计，可以结合上下文识别非结构化文本中的 PII。</p>
+<p>模型可以在本地运行。这意味着 PII 无须离开用户的机器，就能得到遮蔽或删除。它还能高效处理长输入，通过快速的单次处理完成遮蔽判断。</p>
+<p>在 OpenAI 内部，我们已在自己的隐私保护工作流中使用 Privacy Filter 的微调版本。</p>
+<p>我们之所以开发 Privacy Filter，是因为我们相信，借助最新的 AI 能力，隐私保护标准可以超过市场上的现有水平。根据评估期间发现的标注问题完成修正后，今天发布的 Privacy Filter 在 PII-Masking-300k benchmark 上达到了当前最佳水平。</p>
+<p>借助此次发布，开发者可以在自己的环境中运行 Privacy Filter，也可以针对自身场景进行微调。开发者还能把更强的隐私保护能力接入训练、索引、日志记录和审查流程。</p>
+<h3>拥有前沿个人数据检测能力的小型模型</h3>
+<p>现代 AI 系统的隐私保护不能只靠模式匹配。</p>
+<p>传统 PII 检测工具通常依赖确定性规则，以识别电话号码和电子邮件地址等固定格式。这些工具在狭窄场景中可能表现良好，却经常漏掉更隐晦的个人信息，也不擅长理解上下文。</p>
+<p>Privacy Filter 具备更深入的语言和上下文理解能力，因此可以处理更细微的判断。它把强大的语言理解能力与面向隐私的标签体系结合起来，能够在非结构化文本中检测范围更广的 PII。这也包括必须结合上下文才能作出正确判断的情况。</p>
+<p>它可以更准确地区分两类信息。一类是公开信息，应当保留。另一类与私人个体有关，应当遮蔽或删除。</p>
+<p>最终得到的模型足以提供前沿水平的隐私过滤表现。同时，它的规模又足够小，可以在本地运行。</p>
+<p>这意味着尚未过滤的数据可以留在设备上，不必先发送到服务器进行去标识化处理，从而降低暴露风险。</p>
+<h3>模型概览</h3>
+<p>Privacy Filter 是一款采用跨度解码（span decoding）的双向 token 分类模型。</p>
+<p>它以自回归预训练 checkpoint 为起点，随后被改造成使用固定隐私标签分类体系的 token 分类器。模型不会逐 token 生成文本，而是在一次处理中为整个输入序列添加标签，再通过受约束的 Viterbi 程序解码出连贯的文本跨度。</p>
+<p>这种架构为生产环境带来了几项实用特性：</p>
+<ul>
+<li><strong>快速且高效：</strong>所有 token 都在单次前向传播中完成标注。</li>
+<li><strong>理解上下文：</strong>语言先验让模型能够根据周围语境识别 PII 文本跨度。</li>
+<li><strong>长上下文：</strong>此次发布的模型最多支持 128,000 个 token 的上下文。</li>
+<li><strong>可配置：</strong>开发者可以调整运行阈值，并按工作流需要权衡召回率与精确率。</li>
+</ul>
+<p>此次发布的模型共有 15 亿个参数，其中激活参数为 5,000 万个。</p>
+<p>Privacy Filter 可以预测以下八类文本跨度：</p>
+<ul class="label-list">
+<li>private_person</li>
+<li>private_address</li>
+<li>private_email</li>
+<li>private_phone</li>
+<li>private_url</li>
+<li>private_date</li>
+<li>account_number</li>
+<li>secret</li>
+</ul>
+<p><code>account_number</code> 类别用于遮蔽多种账户号码。其中包括信用卡号和银行账号等银行信息。<code>secret</code> 类别用于遮蔽密码和 API 密钥等秘密信息。</p>
+<p>这些标签使用 BIOES 跨度标签进行解码，有助于生成更干净、更连贯的遮蔽边界。</p>
+<h4>输入文本示例</h4>
+<div class="example">主题：第二季度规划后续事项
 
-  <section class="flow">
-    <div class="timeline">
-      <h2>构建路线是先定义边界，再训练识别能力</h2>
-      <div class="step"><div class="num">1</div><p><strong>定义分类体系。</strong>模型覆盖私人姓名、地址、邮箱、电话、网址、日期、账号和 secret。标签边界决定了什么会被遮盖。</p></div>
-      <div class="step"><div class="num">2</div><p><strong>改造预训练模型。</strong>OpenAI 将自回归 checkpoint 转成双向 token 分类器。它不生成文本，而是标注输入。</p></div>
-      <div class="step"><div class="num">3</div><p><strong>混合公开和合成数据。</strong>公开数据用于贴近真实文本，合成数据用于覆盖困难格式和隐私子类型。</p></div>
-      <div class="step"><div class="num">4</div><p><strong>用受约束解码生成 span。</strong>BIOES 标签和 Viterbi 解码帮助得到更干净的遮盖边界。结论是，隐私过滤的质量来自模型能力和标签工程的组合。</p></div>
-    </div>
-  </section>
+Jordan，你好：
 
-  <section class="matrix">
-    <h2>评测显示高召回更适合隐私场景</h2>
-    <table>
-      <thead>
-        <tr><th>评测项</th><th>结果</th><th>为什么重要</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>PII-Masking-300k</td><td>F1 96%，精确率 94.04%，召回率 98.04%</td><td>召回率高意味着更少私人信息被漏掉，这通常比少量过度遮盖更重要。</td></tr>
-        <tr><td>修正标注版本</td><td>F1 97.43%，精确率 96.79%，召回率 98.08%</td><td>OpenAI 指出原数据有标注问题。修正后更能反映模型的真实检测能力。</td></tr>
-        <tr><td>领域适配</td><td>少量数据微调后 F1 从 54% 升至 96%</td><td>不同组织的隐私政策不同。可微调性让模型更像基础设施，而不是固定产品。</td></tr>
-      </tbody>
-    </table>
-  </section>
+再次感谢你今天早些时候与我会面。我想跟进第二季度发布计划的修订时间表，并确认产品定于 2026 年 9 月 18 日发布。项目文件的编号是 4829-1037-5581，供你参考。如果你那边有任何变化，可以直接回复这封邮件联系我。我的邮箱是 maya.chen@example.com，电话是 +1 (415) 555-0124。
 
-  <section class="insight">
-    <blockquote>关键洞见：AI 对隐私的影响不只在于会不会泄露数据，也在于能否把高质量脱敏变成默认、低成本、可部署的工程环节。</blockquote>
-  </section>
+祝好！
 
-  <section class="limits">
-    <h2>它不是匿名化证明，也不是合规替代品</h2>
-    <div class="limit-grid">
-      <div class="limit-box">
-        <p>Privacy Filter 仍可能漏掉罕见标识符，也可能在上下文不足时过度或不足遮盖。不同语言、文字系统、命名习惯和业务领域会影响效果。</p>
-        <p>这说明模型的高 benchmark 分数不能直接等同于法律、医疗、金融等高敏场景的可上线结论。</p>
-      </div>
-      <div class="limit-note">
-        <p>OpenAI 明确把它定位为 privacy-by-design 系统中的一个组件。高敏流程仍需要人工审查、领域评估和进一步微调。</p>
-        <p>结论是，模型降低了隐私工程门槛，但没有消除治理责任。</p>
-      </div>
-    </div>
-  </section>
+Maya Chen</div>
+<h4>遮蔽个人标识信息后的文本</h4>
+<div class="example">主题：第二季度规划后续事项
 
-  <section class="takeaways">
-    <h2>最值得带走的洞见</h2>
-    <div class="mosaic">
-      <div class="tile"><b>隐私保护可以前移</b>本地运行让原始文本在进入训练、索引或日志系统前就被处理，减少后续暴露面。</div>
-      <div class="tile"><b>小模型也能承担关键任务</b>1.5B 总参数和 50M 活跃参数说明，窄任务上的前沿能力不一定依赖巨型通用模型。</div>
-      <div class="tile"><b>secret 检测扩大了实用边界</b>API key、密码和账号信息进入同一标签体系，使它更贴近真实软件工程风险。</div>
-      <div class="tile"><b>评测仍要看数据质量</b>OpenAI 对 benchmark 标注问题做了修正，这提醒读者不要只看一个公开分数。</div>
-      <div class="tile"><b>真正价值在可适配</b>少量数据微调能显著提升领域表现，说明组织可以把自己的隐私政策落到模型行为上。</div>
-    </div>
-  </section>
+[PRIVATE_PERSON]，你好：
+
+再次感谢你今天早些时候与我会面。我想跟进第二季度发布计划的修订时间表，并确认产品定于 [PRIVATE_DATE] 发布。项目文件的编号是 [ACCOUNT_NUMBER]，供你参考。如果你那边有任何变化，可以直接回复这封邮件联系我。我的邮箱是 [PRIVATE_EMAIL]，电话是 [PRIVATE_PHONE]。
+
+祝好！
+
+[PRIVATE_PERSON]</div>
+<h3>构建过程</h3>
+<p>我们分几个阶段开发了 Privacy Filter。</p>
+<p>首先，我们建立了一套隐私分类体系，用来定义模型应当检测的文本跨度类型。</p>
+<p>其中包括个人标识信息、联系方式、地址、私人日期、多种不同的账户号码，以及 API 密钥和密码等秘密信息。账户号码还涵盖信用信息和银行信息。</p>
+<p>其次，我们将一个预训练语言模型转换为双向 token 分类器。具体做法是用 token 分类头替换语言建模头，再使用监督分类目标进行后训练。</p>
+<p>第三，我们使用公开数据和合成数据的混合数据集进行训练。这些数据旨在同时覆盖真实文本和难度较高的隐私模式。</p>
+<p>部分公开数据的标签并不完整。对于这些数据，我们使用模型辅助标注和审核来提高覆盖率。我们还生成了合成示例，以增加格式、上下文和隐私子类型的多样性。</p>
+<p>推理时，模型会通过受约束的序列解码，把 token 级别的预测结果转换为连贯的文本跨度。</p>
+<p>这种方法保留了预训练模型广泛的语言理解能力，同时让模型专门适应隐私检测任务。</p>
+<h3>Privacy Filter 的表现</h3>
+<p>我们在标准 benchmark 上评估了 Privacy Filter。我们还进行了额外的合成评估和聊天式评估，用来测试更困难、也更依赖上下文的情况。</p>
+<p>在 PII-Masking-300k benchmark 上，Privacy Filter 的 F1 分数为 96%，其中精确率为 94.04%，召回率为 98.04%。</p>
+<p>我们在审核期间发现了数据集标注问题。使用修正后的 benchmark 版本时，F1 分数为 97.43%，其中精确率为 96.79%，召回率为 98.08%。</p>
+<p>我们还发现，这款模型能够得到高效适配。即使只使用少量数据进行微调，也能迅速提高模型在特定领域任务中的准确率。</p>
+<p>在我们评估的领域适配 benchmark 上，微调使 F1 分数从 54% 提升到 96%，随后逐渐接近饱和。</p>
+<p>除了 benchmark 表现，Privacy Filter 还面向嘈杂的真实文本设计，力求提供实用的隐私过滤能力。</p>
+<p>这类文本包括长文档、有歧义的指代、混合格式字符串，以及与软件有关的秘密信息。</p>
+<p>模型卡还报告了针对代码库秘密信息检测的专项评估，以及覆盖多语言、对抗性和上下文依赖示例的压力测试。</p>
+<h3>局限性</h3>
+<p>Privacy Filter 不是匿名化工具，不是合规认证，也不能替代高风险场景中的政策审核。它只是更广泛的隐私设计体系中的一个组件。</p>
+<p>模型行为会反映训练所使用的标签分类体系和决策边界。不同机构可能需要不同的检测或遮蔽政策。这些政策可能需要在领域内进行评估，也可能需要进一步微调。</p>
+<p>如果语言、文字系统、命名习惯或业务领域与训练数据分布不同，模型表现也可能发生变化。</p>
+<p>和所有模型一样，Privacy Filter 也会出错。它可能漏掉不常见的标识符，也可能无法识别含义模糊的私人指代。</p>
+<p>上下文有限时，模型可能过度遮蔽实体，也可能遮蔽不足。这个问题在较短的输入序列中尤其明显。</p>
+<p>在法律、医疗和金融工作流等高敏感领域，人工审核、领域专项评估和微调仍然十分重要。</p>
+<h3>获取方式</h3>
+<p>我们发布 OpenAI Privacy Filter，是为了帮助整个生态系统建立更有力的隐私保护。</p>
+<p>该模型已于今天在 Hugging Face 和 GitHub 上发布，采用 Apache 2.0 许可证。</p>
+<p>它可用于实验、定制和商业部署，也可以针对不同的数据分布与隐私政策进行微调。</p>
+<p>除模型之外，我们还共享了相关文档。文档涵盖模型架构、标签分类体系、解码控制、预期使用场景、评估设置和已知局限。</p>
+<p>这些资料可以帮助团队了解模型擅长什么，也能帮助他们判断哪些场景需要谨慎使用。</p>
+<h3>未来展望</h3>
+<p>AI 系统的隐私保护是一项持续工作，涉及研究、产品设计、评估和部署等多个环节。</p>
+<p>Privacy Filter 体现了我们认为十分重要的一条发展方向：针对真实 AI 系统中的重要而明确的任务，打造具备前沿能力的小型高效模型。</p>
+<p>我们选择发布这款模型，是因为我们认为，隐私保护基础设施应当更容易检查、运行、适配和改进。</p>
+<p>我们的目标是让模型了解世界，而不是了解私人个体。Privacy Filter 有助于实现这个目标。</p>
+<p>我们发布 Privacy Filter 的这个预览版本，是为了收集研究界和隐私领域社群的反馈，并进一步迭代模型表现。</p>
+<p class="footer-note">伦理与安全</p>
+<p>2026</p>
+<p>作者</p>
+<p>继续阅读</p>
+<figure class="source-figure" data-source-image="0"><img alt="GPT 5-6 &gt; Card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/1a9IPPV5nXWydTBosgmgYI/8e03f28ca04f26edc8bc81cdba387df1/5-6.jpg?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="1"><img alt="Separating signal from noise &gt; Art Card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/7j6M3prKIsTmV6cbMaHjhZ/e66f7cdd98c66c99546853cbc22cfe84/Seperating-signal-from-noise-card.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="2"><img alt="Art Card 1 1" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/4vJ1lSvYeKz0zM4RVCKwIC/855f7e54052d8a7635e4bf45adf41737/Art_Card_1_1.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+</section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

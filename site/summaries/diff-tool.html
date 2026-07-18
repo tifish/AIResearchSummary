@@ -1,278 +1,350 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI 的“diff”工具：寻找新模型中的行为差异</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>AI 的“diff”工具：发现新模型的行为差异</title>
 <style>
-:root {
-  --bg: #f7f4ee;
-  --ink: #172026;
-  --muted: #61707c;
-  --line: #d8d0c2;
-  --hero: #111820;
-  --hero-ink: #fffaf0;
-  --surface: #ffffff;
-  --surface2: #edf5f1;
-  --surface3: #f5ece2;
-  --surface4: #eef0fb;
-  --surface5: #f7edf1;
-  --data: #1677a3;
-  --risk: #b7472a;
-  --opportunity: #2e7d55;
-  --conclusion: #6f4bb3;
-  --warning: #c08422;
-  --badge-ink: #ffffff;
-  --shadow: 0 18px 50px rgba(23, 32, 38, 0.12);
-}
-:root[data-theme="dark"] {
-  --bg: #0f1317;
-  --ink: #e8edf0;
-  --muted: #a6b2ba;
-  --line: #303942;
-  --hero: #080b0f;
-  --hero-ink: #f2f6f7;
-  --surface: #171d23;
-  --surface2: #12231d;
-  --surface3: #281d15;
-  --surface4: #171a2a;
-  --surface5: #261820;
-  --data: #45b7e5;
-  --risk: #ff7b59;
-  --opportunity: #60d394;
-  --conclusion: #b395ff;
-  --warning: #f0b44c;
-  --badge-ink: #071014;
-  --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+:root,
+:root[data-theme="light"] {
+  --bg: #f5f1e8;
+  --surface: #fffdf8;
+  --surface-soft: #eee8dc;
+  --surface-blue: #e6f1fb;
+  --surface-green: #e4f2e8;
+  --surface-red: #f8e5e2;
+  --surface-yellow: #f7edc8;
+  --surface-purple: #eee5f7;
+  --ink: #182026;
+  --muted: #657078;
+  --line: #d7cfc1;
+  --accent: #1167a8;
+  --accent2: #16805d;
+  --accent3: #bd4b3e;
+  --accent4: #7b4eab;
+  --data: #0875b9;
+  --risk: #c34335;
+  --opportunity: #14795b;
+  --conclusion: #7650a2;
+  --hl: #ffdf72;
+  --hl2: #9bdcc5;
+  --deep: #172938;
+  --deep-ink: #f1f7fa;
+  --shadow: rgba(45, 37, 24, 0.12);
 }
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0f1317;
-    --ink: #e8edf0;
-    --muted: #a6b2ba;
-    --line: #303942;
-    --hero: #080b0f;
-    --hero-ink: #f2f6f7;
-    --surface: #171d23;
-    --surface2: #12231d;
-    --surface3: #281d15;
-    --surface4: #171a2a;
-    --surface5: #261820;
-    --data: #45b7e5;
-    --risk: #ff7b59;
-    --opportunity: #60d394;
-    --conclusion: #b395ff;
-    --warning: #f0b44c;
-    --badge-ink: #071014;
-    --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  :root:not([data-theme="light"]) {
+    --bg: #101619;
+    --surface: #182126;
+    --surface-soft: #202b30;
+    --surface-blue: #142a39;
+    --surface-green: #142d26;
+    --surface-red: #33201f;
+    --surface-yellow: #302b1a;
+    --surface-purple: #2b2135;
+    --ink: #e4ecef;
+    --muted: #a8b5ba;
+    --line: #37464c;
+    --accent: #52b4f0;
+    --accent2: #57cca0;
+    --accent3: #ff8173;
+    --accent4: #bd8be8;
+    --data: #5bc0fa;
+    --risk: #ff8173;
+    --opportunity: #5bd2a4;
+    --conclusion: #c597ef;
+    --hl: #6d5312;
+    --hl2: #14533f;
+    --deep: #091115;
+    --deep-ink: #eaf4f7;
+    --shadow: rgba(0, 0, 0, 0.28);
   }
 }
+:root[data-theme="dark"] {
+  --bg: #101619;
+  --surface: #182126;
+  --surface-soft: #202b30;
+  --surface-blue: #142a39;
+  --surface-green: #142d26;
+  --surface-red: #33201f;
+  --surface-yellow: #302b1a;
+  --surface-purple: #2b2135;
+  --ink: #e4ecef;
+  --muted: #a8b5ba;
+  --line: #37464c;
+  --accent: #52b4f0;
+  --accent2: #57cca0;
+  --accent3: #ff8173;
+  --accent4: #bd8be8;
+  --data: #5bc0fa;
+  --risk: #ff8173;
+  --opportunity: #5bd2a4;
+  --conclusion: #c597ef;
+  --hl: #6d5312;
+  --hl2: #14533f;
+  --deep: #091115;
+  --deep-ink: #eaf4f7;
+  --shadow: rgba(0, 0, 0, 0.28);
+}
 * { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  line-height: 1.72;
+  font-family: "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.8;
 }
-main { overflow: hidden; }
+a { color: var(--accent); }
 .hero {
-  background: var(--hero);
-  color: var(--hero-ink);
-  padding: 72px 7vw 48px;
+  padding: clamp(3.5rem, 9vw, 8rem) max(6vw, calc((100vw - 1120px) / 2));
+  background: var(--deep);
+  color: var(--deep-ink);
 }
-.kicker {
-  color: var(--data);
+.eyebrow {
+  color: var(--accent2);
+  font-size: .82rem;
   font-weight: 800;
-  letter-spacing: 0;
-  margin: 0 0 12px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
 }
-h1 {
-  max-width: 980px;
-  margin: 0;
-  font-size: clamp(2rem, 5vw, 4.6rem);
-  line-height: 1.08;
-  letter-spacing: 0;
-}
-.original {
-  max-width: 820px;
-  margin: 18px 0 0;
-  color: var(--muted);
-  font-size: 1.05rem;
-}
-.thesis {
+.hero h1 {
   max-width: 900px;
-  margin: 34px 0 0;
-  padding-left: 18px;
-  border-left: 6px solid var(--opportunity);
-  font-size: clamp(1.2rem, 2.2vw, 1.8rem);
-  color: var(--hero-ink);
+  margin: .55rem 0 .7rem;
+  font-size: clamp(2.5rem, 6.8vw, 5.8rem);
+  line-height: 1.08;
+  letter-spacing: -.035em;
+}
+.original-title {
+  max-width: 850px;
+  margin: 0;
+  color: var(--muted);
+  font-family: Georgia, serif;
+  font-size: clamp(1rem, 2vw, 1.35rem);
+}
+.dek {
+  max-width: 760px;
+  margin: 2.6rem 0 0;
+  padding-left: 1.2rem;
+  border-left: 5px solid var(--accent3);
+  font-size: clamp(1.15rem, 2.4vw, 1.55rem);
+}
+.summary-shell {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 4.5rem 1.3rem 6rem;
 }
 .band {
   display: grid;
-  grid-template-columns: repeat(4, minmax(150px, 1fr));
-  gap: 1px;
-  background: var(--line);
+  grid-template-columns: repeat(3, 1fr);
+  margin: -6.3rem 0 4rem;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 18px 45px var(--shadow);
 }
 .metric {
+  padding: 1.8rem;
   background: var(--surface);
-  padding: 28px 24px;
 }
+.metric:nth-child(2) { background: var(--surface-yellow); }
+.metric:nth-child(3) { background: var(--surface-green); }
 .metric strong {
   display: block;
   color: var(--data);
-  font-size: clamp(2rem, 4vw, 3.2rem);
-  line-height: 1;
+  font-size: 2.4rem;
+  line-height: 1.15;
 }
-.metric span {
-  display: block;
-  margin-top: 10px;
-  color: var(--muted);
-}
-.section {
-  padding: 58px 7vw;
-}
+.metric span { color: var(--muted); }
 .split {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  gap: 36px;
-  background: var(--surface2);
+  grid-template-columns: .9fr 1.1fr;
+  gap: 2rem;
+  align-items: stretch;
+  margin: 4rem 0;
 }
-.eyebrow {
-  color: var(--opportunity);
-  font-weight: 800;
-  margin: 0 0 8px;
+.split h2 {
+  margin: 0;
+  padding: 2.2rem;
+  background: var(--surface-blue);
+  border-top: 8px solid var(--accent);
+  font-size: 2rem;
 }
-h2 {
-  margin: 0 0 16px;
-  font-size: clamp(1.5rem, 3vw, 2.4rem);
-  line-height: 1.18;
-  letter-spacing: 0;
-}
-.lede {
-  font-size: 1.12rem;
-  color: var(--ink);
-}
-.note {
-  padding: 22px;
-  background: var(--surface);
-  border-left: 7px solid var(--risk);
-  box-shadow: var(--shadow);
-}
-.note b { color: var(--risk); }
-.flow {
-  background: var(--surface3);
-}
-.steps {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-  margin-top: 24px;
-}
-.step {
-  border-top: 6px solid var(--warning);
-  padding: 18px 0 0;
-}
-.step .num {
-  display: inline-grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--warning);
-  color: var(--badge-ink);
-  font-weight: 800;
-}
-.step h3 {
-  margin: 14px 0 6px;
-  font-size: 1.15rem;
-}
-.compare {
-  background: var(--surface4);
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--surface);
-  box-shadow: var(--shadow);
-}
-th, td {
-  padding: 16px;
-  text-align: left;
-  border-bottom: 1px solid var(--line);
-  vertical-align: top;
-}
-th {
-  color: var(--conclusion);
-  font-size: 0.95rem;
-}
-td:first-child {
-  font-weight: 800;
-}
-.insight {
-  background: var(--hero);
-  color: var(--hero-ink);
-}
-.quote {
-  max-width: 980px;
-  font-size: clamp(1.35rem, 3vw, 2.2rem);
-  line-height: 1.35;
-  border-left: 8px solid var(--conclusion);
-  padding-left: 24px;
-}
-.quote small {
-  display: block;
-  margin-top: 18px;
-  color: var(--muted);
-  font-size: 1rem;
-}
-.mosaic {
-  background: var(--surface5);
-}
-.tiles {
-  display: grid;
-  grid-template-columns: 1.2fr 0.9fr 0.9fr;
-  gap: 16px;
-  margin-top: 24px;
-}
-.tile {
-  min-height: 150px;
-  padding: 22px;
+.split .explain {
+  padding: 2.2rem;
   background: var(--surface);
   border: 1px solid var(--line);
 }
-.tile.big {
-  grid-row: span 2;
-  background: var(--hero);
-  color: var(--hero-ink);
+.mark {
+  padding: .08em .25em;
+  background: var(--hl);
+  font-weight: 800;
 }
-.tile h3 {
-  margin: 0 0 10px;
-  color: var(--data);
+.mark2 {
+  padding: .08em .25em;
+  background: var(--hl2);
+  font-weight: 800;
 }
-.tile.big h3 { color: var(--opportunity); }
-.takeaways {
-  background: var(--bg);
+.triad {
+  margin: 4rem 0;
+  padding: 2.5rem;
+  background: var(--deep);
+  color: var(--deep-ink);
+  border-radius: 24px;
 }
-.takeaways ul {
-  max-width: 920px;
-  padding: 0;
-  margin: 22px 0 0;
-  list-style: none;
+.triad h2 { margin-top: 0; }
+.triad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--line);
 }
-.takeaways li {
-  margin: 12px 0;
-  padding: 16px 18px;
+.triad-grid article {
+  padding: 1.5rem;
+  background: var(--deep);
+}
+.triad-grid b {
+  display: block;
+  margin-bottom: .45rem;
+  color: var(--accent2);
+}
+.findings h2 {
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+}
+.finding-row {
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  gap: 1.5rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--line);
+}
+.finding-row:last-child { border-bottom: 1px solid var(--line); }
+.finding-row h3 {
+  margin: 0;
+  color: var(--accent4);
+}
+.finding-row.risk h3 { color: var(--risk); }
+.finding-row.opportunity h3 { color: var(--opportunity); }
+.finding-row p { margin: 0; }
+.steering {
+  margin: 4rem 0;
+  padding: 2.5rem;
+  background: var(--surface-red);
+  border-left: 10px solid var(--risk);
+}
+.steering h2 { margin-top: 0; }
+.flow {
+  display: flex;
+  gap: .8rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+  font-weight: 750;
+}
+.flow span {
+  padding: .6rem .9rem;
   background: var(--surface);
-  border-left: 6px solid var(--conclusion);
+  border: 1px solid var(--line);
+  border-radius: 999px;
 }
-@media (max-width: 820px) {
-  .band, .split, .steps, .tiles {
-    grid-template-columns: 1fr;
-  }
-  .tile.big {
-    grid-row: auto;
-  }
+.flow i {
+  color: var(--risk);
+  font-style: normal;
+}
+.caveat {
+  margin: 4rem 0;
+  padding: 2rem 2.3rem;
+  background: var(--surface-purple);
+  border-top: 6px solid var(--conclusion);
+  font-size: 1.08rem;
+}
+.takeaways h2 { font-size: 2rem; }
+.mosaic {
+  display: grid;
+  grid-template-columns: 1.2fr .8fr;
+  gap: 1rem;
+}
+.tile {
+  min-height: 180px;
+  padding: 1.6rem;
+  border-radius: 18px;
+}
+.tile:nth-child(1) {
+  background: var(--surface-blue);
+  border-bottom: 6px solid var(--data);
+}
+.tile:nth-child(2) {
+  background: var(--surface-red);
+  border-bottom: 6px solid var(--risk);
+}
+.tile:nth-child(3) {
+  background: var(--surface-green);
+  border-bottom: 6px solid var(--opportunity);
+}
+.tile:nth-child(4) {
+  background: var(--surface-purple);
+  border-bottom: 6px solid var(--conclusion);
+}
+.tile h3 { margin-top: 0; }
+#translation {
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  padding: 5rem 1.3rem 7rem;
+}
+.translation-body {
+  max-width: 760px;
+  margin: 0 auto;
+}
+#translation h2 {
+  margin: 0 0 2.5rem;
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  line-height: 1.15;
+}
+#translation h3 {
+  margin: 3.4rem 0 1.2rem;
+  padding-bottom: .55rem;
+  border-bottom: 3px solid var(--accent);
+  font-size: 1.7rem;
+}
+#translation h4 {
+  margin: 2.4rem 0 .8rem;
+  color: var(--accent4);
+  font-size: 1.25rem;
+}
+#translation p, #translation li { font-size: 1.04rem; }
+#translation ul, #translation ol { padding-left: 1.5rem; }
+.source-figure {
+  margin: 2.8rem auto;
+  color: var(--muted);
+}
+.source-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-soft);
+}
+.source-figure figcaption {
+  margin-top: .85rem;
+  padding-left: 1rem;
+  border-left: 3px solid var(--accent3);
+  font-size: .9rem;
+  line-height: 1.65;
+}
+.note {
+  margin-top: 3rem;
+  padding: 1.4rem;
+  background: var(--surface-soft);
+  border-left: 5px solid var(--accent4);
+}
+@media (max-width: 760px) {
+  .band, .split, .triad-grid, .mosaic { grid-template-columns: 1fr; }
+  .band { margin-top: -4rem; }
+  .finding-row { grid-template-columns: 1fr; gap: .4rem; }
+  .hero { padding-bottom: 7rem; }
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -404,140 +476,172 @@ td:first-child {
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/diff-tool" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<header class="hero">
+<div class="eyebrow">Anthropic · Interpretability · 2026 年 3 月 13 日</div>
+<h1>AI 的“diff”工具：发现新模型的行为差异</h1>
+<p class="original-title" lang="en">A “diff” tool for AI: Finding behavioral differences in new models</p>
+<p class="dek"><strong>一句话总括：</strong>Dedicated Feature Crosscoder 让研究者能够跨越模型架构，自动筛出某个模型独有的内部特征，再通过干预实验检验这些特征是否真正控制特定行为。</p>
+</header>
 <main>
-  <header class="hero">
-    <p class="kicker">一句话总括</p>
-    <h1>AI 的“diff”工具：寻找新模型中的行为差异</h1>
-    <p class="original">A “diff” tool for AI: Finding behavioral differences in new models</p>
-    <p class="thesis">这项工作的真正贡献，是把模型安全审计从“检查所有行为”推进到“自动定位模型之间新增或独有的行为”。</p>
-  </header>
-
-  <section class="band" aria-label="关键数字">
-    <div class="metric"><strong>4</strong><span>研究覆盖的开放权重模型数量。</span></div>
-    <div class="metric"><strong>3</strong><span>被验证的行为开关类型。</span></div>
-    <div class="metric"><strong>5/5</strong><span>中共对齐特征被重复发现的次数。</span></div>
-    <div class="metric"><strong>4/5</strong><span>美国例外论特征被重复发现的次数。</span></div>
-  </section>
-
-  <section class="section split">
-    <div>
-      <p class="eyebrow">为什么需要新工具</p>
-      <h2>传统评测擅长抓已知问题，却难以发现未知变化。</h2>
-      <p class="lede">人类编写的 benchmark 只能测试已经被定义的问题。新模型可能出现新的拒答、宣传、偏向或过度安全行为。</p>
-    </div>
-    <div class="note">
-      <p><b>关键改变：</b>模型 diffing 借鉴软件 diff。它不要求审计员从头阅读“百万行代码”，而是把注意力集中到模型之间真正不同的行为特征上。</p>
-      <p>这会改变读者对 AI 风险的理解。风险不只来自模型总体能力，也来自更新后悄悄出现的行为差异。</p>
-    </div>
-  </section>
-
-  <section class="section flow">
-    <p class="eyebrow">方法</p>
-    <h2>Dedicated Feature Crosscoder 把“共有概念”和“独有概念”分开。</h2>
-    <div class="steps">
-      <div class="step">
-        <span class="num">1</span>
-        <h3>共享字典</h3>
-        <p>它映射两个模型都理解的概念。这样审计员不用反复检查正常共有能力。</p>
-      </div>
-      <div class="step">
-        <span class="num">2</span>
-        <h3>模型 A 独有区</h3>
-        <p>它记录只在一个模型中出现的特征。这里更可能藏着新增风险或策略差异。</p>
-      </div>
-      <div class="step">
-        <span class="num">3</span>
-        <h3>模型 B 独有区</h3>
-        <p>它避免把独有行为强行翻译成共有行为。新东西因此更容易被标出来。</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="section compare">
-    <p class="eyebrow">发现</p>
-    <h2>几个特征像行为开关，可以被压低或放大。</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>比较对象</th>
-          <th>独有特征</th>
-          <th>行为变化</th>
-          <th>洞见</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Qwen3-8B 与 Llama-3.1-8B-Instruct</td>
-          <td>中共对齐</td>
-          <td>压低后更愿意谈论天安门事件。放大后更倾向生成亲政府表述。</td>
-          <td>政治审查可以表现为可定位、可操控的内部特征。</td>
-        </tr>
-        <tr>
-          <td>Llama-3.1-8B-Instruct 与 Qwen3-8B</td>
-          <td>美国例外论</td>
-          <td>放大后回答从平衡表述转向强调美国优越性。压低影响不明显。</td>
-          <td>价值偏向不只存在于特定国家模型，也可能出现在不同训练生态中。</td>
-        </tr>
-        <tr>
-          <td>GPT-OSS-20B 与 DeepSeek-R1-0528-Qwen3-8B</td>
-          <td>版权拒绝机制</td>
-          <td>压低后模型更愿意尝试回应版权材料请求。放大后会过度拒绝普通内容。</td>
-          <td>安全机制本身也可能成为需要审计的行为差异。</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="section insight">
-    <div class="quote">
-      高召回的 diff 工具不负责直接判定风险来源，但它能告诉审计员该先看哪里。
-      <small>这点很重要。行为可能来自开发者的有意训练，也可能来自数据和训练过程的间接结果。</small>
-    </div>
-  </section>
-
-  <section class="section mosaic">
-    <p class="eyebrow">适用边界</p>
-    <h2>它是筛查工具，不是安全结论机器。</h2>
-    <div class="tiles">
-      <div class="tile big">
-        <h3>数千候选</h3>
-        <p>一次 diff 可能浮出数千个特征。只有少部分会对应真正重要的行为风险。</p>
-        <p>因此它的价值在于缩小搜索空间，而不是替代人工解释和验证。</p>
-      </div>
-      <div class="tile">
-        <h3>转向验证</h3>
-        <p>研究通过压低或放大特征来观察输出变化。这样可以测试特征和行为之间是否存在因果关系。</p>
-      </div>
-      <div class="tile">
-        <h3>开放模型</h3>
-        <p>实验聚焦开放权重模型。作者尚未把方法用于 frontier models。</p>
-      </div>
-      <div class="tile">
-        <h3>更新监控</h3>
-        <p>作者认为它可用于比较新旧版本。类似 GPT-4o 在 2025 年 4 月出现的 sycophancy 变化，可能被提前标出。</p>
-      </div>
-      <div class="tile">
-        <h3>政策意义</h3>
-        <p>审计重点从“模型是否通过既有测试”扩展到“模型新增了什么行为”。这更贴近真实部署风险。</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="section takeaways">
-    <p class="eyebrow">最值得带走的洞见</p>
-    <h2>模型差异本身，是安全审计的高价值入口。</h2>
-    <ul>
-      <li>已知 benchmark 不能覆盖未知行为，模型更新需要差异化审计。</li>
-      <li>Dedicated Feature Crosscoder 的关键设计，是给模型独有特征留下专门空间。</li>
-      <li>政治对齐、国家叙事和版权拒绝都可能表现为可定位的内部行为特征。</li>
-      <li>高召回筛查会带来噪声，但能显著缩小人工安全审计的搜索范围。</li>
-      <li>未来最实用的场景，可能是持续监控模型版本更新中的新增行为。</li>
-    </ul>
-  </section>
+<section aria-label="中文总结" class="summary-shell">
+<div class="band">
+<div class="metric"><strong>4 个</strong><span>接受跨架构比较的开放权重模型</span></div>
+<div class="metric"><strong>5/5</strong><span>“中共立场一致”特征的重复发现率</span></div>
+<div class="metric"><strong>4/5</strong><span>“美国例外论”特征的重复发现率</span></div>
+</div>
+<div class="split">
+<h2>传统评测只能检查人们已经想到的问题</h2>
+<div class="explain">
+<p>人工编写的 benchmark 很重要，但它们天然具有反应式特征。测试者必须先知道某种风险存在，才能设计测量方法。</p>
+<p>新模型真正棘手的部分，是尚未被命名的涌现行为。DFC 的价值在于把审计重点从整个模型缩小到<span class="mark">模型之间最显著的差异</span>。</p>
+</div>
+</div>
+<section class="triad">
+<h2>DFC 如何避免“强行翻译”</h2>
+<div class="triad-grid">
+<article><b>共享字典</b>记录两个模型共同拥有的概念，帮助研究者识别稳定、可对应的内部特征。</article>
+<article><b>模型 A 专属区</b>保存只在第一个模型中出现的特征，不再把它们勉强匹配到另一个模型。</article>
+<article><b>模型 B 专属区</b>对第二个模型执行同样的工作，让真正的新特征更容易浮现。</article>
+</div>
+<p>这种结构提升了筛查新行为的召回率。它改变了审计问题：研究者不再只问两个模型哪里相似，而是能系统地追问<span class="mark2">哪些机制只存在于其中一个模型</span>。</p>
+</section>
+<section class="findings">
+<h2>工具找到了哪些行为“开关”</h2>
+<div class="finding-row risk">
+<h3>政治审查与宣传</h3>
+<p>Qwen3-8B 和 DeepSeek-R1-0528-Qwen3-8B 中都出现了“中共立场一致”特征。抑制它会减少对天安门事件话题的审查。放大它则会生成更强烈的亲政府表述。<strong>这说明模型差异可以对应到能够被干预的内部因果机制。</strong></p>
+</div>
+<div class="finding-row">
+<h3>美国例外论</h3>
+<p>Llama-3.1-8B-Instruct 中存在一个模型独有特征。放大后，回答会从相对平衡转向强调美国优越性。抑制该特征没有明显效果。<strong>行为控制可能具有方向不对称性，不能把单次相关性直接当成完整机制。</strong></p>
+</div>
+<div class="finding-row opportunity">
+<h3>版权拒绝</h3>
+<p>GPT-OSS-20B 中发现了“版权拒绝”特征。抑制后，模型会尝试响应受版权保护内容的请求。过度放大后，它甚至会把花生酱果酱三明治的做法误判为受版权保护。<strong>安全机制既可能不足，也可能因强度过高而造成过度拒绝。</strong></p>
+</div>
+</section>
+<section class="steering">
+<h2>从“发现相关特征”走向因果验证</h2>
+<p>研究者在模型运行时人工抑制或放大候选特征，再观察输出变化。这种 steering 实验能检验该特征是否真正控制相应行为。</p>
+<div class="flow">
+<span>发现独有特征</span><i>→</i><span>抑制或放大</span><i>→</i><span>比较输出变化</span><i>→</i><span>验证因果作用</span>
+</div>
+</section>
+<aside class="caveat">
+<strong>重要限制：</strong>一次 diff 可能产生数千个独有特征，其中只有少部分对应有意义的行为风险。DFC 是一种高召回率筛查工具，不是自动判定风险的“银弹”。它也无法说明特征来自开发者的刻意选择，还是训练数据造成的间接结果。
+    </aside>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="mosaic">
+<article class="tile">
+<h3>01｜差异比全量审计更可操作</h3>
+<p>把注意力集中到模型独有特征，可以显著缩小人工审计范围。这尤其适合寻找传统 benchmark 没有覆盖的新行为。</p>
+</article>
+<article class="tile">
+<h3>02｜特征必须接受干预验证</h3>
+<p>发现一个内部表征还不够。只有抑制或放大它后，模型行为出现稳定变化，才能获得更有力的因果证据。</p>
+</article>
+<article class="tile">
+<h3>03｜版本更新是很有价值的应用场景</h3>
+<p>如果持续比较模型的新旧版本，类似 GPT-4o 在 2025 年 4 月出现的迎合行为，或许能在发布前被自动标记。</p>
+</article>
+<article class="tile">
+<h3>04｜筛查之后仍需人工判断</h3>
+<p>高召回率意味着大量候选项。工具负责指出值得检查的变化，审计人员仍要判断风险、来源和现实影响。</p>
+</article>
+</div>
+</section>
+</section>
+<section id="translation">
+<div class="translation-body">
+<h2>完整译文</h2>
+<figure class="source-figure" data-source-image="0"><img alt="A “diff” tool for AI: Finding behavioral differences in new models" decoding="async" height="1000" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/710b64c2542329ce05316098b4e405bb1c11e4d4-1000x1000.svg" width="1000"/></figure>
+<p>每当一个新的 AI 模型发布时，开发者都会运行一套评测，用来衡量它的性能与安全性。这些测试必不可少，但也有一定局限。由于 benchmark 由人编写，它们只能检查我们已经想到并学会测量的风险。</p>
+<p>这种安全方法天然是反应式的。它很适合捕捉已知问题，却无法发现所谓的“未知的未知”。这些新颖的涌现行为，可能构成新模型中最隐蔽的风险。若要从头审计一个新模型，就像拿到一百万行代码后，被要求“找出安全漏洞”。如果不知道该找什么，这几乎是不可能完成的任务。</p>
+<p>软件工程师在更新程序时，也会面对同样的问题。他们需要从浩如烟海的代码中识别少量却至关重要的变化。正因如此，人们发明了“diff”工具。没有程序员会为了批准一次更新，从头审查一百万行代码。他们会按照 diff 工具的指引，只检查真正发生变化的 50 行。</p>
+<p>近年来，AI 安全研究者开始把同一原则应用于神经网络。这种方法称为模型差异比较（model diffing）。此前的研究表明，模型差异比较是理解模型在微调过程中如何变化的有力方法。例如，它可以帮助我们理解聊天模型的行为、揭示隐藏后门，或发现不希望出现的涌现行为。</p>
+<p>我们开展的这项 Anthropic Fellows 新研究，把模型差异比较扩展到了最困难、也最通用的场景：比较架构完全不同的模型。通过为 AI 模型构建通用 diff 工具，我们不必再大海捞针。模型之间的比较会自动指出可能存在危险行为差异的地方。</p>
+<p>需要强调的是，这种方法不是银弹。一次 diff 可能找出数千个独有特征。特征是我们分解模型时使用的基本单元，其中只有很小一部分可能对应有意义的行为风险。不过，它可以作为一种高召回率筛查工具，帮助我们找到模型可能出现分歧的领域。</p>
+<p>在工具标记的数千个候选项中，我们已经识别并验证了几个概念。它们就像控制特定模型行为的开关。<sup>1</sup>例如，我们发现了：</p>
+<ul>
+<li><p>Qwen3-8B 和 DeepSeek-R1-0528-Qwen3-8B 中存在一个“中共立场一致”（Chinese Communist Party Alignment）特征。它控制这些中国开发模型中的亲政府审查与宣传行为。我们比较的美国模型中没有这一特征。</p></li>
+<li><p>Meta 的 Llama-3.1-8B-Instruct 中存在一个“美国例外论”（American Exceptionalism）特征。它控制模型生成美国优越论断的倾向。与之比较的中国模型中没有这种控制机制。</p></li>
+<li><p>OpenAI 的 GPT-OSS-20B 独有一个“版权拒绝机制”（Copyright Refusal Mechanism）特征。它控制模型拒绝提供受版权保护材料的倾向。与它比较的模型没有这种行为。</p></li>
+</ul>
+<p>需要说明的是，我们的方法虽然能识别模型独有的特征，却无法判断它们的来源。这类行为可能来自模型开发者有意作出的训练决策，也可能由训练数据间接、无意地催生。由于这是一个 Anthropic Fellows 项目，本研究主要关注开放源代码语言模型。</p>
+<h3>一本面向 AI 模型的双语词典</h3>
+<p>假设你是一部获奖百科全书的终审编辑。写作团队刚刚交给你明年版本的完整书稿。绝大多数内容都与当前可信版本相同，但团队也加入了一些新条目，用于反映近期的科学与文化发展。你的任务是审核最终成品。</p>
+<p>为了提高效率，你不会重新通读整部百科全书。你会使用修订跟踪工具，只找出新增加的条目。因为只有这些新增内容可能引入新的错误。这就是模型差异比较的基本思路。更具体地说，这种方法称为“基础模型与微调模型差异比较”（base-vs-finetune model diffing）。当新模型是由可信旧模型修改而来时，它是非常合适的工具。</p>
+<p>但我们可以进一步提高难度。假设你的公司要为另一个国家推出新版百科全书，把美国版改编成面向法国读者的版本。新版的大部分内容仍由原版中经过验证的概念组成。但为了贴近当地读者，作者增加了有关法国历史、文化和政治哲学的新文章。这些文章在原版中并不存在。</p>
+<p>作为编辑，你的主要目标没有改变。你仍想通过修订跟踪查看新文章，因为这些内容出现错误和偏见的风险最高。但原来的工具在这里毫无用处。你需要一个能够跨语言工作的工具。</p>
+<p>这种困难得多的挑战，类似于“跨架构模型差异比较”（cross-architecture model diffing）：比较两个来源不同、内部“语言”也不同的模型。</p>
+<p>用于这类差异比较的早期研究工具是标准 crosscoder。它就像一本基础双语词典。它很擅长匹配已有词汇，知道英语的“sun”对应法语的“soleil”。但它有一个严重缺陷：它过于专注于寻找联系，因此很难发现某种语言独有的词。</p>
+<p>当它遇到法语词 <em>dépaysement</em> 时，就会尝试强行给出一个不够准确的译法，例如“disorientation”。<em>Dépaysement</em> 特指身处异国时产生的感受。工具把它判定为已有匹配后，就会错误地向编辑发出信号：“这不是新内容，我们以前见过。”结果，一篇需要仔细审查的新文章可能就此被忽略。</p>
+<p>为解决这个问题，我们构建了一本更好的“双语词典”：Dedicated Feature Crosscoder（DFC）。DFC 不再使用一本试图匹配所有内容的大词典，而是在架构上划分出三个不同部分：</p>
+<ul>
+<li><p><strong>共享字典：</strong>这是主要的双语词典，用于映射两种语言都能理解的概念，例如“sun”（<em>soleil</em>）或“water”（<em>eau</em>）。</p></li>
+<li><p><strong>“仅限法语”部分：</strong>这里专门收录法语独有的词。像 <em>dépaysement</em> 这样独特的文化概念会被归入这一部分。</p></li>
+<li><p><strong>“仅限英语”部分：</strong>这里收录英语独有的词。例如 <em>serendipity</em>，也就是没有刻意寻找，却意外发现美好事物的概念。法语中没有与它完全对应的单个词语。</p></li>
+</ul>
+<p>由于这本双语词典为每种语言的独有词汇设置了专门区域，它不会再陷入强行给出不准确翻译的困境。因此，百科全书中的新文章会被正确标记为新内容。编辑也就能把审查精力集中在最需要关注的部分。</p>
+<p>对于安全审计人员，DFC 可以识别新 AI 模型独有的“词”。与以前见过的特征相比，这些独有特征可能更值得深入检查。</p>
+<h3>操控模型</h3>
+<p>我们的方法识别出一个潜在的新特征后，如何知道它是否真的控制了我们所认为的行为？我们可以在模型运行时人为抑制或放大该特征，然后观察模型输出发生了怎样的变化。这是一种常见技术，称为“steering”。</p>
+<p>假设我们认为某个特征负责控制审查。模型生成回答时，我们可以抑制这个特征。如果模型的输出持续变得更少受审查，就有证据表明，我们找到了该特征与模型行为之间真正的因果关系。反过来，我们也可以放大该特征，观察这种行为是否会变得更明显。</p>
+<h3>主要开放权重 AI 模型之间的关键行为差异</h3>
+<h4>Llama-3.1-8B-Instruct 与 Qwen3-8B</h4>
+<p>近期研究发现，中国公司 DeepSeek 开发的 R1-70B 会拒绝回答涉及中国共产党敏感话题的问题。受此发现启发，我们首先比较了另一家中国公司 Alibaba 开发的 Qwen3-8B，以及美国公司 Meta 开发的 Llama-3.1-8B-Instruct。在这次 diff 中，DFC 自动分离出了与不同政治性行为相对应的特征。</p>
+<p>我们在 Qwen 中发现了一个“中共立场一致”特征。它代表与中共意识形态相符的表述。抑制这一特征后，模型愿意讨论天安门广场屠杀，而它通常会拒绝讨论这一话题。放大该特征后，我们可以让模型输出高度亲政府的表述。</p>
+<p>我们在 Llama 中发现了一个“美国例外论”特征。放大这个特征后，模型回答会从相对平衡转向强烈主张美国优越性。抑制它则没有明显效果。</p>
+<figure class="source-figure" data-source-image="1"><img alt="" decoding="async" height="2835" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/a847656473341a884b836bf05618c1fa3bc64675-4584x2835.png" width="4584"/>
+<figcaption>左：面对有关天安门广场的提示，抑制 Qwen 独有的“中共立场一致”特征后，模型不再进行审查。放大该特征会使模型输出高度亲政府的表述。右：放大 Llama 独有的“美国例外论”特征后，模型会生成符合美国优越论叙事的文本。抑制该特征没有明显效果，因此图中没有展示这一情况。</figcaption>
+</figure>
+<h4>GPT-OSS-20B 与 DeepSeek-R1-0528-Qwen3-8B</h4>
+<p>我们还比较了一个能力更强的开放源代码模型 OpenAI GPT-OSS-20B，以及 DeepSeek 的 DeepSeek-R1-0528-Qwen3-8B。</p>
+<p>我们在 GPT 模型中发现了一个独有的“版权拒绝”（Copyright Refusal）特征。它直接对应两个模型之间的一项关键行为差异。当用户要求输出受版权保护的材料时，DeepSeek 会直接尝试生成，GPT 则经常拒绝。</p>
+<p>抑制这个特征后，拒绝机制会失效，模型会尝试生成用户要求的材料。需要注意的是，这不会让模型真正输出受版权保护的原文。它通常只会生成一小段内容，随后很快退化成幻觉。调高该特征会让模型过度拒绝。例如，它会认为花生酱果酱三明治的做法受版权保护，因此不应分享。</p>
+<p>我们在 DeepSeek 模型中再次发现了一个“中共立场一致”特征，复现了此前的结果。它的功能与 Qwen 中的对应特征相同，可以调高或调低审查与宣传行为。这证实了我们的方法能够在不同模型中稳定识别相似行为。</p>
+<figure class="source-figure" data-source-image="2"><img alt="" decoding="async" height="3651" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/d7a3cd0e411835ef0170736b435017f4f382dea0-4584x3651.png" width="4584"/>
+<figcaption>左：抑制 GPT-OSS-20B 独有的“版权拒绝”特征后，其版权拒绝机制会失效，并尝试输出歌曲《Bohemian Rhapsody》的歌词，但生成结果并不准确。调高该特征后，模型会误以为花生酱果酱三明治的做法受版权保护，因而拒绝输出。右：面对有关天安门广场的提示，DeepSeek 独有的“中共立场一致”特征与 Qwen 中发现的特征功能相同。调低该特征后，模型会给出更符合事实的事件描述；调高后，则会输出高度亲政府的表述。</figcaption>
+</figure>
+<h3>结论</h3>
+<p>随着 AI 模型迅速演进，只知道它们在现有测试中的表现已经不够。我们还需要了解模型正在发生怎样的变化，以及它们可能引入哪些新风险。跨架构模型差异比较提供了一种新的系统审计方法。它可以自动标记模型之间的行为差异。</p>
+<p>我们在 DeepSeek 和 Qwen 模型中发现的“中共立场一致”特征，就是一种具体而重要的行为。某些模型拥有它，其他模型则没有。传统测试可能遗漏这种“未知的未知”，而模型差异比较正是为了捕捉此类行为而设计的。</p>
+<p>这些发现具有相当不错的一致性。我们对该方法进行了五次测试，“中共立场一致”特征五次都被独立地重新发现。“美国例外论”特征则在五次测试中成功发现四次。我们尚未把这种方法用于前沿模型，但早期结果表明，DFC 有望成为审计人员工具箱中的实用组成部分。</p>
+<p>监测模型更新可能是一个特别有价值的应用方向。2025 年 4 月，OpenAI GPT-4o 出现了迎合行为。与之前版本相比，这是一次令人担忧的行为变化。如果使用类似的工具对更新后的模型和旧版本执行 diff，它或许能自动标记这种新出现的迎合行为，让开发者有机会在发布前介入。</p>
+<p>把注意力集中在差异上，可以让我们更聪明地审计 AI，把有限的安全资源投入真正重要的变化。</p>
+<p>你可以在此阅读完整论文。</p>
+<h3>致谢</h3>
+<p>本文由 Thomas Jiralerspong（Anthropic Fellows Program）和 Trenton Bricken（Anthropic Alignment Science）撰写。</p>
+<h3>脚注</h3>
+<ol>
+<li>与所有 Anthropic Fellows 可解释性研究一样，本文分析的是开放源代码模型的行为。研究选择了四个模型：Llama-3.1-8B-Instruct、Qwen3-8B、GPT-OSS-20B 和 DeepSeek-R1-0528-Qwen3-8B。选择依据是，它们很适合用来检验 Dedicated Feature Crosscoder 能否发现值得关注的模型行为差异。</li>
+</ol>
+<p class="note">原文来源：Anthropic，2026 年 3 月 13 日。分类：Interpretability。</p>
+</div>
+</section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

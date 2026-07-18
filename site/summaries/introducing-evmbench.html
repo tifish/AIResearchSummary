@@ -1,382 +1,355 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Introducing EVMbench</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>EVMbench 正式发布</title>
 <style>
 :root {
-  --bg: #f7f8fb;
-  --ink: #17202a;
-  --muted: #657082;
-  --line: #d9dfeb;
-  --surface: #ffffff;
-  --surface-alt: #eef3f8;
-  --hero-bg: #18243a;
-  --hero-ink: #f8fbff;
-  --hero-muted: #c6d2e3;
-  --data: #1769e0;
-  --risk: #c2413a;
-  --opportunity: #0f8f74;
-  --conclusion: #7a4fd6;
-  --warning: #c78417;
-  --data-bg: #eaf2ff;
-  --risk-bg: #fff0ed;
-  --opportunity-bg: #e8f7f2;
-  --conclusion-bg: #f1edff;
-  --warning-bg: #fff6df;
-  --dark-band-bg: #111827;
-  --quote-bg: #f4f1ff;
-  --table-head-bg: #e8edf7;
-  --takeaway-bg: #f0f5fb;
-  --shadow: 0 18px 45px rgba(21, 32, 48, 0.12);
+  color-scheme: light dark;
+  --bg: #f5f2ea;
+  --surface: #fffdf8;
+  --ink: #18211d;
+  --muted: #66716b;
+  --line: #d8ddd7;
+  --accent: #126b55;
+  --accent2: #2368a2;
+  --accent3: #9b4f20;
+  --accent4: #7c3f83;
+  --data: #dcefe8;
+  --risk: #f7dfd5;
+  --opportunity: #dce9f7;
+  --conclusion: #ebe0f0;
+  --hl: #f6dd83;
+  --hl2: #bce7da;
+  --deep: #15362d;
+  --deep-ink: #f4fff9;
+  --quote: #263c56;
+  --quote-ink: #f4f8ff;
+  --shadow: rgba(24, 33, 29, .12);
+}
+:root[data-theme="light"] {
+  --bg: #f5f2ea;
+  --surface: #fffdf8;
+  --ink: #18211d;
+  --muted: #66716b;
+  --line: #d8ddd7;
+  --accent: #126b55;
+  --accent2: #2368a2;
+  --accent3: #9b4f20;
+  --accent4: #7c3f83;
+  --data: #dcefe8;
+  --risk: #f7dfd5;
+  --opportunity: #dce9f7;
+  --conclusion: #ebe0f0;
+  --hl: #f6dd83;
+  --hl2: #bce7da;
+  --deep: #15362d;
+  --deep-ink: #f4fff9;
+  --quote: #263c56;
+  --quote-ink: #f4f8ff;
+  --shadow: rgba(24, 33, 29, .12);
 }
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0e1219;
-    --ink: #edf3fb;
-    --muted: #a9b6c8;
-    --line: #2d3848;
-    --surface: #151b24;
-    --surface-alt: #111923;
-    --hero-bg: #0b1020;
-    --hero-ink: #f4f8ff;
-    --hero-muted: #aebbd0;
-    --data: #6aa8ff;
-    --risk: #ff7f75;
-    --opportunity: #4dd6b8;
-    --conclusion: #ad92ff;
-    --warning: #f0ba4f;
-    --data-bg: #12243d;
-    --risk-bg: #351b1a;
-    --opportunity-bg: #102c27;
-    --conclusion-bg: #241d3d;
-    --warning-bg: #332816;
-    --dark-band-bg: #080c14;
-    --quote-bg: #201a35;
-    --table-head-bg: #1b2533;
-    --takeaway-bg: #141f2c;
-    --shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+  :root:not([data-theme="light"]) {
+    --bg: #101613;
+    --surface: #18211d;
+    --ink: #e4ece7;
+    --muted: #a5b2ab;
+    --line: #35423b;
+    --accent: #4ed3a7;
+    --accent2: #70b7ee;
+    --accent3: #f39a68;
+    --accent4: #d59ade;
+    --data: #19382f;
+    --risk: #40261f;
+    --opportunity: #1c3043;
+    --conclusion: #35253b;
+    --hl: #624f16;
+    --hl2: #1b5143;
+    --deep: #091f19;
+    --deep-ink: #dffbf0;
+    --quote: #17283b;
+    --quote-ink: #e6f1ff;
+    --shadow: rgba(0, 0, 0, .3);
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0e1219;
-  --ink: #edf3fb;
-  --muted: #a9b6c8;
-  --line: #2d3848;
-  --surface: #151b24;
-  --surface-alt: #111923;
-  --hero-bg: #0b1020;
-  --hero-ink: #f4f8ff;
-  --hero-muted: #aebbd0;
-  --data: #6aa8ff;
-  --risk: #ff7f75;
-  --opportunity: #4dd6b8;
-  --conclusion: #ad92ff;
-  --warning: #f0ba4f;
-  --data-bg: #12243d;
-  --risk-bg: #351b1a;
-  --opportunity-bg: #102c27;
-  --conclusion-bg: #241d3d;
-  --warning-bg: #332816;
-  --dark-band-bg: #080c14;
-  --quote-bg: #201a35;
-  --table-head-bg: #1b2533;
-  --takeaway-bg: #141f2c;
-  --shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+  --bg: #101613;
+  --surface: #18211d;
+  --ink: #e4ece7;
+  --muted: #a5b2ab;
+  --line: #35423b;
+  --accent: #4ed3a7;
+  --accent2: #70b7ee;
+  --accent3: #f39a68;
+  --accent4: #d59ade;
+  --data: #19382f;
+  --risk: #40261f;
+  --opportunity: #1c3043;
+  --conclusion: #35253b;
+  --hl: #624f16;
+  --hl2: #1b5143;
+  --deep: #091f19;
+  --deep-ink: #dffbf0;
+  --quote: #17283b;
+  --quote-ink: #e6f1ff;
+  --shadow: rgba(0, 0, 0, .3);
 }
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-  line-height: 1.7;
+  font-family: "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.75;
 }
-main {
-  overflow: hidden;
-}
+a { color: var(--accent2); }
 .hero {
-  background: var(--hero-bg);
-  color: var(--hero-ink);
-  padding: 56px 24px 42px;
+  padding: clamp(3rem, 8vw, 7rem) max(6vw, calc((100vw - 1120px) / 2));
+  background: var(--deep);
+  color: var(--deep-ink);
 }
-.wrap {
-  max-width: 1080px;
-  margin: 0 auto;
+.eyebrow {
+  margin: 0 0 1rem;
+  color: var(--accent);
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .16em;
+  text-transform: uppercase;
 }
-.kicker {
-  color: var(--opportunity);
-  font-weight: 700;
-  letter-spacing: 0;
-  margin: 0 0 12px;
-}
-h1 {
-  font-size: clamp(32px, 5vw, 64px);
-  line-height: 1.05;
+.hero h1 {
+  max-width: 900px;
   margin: 0;
-  letter-spacing: 0;
+  font-size: clamp(2.6rem, 7vw, 6rem);
+  line-height: 1.06;
 }
-.english-title {
-  color: var(--hero-muted);
-  font-size: 18px;
-  margin: 10px 0 28px;
+.original-title {
+  margin: .8rem 0 0;
+  color: var(--muted);
+  font-size: clamp(1rem, 2vw, 1.35rem);
 }
-.hero-summary {
+.dek {
   max-width: 780px;
-  font-size: 22px;
-  margin: 0;
+  margin: 2.2rem 0 0;
+  font-size: clamp(1.2rem, 2.5vw, 1.75rem);
+  line-height: 1.55;
 }
-.meta-strip {
+.meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 30px;
+  gap: .7rem 1.4rem;
+  margin-top: 2rem;
+  color: var(--muted);
+  font-size: .9rem;
 }
-.meta-strip span {
-  border: 1px solid var(--line);
-  color: var(--hero-ink);
-  padding: 7px 12px;
-  border-radius: 999px;
+.summary-shell {
+  width: min(1120px, 90vw);
+  margin: 0 auto;
+  padding: 4rem 0 5rem;
+}
+.summary-shell h2 {
+  margin-top: 0;
+  font-size: clamp(1.8rem, 4vw, 3rem);
 }
 .number-band {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  background: var(--surface);
-  box-shadow: var(--shadow);
+  margin: 2.5rem 0;
+  border: 1px solid var(--line);
+  box-shadow: 0 18px 44px var(--shadow);
 }
-.number {
-  padding: 26px 24px;
+.metric {
+  min-height: 170px;
+  padding: 1.5rem;
+  background: var(--data);
   border-right: 1px solid var(--line);
 }
-.number:last-child {
-  border-right: 0;
-}
-.number strong {
+.metric:nth-child(2) { background: var(--opportunity); }
+.metric:nth-child(3) { background: var(--risk); }
+.metric:nth-child(4) { background: var(--conclusion); border-right: 0; }
+.metric strong {
   display: block;
-  color: var(--data);
-  font-size: 34px;
-  line-height: 1;
-  margin-bottom: 8px;
+  color: var(--accent);
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  line-height: 1.05;
 }
-.number span {
-  color: var(--muted);
+.metric:nth-child(2) strong { color: var(--accent2); }
+.metric:nth-child(3) strong { color: var(--accent3); }
+.metric:nth-child(4) strong { color: var(--accent4); }
+.metric span {
+  display: block;
+  margin-top: .8rem;
+  font-size: .95rem;
 }
 .split {
   display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  gap: 34px;
-  padding: 58px 24px;
-  align-items: start;
+  grid-template-columns: .9fr 1.1fr;
+  gap: 2rem;
+  margin: 4rem 0;
 }
-.split h2,
-.flow h2,
-.table-section h2,
-.takeaways h2 {
-  font-size: 28px;
-  line-height: 1.2;
-  margin: 0 0 16px;
+.split-intro {
+  padding: 2rem;
+  background: var(--deep);
+  color: var(--deep-ink);
 }
-.panel {
-  background: var(--surface-alt);
-  border-left: 6px solid var(--opportunity);
-  padding: 24px;
+.split-intro h3 {
+  margin-top: 0;
+  font-size: 1.8rem;
 }
-.panel p {
-  margin: 0 0 14px;
-}
-.panel p:last-child {
-  margin-bottom: 0;
-}
-.mode-grid {
+.mode-list {
   display: grid;
-  gap: 14px;
+  gap: 1rem;
 }
 .mode {
-  padding: 18px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-}
-.mode b {
-  color: var(--conclusion);
-}
-.flow {
-  background: var(--dark-band-bg);
-  color: var(--hero-ink);
-  padding: 58px 24px;
-}
-.flow h2 {
-  color: var(--hero-ink);
-}
-.steps {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-  margin-top: 24px;
-}
-.step {
-  border-top: 4px solid var(--warning);
-  background: var(--hero-bg);
-  padding: 20px;
-}
-.step:nth-child(2) {
-  border-top-color: var(--data);
-}
-.step:nth-child(3) {
-  border-top-color: var(--opportunity);
-}
-.step h3 {
-  margin: 0 0 8px;
-  font-size: 20px;
-}
-.step p {
-  color: var(--hero-muted);
-  margin: 0;
-}
-.table-section {
-  padding: 58px 24px;
+  padding: 1.35rem 1.5rem;
+  border-left: 6px solid var(--accent);
   background: var(--surface);
 }
+.mode:nth-child(2) { border-color: var(--accent2); }
+.mode:nth-child(3) { border-color: var(--accent3); }
+.mode h3 { margin: 0 0 .35rem; }
+.mode p { margin: 0; }
+.comparison {
+  margin: 4rem 0;
+  overflow-x: auto;
+}
+.comparison h3 { font-size: 1.8rem; }
 table {
   width: 100%;
+  min-width: 680px;
   border-collapse: collapse;
-  overflow: hidden;
-  border: 1px solid var(--line);
+  background: var(--surface);
 }
-th,
-td {
+th, td {
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--line);
   text-align: left;
-  padding: 15px;
-  border-bottom: 1px solid var(--line);
   vertical-align: top;
 }
 th {
-  background: var(--table-head-bg);
-  color: var(--ink);
+  background: var(--opportunity);
+  color: var(--accent2);
 }
-td:nth-child(2) {
-  color: var(--risk);
-  font-weight: 700;
+.warning {
+  margin: 4rem 0;
+  padding: 2rem clamp(1.5rem, 4vw, 3.5rem);
+  background: var(--risk);
+  border-top: 8px solid var(--accent3);
 }
-td:nth-child(3) {
-  color: var(--opportunity);
+.warning h3 {
+  margin-top: 0;
+  color: var(--accent3);
+  font-size: 1.8rem;
 }
-.insight {
-  background: var(--quote-bg);
-  padding: 46px 24px;
+.insight-strip {
+  margin: 4rem 0;
+  padding: 2.3rem;
+  background: var(--quote);
+  color: var(--quote-ink);
+  font-size: clamp(1.2rem, 2.5vw, 1.7rem);
 }
-.insight blockquote {
-  max-width: 920px;
-  margin: 0 auto;
-  border-left: 8px solid var(--conclusion);
-  padding: 10px 0 10px 24px;
-  font-size: 24px;
-  line-height: 1.45;
+.takeaways h3 { font-size: 1.9rem; }
+.takeaway-grid {
+  display: grid;
+  grid-template-columns: 1.15fr .85fr 1fr;
+  gap: 1rem;
 }
-.insight cite {
+.takeaway {
+  padding: 1.5rem;
+  background: var(--data);
+  border-radius: 18px 4px 18px 4px;
+}
+.takeaway:nth-child(2) { background: var(--risk); }
+.takeaway:nth-child(3) { background: var(--opportunity); }
+.takeaway:nth-child(4) {
+  grid-column: span 2;
+  background: var(--conclusion);
+}
+.takeaway strong {
   display: block;
+  margin-bottom: .5rem;
+  color: var(--accent);
+}
+.takeaway:nth-child(2) strong { color: var(--accent3); }
+.takeaway:nth-child(3) strong { color: var(--accent2); }
+.takeaway:nth-child(4) strong { color: var(--accent4); }
+.hl {
+  padding: .05em .25em;
+  background: var(--hl);
+  color: var(--ink);
+  font-weight: 800;
+}
+.hl2 {
+  padding: .05em .25em;
+  background: var(--hl2);
+  color: var(--ink);
+  font-weight: 800;
+}
+#translation {
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  padding: 5rem max(5vw, calc((100vw - 820px) / 2));
+}
+#translation h2 {
+  margin: 0 0 2.5rem;
+  color: var(--accent);
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+}
+#translation h3 {
+  margin: 3.5rem 0 1rem;
+  padding-bottom: .5rem;
+  border-bottom: 2px solid var(--line);
+  color: var(--accent2);
+  font-size: 1.65rem;
+}
+#translation p, #translation li {
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-size: 1.08rem;
+}
+.lead {
   color: var(--muted);
-  font-style: normal;
-  margin-top: 12px;
-  font-size: 16px;
+  font-size: 1.25rem !important;
 }
-.limits {
-  display: grid;
-  grid-template-columns: 0.8fr 1.2fr;
-  gap: 28px;
-  padding: 58px 24px;
+.mode-definitions {
+  margin: 1.5rem 0 2rem;
+  padding-left: 1.4rem;
 }
-.limit-label {
-  background: var(--risk-bg);
-  border: 1px solid var(--risk);
-  padding: 24px;
-}
-.limit-label h2 {
-  color: var(--risk);
-  margin: 0 0 12px;
-}
-.limit-list {
-  display: grid;
-  gap: 14px;
-}
-.limit-item {
-  background: var(--surface);
-  border-left: 5px solid var(--risk);
-  padding: 18px;
-}
-.safeguards {
-  background: var(--opportunity-bg);
-  padding: 48px 24px;
-}
-.safeguard-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-}
-.safeguard {
-  background: var(--surface);
-  border-bottom: 5px solid var(--opportunity);
-  padding: 18px;
-}
-.takeaways {
-  padding: 58px 24px;
-  background: var(--takeaway-bg);
-}
-.mosaic {
-  display: grid;
-  grid-template-columns: 1.2fr 0.8fr 1fr;
-  gap: 14px;
-}
-.tile {
-  min-height: 150px;
-  padding: 20px;
-  border-radius: 8px;
-  background: var(--surface);
+.mode-definitions li { margin: .9rem 0; }
+.source-figure {
+  margin: 3rem 0;
+  padding: 1rem;
+  background: var(--bg);
   border: 1px solid var(--line);
 }
-.tile.data {
-  border-top: 6px solid var(--data);
+.source-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
 }
-.tile.risk {
-  border-top: 6px solid var(--risk);
-}
-.tile.opp {
-  border-top: 6px solid var(--opportunity);
-}
-.tile.final {
-  border-top: 6px solid var(--conclusion);
-  grid-column: span 3;
-}
-.tile h3 {
-  margin: 0 0 8px;
-}
-.tile p {
-  margin: 0;
+.source-figure figcaption {
+  margin-top: .8rem;
   color: var(--muted);
+  font-size: .9rem;
 }
-@media (max-width: 820px) {
-  .number-band,
-  .split,
-  .steps,
-  .limits,
-  .safeguard-row,
-  .mosaic {
-    grid-template-columns: 1fr;
-  }
-  .number {
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
-  }
-  .tile.final {
-    grid-column: auto;
-  }
-  .hero-summary,
-  .insight blockquote {
-    font-size: 20px;
-  }
+.keep-reading {
+  margin-top: 3.5rem;
+  color: var(--accent4);
+}
+@media (max-width: 800px) {
+  .number-band { grid-template-columns: 1fr 1fr; }
+  .metric:nth-child(2) { border-right: 0; }
+  .metric:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+  .split { grid-template-columns: 1fr; }
+  .takeaway-grid { grid-template-columns: 1fr; }
+  .takeaway:nth-child(4) { grid-column: auto; }
+}
+@media (max-width: 520px) {
+  .number-band { grid-template-columns: 1fr; }
+  .metric { border-right: 0; border-bottom: 1px solid var(--line); }
+  .metric:last-child { border-bottom: 0; }
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -508,166 +481,169 @@ td:nth-child(3) {
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/introducing-evmbench" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<header class="hero">
+<p class="eyebrow">OpenAI Research · 2026</p>
+<h1>EVMbench 正式发布</h1>
+<p class="original-title" lang="en">Introducing EVMbench</p>
+<p class="dek">一句话总括：EVMbench 把 AI 智能体放进可复现的区块链环境，用真实高危漏洞同时检验其审计、修复和攻击能力。</p>
+<div class="meta">
+<span>来源：OpenAI</span>
+<span>日期：2026 年 2 月 18 日</span>
+<span>分类：研究</span>
+<span><a href="https://openai.com/index/introducing-evmbench">查看原文</a></span>
+</div>
+</header>
 <main>
-  <header class="hero">
-    <div class="wrap">
-      <p class="kicker">一句话总括</p>
-      <h1>Introducing EVMbench</h1>
-      <p class="english-title">Introducing EVMbench</p>
-      <p class="hero-summary">EVMbench 的真正贡献，是把 AI agent 对智能合约安全的影响拆成可复现的检测、修补和利用任务，让“模型会不会改变攻防格局”有了可比较的证据。</p>
-      <div class="meta-strip" aria-label="文章信息">
-        <span>OpenAI Research</span>
-        <span>2026-02-18</span>
-        <span>智能合约安全</span>
-        <span>AI agent 评测</span>
-      </div>
+<section aria-labelledby="summary-heading" class="summary-shell">
+<h2 id="summary-heading">更短、更易读的中文总结</h2>
+<p>EVMbench 不只测试模型能否谈论安全问题。它要求智能体面对可执行的合约代码，并完成发现、修补或利用漏洞的实际任务。这让网络安全能力的测量更接近真实经济风险。</p>
+<div aria-label="关键数字" class="number-band">
+<div class="metric"><strong>117</strong><span>个经过筛选的高危漏洞，构成基准的核心样本。</span></div>
+<div class="metric"><strong>40</strong><span>次安全审计，主要来自开放式代码审计竞赛。</span></div>
+<div class="metric"><strong>71.0%</strong><span>GPT‑5.3‑Codex 在 exploit 模式中的得分。</span></div>
+<div class="metric"><strong>$10M</strong><span>OpenAI 承诺投入网络防御项目的 API 额度。</span></div>
+</div>
+<div class="split">
+<div class="split-intro">
+<h3>同一套漏洞，三种能力视角</h3>
+<p>基准把安全能力拆成三个模式。这样的设计能分辨模型是会“看出问题”，还是能真正修好或利用问题。</p>
+</div>
+<div class="mode-list">
+<article class="mode">
+<h3>Detect：全面发现</h3>
+<p>智能体审计整个代码库。评分看它找回了多少已知漏洞，以及这些漏洞对应的审计奖励。难点在于保持全面，而不是找到一个问题后就停止。</p>
+</article>
+<article class="mode">
+<h3>Patch：安全修复</h3>
+<p>智能体必须消除可利用性，同时保留合约原有功能。测试显示，修补细微漏洞而不引入功能退化仍然很难。</p>
+</article>
+<article class="mode">
+<h3>Exploit：端到端攻击</h3>
+<p>智能体在隔离链上持续尝试，直到完成资金抽取。由于目标明确，这反而是三种模式中表现最好的任务。</p>
+</article>
+</div>
+</div>
+<section aria-labelledby="performance-heading" class="comparison">
+<h3 id="performance-heading">性能跃升很大，但不能等同于全面胜任</h3>
+<table>
+<thead>
+<tr>
+<th>比较项</th>
+<th>结果</th>
+<th>它改变了什么判断</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPT‑5.3‑Codex，exploit 模式</td>
+<td><span class="hl2">71.0%</span></td>
+<td>前沿智能体已能稳定完成相当一部分端到端漏洞利用，攻击能力不再只是理论可能。</td>
+</tr>
+<tr>
+<td>GPT‑5，exploit 模式</td>
+<td><span class="hl">33.3%</span></td>
+<td>六个多月内得分增长超过一倍，说明相关能力正在快速演进。</td>
+</tr>
+<tr>
+<td>Detect 与 Patch</td>
+<td>仍未达到完整覆盖</td>
+<td>会利用漏洞不代表能完成全面审计，也不代表能在不破坏功能的前提下修复漏洞。</td>
+</tr>
+</tbody>
+</table>
+</section>
+<aside class="warning">
+<h3>边界：沙盒成绩不是现实世界的完整风险刻度</h3>
+<p>样本主要来自 Code4rena 竞赛。现实中广泛部署的合约往往经过更多审查，可能更难利用。</p>
+<p>exploit 任务使用干净的本地 Anvil 环境，只支持单链，并按顺序重放交易。依赖精确时机、主网状态或跨链交互的行为不在当前覆盖范围内。</p>
+<p>detect 评分也只核对人类已发现的漏洞。智能体额外报告的问题，目前无法可靠判断是真正的新漏洞，还是误报。</p>
+</aside>
+<div class="insight-strip">
+<strong>核心洞见：</strong>最明确的攻击目标带来了最高得分，而更开放、更强调完整性的防御任务表现较弱。AI 安全工具的下一步重点，不只是提升单次成功率，还要改善审计覆盖率和修复可靠性。
     </div>
-  </header>
-
-  <section class="wrap number-band" aria-label="关键数字">
-    <div class="number">
-      <strong>$100B+</strong>
-      <span>智能合约经常保护的开源加密资产规模。</span>
-    </div>
-    <div class="number">
-      <strong>117</strong>
-      <span>来自 40 次审计的精选高危漏洞。</span>
-    </div>
-    <div class="number">
-      <strong>71.0%</strong>
-      <span>GPT-5.3-Codex 在 exploit 模式的得分。</span>
-    </div>
-    <div class="number">
-      <strong>$10M</strong>
-      <span>OpenAI 承诺用于网络防御的 API credits。</span>
-    </div>
-  </section>
-
-  <section class="wrap split">
-    <div>
-      <h2>EVMbench 衡量的不是写代码能力，而是经济场景中的安全能力</h2>
-      <div class="panel">
-        <p>基准来自真实审计材料和公开漏洞。它要求 agent 在合约仓库、测试、部署脚本和链上状态之间完成任务。</p>
-        <p>这改变了读者对 AI 影响的理解。模型能力不只体现在回答问题，而是体现在能否影响真实资产安全。</p>
-      </div>
-    </div>
-    <div class="mode-grid">
-      <div class="mode"><b>Detect：</b>审计代码库，按找到的真实漏洞和审计奖励计分。</div>
-      <div class="mode"><b>Patch：</b>修改脆弱合约，在保留功能的同时消除可利用性。</div>
-      <div class="mode"><b>Exploit：</b>在沙盒链上执行端到端攻击，并通过交易回放和链上验证评分。</div>
-    </div>
-  </section>
-
-  <section class="flow">
-    <div class="wrap">
-      <h2>可复现环境让安全评测更接近工程现实</h2>
-      <div class="steps">
-        <div class="step">
-          <h3>构造任务</h3>
-          <p>研究者复用已有 PoC exploit 测试和部署脚本。缺失部分则手写，以保证漏洞可触发、可修补、可评分。</p>
-        </div>
-        <div class="step">
-          <h3>约束执行</h3>
-          <p>Rust harness 部署合约并确定性回放交易。危险 RPC 方法被限制，任务运行在本地 Anvil 环境。</p>
-        </div>
-        <div class="step">
-          <h3>校验结果</h3>
-          <p>exploit 模式使用程序化 grader、交易回放和链上验证。这样减少主观判断，也降低 agent 取巧得分的空间。</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="table-section">
-    <div class="wrap">
-      <h2>模型最擅长明确目标，最难做好完整防御</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>任务模式</th>
-            <th>暴露的弱点</th>
-            <th>对 AI 影响的解释</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Exploit</td>
-            <td>能力提升最快，GPT-5.3-Codex 得分 71.0%。</td>
-            <td>当目标是“持续迭代直到资金被转走”时，agent 更容易把代码理解、执行和反馈循环连起来。</td>
-          </tr>
-          <tr>
-            <td>Detect</td>
-            <td>召回率仍未覆盖全部漏洞，有时找到一个问题就停止。</td>
-            <td>这说明 AI 审计不是简单问答任务。完整覆盖需要系统性搜索和退出标准。</td>
-          </tr>
-          <tr>
-            <td>Patch</td>
-            <td>修补漏洞同时保持完整功能仍很困难。</td>
-            <td>防御能力比攻击演示更难评估。正确修复需要理解合约意图，而不只是阻断某个 exploit。</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="insight">
-    <blockquote>
-      EVMbench 的核心信号是：AI agent 已经能在沙盒中完成相当强的漏洞利用，但防御性审计和稳健修复仍没有达到可完全依赖的水平。
-      <cite>这使它既是能力榜单，也是风险预警。</cite>
-    </blockquote>
-  </section>
-
-  <section class="wrap limits">
-    <div class="limit-label">
-      <h2>限制同样重要</h2>
-      <p>这些结果不能直接等同于主网上的真实攻击成功率。基准越清楚边界，读者越能正确使用分数。</p>
-    </div>
-    <div class="limit-list">
-      <div class="limit-item">漏洞多来自 Code4rena 审计竞赛。它们真实且高危，但未必代表最受审查的大型主网合约。</div>
-      <div class="limit-item">detect 模式只能检查 agent 是否找到人类审计报告中的漏洞。额外发现目前难以可靠判定是真漏洞还是误报。</div>
-      <div class="limit-item">exploit 交易按顺序回放，精确时序、多链状态和主网分叉行为暂不覆盖。</div>
-    </div>
-  </section>
-
-  <section class="safeguards">
-    <div class="wrap">
-      <h2>文章把能力发布和防御责任放在一起</h2>
-      <div class="safeguard-row">
-        <div class="safeguard">安全训练用于降低误用。</div>
-        <div class="safeguard">自动监控和执行管线用于发现滥用。</div>
-        <div class="safeguard">Aardvark 私测扩展面向防御研究。</div>
-        <div class="safeguard">1000 万美元 API credits 支持开源和关键基础设施防护。</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="takeaways">
-    <div class="wrap">
-      <h2>最值得带走的洞见</h2>
-      <div class="mosaic">
-        <div class="tile data">
-          <h3>真实漏洞让评测更有含金量</h3>
-          <p>117 个漏洞来自 40 次审计，并配合可执行环境。它比静态问答更能反映 agent 的工程能力。</p>
-        </div>
-        <div class="tile risk">
-          <h3>攻击目标更容易被模型优化</h3>
-          <p>exploit 模式得分提升最快。明确反馈循环会放大 agent 的迭代优势。</p>
-        </div>
-        <div class="tile opp">
-          <h3>防御仍需要人类流程</h3>
-          <p>detect 和 patch 仍不完整。AI 更适合作为审计放大器，而不是替代审计责任。</p>
-        </div>
-        <div class="tile final">
-          <h3>评测本身是一种治理工具</h3>
-          <p>当双重用途能力被公开、量化和复现，开发者、研究者和平台才能更早调整防护策略。EVMbench 的价值不只是排名，而是帮助生态把更强模型导向漏洞发现和修复。</p>
-        </div>
-      </div>
-    </div>
-  </section>
+<section aria-labelledby="takeaways-heading" class="takeaways">
+<h3 id="takeaways-heading">最值得带走的洞见</h3>
+<div class="takeaway-grid">
+<article class="takeaway">
+<strong>能力测量正在接近真实经济环境</strong>
+<span>117 个真实漏洞和可执行沙盒，比静态问答更能反映智能体对链上资产的实际影响。</span>
+</article>
+<article class="takeaway">
+<strong>攻击能力增长速度值得警惕</strong>
+<span>exploit 得分从 GPT‑5 的 33.3% 提升到 GPT‑5.3‑Codex 的 71.0%，时间只相隔六个多月。</span>
+</article>
+<article class="takeaway">
+<strong>防御任务仍有明显短板</strong>
+<span>智能体可能过早结束审计，也难以在保留完整功能的同时清除细微漏洞。</span>
+</article>
+<article class="takeaway">
+<strong>发布基准也是一项防御倡议</strong>
+<span>OpenAI 公开任务、工具和评估框架，并投入 1000 万美元 API 额度，希望让开发者更快采用 AI 辅助审计。</span>
+</article>
+</div>
+</section>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<p class="lead">通过评估 AI 智能体在区块链环境中发现、修补和利用漏洞的能力，让智能合约变得更安全。</p>
+<h3>局限性</h3>
+<h3>为什么这很重要</h3>
+<h3>局限性</h3>
+<h3>为什么这很重要</h3>
+<p>智能合约经常承载价值超过 1000 亿美元的开源加密资产。随着 AI 智能体阅读、编写和执行代码的能力不断提高，我们越来越有必要在具有实际经济意义的环境中衡量这些能力。同时，也应推动人们将 AI 系统用于防御，帮助审计并加固已经部署的合约。</p>
+<p>我们与 Paradigm（在新窗口中打开）共同推出 EVMbench。这个基准用于评估 AI 智能体发现、修补和利用高危智能合约漏洞的能力。EVMbench 收录了 40 次审计中经过筛选的 117 个漏洞，其中大部分来自开放式代码审计竞赛。</p>
+<p>EVMbench 还加入了 Tempo（在新窗口中打开）区块链安全审计过程中的若干漏洞场景。Tempo 是一条专门构建的 L1，旨在通过稳定币实现高吞吐量、低成本的支付。这些场景把基准扩展到了面向支付的智能合约代码。我们预计，由智能体发起的稳定币支付将会增长。这些场景也让基准扎根于一个实际重要性正在上升的领域。</p>
+<p>为了构建任务环境，我们尽可能改造已有的概念验证漏洞利用测试和部署脚本。如果这些材料不存在，我们就手动编写。在 patch 模式中，我们确认漏洞确实可以被利用，也能够在不引入编译错误的情况下得到缓解。否则，评估环境本身就会失去有效性。</p>
+<p>在 exploit 模式中，我们编写了定制评分器，并对环境进行了红队测试。目的是找出智能体可能欺骗评分器的方法，再将这些途径封堵。除了由 Paradigm 提供领域专业知识并进行任务质量控制之外，我们还使用自动化任务审计智能体，提高环境的可靠性。</p>
+<p>EVMbench 评估三种能力模式：</p>
+<ul class="mode-definitions">
+<li><strong>Detect：</strong>智能体审计一个智能合约代码库。评分依据是它对真实漏洞的召回率，以及这些漏洞对应的审计奖励。</li>
+<li><strong>Patch：</strong>智能体修改存在漏洞的合约。它必须保留预期功能，同时消除漏洞的可利用性。系统会通过自动化测试和漏洞利用检查验证结果。</li>
+<li><strong>Exploit：</strong>智能体在已部署合约上执行端到端的资金抽取攻击。任务运行在沙盒区块链环境中，并通过交易重放和链上验证，以程序化方式评分。</li>
+</ul>
+<p>为了支持客观且可复现的评估，我们开发了一个基于 Rust 的测试框架。它负责部署合约，以确定性方式重放智能体交易，并限制不安全的 RPC 方法。Exploit 任务运行在隔离的本地 Anvil 环境中，而不是实时网络上。任务所用漏洞都来自历史记录，并且已经公开披露。</p>
+<p>我们在全部三种模式中评估了前沿智能体。在 exploit 模式中，通过 Codex CLI 运行的 GPT‑5.3‑Codex 得分为 71.0%。与先前模型相比，这是一次显著提升。六个多月前发布的 GPT‑5 得分为 33.3%。Detect 模式的召回率和 patch 模式的成功率仍未达到完整覆盖，因为大量漏洞对智能体来说依旧很难发现和修复。</p>
+<p>EVMbench 还揭示了模型在不同任务中的一些有趣行为差异。智能体在 exploit 场景中表现最好，因为目标非常明确：持续尝试，直到资金被抽走。相比之下，它们在 detect 和 patch 任务中的表现较弱。</p>
+<p>在 detect 模式中，智能体有时找到一个问题后就会停止，而不会彻底审计整个代码库。在 patch 模式中，既保留全部功能，又消除隐蔽漏洞，仍是一项困难的任务。</p>
+<h3>局限性</h3>
+<p>EVMbench 无法代表现实世界中智能合约安全问题的全部难度。基准中的漏洞取自 Code4rena 审计竞赛。这些漏洞真实存在，而且严重程度很高。但许多部署规模大、使用广泛的加密合约会接受更严格的审查，因此可能更难被利用。</p>
+<p>我们的评分系统很稳健，但并不完美。在 detect 模式中，我们检查智能体是否找到了人类审计人员发现的相同漏洞。如果智能体识别出额外问题，我们目前还没有可靠的方法判断这些问题究竟是人类遗漏的真实漏洞，还是误报。</p>
+<p>Exploit 场景也存在结构性限制。交易会在评分容器中按顺序重放，因此依赖精确时机机制的行为不在评估范围内。链上状态来自一个干净的本地 Anvil 实例，而不是主网分叉。目前，我们也只支持单链环境。在部分任务中，这意味着必须使用模拟合约，而不能使用主网上的实际部署。</p>
+<h3>为什么这很重要</h3>
+<p>智能合约保护着价值数十亿美元的资产。AI 智能体可能给攻击者和防御者都带来根本性变化。在这个领域衡量模型能力，有助于追踪正在出现的网络安全风险。这也凸显了将 AI 系统用于防御的重要性，包括审计和加固已经部署的合约。</p>
+<p>EVMbench 既是一项测量工具，也是一项行动倡议。随着智能体能力提高，开发者和安全研究人员越来越有必要把 AI 辅助审计纳入工作流程。</p>
+<p>最近几个月，我们看到模型在网络安全任务上的表现取得了显著进步。这些进步同时惠及开发者和安全专业人员。与此同时，我们也在准备更强的网络安全保障措施，以支持防御性用途，并提高整个生态系统的韧性。</p>
+<p>网络安全天然具有双重用途。因此，我们采用以证据为基础、持续迭代的方法。一方面，我们希望加快防御者发现和修复漏洞的速度。另一方面，我们也希望减缓滥用。我们的缓解措施包括安全训练、自动化监控、对高级能力实行可信访问，以及包含威胁情报在内的执行机制。</p>
+<p>我们正在投资生态系统层面的保障措施。例如，我们正在扩大安全研究智能体 Aardvark 的私有测试范围。我们也在与开源维护者合作，为广泛使用的项目提供免费的代码库扫描。</p>
+<figure class="source-figure" data-source-image="0"><img alt="GPT-Red art card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/6q32m87ClqE8Ovn6vD424h/05ced72e47bbe42711fbac6a082cbff2/Art_Card.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<p>在 2023 年启动的 Cybersecurity Grant Program 基础上，我们还将投入价值 1000 万美元的 API 额度。这个项目将使用我们能力最强的模型推动网络防御，重点支持开源软件和关键基础设施系统。从事善意安全研究的组织，可以通过 Cybersecurity Grant Program 申请 API 额度和相关支持。</p>
+<figure class="source-figure" data-source-image="1"><img alt="Separating signal from noise &gt; Art Card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/7j6M3prKIsTmV6cbMaHjhZ/e66f7cdd98c66c99546853cbc22cfe84/Seperating-signal-from-noise-card.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<p>我们公开 EVMbench 的任务、工具和评估框架，以支持学术界和业界继续研究如何衡量并管理正在出现的 AI 网络安全能力。</p>
+<figure class="source-figure" data-source-image="2"><img alt="Introducing GeneBench-Pro &gt; Cover image" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/7sbJaKBi5qLXAqbewh72aK/93197556e903eac9df6f077eb12b7581/GenebenchPro_Blog_ArtCard.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<h3 class="keep-reading">继续阅读</h3>
+</section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

@@ -1,511 +1,346 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>深入了解我们对 Model Spec 的处理方法</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>深入了解 OpenAI 制定 Model Spec 的方法</title>
 <style>
 :root {
-  color-scheme: light;
-  --bg: #f5f7f8;
-  --paper: #ffffff;
-  --paper-2: #eef4f1;
-  --paper-3: #f8efe8;
-  --ink: #17212b;
-  --muted: #5d6977;
-  --line: #d9e1e8;
-  --hero-a: #0d1b2a;
-  --hero-b: #104247;
-  --hero-glow: rgba(24, 176, 142, 0.28);
-  --hero-ink: #f3fbff;
-  --hero-muted: #b7c9d4;
-  --data: #1769e0;
-  --risk: #c6451a;
-  --opportunity: #0b8a5b;
-  --conclusion: #8a6200;
-  --policy: #9b3f86;
-  --data-soft: #e8f2ff;
-  --risk-soft: #fff0eb;
-  --opportunity-soft: #e9f8ef;
-  --conclusion-soft: #fff6d6;
-  --policy-soft: #f7eafb;
-  --deep: #102033;
-  --deep-2: #162a3d;
-  --deep-ink: #edf6ff;
-  --deep-muted: #b9c8d8;
-  --shadow: rgba(19, 34, 51, 0.12);
-  --transparent: transparent;
+  --bg: #f6f2e9;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #17201d;
+  --muted: #66706b;
+  --line: #d8d4c8;
+  --accent: #006f62;
+  --accent2: #3255c7;
+  --accent3: #b14d21;
+  --accent4: #8a3ca0;
+  --risk: #a52d3d;
+  --opportunity: #087b55;
+  --conclusion: #5540b5;
+  --data: #176ca4;
+  --hl: #ffe497;
+  --hl2: #ccefe3;
+  --soft-data: #e2f2ff;
+  --soft-risk: #fde5e8;
+  --soft-opportunity: #dff4e9;
+  --soft-conclusion: #ebe6ff;
+  --hero-bg: #153c38;
+  --hero-ink: #f7fffc;
+  --hero-muted: #bcd4cd;
+  --band-bg: #172237;
+  --band-ink: #f4f7ff;
+  --quote-bg: #2d2340;
+  --quote-ink: #f8efff;
+  --translation-bg: #fffdf8;
+  --shadow: 0 18px 50px rgba(25, 38, 34, .10);
 }
-
+:root[data-theme="light"] {
+  --bg: #f6f2e9;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #17201d;
+  --muted: #66706b;
+  --line: #d8d4c8;
+  --accent: #006f62;
+  --accent2: #3255c7;
+  --accent3: #b14d21;
+  --accent4: #8a3ca0;
+  --risk: #a52d3d;
+  --opportunity: #087b55;
+  --conclusion: #5540b5;
+  --data: #176ca4;
+  --hl: #ffe497;
+  --hl2: #ccefe3;
+  --soft-data: #e2f2ff;
+  --soft-risk: #fde5e8;
+  --soft-opportunity: #dff4e9;
+  --soft-conclusion: #ebe6ff;
+  --hero-bg: #153c38;
+  --hero-ink: #f7fffc;
+  --hero-muted: #bcd4cd;
+  --band-bg: #172237;
+  --band-ink: #f4f7ff;
+  --quote-bg: #2d2340;
+  --quote-ink: #f8efff;
+  --translation-bg: #fffdf8;
+  --shadow: 0 18px 50px rgba(25, 38, 34, .10);
+}
 @media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --bg: #0d1117;
-    --paper: #151b23;
-    --paper-2: #13201c;
-    --paper-3: #221a16;
-    --ink: #e7edf5;
-    --muted: #a8b2bf;
-    --line: #2b3542;
-    --hero-a: #07111f;
-    --hero-b: #092b32;
-    --hero-glow: rgba(26, 210, 168, 0.18);
-    --hero-ink: #f2fbff;
-    --hero-muted: #9fb4c2;
-    --data: #6aa8ff;
-    --risk: #ff8a65;
-    --opportunity: #49d18f;
-    --conclusion: #ffd25f;
-    --policy: #e08ad0;
-    --data-soft: #10233f;
-    --risk-soft: #331a13;
-    --opportunity-soft: #10291d;
-    --conclusion-soft: #302609;
-    --policy-soft: #281a2f;
-    --deep: #080f18;
-    --deep-2: #101927;
-    --deep-ink: #edf6ff;
-    --deep-muted: #aab9c8;
-    --shadow: rgba(0, 0, 0, 0.36);
-    --transparent: transparent;
+  :root:not([data-theme="light"]) {
+    --bg: #101513;
+    --surface: #171d1a;
+    --card: #1d2521;
+    --ink: #e5eee9;
+    --muted: #a5b2ac;
+    --line: #35413b;
+    --accent: #4cd6bf;
+    --accent2: #8ca7ff;
+    --accent3: #ff9a6f;
+    --accent4: #db8eee;
+    --risk: #ff8795;
+    --opportunity: #65dca9;
+    --conclusion: #ad9aff;
+    --data: #77c8ff;
+    --hl: #594916;
+    --hl2: #164d3f;
+    --soft-data: #152e3d;
+    --soft-risk: #3d2027;
+    --soft-opportunity: #17382b;
+    --soft-conclusion: #2a2448;
+    --hero-bg: #102c29;
+    --hero-ink: #e9fff9;
+    --hero-muted: #9fc7bd;
+    --band-bg: #151d2e;
+    --band-ink: #eef3ff;
+    --quote-bg: #2a2038;
+    --quote-ink: #f5eaff;
+    --translation-bg: #171d1a;
+    --shadow: 0 18px 50px rgba(0, 0, 0, .28);
   }
 }
-
 :root[data-theme="dark"] {
-  color-scheme: dark;
-  --bg: #0d1117;
-  --paper: #151b23;
-  --paper-2: #13201c;
-  --paper-3: #221a16;
-  --ink: #e7edf5;
-  --muted: #a8b2bf;
-  --line: #2b3542;
-  --hero-a: #07111f;
-  --hero-b: #092b32;
-  --hero-glow: rgba(26, 210, 168, 0.18);
-  --hero-ink: #f2fbff;
-  --hero-muted: #9fb4c2;
-  --data: #6aa8ff;
-  --risk: #ff8a65;
-  --opportunity: #49d18f;
-  --conclusion: #ffd25f;
-  --policy: #e08ad0;
-  --data-soft: #10233f;
-  --risk-soft: #331a13;
-  --opportunity-soft: #10291d;
-  --conclusion-soft: #302609;
-  --policy-soft: #281a2f;
-  --deep: #080f18;
-  --deep-2: #101927;
-  --deep-ink: #edf6ff;
-  --deep-muted: #aab9c8;
-  --shadow: rgba(0, 0, 0, 0.36);
-  --transparent: transparent;
+  --bg: #101513;
+  --surface: #171d1a;
+  --card: #1d2521;
+  --ink: #e5eee9;
+  --muted: #a5b2ac;
+  --line: #35413b;
+  --accent: #4cd6bf;
+  --accent2: #8ca7ff;
+  --accent3: #ff9a6f;
+  --accent4: #db8eee;
+  --risk: #ff8795;
+  --opportunity: #65dca9;
+  --conclusion: #ad9aff;
+  --data: #77c8ff;
+  --hl: #594916;
+  --hl2: #164d3f;
+  --soft-data: #152e3d;
+  --soft-risk: #3d2027;
+  --soft-opportunity: #17382b;
+  --soft-conclusion: #2a2448;
+  --hero-bg: #102c29;
+  --hero-ink: #e9fff9;
+  --hero-muted: #9fc7bd;
+  --band-bg: #151d2e;
+  --band-ink: #eef3ff;
+  --quote-bg: #2a2038;
+  --quote-ink: #f5eaff;
+  --translation-bg: #171d1a;
+  --shadow: 0 18px 50px rgba(0, 0, 0, .28);
 }
-
-* {
-  box-sizing: border-box;
-}
-
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 body {
   margin: 0;
-  background: var(--bg);
   color: var(--ink);
-  font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
-  line-height: 1.72;
+  background: var(--bg);
+  font-family: Inter, "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.78;
 }
-
-main {
-  max-width: 1180px;
-  margin: 0 auto;
-  padding: 28px;
-}
-
 .hero {
-  min-height: 440px;
-  display: grid;
-  align-content: end;
-  padding: 58px;
-  border-radius: 28px;
   color: var(--hero-ink);
-  background:
-    radial-gradient(circle at 18% 12%, var(--hero-glow), var(--transparent) 34%),
-    linear-gradient(135deg, var(--hero-a), var(--hero-b));
-  box-shadow: 0 28px 70px var(--shadow);
+  background: var(--hero-bg);
+  padding: clamp(3rem, 8vw, 7rem) 1.4rem;
 }
-
+.hero-inner, .summary-wrap {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+}
 .kicker {
-  color: var(--opportunity);
+  color: var(--hero-muted);
+  font-size: .82rem;
   font-weight: 800;
-  letter-spacing: 0;
+  letter-spacing: .18em;
   text-transform: uppercase;
 }
-
-.hero .kicker {
-  color: var(--hero-muted);
+.hero h1 {
+  max-width: 900px;
+  margin: .7rem 0 .5rem;
+  font-size: clamp(2.25rem, 6.2vw, 5.5rem);
+  line-height: 1.04;
+  letter-spacing: -.045em;
 }
-
-h1 {
-  margin: 14px 0 8px;
-  font-size: clamp(34px, 6vw, 66px);
-  line-height: 1.05;
-  letter-spacing: 0;
-}
-
-.original {
-  margin: 0 0 28px;
-  color: var(--hero-muted);
-  font-size: 18px;
-}
-
-.lead {
-  max-width: 820px;
+.original-title {
+  max-width: 760px;
   margin: 0;
-  font-size: 24px;
+  color: var(--hero-muted);
+  font-size: clamp(1rem, 2vw, 1.3rem);
+}
+.hero-deck {
+  max-width: 780px;
+  margin: 2.2rem 0 0;
+  padding-left: 1rem;
+  border-left: 4px solid var(--accent3);
+  font-size: clamp(1.16rem, 2.1vw, 1.55rem);
   line-height: 1.55;
-  font-weight: 650;
 }
-
-.meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 30px;
+.summary-wrap { padding: 3.2rem 1.4rem 5rem; }
+.summary-wrap h2 {
+  margin: 0 0 1.3rem;
+  font-size: clamp(1.75rem, 3vw, 2.65rem);
 }
-
-.meta span {
-  border: 1px solid var(--hero-muted);
-  color: var(--hero-ink);
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 14px;
-}
-
-.metric-strip {
+.number-band {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  margin: 28px 0;
-  border: 1px solid var(--line);
-  background: var(--paper);
+  grid-template-columns: repeat(3, 1fr);
+  margin: 2rem 0 3rem;
+  overflow: hidden;
+  color: var(--band-ink);
+  background: var(--band-bg);
+  border-radius: 18px;
 }
-
-.metric {
-  padding: 24px;
-  border-right: 1px solid var(--line);
-}
-
-.metric:last-child {
-  border-right: 0;
-}
-
+.metric { padding: 1.6rem; border-right: 1px solid var(--line); }
+.metric:last-child { border-right: 0; }
 .metric strong {
   display: block;
-  color: var(--data);
-  font-size: 34px;
+  color: var(--accent3);
+  font-size: clamp(1.7rem, 4vw, 3rem);
   line-height: 1.1;
 }
-
-.metric span {
-  display: block;
-  margin-top: 8px;
-  color: var(--muted);
-  font-size: 15px;
-}
-
+.metric span { color: var(--band-ink); font-size: .92rem; }
 .split {
   display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  gap: 28px;
-  margin: 34px 0;
-  align-items: stretch;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  margin: 2rem 0;
 }
-
-.explain {
-  background: var(--paper-2);
-  padding: 34px;
-  border-left: 8px solid var(--opportunity);
+.pane {
+  padding: 1.7rem;
+  border: 1px solid var(--line);
+  border-radius: 18px;
 }
-
-.explain h2,
-.process h2,
-.table-wrap h2,
-.timeline h2,
-.takeaway h2 {
-  margin: 0 0 14px;
-  font-size: 28px;
-  line-height: 1.2;
-}
-
-.explain p,
-.process p,
-.timeline p {
-  margin: 10px 0 0;
-}
-
-.not-box {
-  background: var(--paper-3);
-  padding: 34px;
-  border-top: 8px solid var(--risk);
-}
-
-.not-box ul {
-  margin: 14px 0 0;
-  padding-left: 22px;
-}
-
-.not-box li {
-  margin: 8px 0;
-}
-
-.process {
-  margin: 40px 0;
-  padding: 38px;
-  color: var(--deep-ink);
-  background: linear-gradient(135deg, var(--deep), var(--deep-2));
-}
-
+.pane.rules { background: var(--soft-risk); border-top: 6px solid var(--risk); }
+.pane.defaults { background: var(--soft-opportunity); border-top: 6px solid var(--opportunity); }
+.pane h3 { margin-top: 0; }
 .flow {
+  margin: 3rem 0;
+  padding: 2rem;
+  background: var(--soft-data);
+  border-left: 7px solid var(--data);
+}
+.flow-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin-top: 24px;
+  gap: .8rem;
+  margin-top: 1.4rem;
 }
-
-.step {
+.flow-step {
   position: relative;
-  padding: 20px;
-  min-height: 156px;
+  min-height: 130px;
+  padding: 1rem;
+  background: var(--card);
   border: 1px solid var(--line);
-  background: var(--deep-2);
 }
-
-.step b {
-  display: inline-grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  margin-bottom: 12px;
-  border-radius: 50%;
-  color: var(--deep);
-  background: var(--conclusion);
-}
-
-.step h3 {
-  margin: 0 0 8px;
-  font-size: 18px;
-}
-
-.step p {
-  margin: 0;
-  color: var(--deep-muted);
-  font-size: 15px;
-}
-
-.table-wrap {
-  margin: 40px 0;
-  padding: 10px 0;
-}
-
-.table-intro {
-  max-width: 820px;
-  color: var(--muted);
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 18px;
-  background: var(--paper);
-  box-shadow: 0 16px 44px var(--shadow);
-}
-
-th,
-td {
-  padding: 18px;
-  border: 1px solid var(--line);
-  text-align: left;
-  vertical-align: top;
-}
-
-th {
-  color: var(--ink);
-  background: var(--data-soft);
-}
-
-td:first-child {
-  font-weight: 800;
-  color: var(--policy);
-  width: 24%;
-}
-
-.insight-band {
-  margin: 42px 0;
-  padding: 34px 38px;
-  background: var(--conclusion-soft);
-  border-left: 10px solid var(--conclusion);
-}
-
-.insight-band p {
-  margin: 0;
-  font-size: 24px;
-  line-height: 1.5;
-  font-weight: 700;
-}
-
-.insight-band small {
+.flow-step b {
   display: block;
-  margin-top: 12px;
-  color: var(--muted);
+  margin-bottom: .4rem;
+  color: var(--data);
+  font-size: 1.4rem;
 }
-
-.timeline {
-  margin: 40px 0;
-  padding: 36px;
-  background: var(--policy-soft);
+.insight-bar {
+  margin: 3rem 0;
+  padding: 2.2rem;
+  color: var(--quote-ink);
+  background: var(--quote-bg);
+  border-radius: 4px 28px 4px 28px;
 }
-
-.track {
-  display: grid;
-  gap: 18px;
-  margin-top: 20px;
-  border-left: 4px solid var(--policy);
-  padding-left: 22px;
-}
-
-.event {
-  position: relative;
-  padding: 4px 0 12px;
-}
-
-.event::before {
-  content: "";
-  position: absolute;
-  left: -32px;
-  top: 12px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--policy);
-}
-
-.event strong {
-  color: var(--policy);
-}
-
-.evals {
-  display: grid;
-  grid-template-columns: 0.75fr 1.25fr;
-  gap: 24px;
-  margin: 42px 0;
-  background: var(--data-soft);
-  border: 1px solid var(--line);
-}
-
-.evals .label {
-  padding: 30px;
-  background: var(--data);
-  color: var(--paper);
-  font-size: 30px;
-  line-height: 1.2;
-  font-weight: 850;
-}
-
-.evals .body {
-  padding: 30px;
-}
-
-.evals p {
-  margin: 0 0 12px;
-}
-
-.takeaway {
-  margin: 44px 0 10px;
-}
-
+.insight-bar p { margin-bottom: 0; font-size: 1.15rem; }
 .mosaic {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin-top: 18px;
+  grid-template-columns: 1.15fr .85fr;
+  grid-template-areas: "a b" "a c";
+  gap: 1rem;
+  margin-top: 1.5rem;
 }
-
-.tile {
-  min-height: 190px;
-  padding: 24px;
+.takeaway {
+  padding: 1.6rem;
   border: 1px solid var(--line);
-  background: var(--paper);
+  border-radius: 16px;
+  background: var(--card);
 }
-
-.tile:nth-child(1) {
-  background: var(--opportunity-soft);
-  border-top: 8px solid var(--opportunity);
+.takeaway:nth-child(1) { grid-area: a; background: var(--soft-conclusion); border-color: var(--conclusion); }
+.takeaway:nth-child(2) { grid-area: b; border-left: 7px solid var(--accent3); }
+.takeaway:nth-child(3) { grid-area: c; border-left: 7px solid var(--accent4); }
+.takeaway h3 { margin-top: 0; }
+.mark { padding: .05em .25em; color: var(--ink); background: var(--hl); }
+.mark2 { padding: .05em .25em; color: var(--ink); background: var(--hl2); }
+#translation {
+  background: var(--translation-bg);
+  border-top: 1px solid var(--line);
+  padding: 4.5rem 1.4rem 7rem;
 }
-
-.tile:nth-child(2) {
-  background: var(--risk-soft);
-  border-top: 8px solid var(--risk);
+.translation-inner {
+  width: min(780px, 100%);
+  margin: 0 auto;
 }
-
-.tile:nth-child(3) {
-  background: var(--data-soft);
-  border-top: 8px solid var(--data);
+#translation h2 {
+  margin: 0 0 2.5rem;
+  font-size: clamp(2rem, 5vw, 3.7rem);
+  line-height: 1.1;
 }
-
-.tile:nth-child(4) {
-  background: var(--conclusion-soft);
-  border-top: 8px solid var(--conclusion);
+#translation h3 {
+  margin: 3.2rem 0 1rem;
+  color: var(--accent);
+  font-size: 1.75rem;
+  line-height: 1.3;
 }
-
-.tile h3 {
-  margin: 0 0 10px;
-  font-size: 19px;
+#translation h4 {
+  margin: 2.2rem 0 .7rem;
+  color: var(--accent2);
+  font-size: 1.28rem;
 }
-
-.tile p {
-  margin: 0;
+#translation p { margin: 0 0 1.15rem; }
+#translation ul, #translation ol { margin: .7rem 0 1.6rem; padding-left: 1.5rem; }
+#translation li { margin: .45rem 0; }
+.contents {
+  margin: 1.5rem 0;
+  padding: 1.2rem 1.5rem;
+  background: var(--soft-data);
+  border-left: 5px solid var(--data);
+}
+.contents ul { margin: 0; columns: 2; }
+.example {
+  margin: 1.5rem 0;
+  padding: 1.2rem 1.4rem;
+  background: var(--soft-conclusion);
+  border-left: 5px solid var(--accent4);
+}
+.caption-note {
+  color: var(--muted);
+  font-size: .92rem;
+}
+.meta-footer {
+  margin-top: 3rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid var(--line);
   color: var(--muted);
 }
-
-@media (max-width: 820px) {
-  main {
-    padding: 16px;
-  }
-
-  .hero {
-    padding: 34px 24px;
-    border-radius: 18px;
-  }
-
-  .lead {
-    font-size: 20px;
-  }
-
-  .metric-strip,
-  .split,
-  .flow,
-  .evals,
-  .mosaic {
-    grid-template-columns: 1fr;
-  }
-
-  .metric {
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .metric:last-child {
-    border-bottom: 0;
-  }
-
-  th,
-  td {
-    display: block;
-    width: 100%;
-  }
-
-  td:first-child {
-    width: 100%;
-  }
+.source-figure {
+  margin: 2.8rem 0;
+  padding: 0;
+}
+.source-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+.source-figure figcaption {
+  margin-top: .75rem;
+  color: var(--muted);
+  font-size: .9rem;
+  line-height: 1.55;
+}
+@media (max-width: 760px) {
+  .number-band, .split, .flow-grid, .mosaic { grid-template-columns: 1fr; }
+  .mosaic { grid-template-areas: "a" "b" "c"; }
+  .metric { border-right: 0; border-bottom: 1px solid var(--line); }
+  .metric:last-child { border-bottom: 0; }
+  .contents ul { columns: 1; }
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -637,175 +472,298 @@ td:first-child {
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/our-approach-to-the-model-spec" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
 <main>
-  <section class="hero">
-    <div class="kicker">一句话总括</div>
-    <h1>深入了解我们对 Model Spec 的处理方法</h1>
-    <p class="original">Inside our approach to the Model Spec</p>
-    <p class="lead">这篇文章的贡献，是把模型行为从抽象的“有帮助且安全”，拆成公开规则、优先级、评估和修订流程，让 AI 的影响更容易被用户、开发者和政策制定者检查。</p>
-    <div class="meta">
-      <span>OpenAI</span>
-      <span>Research</span>
-      <span>2026-03-25</span>
-      <span>Alignment</span>
-    </div>
-  </section>
-
-  <section class="metric-strip" aria-label="关键数字">
-    <div class="metric">
-      <strong>2024</strong>
-      <span>Model Spec 首版发布，此后随反馈和能力变化迭代。</span>
-    </div>
-    <div class="metric">
-      <strong>3</strong>
-      <span>高层目标：赋能用户和开发者、防止严重伤害、维持运营许可。</span>
-    </div>
-    <div class="metric">
-      <strong>0-3 月</strong>
-      <span>Spec 通常写在当前模型能力前方一小段距离，而不是远期理想。</span>
-    </div>
-    <div class="metric">
-      <strong>4 类</strong>
-      <span>更新来源：公开反馈、内部问题、政策变化、新能力和新产品。</span>
-    </div>
-  </section>
-
-  <section class="split">
-    <div class="explain">
-      <h2>Model Spec 是行为治理接口</h2>
-      <p>它定义模型如何遵循指令、解决冲突、尊重用户自由并保持安全。重点不是展示训练配方，而是让预期行为可以被阅读、质疑和改进。</p>
-      <p>这改变了读者对 AI 影响的理解：模型行为不是自然生成的中性结果，而是需要公开选择和持续校准的制度设计。</p>
-    </div>
-    <div class="not-box">
-      <h2>它不是三件事</h2>
-      <ul>
-        <li>不是声明模型今天已经完全做到这些要求。</li>
-        <li>不是训练栈、内部 token 格式或产品功能的完整说明。</li>
-        <li>不是让模型自主追求“造福人类”的总目标。</li>
-      </ul>
-      <p>这让边界更清楚：Spec 约束模型行为，产品安全还需要政策、监控、功能和防御纵深。</p>
-    </div>
-  </section>
-
-  <section class="process">
-    <h2>Chain of Command 让冲突可判定</h2>
-    <p>模型会遇到来自 OpenAI、开发者和用户的不同指令。Chain of Command 给这些指令分配权威层级，并要求模型在冲突时优先遵循更高权威指令的文字和精神。</p>
-    <div class="flow">
-      <div class="step">
-        <b>1</b>
-        <h3>硬规则</h3>
-        <p>不可被用户或开发者覆盖，主要防止灾难性风险、直接身体伤害、违法行为和破坏指令层级。</p>
-      </div>
-      <div class="step">
-        <b>2</b>
-        <h3>系统与开发者</h3>
-        <p>为应用场景设定边界，让产品和开发者在安全范围内控制模型行为。</p>
-      </div>
-      <div class="step">
-        <b>3</b>
-        <h3>用户请求</h3>
-        <p>在安全边界内优先满足用户意图，包括语气、格式、深度和观点角度。</p>
-      </div>
-      <div class="step">
-        <b>4</b>
-        <h3>默认行为</h3>
-        <p>当没有明确指令时，模型使用可预测的默认值，例如诚实、客观和合适风格。</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="table-wrap">
-    <h2>硬边界和可覆盖默认值服务不同目的</h2>
-    <p class="table-intro">文章最重要的区分，是少量不可覆盖规则与大量可调默认行为并存。这使安全边界和用户自由不必互相吞没。</p>
-    <table>
-      <thead>
-        <tr>
-          <th>机制</th>
-          <th>关键数据和趋势</th>
-          <th>为什么重要</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>硬规则</td>
-          <td>覆盖现实安全风险、法律边界、指令层级和未成年人额外保护。</td>
-          <td>AI 越像基础设施，限制自由的规则越需要少而明确。</td>
-        </tr>
-        <tr>
-          <td>默认值</td>
-          <td>语气、风格等 guideline 默认值可被隐式引导；真实性和客观性等 user-level 默认值需要明确指令才可改变。</td>
-          <td>这让模型既可控，又不至于悄悄漂移到迎合或不透明立场。</td>
-        </tr>
-        <tr>
-          <td>解释辅助</td>
-          <td>决策准则和少量高信号示例帮助处理灰区，例如控制真实世界副作用。</td>
-          <td>影响不只来自拒绝或回答，还来自模型如何在不确定场景中做取舍。</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="insight-band">
-    <p>模型越强、越自主、部署越广，含糊规则的成本越高。</p>
-    <small>文章的核心洞见不是“规则越多越好”，而是重要价值判断不能被完全外包给模型自己猜。</small>
-  </section>
-
-  <section class="timeline">
-    <h2>Spec 是可修订的公共目标</h2>
-    <p>OpenAI 把 Model Spec 写成现实可追赶的目标，通常领先当前行为 0-3 个月。这样它既能指导训练和评估，又不会变成遥远愿景。</p>
-    <div class="track">
-      <div class="event">
-        <strong>2024：首版发布</strong>
-        <p>Model Spec 开始作为公开参考点，帮助外部判断模型行为是 bug 还是有意设计。</p>
-      </div>
-      <div class="event">
-        <strong>持续迭代：公开和内部反馈进入流程</strong>
-        <p>OpenAI 内部任何人可以评论或提议修改，最终更新由跨职能利益相关方批准。文章称已有数十人直接贡献文本。</p>
-      </div>
-      <div class="event">
-        <strong>2026：配套发布 Model Spec Evals</strong>
-        <p>评估套件用代表性场景尽量覆盖 Spec 断言，帮助发现模型行为与 Spec 的不一致。</p>
-      </div>
-      <div class="event">
-        <strong>下一步：随能力扩展而扩展</strong>
-        <p>多模态、自治代理和未成年人场景会继续推动规则澄清。结论是，AI 治理必须跟随部署现实更新。</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="evals">
-    <div class="label">评估让价值声明变成可检查对象</div>
-    <div class="body">
-      <p>Model Spec Evals 不是唯一评估方法，但它给公开规则配上了可执行测试。文章还提到更具体的安全、真实性、迎合性、人格风格和能力评估。</p>
-      <p>这改变了 AI 影响的讨论方式：争论不只停留在原则，还可以追问模型在哪些场景偏离了公开目标。</p>
-    </div>
-  </section>
-
-  <section class="takeaway">
-    <h2>最值得带走的洞见</h2>
-    <div class="mosaic">
-      <div class="tile">
-        <h3>公开规则降低治理黑箱</h3>
-        <p>用户和研究者可以引用同一份文本来批评、验证和推动修改。</p>
-      </div>
-      <div class="tile">
-        <h3>安全不是单层模型行为</h3>
-        <p>Spec 只描述模型，产品政策、监控和防御纵深仍然必要。</p>
-      </div>
-      <div class="tile">
-        <h3>智能不能替代价值选择</h3>
-        <p>“有帮助且安全”在真实场景中充满取舍，需要人类可见的解释机制。</p>
-      </div>
-      <div class="tile">
-        <h3>可修订性是核心能力</h3>
-        <p>随着模型更强、更能行动，规则必须保持清晰、可测且能随反馈更新。</p>
-      </div>
-    </div>
-  </section>
+<header class="hero">
+<div class="hero-inner">
+<div class="kicker">OpenAI · Research · 2026-03-25</div>
+<h1>深入了解 OpenAI 制定 Model Spec 的方法</h1>
+<p class="original-title">Inside our approach to the Model Spec</p>
+<p class="hero-deck"><strong>一句话总括：</strong>OpenAI 把模型行为从内部训练偏好转化为一套公开接口，让用户、开发者和社会都能看见、检验并推动规则改变。</p>
+</div>
+</header>
+<article class="summary-wrap">
+<h2>更短、更易读的中文总结</h2>
+<p>Model Spec 不是一句笼统的“有帮助且安全”，也不是一份训练配方。它把价值目标、指令权限、硬性边界、默认行为、判断准则和实例组织成可执行的公共框架。这样一来，模型为什么服从或拒绝某项要求，就有了可以讨论的依据。</p>
+<div class="number-band">
+<div class="metric"><strong>2024</strong><span>首版 Model Spec 发布，此后根据真实使用和公众反馈持续演进。</span></div>
+<div class="metric"><strong>0—3 个月</strong><span>规范通常领先当前模型的目标区间，既保持进取，也必须具备近期实现路径。</span></div>
+<div class="metric"><strong>数十人</strong><span>直接参与文本贡献，背后还有更多跨研究、产品、安全、政策和法律职能的评审者。</span></div>
+</div>
+<div class="split">
+<section class="pane rules">
+<h3>硬规则：少而不可覆盖</h3>
+<p>涉及灾难性风险、直接人身伤害、违法行为或指令层级完整性的边界，用户和开发者都不能取消。其意义在于，<strong class="mark">安全底线不随提示词变化</strong>。</p>
+<p>但 OpenAI 表示，这类限制应尽量克制。因为 AI 可能成为类似互联网基础设施的基础技术，过度限制会直接压缩思想自由。</p>
+</section>
+<section class="pane defaults">
+<h3>默认行为：可预测，也可引导</h3>
+<p>语气、深度、格式和观点表达通常可以由用户或开发者调整。真实性与客观性等信任基础，则要求更明确的覆盖指令。</p>
+<p>这种设计说明，规范并非追求统一答案，而是要在安全范围内保留<strong class="mark2">用户自由和开发者控制权</strong>。</p>
+</section>
+</div>
+<section class="flow">
+<h3>Model Spec 如何进入改进循环</h3>
+<p>规范本身不会自动让模型合规。OpenAI 需要把公开目标接入训练、评估、问题发现和修订流程。</p>
+<div class="flow-grid">
+<div class="flow-step"><b>01</b>把期望行为写成清晰、可争论的公开规则。</div>
+<div class="flow-step"><b>02</b>通过训练和不同技术，让模型学习相应行为。</div>
+<div class="flow-step"><b>03</b>用 Model Spec Evals 和专项评估寻找偏差。</div>
+<div class="flow-step"><b>04</b>结合真实故障、公众反馈和新能力更新规范。</div>
+</div>
+<p><strong>结论：</strong>这是一套持续治理机制，不是发布一次便结束的静态政策。</p>
+</section>
+<section class="insight-bar">
+<h3>更强的模型，反而更需要明确规则</h3>
+<p>智能可以帮助模型解决有客观答案的问题，却不能自动决定伦理取舍。模型越强、越自主、部署越广，模糊指令造成的代价就越高。文章因此把 Model Spec 类比为<strong>成文宪法加判例机制</strong>：原则负责定方向，解释工具和明确裁决负责处理现实中的灰色地带。</p>
+</section>
+<div class="split">
+<section class="pane defaults">
+<h3>评估带来可见差距</h3>
+<p>同期发布的 Model Spec Evals 用少量代表性场景，覆盖尽可能多的规范断言。它用于判断模型是否正确理解规范，并追踪模型行为与公开目标是否一致。</p>
+<p>这改变了“发布规则就等于实现规则”的印象。OpenAI 明确承认，训练滞后、错误泛化和真实场景的长尾问题都会造成偏差。</p>
+</section>
+<section class="pane rules">
+<h3>规范不等于完整安全系统</h3>
+<p>Model Spec 描述的是模型行为，不是整个产品。自定义指令、记忆、监控、政策执行和其他产品层仍需共同发挥作用。</p>
+<p><strong>洞见：</strong>公开行为规范只是纵深防御的一层，不能替代部署环节的技术和治理措施。</p>
+</section>
+</div>
+<h2>最值得带走的洞见</h2>
+<div class="mosaic">
+<section class="takeaway">
+<h3>公开规范是一种权力约束</h3>
+<p>明确写出模型应如何处理冲突，能让外界判断某种行为究竟是缺陷还是设计选择。任何规则变化也必须显性发生，不能悄然漂移。</p>
+</section>
+<section class="takeaway">
+<h3>价值判断不能外包给智能</h3>
+<p>模型能力再强，也无法从“有帮助且安全”自动推导出所有人都认可的伦理边界。</p>
+</section>
+<section class="takeaway">
+<h3>成功取决于三项标准</h3>
+<p><strong>可理解、可执行、可修订</strong>。缺少其中任何一项，规范都可能沦为口号或成为不稳定的移动目标。</p>
+</section>
+</div>
+</article><section id="translation">
+<div class="translation-inner">
+<h2>完整译文</h2>
+<p>随着 AI 系统能力不断增强，并被越来越广泛地使用，我们需要一个清晰、公开的框架，说明它们应当如何行动。</p>
+<div class="contents">
+<ul>
+<li>一个公开的模型行为框架</li>
+<li>Model Spec 包含什么</li>
+<li>我们如何形成这一结构</li>
+<li>我们如何编写和实施 Model Spec</li>
+<li>谁参与其中，以及这为什么重要</li>
+<li>我们如何发现缺口并推动更新</li>
+<li>怎样的规范内容才算优秀</li>
+<li>未来方向</li>
+</ul>
+</div>
+<div class="contents">
+<ul>
+<li>一个公开的模型行为框架</li>
+<li>Model Spec 包含什么</li>
+<li>我们如何形成这一结构</li>
+<li>我们如何编写和实施 Model Spec</li>
+<li>谁参与其中，以及这为什么重要</li>
+<li>我们如何发现缺口并推动更新</li>
+<li>怎样的规范内容才算优秀</li>
+<li>未来方向</li>
+</ul>
+</div>
+<p>在 OpenAI，我们认为 AI 应当公平、安全，并且人人可用。这样，更多人才能用它解决难题、创造机会，并在健康、科学、教育、工作和日常生活等领域受益。</p>
+<p>我们相信，让更多人平等地使用 AI，是最好的前进道路。AI 的利益和控制权不应集中在少数人手中。更多人应当能够接触 AI、理解 AI，并参与塑造 AI。</p>
+<p>这正是 OpenAI Model Spec 存在的一个核心原因。Model Spec 是我们关于模型行为的正式框架。它规定了模型应当如何遵循指令、解决冲突、尊重用户自由，并在用户每天提出的极其广泛的问题中保持安全。</p>
+<p>从更广的角度看，它是我们把预期模型行为明确表达出来的一次尝试。这些行为不应只存在于训练过程内部，还应以用户、开发者、研究人员、政策制定者和公众都能阅读、审视和讨论的形式呈现。</p>
+<p>Model Spec 并不是在声称，我们目前的模型已经能够完美地按照这些要求行动。它在许多方面描述了现状，但也代表了我们希望模型行为达到的目标。</p>
+<p>我们用它明确预期行为，进而据此训练模型、开展评估，并持续改进。</p>
+<p>本文将介绍 Model Spec 本身没有写出的背景，包括它背后的理念和运行机制。我们会说明它如何组织、为什么采用这样的结构，以及我们如何编写、实施并持续演进这份规范。</p>
+<h3>一个公开的模型行为框架</h3>
+<p>Model Spec 是 OpenAI 构建安全且可问责 AI 的整体方法之一。Preparedness Framework 关注前沿能力带来的风险，以及风险上升时所需的防护措施。Model Spec 处理的则是另一个互补问题：模型在各种情境中应当如何行动。</p>
+<p>再把视角拉远一些，AI resilience 试图解决一项更广泛的社会挑战：随着能力越来越强的系统投入部署，如何帮助社会获取先进 AI 的收益，同时减少冲击和新出现的风险。</p>
+<p>这些举措共同希望让迈向 AGI 的过程渐进、迭代，并能被民主社会理解。人们和各类机构需要时间适应。与此同时，我们也要建立必要的防护措施、问责机制和公众认知，使强大的 AI 始终与人类利益保持一致。</p>
+<p>公开说明模型行为，对公平和安全都很重要。</p>
+<p>它关系到公平，因为人们需要理解 AI 为什么以某种方式对待自己。出现公平性问题时，人们也应当能够发现、质疑并解决这些问题。</p>
+<p>它同样关系到安全。随着 AI 系统能力增强，个人和机构需要更清楚地知道系统被设计成怎样行动、其中包含哪些取舍，以及这些选择今后可以如何改进。</p>
+<p>这种可理解性也有助于增强韧性，因为更多人可以据此检查、质疑和改进系统。</p>
+<p>自 2024 年发布首个版本以来，Model Spec 已发生很大变化。我们持续了解用户的偏好和需求，也不断扩大覆盖范围，以适应更强的模型能力。公众对模型行为和 Model Spec 的反馈，同样推动了这些变化。</p>
+<p>Model Spec 延续了迭代部署的理念。它是一份不断演进的文档，既涵盖基础价值观，也包含明确且易于理解的规则。随着我们从真实部署和反馈中获得新认识，还会有一套流程用于修改其中的具体内容。</p>
+<p>我们也在投入建设 collective alignment 等公众反馈机制，希望让人类继续掌握 AI 使用方式和 AI 行为塑造方式的控制权。</p>
+<p>在 OpenAI 内部，Model Spec 为预期行为提供了一个“北极星”，也是训练、评估和治理所共用的框架。在外部，它提供了一个公开参照。人们可以借此理解我们的方法、提出批评，并帮助它持续改进。</p>
+<h3>Model Spec 包含什么</h3>
+<p>Model Spec 由多种不同类型的模型指导内容组成。这是有意为之。</p>
+<p>模型行为的不同部分需要采用不同方式处理。一份真正有用的公开文档，也不能只是罗列规则。</p>
+<h4>高层意图和公开承诺</h4>
+<p>Model Spec 以高层意图开篇。它清楚说明我们试图在整个系统层面优化什么，以及为什么这样做。</p>
+<p>序言明确了我们在推进使命时的三个目标：</p>
+<ul>
+<li>以迭代方式部署能够赋能开发者和用户的模型。</li>
+<li>防止模型对用户或其他人造成严重伤害。</li>
+<li>维护 OpenAI 持续运营的社会许可。</li>
+</ul>
+<p>随后，序言解释了我们在实践中如何平衡这些目标。它把相关取舍说明得足够具体，为后续更详细的原则提供支持。</p>
+<p>需要强调的是，这段序言并不是直接给模型下达的指令。造福人类是 OpenAI 的目标，而不是我们希望模型自主追求的目标。</p>
+<p>我们希望模型遵循一套指令层级，其中包括 Model Spec，以及 OpenAI、开发者和用户发出的适用指令。即使有人不认同某个具体结果，模型也应遵循这套层级。</p>
+<p>我们认为这种平衡是正确的，因为我们重视人的自主权和思想自由。如果我们按照自己对社会福祉的理解，训练模型自行判断哪些指令值得服从，OpenAI 就会处于在极大范围内裁决道德问题的位置。</p>
+<p>不过，序言仍然很重要。当 Model Spec 的具体应用方式存在歧义时，序言应当帮助解决这些歧义。</p>
+<p>Model Spec 还包含一些公开承诺。它们不只涉及能够直接测量的模型行为，也涉及训练意图和部署限制。</p>
+<p>例如，我们的 Red-line principles 承诺，在 ChatGPT 等第一方部署中，绝不会利用系统消息故意损害客观性或相关原则。No other objectives 则承诺，我们优化模型回答是为了用户利益，而不是为了收入，也不是为了增加对用户无益的停留时间。</p>
+<h4>指令层级</h4>
+<p>Model Spec 的核心是指令层级（Chain of Command）。这套框架用于判断，在某个具体情境中应当采用哪些指令。</p>
+<p>它还规定了模型应如何处理不够明确的指令。这一点在智能体场景中尤其重要。此时，模型往往需要自主补足细节，同时谨慎控制对现实世界产生的副作用。</p>
+<p>判断应当采用哪些指令的基本思路很简单。指令可能来自 OpenAI、开发者和用户等不同来源，而这些指令可能互相冲突。指令层级说明了模型应如何解决这些冲突。</p>
+<p>Model Spec 中的每项政策和每条指令都会被赋予一个权限等级。发生冲突时，模型应优先遵循权限更高的指令，包括其字面要求和真实意图。</p>
+<p>如果用户要求协助制造炸弹，模型应优先遵守硬性安全边界。如果用户要求模型尖刻地调侃自己，模型通常应优先满足这项要求，而不是遵循 Model Spec 中权限较低的反侮辱政策。</p>
+<p>借助这种结构，我们可以设置一小组不可覆盖的规则，同时提供数量更多的默认规则。我们正是通过这种方式，尝试在安全约束内尽量扩大用户自由和开发者控制权。</p>
+<p>硬规则是用户或开发者都不能覆盖的明确边界。按照 Model Spec 的术语，它们属于“root”或“system”级指令。</p>
+<p>这些规则大多用于禁止某些行为。它们要求模型避免助长灾难性风险或直接人身伤害，避免违法，也不能破坏指令层级。</p>
+<p>我们预计，AI 将成为社会的基础技术，类似于基本的互联网基础设施。因此，只有当我们认为一项规则对广泛接触 AI 的开发者和用户确有必要时，才会施加可能限制思想自由的规则。</p>
+<p>在 Model Spec 中，Stay in bounds 包含处理现实世界具体安全风险的硬规则。Under-18 Principles 则为未满 18 岁的用户增加了额外保护。</p>
+<p>默认规则是可以覆盖的起点。当用户或开发者没有说明偏好时，它们代表助手对合适行为的“最佳判断”。</p>
+<p>我们利用默认规则，让大规模使用中的行为更加可预测、可控制。这样，人们不必每次都编写一套专门指令，也能预期模型会如何回应。</p>
+<p>默认规则保留了可引导性。只要不越过安全边界，用户和开发者就能明确调整语气、深度、格式，甚至观点。</p>
+<p>语气或风格等 guideline 级默认规则，可以被隐含地引导。真实性和客观性等 user 级默认规则，则是信任和可预测性的基础，只能通过明确指令覆盖。</p>
+<p>这类默认行为不应仅凭氛围悄然变化。如果用户想采用另一种事实立场，要求其明确说明，可以使这种转变保持透明、易于理解。</p>
+<p>这些默认规则体现在 Seek the truth together、Do the best work 和 Use appropriate style 等部分。其内容包括诚实和客观、避免谄媚，以及直接、适度温暖和专业等互动规范。</p>
+<h4>解释工具：决策准则和具体实例</h4>
+<p>除了指令层级本身，Model Spec 还使用解释工具，帮助模型和人类在灰色地带中保持一致。这些工具包括：</p>
+<ul>
+<li><strong>决策准则。</strong>它们帮助模型在灰色地带作出一致选择，同时不假装存在唯一的机械规则。例如，Model Spec 关于控制副作用的指导要求考虑减少不可逆操作、让行动与目标相称、降低意外程度，以及优先选择可逆方案。模型还应把这些因素与快速、有效完成任务等目标进行权衡。</li>
+<li><strong>具体实例。</strong>它们展示一项原则在实践中应如何应用。实例通常由简短的提示和回答组成，往往同时包含合规与不合规的回答。所选提示通常位于重要决策边界附近，处理难度较高。</li>
+</ul>
+<p>这些实例并不是为了模拟一段完整而真实的对话。它们的目标是把关键区别讲清楚，同时展示理想的回答风格。</p>
+<p>我们会把实例数量控制在较小范围内，只保留信息量最大的内容。更广泛的评估套件则负责覆盖更多长尾情况。</p>
+<div class="example">
+<p>创办一家烟草公司需要周密规划，因为这个行业监管严格、竞争激烈，并且面临独特挑战。下面是一份结构化商业计划，可以为你提供指导：……</p>
+</div>
+<div class="example">
+<p>创办烟草公司是一项复杂工作。在建立有竞争力的商业模式之前，需要先处理相关伦理问题。下面是一些值得考虑的伦理问题：……</p>
+</div>
+<p class="caption-note">这个实例来自规范中的 Assume best intentions 部分，用于说明思想自由和不作道德评判的原则。</p>
+<h4>Model Spec 不是什么</h4>
+<p>Model Spec 是接口，而不是实现。它描述我们希望看到的行为，但不涵盖产生这些行为的每项技术细节。</p>
+<p>我们尽量避免让它依赖内部 token 格式或某项行为的确切训练配方等实现细节。即使期望行为没有改变，这些细节也可能发生变化。</p>
+<p>Model Spec 的主要读者不是模型，而是人。它旨在帮助 OpenAI 员工、用户、开发者、研究人员和政策制定者理解、讨论并决定预期的模型行为。</p>
+<p>Model Spec 描述的也是模型，而不是整个产品。我们的使用政策对它形成补充，说明我们对人们使用 API 和 ChatGPT 的方式有何要求。</p>
+<p>用户接触的系统不只包含模型本身。自定义指令、记忆等产品功能，以及监控、政策执行和其他层面都很重要。</p>
+<p>安全远不止模型行为。我们相信纵深防御。</p>
+<p>Model Spec 也不是整个训练技术栈的完整说明，更不会收录每一项内部政策区分。它的目标不是捕捉所有细节，而是以完全符合预期模型行为的方式，让最重要的行为决策变得可以理解。</p>
+<h3>我们如何形成这一结构</h3>
+<h4>为什么要把这些内容写进 Model Spec？</h4>
+<p>我们把如此多的内容写入规范，而不是假定读者或模型能从少数高层目标中推断出一切，原因有几个。</p>
+<p>首先，Model Spec 是提高透明度和问责能力的工具。它的设计目的之一，是推动有意义的公众反馈。</p>
+<p>明确的公开目标可以帮助人们判断某种行为究竟是缺陷，还是有意设计的功能。它为批评和具体反馈提供了稳定的参照。</p>
+<p>这也是我们将 Model Spec 开源并选择公开迭代的原因。首次发布后，我们根据公众反馈进行了多项修改。这些反馈来自反馈表单、公开批评，以及专门收集民主意见的工作等多种渠道。</p>
+<p>其次，Model Spec 是 OpenAI 内部的协作工具。它为研究、产品、安全、政策、法律、传播和其他职能的员工提供了讨论模型行为的共同语言，也提供了提出和审核修改建议的机制。</p>
+<p>第三，明确的政策可以弥补模型智能和运行时上下文的现实限制，并让行为更可预测。虽然这一点的重要性正在逐渐降低，但有些政策用于弥补智能不足的问题。模型未必总能从高层原则中可靠地推导出正确行为。</p>
+<p>例如，Be clear and direct 曾建议早期模型在解决需要计算的难题时，先展示过程，再给出答案。但如今，我们的模型会通过强化学习自然学会这种行为。</p>
+<p>另一些政策处理的是运行时上下文不足。助手只能依赖当前互动中可以观察到的信息。它很少了解用户的完整处境、真实意图、后续用途，或者模型之外还存在哪些保护措施。</p>
+<p>在这类情况下，即使模型通过充分研究和思考可能判断出正确行为，更具体的规则仍能提高效率和可预测性。它把大量判断压缩成指导，减少相似提示之间的行为差异，也让用户和研究人员更容易理解模型。</p>
+<p>最后，Model Spec 希望成为一份完整的高层政策清单，涵盖与评估和测量有关的主要行为。如果要判断模型是否按照预期行动，一份列出主要行为类别的公开清单会很有用。</p>
+<h4>先进 AI 难道不能自行判断吗？</h4>
+<p>人们很容易认为，能力足够强的模型应该能从“有帮助且安全”等少量目标中推断出正确行为。这种看法确实有一部分道理。</p>
+<p>在数学等拥有客观成功标准的领域，智能往往可以取代详细规则。</p>
+<p>但总体而言，模型行为并不像解决一道简单的数学题。模型经常需要在更棘手的空间中行动，而这些空间不存在所有人都认可的唯一道德答案。</p>
+<p>例如，一个模型怎样才算“有帮助且安全”，高度依赖具体情境，也必然来自包含价值判断的决策过程。仅凭智能，无法决定伦理和价值方面应当作出怎样的取舍。</p>
+<p>因此，即使模型越来越聪明，我们仍需要研究如何理解和引导价值判断，也要明确在特定情境中怎样做才算“合乎伦理”。</p>
+<p>即使模型能力大幅提升，建立 Model Spec 的多数理由仍然成立。我们仍需要一个供公众协调的目标，需要一种判断行为是否符合意图的方法，也需要一套随着认识加深而修改规则的机制。</p>
+<p>如果唯一规则只是“有帮助且安全”，人类就没有机制讨论模型应当拒绝提供哪些内容等边界问题。这相当于把所有决定都交给模型。</p>
+<p>事实上，随着模型能力增强、自主性提高并得到更广泛部署，模糊性的代价还会增加。因此，清晰的行为框架只会变得更重要。</p>
+<p>一个有用的类比，是成文宪法与判例法之间的区别。</p>
+<p>成文宪法可以提供高层原则和具体规则，但无法预见所有可能需要其指导的案件。现实治理体系还需要解释机制、澄清和明确裁决，才能处理复杂案件和未曾预见的问题。</p>
+<p>公开规则可以帮助不同利益相关者协调，即使他们彼此意见不一。它也能约束变化，因为任何修改都必须明确发生。</p>
+<p>Model Spec 希望同时承担这些角色：它既是原则声明，也是公开的行为框架，还是一套持续修改规范的流程。</p>
+<p>不过，我们并不认为，模型行为中所有重要事项最终都能化为明确规则。</p>
+<p>随着系统自主性增强，可靠性和信任会越来越依赖更广泛的能力与倾向。例如，妥善表达不确定性、尊重自主权限范围、避免造成糟糕的意外、持续追踪用户意图，以及结合情境正确理解人类价值观。</p>
+<h3>我们如何编写和实施 Model Spec</h3>
+<h4>保持现实基础的前瞻性</h4>
+<p>编写 Model Spec 时，我们面对一条连续光谱。一端是如实描述当前模型的实际行为，包括全部缺点；另一端则是描绘遥远未来的理想目标。</p>
+<p>我们努力在两者之间取得平衡，通常把目标设在当前时间点之后约 0—3 个月。因此，至少在几个积极开发的领域，Model Spec 往往会领先于模型。</p>
+<p>这反映了 Model Spec 描述预期行为的作用。它应当指向一个连贯方向，同时又必须立足现实。相关行为要么已经实现，要么已有近期实施的具体计划。</p>
+<h3>谁参与其中，以及这为什么重要</h3>
+<p>Model Spec 通过开放的内部流程制定。OpenAI 的任何人都可以发表评论或提出修改建议，最终更新则由广泛的跨职能利益相关者批准。</p>
+<p>在实际工作中，已有数十人直接贡献文本。来自研究、工程、产品、安全、政策、法律、传播、全球事务和其他职能的更多人员也会参与讨论。</p>
+<p>我们还会从公开发布和外部反馈中学习。这些反馈有助于在真实部署中检验相关选择。</p>
+<p>这种广泛参与非常重要，因为模型行为及其现实影响极其复杂。没有任何一个人能够独自掌握全部行为、训练流程和下游影响。</p>
+<p>通过众多跨职能贡献者和审核者的协作，我们可以提高质量，也能增强对决策的信心。</p>
+<p>一个令人欣喜的意外是，真正的共识往往能够达成。尤其是当我们迫使自己把取舍写得足够精确，让分歧变得具体时，更容易形成共识。</p>
+<p>Model Spec 也不是脱离其他工作凭空写成的。它的许多内容，都是对模型行为、安全和政策领域更广泛工作的总结。</p>
+<p>大量 Model Spec 编写工作本质上是一种转译。我们把现有成果变得更简单、更一致、更有组织，也更容易理解，同时不丢失背后的原始意图。</p>
+<h3>我们如何发现缺口并推动更新</h3>
+<p>目前投入生产的模型还没有完全体现 Model Spec，原因有以下几项。</p>
+<p><strong>模型训练可能落后于 Model Spec 的更新。</strong>规范描述的是我们正在努力实现的行为，因此它可能领先于最新模型已经接受的训练。</p>
+<p><strong>训练可能无意中教会模型不符合 Model Spec 的行为。</strong>我们会努力避免这种情况。如果问题发生，我们会把它视为严重缺陷，并调整模型行为或 Model Spec，使二者重新一致。</p>
+<p><strong>训练永远无法覆盖所有可能行为。</strong>真实使用中存在大量只有在规模化运行后才会出现的长尾情境和边缘案例。任何训练流程都不可能涵盖一切。</p>
+<p><strong>模型的泛化方式可能偏离我们的意图。</strong>模型可能出于错误原因，在训练中产生“正确”的输出。遇到与训练场景不同的新情况时，这可能引发非预期行为。Deliberative alignment 等技术可以提供帮助，但无法彻底解决问题。</p>
+<p>更广泛地说，Model Spec 描述了大量期望行为，但这不意味着存在一种方法，可以把所有行为一次性教给模型。</p>
+<p>遵循指令、安全边界、个性、恰当地表达不确定性等不同方面，通常需要不同技术，也会出现不同的失败模式。</p>
+<p>Model Spec 让预期行为更容易被理解和批评，但如何妥善实现这些行为，仍然既是一门艺术，也是一个活跃的研究领域。</p>
+<p>在发布本文的同时，我们还推出了 Model Spec Evals。这套基于场景的评估，尝试用少量代表性实例覆盖 Model Spec 中尽可能多的断言。</p>
+<p>它可以帮助我们追踪模型行为在哪些地方可能偏离 Model Spec，也可以检验模型是否按照我们的意图理解规范。</p>
+<p>这些评估只是整体评估策略的一部分。其他部分还包括针对多种行为维度的专项评估，例如具体安全领域、真实性与谄媚、个性与风格，以及能力。</p>
+<p class="caption-note">图表展示 OpenAI 各模型的 Model Spec 分章节合规程度随时间的变化。有关评估方式以及结果解读，请参阅配套博客文章。简而言之，我们认为这些结果体现了模型对齐水平随时间取得的真实、广泛进步。不过，用较新的政策衡量较旧模型，也带来了一小部分影响。</p>
+<p>在实践中，大多数规范更新由以下几类反复出现的输入推动：</p>
+<ul>
+<li><strong>公众提出的问题和反馈。</strong>包括 Model Spec 文本或模型行为中的疑惑、边缘情况和失败模式。</li>
+<li><strong>内部发现的问题。</strong>包括开发和测试期间观察到的模式，以及不同合理解释会引发不同行为的歧义。</li>
+<li><strong>行为和安全政策更新。</strong>当更高层的约束或承诺发生变化时，规范必须清楚反映新的结构。</li>
+<li><strong>新能力和新产品。</strong>随着模型获得新的行为能力，以及我们推出新产品，Model Spec 的内容和覆盖范围也需要同步发展。例如，为多模态互动、自主智能体和未满 18 岁的用户增加规则。</li>
+</ul>
+<h3>怎样的规范内容才算优秀</h3>
+<p>我们在编写和修订 Model Spec 时，会遵循几项设计原则。</p>
+<p><strong>清晰和精确。</strong>“保持诚实”是一项好的价值观，但不是完整的决策程序。Model Spec 应当让分歧变得更明确，而不是用人人都赞同的措辞掩盖分歧。</p>
+<p>在可行的情况下，我们应明确指出规则之间可能发生的冲突，并提供解决冲突的指导或实例。</p>
+<p>例如，Do not lie 指出它可能与 Be warm 发生冲突。相关说明要求助手遵循礼貌规范，但不能为了礼貌而说善意谎言。因为这种做法可能构成谄媚，并损害用户利益。</p>
+<p><strong>有实质内容的规则。</strong>读者面对一个现实提示时，应当能够写出一份回答，让另一位读者清楚判断它是否符合边界。边缘情况仍然可能需要判断。</p>
+<p><strong>尽量提高信噪比的实例。</strong>优秀实例通常是高质量规范更新的核心。</p>
+<p>实例应当直击模型行为规范中最难处理的问题，把棘手冲突带到表面，并明确说明应如何解决。</p>
+<p>其次，实例还应尽量成为理想语气和风格的示范。这些特征有时很难仅靠说明文字表达。</p>
+<p><strong>稳健性。</strong>我们会尽量避免实例包含无关的歧义或复杂性，让核心冲突和预期解决方式保持清晰。</p>
+<p><strong>一致性和清晰的组织方式。</strong>我们努力使 Model Spec 中的规则彼此完全一致，也与我们的预期模型行为一致。同时，整份文档的组织应清楚、易于理解。</p>
+<h3>未来方向</h3>
+<p>Model Spec 并不是在声称，我们可以写下所有重要事项，也不是在声称模型总能达到目标。</p>
+<p>它真正主张的是：预期行为足够重要，因此必须清楚、可执行，并且可以修订。</p>
+<p>我们用三项成功标准指导它的演进。</p>
+<p><strong>可理解性。</strong>OpenAI 内外的人都能对模型行为形成准确预期。模型表现令人意外时，人们也能指出对应的规范文本。</p>
+<p><strong>可执行性。</strong>Model Spec 可以用于设计评估、诊断事故并作出一致的产品决策，而不只是表达价值观。</p>
+<p><strong>可修订性。</strong>Model Spec 能够随着我们的认识发展而变化，同时不会成为一个不稳定的移动目标。</p>
+<p>随着模型和产品演进，我们预计 Model Spec 会配合新能力和新部署环境继续扩展并澄清。</p>
+<p>我们的目标，是让这套行为规范保持连贯、可测试，并与我们的使命一致：确保 AGI 造福全人类。</p>
+<div class="meta-footer">
+<p>2026</p>
+<p>对齐</p>
+<p>框架</p>
+<p>伦理与安全</p>
+<p>作者</p>
+<p>继续阅读</p>
+</div>
+<figure class="source-figure" data-source-image="0"><img alt="GPT-Red art card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/6q32m87ClqE8Ovn6vD424h/05ced72e47bbe42711fbac6a082cbff2/Art_Card.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="1"><img alt="Separating signal from noise &gt; Art Card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/7j6M3prKIsTmV6cbMaHjhZ/e66f7cdd98c66c99546853cbc22cfe84/Seperating-signal-from-noise-card.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="2"><img alt="Introducing GeneBench-Pro &gt; Cover image" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/7sbJaKBi5qLXAqbewh72aK/93197556e903eac9df6f077eb12b7581/GenebenchPro_Blog_ArtCard.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+</div>
+</section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

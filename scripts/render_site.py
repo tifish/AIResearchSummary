@@ -17,6 +17,7 @@ SOURCE_HOME_URLS = {
     "openai": "https://openai.com/research/index/",
     "cursor": "https://cursor.com/blog/topic/research",
 }
+TRANSLATION_SECTION_RE = re.compile(r"<section\b[^>]*\bid\s*=\s*(['\"])translation\1", re.IGNORECASE)
 
 
 def workspace_root() -> Path:
@@ -75,6 +76,17 @@ def summary_href(record: dict[str, Any], site_dir: Path) -> str:
     if not summary_path.exists():
         return ""
     return f"summaries/{slug}.html"
+
+
+def summary_link_label(record: dict[str, Any], site_dir: Path) -> str:
+    slug = summary_slug(str(record.get("url", "")))
+    if not slug:
+        return "阅读总结"
+    summary_path = site_dir / "summaries" / f"{slug}.html"
+    if not summary_path.exists():
+        return "阅读总结"
+    digest_html = summary_path.read_text(encoding="utf-8")
+    return "总结与译文" if TRANSLATION_SECTION_RE.search(digest_html) else "阅读总结"
 
 
 DIGEST_THEME_HEAD = """  <script id="airs-digest-theme-boot">
@@ -206,6 +218,50 @@ DIGEST_THEME_HEAD = """  <script id="airs-digest-theme-boot">
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>"""
+
+SOURCE_IMAGE_THEME_HEAD = """  <style id="airs-source-image-theme-style">
+    .source-figure .source-image-dark {
+      display: none;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .source-figure .source-image-light {
+        display: none;
+      }
+      :root:not([data-theme="light"]) .source-figure .source-image-dark {
+        display: block;
+      }
+    }
+    :root[data-theme="dark"] .source-figure .source-image-light {
+      display: none;
+    }
+    :root[data-theme="dark"] .source-figure .source-image-dark {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-light {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-dark {
+      display: none;
+    }
   </style>"""
 
 DIGEST_THEME_SCRIPT = """  <script id="airs-digest-theme-script">
@@ -235,6 +291,41 @@ DIGEST_THEME_SCRIPT = """  <script id="airs-digest-theme-script">
   </script>"""
 
 
+def inject_explicit_light_theme(html: str) -> str:
+    """Snapshot page-specific light variables for explicit light mode.
+
+    Generated pages commonly use an unguarded dark-media ``:root`` block. On a
+    dark OS, that block still matches after the user selects light mode. An
+    explicit, higher-specificity light snapshot prevents mixed light/dark pages.
+    """
+    if re.search(r'(?:html|:root)\s*\[\s*data-theme\s*=\s*["\']light["\']\s*\]', html, re.IGNORECASE):
+        return html
+
+    style_pattern = re.compile(r'(<style\b[^>]*>)(.*?)(</style\s*>)', re.IGNORECASE | re.DOTALL)
+    for style_match in style_pattern.finditer(html):
+        if "airs-digest-theme-style" in style_match.group(1):
+            continue
+        css = style_match.group(2)
+        light_region = css.split("@media", 1)[0]
+        root_match = re.search(r':root\s*\{([^{}]*)\}', light_region, re.IGNORECASE | re.DOTALL)
+        if not root_match:
+            continue
+        declarations = re.sub(
+            r'\bcolor-scheme\s*:[^;]+;?', "", root_match.group(1), flags=re.IGNORECASE
+        ).strip()
+        if not declarations:
+            continue
+        light_override = (
+            '\n:root[data-theme="light"] {\n'
+            '  color-scheme: light;\n'
+            f'{declarations}\n'
+            '}\n'
+        )
+        insert_at = style_match.start(3)
+        return html[:insert_at] + light_override + html[insert_at:]
+    return html
+
+
 def inject_digest_theme(html: str) -> str:
     if "airs-digest-theme-style" not in html:
         head_match = re.search(r"</head\s*>", html, re.IGNORECASE)
@@ -242,6 +333,12 @@ def inject_digest_theme(html: str) -> str:
             html = html[: head_match.start()] + DIGEST_THEME_HEAD + "\n" + html[head_match.start() :]
         else:
             html = DIGEST_THEME_HEAD + "\n" + html
+    if "source-image-light" in html and "airs-source-image-theme-style" not in html:
+        head_match = re.search(r"</head\s*>", html, re.IGNORECASE)
+        if head_match:
+            html = html[: head_match.start()] + SOURCE_IMAGE_THEME_HEAD + "\n" + html[head_match.start() :]
+        else:
+            html = SOURCE_IMAGE_THEME_HEAD + "\n" + html
     if "airs-digest-theme-script" in html:
         return html
     body_match = re.search(r"</body\s*>", html, re.IGNORECASE)
@@ -271,6 +368,7 @@ def inject_nav(html: str, url: str) -> str:
 
 
 def prepare_digest_html(html: str, url: str) -> str:
+    html = inject_explicit_light_theme(html)
     return inject_digest_theme(inject_nav(html, url))
 
 
@@ -322,8 +420,9 @@ def render_article(record: dict[str, Any], site_dir: Path) -> str:
     else:
         title_html = f"<h2>{esc(title)}</h2>"
     local_summary_href = summary_href(record, site_dir)
+    local_summary_label = summary_link_label(record, site_dir)
     summary_link = (
-        f'<a class="source-link summary-link" href="{esc(local_summary_href)}" target="_blank" rel="noopener noreferrer">阅读总结</a>'
+        f'<a class="source-link summary-link" href="{esc(local_summary_href)}" target="_blank" rel="noopener noreferrer">{esc(local_summary_label)}</a>'
         if local_summary_href
         else ""
     )

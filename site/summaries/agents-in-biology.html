@@ -1,276 +1,328 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>为生物学中的智能体铺平道路</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>为生物学智能体铺路</title>
 <style>
 :root {
-  --bg: #f7f8fb;
+  color-scheme: light dark;
+  --bg: #f4f7fb;
+  --card: #ffffff;
+  --surface2: #edf2f8;
+  --translation-bg: #fffdf9;
+  --data-bg: #e5f7ff;
+  --risk-bg: #fff0ea;
+  --opportunity-bg: #eaf8ee;
+  --conclusion-bg: #f1eaff;
+  --hero1: #10263e;
+  --hero2: #263f63;
   --ink: #17202a;
-  --muted: #5f6b7a;
-  --line: #dce2ea;
-  --panel: #ffffff;
-  --hero-bg: #17202a;
-  --hero-ink: #f8fafc;
-  --soft-data: #e9f5ff;
-  --soft-risk: #fff0f0;
-  --soft-opportunity: #eef8ee;
-  --soft-conclusion: #fff7dc;
-  --soft-neutral: #eef1f6;
-  --accent-data: #1677b8;
-  --accent-risk: #d94a3a;
-  --accent-opportunity: #2e8b57;
-  --accent-conclusion: #b7791f;
-  --accent-violet: #7a5cff;
-  --shadow: 0 18px 45px rgba(23, 32, 42, .08);
+  --muted: #637083;
+  --line: #ccd6e3;
+  --inverse: #f7fbff;
+  --accent: #0085b5;
+  --accent2: #db5b2a;
+  --accent3: #17864b;
+  --accent4: #7952c7;
+  --hl: #d9f3ff;
+  --hl2: #ffe6a8;
+  --shadow: rgba(20, 38, 60, 0.12);
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0e1217;
-    --ink: #e8edf3;
-    --muted: #a9b4c1;
-    --line: #2b3542;
-    --panel: #151b23;
-    --hero-bg: #080b10;
-    --hero-ink: #f1f5f9;
-    --soft-data: #102638;
-    --soft-risk: #311716;
-    --soft-opportunity: #122719;
-    --soft-conclusion: #302410;
-    --soft-neutral: #1b232e;
-    --accent-data: #55b8ff;
-    --accent-risk: #ff7668;
-    --accent-opportunity: #65d58e;
-    --accent-conclusion: #f5bd47;
-    --accent-violet: #a99bff;
-    --shadow: 0 18px 45px rgba(0, 0, 0, .32);
+    --bg: #0d131b;
+    --card: #151e29;
+    --surface2: #1b2734;
+    --translation-bg: #131a22;
+    --data-bg: #102d39;
+    --risk-bg: #342018;
+    --opportunity-bg: #132d21;
+    --conclusion-bg: #281e3d;
+    --hero1: #091827;
+    --hero2: #172c47;
+    --ink: #e6edf5;
+    --muted: #aeb9c7;
+    --line: #344455;
+    --inverse: #edf7ff;
+    --accent: #41c7ef;
+    --accent2: #ff8a5d;
+    --accent3: #55d78c;
+    --accent4: #b99aff;
+    --hl: #164358;
+    --hl2: #604b19;
+    --shadow: rgba(0, 0, 0, 0.32);
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0e1217;
-  --ink: #e8edf3;
-  --muted: #a9b4c1;
-  --line: #2b3542;
-  --panel: #151b23;
-  --hero-bg: #080b10;
-  --hero-ink: #f1f5f9;
-  --soft-data: #102638;
-  --soft-risk: #311716;
-  --soft-opportunity: #122719;
-  --soft-conclusion: #302410;
-  --soft-neutral: #1b232e;
-  --accent-data: #55b8ff;
-  --accent-risk: #ff7668;
-  --accent-opportunity: #65d58e;
-  --accent-conclusion: #f5bd47;
-  --accent-violet: #a99bff;
-  --shadow: 0 18px 45px rgba(0, 0, 0, .32);
+  --bg: #0d131b;
+  --card: #151e29;
+  --surface2: #1b2734;
+  --translation-bg: #131a22;
+  --data-bg: #102d39;
+  --risk-bg: #342018;
+  --opportunity-bg: #132d21;
+  --conclusion-bg: #281e3d;
+  --hero1: #091827;
+  --hero2: #172c47;
+  --ink: #e6edf5;
+  --muted: #aeb9c7;
+  --line: #344455;
+  --inverse: #edf7ff;
+  --accent: #41c7ef;
+  --accent2: #ff8a5d;
+  --accent3: #55d78c;
+  --accent4: #b99aff;
+  --hl: #164358;
+  --hl2: #604b19;
+  --shadow: rgba(0, 0, 0, 0.32);
 }
 * { box-sizing: border-box; }
 body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", sans-serif;
-  line-height: 1.72;
+  font-family: Inter, "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  line-height: 1.75;
 }
-main { overflow: hidden; }
+main { width: min(1120px, calc(100% - 32px)); margin: 24px auto 72px; }
 .hero {
-  background: var(--hero-bg);
-  color: var(--hero-ink);
-  padding: 64px 6vw 54px;
+  padding: clamp(32px, 7vw, 76px);
+  border-radius: 30px;
+  color: var(--inverse);
+  background: linear-gradient(135deg, var(--hero1), var(--hero2));
+  box-shadow: 0 18px 48px var(--shadow);
 }
-.hero-inner { max-width: 1120px; margin: 0 auto; }
-.kicker {
-  color: var(--accent-opportunity);
-  font-weight: 700;
-  letter-spacing: .04em;
-  margin-bottom: 18px;
+.eyebrow {
+  margin: 0 0 12px;
+  color: var(--accent);
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
 }
-h1 {
+.hero h1 {
   margin: 0;
-  font-size: clamp(32px, 5vw, 64px);
+  max-width: 850px;
+  font-size: clamp(2.25rem, 6vw, 5rem);
   line-height: 1.08;
-  letter-spacing: 0;
 }
-.original {
-  margin-top: 14px;
+.original-title {
+  margin: 14px 0 30px;
   color: var(--muted);
-  font-size: 18px;
+  font-size: clamp(1rem, 2vw, 1.25rem);
 }
-.lede {
-  margin-top: 28px;
+.dek {
   max-width: 780px;
-  font-size: 22px;
-  color: var(--hero-ink);
+  margin: 0;
+  font-size: clamp(1.18rem, 2.5vw, 1.65rem);
+  line-height: 1.55;
 }
-.container { max-width: 1120px; margin: 0 auto; padding: 0 6vw; }
-.metric-band {
+.summary-label {
+  display: inline-block;
+  margin-right: .55em;
+  color: var(--accent3);
+  font-weight: 850;
+}
+.overview {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1px;
-  margin: -24px auto 46px;
-  max-width: 1120px;
-  background: var(--line);
-  box-shadow: var(--shadow);
+  grid-template-columns: .8fr 1.2fr;
+  gap: 28px;
+  margin: 34px 0;
+  padding: 34px;
+  border-left: 8px solid var(--accent4);
+  background: var(--conclusion-bg);
 }
-.metric {
-  background: var(--panel);
-  padding: 24px;
-  min-height: 142px;
+.overview h2 { margin: 0; font-size: clamp(1.7rem, 3vw, 2.5rem); line-height: 1.2; }
+.overview p { margin: 0; font-size: 1.08rem; }
+.data-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  overflow: hidden;
+  margin: 34px 0;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--data-bg);
 }
+.metric { padding: 26px 20px; border-right: 1px solid var(--line); }
+.metric:last-child { border-right: 0; }
 .metric strong {
   display: block;
-  font-size: 34px;
-  color: var(--accent-data);
-  line-height: 1;
-  margin-bottom: 10px;
+  color: var(--accent);
+  font-size: clamp(1.7rem, 4vw, 2.7rem);
+  line-height: 1.1;
 }
-.metric span { color: var(--muted); }
+.metric span { display: block; margin-top: 8px; color: var(--muted); }
 .split {
   display: grid;
-  grid-template-columns: 1.05fr .95fr;
-  gap: 34px;
-  align-items: stretch;
-  margin: 30px 0 54px;
-}
-.explain {
-  background: var(--panel);
-  border-left: 6px solid var(--accent-data);
-  padding: 30px;
-  box-shadow: var(--shadow);
-}
-.explain h2, .panel h2, .flow h2, .table-wrap h2, .takeaways h2 {
-  margin: 0 0 16px;
-  font-size: 26px;
-  line-height: 1.25;
-}
-.risk-box {
-  background: var(--soft-risk);
-  border: 1px solid var(--line);
-  padding: 30px;
-}
-.risk-box h3 {
-  color: var(--accent-risk);
-  margin: 0 0 12px;
-  font-size: 22px;
-}
-.insight {
-  margin: 0 0 54px;
-  padding: 26px 30px;
-  background: var(--soft-conclusion);
-  border-top: 4px solid var(--accent-conclusion);
-  font-size: 21px;
-  font-weight: 700;
-}
-.flow {
-  background: var(--soft-neutral);
-  padding: 42px 6vw;
-  margin: 0 -6vw 56px;
-}
-.flow-inner { max-width: 1120px; margin: 0 auto; }
-.steps {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 18px;
-  margin-top: 24px;
-}
-.step {
-  background: var(--panel);
-  padding: 22px;
-  border-top: 5px solid var(--accent-violet);
-}
-.step b {
-  display: inline-grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--accent-violet);
-  color: var(--hero-ink);
-  margin-bottom: 14px;
-}
-.table-wrap {
-  margin: 0 0 56px;
-  background: var(--panel);
-  padding: 30px;
-  box-shadow: var(--shadow);
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 16px;
-}
-th, td {
-  text-align: left;
-  vertical-align: top;
-  padding: 16px;
-  border-bottom: 1px solid var(--line);
-}
-th {
-  color: var(--accent-data);
-  background: var(--soft-data);
-}
-td:first-child { font-weight: 700; }
-.columns {
-  display: grid;
-  grid-template-columns: .9fr 1.1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 24px;
-  margin-bottom: 56px;
+  margin: 34px 0;
 }
-.panel {
-  padding: 30px;
-  border: 1px solid var(--line);
-  background: var(--panel);
+.panel { padding: 30px; border-radius: 18px; }
+.panel h2 { margin-top: 0; }
+.risk { background: var(--risk-bg); border-top: 6px solid var(--accent2); }
+.opportunity { background: var(--opportunity-bg); border-top: 6px solid var(--accent3); }
+.timeline {
+  margin: 34px 0;
+  padding: 36px;
+  background: var(--card);
+  box-shadow: 0 10px 30px var(--shadow);
 }
-.panel.opportunity {
-  background: var(--soft-opportunity);
-  border-color: var(--accent-opportunity);
+.timeline h2 { margin-top: 0; }
+.step {
+  position: relative;
+  padding: 6px 0 26px 42px;
+  border-left: 3px solid var(--accent);
 }
-.panel.conclusion {
-  background: var(--soft-conclusion);
-  border-color: var(--accent-conclusion);
+.step:last-child { padding-bottom: 0; border-left-color: var(--accent4); }
+.step::before {
+  position: absolute;
+  left: -12px;
+  top: 8px;
+  width: 21px;
+  height: 21px;
+  border-radius: 50%;
+  background: var(--accent);
+  content: "";
 }
-.badge {
-  display: inline-block;
-  color: var(--hero-ink);
-  background: var(--accent-risk);
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 13px;
+.step:last-child::before { background: var(--accent4); }
+.step h3 { margin: 0 0 6px; }
+.step p { margin: 0; }
+.insight-band {
+  margin: 34px 0;
+  padding: 32px;
+  border: 2px solid var(--accent4);
+  border-radius: 14px;
+  background: var(--conclusion-bg);
+  font-size: clamp(1.15rem, 2.5vw, 1.45rem);
   font-weight: 700;
-  margin-bottom: 12px;
 }
-.takeaways {
-  padding: 42px 6vw 64px;
-  background: var(--hero-bg);
-  color: var(--hero-ink);
-}
-.takeaway-inner { max-width: 1120px; margin: 0 auto; }
+.takeaways { margin: 34px 0 54px; }
+.takeaways h2 { font-size: clamp(1.8rem, 3vw, 2.6rem); }
 .mosaic {
   display: grid;
-  grid-template-columns: 1.2fr .8fr 1fr;
-  gap: 16px;
-  margin-top: 24px;
+  grid-template-columns: 1.2fr .8fr .8fr 1.2fr;
+  gap: 14px;
 }
 .tile {
+  min-height: 180px;
   padding: 24px;
-  min-height: 150px;
-  background: var(--panel);
-  color: var(--ink);
+  border-radius: 16px;
+  background: var(--card);
+  border-bottom: 5px solid var(--accent);
 }
-.tile.data { border-top: 6px solid var(--accent-data); }
-.tile.risk { border-top: 6px solid var(--accent-risk); }
-.tile.opp { border-top: 6px solid var(--accent-opportunity); }
-.tile.end { border-top: 6px solid var(--accent-conclusion); }
-.tile.wide { grid-column: span 2; }
-.tile h3 { margin: 0 0 10px; font-size: 20px; }
-p { margin: 0 0 14px; }
+.tile:nth-child(2) { background: var(--risk-bg); border-color: var(--accent2); }
+.tile:nth-child(3) { background: var(--opportunity-bg); border-color: var(--accent3); }
+.tile:nth-child(4) { background: var(--conclusion-bg); border-color: var(--accent4); }
+.tile b { display: block; margin-bottom: 10px; font-size: 1.15rem; }
+mark {
+  padding: .05em .22em;
+  color: var(--ink);
+  background: var(--hl);
+  border-radius: .2em;
+}
+mark.alt { background: var(--hl2); }
+#translation {
+  max-width: 850px;
+  margin: 0 auto;
+  padding: clamp(26px, 5vw, 56px);
+  border-top: 10px solid var(--accent);
+  background: var(--translation-bg);
+  box-shadow: 0 16px 45px var(--shadow);
+}
+#translation h2 {
+  margin-top: 0;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.15;
+}
+#translation h3 {
+  margin: 2.6em 0 .7em;
+  padding-bottom: .35em;
+  border-bottom: 2px solid var(--line);
+  color: var(--accent4);
+  font-size: 1.65rem;
+  line-height: 1.3;
+}
+#translation p, #translation li { font-family: "Noto Serif SC", "Songti SC", serif; }
+#translation p { margin: 1.15em 0; }
+#translation a { color: var(--accent); text-underline-offset: .18em; }
+.byline {
+  padding: 18px 22px;
+  border-left: 5px solid var(--accent3);
+  background: var(--opportunity-bg);
+  color: var(--muted);
+}
+.source-figure {
+  margin: 34px 0;
+  min-height: 120px;
+  border: 2px dashed var(--line);
+  border-radius: 14px;
+  background: var(--surface2);
+}
+.source-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+.source-figure figcaption {
+  padding: 14px 18px;
+  color: var(--muted);
+  font-size: .92rem;
+  line-height: 1.6;
+}
+.note {
+  padding: 18px 22px;
+  border-left: 5px solid var(--accent2);
+  background: var(--risk-bg);
+}
+.footnotes {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 3px solid var(--line);
+  font-size: .94rem;
+}
+.footnotes li { margin-bottom: 16px; }
+sup { color: var(--accent4); font-weight: 800; }
 @media (max-width: 820px) {
-  .metric-band, .split, .steps, .columns, .mosaic { grid-template-columns: 1fr; }
-  .tile.wide { grid-column: auto; }
-  .hero { padding-top: 44px; }
+  .overview, .split { grid-template-columns: 1fr; }
+  .data-strip { grid-template-columns: 1fr 1fr; }
+  .metric:nth-child(2) { border-right: 0; }
+  .metric:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+  .mosaic { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 520px) {
+  main { width: min(100% - 18px, 1120px); margin-top: 9px; }
+  .hero { border-radius: 20px; }
+  .data-strip, .mosaic { grid-template-columns: 1fr; }
+  .metric { border-right: 0; border-bottom: 1px solid var(--line); }
+  .metric:last-child { border-bottom: 0; }
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+--bg: #f4f7fb;
+  --card: #ffffff;
+  --surface2: #edf2f8;
+  --translation-bg: #fffdf9;
+  --data-bg: #e5f7ff;
+  --risk-bg: #fff0ea;
+  --opportunity-bg: #eaf8ee;
+  --conclusion-bg: #f1eaff;
+  --hero1: #10263e;
+  --hero2: #263f63;
+  --ink: #17202a;
+  --muted: #637083;
+  --line: #ccd6e3;
+  --inverse: #f7fbff;
+  --accent: #0085b5;
+  --accent2: #db5b2a;
+  --accent3: #17864b;
+  --accent4: #7952c7;
+  --hl: #d9f3ff;
+  --hl2: #ffe6a8;
+  --shadow: rgba(20, 38, 60, 0.12);
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -402,129 +454,173 @@ p { margin: 0 0 14px; }
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/agents-in-biology" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
 <main>
-  <section class="hero">
-    <div class="hero-inner">
-      <div class="kicker">一句话总括</div>
-      <h1>为生物学中的智能体铺平道路</h1>
-      <div class="original">Paving the way for agents in biology</div>
-      <p class="lede">文章真正的贡献，是把生物学智能体的失败从“模型不够聪明”改写为“基础设施不够可执行”，并用病毒序列检索实验展示确定性工具如何把不稳定答案变成可复现工作流。</p>
-    </div>
-  </section>
-
-  <div class="metric-band">
-    <div class="metric"><strong>120</strong><span>VirBench 查询来自真实病毒序列检索任务，覆盖监测、诊断设计和模型训练数据构建。</span></div>
-    <div class="metric"><strong>40</strong><span>个病原体被纳入测试，标准答案由人工验证。</span></div>
-    <div class="metric"><strong>16.9%-91.3%</strong><span>无确定性工具时，不同智能体的平均准确率跨度很大。</span></div>
-    <div class="metric"><strong>99.7%</strong><span>接入 gget virus 后，GPT-5.5 达到的最高准确率。</span></div>
-  </div>
-
-  <div class="container">
-    <section class="split">
-      <div class="explain">
-        <h2>问题不在“会不会想”，而在“能不能取到同一批数据”</h2>
-        <p>文章指出，编码智能体进步更快，是因为软件世界有 API、版本控制、包管理器和测试。生物数据基础设施则分散在不同数据库、文件格式和网页筛选逻辑中。</p>
-        <p>这改变了读者对 AI 科学能力的判断。一个模型可能理解科学意图，却没有稳定路径把意图转成正确数据集。</p>
-      </div>
-      <div class="risk-box">
-        <h3>小错误会改变生物学结论</h3>
-        <p>取错基因组版本、混用 RefSeq 和 GenBank、把部分基因组当成完整基因组，都会让后续分析失效。</p>
-        <p>在病毒学中，序列检索通常是整个分析链的第一步。第一步看似只是数据准备，却可能决定诊断覆盖率、疫情起点和药物有效性判断。</p>
-      </div>
-    </section>
-
-    <div class="insight">核心洞见：科学智能体需要创造性地提出假设，但它们下面的数据检索、标识符、坐标系统和筛选语义必须足够“无聊”、可复现、可审计。</div>
-
-    <section class="flow">
-      <div class="flow-inner">
-        <h2>病毒序列检索为什么会失败</h2>
-        <div class="steps">
-          <div class="step"><b>1</b><p>研究者提出看似清晰的条件，例如宿主、地区、采样日期、序列长度和排除实验传代样本。</p></div>
-          <div class="step"><b>2</b><p>NCBI Virus 的一部分筛选语义只体现在网页界面中，不完全暴露给单一 API。</p></div>
-          <div class="step"><b>3</b><p>智能体需要拼接 REST、Datasets、E-utilities 等接口，还要处理分页、标识符和本地过滤。</p></div>
-          <div class="step"><b>4</b><p>一旦漏取大结果集或误用筛选条件，输出可能看起来合理，却已经无法支撑科学结论。</p></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="table-wrap">
-      <h2>有无确定性检索层的差别</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>场景</th>
-            <th>表现</th>
-            <th>对 AI 影响的含义</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>智能体独立检索</td>
-            <td>平均准确率从 16.9% 到 91.3%。同一任务多次运行会给出不同结果。</td>
-            <td>更强模型能改善表现，但不能保证科学数据集构建所需的接近 100% 稳定性。</td>
-          </tr>
-          <tr>
-            <td>Ebolavirus 示例</td>
-            <td>Sonnet 4 三次返回 106、15、5 条序列，而标准答案是 266 条。</td>
-            <td>重复性缺失会让用户误以为模型在做科学判断，实际是在不稳定地取数据。</td>
-          </tr>
-          <tr>
-            <td>接入 gget virus</td>
-            <td>所有智能体准确率超过 90%，GPT-5.5 最高 99.7%，运行间波动基本消失。</td>
-            <td>确定性工具让模型选择变得没那么关键，也让便宜模型更可能参与可靠工作流。</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section class="columns">
-      <div class="panel opportunity">
-        <h2>gget virus 的作用</h2>
-        <p>它不是让模型“更聪明”，而是把网页式检索流程翻译成机器可调用的确定性层。</p>
-        <p>它协调多个 NCBI 底层系统，判断哪些过滤可由 API 完成，哪些必须本地核查。它还处理大结果集批量检索，并输出标准化结果和详细日志。</p>
-        <p>这让答案从“看起来对”变成“能检查为什么对”。</p>
-      </div>
-      <div class="panel conclusion">
-        <span class="badge">风险信号</span>
-        <h2>错误数据会推歪下游分析</h2>
-        <p>文章用 2014 年 Ebolavirus 数据说明，同一检索任务会影响系统发育树和最近共同祖先时间估计。</p>
-        <p>人工整理的数据得到与既有报告一致的 2014 年 1 月 TMRCA。错误或不完整的数据集则可能把时间推到 1922 年，或把估计移到 2014 年 4 月。</p>
-        <p>这说明 AI 的错误不一定出现在最终推理环节。它可能隐藏在第一步数据构建里。</p>
-      </div>
-    </section>
-  </div>
-
-  <section class="takeaways">
-    <div class="takeaway-inner">
-      <h2>最值得带走的洞见</h2>
-      <div class="mosaic">
-        <div class="tile data wide">
-          <h3>Benchmark 把问题量化了</h3>
-          <p>VirBench 用 120 个查询和 40 个病原体证明，病毒序列检索不是简单网页任务，而是会直接影响科学结论的基础能力。</p>
-        </div>
-        <div class="tile risk">
-          <h3>可靠性门槛接近 100%</h3>
-          <p>在生物学数据集中，漏掉一条关键记录或错用一个过滤条件，就可能改变诊断、溯源或治疗判断。</p>
-        </div>
-        <div class="tile opp">
-          <h3>确定性层能缩小模型差距</h3>
-          <p>gget virus 让所有智能体超过 90% 准确率，说明工具设计能比单纯升级模型更直接地提升可复现性。</p>
-        </div>
-        <div class="tile end">
-          <h3>数据库也要把智能体当用户</h3>
-          <p>未来的生物数据库需要暴露清晰语义、可审计日志和稳定接口，而不只是给人类点击的网页。</p>
-        </div>
-        <div class="tile data">
-          <h3>科学 AI 的价值链要分层</h3>
-          <p>模型负责假设、解释和推理。底层检索、坐标、标识符和过滤逻辑应由可验证系统承担。</p>
-        </div>
-      </div>
-    </div>
-  </section>
+<header class="hero">
+<p class="eyebrow">Anthropic · Science · 2026年6月8日</p>
+<h1>为生物学智能体铺路</h1>
+<p class="original-title" lang="en">Paving the way for agents in biology</p>
+<p class="dek"><span class="summary-label">一句话总括</span>这项研究表明，要让 AI 可靠地参与生物学工作，必须把复杂的数据检索流程变成确定、可重复且可审计的执行层。</p>
+</header>
+<section class="overview">
+<h2>真正的瓶颈在基础设施</h2>
+<p>智能体往往理解研究人员想要什么，却无法稳定地从生物数据库取回正确数据。问题不只是模型推理能力不足。数据库接口、标识符、元数据和过滤规则也没有为机器规模化使用而设计。<strong>科学工作需要接近 100% 的检索准确率</strong>，因为一条遗漏或错误记录就可能改变疫情时间线、诊断覆盖率或疗法评估。</p>
+</section>
+<section aria-label="关键数据" class="data-strip">
+<div class="metric"><strong>120</strong><span>个真实病毒序列查询</span></div>
+<div class="metric"><strong>40</strong><span>种病原体</span></div>
+<div class="metric"><strong>16.9%–91.3%</strong><span>智能体独立检索的平均准确率</span></div>
+<div class="metric"><strong>99.7%</strong><span>GPT-5.5 接入 gget virus 后的峰值</span></div>
+</section>
+<section class="split">
+<article class="panel risk">
+<h2>看似合理的答案可能完全错误</h2>
+<p>Sonnet 4 对同一个 Ebolavirus 查询运行三次，只返回了 <mark class="alt">106、15 和 5</mark> 条序列。正确数量是 <mark class="alt">266</mark> 条。</p>
+<p>错误数据把一次系统发育分析推到了 <strong>1922 年</strong>。另一组表面可信的数据漏掉了 Guinea 的序列，并把疫情共同祖先时间从 2014 年初推迟到 4 月。结论是：可重复性不足会直接扭曲生物学解释。</p>
+</article>
+<article class="panel opportunity">
+<h2>确定性工具缩小了模型差距</h2>
+<p>gget virus 协调 REST、Datasets 和 E-utilities API，并补做本地过滤、分页、标识符协调和日志记录。</p>
+<p>接入该工具后，<mark>所有智能体都超过 90%</mark>，运行间差异基本消失。最强结果达到 99.7%。这意味着可靠工作流不必完全依赖最新或最昂贵的模型。</p>
+</article>
+</section>
+<section class="timeline">
+<h2>从研究意图到可复现结果</h2>
+<div class="step">
+<h3>1. 科学家描述目标</h3>
+<p>例如限定宿主、地点、采样日期、序列长度和模糊碱基数量，检索符合条件的病毒序列。</p>
+</div>
+<div class="step">
+<h3>2. 智能体直接操作现有基础设施</h3>
+<p>它必须跨越多个接口和数据库，还要推断网页端独有的过滤语义。结果容易漏取、重复或误筛。</p>
+</div>
+<div class="step">
+<h3>3. 确定性层执行检索</h3>
+<p>gget virus 统一分页、批处理、跨库查询和本地校验，并保存详细日志。</p>
+</div>
+<div class="step">
+<h3>4. 智能体回到更适合它的工作</h3>
+<p>模型负责提出假设、设计实验和解释机制。基础设施负责稳定地提供事实。</p>
+</div>
+</section>
+<aside class="insight-band">模型可以在创造性推理上保持灵活，但承载推理的数据层必须“无聊地可靠”。即使未来模型能自行穿越混乱的门户，这类例行任务仍可能更适合由更快、更便宜、更易审计的确定性工具完成。</aside>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="mosaic">
+<article class="tile"><b>可靠性不是附加要求</b>在科学检索中，少量错误就可能改变疫情起源、传播时间和治疗有效性的判断。</article>
+<article class="tile"><b>模型升级不能替代接口设计</b>更强的模型有所改善，但仍无法稳定达到数据集构建所需的近 100% 准确率。</article>
+<article class="tile"><b>工具能扩大可及性</b>较便宜的模型配合正确工具，也能获得稳定结果，减少对昂贵前沿模型的依赖。</article>
+<article class="tile"><b>数据库需要把智能体视为用户</b>标准接口、明确语义、完整分页和可审计日志，将决定科学智能体能否规模化工作。</article>
+</div>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<figure class="source-figure" data-source-image="0"><img alt="Paving the way for agents in biology" decoding="async" height="1000" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/8925ac952fa2cb8eb5e845b2e44f3e71b33fd695-1000x1000.svg" width="1000"/></figure>
+<p class="byline">作者：Laura Luebbert。本文基于 Ferdous Nasri、Sarah Gurev、Patrick Varilly、Krithik Ramesh、Nuala A. O’Leary、Jonah Cool、Bernhard Y. Renard、Pardis Sabeti 和 Laura Luebbert 的研究。</p>
+<p>Laura Luebbert 在本文中提出，我们需要让生物数据基础设施对智能体更加友好。她和团队开展了一项案例研究。他们让科学研究智能体，包括 Claude、Biomni Open Source（Biomni OSS）<sup>1</sup>、Edison Analysis<sup>2</sup> 和 GPT，从 NCBI Virus 中检索序列数据。病毒学家会使用这个数据库开展监测和诊断检测设计等工作。</p>
+<p>即使是能力最强的模型，也无法持续达到可靠构建数据集所需的准确率。不过，团队加入确定性检索层 gget virus 后，准确率提升到了接近 100%。这对科学智能体有一个更普遍的启示：至少在目前，确定性检索工具仍是提高智能体工作流可靠性的关键。随着智能体成为规模化用户，生物数据库也需要围绕它们的需求来设计。</p>
+<p>让 AI 智能体在生物数据基础设施中穿行，就像开车驶入一座汽车诞生前建成的古城。那里的基础设施可能很美，也可能经过精心规划，但城中到处都是狭窄而曲折的街道。现代车辆很难通行。生物学领域那些特殊的文件格式、分散的数据库和一次性检索脚本，正是这样的街道。<sup>3</sup></p>
+<p>你可以给古城增设交通标志和停车场，偶尔拓宽一段道路。但它的基本格局仍然难以通行，因为它原本是为另一种交通方式设计的。相比之下，软件基础设施几乎就是按汽车，也就是智能体的需求建造的。它有铺好的道路、清晰的车道、标准化信号，以及支持全程快速通行的系统，例如版本控制、文档完备的 API 和包管理器。</p>
+<p>因此，编程智能体的进步远快于生物学智能体。软件通常提供结构化的数字工作流和可靠接口。计算生物学的数据检索与验证基础设施则经常很脆弱。它们彼此异构，而且高度依赖具体流程。用于操作这些基础设施的工具也只能是定制的，通常只适配特定领域或假设。</p>
+<p>此外，软件能够产生可测试的输出，并能快速编译和验证。例如，智能体可以生成一个通过项目测试的补丁，以此解决 GitHub issue。生物学却很少提供既容易验证、又有实际意义的简单奖励信号。</p>
+<p>所以，生物学智能体的瓶颈不只是推理能力不足。另一个问题是，我们普遍缺少用于查询生物数据的确定性执行层。科学家可以表达自己的意图，例如“找出所有包含这一结构域的人类激酶，并获取它们的结构”。但智能体往往无法可靠地访问保存这些信息的数据库。</p>
+<p>在生物学和其他科学工作流中，即使很小的错误也可能造成严重后果。例如，从错误的基因组版本中提取坐标，会让后续的生物学解释失效。无意中混用 RefSeq 与 GenBank 记录，也会产生同样的问题。把部分基因组当成完整基因组、混淆分节病毒的片段名称，或者因为元数据字段不一致而漏掉相关记录，也都可能破坏结论。研究的魅力与难处正在于此：细节往往至关重要。</p>
+<p>这就像开车穿过一座意大利山城。无论汽车多么强大，只要街道太窄、弯道太急，而且路线依赖本地经验，它就无法顺利通行。如果我们希望智能体协助科学发现，从疫情响应到药物设计，再到生物学建模，就需要建设一种生物数据基础设施，让智能体能够像人类一样可靠地使用它。</p>
+<h3>Karpathy 关于 Web 开发的演讲，给 AI 智能体从事生物学研究带来了什么启示</h3>
+<p>智能体的需求与人类设计的工具不匹配，这个问题并非生物学所独有。只要把智能体放入一个完全为人类使用而设计的环境，同样的摩擦就会出现。</p>
+<p>几个月前，Andrej Karpathy 在一次关于 AI 时代软件的演讲中，抱怨了一件听起来非常熟悉的事。他通过 vibe coding 制作了一个小型 Web 应用。但当他试图把应用真正投入使用时，还需要处理身份验证、支付和部署。结果，他花了整整一周在浏览器控制面板里点击操作。</p>
+<p>他总结道：“写代码反而是最简单的部分！大多数工作都发生在浏览器里，就是不停地点东西。”文档总是让他“打开这个 URL，再点击这个下拉菜单”。他的结论是，没有人应该被迫这样工作。相反，我们必须<strong>为智能体而建设</strong>。</p>
+<p>Karpathy 在软件智能体领域遭遇了一种新问题。但生物学研究人员早已被这个问题困扰多年：如何让智能系统在一种为人类点击浏览器而建的环境中工作。这里的信息彼此异构，惯例通常没有明说，很多操作也只能由人完成。</p>
+<h3>案例研究：病毒学中的“点击税”</h3>
+<p>早在 AI 智能体出现之前，计算生物学家和遗传学家就已经开始为传统计算生物学开发工具，并逐步缓解这个问题。Biopython、BioPerl、BioJulia、Entrez Direct、BioMart、gget 和许多其他工作流库，都在尝试把生物数据从浏览器界面中解放出来，让研究人员能够直接对数据进行计算。</p>
+<p>问题在于，生物数据并不存放在具有统一接口的单一数据库中。它更像一张混乱的道路网。每条道路都有自己的标识符、惯例、格式、过滤逻辑和程序化访问能力。有些数据很容易通过程序访问，另一些则困难得多。</p>
+<p>病毒学尤其棘手。从疫苗与诊断检测设计，到为蛋白质模型构建训练数据，许多研究工作流都以从 NCBI Virus 获取序列为起点。NCBI Virus 通过可搜索的 Web 界面汇集病毒序列记录。这些记录来自 GenBank、RefSeq 和国际 INSDC 生态系统，其中包括 Pathoplexus。</p>
+<p>我们一直在开发病毒疫情监测工具，因此非常了解这些检索操作背后隐藏了多少专家知识。在病毒学实验室里，NCBI Virus 数据集的整理说明往往以冗长而复杂的过滤条件清单流传。用户必须在 Web 界面中手动复现这些条件。这恰好就是 Karpathy 所抱怨的浏览器点击式工作流。</p>
+<p>刚果民主共和国目前暴发了由 Bundibugyo virus 引起的 Ebola disease。这一事件鲜明地说明，能否顺畅访问病毒数据，可能带来关乎生死的现实后果。2026 年 5 月 14 日，刚果民主共和国的 INRB Kinshasa 分析了 13 份血液样本。次日，其中 8 份被确认感染 Bundibugyo virus disease，随后官方宣布发生 Ebola 疫情。<sup>4</sup></p>
+<p>截至 5 月 29 日，WHO 报告刚果民主共和国已有超过 1,000 例确诊和疑似病例，其中超过 200 人死亡。研究人员还生成了首批接近完整的疫情病毒基因组。这些数据帮助确认，本次疫情源于一次新的跨物种溢出事件。</p>
+<p>这些基因组给公共卫生官员提出了三个紧迫问题。第一，本次疫情的病毒与过去发现的 Ebola 病毒有多大差异？第二，现有诊断工具还能检测到它吗？第三，现有治疗手段还能提供保护吗？</p>
+<p>要回答这些问题，需要把新基因组与 NCBI Virus 和 Pathoplexus 中的历史 Ebola 基因组进行比较。Pathoplexus 的数据会同步到 NCBI Virus。这个过程本应很容易自动化，但实际分析的第一步却需要研究人员手动点击 Web 界面，逐一复现复杂过滤条件，然后期望最终数据集既完整又正确。</p>
+<p>这个工作流难以自动化，是因为 NCBI Virus 的大部分过滤逻辑只存在于 Web 界面中。它让人类感到烦琐，对智能体而言则更为糟糕。假设研究人员想要获取 2025 年发布、且包含表面糖蛋白的所有 SARS-CoV-2 序列。经验丰富的病毒学家可能只需在浏览器中点击几次。</p>
+<p>但通过程序实现同一目标，可能需要一段数百行的脚本。它要把 REST、Datasets 和 E-utilities 等多个 API 拼接起来，逐页检索结果，协调不同标识符，还要下载数百 GB 数据。经过本地过滤后，其中大部分数据又会被丢弃。</p>
+<p>即使一个资源提供 API，智能体仍可能因为多种原因而无法可靠使用。API 可能没有提供与 Web 界面相同的过滤语义。元数据字段可能文档不足或标准不一。不同来源之间的标识符也可能发生变化。有时，“正确答案”还取决于专家熟知、但机器只能自行推断的惯例。</p>
+<h3>当智能体仍然尝试检索时，会发生什么</h3>
+<p>为了更好地理解智能体连接数据库时面临的挑战，我们设计了一项测试。测试对象是当前先进的科学研究智能体，包括 Claude、Biomni OSS、Edison Analysis 和 GPT。我们要求它们使用现有基础设施，从 NCBI Virus 检索病毒序列。</p>
+<p>我们的 benchmark 名为 VirBench。它包含 120 个真实的病毒序列查询，覆盖 40 种病原体，并为每个查询准备了人工验证的正确记录数。这些查询来自病毒监测、诊断检测设计和蛋白质模型训练数据构建等实际任务。</p>
+<p>其中一个查询要求智能体：“从 NCBI 检索 TaxID 3052462（Orthoebolavirus zairense，ZEBOV）的病毒序列，并满足以下条件：宿主生物为人类；样本采集地为 Africa；采集日期不早于 2014 年 1 月 1 日，且不晚于 2014 年 6 月 20 日；序列长度至少为 15,200 个碱基；最多包含 1,900 个模糊字符（N）；排除经过实验室传代的样本。”</p>
+<p>当智能体独立解决这些查询时，不同系统的表现差异很大。较新的前沿模型取得了明显进步。不过，即使最强的模型，也无法持续达到可靠构建数据集所需的准确率和可重复性。</p>
+<p>Claude Sonnet 4、Claude Opus 4.7、Biomni OSS、Edison Analysis、GPT-5.2-pro 和 GPT-5.5<sup>5</sup> 的平均准确率介于 16.9% 与 91.3% 之间。对于这类数据检索任务，标准实际上接近 100%。在某些情况下，一条记录缺失或出错，就可能影响研究人员对诊断检测覆盖当前病毒多样性的判断，也可能让疫情起始时间看起来比真实时间提前或推迟数周。</p>
+<p>此外，同一个模型面对完全相同的问题时，往往会给出差异很大的答案。我们把每个问题重复询问三次，这种差异削弱了可靠科学工作流所需的准确性和可重复性。对于上面的 Ebolavirus 查询，Sonnet 4<sup>6</sup> 第一次返回 106 条序列，正确答案应为 266 条。第二次返回 15 条，第三次只返回 5 条。三次使用的提示完全相同。</p>
+<p>这种不一致会影响下游分析。我们使用上述查询检索 Ebolavirus 序列，并构建系统发育树。系统发育树是重建疫情中不同病毒样本关系的标准分析方法。</p>
+<p>我们可以从系统发育树中得到一个重要指标，即最近共同祖先时间估计值（time to the most recent common ancestor，TMRCA）。它代表推断出的疫情根节点日期，可能改变研究人员对病毒起源时间、起源地点和传播时长的判断。</p>
+<p>在本例中，使用人工整理的 NCBI Virus 序列集构建的树得到 2014 年 1 月的 TMRCA。这个结果与此前对 2014 年 Ebolavirus 疫情的报告一致，其 95% 最高后验密度区间为 1 月 27 日至 3 月 14 日。</p>
+<p>相比之下，Sonnet 4 检索出的三组序列中，有两组明显不完整。其中一棵树甚至把推断的 TMRCA 推到了 1922 年。剩余的数据集，也就是第 1 次运行的结果，表面上似乎合理，却漏掉了来自 Guinea 的序列，并把估计的 TMRCA 移到了 2014 年 4 月。这改变了对疫情发生时间的推断。</p>
+<figure class="source-figure" data-source-image="1"><img alt="chart showing the Phylogenetic trees of Zaire ebolavirus" decoding="async" height="5898" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/faa2dc4dccb2e47dbce35a8d6acc92b0aa5e5782-5820x5898.png" width="5820"/>
+<figcaption>使用 Delphy 推断的 2014 年西非疫情期间 Zaire ebolavirus 系统发育树。末端节点按采样国家着色；灰色表示国家元数据缺失或检索错误。红色虚线标出每棵树估计的最近共同祖先时间（TMRCA）。左上方的树使用通过 NCBI Web 界面手动检索的序列构建；第 1 至第 3 次运行所用的序列集，则由 Sonnet 4 智能体通过 Web 搜索和代码执行工具整理。分析与可视化：Gage Moreno。</figcaption>
+</figure>
+<p>NCBI Virus 多次检索结果之间的差异，也可能影响有关治疗方法的结论。我们检索了 Ebolavirus 糖蛋白序列，用于检查 maftivimab 和 MBP134 所结合的表位。这两种抗体疗法面向 Zaire ebolavirus 开发，也是当前 Ebolavirus 疫情中的 WHO 优先候选治疗方案。</p>
+<p>我们想知道，在相关 Zaire ebolavirus 序列中，这些抗体靶向区域过去是否出现过突变。此类分析可以帮助研究人员判断，随着病毒演化，一种治疗方法能否继续保护患者。如果底层序列不完整或检索有误，结论就可能发生偏差。</p>
+<p>在本例中，Sonnet 4 第一次检索的序列，与人工执行 NCBI 查询所得结果较为接近。再次运行时，它漏掉了大部分发生突变的残基。第三次运行时，它又突出显示了另一组残基。因此，三次运行对这些靶向区域的变异情况给出了三种不同印象。<sup>7</sup></p>
+<figure class="source-figure" data-source-image="2"><img alt="depiction of Existing Zaire ebolavirus mutations" decoding="async" height="646" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/5f8526abfb93dbe99a0c2078ddd344528de2be0f-2500x646.png" width="2500"/>
+<figcaption>Zaire ebolavirus 糖蛋白上已有的突变以红色显示。颜色越深，表示突变频率越高。球体表示抗体疗法 maftivimab 和 MBP134 的已知结合足迹。最左侧的可视化使用人工整理的 NCBI 数据集构建；第 1 至第 3 次运行所用的序列集，则由 Sonnet 4 智能体通过 Web 搜索和代码执行工具整理。图中所示 PDB 结构为 7TN9。分析与可视化：Sarah Gurev。</figcaption>
+</figure>
+<p>这两个例子都反映了科学研究中的一个普遍规律：看似微小的数据检索选择，也可能改变生物学结论。在本例中，模型检索病毒序列时表现不稳定。失败模式的性质还表明，大部分差异源自基础设施的不足。</p>
+<p>当智能体无法获取大规模结果集时，就会少算记录。当过滤条件应用错误时，又会多算记录。与预期数量偏差最大的情况，出现在拥有海量可用记录的病毒上，包括 Influenza A、HIV-1 和 SARS-CoV-2。如果检索中途停止，或者下游过滤出错，最终数据集就会严重失真。</p>
+<p>智能体也难以处理含义依赖上下文、惯例或信息存储位置的元数据字段。随着查询复杂度提高，性能会继续下降。尤其当查询同时包含超过三四个过滤条件时，下降更加明显。</p>
+<p>归根结底，智能体通常足以理解任务，也知道应该尝试什么。但它们缺少一种机器可以直接操作的方法，用来执行、验证并重复完成任务。因此，最终答案可能看起来可信，实际却是错的。这尤其危险，因为序列检索通常只是一个漫长生物学工作流的第一步。</p>
+<h3>用于病毒数据检索的确定性执行层</h3>
+<p>如需更详细地了解 VirBench 和 gget virus，请阅读预印本。</p>
+<p>为了让智能体和人类能够直接调用病毒数据检索功能，我们与 NCBI 的研究人员合作开发了 gget virus。最初，这件事看起来似乎只需连接正确的 API。实际工作却困难得多。NCBI Virus 是一个建立在多个底层资源之上的门户，其中包括由美国、欧洲和日本共同维护并在国际间同步的序列数据库。因此，即使要回答一个看似简单的问题，往往也需要拼接多个来源的信息。</p>
+<p>为了复现 NCBI Virus Web 界面的行为，gget virus 必须协调其底层的不同系统，包括 REST、Datasets 和 E-utilities API。gget virus 会判断哪些过滤条件可以通过现有 API 执行，哪些必须在本地检查。出现后一种情况，是因为 Web 界面提供的某些过滤行为无法从单一程序端点获得。</p>
+<p>gget virus 还会处理批量检索，确保 SARS-CoV-2 和 Influenza A 等大型数据集得到完整下载，而不是在任意位置被截断。如果过滤过程依赖另一个数据库中的附加信息，它也会获取相应记录。例如，GenBank 记录可以说明一条序列是否包含特定病毒蛋白。gget virus 会取得这些记录，用它们执行过滤，并在最终输出中保留相关 GenBank 信息。</p>
+<p>最后，它会返回人和机器都能读取的标准化输出，并提供详细日志，说明最终结果是如何生成的。<sup>8</sup></p>
+<p>当我们让智能体使用 gget virus 后，所有智能体的准确率都超过了 90%，其中 GPT-5.5 的最高准确率达到 99.7%。不同运行之间的差异基本消失，模型之间的性能差距也大幅缩小。</p>
+<p>换句话说，加入确定性检索层后，选择哪一个模型变得远没有那么重要。这一点意义重大，因为可靠的数据集构建不应依赖最新或最昂贵的模型，也不应要求使用者事先知道哪个模型最适合某个数据库。相反，较便宜的模型配合正确工具，也能减少结果波动，并让更多人获得这类能力。</p>
+<figure class="source-figure" data-source-image="3"><img alt="chart showing AI agent performance on the VirBench benchmark with and without gget virus." decoding="async" height="1080" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/1206c88f2917169c303ecd2a8ad8ab7622042852-1920x1080.jpg" width="1920"/>
+<figcaption>AI 智能体在使用和不使用 gget virus 时的 VirBench benchmark 表现。VirBench 评估智能体正确检索病毒序列数据集的能力。最后一根柱表示不经过智能体、直接运行 gget virus 的结果。图片改编自 Nasri 等人，2026。</figcaption>
+</figure>
+<p>gget virus 把复杂的浏览器检索工作流转化为准确、可重复的接口，从而提高现有智能体检索病毒数据时的可靠性。回到适合步行的古城这个比喻，它就像在步行基础设施下方修建了一条公路隧道。隧道拥有完整的出入口匝道、顺畅的互通系统，以及与已知里程标记对应的出口编号。</p>
+<h3>正如 Karpathy 所说：“让[基因组数据]可供智能体访问”</h3>
+<p>当模型提出假设、设计实验或推理生物机制时，我们希望它们保持创造力。但支撑这种创造力的底层部分必须“无聊地可靠”。这些部分包括基因标识符、schema、检索逻辑、坐标系统、元数据惯例和数据访问路径。换句话说，它们必须是确定性的。</p>
+<p>gget virus 是建设此类“上下文引擎”的一个例子。所谓上下文引擎，是指可靠且可由智能体访问的生物数据基础设施。AI for science 系统中也出现了其他相关实践。其中许多系统依靠模型 harness，把智能体连接到生物数据源，包括 ToolUniverse、Edison Scientific 的 Robin、Biomni 和其他相关生物医学智能体。真正的挑战在于确定：确定性应该放在哪一层，又该如何建设。</p>
+<p>考虑到模型能力变化得如此迅速，连接器和 harness 的开发工作会变得更加复杂。如果把上述结果中的模型能力曲线继续向前延伸，很容易想象一个可能很快到来的未来：gget virus 这类工具带来的收益逐渐接近于零。智能体将能够自行穿越混乱的门户，协调标识符，正确处理分页，并从失败中恢复。在那个世界里，harness 也许不再必要。</p>
+<p>不过，即使智能体有能力完成一项任务，也不代表每次都应该让智能体重新处理它。一个能够在混乱生物信息学工作流中艰难前进的模型，对于日常科学工作而言，仍可能太昂贵、太缓慢、太难审计，或者太难让人信任。</p>
+<p>即使智能体最终让今天的 harness 变得过时，关于生物数据库的基本结论仍然成立：我们需要把智能体纳入用户群体来考虑，也需要为规模化使用进行建设。</p>
+<h3>致谢</h3>
+<p>感谢 Xander Balwit、Ethan Dyer、Stuart Ritchie、Rebecca Hiscott、Alyssa Morrow、Keir Bradwell、Eric Kauderer-Abrams、Jonah Cool、Andrej Karpathy、Patrick Varilly、Cesar Arze、Blake Lash、Philine Guckelberger、Nisha Gopal、Elliot Hershberg、Pardis Sabeti 和 Jonathan Feldman。他们提供了深思熟虑的反馈、细致的修改和有益的交流，使本文得到完善。</p>
+<p>我们尤其感谢 Sarah Gurev 和 Gage Moreno。他们协助开发并完成了文中的病毒学示例分析。我们也特别感谢 Ferdous Nasri 和 Krithik Ramesh，他们为本文的思想、框架和写作作出了重要贡献。</p>
+<h3>脚注</h3>
+<ol class="footnotes">
+<li>Biomni Open Source（Biomni OSS）指 Biomni 的开源版本（<a href="https://github.com/snap-stanford/Biomni">https://github.com/snap-stanford/Biomni</a>，v0.0.8），底层 LLM 为 Claude Sonnet 4。这里的结果不代表 Phylo 的 Biomni Lab 产品表现。</li>
+<li>评估于 2026 年 2 月 26 日进行。受任务性质影响，Edison Analysis 使用了能够完成 benchmark、且不会触发生物安全访问限制的较旧后备模型，例如 Claude Sonnet 4。因此，不应把 Edison Analysis 的结果理解为可以与 Opus 4.7 的结果直接比较。</li>
+<li>如需深入了解生物软件为何经常显得零散、维护不足且难以使用，请参阅 Elliot Hershberg 的文章《生命科学软件究竟如何运作，又为何无法正常运作》（How Software in the Life Sciences Actually Works (And Doesn’t Work)）。</li>
+<li>我们认可并感谢刚果民主共和国 Institut National de Recherche Biomédicale（INRB）团队，以及 Uganda Central Public Health Laboratory（CPHL）团队。他们在 2026 年 5 月疫情期间迅速完成测序和分析，并开放共享了最初的 Bundibugyo virus 基因组。</li>
+<li>在 360 次运行中，有一次是 GPT-5.5 在没有得到明确提示的情况下自行发现并使用了 gget virus。它发生在查询 32 的第三次重复运行中，也是这个问题唯一得到正确答案的一次运行。</li>
+<li>由于更新模型受到后续生物安全访问限制，Claude Sonnet 4 是可用于本次评估的最新公开 Anthropic 模型。</li>
+<li class="note">本文中的所有分析仅用于说明，不构成医疗或公共卫生指导。有关 Ebola disease 的治疗建议，请参阅 WHO 官方指南。</li>
+<li>这也呼应了 Nils Homer 最近对 AI-ready 生物信息学工具提出的观点：“AI 助手需要能够处理你的代码、输出和分析逻辑。”这样一来，智能体不仅可以检查检索到了什么，还能检查检索过程本身，把一个看似可信的答案转化为可验证、可复现的结果。</li>
+</ol>
+</section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

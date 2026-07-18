@@ -1,414 +1,279 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>快速正则搜索：为 Agent 工具索引文本</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>快速正则搜索：为智能体工具建立文本索引</title>
 <style>
-:root {
-  --bg: #f7f3ec;
-  --ink: #1f2428;
-  --muted: #667085;
-  --line: #d8d1c6;
-  --panel: #ffffff;
-  --panel-soft: #fff7e8;
-  --band: #17202a;
-  --band-ink: #f8fafc;
-  --data: #1769aa;
-  --data-bg: #e8f3ff;
-  --risk: #b42318;
-  --risk-bg: #ffe9e6;
-  --opportunity: #0f7b62;
-  --opportunity-bg: #e6f6ef;
-  --conclusion: #7a4cc2;
-  --conclusion-bg: #f0e9ff;
-  --warn: #9a6700;
-  --warn-bg: #fff2cc;
-  --code-bg: #edf0f3;
-  --shadow: 0 18px 48px rgba(31, 36, 40, .12);
-  --radius: 8px;
+:root,
+:root[data-theme="light"]{
+  --bg:#f5f2e9;
+  --paper:#fffdf7;
+  --ink:#17202a;
+  --muted:#66707b;
+  --line:#d9d3c6;
+  --deep:#172436;
+  --deep-ink:#f5f8fc;
+  --accent:#176b87;
+  --accent2:#b45a32;
+  --accent3:#6e4ba8;
+  --accent4:#287756;
+  --risk:#a83f52;
+  --data-bg:#dceff5;
+  --risk-bg:#f7e1e5;
+  --opportunity-bg:#e1f1e8;
+  --conclusion-bg:#ece4f7;
+  --warm-bg:#f5e8d5;
+  --hl:#ffe08a;
+  --hl2:#aee6d0;
+  --shadow:rgba(28,36,45,.12);
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #111418;
-    --ink: #e8edf2;
-    --muted: #a8b3bf;
-    --line: #323a45;
-    --panel: #191f26;
-    --panel-soft: #241c12;
-    --band: #080b0f;
-    --band-ink: #f4f7fb;
-    --data: #65b8ff;
-    --data-bg: #102337;
-    --risk: #ff897d;
-    --risk-bg: #351512;
-    --opportunity: #54d6b2;
-    --opportunity-bg: #102a23;
-    --conclusion: #b89cff;
-    --conclusion-bg: #221936;
-    --warn: #ffd166;
-    --warn-bg: #30250e;
-    --code-bg: #202833;
-    --shadow: 0 18px 48px rgba(0, 0, 0, .38);
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e141b;
+    --paper:#17202a;
+    --ink:#e7edf3;
+    --muted:#aab5c0;
+    --line:#344250;
+    --deep:#090e14;
+    --deep-ink:#edf5fc;
+    --accent:#58c7e5;
+    --accent2:#f08b60;
+    --accent3:#b99ae9;
+    --accent4:#68d6a1;
+    --risk:#f07b91;
+    --data-bg:#173440;
+    --risk-bg:#3b2029;
+    --opportunity-bg:#18392b;
+    --conclusion-bg:#302643;
+    --warm-bg:#3a2d20;
+    --hl:#735812;
+    --hl2:#165b45;
+    --shadow:rgba(0,0,0,.35);
   }
 }
-:root[data-theme="dark"] {
-  --bg: #111418;
-  --ink: #e8edf2;
-  --muted: #a8b3bf;
-  --line: #323a45;
-  --panel: #191f26;
-  --panel-soft: #241c12;
-  --band: #080b0f;
-  --band-ink: #f4f7fb;
-  --data: #65b8ff;
-  --data-bg: #102337;
-  --risk: #ff897d;
-  --risk-bg: #351512;
-  --opportunity: #54d6b2;
-  --opportunity-bg: #102a23;
-  --conclusion: #b89cff;
-  --conclusion-bg: #221936;
-  --warn: #ffd166;
-  --warn-bg: #30250e;
-  --code-bg: #202833;
-  --shadow: 0 18px 48px rgba(0, 0, 0, .38);
+:root[data-theme="dark"]{
+  --bg:#0e141b;
+  --paper:#17202a;
+  --ink:#e7edf3;
+  --muted:#aab5c0;
+  --line:#344250;
+  --deep:#090e14;
+  --deep-ink:#edf5fc;
+  --accent:#58c7e5;
+  --accent2:#f08b60;
+  --accent3:#b99ae9;
+  --accent4:#68d6a1;
+  --risk:#f07b91;
+  --data-bg:#173440;
+  --risk-bg:#3b2029;
+  --opportunity-bg:#18392b;
+  --conclusion-bg:#302643;
+  --warm-bg:#3a2d20;
+  --hl:#735812;
+  --hl2:#165b45;
+  --shadow:rgba(0,0,0,.35);
 }
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  line-height: 1.65;
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  color:var(--ink);
+  background:var(--bg);
+  font-family:Inter,"Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
+  line-height:1.78;
 }
-main { overflow: hidden; }
-.hero {
-  background: var(--band);
-  color: var(--band-ink);
-  padding: 58px 7vw 46px;
+a{color:var(--accent);text-underline-offset:.18em}
+.hero{
+  padding:clamp(3rem,8vw,7rem) max(1.25rem,calc((100% - 1120px)/2));
+  color:var(--deep-ink);
+  background:var(--deep);
+  border-bottom:.45rem solid var(--accent2);
 }
-.hero-inner {
-  max-width: 1120px;
-  margin: 0 auto;
+.eyebrow{
+  color:var(--accent4);
+  font-size:.78rem;
+  font-weight:800;
+  letter-spacing:.16em;
+  text-transform:uppercase;
 }
-.kicker {
-  color: var(--opportunity);
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 0;
-  margin-bottom: 18px;
+h1{
+  max-width:900px;
+  margin:.5rem 0 .3rem;
+  font-size:clamp(2.35rem,6vw,5.4rem);
+  line-height:1.08;
 }
-h1 {
-  max-width: 900px;
-  margin: 0;
-  font-size: clamp(34px, 5vw, 68px);
-  line-height: 1.08;
-  letter-spacing: 0;
+.original{
+  margin:0 0 2rem;
+  color:var(--muted);
+  font-size:clamp(1rem,2vw,1.3rem);
 }
-.original {
-  max-width: 760px;
-  margin-top: 16px;
-  color: var(--muted);
-  font-size: 18px;
+.hero-summary{
+  max-width:850px;
+  margin:0;
+  padding-left:1.2rem;
+  border-left:4px solid var(--accent);
+  font-size:clamp(1.12rem,2.2vw,1.45rem);
 }
-.thesis {
-  max-width: 880px;
-  margin-top: 30px;
-  padding-left: 18px;
-  border-left: 5px solid var(--opportunity);
-  font-size: 22px;
-  line-height: 1.45;
+.meta{margin-top:1.5rem;color:var(--muted);font-size:.92rem}
+.summary-wrap{max-width:1120px;margin:auto;padding:3rem 1.25rem 5rem}
+h2{font-size:clamp(1.8rem,4vw,2.8rem);line-height:1.2}
+h3{margin-top:2rem;font-size:1.35rem;line-height:1.35}
+.number-band{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:1px;
+  margin:2.5rem 0;
+  overflow:hidden;
+  border:1px solid var(--line);
+  background:var(--line);
+  box-shadow:0 16px 45px var(--shadow);
 }
-.metrics {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(130px, 1fr));
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  background: var(--panel);
+.number-band article{padding:1.6rem;background:var(--paper)}
+.number-band strong{
+  display:block;
+  color:var(--accent2);
+  font-size:2rem;
+  line-height:1.1;
 }
-.metric {
-  padding: 26px 22px;
-  border-right: 1px solid var(--line);
+.number-band span{color:var(--muted);font-size:.88rem}
+.split{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:2rem;
+  margin:3rem 0;
 }
-.metric:last-child { border-right: 0; }
-.metric strong {
-  display: block;
-  color: var(--data);
-  font-size: 32px;
-  line-height: 1;
+.split .problem{
+  padding:2rem;
+  background:var(--risk-bg);
+  border-top:5px solid var(--risk);
 }
-.metric span {
-  display: block;
-  margin-top: 10px;
-  color: var(--muted);
-  font-size: 14px;
+.split .answer{
+  padding:2rem;
+  background:var(--opportunity-bg);
+  border-top:5px solid var(--accent4);
 }
-.split {
-  display: grid;
-  grid-template-columns: 1.1fr .9fr;
-  gap: 36px;
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 56px 7vw;
+.timeline{
+  margin:3rem 0;
+  padding:2rem;
+  background:var(--warm-bg);
+  border-left:6px solid var(--accent2);
 }
-.split h2,
-.timeline h2,
-.compare h2,
-.local h2,
-.takeaways h2 {
-  margin: 0 0 16px;
-  font-size: 28px;
-  line-height: 1.2;
+.timeline ol{display:grid;gap:1rem;padding-left:1.4rem}
+.timeline strong{color:var(--accent3)}
+.compare{
+  width:100%;
+  margin:2rem 0 3rem;
+  border-collapse:collapse;
+  background:var(--paper);
+  box-shadow:0 10px 35px var(--shadow);
 }
-.problem {
-  background: var(--risk-bg);
-  border-left: 6px solid var(--risk);
-  padding: 28px;
+.compare th,.compare td{
+  padding:1rem;
+  border:1px solid var(--line);
+  text-align:left;
+  vertical-align:top;
 }
-.problem p,
-.answer p,
-.local p,
-.timeline p,
-.compare p {
-  margin: 0 0 14px;
+.compare th{color:var(--deep-ink);background:var(--deep)}
+.insight{
+  margin:3rem 0;
+  padding:2.2rem;
+  color:var(--deep-ink);
+  background:var(--deep);
+  border-right:8px solid var(--accent3);
+  font-size:1.18rem;
 }
-.answer {
-  padding: 28px 0;
+.architecture{
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  gap:1rem;
+  margin:3rem 0;
 }
-.answer .tag {
-  display: inline-block;
-  margin-bottom: 14px;
-  padding: 5px 10px;
-  border: 1px solid var(--opportunity);
-  color: var(--opportunity);
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 700;
+.architecture article{
+  padding:1.8rem;
+  background:var(--data-bg);
+  border-bottom:5px solid var(--accent);
 }
-.flow-band {
-  background: var(--data-bg);
-  padding: 54px 7vw;
+.architecture .arrow{color:var(--accent2);font-size:2rem;font-weight:900}
+.takeaways{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:1rem;
+  margin-top:2rem;
 }
-.timeline {
-  max-width: 1120px;
-  margin: 0 auto;
+.takeaways article{padding:1.4rem;background:var(--paper);border:1px solid var(--line)}
+.takeaways article:nth-child(1),.takeaways article:nth-child(4){grid-column:span 3}
+.takeaways article:nth-child(2),.takeaways article:nth-child(3){grid-column:span 3}
+.badge{
+  display:inline-block;
+  margin-bottom:.5rem;
+  padding:.15rem .6rem;
+  color:var(--deep-ink);
+  background:var(--accent3);
+  border-radius:999px;
+  font-size:.75rem;
+  font-weight:800;
 }
-.steps {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(120px, 1fr));
-  gap: 14px;
-  margin-top: 24px;
+mark{padding:.05em .2em;color:var(--ink);background:var(--hl)}
+.hl2{padding:.05em .2em;background:var(--hl2);font-weight:800}
+#translation{
+  padding:4rem max(1.25rem,calc((100% - 820px)/2)) 6rem;
+  background:var(--paper);
+  border-top:1px solid var(--line);
 }
-.step {
-  position: relative;
-  padding: 18px;
-  background: var(--panel);
-  border-top: 5px solid var(--data);
-  box-shadow: var(--shadow);
-  min-height: 180px;
+#translation>h2{
+  margin-bottom:2.5rem;
+  padding-bottom:.8rem;
+  border-bottom:4px solid var(--accent);
 }
-.step b {
-  color: var(--data);
-  font-size: 22px;
+#translation h3{margin-top:3.4rem;color:var(--accent)}
+#translation h4{margin-top:2.4rem;color:var(--accent3)}
+#translation p,#translation li{font-family:"Noto Serif SC","Songti SC",serif}
+#translation .toc{
+  padding:1.5rem 2rem;
+  background:var(--data-bg);
+  border-left:4px solid var(--accent);
 }
-.step h3 {
-  margin: 10px 0 8px;
-  font-size: 16px;
+#translation .ui-copy{
+  margin:.75rem 0;
+  padding:.65rem 1rem;
+  color:var(--muted);
+  background:var(--bg);
+  border-left:3px solid var(--accent4);
+  font-family:Inter,"Noto Sans SC",sans-serif;
+  font-size:.92rem;
 }
-.step p {
-  color: var(--muted);
-  font-size: 14px;
+#translation .repeat-divider{
+  margin:5rem 0 3rem;
+  padding:1rem;
+  color:var(--deep-ink);
+  background:var(--deep);
+  text-align:center;
+  font-family:Inter,"Noto Sans SC",sans-serif;
+  font-weight:800;
 }
-.compare {
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 58px 7vw;
-}
-.table-wrap {
-  overflow-x: auto;
-  border: 1px solid var(--line);
-  background: var(--panel);
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 760px;
-}
-th, td {
-  padding: 16px;
-  text-align: left;
-  vertical-align: top;
-  border-bottom: 1px solid var(--line);
-}
-th {
-  background: var(--code-bg);
-  color: var(--ink);
-}
-td:nth-child(2) { color: var(--opportunity); }
-td:nth-child(3) { color: var(--risk); }
-td:nth-child(4) { color: var(--conclusion); }
-.insight {
-  background: var(--conclusion-bg);
-  border-block: 1px solid var(--line);
-  padding: 42px 7vw;
-}
-.insight-inner {
-  max-width: 940px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 84px 1fr;
-  gap: 22px;
-  align-items: start;
-}
-.quote-mark {
-  width: 64px;
-  height: 64px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--conclusion);
-  color: var(--band-ink);
-  font-size: 34px;
-  font-weight: 900;
-}
-.insight p {
-  margin: 0;
-  font-size: 23px;
-  line-height: 1.45;
-}
-.local {
-  background: var(--band);
-  color: var(--band-ink);
-  padding: 58px 7vw;
-}
-.local-grid {
-  max-width: 1120px;
-  margin: 26px auto 0;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-}
-.local h2 {
-  max-width: 1120px;
-  margin-left: auto;
-  margin-right: auto;
-}
-.local-lead {
-  max-width: 1120px;
-  margin: 0 auto;
-  color: var(--muted);
-}
-.local-item {
-  border: 1px solid var(--line);
-  padding: 22px;
-}
-.local-item b {
-  color: var(--opportunity);
-}
-.local-item p {
-  color: var(--band-ink);
-  margin-top: 10px;
-}
-.pipeline {
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 56px 7vw;
-  display: grid;
-  grid-template-columns: .9fr 1.1fr;
-  gap: 28px;
-  align-items: center;
-}
-.pipeline-title {
-  background: var(--warn-bg);
-  border-left: 6px solid var(--warn);
-  padding: 26px;
-}
-.pipeline-list {
-  display: grid;
-  gap: 12px;
-}
-.pipe-row {
-  display: grid;
-  grid-template-columns: 44px 1fr;
-  gap: 14px;
-  align-items: start;
-}
-.badge {
-  width: 44px;
-  height: 44px;
-  display: grid;
-  place-items: center;
-  background: var(--warn);
-  color: var(--band-ink);
-  border-radius: 50%;
-  font-weight: 900;
-}
-.pipe-row p {
-  margin: 0;
-  padding: 12px 0 16px;
-  border-bottom: 1px solid var(--line);
-}
-.takeaways {
-  padding: 58px 7vw 70px;
-}
-.takeaways-inner {
-  max-width: 1120px;
-  margin: 0 auto;
-}
-.mosaic {
-  display: grid;
-  grid-template-columns: 1.2fr .8fr 1fr;
-  gap: 14px;
-  margin-top: 22px;
-}
-.tile {
-  min-height: 150px;
-  padding: 22px;
-  color: var(--ink);
-}
-.tile h3 {
-  margin: 0 0 10px;
-  font-size: 18px;
-}
-.tile p { margin: 0; }
-.tile.data { background: var(--data-bg); border-top: 5px solid var(--data); }
-.tile.risk { background: var(--risk-bg); border-top: 5px solid var(--risk); }
-.tile.opp { background: var(--opportunity-bg); border-top: 5px solid var(--opportunity); }
-.tile.final {
-  background: var(--conclusion-bg);
-  border-top: 5px solid var(--conclusion);
-  grid-column: span 2;
-}
-@media (max-width: 900px) {
-  .metrics,
-  .split,
-  .steps,
-  .local-grid,
-  .pipeline,
-  .mosaic {
-    grid-template-columns: 1fr;
-  }
-  .metric {
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
-  }
-  .metric:last-child { border-bottom: 0; }
-  .insight-inner {
-    grid-template-columns: 1fr;
-  }
-  .tile.final {
-    grid-column: auto;
-  }
+.source-figure{margin:2.4rem 0}
+.source-figure img{display:block;max-width:100%;height:auto;margin:auto}
+.source-figure figcaption{margin-top:.75rem;color:var(--muted);font-size:.9rem;text-align:center}
+.footer-meta{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--line);color:var(--muted)}
+@media(max-width:760px){
+  .number-band{grid-template-columns:1fr 1fr}
+  .split,.architecture{grid-template-columns:1fr}
+  .architecture .arrow{transform:rotate(90deg);text-align:center}
+  .takeaways{grid-template-columns:1fr}
+  .takeaways article:nth-child(n){grid-column:auto}
+  .compare{display:block;overflow-x:auto}
 }
 </style>
-  <script id="airs-digest-theme-boot">
+<script id="airs-digest-theme-boot">
     try {
       var saved = localStorage.getItem("theme");
       if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
     } catch (e) {}
   </script>
-  <style id="airs-digest-theme-style">
+<style id="airs-digest-theme-style">
     :root {
       color-scheme: light;
       --airs-digest-ink: #191816;
@@ -531,177 +396,519 @@ td:nth-child(4) { color: var(--conclusion); }
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+  <style id="airs-source-image-theme-style">
+    .source-figure .source-image-dark {
+      display: none;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .source-figure .source-image-light {
+        display: none;
+      }
+      :root:not([data-theme="light"]) .source-figure .source-image-dark {
+        display: block;
+      }
+    }
+    :root[data-theme="dark"] .source-figure .source-image-light {
+      display: none;
+    }
+    :root[data-theme="dark"] .source-figure .source-image-dark {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-light {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-dark {
+      display: none;
+    }
   </style>
 </head>
 <body>
-<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/fast-regex-search" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">← 返回索引</a><a href="https://cursor.com/blog/fast-regex-search" rel="noopener noreferrer" target="_blank">阅读原文 ↗</a></div><button class="airs-digest-theme-toggle" data-airs-theme-toggle="" type="button">主题 · 跟随系统</button></nav>
+<header class="hero">
+<div class="eyebrow">Cursor Research · 2026</div>
+<h1>快速正则搜索：为智能体工具建立文本索引</h1>
+<p class="original" lang="en">Fast regex search: indexing text for agent tools</p>
+<p class="hero-summary"><strong>一句话总括：</strong>Cursor 把正则搜索从“扫描整个代码库”改造成“先用本地索引筛选候选文件，再做确定性匹配”，让智能体在大型仓库中更快获得准确且足够新鲜的文本上下文。</p>
+<p class="meta">来源：Cursor　·　日期：2026 年 3 月 23 日　·　作者：Vicent Marti</p>
+</header>
 <main>
-  <section class="hero">
-    <div class="hero-inner">
-      <div class="kicker">Cursor Research · Mar 23, 2026</div>
-      <h1>快速正则搜索：为 Agent 工具索引文本</h1>
-      <div class="original">Fast regex search: indexing text for agent tools</div>
-      <p class="thesis">一句话总括：文章的真正贡献，是把 Agent 常用的正则搜索从“每次扫完整个仓库”转向“本地、可更新、面向代码查询的文本索引”。</p>
-    </div>
-  </section>
-
-  <section class="metrics" aria-label="关键数字">
-    <div class="metric"><strong>1973</strong><span>grep 最早发布，正则文件搜索成为基础工具。</span></div>
-    <div class="metric"><strong>15s+</strong><span>Cursor 经常看到大型 monorepo 中的 rg 调用超过 15 秒。</span></div>
-    <div class="metric"><strong>1993</strong><span>n-gram 倒排索引用于部分指定词搜索的论文发表。</span></div>
-    <div class="metric"><strong>2B</strong><span>概率掩码方案每个 posting 只增加两个 8-bit 掩码。</span></div>
-    <div class="metric"><strong>2 files</strong><span>本地索引拆成 posting 文件和 mmap 查找表。</span></div>
-  </section>
-
-  <section class="split">
-    <div class="problem">
-      <h2>问题不是 ripgrep 慢，而是扫描范围太大</h2>
-      <p>ripgrep 的正则匹配非常快。它的问题在于必须查看所有文件。</p>
-      <p>在小项目里，这通常可以接受。在大型企业 monorepo 中，搜索延迟会直接阻塞人与 Agent 的交互。</p>
-      <p>这改变了读者对 AI 工具性能的理解：瓶颈不只在模型推理，也在模型每一步拿上下文的系统路径上。</p>
-    </div>
-    <div class="answer">
-      <span class="tag">核心判断</span>
-      <h2>正则搜索已成为 Agentic 开发的基础操作</h2>
-      <p>Agent 经常需要查找具体文本、符号片段、错误信息和代码模式。语义索引适合许多上下文检索任务，但不能替代所有正则查询。</p>
-      <p>因此，Cursor 把正则搜索视为类似 Go To Definition 的基础能力。它需要专门的本地索引，而不是每次退回全仓库扫描。</p>
-    </div>
-  </section>
-
-  <section class="flow-band">
-    <div class="timeline">
-      <h2>技术路线是一条逐步收窄候选文件的历史</h2>
-      <p>这些方案的共同目标很直接：先用索引找到“可能匹配”的文件，再用确定性的正则匹配确认结果。</p>
-      <div class="steps">
-        <div class="step"><b>1973</b><h3>grep</h3><p>逐文件匹配正则。简单可靠，但延迟随代码库规模增长。</p></div>
-        <div class="step"><b>1993</b><h3>n-gram 倒排索引</h3><p>把文本切成固定宽度片段，用 posting list 快速缩小范围。</p></div>
-        <div class="step"><b>2012</b><h3>Code Search 思路普及</h3><p>Russ Cox 的文章让三元组索引成为很多工程师熟悉的方案。</p></div>
-        <div class="step"><b>2015</b><h3>livegrep 后缀数组</h3><p>把源码拼成可二分查找的后缀数组，查询快但动态更新困难。</p></div>
-        <div class="step"><b>2B</b><h3>概率掩码</h3><p>用 nextMask 和 locMask 增强三元组，降低候选文件数量。</p></div>
-        <div class="step"><b>Now</b><h3>Sparse N-grams</h3><p>索引时多做工作，查询时只取最少且高区分度的 n-gram。</p></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="compare">
-    <h2>四类索引的取舍</h2>
-    <p>文章最有价值的部分，是没有把某一种结构包装成银弹，而是展示了每种结构为什么会在规模、更新和查询之间付出代价。</p>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>方案</th>
-            <th>优势</th>
-            <th>代价</th>
-            <th>对 Agent 的意义</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>经典三元组倒排索引</td>
-            <td>实现清晰，可复用搜索引擎结构。</td>
-            <td>索引不小，复杂正则可能需要加载大量 posting list。</td>
-            <td>能避免全仓库扫描，但查询分解质量决定收益。</td>
-          </tr>
-          <tr>
-            <td>后缀数组</td>
-            <td>可用二分搜索定位文字片段。</td>
-            <td>需要把语料拼成一个大字符串，增量更新昂贵。</td>
-            <td>适合静态语料，不适合频繁变化的工作区。</td>
-          </tr>
-          <tr>
-            <td>带概率掩码的三元组</td>
-            <td>用少量位信息模拟更强的四元组过滤。</td>
-            <td>Bloom filter 会饱和，原地更新会变痛苦。</td>
-            <td>说明“允许假阳性”是搜索加速的关键工程自由度。</td>
-          </tr>
-          <tr>
-            <td>Sparse N-grams</td>
-            <td>查询时只查少量高信息量片段。</td>
-            <td>索引构建更重，需要确定性权重函数。</td>
-            <td>更接近 Agent 工具需要的低延迟、高选择性检索。</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="insight">
-    <div class="insight-inner">
-      <div class="quote-mark">!</div>
-      <p>关键洞见：索引不需要直接给出最终答案。它只需要以很低的成本排除大多数不可能匹配的文件，然后把剩下的少量文件交给确定性正则匹配。</p>
-    </div>
-  </section>
-
-  <section class="local">
-    <h2>为什么索引要放在用户机器上</h2>
-    <p class="local-lead">Cursor 的选择不是把所有代码送到服务器，而是在本机建立和查询索引。这一决定同时影响延迟、隐私和新写入代码的可见性。</p>
-    <div class="local-grid">
-      <div class="local-item">
-        <b>延迟</b>
-        <p>Agent 会频繁并行调用搜索。网络往返会放大等待时间，尤其会削弱快速模型的交互优势。</p>
-      </div>
-      <div class="local-item">
-        <b>隐私</b>
-        <p>服务器端搜索要同步文件或反复回传内容。本地扫描避免了额外的数据存储风险。</p>
-      </div>
-      <div class="local-item">
-        <b>新鲜度</b>
-        <p>正则索引必须读到 Agent 刚写下的文本。否则模型会误判不存在，继续浪费 token 搜索。</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="pipeline">
-    <div class="pipeline-title">
-      <h2>本地实现的关键设计</h2>
-      <p>Cursor 用 Git commit 作为基础层，用户和 Agent 的修改作为覆盖层。这样启动同步和增量更新都更轻。</p>
-    </div>
-    <div class="pipeline-list">
-      <div class="pipe-row">
-        <div class="badge">1</div>
-        <p>posting 列表顺序写入磁盘，构建时不需要把全部 posting 留在编辑器内存中。</p>
-      </div>
-      <div class="pipe-row">
-        <div class="badge">2</div>
-        <p>查找表保存 n-gram 哈希和 posting 文件偏移量，并按哈希排序。</p>
-      </div>
-      <div class="pipe-row">
-        <div class="badge">3</div>
-        <p>编辑器只 mmap 查找表。查询时二分找到偏移，再从 posting 文件读取对应列表。</p>
-      </div>
-      <div class="pipe-row">
-        <div class="badge">4</div>
-        <p>哈希碰撞最多让候选集合变宽，不会产生错误结果。最终匹配仍由原始文本上的正则确认。</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="takeaways">
-    <div class="takeaways-inner">
-      <h2>最值得带走的洞见</h2>
-      <div class="mosaic">
-        <div class="tile data">
-          <h3>搜索延迟会塑造 Agent 行为</h3>
-          <p>当 rg 一次超过 15 秒时，问题已经不是工具小优化，而是交互循环被打断。</p>
-        </div>
-        <div class="tile risk">
-          <h3>语义索引不能替代正则</h3>
-          <p>具体文本、错误字符串和代码模式仍需要精确查找。Agent 工具链必须同时支持两类检索。</p>
-        </div>
-        <div class="tile opp">
-          <h3>假阳性可以接受</h3>
-          <p>索引阶段只负责缩小候选集。只要最后一步是确定性匹配，宽一点不会损害正确性。</p>
-        </div>
-        <div class="tile final">
-          <h3>本地索引是产品判断</h3>
-          <p>它同时服务于低延迟、隐私和读写一致性。对大型仓库中的 Agentic 开发来说，这比单纯追求服务器端集中索引更贴近工作流。</p>
-        </div>
-      </div>
-    </div>
-  </section>
+<div class="summary-wrap">
+<h2>先看真正的问题：快模型仍会被慢搜索卡住</h2>
+<p>ripgrep 已经把单个文件内的正则匹配做得很快。但它仍要读取所有文件。仓库越大，搜索延迟就越明显。对于频繁调用搜索工具的智能体，这不是一次性的等待，而是反复进入推理链路的系统性瓶颈。</p>
+<div aria-label="关键数字" class="number-band">
+<article><strong>&gt;15 秒</strong><span>Cursor 经常观察到的大型仓库 rg 调用耗时</span></article>
+<article><strong>1973</strong><span>第一版 grep 发布的年份</span></article>
+<article><strong>1993</strong><span>N-gram 倒排索引方法首次发表的年份</span></article>
+<article><strong>2 个文件</strong><span>Cursor 本地索引的磁盘布局</span></article>
+</div>
+<div class="split">
+<section class="problem">
+<h3>风险：扫描成本会随仓库扩大</h3>
+<p>grep 是少数会直接受代码库规模和复杂度影响的智能体操作。模型越快，这段等待越突出。缺陷调查尤其依赖多轮搜索，因此更容易被延迟拖慢。</p>
+<p><strong>结论：</strong>只优化正则引擎并不够。必须减少真正需要扫描的文件数量。</p>
+</section>
+<section class="answer">
+<h3>机会：把文本检索也变成本地索引操作</h3>
+<p>索引不直接给出最终答案。它先筛出可能匹配的文件，再由正则引擎读取原文并确认结果。</p>
+<p><strong>结论：</strong>索引允许出现假阳性，却不能漏掉真匹配。这样既能提速，也不牺牲正确性。</p>
+</section>
+</div>
+<section class="timeline">
+<h3>技术路线不是凭空出现的</h3>
+<ol>
+<li><strong>三元组倒排索引：</strong>用重叠的 3 字符片段建立 posting list。它在键数量和列表长度之间取得折中。</li>
+<li><strong>后缀数组：</strong>通过二分搜索定位匹配位置。查询能力强，但动态更新和多文件映射成本很高。</li>
+<li><strong>概率掩码：</strong>为三元组附加后继字符和位置掩码。它能像四元组一样收窄候选，但 Bloom filter 会饱和。</li>
+<li><strong>稀疏 N-gram：</strong>索引阶段多做工作，查询阶段只查覆盖匹配所需的少量片段。Cursor 选择它作为本地方案的基础。</li>
+</ol>
+<p><strong>洞见：</strong>这些方案的差异不只是查询速度。索引体积、更新代价和候选集精度同样决定它能否服务持续改写代码的智能体。</p>
+</section>
+<table class="compare">
+<thead>
+<tr><th>方案</th><th>关键数据或机制</th><th>改变了什么认识</th></tr>
+</thead>
+<tbody>
+<tr><td>二元组</td><td>键最多约 <mark>64K</mark>，但 posting list 过大</td><td>键少不等于索引高效。候选列表可能成为新的瓶颈。</td></tr>
+<tr><td>四元组</td><td>posting list 很小，但可能出现数十亿个键</td><td>更精确的 token 会把成本转移到索引规模。</td></tr>
+<tr><td>概率掩码</td><td>每个 posting 增加 <mark>2 字节</mark>，包括两个 8-bit 掩码</td><td>少量概率信息可以显著提升候选过滤能力，但原地更新会逐渐降低效果。</td></tr>
+<tr><td>稀疏 N-gram</td><td>以确定性权重选择可变长度片段；频率表来自数 TB 开源代码</td><td>把更多成本放到建索引阶段，可以减少智能体每次查询需要读取的 posting 数量。</td></tr>
+</tbody>
+</table>
+<blockquote class="insight">最关键的设计选择不是“找到最聪明的远程搜索服务”，而是把索引放到用户机器上。最终匹配本来就要读取本地文件。本地执行还能避开文件同步、网络往返和集中存储代码带来的隐私问题。</blockquote>
+<section class="architecture">
+<article>
+<h3>稳定基线</h3>
+<p>索引以底层 Git 仓库的某个 commit 为基线。用户和智能体产生的改动作为增量层叠加。</p>
+<p><strong>结果：</strong>启动时可以快速加载和同步，也能让模型及时读到自己的修改。</p>
+</article>
+<div aria-hidden="true" class="arrow">→</div>
+<article>
+<h3>紧凑查询</h3>
+<p>一个文件顺序存放 posting list。另一个文件保存排序后的 N-gram 哈希及偏移量。</p>
+<p>编辑器只 mmap 查找表，再用二分搜索找到偏移并读取 posting 文件。哈希碰撞最多扩大候选集，<span class="hl2">不会制造错误结果</span>。</p>
+</article>
+</section>
+<h2>最值得带走的洞见</h2>
+<div class="takeaways">
+<article><span class="badge">性能</span><p>智能体的实际速度取决于工具链，而不只取决于模型 TPS。一次超过 15 秒的搜索足以抵消快速生成带来的体验优势。</p></article>
+<article><span class="badge">方法</span><p>索引的职责是安全地排除不可能匹配的文件。最终结果仍由原文上的正则匹配确定。</p></article>
+<article><span class="badge">更新</span><p>文本索引必须比语义索引更新得更及时。智能体若搜不到自己刚写入的精确文本，可能浪费更多搜索和推理步骤。</p></article>
+<article><span class="badge">架构</span><p>本地索引同时减少网络延迟、文件同步成本和代码托管风险。对于大型私有仓库，这些收益相互强化。</p></article>
+</div>
+</div>
+<section id="translation">
+<h2>完整译文</h2>
+<div class="toc">
+<h3>目录</h3>
+<ul>
+<li>经典算法</li>
+<li>倒排索引</li>
+<li>三元组分解</li>
+<li>组合成完整方案</li>
+<li>后缀数组：一段题外话</li>
+<li>使用概率掩码的三元组查询</li>
+<li>稀疏 N-gram：更聪明地选择三元组</li>
+<li>把这一切放进你的电脑</li>
+<li>结论</li>
+</ul>
+</div>
+<p>时间仿佛是一个循环。第一版 grep 于 1973 年发布。它当时只是一个基础工具，用来在文件系统的文本文件中匹配正则表达式。</p>
+<p>随着开发工具日益先进，grep 逐渐被更专业的工具取代。最先出现的是 ctags 这类粗略的语法索引。后来，许多开发者转向针对特定编程语言打造的 IDE。这些 IDE 会解析代码并建立语法索引，通常还会补充类型层面的信息，因此能让开发者高效浏览代码库。</p>
+<p>最终，这套能力通过语言服务器协议（Language Server Protocol，LSP）实现了标准化。新旧文本编辑器都能使用这些索引。可就在 LSP 即将成为行业标准时，智能体编程出现了。结果颇为有趣：智能体非常喜欢使用 grep。</p>
+<p>当然，还有其他先进技术可以为智能体收集上下文。我们过去讨论过，语义索引能在许多任务中大幅改善智能体表现。但有些查询只能由模型借助正则表达式搜索来解决。这意味着我们又回到了 1973 年，尽管这个领域此后已经进步了不少。</p>
+<p>包括 Cursor 在内，大多数智能体运行框架都会默认使用 ripgrep 提供搜索工具。它是 Andrew Gallant 开发的独立可执行程序，可以替代经典的 grep。它提供了更合理的默认行为，例如忽略文件的方式，而且性能高得多。</p>
+<p>ripgrep 以速度快而闻名。这是因为 Andrew 花了大量时间研究如何提升正则表达式匹配速度。</p>
+<p>然而，无论 ripgrep 匹配单个文件内容的速度有多快，它都有一个严重限制：它必须检查所有文件的内容。</p>
+<p>在小型项目中，这不成问题。但 Cursor 的许多用户，尤其是大型企业客户，都在规模极大的单体仓库中工作。那些仓库大得令人痛苦。</p>
+<p>我们经常看到一次 rg 调用耗时超过 15 秒。对于正在主动指导智能体编写代码的人来说，这会严重打断工作流程。</p>
+<p>正则表达式匹配已经成为智能体开发中的关键环节。我们认为，必须专门优化这项操作。传统 IDE 会在本地建立语法索引，以支持“转到定义”等操作。与此类似，我们正在为现代智能体查找文本时最核心的操作建立索引。</p>
+<h3>经典算法</h3>
+<p>通过索引文本数据来加快正则表达式匹配，并不是新想法。Zobel、Moffat 和 Sacks-Davis 在 1993 年发表的论文《使用压缩倒排文件搜索部分指定的词项》（Searching Large Lexicons for Partially Specified Terms using Compressed Inverted Files）中首次提出了这种方法。</p>
+<p>他们使用 N-gram，也就是宽度为 N 个字符的字符串片段，来建立倒排索引。他们还提出了一些启发式方法，把正则表达式分解为一棵 N-gram 树，再通过索引查询这些片段。</p>
+<p>如果你以前听说过这个概念，更可能是从 Russ Cox 于 2012 年发表的一篇博客文章中了解到的。那篇文章发布于 Google Code Search 关闭后不久。</p>
+<p>下面快速回顾一下这类索引的基本组成。此后开发的其他索引方法，基本都沿用了这些构件。</p>
+<h3>倒排索引</h3>
+<p>倒排索引是搜索引擎背后的基础数据结构。</p>
+<p>建立倒排索引时，首先要把每份待索引文档拆分成 token。这个过程称为分词（tokenization），实现方式有很多。为了便于说明，这里采用最简单的方式：把每个单词视为一个 token。</p>
+<p>这些 token 会成为类似字典的数据结构中的键。每个键对应的值，是所有包含该 token 的文档列表。</p>
+<p>这份列表通常称为 posting list。每份文档都会由一个唯一数字标识，这个数字称为 posting。</p>
+<p>搜索一个或多个 token 时，我们会加载相应的 posting list。如果列表不止一个，就计算它们的交集，从而找出同时出现在所有列表中的文档。</p>
+<p class="ui-copy">编辑文档，观察索引如何更新。单击某个词项即可选中并查看它。</p>
+<p class="ui-copy">将鼠标悬停在词项上，或轻触词项，即可追踪同一个索引条目。</p>
+<p class="ui-copy">每个词项都会映射到包含它的文档。悬停或轻触即可逐一查看条目。</p>
+<p class="ui-copy">搜索词项，查找匹配的文档。</p>
+<p class="ui-copy">可以尝试搜索 cat、the 或 ran。</p>
+<p>如今大多数搜索引擎都以这种设计为基础，只是在上面增加了大量复杂机制。</p>
+<p>然而，这些搜索引擎面向的是自然语言。我们要搜索的却是正则表达式，而且匹配对象是源代码。这套方法并不完全适用。</p>
+<p>一种可能的办法，是在分词上投入大量精力。系统可以理解每种编程语言的语法，也可以拆分源代码中的标识符。但这很难做好。</p>
+<p>GitHub 早期的 Code Search 就采用过这条路线。它使用非常复杂的编程语言分词器，并依赖规模庞大的 ElasticSearch 集群。</p>
+<p>搜索效果并不好，用户对这个功能的评价也很差。它勉强能搜索标识符，却无法匹配正则表达式。要解决这个问题，必须采用更好的分词方式。</p>
+<h3>三元组分解</h3>
+<p>对源代码进行朴素分词，不适合正则表达式匹配。我们需要把文档拆成更基础的片段。</p>
+<p>经典算法选择三元组（trigram）。输入字符串中每个相互重叠的三字符片段，都会成为一个 token。</p>
+<p>为什么是三个字符？因为这些三元组将作为倒排索引的键。</p>
+<p>如果选择二元组，也就是长度为 2 的片段，索引中的键会很少，最多约为 64K。但每个键对应的 posting list 会非常庞大，难以高效处理。</p>
+<p>如果选择四元组，也就是长度为 4 的片段，posting list 会很小。这当然很好，但倒排索引可能出现数十亿个键，同样难以处理。</p>
+<p>因此，三元组是一个不错的折中。建立文档索引时，分词过程也很简单：提取文档中所有相互重叠的三字符序列，并把它们作为倒排索引中的 token。</p>
+<p>真正复杂的部分，是如何对正则表达式分词，使它能够通过索引进行匹配。</p>
+<p>正则表达式包含语法。系统必须先解析表达式，再用启发式方法判断哪些实际表示文本的片段能够提取出三元组。</p>
+<p>把字面字符串分解成三元组很直接，算法与建立文档索引时相同。只需提取字符串中的所有重叠三元组。</p>
+<p>包含全部这些三元组的文档，很可能包含这个字面字符串，但并非一定如此。</p>
+<p>选择分支需要分别分解。分解后会产生两个分支，只要文档包含其中一个分支，就可能匹配。查询倒排索引时，我们会合并 posting list，而不是计算交集。</p>
+<p>字符类可以分解成多个三元组。像 <code>[rbc]at</code> 这样的小型字符类，会为类中的每个元素生成一个三元组。</p>
+<p>对于范围更广的字符类，我们会直接跳过跨越这些边界的三元组提取。</p>
+<h3>组合成完整方案</h3>
+<p>现在，我们知道三元组适合用来切分文档，也知道如何在建立索引时切分文档，以及如何在查询时切分表达式。把这些部分组合起来，就能得到一个高效匹配正则表达式的搜索索引。</p>
+<p>系统先把正则表达式分解成一组三元组，再从倒排索引中加载相关的 posting list。这样会得到一份可能匹配该正则表达式的文档列表。</p>
+<p>这里必须强调“可能匹配”。最终结果仍然需要加载所有候选文档，并用传统方式执行正则表达式匹配。</p>
+<p>不过，扫描候选文档子集始终比逐个扫描并匹配整个代码库更快。</p>
+<p class="ui-copy">编辑文档，观察索引如何更新。单击三元组即可选中并查看它。</p>
+<p class="ui-copy">将鼠标悬停在三元组上，或轻触三元组，即可追踪同一个索引条目。</p>
+<p class="ui-copy">每个三元组都会映射到包含它的文档。悬停或轻触即可逐一查看条目。</p>
+<p class="ui-copy">使用字面字符串或正则表达式搜索，观察三元组如何分解。</p>
+<p class="ui-copy">可以尝试搜索 cat、the rat，或正则表达式 <code>c[au]t</code>。</p>
+<p>无论从哪个角度看，这套设计都完全可用。google/codesearch 和 sourcegraph/zoekt 等项目，都使用三元组倒排索引为大型索引提供了良好性能。与所有搜索引擎一样，它们还在基础设计之上增加了许多复杂机制。</p>
+<p>但这套方案也有明显缺点。索引体积并不小，而且查询时的分解策略必须做出取舍。</p>
+<p>如果采用简单的启发式方法，查询只会被分解成少量三元组。这样会产生大量候选文档。</p>
+<p>如果采用复杂的启发式方法，查询可能被分解成几十个，甚至数百个三元组。从倒排索引中加载所有这些条目，可能和从头搜索全部内容一样慢。</p>
+<p>我们还可以做得更好。</p>
+<h3>后缀数组：一段题外话</h3>
+<p>既然正在回顾正则表达式文本索引的发展历史，我想稍微离开主线，谈谈 Nelson Elhage 在 2015 年为其 livegrep Web 服务开发的实现。</p>
+<p>与其他大型产业项目相比，livegrep 的规模很小。它只索引 Linux Kernel 的最新版本。</p>
+<p>但正因为范围有限，它的实现与其他方案很不一样。这也让它格外有趣，值得讨论。</p>
+<p>Nelson 从第一性原理出发解决问题。这个搜索引擎背后没有倒排索引。相反，所有源代码都被索引进一个后缀数组。</p>
+<p>后缀数组的概念从名称就能看懂：它是一个字符串所有后缀按顺序排列而成的数组。</p>
+<p>如果尝试为较长的字符串建立后缀数组，就会发现这个数据结构增长得很快。它看起来是一种成本很高的索引，很多方面也确实如此。</p>
+<p>不过，如果能够访问原始字符串，它的存储可以得到很好的压缩。只需保存每个后缀起始位置的偏移量即可。</p>
+<p>为待搜索的语料建立后缀数组后，就可以把正则表达式分解成字面量，从而高效执行搜索。</p>
+<p>随后，可以在后缀数组上执行二分搜索，找出正则表达式所有可能的匹配位置。</p>
+<p class="ui-copy">尝试搜索 th 这样的短字符串，观察二分搜索如何圈定文档中的所有匹配位置。</p>
+<p>利用后缀数组的相同性质，还能匹配正则表达式中的复杂结构。</p>
+<p>例如，要匹配 <code>[a-z]</code> 这样的字符范围，可以分别对范围起点和终点执行二分搜索。两个端点之间的内容必然符合这个范围。</p>
+<p class="ui-copy">输入一个字符串来建立后缀数组。字符串中的每个位置都会定义一个后缀。</p>
+<p class="ui-copy">将鼠标悬停在某个后缀行上，或轻触该行，即可查看该后缀在字符串中的起始位置。</p>
+<p class="ui-copy">所有后缀按字典序排列。数组只保存索引，后缀内容由原始字符串推导得出。</p>
+<p>这套方案有什么缺点？后缀数组必须根据一个输入字符串建立。这是很大的限制。</p>
+<p>如果要索引大型代码库，甚至多个不同代码库，首先需要把全部内容连接成一个字符串，再基于它建立后缀数组。</p>
+<p>在后缀数组中匹配时，还需要辅助数据结构，把匹配位置映射回包含该位置的原始文件。</p>
+<p>这些复杂问题并非无法解决，但会让索引的动态更新变得非常昂贵。这是一种很难扩展的方案。</p>
+<h3>使用概率掩码的三元组查询</h3>
+<p>现在回到更传统的设计。下面介绍一种最初由 GitHub 为 Project Blackbird 开发的方法。</p>
+<p>这是一个旨在替代旧版 Code Search 的研究项目。前面提到，旧版搜索通过切分源代码来实现，无法匹配正则表达式。新实现的目标，就是加入这种能力。</p>
+<p>早期版本尝试采用经典的三元组倒排索引，但很快遇到了容量问题。</p>
+<p>GitHub 上有海量代码。使用三元组建立索引后，posting list 大得难以搜索。</p>
+<p>既然三元组不够理想，下一步就是为索引寻找更合适的 N-gram 长度。</p>
+<p>我们已经看到，二元组覆盖范围太宽，posting list 会大到难以管理。四元组又过于具体，会让索引产生太多键。</p>
+<p>三元组处在两者之间。但在实际应用中，理想长度更像是“三点五元组”。可是，我们总不能把一个字符切成两半吧？</p>
+<p>事实上，我们可以实现非常接近的效果。</p>
+<p>这套设计仍用三元组作为倒排索引的键，但会在 posting list 中加入额外信息，记录特定文档中跟在该三元组之后的“第四个字符”。</p>
+<p>我们可以直接用一个额外字节保存第四个字符。但这样会让索引变成四元组索引，而前面已经说明，四元组索引太大。</p>
+<p>因此，实际保存的是一个 Bloom filter。它包含跟在特定三元组之后的所有字符。</p>
+<p class="ui-copy">每个三元组都带有一个 8-bit locMask（位置对 8 取模）和一个 nextMask（每个后继字符的哈希）。</p>
+<p class="ui-copy">将鼠标悬停在三元组上，或轻触三元组，即可追踪索引中的同一个条目。</p>
+<p class="ui-copy">每个（三元组，文档）条目保存两个 8-bit 掩码。悬停或轻触即可逐一查看三元组。</p>
+<p>你可能觉得 Bloom filter 是一种庞大而复杂的数据结构，但它不一定如此。Bloom filter 可以压缩到很少的几个 bit。</p>
+<p>如果编码足够仔细，8 bit 也能容纳很多信息。每个 posting 只需增加两个字节，就能绕开经典三元组索引的两个最大问题。</p>
+<p>有了保存三元组后继字符的掩码，倒排索引仍可使用三元组作为键，却能使用四元组进行查询。</p>
+<p>与简单的三元组索引相比，这已经可以大幅缩小候选文档范围。</p>
+<p>第二个增强掩码保存三元组在文档中的位置偏移。它可以解决三元组的歧义问题。</p>
+<p>文档包含两个三元组，不代表它们在文档中彼此相邻。但要匹配查询，它们必须相邻。</p>
+<p>我们把第二个三元组的位置掩码左移一位，再与第一个三元组的掩码比较。这样就能确认两者确实相邻。</p>
+<p>对于非常常见的三元组，这种能力尤其重要。它可以进一步缩小候选文档列表。</p>
+<p>这些信息当然都是概率性的。与 Bloom filter 中保存的任何信息一样，它可能产生假阳性。</p>
+<p>但在这里，假阳性完全可以接受。最终匹配仍会在文本本身上以确定性方式执行。索引的目标，只是尽量减少需要扫描的候选文档数量。</p>
+<p>最终得到的索引效率极高，但存在一个重大缺点：Bloom filter 可能饱和。</p>
+<p>这是 Bloom filter 令人遗憾的特性。它可以更新，但如果加入过多数据，最终过滤器中的所有 bit 都会被置位。</p>
+<p>Bloom filter 一旦饱和，就会匹配所有内容。这样又会退回到最初那种索引的性能水平。</p>
+<p>这套索引最大限度地减少了存储空间，却很难高效地进行原地更新。</p>
+<h3>稀疏 N-gram：更聪明地选择三元组</h3>
+<p>下面是另一个非常巧妙的想法。你可能在 ClickHouse 的正则表达式运算符中见过它。GitHub 几年前推出的新版 Code Search 也采用了它，并且支持正则表达式匹配。</p>
+<p>它叫作稀疏 N-gram（Sparse N-grams），是各种折中方案中最出色的一种。</p>
+<p>传统三元组索引会提取每一个连续的三字符序列。这样会产生大量冗余，因为每个三元组中的字符都会在相邻三元组中重复出现。</p>
+<p>这套算法会提取数量不定的 N-gram，而且每个 N-gram 的长度也不固定。</p>
+<p>这里的“随机”当然不能是真正的随机，否则索引就无法查询。</p>
+<p>我们会为文档中的每一对字符分配一个“权重”。只要结果具有确定性，权重可以用任何方式计算。ClickHouse 使用两个字符的 crc32 哈希。</p>
+<p>随后，我们选择这样的子字符串作为稀疏 N-gram：子字符串两端的权重，都严格大于内部的所有权重。</p>
+<p>关键在于，稀疏 N-gram 可以具有任意长度。它们并不统一。</p>
+<p>这也意味着，算法可能生成很多 N-gram，甚至比单纯提取三元组还多。</p>
+<p>不过，N-gram 是以确定性方式生成的，因此查询时可以进行一些非常重要的优化。下面看看它如何工作。</p>
+<p>这套算法并不容易理解，所以需要通过交互来观察。你可以使用可视化界面中的前进和后退箭头，逐步查看运行过程。</p>
+<p class="ui-copy">输入内容的字符分解上方，会显示分配给每对字符的随机权重。这些权重决定了哪些片段会被提取为 N-gram。</p>
+<p class="ui-copy">最下方区域会显示输入字符串提取出的稀疏 N-gram 数量，以及采用二元组、三元组或四元组时会提取的数量。差异非常明显：算法确实提取了大量稀疏 N-gram。</p>
+<p>那么，这到底有什么意义？我们只是在做一件愚蠢的事吗？并不是。</p>
+<p>我们在建立索引时承担较高的前期成本，以换取查询阶段的极快速度。</p>
+<p>当前展示的 <code>build_all</code> 算法用于索引文档。它会从输入中提取所有可能的稀疏 N-gram。</p>
+<p>但查询时不必这样做。因为权重虽然像随机值，却具有确定性，所以查询时可以使用覆盖算法，只生成在索引中完成匹配所需的最少 N-gram。</p>
+<p>我们知道这些 N-gram 已经是最少集合。原因在于，建立索引时，只有片段内部的所有权重都低于两端权重，算法才会生成该 N-gram。</p>
+<p>因此，查询时只需提取边缘位置的稀疏 N-gram。它们的数量远少于全部三元组，同时仍能以很高的精度筛选候选文档。</p>
+<p>还能做得更好吗？可以，而且能好很多。</p>
+<p>前面的示例使用 crc32 作为权重函数。不过，只要结果具有确定性，任何哈希函数都可以使用。</p>
+<p>我们可以选择一种更聪明的函数：实际非常罕见的字符对获得高权重，非常常见的字符对获得低权重。</p>
+<p>这种函数很容易计算。因为索引对象是源代码，我们可以从互联网上收集数 TB 的开源代码，再统计其中所有字符对的频率表。</p>
+<p>这张频率表就是我们的哈希函数。</p>
+<p>把它应用到算法后，最高权重会出现在最不常见的字符对下方。因此，覆盖模式需要查询的 N-gram 会更少，可能匹配的文档也会更少。</p>
+<p>这种方案能最大限度地减少 posting 查询次数。它非常适合作为起点，用来构建可在用户电脑上高效查询的索引。</p>
+<h3>把这一切放进你的电脑</h3>
+<p>用于加快正则表达式搜索的索引总要存放在某个地方。</p>
+<p>此前看到的所有设计都部署在服务端。我们讨论过的语义索引，也由服务端负责管理和查询。</p>
+<p>但这一次，我们选择了不同方向：在用户的电脑上建立并查询索引。</p>
+<p>把索引留在本地有几个合理的原因。</p>
+<p>首先，索引只是正则表达式匹配所需的一部分。它能筛出可能匹配的文档子集，但系统仍要逐一扫描其中的文件。</p>
+<p>如果在服务端完成这项工作，就必须同步所有文件，或者在服务端与客户端之间进行成本高昂的多次往返。</p>
+<p>在客户端执行则很简单。它还能避开数据存储相关的许多安全和隐私问题。</p>
+<p>延迟对这项功能也十分重要。</p>
+<p>我们的 Composer 模型拥有业界领先的每秒 token 数（TPS）表现之一。我们也一直在努力让它变得更聪明、更快。</p>
+<p>模型会持续调用搜索这项关键操作，而且经常并行调用。为它加入网络往返只会增加阻力和停顿，与我们改善智能体交互体验的目标背道而驰。</p>
+<p>与语义索引不同，正则表达式搜索索引还必须非常新鲜。模型能否读到自己刚写入的内容，尤其重要。</p>
+<p>语义索引不必持续更新。文件修改后，即使重新计算 embedding，新向量通常也不会在多维空间中发生显著位移。最近邻搜索仍会把智能体引向正确方向。</p>
+<p>但如果智能体搜索某段具体文本却没有找到，它往往会开始无效追查。这会浪费 token，也会从根本上抵消性能优化的意义。</p>
+<p>把索引带到客户端，也会产生新的挑战。同步磁盘数据既复杂又昂贵，但我们在实践中把它做得很高效。</p>
+<p>我们以底层 Git 仓库中的一个 commit 为基准，控制索引状态。用户和智能体的改动会作为叠加层存储在它之上。</p>
+<p>因此，索引可以快速更新，也能在启动时快速加载和同步。</p>
+<p>为了尽量降低编辑器中的内存占用，我们把索引存储在两个独立文件中。</p>
+<p>第一个文件依次保存索引的所有 posting list。构建索引时，我们会把它们直接刷新到磁盘。</p>
+<p>另一个文件保存一张排序表，其中包含所有 N-gram 的哈希，以及对应 posting list 在 posting 文件中的偏移量。</p>
+<p>这里只保存哈希，不保存完整 N-gram，而且始终是安全的。</p>
+<p>如果两个哈希发生碰撞，posting list 的覆盖范围可能变大。这在实践中极少发生，但即使发生，也不会产生错误结果。</p>
+<p>这种方式还能让查找表的布局非常紧凑。</p>
+<p>随后，我们在编辑器进程中只对这张表执行 mmap，并使用二分搜索处理查询。</p>
+<p>搜索会返回一个偏移量。系统再直接读取 posting 文件中对应偏移位置的数据。</p>
+<p class="ui-copy">将鼠标悬停在查找表中的某一行，或轻触该行，即可追踪对应 posting 在磁盘上的位置。</p>
+<h3>结论</h3>
+<p>我们发现，为 Composer 2 这类快速模型提供文本搜索索引，会给智能体工作流带来质的变化。</p>
+<p>这种影响在大型企业仓库中更加明显。grep 是少数延迟会随代码规模和复杂度增长的智能体操作。</p>
+<p>可以看看这些由 Composer 2 运行的示例工作流。彻底消除代码库搜索耗时，能节省可观的时间。</p>
+<p>智能体调查缺陷时，收益尤其明显。搜索加快后，迭代也会有效得多。</p>
+<p class="ui-copy">切换模式，然后将鼠标悬停在某个片段上，或轻触该片段，即可查看它的持续时间。</p>
+<p>下一步会是什么？谁也不知道。</p>
+<p>围绕如何为智能体提供上下文，正在出现许多令人兴奋的新进展。包括 Cursor 的研究人员在内，很多人都在研究这个方向。</p>
+<p>我们会继续优化现有方法的性能，其中也包括语义索引。</p>
+<p>我们还希望推出全新的方法，进一步提升智能体表现。同时，我们会始终确保这些方法能在最重要的环境中正常运行。</p>
+<p>这里所说的环境，就是世界上规模最大的代码仓库。智能体开发的未来，正在这些仓库中真正形成势头。</p>
+<div class="footer-meta">
+<p>归档分类：Research</p>
+<p>作者：Vicent Marti</p>
+<ul>
+<li>训练 Composer 处理更长周期的任务</li>
+<li>奖励黑客正在淹没模型智能的提升</li>
+<li>安全地索引大型代码库</li>
+<li>快速正则搜索：为智能体工具建立文本索引</li>
+</ul>
+</div>
+<div class="repeat-divider">以下内容在输入正文中再次出现，按原顺序完整翻译</div>
+<div class="toc">
+<h3>目录</h3>
+<ul>
+<li>经典算法</li>
+<li>倒排索引</li>
+<li>三元组分解</li>
+<li>组合成完整方案</li>
+<li>后缀数组：一段题外话</li>
+<li>使用概率掩码的三元组查询</li>
+<li>稀疏 N-gram：更聪明地选择三元组</li>
+<li>把这一切放进你的电脑</li>
+<li>结论</li>
+</ul>
+</div>
+<p>时间仿佛是一个循环。第一版 grep 于 1973 年发布。它当时只是一个基础工具，用来在文件系统的文本文件中匹配正则表达式。</p>
+<p>随着开发工具日益先进，grep 逐渐被更专业的工具取代。最先出现的是 ctags 这类粗略的语法索引。后来，许多开发者转向针对特定编程语言打造的 IDE。这些 IDE 会解析代码并建立语法索引，通常还会补充类型层面的信息，因此能让开发者高效浏览代码库。</p>
+<p>最终，这套能力通过语言服务器协议（Language Server Protocol，LSP）实现了标准化。新旧文本编辑器都能使用这些索引。可就在 LSP 即将成为行业标准时，智能体编程出现了。结果颇为有趣：智能体非常喜欢使用 grep。</p>
+<p>当然，还有其他先进技术可以为智能体收集上下文。我们过去讨论过，语义索引能在许多任务中大幅改善智能体表现。但有些查询只能由模型借助正则表达式搜索来解决。这意味着我们又回到了 1973 年，尽管这个领域此后已经进步了不少。</p>
+<p>包括 Cursor 在内，大多数智能体运行框架都会默认使用 ripgrep 提供搜索工具。它是 Andrew Gallant 开发的独立可执行程序，可以替代经典的 grep。它提供了更合理的默认行为，例如忽略文件的方式，而且性能高得多。</p>
+<p>ripgrep 以速度快而闻名。这是因为 Andrew 花了大量时间研究如何提升正则表达式匹配速度。</p>
+<p>然而，无论 ripgrep 匹配单个文件内容的速度有多快，它都有一个严重限制：它必须检查所有文件的内容。</p>
+<p>在小型项目中，这不成问题。但 Cursor 的许多用户，尤其是大型企业客户，都在规模极大的单体仓库中工作。那些仓库大得令人痛苦。</p>
+<p>我们经常看到一次 rg 调用耗时超过 15 秒。对于正在主动指导智能体编写代码的人来说，这会严重打断工作流程。</p>
+<p>正则表达式匹配已经成为智能体开发中的关键环节。我们认为，必须专门优化这项操作。传统 IDE 会在本地建立语法索引，以支持“转到定义”等操作。与此类似，我们正在为现代智能体查找文本时最核心的操作建立索引。</p>
+<h3>经典算法</h3>
+<p>通过索引文本数据来加快正则表达式匹配，并不是新想法。Zobel、Moffat 和 Sacks-Davis 在 1993 年发表的论文《使用压缩倒排文件搜索部分指定的词项》（Searching Large Lexicons for Partially Specified Terms using Compressed Inverted Files）中首次提出了这种方法。</p>
+<p>他们使用 N-gram，也就是宽度为 N 个字符的字符串片段，来建立倒排索引。他们还提出了一些启发式方法，把正则表达式分解为一棵 N-gram 树，再通过索引查询这些片段。</p>
+<p>如果你以前听说过这个概念，更可能是从 Russ Cox 于 2012 年发表的一篇博客文章中了解到的。那篇文章发布于 Google Code Search 关闭后不久。</p>
+<p>下面快速回顾一下这类索引的基本组成。此后开发的其他索引方法，基本都沿用了这些构件。</p>
+<h3>倒排索引</h3>
+<p>倒排索引是搜索引擎背后的基础数据结构。</p>
+<p>建立倒排索引时，首先要把每份待索引文档拆分成 token。这个过程称为分词（tokenization），实现方式有很多。为了便于说明，这里采用最简单的方式：把每个单词视为一个 token。</p>
+<p>这些 token 会成为类似字典的数据结构中的键。每个键对应的值，是所有包含该 token 的文档列表。</p>
+<p>这份列表通常称为 posting list。每份文档都会由一个唯一数字标识，这个数字称为 posting。</p>
+<p>搜索一个或多个 token 时，我们会加载相应的 posting list。如果列表不止一个，就计算它们的交集，从而找出同时出现在所有列表中的文档。</p>
+<p class="ui-copy">编辑文档，观察索引如何更新。单击某个词项即可选中并查看它。</p>
+<p class="ui-copy">将鼠标悬停在词项上，或轻触词项，即可追踪同一个索引条目。</p>
+<p class="ui-copy">每个词项都会映射到包含它的文档。悬停或轻触即可逐一查看条目。</p>
+<p class="ui-copy">搜索词项，查找匹配的文档。</p>
+<p class="ui-copy">可以尝试搜索 cat、the 或 ran。</p>
+<p>如今大多数搜索引擎都以这种设计为基础，只是在上面增加了大量复杂机制。</p>
+<p>然而，这些搜索引擎面向的是自然语言。我们要搜索的却是正则表达式，而且匹配对象是源代码。这套方法并不完全适用。</p>
+<p>一种可能的办法，是在分词上投入大量精力。系统可以理解每种编程语言的语法，也可以拆分源代码中的标识符。但这很难做好。</p>
+<p>GitHub 早期的 Code Search 就采用过这条路线。它使用非常复杂的编程语言分词器，并依赖规模庞大的 ElasticSearch 集群。</p>
+<p>搜索效果并不好，用户对这个功能的评价也很差。它勉强能搜索标识符，却无法匹配正则表达式。要解决这个问题，必须采用更好的分词方式。</p>
+<h3>三元组分解</h3>
+<p>对源代码进行朴素分词，不适合正则表达式匹配。我们需要把文档拆成更基础的片段。</p>
+<p>经典算法选择三元组（trigram）。输入字符串中每个相互重叠的三字符片段，都会成为一个 token。</p>
+<p>为什么是三个字符？因为这些三元组将作为倒排索引的键。</p>
+<p>如果选择二元组，也就是长度为 2 的片段，索引中的键会很少，最多约为 64K。但每个键对应的 posting list 会非常庞大，难以高效处理。</p>
+<p>如果选择四元组，也就是长度为 4 的片段，posting list 会很小。这当然很好，但倒排索引可能出现数十亿个键，同样难以处理。</p>
+<p>因此，三元组是一个不错的折中。建立文档索引时，分词过程也很简单：提取文档中所有相互重叠的三字符序列，并把它们作为倒排索引中的 token。</p>
+<p>真正复杂的部分，是如何对正则表达式分词，使它能够通过索引进行匹配。</p>
+<p>正则表达式包含语法。系统必须先解析表达式，再用启发式方法判断哪些实际表示文本的片段能够提取出三元组。</p>
+<p>把字面字符串分解成三元组很直接，算法与建立文档索引时相同。只需提取字符串中的所有重叠三元组。</p>
+<p>包含全部这些三元组的文档，很可能包含这个字面字符串，但并非一定如此。</p>
+<p>选择分支需要分别分解。分解后会产生两个分支，只要文档包含其中一个分支，就可能匹配。查询倒排索引时，我们会合并 posting list，而不是计算交集。</p>
+<p>字符类可以分解成多个三元组。像 <code>[rbc]at</code> 这样的小型字符类，会为类中的每个元素生成一个三元组。</p>
+<p>对于范围更广的字符类，我们会直接跳过跨越这些边界的三元组提取。</p>
+<h3>组合成完整方案</h3>
+<p>现在，我们知道三元组适合用来切分文档，也知道如何在建立索引时切分文档，以及如何在查询时切分表达式。把这些部分组合起来，就能得到一个高效匹配正则表达式的搜索索引。</p>
+<p>系统先把正则表达式分解成一组三元组，再从倒排索引中加载相关的 posting list。这样会得到一份可能匹配该正则表达式的文档列表。</p>
+<p>这里必须强调“可能匹配”。最终结果仍然需要加载所有候选文档，并用传统方式执行正则表达式匹配。</p>
+<p>不过，扫描候选文档子集始终比逐个扫描并匹配整个代码库更快。</p>
+<p class="ui-copy">编辑文档，观察索引如何更新。单击三元组即可选中并查看它。</p>
+<p class="ui-copy">将鼠标悬停在三元组上，或轻触三元组，即可追踪同一个索引条目。</p>
+<p class="ui-copy">每个三元组都会映射到包含它的文档。悬停或轻触即可逐一查看条目。</p>
+<p class="ui-copy">使用字面字符串或正则表达式搜索，观察三元组如何分解。</p>
+<p class="ui-copy">可以尝试搜索 cat、the rat，或正则表达式 <code>c[au]t</code>。</p>
+<p>无论从哪个角度看，这套设计都完全可用。google/codesearch 和 sourcegraph/zoekt 等项目，都使用三元组倒排索引为大型索引提供了良好性能。与所有搜索引擎一样，它们还在基础设计之上增加了许多复杂机制。</p>
+<p>但这套方案也有明显缺点。索引体积并不小，而且查询时的分解策略必须做出取舍。</p>
+<p>如果采用简单的启发式方法，查询只会被分解成少量三元组。这样会产生大量候选文档。</p>
+<p>如果采用复杂的启发式方法，查询可能被分解成几十个，甚至数百个三元组。从倒排索引中加载所有这些条目，可能和从头搜索全部内容一样慢。</p>
+<p>我们还可以做得更好。</p>
+<h3>后缀数组：一段题外话</h3>
+<p>既然正在回顾正则表达式文本索引的发展历史，我想稍微离开主线，谈谈 Nelson Elhage 在 2015 年为其 livegrep Web 服务开发的实现。</p>
+<p>与其他大型产业项目相比，livegrep 的规模很小。它只索引 Linux Kernel 的最新版本。</p>
+<p>但正因为范围有限，它的实现与其他方案很不一样。这也让它格外有趣，值得讨论。</p>
+<p>Nelson 从第一性原理出发解决问题。这个搜索引擎背后没有倒排索引。相反，所有源代码都被索引进一个后缀数组。</p>
+<p>后缀数组的概念从名称就能看懂：它是一个字符串所有后缀按顺序排列而成的数组。</p>
+<p>如果尝试为较长的字符串建立后缀数组，就会发现这个数据结构增长得很快。它看起来是一种成本很高的索引，很多方面也确实如此。</p>
+<p>不过，如果能够访问原始字符串，它的存储可以得到很好的压缩。只需保存每个后缀起始位置的偏移量即可。</p>
+<p>为待搜索的语料建立后缀数组后，就可以把正则表达式分解成字面量，从而高效执行搜索。</p>
+<p>随后，可以在后缀数组上执行二分搜索，找出正则表达式所有可能的匹配位置。</p>
+<p class="ui-copy">尝试搜索 th 这样的短字符串，观察二分搜索如何圈定文档中的所有匹配位置。</p>
+<p>利用后缀数组的相同性质，还能匹配正则表达式中的复杂结构。</p>
+<p>例如，要匹配 <code>[a-z]</code> 这样的字符范围，可以分别对范围起点和终点执行二分搜索。两个端点之间的内容必然符合这个范围。</p>
+<p class="ui-copy">输入一个字符串来建立后缀数组。字符串中的每个位置都会定义一个后缀。</p>
+<p class="ui-copy">将鼠标悬停在某个后缀行上，或轻触该行，即可查看该后缀在字符串中的起始位置。</p>
+<p class="ui-copy">所有后缀按字典序排列。数组只保存索引，后缀内容由原始字符串推导得出。</p>
+<p>这套方案有什么缺点？后缀数组必须根据一个输入字符串建立。这是很大的限制。</p>
+<p>如果要索引大型代码库，甚至多个不同代码库，首先需要把全部内容连接成一个字符串，再基于它建立后缀数组。</p>
+<p>在后缀数组中匹配时，还需要辅助数据结构，把匹配位置映射回包含该位置的原始文件。</p>
+<p>这些复杂问题并非无法解决，但会让索引的动态更新变得非常昂贵。这是一种很难扩展的方案。</p>
+<h3>使用概率掩码的三元组查询</h3>
+<p>现在回到更传统的设计。下面介绍一种最初由 GitHub 为 Project Blackbird 开发的方法。</p>
+<p>这是一个旨在替代旧版 Code Search 的研究项目。前面提到，旧版搜索通过切分源代码来实现，无法匹配正则表达式。新实现的目标，就是加入这种能力。</p>
+<p>早期版本尝试采用经典的三元组倒排索引，但很快遇到了容量问题。</p>
+<p>GitHub 上有海量代码。使用三元组建立索引后，posting list 大得难以搜索。</p>
+<p>既然三元组不够理想，下一步就是为索引寻找更合适的 N-gram 长度。</p>
+<p>我们已经看到，二元组覆盖范围太宽，posting list 会大到难以管理。四元组又过于具体，会让索引产生太多键。</p>
+<p>三元组处在两者之间。但在实际应用中，理想长度更像是“三点五元组”。可是，我们总不能把一个字符切成两半吧？</p>
+<p>事实上，我们可以实现非常接近的效果。</p>
+<p>这套设计仍用三元组作为倒排索引的键，但会在 posting list 中加入额外信息，记录特定文档中跟在该三元组之后的“第四个字符”。</p>
+<p>我们可以直接用一个额外字节保存第四个字符。但这样会让索引变成四元组索引，而前面已经说明，四元组索引太大。</p>
+<p>因此，实际保存的是一个 Bloom filter。它包含跟在特定三元组之后的所有字符。</p>
+<p class="ui-copy">每个三元组都带有一个 8-bit locMask（位置对 8 取模）和一个 nextMask（每个后继字符的哈希）。</p>
+<p class="ui-copy">将鼠标悬停在三元组上，或轻触三元组，即可追踪索引中的同一个条目。</p>
+<p class="ui-copy">每个（三元组，文档）条目保存两个 8-bit 掩码。悬停或轻触即可逐一查看三元组。</p>
+<p>你可能觉得 Bloom filter 是一种庞大而复杂的数据结构，但它不一定如此。Bloom filter 可以压缩到很少的几个 bit。</p>
+<p>如果编码足够仔细，8 bit 也能容纳很多信息。每个 posting 只需增加两个字节，就能绕开经典三元组索引的两个最大问题。</p>
+<p>有了保存三元组后继字符的掩码，倒排索引仍可使用三元组作为键，却能使用四元组进行查询。</p>
+<p>与简单的三元组索引相比，这已经可以大幅缩小候选文档范围。</p>
+<p>第二个增强掩码保存三元组在文档中的位置偏移。它可以解决三元组的歧义问题。</p>
+<p>文档包含两个三元组，不代表它们在文档中彼此相邻。但要匹配查询，它们必须相邻。</p>
+<p>我们把第二个三元组的位置掩码左移一位，再与第一个三元组的掩码比较。这样就能确认两者确实相邻。</p>
+<p>对于非常常见的三元组，这种能力尤其重要。它可以进一步缩小候选文档列表。</p>
+<p>这些信息当然都是概率性的。与 Bloom filter 中保存的任何信息一样，它可能产生假阳性。</p>
+<p>但在这里，假阳性完全可以接受。最终匹配仍会在文本本身上以确定性方式执行。索引的目标，只是尽量减少需要扫描的候选文档数量。</p>
+<p>最终得到的索引效率极高，但存在一个重大缺点：Bloom filter 可能饱和。</p>
+<p>这是 Bloom filter 令人遗憾的特性。它可以更新，但如果加入过多数据，最终过滤器中的所有 bit 都会被置位。</p>
+<p>Bloom filter 一旦饱和，就会匹配所有内容。这样又会退回到最初那种索引的性能水平。</p>
+<p>这套索引最大限度地减少了存储空间，却很难高效地进行原地更新。</p>
+<h3>稀疏 N-gram：更聪明地选择三元组</h3>
+<p>下面是另一个非常巧妙的想法。你可能在 ClickHouse 的正则表达式运算符中见过它。GitHub 几年前推出的新版 Code Search 也采用了它，并且支持正则表达式匹配。</p>
+<p>它叫作稀疏 N-gram（Sparse N-grams），是各种折中方案中最出色的一种。</p>
+<p>传统三元组索引会提取每一个连续的三字符序列。这样会产生大量冗余，因为每个三元组中的字符都会在相邻三元组中重复出现。</p>
+<p>这套算法会提取数量不定的 N-gram，而且每个 N-gram 的长度也不固定。</p>
+<p>这里的“随机”当然不能是真正的随机，否则索引就无法查询。</p>
+<p>我们会为文档中的每一对字符分配一个“权重”。只要结果具有确定性，权重可以用任何方式计算。ClickHouse 使用两个字符的 crc32 哈希。</p>
+<p>随后，我们选择这样的子字符串作为稀疏 N-gram：子字符串两端的权重，都严格大于内部的所有权重。</p>
+<p>关键在于，稀疏 N-gram 可以具有任意长度。它们并不统一。</p>
+<p>这也意味着，算法可能生成很多 N-gram，甚至比单纯提取三元组还多。</p>
+<p>不过，N-gram 是以确定性方式生成的，因此查询时可以进行一些非常重要的优化。下面看看它如何工作。</p>
+<p>这套算法并不容易理解，所以需要通过交互来观察。你可以使用可视化界面中的前进和后退箭头，逐步查看运行过程。</p>
+<p class="ui-copy">输入内容的字符分解上方，会显示分配给每对字符的随机权重。这些权重决定了哪些片段会被提取为 N-gram。</p>
+<p class="ui-copy">最下方区域会显示输入字符串提取出的稀疏 N-gram 数量，以及采用二元组、三元组或四元组时会提取的数量。差异非常明显：算法确实提取了大量稀疏 N-gram。</p>
+<p>那么，这到底有什么意义？我们只是在做一件愚蠢的事吗？并不是。</p>
+<p>我们在建立索引时承担较高的前期成本，以换取查询阶段的极快速度。</p>
+<p>当前展示的 <code>build_all</code> 算法用于索引文档。它会从输入中提取所有可能的稀疏 N-gram。</p>
+<p>但查询时不必这样做。因为权重虽然像随机值，却具有确定性，所以查询时可以使用覆盖算法，只生成在索引中完成匹配所需的最少 N-gram。</p>
+<p>我们知道这些 N-gram 已经是最少集合。原因在于，建立索引时，只有片段内部的所有权重都低于两端权重，算法才会生成该 N-gram。</p>
+<p>因此，查询时只需提取边缘位置的稀疏 N-gram。它们的数量远少于全部三元组，同时仍能以很高的精度筛选候选文档。</p>
+<p>还能做得更好吗？可以，而且能好很多。</p>
+<p>前面的示例使用 crc32 作为权重函数。不过，只要结果具有确定性，任何哈希函数都可以使用。</p>
+<p>我们可以选择一种更聪明的函数：实际非常罕见的字符对获得高权重，非常常见的字符对获得低权重。</p>
+<p>这种函数很容易计算。因为索引对象是源代码，我们可以从互联网上收集数 TB 的开源代码，再统计其中所有字符对的频率表。</p>
+<p>这张频率表就是我们的哈希函数。</p>
+<p>把它应用到算法后，最高权重会出现在最不常见的字符对下方。因此，覆盖模式需要查询的 N-gram 会更少，可能匹配的文档也会更少。</p>
+<p>这种方案能最大限度地减少 posting 查询次数。它非常适合作为起点，用来构建可在用户电脑上高效查询的索引。</p>
+<h3>把这一切放进你的电脑</h3>
+<p>用于加快正则表达式搜索的索引总要存放在某个地方。</p>
+<p>此前看到的所有设计都部署在服务端。我们讨论过的语义索引，也由服务端负责管理和查询。</p>
+<p>但这一次，我们选择了不同方向：在用户的电脑上建立并查询索引。</p>
+<p>把索引留在本地有几个合理的原因。</p>
+<p>首先，索引只是正则表达式匹配所需的一部分。它能筛出可能匹配的文档子集，但系统仍要逐一扫描其中的文件。</p>
+<p>如果在服务端完成这项工作，就必须同步所有文件，或者在服务端与客户端之间进行成本高昂的多次往返。</p>
+<p>在客户端执行则很简单。它还能避开数据存储相关的许多安全和隐私问题。</p>
+<p>延迟对这项功能也十分重要。</p>
+<p>我们的 Composer 模型拥有业界领先的每秒 token 数（TPS）表现之一。我们也一直在努力让它变得更聪明、更快。</p>
+<p>模型会持续调用搜索这项关键操作，而且经常并行调用。为它加入网络往返只会增加阻力和停顿，与我们改善智能体交互体验的目标背道而驰。</p>
+<p>与语义索引不同，正则表达式搜索索引还必须非常新鲜。模型能否读到自己刚写入的内容，尤其重要。</p>
+<p>语义索引不必持续更新。文件修改后，即使重新计算 embedding，新向量通常也不会在多维空间中发生显著位移。最近邻搜索仍会把智能体引向正确方向。</p>
+<p>但如果智能体搜索某段具体文本却没有找到，它往往会开始无效追查。这会浪费 token，也会从根本上抵消性能优化的意义。</p>
+<p>把索引带到客户端，也会产生新的挑战。同步磁盘数据既复杂又昂贵，但我们在实践中把它做得很高效。</p>
+<p>我们以底层 Git 仓库中的一个 commit 为基准，控制索引状态。用户和智能体的改动会作为叠加层存储在它之上。</p>
+<p>因此，索引可以快速更新，也能在启动时快速加载和同步。</p>
+<p>为了尽量降低编辑器中的内存占用，我们把索引存储在两个独立文件中。</p>
+<p>第一个文件依次保存索引的所有 posting list。构建索引时，我们会把它们直接刷新到磁盘。</p>
+<p>另一个文件保存一张排序表，其中包含所有 N-gram 的哈希，以及对应 posting list 在 posting 文件中的偏移量。</p>
+<p>这里只保存哈希，不保存完整 N-gram，而且始终是安全的。</p>
+<p>如果两个哈希发生碰撞，posting list 的覆盖范围可能变大。这在实践中极少发生，但即使发生，也不会产生错误结果。</p>
+<p>这种方式还能让查找表的布局非常紧凑。</p>
+<p>随后，我们在编辑器进程中只对这张表执行 mmap，并使用二分搜索处理查询。</p>
+<p>搜索会返回一个偏移量。系统再直接读取 posting 文件中对应偏移位置的数据。</p>
+<p class="ui-copy">将鼠标悬停在查找表中的某一行，或轻触该行，即可追踪对应 posting 在磁盘上的位置。</p>
+<h3>结论</h3>
+<p>我们发现，为 Composer 2 这类快速模型提供文本搜索索引，会给智能体工作流带来质的变化。</p>
+<p>这种影响在大型企业仓库中更加明显。grep 是少数延迟会随代码规模和复杂度增长的智能体操作。</p>
+<p>可以看看这些由 Composer 2 运行的示例工作流。彻底消除代码库搜索耗时，能节省可观的时间。</p>
+<p>智能体调查缺陷时，收益尤其明显。搜索加快后，迭代也会有效得多。</p>
+<p class="ui-copy">切换模式，然后将鼠标悬停在某个片段上，或轻触该片段，即可查看它的持续时间。</p>
+<p>下一步会是什么？谁也不知道。</p>
+<p>围绕如何为智能体提供上下文，正在出现许多令人兴奋的新进展。包括 Cursor 的研究人员在内，很多人都在研究这个方向。</p>
+<p>我们会继续优化现有方法的性能，其中也包括语义索引。</p>
+<p>我们还希望推出全新的方法，进一步提升智能体表现。同时，我们会始终确保这些方法能在最重要的环境中正常运行。</p>
+<p>这里所说的环境，就是世界上规模最大的代码仓库。智能体开发的未来，正在这些仓库中真正形成势头。</p>
+<div class="footer-meta">
+<p>归档分类：Research</p>
+<p>作者：Vicent Marti</p>
+</div>
+</section>
 </main>
-  <script id="airs-digest-theme-script">
+<script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;
       const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));

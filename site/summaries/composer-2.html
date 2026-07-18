@@ -1,284 +1,438 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Introducing Composer 2</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>推出 Composer 2</title>
 <style>
-:root {
-  --bg: #f7f4ee;
-  --ink: #18212b;
-  --muted: #64707d;
-  --line: #d9d2c7;
-  --paper: #fffaf2;
-  --hero-bg: #192332;
-  --hero-ink: #fff8ec;
-  --band-bg: #eef6ff;
-  --panel-bg: #ffffff;
-  --soft-bg: #f2efe7;
-  --warm-bg: #fff1df;
-  --cool-bg: #eaf7f4;
-  --risk-bg: #fff0f0;
-  --quote-bg: #202735;
-  --quote-ink: #f8efe1;
-  --accent-data: #2563eb;
-  --accent-risk: #dc2626;
-  --accent-opportunity: #059669;
-  --accent-conclusion: #7c3aed;
-  --accent-cost: #d97706;
-  --shadow: rgba(24, 33, 43, 0.12);
-}
-:root[data-theme="dark"] {
-  --bg: #111318;
-  --ink: #ece7dd;
-  --muted: #a8afba;
-  --line: #333946;
-  --paper: #191d24;
-  --hero-bg: #0e1520;
-  --hero-ink: #fff4df;
-  --band-bg: #132235;
-  --panel-bg: #1b2028;
-  --soft-bg: #181b21;
-  --warm-bg: #271d12;
-  --cool-bg: #112420;
-  --risk-bg: #2a171a;
-  --quote-bg: #080b10;
-  --quote-ink: #f3eadc;
-  --accent-data: #60a5fa;
-  --accent-risk: #f87171;
-  --accent-opportunity: #34d399;
-  --accent-conclusion: #a78bfa;
-  --accent-cost: #fbbf24;
-  --shadow: rgba(0, 0, 0, 0.38);
+:root,
+:root[data-theme="light"] {
+  --bg: #f6f3ed;
+  --surface: #ffffff;
+  --surface-soft: #ece8df;
+  --surface-data: #e3f1ff;
+  --surface-opportunity: #e4f5e9;
+  --surface-risk: #ffe8e6;
+  --surface-conclusion: #f0e8ff;
+  --surface-warm: #fff1d7;
+  --ink: #18202b;
+  --muted: #667080;
+  --line: #d4d0c8;
+  --accent: #1769aa;
+  --accent2: #167548;
+  --accent3: #b2473e;
+  --accent4: #7650ad;
+  --accent-warm: #a75d00;
+  --hero-bg: #15243b;
+  --hero-ink: #f5f8ff;
+  --hero-muted: #b9c9df;
+  --hl: #ffdf75;
+  --hl2: #a9e6c3;
+  --hl3: #f5b6b0;
+  --hl4: #cdb4f4;
+  --quote-bg: #252047;
+  --quote-ink: #f8f5ff;
+  --shadow: rgba(24, 32, 43, 0.12);
+  --code-bg: #ece8df;
 }
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #111318;
-    --ink: #ece7dd;
-    --muted: #a8afba;
-    --line: #333946;
-    --paper: #191d24;
-    --hero-bg: #0e1520;
-    --hero-ink: #fff4df;
-    --band-bg: #132235;
-    --panel-bg: #1b2028;
-    --soft-bg: #181b21;
-    --warm-bg: #271d12;
-    --cool-bg: #112420;
-    --risk-bg: #2a171a;
-    --quote-bg: #080b10;
-    --quote-ink: #f3eadc;
-    --accent-data: #60a5fa;
-    --accent-risk: #f87171;
-    --accent-opportunity: #34d399;
-    --accent-conclusion: #a78bfa;
-    --accent-cost: #fbbf24;
-    --shadow: rgba(0, 0, 0, 0.38);
+  :root:not([data-theme="light"]) {
+    --bg: #10151d;
+    --surface: #19212c;
+    --surface-soft: #222c38;
+    --surface-data: #162c40;
+    --surface-opportunity: #173328;
+    --surface-risk: #3a2224;
+    --surface-conclusion: #2b2440;
+    --surface-warm: #382d1c;
+    --ink: #e9eef6;
+    --muted: #a7b2c1;
+    --line: #344252;
+    --accent: #69b9f2;
+    --accent2: #63d69a;
+    --accent3: #ff8c84;
+    --accent4: #bd98f2;
+    --accent-warm: #f0b45e;
+    --hero-bg: #0b111b;
+    --hero-ink: #edf5ff;
+    --hero-muted: #9fb3ca;
+    --hl: #f1bd3e;
+    --hl2: #43b978;
+    --hl3: #de635c;
+    --hl4: #9d78d5;
+    --quote-bg: #211b3c;
+    --quote-ink: #f0eaff;
+    --shadow: rgba(0, 0, 0, 0.28);
+    --code-bg: #222c38;
   }
 }
+:root[data-theme="dark"] {
+  --bg: #10151d;
+  --surface: #19212c;
+  --surface-soft: #222c38;
+  --surface-data: #162c40;
+  --surface-opportunity: #173328;
+  --surface-risk: #3a2224;
+  --surface-conclusion: #2b2440;
+  --surface-warm: #382d1c;
+  --ink: #e9eef6;
+  --muted: #a7b2c1;
+  --line: #344252;
+  --accent: #69b9f2;
+  --accent2: #63d69a;
+  --accent3: #ff8c84;
+  --accent4: #bd98f2;
+  --accent-warm: #f0b45e;
+  --hero-bg: #0b111b;
+  --hero-ink: #edf5ff;
+  --hero-muted: #9fb3ca;
+  --hl: #f1bd3e;
+  --hl2: #43b978;
+  --hl3: #de635c;
+  --hl4: #9d78d5;
+  --quote-bg: #211b3c;
+  --quote-ink: #f0eaff;
+  --shadow: rgba(0, 0, 0, 0.28);
+  --code-bg: #222c38;
+}
 * { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 body {
   margin: 0;
-  background: var(--bg);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-  line-height: 1.65;
+  background: var(--bg);
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.75;
 }
-main { overflow: hidden; }
+a { color: var(--accent); }
 .hero {
-  background: radial-gradient(circle at 20% 10%, var(--accent-conclusion), transparent 28%), var(--hero-bg);
+  padding: 5rem max(1.5rem, calc((100vw - 1120px) / 2));
   color: var(--hero-ink);
-  padding: 64px 7vw 48px;
+  background: var(--hero-bg);
 }
-.hero .eyebrow {
-  color: var(--accent-cost);
-  font-weight: 700;
-  letter-spacing: 0;
+.eyebrow {
+  margin: 0 0 1rem;
+  color: var(--hero-muted);
+  font-size: .82rem;
+  font-weight: 750;
+  letter-spacing: .14em;
+  text-transform: uppercase;
 }
 .hero h1 {
-  margin: 14px 0 6px;
-  font-size: clamp(34px, 6vw, 68px);
-  line-height: 1.05;
-  letter-spacing: 0;
+  max-width: 900px;
+  margin: 0;
+  font-size: clamp(2.7rem, 8vw, 6.3rem);
+  line-height: 1.03;
+  letter-spacing: -.045em;
 }
-.hero .original {
-  margin: 0 0 28px;
-  color: var(--muted);
-  font-size: 18px;
+.original-title {
+  margin: 1rem 0 2.4rem;
+  color: var(--hero-muted);
+  font-size: clamp(1rem, 2vw, 1.35rem);
 }
-.hero .lede {
-  max-width: 850px;
-  font-size: clamp(20px, 2.5vw, 30px);
-  line-height: 1.35;
+.lede {
+  max-width: 820px;
+  margin: 0;
+  padding-left: 1.2rem;
+  border-left: .32rem solid var(--hl);
+  font-size: clamp(1.18rem, 2.5vw, 1.65rem);
+  line-height: 1.55;
 }
 .meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 30px;
+  gap: .65rem;
+  margin-top: 2.2rem;
 }
 .meta span {
-  border: 1px solid var(--line);
-  padding: 7px 12px;
+  padding: .35rem .78rem;
+  border: 1px solid var(--hero-muted);
   border-radius: 999px;
-  color: var(--hero-ink);
+  color: var(--hero-muted);
+  font-size: .85rem;
 }
-.numbers {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(150px, 1fr));
-  gap: 1px;
-  background: var(--line);
+.summary-shell {
+  width: min(1120px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 4rem 0 5rem;
 }
-.num {
-  background: var(--band-bg);
-  padding: 26px;
-}
-.num strong {
-  display: block;
-  color: var(--accent-data);
-  font-size: 30px;
-  line-height: 1.1;
-}
-.num span { color: var(--muted); }
-.split {
-  display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  gap: 36px;
-  padding: 56px 7vw;
-  background: var(--paper);
-}
-.split h2, .flow h2, .compare h2, .takeaways h2 {
-  margin: 0 0 14px;
-  font-size: 28px;
+.band-title {
+  max-width: 750px;
+  margin: 0 0 2rem;
+  font-size: clamp(1.8rem, 4vw, 3rem);
   line-height: 1.2;
 }
-.note-line {
-  border-left: 6px solid var(--accent-opportunity);
-  padding: 18px 22px;
-  background: var(--cool-bg);
-}
-.note-line b { color: var(--accent-opportunity); }
-.explain {
-  background: var(--soft-bg);
-  padding: 24px;
-  border-top: 4px solid var(--accent-conclusion);
-}
-.explain p { margin: 0 0 14px; }
-.flow {
-  padding: 54px 7vw;
-  background: var(--warm-bg);
-}
-.steps {
+.metrics {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-  margin-top: 24px;
+  grid-template-columns: repeat(4, 1fr);
+  margin-bottom: 3.5rem;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 1.2rem;
+  background: var(--surface-data);
+  box-shadow: 0 1rem 3rem var(--shadow);
 }
-.step {
-  position: relative;
-  padding: 24px 22px 22px;
-  background: var(--panel-bg);
-  box-shadow: 0 12px 28px var(--shadow);
-  border-bottom: 5px solid var(--accent-cost);
+.metric {
+  min-height: 165px;
+  padding: 1.5rem;
+  border-right: 1px solid var(--line);
 }
-.step .badge {
-  display: inline-grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--accent-cost);
-  color: var(--hero-ink);
-  font-weight: 800;
+.metric:last-child { border-right: 0; }
+.metric strong {
+  display: block;
+  color: var(--accent);
+  font-size: clamp(1.65rem, 3.5vw, 2.75rem);
+  line-height: 1.1;
 }
-.step h3 { margin: 14px 0 8px; }
-.compare {
-  padding: 56px 7vw;
-  background: var(--bg);
+.metric span {
+  display: block;
+  margin-top: .7rem;
+  color: var(--muted);
+  font-size: .92rem;
 }
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--panel-bg);
-  box-shadow: 0 10px 26px var(--shadow);
+.split {
+  display: grid;
+  grid-template-columns: .88fr 1.12fr;
+  gap: 0;
+  margin: 3.5rem 0;
+  overflow: hidden;
+  border-radius: 1.3rem;
+  box-shadow: 0 1rem 3rem var(--shadow);
 }
-th, td {
-  text-align: left;
-  padding: 16px;
-  border-bottom: 1px solid var(--line);
-  vertical-align: top;
-}
-th {
+.split-intro {
+  padding: 2.5rem;
   color: var(--hero-ink);
   background: var(--hero-bg);
 }
-td:first-child { font-weight: 700; color: var(--accent-data); }
-.insight {
-  display: grid;
-  grid-template-columns: 0.8fr 1.2fr;
-  gap: 0;
-  background: var(--quote-bg);
-  color: var(--quote-ink);
+.split-intro h2 {
+  margin-top: 0;
+  font-size: 2rem;
+  line-height: 1.25;
 }
-.insight .quote {
-  padding: 48px 7vw;
-  font-size: 28px;
-  line-height: 1.35;
-  color: var(--accent-cost);
+.split-intro p { color: var(--hero-muted); }
+.split-body {
+  padding: 2.5rem;
+  background: var(--surface-opportunity);
 }
-.insight .body {
-  padding: 48px 7vw 48px 0;
-}
-.insight p { margin-top: 0; }
-.risk {
-  background: var(--risk-bg);
-  border-left: 6px solid var(--accent-risk);
-  padding: 18px 20px;
+.split-body h3 { color: var(--accent2); }
+.split-body h3:first-child { margin-top: 0; }
+.marker {
+  padding: .05em .24em;
   color: var(--ink);
+  background: var(--hl);
+  border-radius: .2em;
 }
-.takeaways {
-  padding: 56px 7vw 70px;
-  background: var(--paper);
+.marker.green { background: var(--hl2); }
+.marker.red { background: var(--hl3); }
+.marker.purple { background: var(--hl4); }
+.timeline {
+  position: relative;
+  margin: 3.5rem 0;
+  padding: 2.5rem;
+  border-left: .55rem solid var(--accent4);
+  background: var(--surface-conclusion);
+}
+.timeline h2 { margin-top: 0; }
+.timeline-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+.step {
+  padding-top: 1rem;
+  border-top: 3px solid var(--accent4);
+}
+.step b {
+  display: inline-grid;
+  width: 2rem;
+  height: 2rem;
+  margin-bottom: .6rem;
+  place-items: center;
+  color: var(--hero-ink);
+  background: var(--accent4);
+  border-radius: 50%;
+}
+.caveat {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1.4rem;
+  margin: 3.5rem 0;
+  padding: 2rem;
+  background: var(--surface-risk);
+  border: 1px solid var(--accent3);
+  border-radius: .8rem;
+}
+.caveat-symbol {
+  color: var(--accent3);
+  font-size: 2.5rem;
+  font-weight: 900;
+  line-height: 1;
+}
+.caveat h2 { margin: 0 0 .5rem; }
+.caveat p { margin: 0; }
+.insight-bar {
+  margin: 3.5rem 0;
+  padding: 2.7rem;
+  color: var(--quote-ink);
+  background: var(--quote-bg);
+  border-radius: 0 2rem 0 2rem;
+  font-size: clamp(1.15rem, 2.4vw, 1.55rem);
+}
+.insight-bar strong { color: var(--hl); }
+.takeaways h2 {
+  margin-bottom: 1.4rem;
+  font-size: 2rem;
 }
 .mosaic {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 12px;
+  grid-template-columns: 1.25fr .75fr;
+  grid-template-areas:
+    "a b"
+    "a c"
+    "d d";
+  gap: 1rem;
 }
 .tile {
-  min-height: 150px;
-  padding: 18px;
-  color: var(--ink);
-  background: var(--panel-bg);
-  border-top: 5px solid var(--accent-conclusion);
+  padding: 1.6rem;
+  border-radius: 1rem;
 }
-.tile:nth-child(2) { border-color: var(--accent-data); background: var(--band-bg); }
-.tile:nth-child(3) { border-color: var(--accent-opportunity); background: var(--cool-bg); }
-.tile:nth-child(4) { border-color: var(--accent-risk); background: var(--risk-bg); }
-.tile:nth-child(5) { border-color: var(--accent-cost); background: var(--warm-bg); }
-.tile b {
+.tile h3 { margin-top: 0; }
+.tile:nth-child(1) {
+  grid-area: a;
+  background: var(--surface-data);
+  border-top: .35rem solid var(--accent);
+}
+.tile:nth-child(2) {
+  grid-area: b;
+  background: var(--surface-opportunity);
+  border-top: .35rem solid var(--accent2);
+}
+.tile:nth-child(3) {
+  grid-area: c;
+  background: var(--surface-risk);
+  border-top: .35rem solid var(--accent3);
+}
+.tile:nth-child(4) {
+  grid-area: d;
+  background: var(--surface-warm);
+  border-top: .35rem solid var(--accent-warm);
+}
+#translation {
+  width: min(820px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 5rem 0 7rem;
+}
+.translation-divider {
+  width: 4rem;
+  height: .45rem;
+  margin-bottom: 1.5rem;
+  background: var(--accent);
+  border-radius: 999px;
+}
+#translation > h2 {
+  margin: 0 0 .6rem;
+  font-size: clamp(2.2rem, 5vw, 3.7rem);
+  line-height: 1.15;
+}
+.translation-note {
+  margin: 0 0 3rem;
+  color: var(--muted);
+}
+#translation h1 {
+  margin: 3.4rem 0 1.2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  font-size: 2rem;
+  line-height: 1.25;
+}
+#translation p,
+#translation li {
+  font-family: "Noto Serif SC", "Songti SC", Georgia, serif;
+  font-size: 1.07rem;
+}
+#translation .article-lead {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+.price-line {
+  padding: 1.1rem 1.3rem;
+  background: var(--surface-warm);
+  border-left: .35rem solid var(--accent-warm);
+}
+.footnote {
+  margin-top: 2.3rem;
+  padding-top: 1.2rem;
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+  font-size: .94rem;
+}
+.related {
+  margin-top: 2rem;
+  padding: 1.4rem;
+  background: var(--surface-soft);
+  border-radius: .8rem;
+}
+.related p { margin: .35rem 0; }
+.source-figure {
+  margin: 2.3rem 0;
+  padding: .7rem;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  box-shadow: 0 .8rem 2rem var(--shadow);
+}
+.source-figure img {
   display: block;
-  margin-bottom: 8px;
+  width: 100%;
+  height: auto;
+  border-radius: .6rem;
 }
-@media (max-width: 850px) {
-  .numbers, .split, .steps, .insight, .mosaic {
+.source-figure figcaption {
+  padding: .7rem .35rem .2rem;
+  color: var(--muted);
+  font-size: .9rem;
+}
+.source-dark { display: none; }
+:root[data-theme="dark"] .source-light { display: none; }
+:root[data-theme="dark"] .source-dark { display: block; }
+:root[data-theme="light"] .source-light { display: block; }
+:root[data-theme="light"] .source-dark { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .source-light { display: none; }
+  :root:not([data-theme="light"]) .source-dark { display: block; }
+}
+@media (max-width: 820px) {
+  .metrics { grid-template-columns: repeat(2, 1fr); }
+  .metric:nth-child(2) { border-right: 0; }
+  .metric:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+  .split { grid-template-columns: 1fr; }
+  .timeline-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .hero { padding-top: 3.5rem; padding-bottom: 3.5rem; }
+  .metrics { grid-template-columns: 1fr; }
+  .metric {
+    min-height: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .metric:last-child { border-bottom: 0; }
+  .mosaic {
     grid-template-columns: 1fr;
+    grid-template-areas: "a" "b" "c" "d";
   }
-  .insight .body {
-    padding: 0 7vw 48px;
-  }
-  .hero {
-    padding-top: 44px;
-  }
+  .caveat { grid-template-columns: 1fr; }
 }
 </style>
-  <script id="airs-digest-theme-boot">
+<script id="airs-digest-theme-boot">
     try {
       var saved = localStorage.getItem("theme");
       if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
     } catch (e) {}
   </script>
-  <style id="airs-digest-theme-style">
+<style id="airs-digest-theme-style">
     :root {
       color-scheme: light;
       --airs-digest-ink: #191816;
@@ -401,125 +555,210 @@ td:first-child { font-weight: 700; color: var(--accent-data); }
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+  <style id="airs-source-image-theme-style">
+    .source-figure .source-image-dark {
+      display: none;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .source-figure .source-image-light {
+        display: none;
+      }
+      :root:not([data-theme="light"]) .source-figure .source-image-dark {
+        display: block;
+      }
+    }
+    :root[data-theme="dark"] .source-figure .source-image-light {
+      display: none;
+    }
+    :root[data-theme="dark"] .source-figure .source-image-dark {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-light {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-dark {
+      display: none;
+    }
   </style>
 </head>
 <body>
-<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/composer-2" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">← 返回索引</a><a href="https://cursor.com/blog/composer-2" rel="noopener noreferrer" target="_blank">阅读原文 ↗</a></div><button class="airs-digest-theme-toggle" data-airs-theme-toggle="" type="button">主题 · 跟随系统</button></nav>
+<header class="hero">
+<p class="eyebrow">Cursor Research · 2026 年 3 月 19 日</p>
+<h1>推出 Composer 2</h1>
+<p class="original-title" lang="en">Introducing Composer 2</p>
+<p class="lede"><strong>一句话总括：</strong>Composer 2 把前沿水平的编程能力、长流程智能体训练和更低的 token 价格组合在一起，目标是让复杂编码任务更具成本效益。</p>
+<div class="meta">
+<span>来源：Cursor</span>
+<span>作者：Cursor Team</span>
+<span>分类：Research</span>
+</div>
+</header>
 <main>
-  <section class="hero">
-    <div class="eyebrow">一句话总括</div>
-    <h1>Introducing Composer 2</h1>
-    <p class="original">Original title: Introducing Composer 2</p>
-    <p class="lede">Cursor 用 Composer 2 展示了一个更现实的编码模型路线：不是只谈最高能力，而是把长程任务能力、推理成本和产品默认体验绑定在一起。</p>
-    <div class="meta">
-      <span>来源：Cursor</span>
-      <span>日期：Mar 19, 2026</span>
-      <span>分类：Research</span>
-      <span>作者：Cursor Team</span>
-    </div>
-  </section>
-
-  <section class="numbers" aria-label="关键数字">
-    <div class="num"><strong>$0.50/M</strong><span>标准版输入 token 价格</span></div>
-    <div class="num"><strong>$2.50/M</strong><span>标准版输出 token 价格</span></div>
-    <div class="num"><strong>$1.50/M</strong><span>快速版输入 token 价格</span></div>
-    <div class="num"><strong>5 次</strong><span>Terminal-Bench 2.0 每组评测迭代数</span></div>
-  </section>
-
-  <section class="split">
-    <div>
-      <h2>真正的主张：编码智能开始按成本交付</h2>
-      <p>Cursor 说 Composer 2 在编码上达到 frontier-level。更关键的是，它把标准版价格压到每百万输入 token 0.50 美元、每百万输出 token 2.50 美元。</p>
-      <p>这会改变读者对 AI 编程工具的判断。模型不只是能力排行榜上的项目，也开始成为 IDE 内可持续使用的基础设施。</p>
-      <div class="note-line"><b>机会：</b>如果质量确实接近前沿模型，低价会让长对话、长上下文和多步代理任务更容易进入日常开发。</div>
-    </div>
-    <div class="explain">
-      <h2>训练路线：先打底，再做长程强化学习</h2>
-      <p>文章把质量提升归因于首次 continued pretraining。这个阶段提供了更强的基础模型。</p>
-      <p>随后 Cursor 用强化学习训练长程编码任务。Composer 2 被描述为可以完成需要数百个动作的复杂任务。</p>
-      <p>这说明 AI 编程的竞争点正在从单次补全，转向跨文件、跨命令、跨反馈循环的任务执行。</p>
-    </div>
-  </section>
-
-  <section class="flow">
-    <h2>能力形成路径</h2>
-    <p>文章没有公开完整训练细节，但给出了清晰的三段式方向。</p>
-    <div class="steps">
-      <div class="step">
-        <span class="badge">1</span>
-        <h3>持续预训练</h3>
-        <p>Cursor 先增强基础模型。结论是后续强化学习需要更强的起点。</p>
-      </div>
-      <div class="step">
-        <span class="badge">2</span>
-        <h3>长程编码强化学习</h3>
-        <p>训练目标不是单步回答，而是让模型能推进需要大量动作的编码任务。</p>
-      </div>
-      <div class="step">
-        <span class="badge">3</span>
-        <h3>进入产品默认体验</h3>
-        <p>快速版被设为默认选项。模型能力与交互速度因此直接影响用户感知。</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="compare">
-    <h2>价格与评测口径</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>项目</th>
-          <th>文章给出的信息</th>
-          <th>读者应如何理解</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>标准版 Composer 2</td>
-          <td>每百万输入 token 0.50 美元，每百万输出 token 2.50 美元。</td>
-          <td>这是文章最硬的数据。它支撑了“智能与成本组合更优”的商业主张。</td>
-        </tr>
-        <tr>
-          <td>快速版 Composer 2</td>
-          <td>同等智能，价格为每百万输入 token 1.50 美元、输出 token 7.50 美元。</td>
-          <td>Cursor 用更高价格换更快响应，并把 fast 设为默认。</td>
-        </tr>
-        <tr>
-          <td>Terminal-Bench 2.0</td>
-          <td>使用官方 Harbor evaluation framework。每个 model-agent 组合运行 5 次并报告平均值。</td>
-          <td>评测口径较具体，但正文没有给出分数。读者不能只凭本文比较模型排名。</td>
-        </tr>
-        <tr>
-          <td>速度快照</td>
-          <td>TPS 来自 2026 年 3 月 18 日 Cursor 流量快照。Anthropic token 约小 15%，文中做了归一化。</td>
-          <td>速度数据有时间点限制。供应商容量和后续优化会改变结果。</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="insight">
-    <div class="quote">“低价的长程代理能力，可能比单次最高分更影响开发者使用频率。”</div>
-    <div class="body">
-      <h2>需要保留的风险判断</h2>
-      <p>文章强调所有内部 benchmark 都有大幅提升，并点名 Terminal-Bench 2.0 与 SWE-bench Multilingual。</p>
-      <p>但正文没有列出具体分数，也没有展示和其他模型的完整对照表。</p>
-      <div class="risk">风险：读者可以接受“方向上变强”的信息，但不应把它当成可复核的模型排名证据。</div>
-    </div>
-  </section>
-
-  <section class="takeaways">
-    <h2>最值得带走的洞见</h2>
-    <div class="mosaic">
-      <div class="tile"><b>成本是产品能力的一部分</b>Composer 2 的重点不只是更聪明，而是让高频编码代理使用更便宜。</div>
-      <div class="tile"><b>长程任务成为主战场</b>数百步动作的任务能力，代表 AI 编程正在靠近真实开发流程。</div>
-      <div class="tile"><b>训练路径更加工程化</b>continued pretraining 与强化学习被组合使用，目标是提升代理式执行。</div>
-      <div class="tile"><b>评测仍需具体分数</b>文章给出口径，但缺少 benchmark 结果数字。结论要谨慎解读。</div>
-      <div class="tile"><b>默认快速版有产品含义</b>Cursor 把速度放进默认体验，说明响应时间会直接决定模型采用率。</div>
-    </div>
-  </section>
+<div class="summary-shell">
+<h2 class="band-title">先看数字：Composer 2 的核心卖点是能力与成本的组合</h2>
+<section aria-label="关键数字" class="metrics">
+<div class="metric">
+<strong>$0.50/M</strong>
+<span>标准版每百万输入 token 的价格</span>
+</div>
+<div class="metric">
+<strong>$2.50/M</strong>
+<span>标准版每百万输出 token 的价格</span>
+</div>
+<div class="metric">
+<strong>数百次操作</strong>
+<span>复杂长周期任务可能需要的动作规模</span>
+</div>
+<div class="metric">
+<strong>5 次</strong>
+<span>每个模型与智能体组合的评测迭代次数</span>
+</div>
+</section>
+<section class="split">
+<div class="split-intro">
+<h2>能力提升不只来自强化学习</h2>
+<p>Cursor 首次加入持续预训练，为后续的长周期强化学习提供了更强的基础模型。</p>
+</div>
+<div class="split-body">
+<h3>训练路径</h3>
+<p>团队先完成首次<span class="marker purple">持续预训练</span>，再针对长周期编程任务开展强化学习。这个顺序意味着能力提升并非只靠最后阶段的奖励优化。</p>
+<h3>为何重要</h3>
+<p>Composer 2 可以处理需要<span class="marker">数百次操作</span>的挑战性任务。AI 编程能力因此不再只体现为单次补全质量，也体现为能否稳定推进较长的执行链。</p>
+</div>
+</section>
+<section class="timeline">
+<h2>从基础模型到长流程编码智能体</h2>
+<div class="timeline-grid">
+<div class="step">
+<b>1</b>
+<h3>持续预训练</h3>
+<p>先建立更强的基础能力，为后续训练提供更高的起点。</p>
+</div>
+<div class="step">
+<b>2</b>
+<h3>强化学习</h3>
+<p>训练重点转向需要持续规划和执行的长周期编程任务。</p>
+</div>
+<div class="step">
+<b>3</b>
+<h3>数百次动作</h3>
+<p>最终目标是完成多步骤挑战，而不是只解决孤立的小问题。</p>
+</div>
+</div>
+<p><strong>结论：</strong>这条训练路线把模型能力的衡量重点，从局部代码生成推向了持续执行和任务完成。</p>
+</section>
+<section class="caveat">
+<div class="caveat-symbol">!</div>
+<div>
+<h2>基准结果需要结合评测口径阅读</h2>
+<p>原文称 Composer 2 在 Terminal-Bench 2.0 和 SWE-bench Multilingual 等评测中明显进步，但正文没有列出具体分数。Terminal-Bench 2.0 的结果来自官方 Harbor 框架，每个模型与智能体组合运行 <span class="marker red">5 次</span>，随后报告平均值。其他模型则采用官方榜单与 Cursor 内部运行结果中的较高值。</p>
+</div>
+</section>
+<section class="insight-bar">
+      评测框架并不完全相同：Anthropic 使用 <strong>Claude Code harness</strong>，OpenAI 使用 <strong>Simple Codex harness</strong>，Cursor 则使用 Terminal-Bench 2.0 指定的 <strong>Harbor</strong>。跨模型比较时，不能只看最终柱状图。
+    </section>
+<section class="split">
+<div class="split-body">
+<h3>快速版</h3>
+<p>快速版保持相同智能水平。每百万输入和输出 token 的价格分别是 <span class="marker green">1.50 美元</span>和 <span class="marker green">7.50 美元</span>。</p>
+<p>Cursor 将快速版设为默认选项。它面向更看重响应速度，同时仍希望控制成本的用户。</p>
+</div>
+<div class="split-intro">
+<h2>速度比较经过归一化</h2>
+<p>速度数据取自 2026 年 3 月 18 日的 Cursor 流量快照。由于 Anthropic token 约小 15%，TPS 和非 Anthropic 模型的输出价格经过了对应调整。</p>
+</div>
+</section>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="mosaic">
+<article class="tile">
+<h3>01 · 成本是产品定位的一部分</h3>
+<p>标准版输入价格为每百万 token <strong>0.50 美元</strong>，输出价格为 <strong>2.50 美元</strong>。Composer 2 想证明，高水平编程能力不一定必须伴随最高一档价格。</p>
+</article>
+<article class="tile">
+<h3>02 · 长流程能力成为重点</h3>
+<p>能够执行数百次操作，比一次生成一段正确代码更接近真实的软件开发工作。</p>
+</article>
+<article class="tile">
+<h3>03 · 分数不能脱离框架</h3>
+<p>不同模型使用不同 harness。评测次数、取值方法和运行环境都会影响横向比较。</p>
+</article>
+<article class="tile">
+<h3>04 · 快速版换取延迟优势</h3>
+<p>快速版价格是标准版的三倍，但保留相同智能水平。它体现的是速度与费用之间的选择，而不是能力等级的变化。</p>
+</article>
+</div>
+</section>
+</div>
+<section id="translation">
+<div class="translation-divider"></div>
+<h2>完整译文</h2>
+<p class="translation-note">以下内容依照原文顺序完整翻译。</p>
+<p class="article-lead">Composer 2 现已在 Cursor 中上线。</p>
+<p>它具备前沿水平的编程能力。每百万输入 token 收费 0.50 美元，每百万输出 token 收费 2.50 美元，在智能水平与成本之间形成了新的理想组合。我们还发布了一份技术报告，介绍它的训练方式。</p>
+<figure class="source-figure source-light" data-source-image="0"><img alt="Composer 2 efficiency and quality on CursorBench" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fcomposer-2-scatter-r4.png&amp;w=1920&amp;q=70" width="800"/><img alt="Composer 2 efficiency and quality on CursorBench" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fcomposer-2-scatter-r4-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<h1>前沿水平的编程智能</h1>
+<p>我们正在快速提升模型质量。Composer 2 在我们测量的所有 benchmark 上都有显著进步，其中包括 Terminal-Bench 2.0<sup>1</sup> 和 SWE-bench Multilingual。</p>
+<figure class="source-figure source-light" data-source-image="1"><img alt="Composer 2 Terminal-Bench 2.0 results" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fcomposer-2-terminal-bench-score-r9.png&amp;w=1920&amp;q=70" width="800"/><img alt="Composer 2 Terminal-Bench 2.0 results" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fcomposer-2-terminal-bench-score-r9-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<p>这些质量提升来自我们的首次持续预训练。它提供了强得多的基础，让我们能够进一步扩大强化学习的规模。</p>
+<p>在这一基础之上，我们通过强化学习训练模型处理长周期编程任务。Composer 2 能够解决需要数百次操作的挑战性任务。</p>
+<h1>试用 Composer 2</h1>
+<p class="price-line">Composer 2 每百万输入 token 收费 0.50 美元，每百万输出 token 收费 2.50 美元。</p>
+<p>我们还提供一个智能水平相同、速度更快的版本。它每百万输入 token 收费 1.50 美元，每百万输出 token 收费 7.50 美元，成本低于其他快速模型<sup>2</sup>。我们会将快速版设为默认选项。完整信息请参阅当前的 Composer 模型文档。</p>
+<figure class="source-figure source-light" data-source-image="2"><img alt="Composer 2 fast variant speed and cost compared to other models" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fcomposer-speed-cost-r12.png&amp;w=1920&amp;q=70" width="800"/><img alt="Composer 2 fast variant speed and cost compared to other models" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fcomposer-speed-cost-r12-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<p>在个人套餐中，Composer 的用量计入 First-party models 共享额度，其中包含了充足的使用量。你现在可以在 Cursor 中试用 Composer 2，也可以通过我们新界面的早期 alpha 版本体验它。</p>
+<p class="footnote"><sup>1</sup> Terminal-Bench 2.0 是由 Laude Institute 维护的终端使用智能体评测 benchmark。Anthropic 模型的分数使用 Claude Code harness，OpenAI 模型的分数使用 Simple Codex harness。Cursor 的分数采用官方 Harbor 评测框架计算。Harbor 是 Terminal-Bench 2.0 指定的 harness。评测使用 benchmark 默认设置。我们对每个模型与智能体组合运行 5 次，并报告平均值。有关该 benchmark 的更多信息，请参阅 Terminal Bench 官方网站。对于 Composer 2 之外的其他模型，我们比较了官方排行榜分数与在自身基础设施中运行得到的分数，并采用其中的较高值。↩</p>
+<p class="footnote"><sup>2</sup> 所有模型的每秒 token 数（TPS）都来自 2026 年 3 月 18 日 Cursor 流量的一个时间点快照。Composer 与 GPT 模型的 token 划分方式相近。Anthropic token 大约小 15%，因此 TPS 数字经过了归一化，以反映这一差异。同样，非 Anthropic 模型的输出 token 价格也经过换算，以匹配约 15% 的变化。实际速度可能随着供应商容量和后续改进而变化。↩</p>
+<p>归档分类：Research</p>
+<p>作者：Cursor Team</p>
+<div class="related">
+<p>Composer 2 技术报告</p>
+<p>推出 Composer 2.5</p>
+<p>通过 warp decode 改善 MoE 模型推理</p>
+</div>
+<h1>推出 Composer 2</h1>
+<p class="article-lead">Composer 2 现已在 Cursor 中上线。</p>
+<p>它具备前沿水平的编程能力。每百万输入 token 收费 0.50 美元，每百万输出 token 收费 2.50 美元，在智能水平与成本之间形成了新的理想组合。我们还发布了一份技术报告，介绍它的训练方式。</p>
+<h1>前沿水平的编程智能</h1>
+<p>我们正在快速提升模型质量。Composer 2 在我们测量的所有 benchmark 上都有显著进步，其中包括 Terminal-Bench 2.0<sup>1</sup> 和 SWE-bench Multilingual。</p>
+<p>这些质量提升来自我们的首次持续预训练。它提供了强得多的基础，让我们能够进一步扩大强化学习的规模。</p>
+<p>在这一基础之上，我们通过强化学习训练模型处理长周期编程任务。Composer 2 能够解决需要数百次操作的挑战性任务。</p>
+<h1>试用 Composer 2</h1>
+<p class="price-line">Composer 2 每百万输入 token 收费 0.50 美元，每百万输出 token 收费 2.50 美元。</p>
+<p>我们还提供一个智能水平相同、速度更快的版本。它每百万输入 token 收费 1.50 美元，每百万输出 token 收费 7.50 美元，成本低于其他快速模型<sup>2</sup>。我们会将快速版设为默认选项。完整信息请参阅当前的 Composer 模型文档。</p>
+<p>在个人套餐中，Composer 的用量计入 First-party models 共享额度，其中包含了充足的使用量。你现在可以在 Cursor 中试用 Composer 2，也可以通过我们新界面的早期 alpha 版本体验它。</p>
+<p class="footnote"><sup>1</sup> Terminal-Bench 2.0 是由 Laude Institute 维护的终端使用智能体评测 benchmark。Anthropic 模型的分数使用 Claude Code harness，OpenAI 模型的分数使用 Simple Codex harness。Cursor 的分数采用官方 Harbor 评测框架计算。Harbor 是 Terminal-Bench 2.0 指定的 harness。评测使用 benchmark 默认设置。我们对每个模型与智能体组合运行 5 次，并报告平均值。有关该 benchmark 的更多信息，请参阅 Terminal Bench 官方网站。对于 Composer 2 之外的其他模型，我们比较了官方排行榜分数与在自身基础设施中运行得到的分数，并采用其中的较高值。↩</p>
+<p class="footnote"><sup>2</sup> 所有模型的每秒 token 数（TPS）都来自 2026 年 3 月 18 日 Cursor 流量的一个时间点快照。Composer 与 GPT 模型的 token 划分方式相近。Anthropic token 大约小 15%，因此 TPS 数字经过了归一化，以反映这一差异。同样，非 Anthropic 模型的输出 token 价格也经过换算，以匹配约 15% 的变化。实际速度可能随着供应商容量和后续改进而变化。↩</p>
+<p>归档分类：Research</p>
+<p>作者：Cursor Team</p>
+<div class="related">
+<p>Composer 2 技术报告</p>
+<p>推出 Composer 2.5</p>
+<p>通过 warp decode 改善 MoE 模型推理</p>
+</div>
+</section>
 </main>
-  <script id="airs-digest-theme-script">
+<script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;
       const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));

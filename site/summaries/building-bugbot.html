@@ -1,280 +1,380 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>构建更好的 Bugbot</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>打造更好的 Bugbot</title>
 <style>
-:root {
-  --bg: #f6f3ec;
-  --surface: #fffaf0;
-  --panel: #ffffff;
-  --band: #e8f1ff;
-  --soft-data: #e5f5ff;
-  --soft-risk: #ffe9e3;
-  --soft-opportunity: #e9f7ec;
-  --soft-conclusion: #f3e9ff;
-  --deep: #18212f;
-  --deep-2: #243044;
-  --ink: #18202a;
-  --muted: #5d6673;
-  --line: #d9d1c3;
-  --accent-data: #1677b8;
-  --accent-risk: #d34a2c;
-  --accent-opportunity: #218a52;
-  --accent-conclusion: #7b3fc8;
-  --accent-warm: #b26a00;
-  --white-soft: #fffaf0;
-  --shadow: 0 18px 45px rgba(24, 32, 42, 0.12);
+:root,
+:root[data-theme="light"] {
+  --bg: #f5f3ee;
+  --card: #ffffff;
+  --ink: #17201d;
+  --muted: #65706c;
+  --line: #d8ded9;
+  --accent: #146b5a;
+  --accent2: #2563a5;
+  --accent3: #b86518;
+  --accent4: #9b3658;
+  --data: #dcecff;
+  --risk: #fde3e8;
+  --opportunity: #ddf3e8;
+  --conclusion: #fff0cf;
+  --hl: #ffe09a;
+  --hl2: #bfe8dc;
+  --hero: #142a25;
+  --hero-ink: #f3fff9;
+  --hero-muted: #b7d1c8;
+  --band: #203a66;
+  --band-ink: #f5f8ff;
+  --translation-bg: #fbfaf7;
+  --quote-bg: #e9e2f5;
+  --takeaway-bg: #eef0e9;
+  --shadow: 0 18px 48px rgba(24, 42, 36, .10);
 }
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #10141a;
-    --surface: #171d25;
-    --panel: #1d2430;
-    --band: #14253a;
-    --soft-data: #102738;
-    --soft-risk: #341b17;
-    --soft-opportunity: #123020;
-    --soft-conclusion: #27183a;
-    --deep: #080b10;
-    --deep-2: #111823;
-    --ink: #e8edf3;
-    --muted: #aab4c2;
-    --line: #354052;
-    --accent-data: #4db8ff;
-    --accent-risk: #ff7f66;
-    --accent-opportunity: #66d48f;
-    --accent-conclusion: #b88cff;
-    --accent-warm: #ffbf4f;
-    --white-soft: #e8edf3;
-    --shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+  :root:not([data-theme="light"]) {
+    --bg: #101614;
+    --card: #18201e;
+    --ink: #e6eeea;
+    --muted: #a5b2ad;
+    --line: #34413d;
+    --accent: #57d4b4;
+    --accent2: #71b7ff;
+    --accent3: #f0a85b;
+    --accent4: #f181aa;
+    --data: #172b42;
+    --risk: #3b2029;
+    --opportunity: #17352c;
+    --conclusion: #3b301b;
+    --hl: #5c4514;
+    --hl2: #17483c;
+    --hero: #0b2420;
+    --hero-ink: #e9fff7;
+    --hero-muted: #9bc6b8;
+    --band: #172b4c;
+    --band-ink: #e8f1ff;
+    --translation-bg: #131917;
+    --quote-bg: #292138;
+    --takeaway-bg: #20261e;
+    --shadow: 0 18px 48px rgba(0, 0, 0, .32);
   }
 }
 :root[data-theme="dark"] {
-  --bg: #10141a;
-  --surface: #171d25;
-  --panel: #1d2430;
-  --band: #14253a;
-  --soft-data: #102738;
-  --soft-risk: #341b17;
-  --soft-opportunity: #123020;
-  --soft-conclusion: #27183a;
-  --deep: #080b10;
-  --deep-2: #111823;
-  --ink: #e8edf3;
-  --muted: #aab4c2;
-  --line: #354052;
-  --accent-data: #4db8ff;
-  --accent-risk: #ff7f66;
-  --accent-opportunity: #66d48f;
-  --accent-conclusion: #b88cff;
-  --accent-warm: #ffbf4f;
-  --white-soft: #e8edf3;
-  --shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+  --bg: #101614;
+  --card: #18201e;
+  --ink: #e6eeea;
+  --muted: #a5b2ad;
+  --line: #34413d;
+  --accent: #57d4b4;
+  --accent2: #71b7ff;
+  --accent3: #f0a85b;
+  --accent4: #f181aa;
+  --data: #172b42;
+  --risk: #3b2029;
+  --opportunity: #17352c;
+  --conclusion: #3b301b;
+  --hl: #5c4514;
+  --hl2: #17483c;
+  --hero: #0b2420;
+  --hero-ink: #e9fff7;
+  --hero-muted: #9bc6b8;
+  --band: #172b4c;
+  --band-ink: #e8f1ff;
+  --translation-bg: #131917;
+  --quote-bg: #292138;
+  --takeaway-bg: #20261e;
+  --shadow: 0 18px 48px rgba(0, 0, 0, .32);
 }
 * { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 body {
   margin: 0;
-  background: var(--bg);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-  line-height: 1.65;
+  background: var(--bg);
+  font-family: Inter, "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.75;
 }
-main { overflow: hidden; }
+a { color: var(--accent2); }
 .hero {
-  min-height: 64vh;
-  padding: 64px 6vw 42px;
-  background: linear-gradient(135deg, var(--deep), var(--deep-2));
-  color: var(--white-soft);
-  display: grid;
-  align-items: end;
+  padding: clamp(3rem, 8vw, 7rem) max(1.5rem, calc((100vw - 1120px) / 2));
+  color: var(--hero-ink);
+  background: var(--hero);
 }
-.hero-inner { max-width: 1080px; }
-.kicker {
-  color: var(--accent-warm);
-  font-weight: 700;
-  letter-spacing: 0;
+.eyebrow {
+  margin: 0 0 1rem;
+  color: var(--hero-muted);
+  font-size: .82rem;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
 }
-h1 {
-  margin: 10px 0 8px;
-  font-size: clamp(34px, 7vw, 76px);
-  line-height: 1.04;
+.hero h1 {
+  max-width: 850px;
+  margin: 0;
+  font-size: clamp(2.6rem, 7vw, 6rem);
+  line-height: 1.05;
+  letter-spacing: -.055em;
 }
-.english {
-  margin: 0 0 28px;
-  color: var(--muted);
-  font-size: 18px;
+.original-title {
+  margin: 1rem 0 2.2rem;
+  color: var(--hero-muted);
+  font-size: clamp(1rem, 2vw, 1.3rem);
 }
-.one-line {
-  max-width: 820px;
-  padding-left: 18px;
-  border-left: 5px solid var(--accent-data);
-  font-size: 22px;
+.lede {
+  max-width: 800px;
+  margin: 0;
+  font-size: clamp(1.2rem, 2.6vw, 1.75rem);
+  line-height: 1.55;
 }
-.metrics {
+.summary-shell {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 1.5rem 5rem;
+}
+.metric-band {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  background: var(--line);
+  margin: -2rem 0 4rem;
+  color: var(--band-ink);
+  background: var(--band);
+  border-radius: 1.2rem;
+  box-shadow: var(--shadow);
+  overflow: hidden;
 }
 .metric {
-  background: var(--soft-data);
-  padding: 28px 24px;
+  padding: 1.7rem;
+  border-right: 1px solid var(--line);
 }
+.metric:last-child { border-right: 0; }
 .metric strong {
   display: block;
-  color: var(--accent-data);
-  font-size: 34px;
-  line-height: 1;
+  color: var(--band-ink);
+  font-size: clamp(1.7rem, 3.5vw, 2.7rem);
+  line-height: 1.15;
 }
 .metric span {
   display: block;
-  margin-top: 10px;
-  color: var(--muted);
+  margin-top: .55rem;
+  color: var(--band-ink);
+  opacity: .78;
+  font-size: .9rem;
 }
 .split {
-  padding: 70px 6vw;
-  background: var(--surface);
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  gap: 44px;
+  grid-template-columns: .9fr 1.1fr;
+  gap: 2rem;
   align-items: start;
+  margin: 4rem 0;
 }
-.split h2, .flow h2, .table-zone h2, .future h2, .takeaways h2 {
-  margin: 0 0 18px;
-  font-size: 30px;
-  line-height: 1.2;
+.split h2,
+.flow h2,
+.takeaways h2 {
+  margin-top: 0;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1.15;
 }
-.lead { font-size: 19px; color: var(--muted); }
-.note-box {
-  background: var(--panel);
-  border-left: 6px solid var(--accent-risk);
-  padding: 24px;
-  box-shadow: var(--shadow);
+.explainer {
+  padding: 1.8rem;
+  background: var(--opportunity);
+  border-left: .45rem solid var(--accent);
 }
-.note-box h3 { margin: 0 0 10px; color: var(--accent-risk); }
+.explainer h3 { color: var(--accent); }
+.contrast {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.contrast article {
+  padding: 1.5rem;
+  border-radius: 1rem;
+}
+.contrast article:first-child {
+  background: var(--risk);
+  border-top: .35rem solid var(--accent4);
+}
+.contrast article:last-child {
+  background: var(--data);
+  border-top: .35rem solid var(--accent2);
+}
 .flow {
-  padding: 70px 6vw;
-  background: var(--band);
-}
-.steps {
-  max-width: 980px;
-  display: grid;
-  gap: 18px;
-}
-.step {
-  display: grid;
-  grid-template-columns: 58px 1fr;
-  gap: 18px;
-  align-items: start;
-}
-.badge {
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  background: var(--accent-conclusion);
-  color: var(--white-soft);
-  display: grid;
-  place-items: center;
-  font-weight: 800;
-}
-.step-content {
-  padding-bottom: 18px;
-  border-bottom: 1px solid var(--line);
-}
-.step-content h3 { margin: 0 0 6px; }
-.step-content p { margin: 0; color: var(--muted); }
-.table-zone {
-  padding: 70px 6vw;
-  background: var(--soft-opportunity);
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--panel);
+  margin: 4rem 0;
+  padding: clamp(1.5rem, 5vw, 3rem);
+  background: var(--card);
   box-shadow: var(--shadow);
 }
-th, td {
-  padding: 18px;
-  border-bottom: 1px solid var(--line);
-  text-align: left;
-  vertical-align: top;
-}
-th {
-  color: var(--accent-opportunity);
-  background: var(--surface);
-}
-.quote {
-  padding: 48px 6vw;
-  background: var(--deep);
-  color: var(--white-soft);
-}
-.quote blockquote {
-  max-width: 980px;
-  margin: 0;
-  font-size: 28px;
-  line-height: 1.35;
-  border-left: 7px solid var(--accent-warm);
-  padding-left: 24px;
-}
-.future {
-  padding: 70px 6vw;
-  background: var(--soft-risk);
-}
-.future-grid {
+.flow-line {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
 }
-.future-item {
-  background: var(--panel);
-  padding: 22px;
-  border-top: 6px solid var(--accent-risk);
+.flow-step {
+  position: relative;
+  padding-top: 1rem;
+  border-top: .3rem solid var(--accent3);
 }
-.future-item h3 { margin: 0 0 8px; }
-.future-item p { margin: 0; color: var(--muted); }
+.flow-step:nth-child(2) { border-color: var(--accent2); }
+.flow-step:nth-child(3) { border-color: var(--accent); }
+.flow-step:nth-child(4) { border-color: var(--accent4); }
+.flow-step b {
+  display: block;
+  margin-bottom: .5rem;
+}
+.insight-strip {
+  margin: 4rem 0;
+  padding: 2rem clamp(1.5rem, 5vw, 4rem);
+  color: var(--hero-ink);
+  background: var(--hero);
+  border-left: .6rem solid var(--accent3);
+  font-size: clamp(1.15rem, 2.4vw, 1.55rem);
+}
 .takeaways {
-  padding: 70px 6vw;
-  background: var(--soft-conclusion);
+  margin: 4rem 0 0;
 }
-.mosaic {
+.takeaway-grid {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr 1fr;
-  gap: 16px;
+  grid-template-columns: 1.25fr .75fr 1fr;
+  gap: 1rem;
 }
-.tile {
-  min-height: 150px;
-  padding: 24px;
-  background: var(--panel);
+.takeaway {
+  padding: 1.5rem;
+  background: var(--takeaway-bg);
   border: 1px solid var(--line);
 }
-.tile strong {
+.takeaway:nth-child(2) {
+  background: var(--conclusion);
+  border-color: var(--accent3);
+}
+.takeaway:nth-child(3) {
+  color: var(--hero-ink);
+  background: var(--hero);
+}
+.takeaway:nth-child(4) {
+  grid-column: span 2;
+  background: var(--quote-bg);
+  border-left: .4rem solid var(--accent4);
+}
+.takeaway:nth-child(5) {
+  background: var(--data);
+  border-left: .4rem solid var(--accent2);
+}
+.takeaway h3 { margin-top: 0; }
+mark {
+  padding: .06em .3em;
+  color: var(--ink);
+  background: var(--hl);
+}
+.hl2 {
+  padding: .06em .3em;
+  background: var(--hl2);
+  font-weight: 750;
+}
+#translation {
+  padding: 5rem 1.5rem 7rem;
+  background: var(--translation-bg);
+  border-top: 1px solid var(--line);
+}
+.translation-inner {
+  max-width: 760px;
+  margin: 0 auto;
+}
+#translation h2 {
+  margin: 0 0 2.5rem;
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  line-height: 1.1;
+}
+#translation h3 {
+  margin: 3.5rem 0 1.2rem;
+  padding-bottom: .55rem;
+  font-size: 1.75rem;
+  line-height: 1.25;
+  border-bottom: 2px solid var(--line);
+}
+#translation h4 {
+  margin: 2.4rem 0 .8rem;
+  font-size: 1.3rem;
+}
+#translation p,
+#translation li {
+  font-family: "Noto Serif SC", "Songti SC", Georgia, serif;
+  font-size: 1.06rem;
+}
+#translation ul,
+#translation ol {
+  padding-left: 1.4rem;
+}
+.toc {
+  margin: 1.5rem 0 3rem;
+  padding: 1.5rem 1.8rem;
+  background: var(--card);
+  border-left: .35rem solid var(--accent2);
+}
+.toc h3 {
+  margin: 0 0 .8rem !important;
+  padding: 0 !important;
+  font-size: 1.25rem !important;
+  border: 0 !important;
+}
+.source-figure {
+  margin: 2.8rem 0;
+  padding: 1rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: .8rem;
+}
+.source-figure img {
   display: block;
-  margin-bottom: 10px;
-  color: var(--accent-conclusion);
+  width: 100%;
+  height: auto;
+  border-radius: .45rem;
 }
-.tile.large {
-  grid-row: span 2;
-  background: var(--deep-2);
-  color: var(--white-soft);
+.source-figure figcaption {
+  margin-top: .9rem;
+  color: var(--muted);
+  font-size: .9rem;
+  line-height: 1.55;
 }
-.tile.large strong { color: var(--accent-warm); }
-@media (max-width: 760px) {
-  .metrics, .split, .future-grid, .mosaic {
-    grid-template-columns: 1fr;
-  }
-  .hero { min-height: 58vh; padding-top: 42px; }
-  .quote blockquote { font-size: 22px; }
+.meta,
+.filed {
+  color: var(--muted);
+  font-size: .92rem;
+}
+.related {
+  margin: 2.5rem 0;
+  padding: 1.4rem 1.6rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+.duplicate-note {
+  margin: 4rem 0 2rem;
+  padding: 1rem 1.2rem;
+  color: var(--muted);
+  background: var(--conclusion);
+  border-left: .35rem solid var(--accent3);
+}
+@media (max-width: 800px) {
+  .metric-band,
+  .flow-line { grid-template-columns: 1fr 1fr; }
+  .metric:nth-child(2) { border-right: 0; }
+  .split,
+  .contrast { grid-template-columns: 1fr; }
+  .takeaway-grid { grid-template-columns: 1fr; }
+  .takeaway:nth-child(4) { grid-column: auto; }
+}
+@media (max-width: 520px) {
+  .metric-band,
+  .flow-line { grid-template-columns: 1fr; }
+  .metric { border-right: 0; border-bottom: 1px solid var(--line); }
 }
 </style>
-  <script id="airs-digest-theme-boot">
+<script id="airs-digest-theme-boot">
     try {
       var saved = localStorage.getItem("theme");
       if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
     } catch (e) {}
   </script>
-  <style id="airs-digest-theme-style">
+<style id="airs-digest-theme-style">
     :root {
       color-scheme: light;
       --airs-digest-ink: #191816;
@@ -397,130 +497,283 @@ th {
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+  <style id="airs-source-image-theme-style">
+    .source-figure .source-image-dark {
+      display: none;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .source-figure .source-image-light {
+        display: none;
+      }
+      :root:not([data-theme="light"]) .source-figure .source-image-dark {
+        display: block;
+      }
+    }
+    :root[data-theme="dark"] .source-figure .source-image-light {
+      display: none;
+    }
+    :root[data-theme="dark"] .source-figure .source-image-dark {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-light {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-dark {
+      display: none;
+    }
   </style>
 </head>
 <body>
-<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/building-bugbot" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
-<main>
-  <section class="hero">
-    <div class="hero-inner">
-      <div class="kicker">一句话总括</div>
-      <h1>构建更好的 Bugbot</h1>
-      <p class="english">Building a better Bugbot</p>
-      <p class="one-line">Cursor 的真正贡献不是又做了一个代码审查机器人，而是把 AI 审查质量转化为可测量、可实验、可持续改进的生产系统。</p>
-    </div>
-  </section>
-
-  <section class="metrics" aria-label="关键数字">
-    <div class="metric"><strong>40</strong><span>发布后运行的主要实验数量。</span></div>
-    <div class="metric"><strong>52% → 70%+</strong><span>resolution rate 的提升，说明更多报告最终被作者修复。</span></div>
-    <div class="metric"><strong>0.4 → 0.7</strong><span>单次运行平均标记 bug 数提高。</span></div>
-    <div class="metric"><strong>200万+</strong><span>Bugbot 当前每月审查的客户 PR 数量。</span></div>
-  </section>
-
-  <section class="split">
-    <div>
-      <h2>指标改变了产品方向</h2>
-      <p class="lead">早期 Bugbot 依靠工程师主观判断来减少误报。后来 Cursor 定义了 resolution rate：在 PR 合并时，用 AI 判断报告的 bug 是否真的被作者解决。</p>
-      <p>这个指标把“评论看起来有用”变成了“工程师是否采纳并修复”。它让团队能在线观察真实使用效果，也能离线用 BugBench 对真实 diff 和人工标注 bug 做对比。</p>
-    </div>
-    <div class="note-box">
-      <h3>为什么这很关键</h3>
-      <p>AI 代码审查最容易被表面活跃度误导。评论多不等于有价值，点赞也不等于发现了真实缺陷。resolution rate 直接看最终代码是否改变，因此更接近业务价值。</p>
-    </div>
-  </section>
-
-  <section class="flow">
-    <h2>从固定流水线到 agentic 架构</h2>
-    <div class="steps">
-      <div class="step">
-        <div class="badge">1</div>
-        <div class="step-content">
-          <h3>早期靠多轮并行审查</h3>
-          <p>Bugbot 会用随机 diff 顺序运行八个并行 pass，再合并相似问题，用多数投票过滤只出现一次的发现。这降低了偶然误报。</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="badge">2</div>
-        <div class="step-content">
-          <h3>生产化补上基础设施</h3>
-          <p>Cursor 重写 Rust Git 集成，减少抓取数据，并加入速率限制监控、请求批处理和代理基础设施。没有这些工程层，模型能力无法稳定服务真实仓库。</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="badge">3</div>
-        <div class="step-content">
-          <h3>最大增益来自代理式审查</h3>
-          <p>新的 Bugbot 能围绕 diff 推理、调用工具、决定深入哪里。它不再只按固定流程走，而是在运行时拉取所需上下文。</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="table-zone">
-    <h2>旧方法和新方法的差别</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>维度</th>
-          <th>早期 Bugbot</th>
-          <th>agentic Bugbot</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>上下文</td>
-          <td>更多依赖预先塞入的静态上下文。</td>
-          <td>按需调用工具，运行时补足动态上下文。</td>
-        </tr>
-        <tr>
-          <td>提示词</td>
-          <td>主要约束模型，避免误报。</td>
-          <td>鼓励更积极调查可疑模式，避免过度保守。</td>
-        </tr>
-        <tr>
-          <td>优化方式</td>
-          <td>依靠内部质检和直觉迭代。</td>
-          <td>用真实 resolution rate 和 BugBench 做爬坡实验。</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="quote">
-    <blockquote>真正影响 AI 审查质量的，不只是模型本身，也包括它能调用什么工具、何时获取上下文，以及团队用什么信号判断它是否有效。</blockquote>
-  </section>
-
-  <section class="future">
-    <h2>下一步从发现走向验证和修复</h2>
-    <div class="future-grid">
-      <div class="future-item">
-        <h3>Bugbot Autofix Beta</h3>
-        <p>发现 PR bug 后自动启动 Cloud Agent 修复问题。这把审查从提醒推进到执行。</p>
-      </div>
-      <div class="future-item">
-        <h3>运行代码验证报告</h3>
-        <p>未来 Bugbot 将能运行代码验证自己的 bug 报告。它有机会减少误报，并提高开发者信任。</p>
-      </div>
-      <div class="future-item">
-        <h3>常驻扫描代码库</h3>
-        <p>Cursor 还在实验 always-on 版本。审查不再只等待 PR，而是持续观察代码库风险。</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="takeaways">
-    <h2>最值得带走的洞见</h2>
-    <div class="mosaic">
-      <div class="tile large"><strong>一</strong>AI 代码审查的核心指标应接近真实修复行为，而不是评论数量或主观反馈。</div>
-      <div class="tile"><strong>二</strong>40 次主要实验把每个 PR 解决的 bug 数从约 0.2 推到约 0.5，说明系统性爬坡能产生复利。</div>
-      <div class="tile"><strong>三</strong>agentic 架构让模型从被动读上下文，变成主动寻找证据。</div>
-      <div class="tile"><strong>四</strong>工具接口本身会塑造模型行为，小改动也可能影响结果。</div>
-      <div class="tile"><strong>五</strong>下一阶段的竞争点会从“发现问题”扩展到“验证问题并自动修复”。</div>
-    </div>
-  </section>
-</main>
-  <script id="airs-digest-theme-script">
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">← 返回索引</a><a href="https://cursor.com/blog/building-bugbot" rel="noopener noreferrer" target="_blank">阅读原文 ↗</a></div><button class="airs-digest-theme-toggle" data-airs-theme-toggle="" type="button">主题 · 跟随系统</button></nav>
+<header class="hero">
+<p class="eyebrow">Cursor Research · 2026 年 1 月 15 日</p>
+<h1>打造更好的 Bugbot</h1>
+<p class="original-title" lang="en">Building a better Bugbot</p>
+<p class="lede"><strong>一句话总括：</strong>Cursor 为 AI 代码审查建立了可量化的反馈闭环，并借助真实 PR 数据、离线 benchmark 和智能体架构，把 Bugbot 从经验驱动的原型变成了能够持续优化的生产系统。</p>
+</header>
+<main class="summary-shell">
+<section aria-label="关键数据" class="metric-band">
+<div class="metric"><strong>40 次</strong><span>上线后的重大实验</span></div>
+<div class="metric"><strong>52% → 70%+</strong><span>Bugbot 解决率</span></div>
+<div class="metric"><strong>0.4 → 0.7</strong><span>每次运行平均报告的问题数</span></div>
+<div class="metric"><strong>200 万+</strong><span>每月审查的 PR 数量</span></div>
+</section>
+<section class="split">
+<div>
+<h2>真正的突破是找到可优化的目标</h2>
+<p>早期团队主要依靠工程师的主观判断。某个配置看起来误报更少，就采用这个配置。</p>
+<p>这种方法足以打造原型，却无法证明线上质量是否真的提高。团队因此定义了“解决率”。它衡量开发者最终是否修改了 Bugbot 指出的问题。</p>
+</div>
+<div class="explainer">
+<h3>解决率为何重要</h3>
+<p>评论反应和零散反馈容易受到表达习惯影响。解决率直接观察合并后的代码，因此更接近实际价值。</p>
+<p>Cursor 表示，内部逐例与 PR 作者核对时，LLM 对“已解决”或“未解决”的判断几乎全部正确。这个指标让团队首次能够依据真实信号进行<mark>爬坡式优化</mark>。</p>
+</div>
+</section>
+<section class="contrast">
+<article>
+<h3>早期方法：固定流程抑制误报</h3>
+<p>Bugbot 并行执行 <strong>8 次</strong>检查。每次使用不同的 diff 顺序，再通过多数投票、聚类、验证和去重过滤结果。</p>
+<p>核心思路是约束模型。只有多个检查过程独立发现同一问题时，系统才把它视为更可靠的信号。</p>
+</article>
+<article>
+<h3>智能体方法：主动调查可疑线索</h3>
+<p>全智能体版本可以分析 diff、调用工具，并自行决定深入检查的位置。团队发现，它面临的问题不再是过度报告，而是<mark>过于谨慎</mark>。</p>
+<p>提示策略因此转向更积极的调查。模型会在运行时补充所需上下文，不必预先接收全部资料。</p>
+</article>
+</section>
+<section class="flow">
+<h2>从原型走向持续优化系统</h2>
+<div class="flow-line">
+<div class="flow-step">
+<b>01 · 定性迭代</b>
+<span>比较模型、流水线、过滤器和上下文策略。</span>
+</div>
+<div class="flow-step">
+<b>02 · 生产基础设施</b>
+<span>用 Rust 重建 Git 集成，并加入批处理、限流监控和代理设施。</span>
+</div>
+<div class="flow-step">
+<b>03 · 双轨评估</b>
+<span>线上观察真实解决率，线下使用人工标注的 BugBench。</span>
+</div>
+<div class="flow-step">
+<b>04 · 智能体架构</b>
+<span>让模型调用工具、动态寻找上下文，并决定调查路径。</span>
+</div>
+</div>
+</section>
+<section class="split">
+<div class="explainer">
+<h3>数字显示的不只是“多报了一些问题”</h3>
+<p>解决率从 <mark>52%</mark> 提升到 <mark>70% 以上</mark>。与此同时，每次运行报告的问题从 <strong>0.4 个</strong>增至 <strong>0.7 个</strong>。</p>
+<p>每个 PR 最终解决的问题因此从约 <strong>0.2 个</strong>增至约 <strong>0.5 个</strong>，提升超过一倍。这说明覆盖面扩大时，结果的可用性并未同步恶化。</p>
+</div>
+<div>
+<h2>许多看似合理的改动反而会退步</h2>
+<p>团队测试了模型、提示、迭代次数、验证器、上下文管理、类别过滤和智能体设计。大量改动让指标下降。</p>
+<p>这改变了对 AI 产品迭代的理解。局部上更复杂或更“聪明”的设计，不一定能改善线上效果。可靠评估比直觉更重要。</p>
+</div>
+</section>
+<aside class="insight-strip">
+    工具不是智能体外围的辅助设施。工具的设计和可用性会直接塑造模型行为。Cursor 发现，即使是很小的接口变化，也可能对最终结果产生超出预期的影响。
+  </aside>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="takeaway-grid">
+<article class="takeaway">
+<h3>评估指标决定优化上限</h3>
+<p>没有解决率，团队只能判断评论“看起来是否更好”。有了合并时的真实结果，优化才形成闭环。</p>
+</article>
+<article class="takeaway">
+<h3>质量与数量可以同时提升</h3>
+<p>报告量增加的同时，解决率也从 <strong>52%</strong> 升至 <strong>70% 以上</strong>。</p>
+</article>
+<article class="takeaway">
+<h3>智能体需要不同的提示策略</h3>
+<p>固定流水线需要抑制误报。自主调查的智能体反而需要鼓励它大胆追查异常。</p>
+</article>
+<article class="takeaway">
+<h3>动态上下文比一次性塞满信息更灵活</h3>
+<p>模型能够在运行时主动取得额外上下文。这降低了预先提供全部信息的必要性，也扩大了系统的实验空间。</p>
+</article>
+<article class="takeaway">
+<h3>下一步是验证与修复</h3>
+<p>Bugbot Autofix 已进入 Beta。后续方向包括运行代码验证报告、研究复杂问题，以及持续扫描整个代码库。</p>
+</article>
+</div>
+</section>
+</main><section id="translation">
+<div class="translation-inner">
+<h2>完整译文</h2>
+<nav aria-label="目录" class="toc">
+<h3>目录</h3>
+<ul>
+<li>从不起眼的起点开始</li>
+<li>从原型走向生产环境</li>
+<li>衡量真正重要的指标</li>
+<li>爬坡式优化</li>
+<li>智能体架构</li>
+<li>下一步</li>
+</ul>
+</nav>
+<p>随着编程智能体越来越强，我们发现自己花在代码审查上的时间也越来越多。为了解决这个问题，我们打造了 Bugbot。它是一个代码审查智能体，可以在代码进入生产环境之前分析 pull request，找出逻辑错误、性能问题和安全漏洞。到去年夏天，它的表现已经相当出色，因此我们决定向用户发布。</p>
+<p>Bugbot 的开发最初依靠定性评估，之后逐渐转向更系统的方法。我们设计了一个由 AI 驱动的自定义指标，用它对质量进行爬坡式优化。</p>
+<p>上线以来，我们完成了 40 次重大实验。Bugbot 的解决率从 52% 提高到 70% 以上，单次运行平均报告的问题数也从 0.4 个升至 0.7 个。这意味着每个 PR 中最终得到解决的问题数量增加了一倍以上，从约 0.2 个升至约 0.5 个。</p>
+<figure class="source-figure" data-source-image="0"><img alt="A chart showing Bugbot's improvement over 11 versions, plotting resolution rate against average bugs per run, with performance moving up and to the right" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fuploads%2Fbugbot-blog-image-1.jpg&amp;w=1920&amp;q=70" width="800"/>
+<figcaption>我们在 2025 年 7 月发布了版本 1，并在 2026 年 1 月发布了版本 11。新版本发现的问题更多，但误报没有出现相近幅度的增长。</figcaption>
+</figure>
+<h3>从不起眼的起点开始</h3>
+<p>我们第一次尝试开发代码审查智能体时，模型能力还不够强，给出的审查意见没有多少帮助。但随着基础模型不断进步，我们意识到，可以从多个方面提高问题报告的质量。</p>
+<p>我们尝试了不同的模型、流水线、过滤器和巧妙的上下文管理策略，也在这个过程中不断征询内部工程师的意见。如果某种配置看起来能减少误报，我们就采用它。</p>
+<p>早期最有效的质量改进之一，是并行执行多次问题查找，再通过多数投票合并结果。每次检查收到的 diff 顺序都不一样，这会推动模型采用不同的推理路径。如果多次检查分别发现了同一个问题，我们就会把它视为更强的信号，认为这个问题更可能真实存在。</p>
+<p>经过数周的内部定性迭代，我们最终得到了一个优于市场上其他代码审查工具的 Bugbot 版本。这让我们有信心将它发布。它采用以下流程：</p>
+<ol>
+<li>以随机的 diff 顺序并行执行 8 次检查。</li>
+<li>把相似的问题归入同一个分组。</li>
+<li>通过多数投票，过滤掉只在一次检查中发现的问题。</li>
+<li>把每个分组整合成一段清晰的描述。</li>
+<li>过滤不需要的类别，例如编译器警告或文档错误。</li>
+<li>让验证模型检查结果，找出误报。</li>
+<li>与此前运行已经发布的问题进行去重。</li>
+</ol>
+<h3>从原型走向生产环境</h3>
+<p>为了让 Bugbot 真正可用，我们不仅要改进核心审查逻辑，还必须建设一系列基础系统。为了快速、可靠地访问代码仓库，我们用 Rust 重写了 Git 集成，并尽量减少需要获取的数据量。我们还加入了限流监控、请求批处理和基于代理的基础设施，以便在 GitHub 的限制下运行。</p>
+<p>随着使用规模扩大，各个团队也需要表达代码库特有的不变条件，例如不安全的迁移方式，或错误使用内部 API。为此，我们加入了 Bugbot 规则。团队可以通过规则执行这些检查，不必把它们硬编码进系统。</p>
+<p>这些组件共同让 Bugbot 能够实际运行，也能适应真实的代码库。但它们无法告诉我们，质量是否真的有所提高。如果没有衡量进展的指标，我们就无法定量评估 Bugbot 在真实使用环境中的表现。这也限制了我们继续改进它的空间。</p>
+<h3>衡量真正重要的指标</h3>
+<p>为了解决这个问题，我们设计了一个名为“解决率”的指标。它会在 PR 合并时使用 AI 判断作者最终在代码中解决了哪些问题。开发这个指标时，我们在内部逐例抽查，并与对应的 PR 作者核实。结果显示，LLM 几乎总能正确判断问题是已经解决还是尚未解决。</p>
+<p>团队经常询问，该如何评估 Bugbot 为他们带来的影响。因此，我们在仪表板的显眼位置展示了这个指标。对于评估实际效果的团队来说，它比零散反馈或评论反应更清晰。解决率直接回答了一个问题：Bugbot 找出的是否是真实存在、并且工程师愿意修复的问题。</p>
+<figure class="source-figure" data-source-image="1"><img alt="The Bugbot dashboard showing PRs reviewed, issues resolved, users, and hours saved metrics over time" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fuploads%2Fbugbot-blog-image-2.png&amp;w=1920&amp;q=70" width="800"/>
+<figcaption>Bugbot 仪表板展示了一个团队的解决率随时间的变化，以及其他关键指标。</figcaption>
+</figure>
+<h3>爬坡式优化</h3>
+<p>定义解决率改变了我们开发 Bugbot 的方式。我们第一次可以依据真实信号进行爬坡式优化，而不再只凭感觉。我们开始通过实际解决率在线评估改动，同时使用 BugBench 进行离线评估。BugBench 是一个经过筛选的 benchmark，其中包含真实代码 diff 和人工标注的问题。</p>
+<p>我们围绕模型、提示、迭代次数、验证器、上下文管理、类别过滤和智能体设计开展了数十次实验。令人意外的是，许多改动反而让指标下降。事实证明，我们早期在定性分析中做出的很多初始判断是正确的。</p>
+<h3>智能体架构</h3>
+<p>去年秋天，我们把 Bugbot 改成完全基于智能体的设计。正是在这次转换后，我们看到了最大幅度的提升。智能体可以分析 diff、调用工具，并自行决定应该深入检查哪些地方，不必再遵循固定的检查步骤。</p>
+<p>智能体循环迫使我们重新思考提示设计。在早期版本中，我们需要约束模型，以尽量减少误报。但采用智能体方法后，我们遇到了相反的问题：它过于谨慎。于是，我们改用更积极的提示，鼓励智能体调查每一种可疑模式，并在判断边界不明确时倾向于报告潜在问题。</p>
+<p>此外，智能体架构也提供了更丰富的实验空间。我们可以把更多信息从静态上下文移到动态上下文中。我们会调整模型预先获得的上下文数量，再观察它如何适应。模型总能在运行时取得自己需要的额外上下文，无须提前得到全部信息。</p>
+<p>同一套架构也让我们可以直接迭代工具集。模型行为会受到可调用工具的影响，因此，即使只是工具设计或可用性上的小改动，也会对结果产生格外显著的影响。经过多轮迭代，我们不断调整和改进这个接口，直到模型行为能够稳定符合预期。</p>
+<h3>下一步</h3>
+<p>如今，Bugbot 每月为 Rippling、Discord、Samsara、Airtable 和 Sierra AI 等客户审查超过 200 万个 PR。Cursor 的所有内部代码也会使用 Bugbot 审查。</p>
+<p>展望未来，我们预计新模型会持续出现。无论是其他供应商提供的模型，还是我们自行训练的模型，它们都会有不同的优势和弱点。要继续取得进展，就必须找到模型、运行框架设计和审查结构之间的正确组合。今天的 Bugbot 已经比刚发布时强了数倍。我们预计，再过几个月，它还会获得显著提升。</p>
+<p>我们已经开始为这个未来做准备。我们刚刚发布了 Beta 版 Bugbot Autofix。它会自动启动一个 Cloud Agent，修复 PR 审查期间发现的问题。接下来的主要能力包括：让 Bugbot 运行代码，以验证自己的问题报告；在遇到复杂问题时进行深度研究。我们还在试验一个始终在线的版本。它会持续扫描代码库，而不是等到出现 pull request 后才开始工作。</p>
+<p>我们至今取得的巨大进展，离不开一些核心团队成员的贡献，其中包括 Lee Danilek、Vincent Marti、Rohan Varma、Yuri Volkov、Jack Pertschuk、Michiel De Jong、Federico Cassano、Ravi Rahman 和 Josh Ma。我们的目标始终不变：随着团队扩大 AI 开发工作流，帮助他们继续维持代码质量。</p>
+<p>阅读文档，或立即试用 Bugbot。</p>
+<p class="filed">分类：研究</p>
+<p class="meta">作者：Jon Kaplan</p>
+<aside class="related">
+<h4>相关文章</h4>
+<ul>
+<li>为本地智能体实现安全沙箱</li>
+<li>动态上下文发现</li>
+<li>通过自动安装引导 Composer</li>
+<li>打造更好的 Bugbot</li>
+</ul>
+</aside>
+<div class="duplicate-note">以下内容在所提供的正文中重复出现，现按原有顺序完整翻译。</div>
+<nav aria-label="重复内容目录" class="toc">
+<h3>目录</h3>
+<ul>
+<li>从不起眼的起点开始</li>
+<li>从原型走向生产环境</li>
+<li>衡量真正重要的指标</li>
+<li>爬坡式优化</li>
+<li>智能体架构</li>
+<li>下一步</li>
+</ul>
+</nav>
+<p>随着编程智能体越来越强，我们发现自己花在代码审查上的时间也越来越多。为了解决这个问题，我们打造了 Bugbot。它是一个代码审查智能体，可以在代码进入生产环境之前分析 pull request，找出逻辑错误、性能问题和安全漏洞。到去年夏天，它的表现已经相当出色，因此我们决定向用户发布。</p>
+<p>Bugbot 的开发最初依靠定性评估，之后逐渐转向更系统的方法。我们设计了一个由 AI 驱动的自定义指标，用它对质量进行爬坡式优化。</p>
+<p>上线以来，我们完成了 40 次重大实验。Bugbot 的解决率从 52% 提高到 70% 以上，单次运行平均报告的问题数也从 0.4 个升至 0.7 个。这意味着每个 PR 中最终得到解决的问题数量增加了一倍以上，从约 0.2 个升至约 0.5 个。</p>
+<h3>从不起眼的起点开始</h3>
+<p>我们第一次尝试开发代码审查智能体时，模型能力还不够强，给出的审查意见没有多少帮助。但随着基础模型不断进步，我们意识到，可以从多个方面提高问题报告的质量。</p>
+<p>我们尝试了不同的模型、流水线、过滤器和巧妙的上下文管理策略，也在这个过程中不断征询内部工程师的意见。如果某种配置看起来能减少误报，我们就采用它。</p>
+<p>早期最有效的质量改进之一，是并行执行多次问题查找，再通过多数投票合并结果。每次检查收到的 diff 顺序都不一样，这会推动模型采用不同的推理路径。如果多次检查分别发现了同一个问题，我们就会把它视为更强的信号，认为这个问题更可能真实存在。</p>
+<p>经过数周的内部定性迭代，我们最终得到了一个优于市场上其他代码审查工具的 Bugbot 版本。这让我们有信心将它发布。它采用以下流程：</p>
+<ol>
+<li>以随机的 diff 顺序并行执行 8 次检查。</li>
+<li>把相似的问题归入同一个分组。</li>
+<li>通过多数投票，过滤掉只在一次检查中发现的问题。</li>
+<li>把每个分组整合成一段清晰的描述。</li>
+<li>过滤不需要的类别，例如编译器警告或文档错误。</li>
+<li>让验证模型检查结果，找出误报。</li>
+<li>与此前运行已经发布的问题进行去重。</li>
+</ol>
+<h3>从原型走向生产环境</h3>
+<p>为了让 Bugbot 真正可用，我们不仅要改进核心审查逻辑，还必须建设一系列基础系统。为了快速、可靠地访问代码仓库，我们用 Rust 重写了 Git 集成，并尽量减少需要获取的数据量。我们还加入了限流监控、请求批处理和基于代理的基础设施，以便在 GitHub 的限制下运行。</p>
+<p>随着使用规模扩大，各个团队也需要表达代码库特有的不变条件，例如不安全的迁移方式，或错误使用内部 API。为此，我们加入了 Bugbot 规则。团队可以通过规则执行这些检查，不必把它们硬编码进系统。</p>
+<p>这些组件共同让 Bugbot 能够实际运行，也能适应真实的代码库。但它们无法告诉我们，质量是否真的有所提高。如果没有衡量进展的指标，我们就无法定量评估 Bugbot 在真实使用环境中的表现。这也限制了我们继续改进它的空间。</p>
+<h3>衡量真正重要的指标</h3>
+<p>为了解决这个问题，我们设计了一个名为“解决率”的指标。它会在 PR 合并时使用 AI 判断作者最终在代码中解决了哪些问题。开发这个指标时，我们在内部逐例抽查，并与对应的 PR 作者核实。结果显示，LLM 几乎总能正确判断问题是已经解决还是尚未解决。</p>
+<p>团队经常询问，该如何评估 Bugbot 为他们带来的影响。因此，我们在仪表板的显眼位置展示了这个指标。对于评估实际效果的团队来说，它比零散反馈或评论反应更清晰。解决率直接回答了一个问题：Bugbot 找出的是否是真实存在、并且工程师愿意修复的问题。</p>
+<h3>爬坡式优化</h3>
+<p>定义解决率改变了我们开发 Bugbot 的方式。我们第一次可以依据真实信号进行爬坡式优化，而不再只凭感觉。我们开始通过实际解决率在线评估改动，同时使用 BugBench 进行离线评估。BugBench 是一个经过筛选的 benchmark，其中包含真实代码 diff 和人工标注的问题。</p>
+<p>我们围绕模型、提示、迭代次数、验证器、上下文管理、类别过滤和智能体设计开展了数十次实验。令人意外的是，许多改动反而让指标下降。事实证明，我们早期在定性分析中做出的很多初始判断是正确的。</p>
+<h3>智能体架构</h3>
+<p>去年秋天，我们把 Bugbot 改成完全基于智能体的设计。正是在这次转换后，我们看到了最大幅度的提升。智能体可以分析 diff、调用工具，并自行决定应该深入检查哪些地方，不必再遵循固定的检查步骤。</p>
+<p>智能体循环迫使我们重新思考提示设计。在早期版本中，我们需要约束模型，以尽量减少误报。但采用智能体方法后，我们遇到了相反的问题：它过于谨慎。于是，我们改用更积极的提示，鼓励智能体调查每一种可疑模式，并在判断边界不明确时倾向于报告潜在问题。</p>
+<p>此外，智能体架构也提供了更丰富的实验空间。我们可以把更多信息从静态上下文移到动态上下文中。我们会调整模型预先获得的上下文数量，再观察它如何适应。模型总能在运行时取得自己需要的额外上下文，无须提前得到全部信息。</p>
+<p>同一套架构也让我们可以直接迭代工具集。模型行为会受到可调用工具的影响，因此，即使只是工具设计或可用性上的小改动，也会对结果产生格外显著的影响。经过多轮迭代，我们不断调整和改进这个接口，直到模型行为能够稳定符合预期。</p>
+<h3>下一步</h3>
+<p>如今，Bugbot 每月为 Rippling、Discord、Samsara、Airtable 和 Sierra AI 等客户审查超过 200 万个 PR。Cursor 的所有内部代码也会使用 Bugbot 审查。</p>
+<p>展望未来，我们预计新模型会持续出现。无论是其他供应商提供的模型，还是我们自行训练的模型，它们都会有不同的优势和弱点。要继续取得进展，就必须找到模型、运行框架设计和审查结构之间的正确组合。今天的 Bugbot 已经比刚发布时强了数倍。我们预计，再过几个月，它还会获得显著提升。</p>
+<p>我们已经开始为这个未来做准备。我们刚刚发布了 Beta 版 Bugbot Autofix。它会自动启动一个 Cloud Agent，修复 PR 审查期间发现的问题。接下来的主要能力包括：让 Bugbot 运行代码，以验证自己的问题报告；在遇到复杂问题时进行深度研究。我们还在试验一个始终在线的版本。它会持续扫描代码库，而不是等到出现 pull request 后才开始工作。</p>
+<p>我们至今取得的巨大进展，离不开一些核心团队成员的贡献，其中包括 Lee Danilek、Vincent Marti、Rohan Varma、Yuri Volkov、Jack Pertschuk、Michiel De Jong、Federico Cassano、Ravi Rahman 和 Josh Ma。我们的目标始终不变：随着团队扩大 AI 开发工作流，帮助他们继续维持代码质量。</p>
+<p>阅读文档，或立即试用 Bugbot。</p>
+<p class="filed">分类：研究</p>
+<p class="meta">作者：Jon Kaplan</p>
+<aside class="related">
+<h4>相关文章</h4>
+<ul>
+<li>为本地智能体实现安全沙箱</li>
+<li>动态上下文发现</li>
+<li>通过自动安装引导 Composer</li>
+</ul>
+</aside>
+</div>
+</section>
+<script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;
       const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));

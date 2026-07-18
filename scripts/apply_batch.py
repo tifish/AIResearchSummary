@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 
 from agent_cli import extract_html
-from generate import upsert_summary
+from generate import inject_original_images, upsert_summary
 from render_site import default_site_dir, load_articles, prepare_digest_html, render_page
 
 
@@ -54,7 +54,9 @@ def main() -> int:
         summaries += 1
         html = str(res.get("html", ""))
         if "<html" in html.lower():
-            html = prepare_digest_html(extract_html(html), item["url"])
+            html = extract_html(html)
+            html = inject_original_images(html, list(record.get("article_images", [])))
+            html = prepare_digest_html(html, item["url"])
             out = Path(item["out_file"])
             out.parent.mkdir(parents=True, exist_ok=True)
             out.write_text(html, encoding="utf-8")

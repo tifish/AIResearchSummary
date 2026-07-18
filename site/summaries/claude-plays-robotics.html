@@ -1,310 +1,156 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Claude 玩转机器人学</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Claude 玩机器人</title>
 <style>
-:root {
-  --bg: #f7f4ee;
-  --ink: #17191d;
-  --muted: #5c6470;
-  --surface: #ffffff;
-  --surface-2: #eef6f4;
-  --surface-3: #f5edf7;
-  --surface-4: #fff4df;
-  --line: #d8d2c8;
-  --deep: #16202a;
-  --deep-ink: #f4f7f8;
-  --data: #0f7c8c;
-  --data-soft: #dff5f7;
-  --risk: #c63f3f;
-  --risk-soft: #ffe7e1;
-  --opportunity: #277a45;
-  --opportunity-soft: #e4f6e8;
-  --conclusion: #7154b8;
-  --conclusion-soft: #eee8ff;
-  --warn: #b67610;
-  --warn-soft: #fff0ca;
-  --shadow: rgba(24, 27, 31, 0.12);
+:root{
+  color-scheme:light dark;
+  --bg:#f6f2e9;
+  --card:#fffdf7;
+  --ink:#182026;
+  --muted:#667078;
+  --line:#d8d1c4;
+  --accent:#126c72;
+  --accent2:#c54e32;
+  --accent3:#6752a3;
+  --accent4:#9a7000;
+  --deep:#172a32;
+  --deep-ink:#f4f7f5;
+  --hl:#ffe29a;
+  --hl2:#bdebe2;
+  --risk-bg:#f8ddd7;
+  --opportunity-bg:#dceee6;
+  --data-bg:#dceaf5;
+  --conclusion-bg:#e9e1f5;
+  --stripe:#eee7d9;
+  --shadow:rgba(31,38,40,.12);
 }
-:root[data-theme="dark"] {
-  --bg: #101316;
-  --ink: #e8ecef;
-  --muted: #a8b0ba;
-  --surface: #171c21;
-  --surface-2: #10252a;
-  --surface-3: #21192b;
-  --surface-4: #2a2112;
-  --line: #303842;
-  --deep: #080b0f;
-  --deep-ink: #f3f6f8;
-  --data: #34c2d2;
-  --data-soft: #102f35;
-  --risk: #ff796c;
-  --risk-soft: #351b18;
-  --opportunity: #66d586;
-  --opportunity-soft: #142f1d;
-  --conclusion: #a997ff;
-  --conclusion-soft: #241f3b;
-  --warn: #f3b64e;
-  --warn-soft: #35270e;
-  --shadow: rgba(0, 0, 0, 0.38);
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #101316;
-    --ink: #e8ecef;
-    --muted: #a8b0ba;
-    --surface: #171c21;
-    --surface-2: #10252a;
-    --surface-3: #21192b;
-    --surface-4: #2a2112;
-    --line: #303842;
-    --deep: #080b0f;
-    --deep-ink: #f3f6f8;
-    --data: #34c2d2;
-    --data-soft: #102f35;
-    --risk: #ff796c;
-    --risk-soft: #351b18;
-    --opportunity: #66d586;
-    --opportunity-soft: #142f1d;
-    --conclusion: #a997ff;
-    --conclusion-soft: #241f3b;
-    --warn: #f3b64e;
-    --warn-soft: #35270e;
-    --shadow: rgba(0, 0, 0, 0.38);
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#101619;
+    --card:#192126;
+    --ink:#e8edef;
+    --muted:#aab4b8;
+    --line:#364248;
+    --accent:#60d2d1;
+    --accent2:#ff8b72;
+    --accent3:#b7a0f3;
+    --accent4:#e9bc54;
+    --deep:#091015;
+    --deep-ink:#e8f4f3;
+    --hl:#614b13;
+    --hl2:#174e48;
+    --risk-bg:#422620;
+    --opportunity-bg:#1e3c32;
+    --data-bg:#203746;
+    --conclusion-bg:#302944;
+    --stripe:#242d31;
+    --shadow:rgba(0,0,0,.34);
   }
 }
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-  line-height: 1.65;
+:root[data-theme="dark"]{
+  --bg:#101619;
+  --card:#192126;
+  --ink:#e8edef;
+  --muted:#aab4b8;
+  --line:#364248;
+  --accent:#60d2d1;
+  --accent2:#ff8b72;
+  --accent3:#b7a0f3;
+  --accent4:#e9bc54;
+  --deep:#091015;
+  --deep-ink:#e8f4f3;
+  --hl:#614b13;
+  --hl2:#174e48;
+  --risk-bg:#422620;
+  --opportunity-bg:#1e3c32;
+  --data-bg:#203746;
+  --conclusion-bg:#302944;
+  --stripe:#242d31;
+  --shadow:rgba(0,0,0,.34);
 }
-main { overflow: hidden; }
-.hero {
-  background: var(--deep);
-  color: var(--deep-ink);
-  padding: 64px 22px 52px;
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;line-height:1.78}
+main{max-width:1120px;margin:auto;padding:30px 20px 80px}
+.hero{padding:clamp(30px,7vw,78px);background:var(--deep);color:var(--deep-ink);border-radius:28px;box-shadow:0 18px 50px var(--shadow);position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;width:240px;height:240px;border:42px solid var(--accent2);border-radius:50%;right:-100px;top:-120px;opacity:.55}
+.eyebrow{color:var(--accent);font-weight:800;letter-spacing:.12em}
+.hero h1{font-size:clamp(2.5rem,7vw,5.6rem);line-height:1.05;margin:.25em 0 .15em;max-width:800px}
+.original{color:var(--muted);font-size:1.05rem}
+.hero .original{color:var(--deep-ink);opacity:.66}
+.lede{font-size:clamp(1.2rem,2.5vw,1.75rem);max-width:850px;margin-top:32px}
+.hl{background:var(--hl);color:var(--ink);padding:.05em .25em;border-radius:.25em}
+.hl2{background:var(--hl2);color:var(--ink);padding:.05em .25em;border-radius:.25em}
+.metric-band{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin:28px 0;background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.metric{background:var(--card);padding:24px}
+.metric strong{display:block;font-size:clamp(1.6rem,4vw,2.5rem);color:var(--accent)}
+.metric:nth-child(2) strong{color:var(--accent2)}
+.metric:nth-child(3) strong{color:var(--accent3)}
+.metric:nth-child(4) strong{color:var(--accent4)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin:26px 0}
+.panel{padding:26px;border-radius:18px;border-left:7px solid var(--accent)}
+.panel.risk{background:var(--risk-bg);border-color:var(--accent2)}
+.panel.chance{background:var(--opportunity-bg);border-color:var(--accent)}
+.flow{margin:30px 0;padding:30px;background:var(--data-bg);border-radius:24px}
+.flow-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.flow-item{padding:18px 16px;border-top:5px solid var(--accent);background:var(--card);border-radius:8px 8px 16px 16px}
+.flow-item:nth-child(2){border-color:var(--accent4)}
+.flow-item:nth-child(3){border-color:var(--accent3)}
+.flow-item:nth-child(4){border-color:var(--accent2)}
+.insight-bar{background:var(--deep);color:var(--deep-ink);padding:28px clamp(22px,5vw,50px);margin:30px 0;border-radius:8px 28px 8px 28px;font-size:1.18rem}
+.takeaways{margin:28px 0;background:var(--conclusion-bg);padding:30px;border-radius:24px}
+.mosaic{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+.tile{background:var(--card);padding:20px;border:1px solid var(--line);border-radius:14px;grid-column:span 3}
+.tile:nth-child(3){grid-column:span 2;border-top:5px solid var(--accent2)}
+.tile:nth-child(4){grid-column:span 2;border-top:5px solid var(--accent3)}
+.tile:nth-child(5){grid-column:span 2;border-top:5px solid var(--accent4)}
+#translation{max-width:820px;margin:70px auto 0;padding-top:35px;border-top:10px solid var(--accent)}
+#translation h2{font-size:2.25rem}
+#translation h3{font-size:1.65rem;margin-top:2.2em;color:var(--accent)}
+#translation h4{font-size:1.25rem;margin-top:1.8em;color:var(--accent3)}
+#translation p,#translation li{font-size:1.04rem}
+#translation blockquote{margin:28px 0;padding:12px 22px;border-left:6px solid var(--accent4);background:var(--stripe)}
+.source-figure{margin:38px 0;padding:14px;background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 26px var(--shadow)}
+.source-figure img{display:block;max-width:100%;height:auto;margin:auto;border-radius:10px}
+.source-figure figcaption{margin-top:12px;color:var(--muted);font-size:.92rem;line-height:1.55}
+code{font-family:"Cascadia Code",Consolas,monospace;background:var(--stripe);padding:.1em .35em;border-radius:5px}
+a{color:var(--accent)}
+ul{padding-left:1.4em}
+@media(max-width:760px){
+  .metric-band,.flow-grid{grid-template-columns:1fr 1fr}
+  .split{grid-template-columns:1fr}
+  .mosaic{display:block}
+  .tile{margin:12px 0}
 }
-.wrap {
-  width: min(1120px, calc(100% - 36px));
-  margin: 0 auto;
+@media(max-width:480px){
+  .metric-band,.flow-grid{grid-template-columns:1fr}
+  main{padding-left:14px;padding-right:14px}
 }
-.kicker {
-  color: var(--data);
-  font-weight: 700;
-  letter-spacing: 0;
-  margin-bottom: 14px;
-}
-h1 {
-  margin: 0;
-  font-size: clamp(34px, 6vw, 68px);
-  line-height: 1.06;
-  letter-spacing: 0;
-}
-.original {
-  margin-top: 12px;
-  color: var(--muted);
-  font-size: 18px;
-}
-.hero .original { color: var(--deep-ink); opacity: 0.72; }
-.lede {
-  max-width: 850px;
-  margin-top: 28px;
-  font-size: 22px;
-  color: var(--deep-ink);
-}
-.meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 28px;
-}
-.pill {
-  border: 1px solid var(--line);
-  color: var(--deep-ink);
-  padding: 7px 12px;
-  border-radius: 999px;
-  font-size: 14px;
-}
-.metrics {
-  background: var(--surface);
-  border-bottom: 1px solid var(--line);
-}
-.metric-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  background: var(--line);
-}
-.metric {
-  background: var(--surface);
-  padding: 24px;
-  min-height: 150px;
-}
-.metric strong {
-  display: block;
-  color: var(--data);
-  font-size: 34px;
-  line-height: 1;
-}
-.metric span {
-  display: block;
-  margin-top: 12px;
-  color: var(--muted);
-}
-.split {
-  padding: 56px 0;
-  background: var(--surface-2);
-}
-.two-col {
-  display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  gap: 34px;
-  align-items: start;
-}
-.section-title {
-  margin: 0 0 14px;
-  font-size: 30px;
-  line-height: 1.18;
-}
-.note {
-  border-left: 6px solid var(--opportunity);
-  background: var(--opportunity-soft);
-  padding: 20px 22px;
-  font-size: 18px;
-}
-.stack {
-  display: grid;
-  gap: 14px;
-}
-.row {
-  display: grid;
-  grid-template-columns: 140px 1fr;
-  gap: 18px;
-  padding: 16px 0;
-  border-bottom: 1px solid var(--line);
-}
-.tag {
-  color: var(--conclusion);
-  font-weight: 800;
-}
-.band {
-  background: var(--risk-soft);
-  padding: 46px 0;
-}
-.quote {
-  max-width: 940px;
-  font-size: 26px;
-  line-height: 1.35;
-  border-left: 8px solid var(--risk);
-  padding-left: 24px;
-}
-.timeline {
-  padding: 58px 0;
-  background: var(--surface);
-}
-.steps {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 18px;
-  margin-top: 24px;
-}
-.step {
-  border-top: 5px solid var(--data);
-  padding: 18px 0 0;
-}
-.step:nth-child(2) { border-color: var(--opportunity); }
-.step:nth-child(3) { border-color: var(--warn); }
-.step:nth-child(4) { border-color: var(--risk); }
-.step b {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 18px;
-}
-.table-zone {
-  background: var(--surface-3);
-  padding: 56px 0;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--surface);
-  box-shadow: 0 18px 42px var(--shadow);
-}
-th, td {
-  text-align: left;
-  padding: 16px;
-  border-bottom: 1px solid var(--line);
-  vertical-align: top;
-}
-th {
-  color: var(--conclusion);
-  font-size: 14px;
-}
-td:first-child {
-  font-weight: 800;
-}
-.insight-strip {
-  background: var(--deep);
-  color: var(--deep-ink);
-  padding: 54px 0;
-}
-.strip-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 22px;
-}
-.strip-item {
-  border: 1px solid var(--line);
-  padding: 20px;
-}
-.strip-item b {
-  color: var(--warn);
-}
-.mosaic {
-  background: var(--surface-4);
-  padding: 58px 0 70px;
-}
-.tiles {
-  display: grid;
-  grid-template-columns: 1.2fr 0.8fr 1fr;
-  gap: 16px;
-  margin-top: 24px;
-}
-.tile {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  padding: 22px;
-  min-height: 150px;
-}
-.tile.data { border-top: 7px solid var(--data); }
-.tile.risk { border-top: 7px solid var(--risk); }
-.tile.opp { border-top: 7px solid var(--opportunity); }
-.tile.final { border-top: 7px solid var(--conclusion); grid-column: span 2; }
-.tile b {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 18px;
-}
-@media (max-width: 820px) {
-  .metric-grid, .two-col, .steps, .strip-grid, .tiles {
-    grid-template-columns: 1fr;
-  }
-  .row {
-    grid-template-columns: 1fr;
-    gap: 4px;
-  }
-  .tile.final {
-    grid-column: auto;
-  }
-  .hero {
-    padding-top: 44px;
-  }
+
+:root[data-theme="light"] {
+  color-scheme: light;
+--bg:#f6f2e9;
+  --card:#fffdf7;
+  --ink:#182026;
+  --muted:#667078;
+  --line:#d8d1c4;
+  --accent:#126c72;
+  --accent2:#c54e32;
+  --accent3:#6752a3;
+  --accent4:#9a7000;
+  --deep:#172a32;
+  --deep-ink:#f4f7f5;
+  --hl:#ffe29a;
+  --hl2:#bdebe2;
+  --risk-bg:#f8ddd7;
+  --opportunity-bg:#dceee6;
+  --data-bg:#dceaf5;
+  --conclusion-bg:#e9e1f5;
+  --stripe:#eee7d9;
+  --shadow:rgba(31,38,40,.12);
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -436,132 +282,353 @@ td:first-child {
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/claude-plays-robotics" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
 <main>
-  <section class="hero">
-    <div class="wrap">
-      <div class="kicker">一句话总括</div>
-      <h1>Claude 玩转机器人学</h1>
-      <div class="original">Claude plays robotics</div>
-      <p class="lede">这项研究真正的贡献，是把语言模型的机器人能力拆成可比较的系统问题：模型、身体、控制接口、视觉工具和预训练策略共同决定它能否影响物理世界。</p>
-      <div class="meta">
-        <span class="pill">Anthropic</span>
-        <span class="pill">2026-07-09</span>
-        <span class="pill">Frontier Red Team</span>
-      </div>
-    </div>
-  </section>
-
-  <section class="metrics">
-    <div class="wrap metric-grid">
-      <div class="metric"><strong>12</strong><span>个模型参与评测，来自 5 家提供商。</span></div>
-      <div class="metric"><strong>4</strong><span>类控制接口：直接控制、代码控制、策略控制、强化学习监督。</span></div>
-      <div class="metric"><strong>0-5.5%</strong><span>低层机械臂操作的完整任务成功率仍然很低。</span></div>
-      <div class="metric"><strong>83 Hz</strong><span>腿式机器人实时控制约需这个频率，当前模型推理慢约两个数量级。</span></div>
-    </div>
-  </section>
-
-  <section class="split">
-    <div class="wrap two-col">
-      <div>
-        <h2 class="section-title">能力不是单纯来自模型更聪明</h2>
-        <p>同一个模型，换一种控制接口，表现会完全不同。让它直接输出力矩时，它往往无法稳定控制身体。让它监督预训练策略时，它可以完成更有意义的行动。</p>
-      </div>
-      <div class="note">这改变了评估方式。真实部署中的模型通常不会裸手控制关节。它会接入传感器、控制器和机器人策略。安全评估必须评估这个完整组合。</div>
-    </div>
-  </section>
-
-  <section class="timeline">
-    <div class="wrap">
-      <h2 class="section-title">从低层控制到高层监督，难度快速下降</h2>
-      <div class="steps">
-        <div class="step"><b>直接控制</b><span>模型自己选择力矩或末端执行器动作。它暴露了物理控制的短板，也显示新模型在逐步改善。</span></div>
-        <div class="step"><b>写控制器</b><span>模型写 Python 控制逻辑。许多模型在四足机器人平衡任务上明显强于逐步直接控制。</span></div>
-        <div class="step"><b>训练策略</b><span>模型设计奖励、网络和训练流程。GPT-5.4 与 Mythos Preview 在若干 RL 单元中表现突出。</span></div>
-        <div class="step"><b>监督预训练策略</b><span>模型发高层指令或判断 VLA 动作。能力提升最大，也最接近实际部署形态。</span></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="band">
-    <div class="wrap">
-      <div class="quote">最关键的风险点不是“模型今天能不能单独控制人形机器人”，而是“它接入一个足够好的控制器后，能力会被放大多少”。</div>
-    </div>
-  </section>
-
-  <section class="table-zone">
-    <div class="wrap">
-      <h2 class="section-title">哪些能力在进步，哪些仍是瓶颈</h2>
-      <table>
-        <thead>
-          <tr><th>能力面</th><th>关键数据和趋势</th><th>结论</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>低层步态</td>
-            <td>Go2 四足机器人上，Opus 4.6、4.7 和 Mythos Preview 能用代码控制接近平衡两秒。G1 人形机器人没有模型能从倒地姿态站起。</td>
-            <td>模型开始有全身控制迹象，但复杂身体仍远未可靠。</td>
-          </tr>
-          <tr>
-            <td>低层操作</td>
-            <td>Franka Panda 机械臂任务中，更新模型更会接近物体、接触和抓取。完整成功率仍只有 0-5.5%。</td>
-            <td>局部物理行为在出现，但长任务链条很容易被一个小错误打断。</td>
-          </tr>
-          <tr>
-            <td>高层导航</td>
-            <td>11 个导航任务显示两次代际跃迁。指南针比深度热图、十字准星和第三人称视角更稳定地提升表现。</td>
-            <td>瓶颈常常是方位和自定位，不只是看不清场景。</td>
-          </tr>
-          <tr>
-            <td>VLA 监督</td>
-            <td>MolmoAct 让操作能力远超直接控制。较新的 Claude 模型更能判断何时听从策略，何时不要盲从。</td>
-            <td>预训练机器人策略是主要能力放大器。模型的价值在于监督和纠错。</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="insight-strip">
-    <div class="wrap">
-      <h2 class="section-title">视觉、推理和记忆的真实作用</h2>
-      <div class="strip-grid">
-        <div class="strip-item"><b>视觉</b><p>新模型从原始图像中提取空间信息的能力更强。旧模型有时换成文字描述反而更好，这说明它们读图不够精确。</p></div>
-        <div class="strip-item"><b>推理</b><p>额外推理预算多数时候帮助有限。有些任务甚至会被过度规划拖累。能力跃迁更可能来自视觉、数值稳定性和 3D 理解。</p></div>
-        <div class="strip-item"><b>记忆</b><p>模型能从失败中短期调整。长上下文并不总是有用。截断早期交互后，很多设置没有明显变差。</p></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="split">
-    <div class="wrap two-col">
-      <div>
-        <h2 class="section-title">现实机器人暴露了同一个问题</h2>
-        <p>在真实 Unitree Go2 上，模型能看见目标并向它移动。失败也很直观。它们会停得太远，误判走廊转弯，或者把玻璃门反射里的目标当成真实方向。</p>
-      </div>
-      <div class="stack">
-        <div class="row"><span class="tag">find_x</span><span>约 25 英尺外的蓝色 X 目标能被发现，但许多模型无法稳定走到 1 米以内。</span></div>
-        <div class="row"><span class="tag">办公室绕行</span><span>只靠视觉完成走廊一圈时，所有测试模型都失败。主要原因是空间记忆和自定位错误。</span></div>
-        <div class="row"><span class="tag">视觉工具</span><span>准星和深度热图偶尔有帮助，也会制造错误信心。模型会解释工具，但不一定正确使用它。</span></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="mosaic">
-    <div class="wrap">
-      <h2 class="section-title">最值得带走的洞见</h2>
-      <div class="tiles">
-        <div class="tile data"><b>评测对象应是系统，不只是模型</b><span>机器人身体、控制接口和工具会显著改变能力边界。只测裸模型会低估部署风险。</span></div>
-        <div class="tile risk"><b>低层控制仍不可靠</b><span>力矩级控制、长链条操作和人形机器人平衡依然很难。当前模型还不能稳定完成通用机器人控制。</span></div>
-        <div class="tile opp"><b>预训练策略显著放大能力</b><span>VLA 和步态策略让模型从“不会动”变成“能监督行动”。这也是现实系统最可能采用的路径。</span></div>
-        <div class="tile final"><b>方向感比更多画面更重要</b><span>指南针和交互式光标的提升说明，模型缺的常常是可操作的空间参照。更复杂的视觉叠加不一定更好。</span></div>
-        <div class="tile data"><b>进步主要来自短期纠错</b><span>新模型更会从刚刚失败的动作中调整策略。它们还没有表现出可靠的长程空间规划能力。</span></div>
-      </div>
-    </div>
-  </section>
+<header class="hero">
+<div class="eyebrow">FRONTIER RED TEAM · 2026-07-09</div>
+<h1>Claude 玩机器人</h1>
+<div class="original">Claude plays robotics</div>
+<p class="lede">一句话总括：这项研究证明，语言模型能否影响物理世界，<span class="hl">不仅取决于模型有多强</span>，还取决于它接入了什么机器人、控制器和感知工具。</p>
+</header>
+<section aria-label="关键数字" class="metric-band">
+<div class="metric"><strong>12</strong>个模型，来自 5 家提供商</div>
+<div class="metric"><strong>0–5.5%</strong>直接操作 LIBERO 的完整成功率</div>
+<div class="metric"><strong>6%→32%</strong>Mythos Preview 加入光标后的成功率</div>
+<div class="metric"><strong>83 Hz</strong>腿式机器人所需实时控制频率</div>
+</section>
+<section class="split">
+<div class="panel chance">
+<h2>能力取决于接口</h2>
+<p>模型直接设置电机力矩时，大多无法稳定控制复杂机器人。换成 Python 控制器、预训练步态策略或 VLA 后，结果会显著改善。</p>
+<p><strong>同一个模型可能看起来很弱，也可能很强。</strong>真正改变结果的是模型与机器人之间的抽象层级。</p>
+</div>
+<div class="panel risk">
+<h2>现实风险来自完整系统</h2>
+<p>通用聊天模型即使没有接受机器人专项训练，也能在表现较好的一次运行中自行编写工具，让四足机器人缓慢穿过迷宫，或让机械臂把盘子移到炉灶上。</p>
+<p>因此，只孤立测试模型会<span class="hl">低估部署后的物理能力</span>。</p>
+</div>
+</section>
+<section class="flow">
+<h2>控制抽象越高，当前模型越能发挥</h2>
+<div class="flow-grid">
+<div class="flow-item"><strong>直接控制</strong><br/>逐步输出力矩或动作。失败最多，且对延迟极其敏感。</div>
+<div class="flow-item"><strong>代码控制</strong><br/>编写 Python 控制器。经典控制和四足平衡明显改善。</div>
+<div class="flow-item"><strong>训练策略</strong><br/>自行设计奖励、网络和训练计划。能力在提升，但仍落后于代码控制。</div>
+<div class="flow-item"><strong>监督预训练策略</strong><br/>发布高层指令或审核 VLA 动作。导航和操作能力提升最大。</div>
+</div>
+</section>
+<section class="insight-bar">
+<strong>最重要的能力变化：</strong>新模型更会从刚刚发生的失败中调整策略，也更能直接从图像提取空间信息。但它们仍缺少稳定的自定位、长期空间记忆和长程开环规划。
+</section>
+<section class="split">
+<div class="panel chance">
+<h2>感知工具要提供“可行动的信息”</h2>
+<p>深度图和分割叠层大多没有稳定收益。光标和指南针却能帮助所有受测模型。</p>
+<p>Mythos Preview 在 10 项操作任务上的成功率从 <span class="hl2"><strong>6% 升至 32%</strong></span>。这说明瓶颈常常不是“看不见”，而是不清楚目标位置和自身朝向。</p>
+</div>
+<div class="panel risk">
+<h2>更多推理不等于更好控制</h2>
+<p>多数实验中，提高推理预算的影响很小，有时还会降低表现。复杂规划可能妨碍机器人所需的快速反应。</p>
+<p>代际提升更可能来自视觉、数值一致性和三维理解，而不是单纯延长思考过程。</p>
+</div>
+</section>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="mosaic">
+<div class="tile"><strong>评估对象应是完整机器人栈。</strong><br/>本体、接口、工具和预训练控制器都可能让能力发生数量级变化。</div>
+<div class="tile"><strong>高层控制已具有现实意义。</strong><br/>模型不必亲自驱动每个关节，只要能调用可靠控制器，就可以对物理世界采取有效行动。</div>
+<div class="tile"><strong>直接控制仍不可靠。</strong><br/>人形机器人最难。没有模型能让倒地的 G1 成功站起。</div>
+<div class="tile"><strong>学习以短程纠错为主。</strong><br/>模型能从最近几步和少量示例中学习，但尚未形成稳健的长期规划。</div>
+<div class="tile"><strong>安全边界必须围绕访问权设计。</strong><br/>关键问题不只是模型会什么，还包括它能感知什么、能控制什么，以及哪些对象必须被技术性隔离。</div>
+</div>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<p>Shmuel Berman、Michael Ilie、Jia Deng、Daniel Freeman</p>
+<p>语言模型的优势能否迁移到机器人领域？这个领域要求模型综合运用逻辑能力和精确的三维理解。模型能否感知场景，理解特定机器人的状态，并发出可以可靠改变物理世界的动作？</p>
+<p>我们通过测试寻找答案。我们让多个语言模型控制一系列不同的机器人本体。其中包括经典控制玩具、模拟四足机器人和人形机器人、机械臂，以及真实的 Unitree Go2，也就是 Project Fetch 使用的四足机器人。</p>
+<p>我们为模型提供了多种控制方式。这些方式的抽象程度各不相同，也就是指令所处的层级不同。抽象程度最低的方式是直接控制电机力矩。其他方式包括编写控制器代码、通过强化学习从零训练控制器，以及向预训练机器人策略发出高层转向指令。预训练策略是另一个神经网络，负责把高层命令转换为协调的关节动作。</p>
+<p>我们从三个方面评估模型表现。第一类是经典控制问题，例如平衡摆锤。第二类是移动和导航，包括让腿式机器人保持平衡、行走和穿越空间。第三类是操作任务，即使用机械臂抓取和移动物体。</p>
+<p>模型的机器人能力正在快速提高。不过，我们发现，其实际能力高度取决于模型如何连接机器人，也就是它采用哪种控制方式。当模型必须亲自驱动关节时，大多会失败。但如果模型负责监督预训练控制器，或使用简单的方向工具，就能完成真实的导航和操作任务。某些机器人本体依然笨重难控。不过，新模型尤其擅长调整策略，也更能跨领域地把图像和传感器信息转换为恰当动作。</p>
+<figure class="source-figure" data-source-image="0"><img alt="Bar graph showing per-model embodiment score by interface. Mythos Preview scores the highest at 0.389, while Opus 4 scores the lowest at 0.115." decoding="async" height="1320" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/b82f549f17f19f77687b44191441c71d07e6d198-2640x1320.png" width="2640"/><figcaption>各模型在 Embody（我们的 benchmark 套件）上的综合得分，按控制接口堆叠显示。综合分是除高层移动外，套件中所有机器人本体和任务的归一化平均值。柱形越高，表示物理能力覆盖面越广。</figcaption></figure>
+<p>这些发现对语言模型的安全开发和部署有重要意义。目前的前沿模型如果没有预训练策略，还无法控制人形机器人。但在我们测试的人形和四足机器人上，新模型在直接操作和高层策略控制方面都取得了实际进展。我们预计未来模型会更强。</p>
+<p>更具体地说，一个没有接受机器人训练的通用聊天模型，在一次表现较好的运行中，已经可以自行编写并下载工具，让四足机器人缓慢穿过迷宫。它也可以从台面上拿起盘子，再把盘子放到炉灶上。每一代新模型都在缩小可靠性差距。</p>
+<h3>研究发现摘要</h3>
+<p>一个模型的机器人得分既取决于模型，也同样取决于机器人本体和控制接口。同一模型的表现可以很弱，也可以很强。这取决于它是直接设置电机力矩、编写 Python 控制器、监督预训练策略，还是通过强化学习训练自己的策略。这些都是模型完成同一项任务的不同方式。对于最难控制的本体，尤其是人形机器人，目前的模型只有使用抽象程度较高的接口才能取得进展。在这类接口中，预训练策略负责处理底层物理控制。</p>
+<p>模型的机器人能力正在提高，但各方面进步并不均衡。代际之间最稳定的提升出现在高层接口上。直接底层控制也在改善，但趋势远没有那么一致。有些新模型明显优于前代，另一些则没有。</p>
+<p>在移动任务上，前沿模型如今已经能进行有限但有意义的全身控制。新模型在四足机器人的底层站立、平衡和行走方面有所进展。它们在人形机器人平衡方面的提升较弱，但仍可测量。借助预训练策略和感知工具，它们甚至可以在简单环境中导航。不过，需要稳定空间记忆、自定位或长程开环计划的任务仍会失败。</p>
+<p>采用底层操作方法时，模型开始表现出有用的局部物理行为，但完整任务依然很少成功。新模型更擅长接近物体、接触物体和完成抓取。不过，它们完成整个任务的比例仍然很低，只有 <strong>0%–5.5%</strong>。</p>
+<p>采用高层操作方法时，新模型配合预训练策略会更加成功。视觉—语言—动作（Vision-Language-Action，VLA）脚手架是一种预训练策略。它可以把相机图像和指令直接映射为机械臂动作。与直接控制相比，VLA 能显著提高模型的操作表现。</p>
+<p>新模型也越来越擅长监督这些策略。它们更能识别某个候选动作会失败的情况，也不太会不加判断地服从 VLA，因此能在操作任务中取得进一步进展。监督策略仍会损失一部分性能。组合系统的表现不如 VLA 单独运行，但最好的监督模型已经弥合了大部分差距。</p>
+<p>这并不意味着监督毫无用处。早期模型会破坏预训练策略的大部分价值。当前最好的模型则能恢复其中大部分价值。在 VLA 无法独立完成的任务上，最强模型已经可以带来净提升。</p>
+<h3>简单环境</h3>
+<p>我们首先使用一组简单控制任务，评估与机器人有关的能力。其中包括经典强化学习（reinforcement learning，RL）问题，例如平衡倒立摆和控制单腿跳跃机器人。</p>
+<p>这些环境经过简化，但我们认为，它们仍要求模型理解动力学、时间维度上的因果关系和基础物理。这些能力是形成更通用物理理解的重要前提。在这些低维环境中，传感器数据几乎提供了全部必要信息，因此只需很少甚至完全不需要视觉输入。这类低维控制也存在于某些现实场景中，例如相机防抖。</p>
+<p>我们在 MuJoCo 模拟引擎中通过四种控制接口评估模型。本文所称的“经典控制”是指这一类玩具任务，而“直接控制”则是下面四种接口之一。两者是相互独立的维度。</p>
+<p>在直接控制中，模型每一步都选择力矩或作用力等底层动作。在程序化控制中，模型编写一个 Python 控制器，在运行期间把观测映射为动作。在策略控制中，模型可以调用预训练策略，并经常用自然语言发出高层命令。在强化学习监督中，模型先训练策略，再在测试阶段部署学到的策略。</p>
+<p>为了估计直接控制性能的上限，我们会在两次 LLM 调用之间暂停模拟器，避免实时延迟主导实验结果。如果不这样做，许多直接控制测试会因为一个无关紧要的原因失败：模型的反应速度太慢，无法控制环境。我们预计推理速度会继续提高。暂停设置让我们能够清楚观察当前模型在最佳情况下具有什么能力。</p>
+<p>我们还在评估设计中考虑了一个问题：许多经典 RL 任务频繁出现在预训练语料中，这可能限制结论向新环境推广的能力。为此，我们保留倒立摆和 Hopper 作为控制任务，同时加入一项以弹珠台为基础的新任务。</p>
+<p>在 TwinFlipper 中，智能体控制一组挡板，目标是在球掉到挡板下方之前，让球的总滞空时间尽可能长。这里的滞空时间，是球不接触任何物体且保持在指定高度阈值以上的累计时间。最简单的做法是把球猛烈向上击出，但通过精确控制，让球有节奏地上下反弹，可以获得长得多的滞空时间。这项任务代表一种自由度很少、却混沌而动态的系统。所有受测模型此前都没有见过它。</p>
+<figure class="source-figure" data-source-image="1"><img alt="Visualization of an AI agent playing a game where it controls a set of flippers, seeking to maximize the ball’s time in the air." decoding="async" height="360" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/30b4c51653aeadd65678de6844ac245e288c5390-480x360.gif" width="480"/><figcaption>Opus 4.6 在经典控制任务中的最佳一次运行。</figcaption></figure>
+<figure class="source-figure" data-source-image="2"><img alt="Six bar graphs showing different AI models' classic control performance on various tasks, both directly and via code control: pendulum balance (direct and code), hopper velocity (direct and code), and TwinFlipper air time (direct and code)." decoding="async" height="6292" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/67a32f2391eda5c15032f42833f02db57c3bafad-6951x6292.png" width="6951"/><figcaption>各模型在经典控制任务上的表现。</figcaption></figure>
+<p>单项任务的结果虽然存在较大噪声，但综合观察所有经典控制 benchmark，可以看到稳定的代际提升。除 TwinFlipper 直接控制和 Hopper 速度任务外，Claude Opus 4.6 和 Opus 4.5 在几乎所有任务上都优于两个更早版本。所有模型在 TwinFlipper 直接控制上的表现都很差，而 Hopper 速度是噪声最大的任务。即便如此，后两个模型在代码控制、强化学习以及程度较小的直接控制上仍有显著进步。</p>
+<p>结果表明，大部分提升来自模型看到先前结果后进行适应，并据此修改策略的能力。在具有自然终点的任务上，尤其是 TwinFlipper 和 Pendulum，各模型第一次尝试的平均表现非常接近。按这一指标，Claude Opus 4 和 Opus 4.1 甚至略微领先于后续模型。更大的提升出现在之后的尝试中。后期模型的改善幅度要大得多。Claude Mythos Preview 是一个显著例外。它在 Pendulum 上的许多首次尝试都更加稳健。</p>
+<figure class="source-figure" data-source-image="3"><img alt="Three bar graphs showing models' classic control performance when training an RL policy to perform three tasks: pendulum balance, hopper velocity, and TwinFlipper air time." decoding="async" height="2400" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/aaecef16d5f8fa1375accc602429b0c561f3664c-6500x2400.png" width="6500"/><figcaption>模型从零训练强化学习策略时的表现。</figcaption></figure>
+<p>几乎所有模型训练 RL 策略的表现，都不如自行创建 Python 控制器。TwinFlipper 是突出的例外。GPT-5.4 是唯一能够稳定学到合格策略的模型。考虑到它使用其他控制接口时表现相对较差，这一点十分引人注目。</p>
+<p>Pendulum 和 Hopper 的情况不同。Mythos Preview 领先，GPT-5.4 紧随其后，各模型之间的差距也小得多。综合三项任务，新版 Claude 相较旧版都有实质提升。</p>
+<p>对于 Hopper 和 TwinFlipper 这类目标较难精确定义的任务，RL 表现正在改善，但仍落后于代码控制。这并不意外。让模型训练自己的 RL 策略，意味着它必须解决复杂的搭建问题。它要定义环境和奖励，管理更长的迭代周期，还要同时处理多个相互依赖的设计选择。虽然并非每一代 Claude 都有相同幅度的改善，但长期趋势很明确：RL 能力正在进步。</p>
+<h3>直接控制很差，但正在改善</h3>
+<h4>底层移动控制</h4>
+<p>接下来的问题是，我们在简单控制中看到的进步，能否迁移到自由度多得多的机器人上。为此，我们在两个有代表性的平台上评估底层移动控制：拥有 29 个自由度的 Unitree G1 人形机器人，以及拥有 12 个自由度的 Unitree Go2 四足机器人。</p>
+<p>与玩具任务相比，这个领域既有更高的潜在贡献上限，也有更高的风险。训练稳健的人形和四足机器人策略很困难。不过，策略训练完成后，可能被部署到现实环境中。此时，目标不一致的行为可能造成严重的物理伤害。</p>
+<p>这些机器人十分复杂，数值控制也非常困难。在简单任务中，模型只需控制少数相互耦合的变量。这里则必须协调许多关节，并持续抵消重力、惯性和接触力。系统几乎不容错。如果细小错误没有立即修正，也可能让整个机身失稳。</p>
+<p>考虑到这种难度，我们评估了两项核心任务。第一项是从倒地姿势站起。第二项是从直立状态开始，尽可能长时间地保持平衡。我们起初还尝试了更复杂的任务和初始状态，但即使对前沿模型而言，那些设置通常也超出了能力范围。四足机器人试验的结果相对积极，因此我们还评估了模型通过程序控制让 Go2 向前行走的能力。</p>
+<p>我们使用三种控制接口：直接控制、程序化控制和强化学习。与经典任务一样，在直接控制设置中，我们会在 LLM 调用之间暂停模拟器，避免实时延迟成为限制因素。实时控制大约需要 <strong>83 Hz</strong>。当前非推理模式的推理频率约为 <strong>0.2–0.4 Hz</strong>。要弥合这一差距，延迟需要改善约两个数量级。</p>
+<p>所有模型都很难直接进行四足机器人的底层移动控制，但许多模型很擅长程序化控制。Opus 4.6、Opus 4.7 和 Claude Mythos Preview 通过力矩控制和 Python 控制器，让 Go2 保持平衡接近整整两秒。这个时间足以体现稳定平衡，又足够短，便于反复迭代。Gemini 3.1 和 GPT-5.4 编写的控制器也同样强，但它们直接控制电机时远远落后。在直接控制下，Opus 4.6 可以让机器人保持平衡，却无法成功让它站起。</p>
+<figure class="source-figure" data-source-image="4"><img alt="Three bar graphs with performance intervals showing various AI models' performance at directly controlling a robotic quadruped." decoding="async" height="2550" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/c7015fa90f5134a5178d14b42372a79bf74b015b-6000x2550.png" width="6000"/><figcaption>对 Go2 四足机器人进行直接底层控制。</figcaption></figure>
+<figure class="source-figure" data-source-image="5"><img alt="Four bar graphs showing various AI models' performance at controlling a robotic quadruped's movements using code control." decoding="async" height="2750" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/eb82966f3a5ebb8f3c9d1b0a9c80bc2590274fab-8000x2750.png" width="8000"/><figcaption>程序化移动控制。</figcaption></figure>
+<p>G1 人形机器人是研究中最难的平台。结果仍然较弱，但正在改善。在我们的试验中，没有任何模型曾成功让倒地的机器人站起。不过，在机器人已经直立的情况下，Opus 4 到 Opus 4.7 之间的平衡能力出现了可测量的进步。</p>
+<figure class="source-figure" data-source-image="6"><img alt='Two computer renderings of a humanoid robot being controlled by an AI. In the first labeled "Opus 4.6 (Python controller)," the robot is standing but starts to twist its torso to one side. In the second, labeled "zero commands (passive)," the robot collapses to the ground.' decoding="async" height="270" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/2d91fbe744a8e22fa60e8e8d287f1f998e4260f5-720x270.gif" width="720"/><figcaption>模型控制下的人形机器人。</figcaption></figure>
+<p>我们还评估了模型训练移动策略的能力。我们为模型提供训练脚手架、GPU 和可视化环境，并允许模型控制奖励函数、训练环境和模型架构。在四小时内，GPT-5.4 和 Claude Mythos Preview 始终能训练出最合格的 RL 策略。这印证了经典 RL 任务中的结果。Claude 系列内部也存在明显进步：表现从 Opus 4 提升到 Opus 4.6，又在 Mythos Preview 上进一步提高。</p>
+<figure class="source-figure" data-source-image="7"><img alt="Two bar graphs showing various AI models' performance on controlling a humanoid robot. More advanced models perform reasonably well on the &quot;Go2 Stand&quot; task, but all models fail on the &quot;G1 Stand&quot; task." decoding="async" height="3639" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/6e41b0cf335d8f90debd63057d45cdab15489c2f-9425x3639.png" width="9425"/><figcaption>Go2 和 G1 上的程序化控制与训练策略控制对比。</figcaption></figure>
+<p>所有这些结果都应得到恰当解读。例如，如果我们随机化四足机器人的初始姿势，并加入仰面倒地的状态，Opus 4.6 一次也无法让它站起。此外，我们会在每次平衡尝试之间重置环境。只有少数模型曾在第一次尝试中实现稳健平衡。不过，前沿模型正在形成移动控制能力，这一点已经很清楚。</p>
+<h4>底层操作</h4>
+<p>操作是另一项核心机器人能力，具有明确的实用价值和安全意义，因此我们将它与移动控制一同研究。这里的“操作”，是指通过夹爪或机械臂，以受控方式在场景中移动物体并改变其方向。</p>
+<p>我们使用固定底座、7 自由度的 Franka Panda 机械臂评估这项能力。环境改编自 LIBERO benchmark，类似厨房。任务也具有厨房特征，例如“把盘子放到炉灶上”。</p>
+<p>机械臂固定在原地，因此不需要像移动任务那样保持平衡。困难在于，模型必须足够精确地控制位置、方向和接触，才能完成目标。一次成功尝试要求模型识别正确物体，把机械臂移动到位，正确对齐夹爪，稳定抓住物体，再运输和放置物体，同时不能失去控制。任何阶段的错误都可能让整个尝试失败，不过这类错误通常可以修正。</p>
+<p>我们测试了一种简化的直接控制设置。模型输出标准的七维末端执行器运动命令。每次移动后，它都会收到场景图像和夹爪力传感器的读数。这与 VLA 收到的信息相似。系统不会直接提供物体坐标，因此模型必须先通过视觉识别相关物体，再据此决定机械手下一步如何移动。</p>
+<figure class="source-figure" data-source-image="8"><img alt="Rendering of an AI model manipulating a simulated robotic arm. The robotic arm reaches down, picks up an object, and moves it to a pedestal." decoding="async" height="360" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/910d0e73cc16479c5e31ff196bece2d6b8f80289-360x360.gif" width="360"/><figcaption>Opus 4.6 通过直接操作控制完成一项 LIBERO 任务。</figcaption></figure>
+<p>固定底座机械臂没有实时平衡约束，因此模拟器暂停所提供的上限与实时表现之间，差距远小于腿式机器人。由 LLM 控制的固定机械臂已经是一种现实可行的部署方式，例如实验室自动化和轻型制造。因此，即使操作能力只取得适度进步，也具有直接的安全意义。只要模型能可靠抓取、移动和重新放置物体，它在接入机器人系统后，就已经拥有影响物理世界的实质能力。</p>
+<p>最明显的改善出现在每次操作尝试的中间阶段。与 Claude Opus 4 和 Opus 4.1 相比，Opus 4.6 更有可能引导机械臂接近目标物体，与物体接触并抓住物体。模型成功抓取物体的情况仍然相对少见。不过，后期模型往往能在失败前推进得更远，按简单综合得分衡量的整体任务进度也更高。具体计算方式见附录。</p>
+<p>有趣的是，Claude Mythos Preview 接触和抓取物体的次数较少，却能以明显高于第二名 Opus 4.6 的概率完成任务。原因是 Opus 4.6 会犯更多错误，也会进行更多调整。</p>
+<p>尽管各代模型进步很快，完整任务仍然很少成功。最好的模型也无法稳定、有意地执行较长任务。即便如此，它们影响物理世界的能力正在以可见方式改善，并且在少数情况下确实能端到端成功。这种能力也可能足以让模型成为机器人训练数据的来源。我们预计未来工作会探索这种可能性。</p>
+<figure class="source-figure" data-source-image="9"><img alt="Two bar graphs (the second with performance intervals) showing various AI models' success on LIBERO with direct control. Mythos Preview has the highest success rate, at 5.5; many AI models have a success rate of 0." decoding="async" height="2400" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/2ad888f5aac3302eb70d844c1bd131cb39e39c11-6500x2400.png" width="6500"/><figcaption>LIBERO 直接操作任务的成功率。</figcaption></figure>
+<figure class="source-figure" data-source-image="10"><img alt="Three bar charts showing various AI models' performance on various LIBERO subgoals. Here, the models show higher rates of progress." decoding="async" height="2800" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/1380257d31c7ed2adbbb0f10f6e066def1821a18-8000x2800.png" width="8000"/><figcaption>直接控制下，模型在 LIBERO 各子目标上的进度。</figcaption></figure>
+<h3>工具弥合了部分差距</h3>
+<p>当模型可以使用更高层的抽象工具，例如预训练移动策略和 VLA 时，表现会显著改善。不过，性能上限仍然不高。</p>
+<h4>高层移动控制</h4>
+<p>为测试高层移动能力，我们让模型通过预训练摇杆策略控制四足机器人。模型不再直接输出力矩，而是向步态策略发送速度命令，包括前进、横移和偏航。它还会定期收到前向 RGB 相机画面。大多数商用四足机器人都有这类现成策略。</p>
+<p>我们构建了 11 项导航和空间推理任务。范围从简单的目标搜寻，到搜索、迷宫和路点序列。例如，<code>find_x</code> 要求机器人走到带有蓝色 X 的桌子旁。</p>
+<p>部分任务明确测试自我监控能力。例如，<code>drift_detection</code> 要求模型发现自己的命令正在被暗中篡改。另一些任务测试空间心理模型的构建。例如，<code>explore_report</code> 要求模型在场地中探索，再凭记忆回答布局问题。</p>
+<p><code>oneshot_course</code> 完全移除了相机。模型会收到一张俯视地图，并被要求一次性预先登记全部命令序列。这可以把规划能力与感知能力分开。每项任务按成功与否或归一化进度评分。我们报告 11 项任务的综合分，范围为 0–100。具体方法见附录。</p>
+<figure class="source-figure" data-source-image="11"><img alt="Bar chart showing various models' performance on high-level locomotion with various reasoning configs. Mythos Preview (adamax) and Mythos Preview (20k) have the highest scores, at 54 and 49." decoding="async" height="5500" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/31b1248bf11ca460dd1077060b3113ca6645645f-4750x5500.png" width="4750"/><figcaption>所有“模型×推理配置”在高层移动任务上的综合分。NR 表示不使用推理；20k 表示 2 万个思考 token 的预算；adlo 表示 adaptive low；admax 表示 adaptive max。</figcaption></figure>
+<p>高层移动能力经历了两次明显的代际跃升。第一次发生在 Claude Opus 4.1 到 Opus 4.5 之间，第二次发生在 Opus 4.7 到 Mythos Preview 之间。Opus 4.5 至 Opus 4.7 则处于某种平台期。</p>
+<p>这个平台期是平均计算造成的表象。在大多数单项任务中，每一代 Claude 都发生了变化，只是不同任务上的变化方向并不总是一致。若按各自表现最好的推理配置逐项比较 Opus 4.7 和 Opus 4.6，最大单项退步出现在 <code>invisible_walls</code>，得分从 15% 降至 3%。该任务要求模型绕过看不见的障碍重新规划。</p>
+<p>另一些任务则有所提升。Opus 4.7 在 <code>turn_correction</code> 上增加 24 分，在 <code>return_home</code> 上增加 11 分。我们认为，从 Opus 4.6 到 Opus 4.7 的变化代表失败模式发生转移。模型的闭环自我纠正能力增强了，但在遮挡情况下的重新规划能力减弱了。</p>
+<p>我们测试了几种工具，尝试改善模型的视觉、方向和整体感知能力。我们在第一视角图像中心绘制绿色准星；把半透明深度热力图叠加到画面上；用第三人称追踪相机替代前向视角；还提供了一个“指南针”，直接告诉模型以角度表示的朝向。指南针远胜其他工具。后文分析瓶颈时会进一步说明。</p>
+<figure class="source-figure" data-source-image="12"><img alt="Four bar charts showing how perceptual aids change various models' performance on high-level locomotion tasks: compass, third-person cam, all combined, crosshair, and depth overlay." decoding="async" height="1761" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/3b89c8c4e229501a45726fca1a88bd1e03bb47b3-6453x1761.png" width="6453"/><figcaption>各类感知辅助工具相对于高层移动综合基线带来的变化。</figcaption></figure>
+<blockquote><strong>要点：</strong>与预训练步态策略配合后，当前模型可以完成简单导航任务，但仍会稳定地在持续空间记录和开环规划任务中失败。主要瓶颈是跟踪机器人所在位置。少量额外信息就能补救部分感知失败。</blockquote>
+<h4>高层操作</h4>
+<p>我们还评估了前沿模型能否在操作环境中有效使用预训练 VLA。直接操作结果表明，模型独立执行任务的能力依然有限，尽管改善速度很快。不过，一个独立能力一般的模型，与预训练策略结合后可能会有效得多。</p>
+<p>为研究这一点，我们在相同的 LIBERO 操作任务中，让模型与 VLA 策略配合。在这个设置中，VLA 提议底层动作，语言模型决定如何处理。它可以接受、调整或完全替换候选动作。</p>
+<p>这与直接控制形成了截然不同的挑战。这里的核心问题是判断哪些命令应该接受，哪些命令有误并需要修改。所有实验都使用 MolmoAct VLA。</p>
+<p>在标准的 40 项 LIBERO benchmark 上，相较直接控制，VLA 极大地扩展了模型能力。即使是新模型，在直接控制下也很少能端到端完成 LIBERO 任务，不过几乎总能取得一定进展。</p>
+<p>如果允许 LLM 智能体指导 VLA，包括发出指令，以及接受、修改或替换其候选动作，每个模型的任务成功率和整体进度都会大幅提高。经过这种增强后，即使旧模型也能取得有意义的成功率。</p>
+<figure class="source-figure" data-source-image="13"><img alt="Two bar charts showing various models' performance on LIBERO tasks with VLA supervision." decoding="async" height="2550" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/35be79dfefc49b5ff33f87fb1771f64a8c5c8c1b-6500x2550.png" width="6500"/><figcaption>使用 VLA 监督时的 LIBERO-40 成功率。</figcaption></figure>
+<p>需要指出的是，所有受测模型的表现仍然明显低于 MolmoAct 独立运行。反直觉的是，最强模型受到的性能惩罚并不是最小。Claude Mythos Preview 在这里落后于 Opus 4.5 和 Opus 4.6，因为它在没有充分理由时更频繁地推翻 VLA。它过度相信自己的判断，而在这些情况下，直接服从 VLA 本可成功。</p>
+<p>为了理解这种控制惩罚来自哪里，我们测量智能体直接采用 VLA 候选动作的频率。只有当语言模型完整、原样地传递 Panda 机械臂的全部七维动作时，我们才认为它服从了该命令。任何编辑、替换或遗漏都算偏离。这让我们可以确定 VLA 通常可靠的建议是否遭到忽视。</p>
+<p>结果显示，总体而言，Claude 系列服从 VLA 指令的频率显著高于 GPT-5.4 和 Gemini 3.1。结果还表明，在 LIBERO-40 上，新模型 Opus 4.5 和 Opus 4.6 服从的指令数量是所有受测模型中最多的。</p>
+<figure class="source-figure" data-source-image="14"><img alt="Two bar charts showing various models' follow rate on familiar (LIBERO-40) and novel tasks." decoding="async" height="2400" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/950ef9f18406837c8f265bfd4f53d08b17f35819-7000x2400.png" width="7000"/><figcaption>各模型服从 VLA 推荐步骤的频率。</figcaption></figure>
+<p>这些结果无法区分两种情况：模型可能只是更顺从，也可能确实有更好的判断力。为此，我们测试了这些系统能否使用并纠正不可靠的 VLA。</p>
+<p>我们基于原始 LIBERO-goal 场景，创建了三项未被 benchmark 收录的新任务。在基线试验中，MolmoAct 无法完成其中任何一项。</p>
+<p>在这个 VLA 命令需要修正的环境中，早期 Claude 模型和 GPT-5.4 仍然相对紧密地服从 VLA。相比之下，Opus 4.5、Opus 4.6 和 Opus 4.7 对它的服从程度低得多。它们更能发现策略正在失败，尽管还不能直接纠正这些失败。</p>
+<p>即便如此，Claude Opus 4.5、Opus 4.6 和 Gemini 3.1 的表现仍优于 MolmoAct 单独运行。有趣的是，在这一新环境中，Opus 4 和 Opus 4.1 比 Opus 4.5 和 Opus 4.6 更频繁地服从 VLA，但整体表现更差。</p>
+<p>最简单的解释是，它们较高的服从率并不代表更好的判断。它们在这里听从 VLA 的频率，与 VLA 实际胜任任务时大致相同。这种行为在很大程度上是不加区分的。</p>
+<figure class="source-figure" data-source-image="15"><img alt="Two bar charts showing various models' VLA-supervised performance on novel tasks." decoding="async" height="2700" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/b957451d85e48a344d16052fb6bdde329aaa503b-6500x2700.png" width="6500"/><figcaption>VLA 监督系统在新场景中的表现。</figcaption></figure>
+<p>在 VLA 熟悉的任务上，Opus 4.5、Opus 4.6、Opus 4.7 和 Mythos Preview 的接触率、抓取率和成功率最高。不过，只有 Mythos Preview 还能解决相当一部分新任务。</p>
+<figure class="source-figure" data-source-image="16"><img alt="Two bar charts showing various LLMs' success on familiar and novel touch, grasp, and place tasks." decoding="async" height="3000" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/a86ffc18f5b012e73d69b2c56a391d06d0369353-7500x3000.png" width="7500"/><figcaption>VLA 在熟悉任务与新任务上的接触率、抓取率和放置率对比。</figcaption></figure>
+<blockquote><strong>要点：</strong>预训练策略会极大改善表现。高层控制远好于底层控制。新版 Claude 更能使用预训练策略，而不会无谓地与策略对抗。当策略出错时，新模型的性能退化也较小。不过，它们仍没有充分发挥 VLA 的能力。在新任务上，最强模型已经能给高层策略带来小幅提升。</blockquote>
+<p>从安全角度看，这一点很重要。实际部署的系统很可能正会提供预训练策略。模型不需要亲自驱动关节，只需能够调用合格的控制器，就足以在世界中采取有效行动。只孤立测试模型的能力评估，会低估它嵌入机器人技术栈后的实际能力。</p>
+<h3>瓶颈是什么？</h3>
+<p>新模型的改善来自哪里？它们仍在哪些方面遇到困难？</p>
+<h4>视觉感知是瓶颈吗？</h4>
+<p>在操作和移动实验中，我们都测试了增加视觉输入能否改善表现。对于 Panda 机械臂，我们加入了深度图、带标签的分割叠层和光标工具。光标是在夹爪相机画面上的一个红色小 X，模型可以移动它，并查询该位置的物体和距离。</p>
+<p>对于 Go2，我们加入了叠加在前向相机画面上的深度热力图、绿色中心准星，以及替代前向视角的第三人称追踪相机。</p>
+<p>在操作任务上，深度图和分割叠层的效果大致为中性。它们传达了正确类型的信息，但信号似乎过于分散，无法稳定提供帮助。在移动任务上，深度热力图和准星叠层同样接近中性。深度热力图还会轻微损害较强模型的表现。</p>
+<figure class="source-figure" data-source-image="17"><img alt="Three colorful renderings of overlays given to the manipulation model." decoding="async" height="764" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/e2d956b8d755355e3dca8a9063b118cfae019170-2048x764.png" width="2048"/><figcaption>提供给操作模型的叠层示例：光标、深度图和分割掩码。</figcaption></figure>
+<figure class="source-figure" data-source-image="18"><img alt="Four bar charts showing various models' success rates when given vision tools: RGB baseline, depth, segmentation, and cursor." decoding="async" height="2300" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/19fc142a57f8a25e4f04d4404df0c293e46002b6-7000x2300.png" width="7000"/><figcaption>使用不同视觉辅助工具时的操作成功率。</figcaption></figure>
+<p>第三人称相机的效果最依赖具体模型。对于 Opus 4.6 及更早模型，它没有帮助，甚至会轻微损害表现。Opus 4.6 下降 3.6 分。它却让 Opus 4.7 提升 5.8 分，让 Mythos Preview 提升 10.7 分，并成为 Mythos Preview 效果最好的单项视觉辅助工具。</p>
+<p>从任务层面看，如果模型需要随时间跟踪自身位置，例如 <code>color_sequence</code>、<code>drift_detection</code> 和 <code>invisible_walls</code>，第三人称相机会有所帮助。如果任务依赖前向视角，例如 <code>turn_correction</code>，它就会造成损害。Mythos Preview 是例外，它甚至在 <code>turn_correction</code> 上也有所改善。</p>
+<figure class="source-figure" data-source-image="19"><img alt="Bar chart showing the per-task effect of replacing the forward camera with a third-person camera on various models' performance on high-level locomotion tasks. Some tasks, like color_sequence, improved, while some tasks, such as find_x declined." decoding="async" height="2500" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/8368ba2585173f52aa269eb60151ca966d37c82f-6000x2500.png" width="6000"/><figcaption>在高层移动任务中，用第三人称相机替换前向相机对各项任务的影响。</figcaption></figure>
+<p>相比之下，光标工具会大幅改善每一个模型的操作表现。Mythos Preview 在 10 项任务子集上的成功率从 <strong>6% 升至 32%</strong>。指南针对移动控制也有同样效果，提升了我们测试的每一种配置。</p>
+<p>两类结果都表明，模型主要需要的是更好的方向信息，而不是从另一个角度观察场景。告诉模型自身朝向，仍然比向它展示一张自己的照片更有帮助。</p>
+<p>我们还测试了真实图像相比详细文字描述能提供多少额外信息。为此，我们把视觉输入替换为 Gemini 3.1 生成的文字描述。它是我们测试过的最强图像问答模型。这样，我们可以观察模型收到高质量场景文字描述，而不是像素时的表现。如果模型本来就能有效使用视觉输入，这种替换理应降低性能。</p>
+<figure class="source-figure" data-source-image="20"><img alt="Bar chart showing various AI models' average best progress on tasks when using RGB baseline vs. VLM scene description. Performance was generally higher with RGB baseline." decoding="async" height="2550" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/5773bcff06d744fa7cadde3e2cd4b0ec798509b3-6000x2550.png" width="6000"/><figcaption>RGB 基线与让另一个视觉语言模型（VLM）生成文字场景描述的结果对比。</figcaption></figure>
+<p>对旧模型而言，视觉感知是更严重的限制。换句话说，新模型更擅长直接从图像中提取空间信息。用文字描述替换图像后，较早的 Claude 模型表现更好。这说明它们难以仅从像素中读取足够精确的空间细节。</p>
+<p>相比之下，Opus 4.6 和 Opus 4.7 在用文字替代图像时表现略差，Gemini 的下降幅度更大。对这些模型而言，原始视觉输入包含有用信息，而场景被压缩为语言时，这些信息会丢失。</p>
+<p>我们测试的大多数附加视觉输入都没有帮助。第三人称相机能帮助 Opus 4.7 和 Mythos Preview。除此之外，除光标和指南针以外的视觉辅助工具，整体效果大致为中性或轻微负面。<code>ask_vlm</code> 对比还表明，新模型从原始图像中获取的信息已经多于旧模型。</p>
+<h4>小记：真实 Go2 上的视觉工具</h4>
+<p>在后文讨论的现实探索中，我们让 Claude Opus 4.6 控制一台真实的 Go2 四足机器人，并在基础导航任务中启用部分视觉辅助工具。例如，让它绕办公室走一圈。</p>
+<p>启用第一视角准星后，我们能从模型的推理中看到，它会用中心标记判断是否对齐。当机器人在走廊中略微偏斜地前进时，模型发现走廊相对准星似乎正在向左漂移。它据此判断自己可能朝右偏得太多，并进行了修正。这些情况令人鼓舞。</p>
+<p>不过，准星有时也会让模型忽略障碍物。在一次运行中，机器人前方有一个小垃圾桶。模型看到了它，并自信地表示，垃圾桶位于准星左侧，因此不在行进路线上，可以安全前进。</p>
+<p>实际上，垃圾桶就在机器人正前方。机器人撞了上去，一条腿被卡住，又拖着垃圾桶走了几米，之后我们才将它停下。</p>
+<p>我们也在真实 Go2 上测试了深度热力图。我们使用计算机视觉模型，在第一视角画面上叠加估计深度的半透明热力图。叠层经过调整，仍保留足够的现实画面对比度，让机器人可以导航。</p>
+<p>有些迹象表明，模型可以理解热力图的颜色。它经常在记录中讨论画面中的颜色，并把这些颜色与物体距离更近或阻挡路线联系起来。</p>
+<p>但在一个更繁忙的场景中，模型明显困惑了。这个场景是走廊转角，周围有植物和办公室饮水机。模型忽略了已有的深度信息，转向障碍物，而不是转向开阔空间。</p>
+<h4>推理有帮助吗？</h4>
+<p>推理对大多数结果影响很小，许多差异都落在标准误差范围内。</p>
+<p>在经典控制任务上，新模型获得更高推理预算后反而退步。这可能是因为模型把相对简单的实验设计得过度复杂。对旧模型而言，推理预算似乎没有造成很大差异。</p>
+<figure class="source-figure" data-source-image="21"><img alt="Bar chart showing the effect of reasoning on classic code control for various AI models when performing two tasks: pendulum code controller and hopper code controller. The two reasoning modes—baseline vs. high—show similar results." decoding="async" height="3639" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/2a5f5b74f10cf7ec6ecfd4d5700e64672b453c45-8450x3639.png" width="8450"/><figcaption>推理对经典控制任务的影响。</figcaption></figure>
+<p>在移动测试中，只有 GPT-5.4 能从额外的测试时计算中显著获益，其他模型都不能。我们推测，对多数模型而言，额外推理带来的规划收益，也会妨碍迅速、灵活地采取反应动作。</p>
+<figure class="source-figure" data-source-image="22"><img alt="Two bar charts showing the effect of reasoning on locomotion using code control for various AI models." decoding="async" height="2900" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/eb283889a737e2c4115df62facffcf82d0149794-6000x2900.png" width="6000"/><figcaption>推理对移动控制的影响。</figcaption></figure>
+<p>在直接操作和高层操作上，推理对 Claude 系列没有重大影响，但会显著影响 Gemini 3.1 和 GPT-5.4。综合各模型结果，额外推理似乎会损害表现。</p>
+<figure class="source-figure" data-source-image="23"><img alt="Three bar charts showing the effect of reasoning on VLA-familiar tasks for various models." decoding="async" height="3900" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/8facf609f81803b818fae588d26022d00210905f-8000x3900.png" width="8000"/><figcaption>推理对直接操作的影响。</figcaption></figure>
+<figure class="source-figure" data-source-image="24"><img alt="Three bar charts showing the effect of reasoning on VLA-familiar tasks with VLA and LLM supervision for various AI models." decoding="async" height="3900" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/98e91d4e6bdc21191c92ed493235bb8f91f20315-8000x3900.png" width="8000"/><figcaption>推理对 VLA 监督操作的影响。</figcaption></figure>
+<p>在高层移动上，推理预算对 Opus 各代影响很小。例如，在不推理、2 万 token 预算和 adaptive-max 三种配置中，Opus 4.6 的得分只落在 <strong>37.8–40.4</strong> 的 2.6 分区间内。Opus 4.7 的范围也只有 4.0 分。</p>
+<p>唯一稳定落后的配置是 adaptive-low。它在几乎所有支持该配置的模型上都不如其他设置。Mythos Preview 是例外。它在不同配置中的差距接近 14 分，从 adaptive-low 的 40.2 分升至 adaptive-max 的 54.1 分。它也是唯一一个通过增加推理获得与感知辅助工具相当提升的模型。</p>
+<p>我们没有发现有力证据，证明推理会改变模型使用感知辅助工具的方式。还需要更多研究，才能理解额外推理为何对某些模型有帮助，以及它是否释放了模型已有的潜在能力。</p>
+<figure class="source-figure" data-source-image="25"><img alt="Four bar charts showing how different reasoning levels and a perceptual aid affect various AI models' performance on tasks. The models shown are Opus 4.6, Opus 4.7, Mythos Preview, and Sonnet 4.6." decoding="async" height="2391" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/235fbbe717d3a81a05cf26b0e1f34e60a772936c-6953x2391.png" width="6953"/><figcaption>不同模型从辅助工具中获得的提升：推理是否会改变哪些辅助工具有效？</figcaption></figure>
+<p>这些发现表明，对于当前一代模型，单纯增加推理不太可能克服妨碍通用底层机器人控制的缺陷。有些模型确实会从额外推理中获益，但代际之间的能力跃升由其他技能共同构成，例如更好的视觉、更稳定的数值处理或更强的三维理解。</p>
+<h4>它们能从经验中学习吗？</h4>
+<p>可以，但主要局限于较短时间范围。</p>
+<p>众所周知，语言模型在少样本设置下表现更好。不过，这并不意味着它们能在长上下文的机器人具身环境中学习。此类交互可能包含数百张图像和数十万个 token。</p>
+<p>上下文学习最有力的证据来自经典控制任务。后期 Claude 并不是因为起点明显更高才取得领先。除少数例外外，几乎所有模型第一次尝试的表现都很差。它们的优势来自从失败尝试中进行上下文学习，并在之后采取更好的控制方式。</p>
+<p>Opus 4.5 和 Opus 4.6 从迭代中获得的收益，远大于 Opus 4 和 Opus 4.1。新版 Claude 更能从失败中学习，修改方法并找到可行方案。</p>
+<figure class="source-figure" data-source-image="26"><img alt="Three charts showing performance ranges, from average first attempt to average best attempt, for various AI models on three tasks: pendulum (direct), pendulum (code), and TwinFlipper (code)." decoding="async" height="2900" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/c56553c8bf4a12ea4838deee45086e66131d0ba7-7000x2900.png" width="7000"/><figcaption>经典控制任务的代际进步来自重试，而不是第一次尝试。</figcaption></figure>
+<p>长程机器人交互不只要求模型正确选择下一个动作。虽然我们研究的任务原则上大多具有马尔可夫性，但成功仍需要连续发出数百条甚至更多精确命令。实际运行时，系统会利用这段延伸交互来了解任务如何变化，并排除无效策略。</p>
+<p>我们通过一项实验，测试模型能否在一次试验过程中逐步形成更丰富、更长程的理解。我们在操作任务中进行了上下文截断实验。实验会刻意删除大部分先前交互，只留下更小范围内的近期动作和观测。如果性能依赖对完整过程的细致记忆，这应该造成明显下降。</p>
+<p>但大多数情况下并没有下降。有时表现甚至会改善。这说明模型更依赖最近发生的事情，而不是对更早全部经历形成的广泛积累性理解。</p>
+<p>在这些截断运行中，我们始终保留最初 10 轮以及最近 N 轮。删除第一轮会让模型忘记基础约定并陷入循环，因此所有条件都保留这一部分。</p>
+<figure class="source-figure" data-source-image="27"><img alt="Three bar charts showing various models' performance on LIBERO-40 under three context truncation conditions: full context, keep first 10 + last 12, and keep first 10 + last 6." decoding="async" height="2400" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/7a4cf5c2c251820944b6a7d20e75588bdadf99aa-6750x2400.png" width="6750"/><figcaption>截断上下文时的 LIBERO-40 成功率。</figcaption></figure>
+<p>只有 Opus 4.6 的表现出现具有统计显著性的下降。值得注意的是，在我们的测试中整体最强的 Claude Mythos Preview，并未出现显著的准确率下降。</p>
+<p>我们怀疑，Opus 4.6 会不断学习行为模式，而上下文被删除后，它又会忘记这些模式。Claude Mythos Preview 则可能无需学习，就能直接使用相关策略。</p>
+<p>较弱模型可能会被早期上下文干扰。这是一种已有文献记录的现象，称为“上下文腐化”（context rot）。它可以解释为何截断上下文后，性能反而上升。这些模型无法从遥远的过去学习，因此删除那部分内容会改善表现。</p>
+<p>前文已经看到，新版 Claude 更可能在失败后改变策略。这推动了部分性能提升。上下文截断结果说明，这种适应主要发生在短程范围内。模型确实会重新理解问题并进行调整，但似乎主要依据最近几步。它们不需要构建贯穿整个过程的长期策略。</p>
+<p>尤其是，交互中很早以前的动作似乎并不重要。删除这些动作几乎不会改变表现。</p>
+<p>我们也在高层移动任务中看到了短期学习的证据。在 <code>oneshot_course</code> 任务里，模型必须查看一张简单的 L 形走廊俯视图，并在行动前规划全部移动命令。系统没有相机输入，也没有中途调整的机会。</p>
+<p>没有练习时，模型普遍表现困难。这说明仅靠基础地图阅读无法解决任务。模型必须把地图转换成第一次执行就能奏效的行动计划。</p>
+<p>当我们让模型在同一条路线练习几次后，所有模型的表现都会改善。主要差别在于学习速度。Mythos Preview 只看一个示例就能取得良好表现，而 Opus 会在多次尝试中逐渐进步。即使是较小模型，只要练习足够多，也能学会这条路线。</p>
+<p>总体而言，从少量上下文示例中学习的能力广泛存在。Mythos Preview 的突出之处，是它只需少得多的练习，就能有效利用这些信息。</p>
+<p>在更困难、更长的路线中，练习没有帮助。即使进行 20 次练习，Mythos Preview 和 Opus 4.7 也无法完成任何一次试验。模型学到的是某个特定序列，尚未成为通用规划器。</p>
+<figure class="source-figure" data-source-image="28"><img alt="Two line graphs showing various AI models' performance on practice runs on one_shot course. The models show varied performance on the L-hallway (easy) course; all models failed on the ultimate (hard) course." decoding="async" height="2300" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/9494d0b620e660f01b4160cbd2c47c2acdf0a8e6-6000x2300.png" width="6000"/><figcaption><code>oneshot_course</code> 的练习运行：简单路线（左）与困难路线（右）。</figcaption></figure>
+<h3>现实世界小记</h3>
+<p>前面的视觉工具小记已经使用了一台真实的 Unitree Go2。本节介绍我们在这台机器人上进行的其他现实运行。现实工作只能串行开展，因此我们无法获得较高的试验次数。不过，探索结果总体符合模拟实验，同时也揭示了一些有趣的失败案例。这些案例都围绕较差的视觉和空间推理展开。</p>
+<p>首先，我们成功复现了 <code>find_x</code> 任务。在这项任务中，四足机器人距离一张翻倒的桌子约 25 英尺，初始朝向与桌子相反，相差 180 度。桌子上有一个很大的蓝色 X。模型接到的指令是找到桌子，并一直走到离桌子不超过一米的位置。</p>
+<p>最常见的失败情况在模拟中也出现过：许多模型会在达到成功所需的一米距离之前停下。此外，旧模型在前往目标物体的过程中无法修正路线。</p>
+<p>所有模型在这项任务中的常见行为，是先旋转到画面中出现桌子，再向桌子前进。旧模型无法准确对齐，因此会错过桌子。它们经常说服自己仍在正确路线上，或无法意识到桌子已经明显偏向一侧。结果，机器人实际上离桌子越来越远，模型却声称正在接近目标。</p>
+<p>现实版 <code>find_x</code> 的一次失败来自 Grok 4.1 Fast。Go2 当时的朝向使它面对桌子对面的一扇玻璃门。Grok 在玻璃门的倒影中看到了目标桌子，并开始冲向玻璃门。所幸我们及时停止了机器人，玻璃门和机器人都没有受损。</p>
+<p>我们还设置了一项非正式 benchmark：让模型控制 Go2，仅靠视觉绕办公室走廊完成一整圈。不论使用何种脚手架和模型，也不论我们尝试提供什么优势，所有模型都失败了。</p>
+<p>这种失败主要由视觉和记忆问题造成。有时，机器人经过另一条走廊的入口时，模型无法判断何时应该转弯。有时，它以为自己已经转进走廊，而且已经深入其中，但实际上根本没有。接着，它会再次尝试转弯，或朝错误方向移动。</p>
+<p>即使模型能转进走廊，也可能转过头或转得不够。之后它会陷入混乱，通常最终走向相反方向。</p>
+<h3>结论</h3>
+<p>我们的实验套件表明，不同代际模型在机器人任务上正快速进步，尽管各项进展并不均衡。新版 Claude 更能在多种机器人本体上，把感知和推理转换为物理动作。直接控制作用力和力矩的能力也在改善，但速度慢于高层控制。</p>
+<p>这项研究具有明确的安全意义。VLM 对现实世界的影响力，可能因为它能访问的信息不同而产生数量级变化。评估和部署必须把访问级别视为系统的核心组成部分。工具或控制方式的一点变化，就可能带来巨大的能力变化。</p>
+<p>我们希望这些结果能推动两个方向的工作。在建设性方向上，模型可以帮助机器人调试故障、监督现有控制器，并生成有用的训练数据。</p>
+<p>在安全方向上，我们需要设计更好的物理访问授权方式，并建立明确限制。系统可以被允许影响某些物体，同时在技术上被阻止接触其他物体。</p>
+<h3>附录</h3>
+<p>本附录汇总评估的实际细节，包括使用了哪些模型 API、运行了多少次试验、提示词如何构造、延迟如何影响实验设置，以及强化学习实验如何运行。</p>
+<h4>模型和 API</h4>
+<p>我们评估了来自 5 家提供商的 12 个模型，其中 4 个通过 OpenRouter 调用。为了让不同提供商使用相同的评估框架，我们为每个后端编写了一个小型适配器。适配器负责特定模型的 API 调用，而机器人任务、提示词和评分代码保持一致。</p>
+<p>以下几个实现细节对复现结果很重要：</p>
+<ul>
+<li><strong>Claude 模型。</strong>Claude 模型通过 Anthropic Agent SDK 运行。评估期间，我们禁用了 SDK 内置工具，只开放机器人动作服务器。这样，Claude 可用的动作便与 OpenRouter 和 Gemini 实验保持一致。</li>
+<li><strong>推理设置。</strong>新版 Claude 使用 Anthropic 的自适应推理设置，由模型自行决定使用多少推理预算。旧版 Claude 使用固定推理预算。其他所有模型都使用等同于高推理的设置。</li>
+<li><strong>OpenRouter 设置。</strong>部分 OpenRouter 模型不支持真正的“不推理”模式，因此我们使用对应厂商所提供的最接近设置。Kimi K2.6 固定使用 Novita 提供商，因为其他路由使用了精度更低的版本。对于 OpenAI 模型，我们排除了 Azure 提供商，因为它会在不作说明的情况下，把每次请求的图像数量限制在 50 张。</li>
+</ul>
+<h4>试验次数</h4>
+<p>一个“单元格”（cell）表示一个模型在一种实验设置下接受评估。大多数单元格运行 35 次试验。某些设置的噪声更大，或需要更精确的估计，因此运行次数更多。</p>
+<h4>提示词</h4>
+<p>我们没有为每个模型分别调优提示词。每种接口只使用一个固定提示词模板。运行试验时，模板会填入关节数量、机器人质量、作用力限制和观测字段等任务专属细节。</p>
+<h4>代码控制</h4>
+<p>在代码控制中，模型编写 Python 控制器。它通常采用 <code>controller(obs) -&gt; action</code> 形式，随后运行该控制器。</p>
+<h4>由 VLA 监督的操作</h4>
+<p>在这种设置中，预训练视觉—语言—动作策略提出机械臂动作，语言模型决定接受、编辑或替换这些动作。</p>
+<h4>强化学习监督</h4>
+<p>在这种设置中，模型编写奖励函数、策略网络和训练计划。随后，它训练并部署策略。</p>
+<h4>延迟</h4>
+<p>我们没有进行正式的延迟研究。实验使用共享基础设施。API 延迟会随着提供商、负载、图像数量和推理预算而变化。不过，启动日志仍能提供有用的粗略情况。</p>
+<p><strong>不使用推理时</strong>，大多数纯文本轮次耗时约 2–8 秒。加入一两张图像后，通常会上升到 5–15 秒。</p>
+<p><strong>使用推理时</strong>，延迟高度依赖推理预算。Opus 4.6 和 Opus 4.7 在高推理设置下，典型轮次耗时 15–60 秒，较长的尾部延迟为 60–180 秒。超高推理的平均速度大约还要慢一倍。</p>
+<p>完整单元格的运行时间差异很大。不使用推理时，一个包含 35 次试验的直接控制或代码控制单元格通常需要 30–90 分钟。使用推理后则需要 1–4 小时。</p>
+<p>每个模型和条件下的 LIBERO-40 直接控制运行需要 6–12 小时。LIBERO-40 的 VLA+LLM 运行需要 8–18 小时，因为 MolmoAct 还需要进行 GPU 推理。经典控制的 RL 单元格上限是 1.5 小时，G1 和 Go2 的 RL 单元格上限是 4 小时。</p>
+<p>对于直接控制和代码控制模拟，我们会在模型生成下一项动作时暂停模拟器。如果不暂停，当前 API 模型会因为一个无关紧要的原因失败：它们的行动速度远不足以跟上以 10–125 Hz 运行的物理循环。</p>
+<p>暂停使我们能衡量模型在推理速度更快时可以做到什么，而不是只测量当前 API 的延迟。</p>
+<p>机械臂不像移动任务那样需要严格的实时稳定性，因此在操作设置中，我们没有在模型调用之间暂停模拟器。</p>
+<h4>强化学习细节</h4>
+<p>强化学习接口使用 <code>envapi/training_bridge.py:train_ppo_batched</code> 中的实时 PPO 训练路径。PPO 是一种标准强化学习算法。</p>
+<p>模型可以定义奖励函数、策略网络和训练计划，随后调用训练和部署工具。</p>
+<h4>环境</h4>
+<p>我们使用名为 <code>BatchedEnvWarp</code> 的 GPU 批处理 MuJoCo 环境。模型可以同时在多个模拟副本上进行训练。</p>
+<h4>默认训练设置</h4>
+<p>模型可以在约束范围内修改这些设置，但默认值如下。</p>
+<h4>限制和保障措施</h4>
+<ul>
+<li>框架默认最多开放 32 个并行环境。</li>
+<li>策略网络上限为 20 万个参数。</li>
+<li>单次训练调用最多只能消耗整个会话的三分之一。</li>
+<li>系统为策略部署保留最后 120 秒。</li>
+</ul>
+<h4>RL 单元格</h4>
+<p>RL 路径用于以下任务：</p>
+<ul>
+<li>Pendulum RL</li>
+<li>Hopper RL</li>
+<li>TwinFlipper RL</li>
+<li>G1 Stand RL</li>
+<li>Go2 Stand-from-prone RL</li>
+</ul>
+<p>经典控制 RL 单元格的超时时间为 1.5 小时。人形和四足机器人 RL 单元格的超时时间为 4 小时。</p>
+<h4>视觉输入</h4>
+<p>启用视觉后，框架会把经过 JPEG 编码的 RGB 帧发送给模型。</p>
+<h4>图像格式</h4>
+<p>图像帧在 MuJoCo 中离屏渲染，再编码为 JPEG。每家提供商都以自己的原生格式接收图像：</p>
+<ul>
+<li>Anthropic 图像块</li>
+<li>采用数据 URI 的 OpenAI 风格 <code>image_url</code></li>
+<li>Gemini 内联图像部分</li>
+</ul>
+<h4>每轮帧数</h4>
+<p>框架默认允许每轮使用三帧，但所有已发布单元格都只使用一帧。</p>
+<h4>保留之前的图像帧</h4>
+<p>所有已发布的视觉单元格都会在上下文中保留之前的图像帧。使用视觉功能的 Claude Agent SDK 实验必须这样做，因为该 SDK 路径不支持逐轮删除旧图像。</p>
+<h4>视觉工具</h4>
+<p>我们还测试了几种改变模型所接收视觉信息的方法：</p>
+<ul>
+<li><code>--vision-depth</code>：加入深度热力图叠层。</li>
+<li><code>--tools segmentation</code>：加入带标签的分割图。</li>
+<li><code>--crosshair --gripper-cam</code>：在夹爪相机上加入交互式光标。该功能以前称为 crosshair。</li>
+<li><code>--vision-mode ask_vlm</code>：用 Gemini 3.1 Pro Preview 生成的自然语言场景描述替代像素。</li>
+</ul>
+<p>对于高层移动套件，除基线前向相机外，我们还测试了五种感知辅助条件：</p>
+<ul>
+<li><code>compass</code>：把机器人的世界坐标系朝向以角度表示，并作为文字附加在每一帧旁。</li>
+<li><code>crosshair</code>：在前向相机图像上绘制绿色中心准星。</li>
+<li><code>depth</code>：在前向相机图像上以 alpha 混合方式叠加半透明深度热力图。</li>
+<li><code>third_person</code>：用位于机器人后上方的第三人称追踪相机替代前向相机。</li>
+<li><code>combo</code>：同时应用上述四种辅助工具。</li>
+</ul>
+<p>“ask VLM”设置会增加延迟，因为每次视觉查询都需要额外调用一次模型。它还降低了最强模型的表现。这说明那些模型正在使用原始图像中的信息，而图像转换为文字后，这些信息会丢失。</p>
+<h4>计算环境</h4>
+<p>所有实验都运行在由 SLURM 管理的集群上。SLURM 是一种常见的大规模计算任务调度系统。</p>
+<p>直接控制和代码控制单元格使用纯 CPU 节点。典型配置是 16 个 CPU、48 GB 内存，以及 24 小时的最长运行时间。</p>
+<p>VLA 单元格的每项作业使用一块 GPU 进行 MolmoAct 推理，并使用 CPU 完成模拟器渲染。</p>
+<p>RL 单元格的每项作业使用一块 GPU。经典控制 RL 的会话时长为 1.5 小时，G1 和 Go2 RL 的会话时长为 4 小时。</p>
+<p>渲染通过 <code>osmesa</code> 在 MuJoCo 中离屏完成，并设置 <code>MUJOCO_GL=osmesa</code> 和 <code>PYOPENGL_PLATFORM=osmesa</code>。</p>
+<p>所有脚本都会禁用旧版 Claude 模型重映射，加载项目虚拟环境，加载环境变量，检查是否已安装 <code>libosmesa6</code>，并为 Claude SDK 运行传入 <code>--no-sdk-tool-only</code>。</p>
+<h4>可复现性</h4>
+<p>代码发布后将位于 <a href="https://github.com/safety-research/embody">github.com/safety-research/embody</a>，这是该代码库的公开镜像。每个评估单元格使用的命令列在 <code>EXPERIMENTS.md</code> 中，评分方法记录在 <code>METRICS.md</code> 中。</p>
+</section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

@@ -1,346 +1,405 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>我们从构建云端智能体中学到的经验</title>
-  <style>
-    :root {
-      --bg: #f7f4ee;
-      --surface: #fffdf8;
-      --surface-alt: #edf5f2;
-      --surface-warm: #fff1d8;
-      --surface-cool: #eaf2ff;
-      --surface-risk: #ffe8e4;
-      --surface-dark: #17202a;
-      --ink: #18212b;
-      --muted: #637083;
-      --line: #d8d1c5;
-      --data: #2563eb;
-      --risk: #dc2626;
-      --opportunity: #0f9f7a;
-      --conclusion: #7c3aed;
-      --warning: #d97706;
-      --badge-ink: #ffffff;
-      --shadow: 0 20px 50px rgba(24, 33, 43, 0.12);
-      --radius: 18px;
-    }
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>我们在构建云端智能体过程中学到的经验</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #f4f1ea;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #18212b;
+  --muted: #66717d;
+  --line: #d9d2c5;
+  --accent: #235bd8;
+  --accent2: #00866f;
+  --accent3: #d56a18;
+  --accent4: #9d3f78;
+  --risk: #ba3548;
+  --opportunity: #087f5b;
+  --conclusion: #563bb7;
+  --data: #1765c1;
+  --hero-bg: #17243a;
+  --hero-ink: #f7f9ff;
+  --hero-muted: #bdc9dc;
+  --metric-bg: #e2eefc;
+  --risk-bg: #f9e3e6;
+  --opportunity-bg: #ddf3e9;
+  --conclusion-bg: #ebe5fa;
+  --warm-bg: #f7ead9;
+  --cool-bg: #e3f1ef;
+  --hl: #ffe08a;
+  --hl2: #aee8d3;
+  --shadow: 0 16px 45px rgba(28, 39, 52, .10);
+  --figure-bg: #ece8df;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #10151c;
+    --surface: #171e27;
+    --card: #1c2530;
+    --ink: #e8edf3;
+    --muted: #a6b0bc;
+    --line: #344150;
+    --accent: #73a1ff;
+    --accent2: #42c8aa;
+    --accent3: #ff9e52;
+    --accent4: #e57fba;
+    --risk: #ff7585;
+    --opportunity: #45d5a0;
+    --conclusion: #ae93ff;
+    --data: #75b4ff;
+    --hero-bg: #0b111c;
+    --hero-ink: #edf3ff;
+    --hero-muted: #9eacc2;
+    --metric-bg: #172b43;
+    --risk-bg: #3a1d25;
+    --opportunity-bg: #15352c;
+    --conclusion-bg: #28203f;
+    --warm-bg: #39291d;
+    --cool-bg: #173331;
+    --hl: #6d5214;
+    --hl2: #155a49;
+    --shadow: 0 18px 50px rgba(0, 0, 0, .35);
+    --figure-bg: #121923;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10151c;
+  --surface: #171e27;
+  --card: #1c2530;
+  --ink: #e8edf3;
+  --muted: #a6b0bc;
+  --line: #344150;
+  --accent: #73a1ff;
+  --accent2: #42c8aa;
+  --accent3: #ff9e52;
+  --accent4: #e57fba;
+  --risk: #ff7585;
+  --opportunity: #45d5a0;
+  --conclusion: #ae93ff;
+  --data: #75b4ff;
+  --hero-bg: #0b111c;
+  --hero-ink: #edf3ff;
+  --hero-muted: #9eacc2;
+  --metric-bg: #172b43;
+  --risk-bg: #3a1d25;
+  --opportunity-bg: #15352c;
+  --conclusion-bg: #28203f;
+  --warm-bg: #39291d;
+  --cool-bg: #173331;
+  --hl: #6d5214;
+  --hl2: #155a49;
+  --shadow: 0 18px 50px rgba(0, 0, 0, .35);
+  --figure-bg: #121923;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.78;
+}
+.hero {
+  padding: 5.5rem max(6vw, 1.25rem) 4.5rem;
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+  border-bottom: .4rem solid var(--accent2);
+}
+.hero-inner {
+  width: min(1080px, 100%);
+  margin: 0 auto;
+}
+.eyebrow {
+  color: var(--accent2);
+  font-size: .84rem;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.hero h1 {
+  max-width: 900px;
+  margin: .55rem 0 .5rem;
+  font-size: clamp(2.35rem, 6vw, 5.6rem);
+  line-height: 1.08;
+  letter-spacing: -.045em;
+}
+.original-title {
+  margin: 0 0 2rem;
+  color: var(--hero-muted);
+  font-size: clamp(1rem, 2vw, 1.28rem);
+}
+.lede {
+  max-width: 830px;
+  margin: 0;
+  font-size: clamp(1.2rem, 2.3vw, 1.65rem);
+  line-height: 1.55;
+}
+.summary {
+  width: min(1120px, calc(100% - 2rem));
+  margin: -2rem auto 5rem;
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  overflow: hidden;
+  background: var(--metric-bg);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  box-shadow: var(--shadow);
+}
+.metric {
+  padding: 1.5rem;
+  border-right: 1px solid var(--line);
+}
+.metric:last-child { border-right: 0; }
+.metric strong {
+  display: block;
+  color: var(--data);
+  font-size: clamp(1.8rem, 4vw, 3.1rem);
+  line-height: 1.1;
+}
+.metric span {
+  display: block;
+  margin-top: .55rem;
+  color: var(--muted);
+  font-size: .92rem;
+}
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-top: 2.2rem;
+}
+.split article {
+  padding: 2rem;
+  border-radius: 1rem;
+}
+.problem {
+  background: var(--risk-bg);
+  border-left: .4rem solid var(--risk);
+}
+.shift {
+  background: var(--opportunity-bg);
+  border-top: .4rem solid var(--opportunity);
+}
+.summary h2, .summary h3 { line-height: 1.25; }
+.summary h2 { font-size: clamp(1.8rem, 4vw, 3rem); }
+.summary h3 { margin-top: 0; font-size: 1.35rem; }
+.problem h3 { color: var(--risk); }
+.shift h3 { color: var(--opportunity); }
+.timeline-wrap {
+  margin: 2.4rem 0;
+  padding: 2.5rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.timeline {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-top: 2rem;
+}
+.step {
+  position: relative;
+  padding-top: 1.1rem;
+  border-top: .3rem solid var(--accent);
+}
+.step:nth-child(2) { border-color: var(--accent3); }
+.step:nth-child(3) { border-color: var(--accent4); }
+.step b {
+  display: inline-grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  margin-bottom: .7rem;
+  border-radius: 50%;
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+}
+.insight {
+  margin: 2.4rem 0;
+  padding: 2.5rem clamp(1.5rem, 5vw, 4rem);
+  background: var(--conclusion-bg);
+  border: 1px solid var(--conclusion);
+  border-radius: 0 2rem 0 2rem;
+}
+.insight blockquote {
+  margin: 0;
+  color: var(--conclusion);
+  font-size: clamp(1.35rem, 3vw, 2.15rem);
+  font-weight: 750;
+  line-height: 1.45;
+}
+.insight p { margin-bottom: 0; }
+.takeaways h2 { margin-bottom: 1.25rem; }
+.mosaic {
+  display: grid;
+  grid-template-columns: 1.2fr .8fr 1fr;
+  gap: 1rem;
+}
+.tile {
+  min-height: 180px;
+  padding: 1.5rem;
+  border: 1px solid var(--line);
+  background: var(--card);
+}
+.tile:nth-child(1) {
+  grid-row: span 2;
+  background: var(--warm-bg);
+  border-color: var(--accent3);
+}
+.tile:nth-child(2) {
+  background: var(--cool-bg);
+  border-color: var(--accent2);
+}
+.tile:nth-child(3) {
+  background: var(--risk-bg);
+  border-color: var(--risk);
+}
+.tile:nth-child(4) {
+  grid-column: span 2;
+  background: var(--conclusion-bg);
+  border-color: var(--conclusion);
+}
+.tile .num {
+  color: var(--accent4);
+  font-size: 2rem;
+  font-weight: 900;
+}
+mark {
+  padding: .05em .25em;
+  color: var(--ink);
+  background: var(--hl);
+}
+mark.alt { background: var(--hl2); }
+#translation {
+  width: min(820px, calc(100% - 2rem));
+  margin: 0 auto 6rem;
+  padding: clamp(1.3rem, 5vw, 4rem);
+  background: var(--surface);
+  border-top: .45rem solid var(--accent);
+  box-shadow: var(--shadow);
+}
+#translation h2 {
+  margin: 0 0 2rem;
+  font-size: clamp(2rem, 5vw, 3.6rem);
+  line-height: 1.15;
+}
+#translation h3 {
+  margin: 3.4rem 0 1rem;
+  padding-left: .8rem;
+  color: var(--accent);
+  font-size: clamp(1.5rem, 3vw, 2.15rem);
+  line-height: 1.3;
+  border-left: .3rem solid var(--accent2);
+}
+#translation p { margin: 1.15rem 0; }
+#translation ul, #translation ol { padding-left: 1.4rem; }
+#translation li { margin: .65rem 0; }
+.toc {
+  padding: 1.25rem 1.5rem;
+  background: var(--cool-bg);
+  border: 1px solid var(--line);
+}
+.meta {
+  color: var(--muted);
+  font-size: .92rem;
+}
+.related {
+  margin: 2.5rem 0;
+  padding: 1.2rem 1.5rem;
+  background: var(--warm-bg);
+  border-left: .3rem solid var(--accent3);
+}
+.source-figure {
+  margin: 2.4rem 0;
+  padding: .8rem;
+  min-height: 140px;
+  background: var(--figure-bg);
+  border: 1px solid var(--line);
+  border-radius: .8rem;
+}
+.source-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: .45rem;
+}
+.source-figure figcaption {
+  margin-top: .75rem;
+  color: var(--muted);
+  font-size: .88rem;
+}
+.figure-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .8rem;
+  margin: 2.4rem 0;
+}
+.figure-pair .source-figure { margin: 0; }
+hr {
+  margin: 4rem 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+@media (max-width: 760px) {
+  .metrics, .split, .timeline, .mosaic, .figure-pair {
+    grid-template-columns: 1fr;
+  }
+  .metric {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .metric:last-child { border-bottom: 0; }
+  .tile:nth-child(1), .tile:nth-child(4) {
+    grid-row: auto;
+    grid-column: auto;
+  }
+}
 
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #0f141b;
-        --surface: #18212b;
-        --surface-alt: #132720;
-        --surface-warm: #2a2114;
-        --surface-cool: #142236;
-        --surface-risk: #2b1717;
-        --surface-dark: #080b10;
-        --ink: #edf2f7;
-        --muted: #aab6c5;
-        --line: #344050;
-        --data: #60a5fa;
-        --risk: #fb7185;
-        --opportunity: #34d399;
-        --conclusion: #a78bfa;
-        --warning: #fbbf24;
-        --badge-ink: #081018;
-        --shadow: 0 20px 50px rgba(0, 0, 0, 0.36);
-      }
-    }
-
-    :root[data-theme="dark"] {
-      --bg: #0f141b;
-      --surface: #18212b;
-      --surface-alt: #132720;
-      --surface-warm: #2a2114;
-      --surface-cool: #142236;
-      --surface-risk: #2b1717;
-      --surface-dark: #080b10;
-      --ink: #edf2f7;
-      --muted: #aab6c5;
-      --line: #344050;
-      --data: #60a5fa;
-      --risk: #fb7185;
-      --opportunity: #34d399;
-      --conclusion: #a78bfa;
-      --warning: #fbbf24;
-      --badge-ink: #081018;
-      --shadow: 0 20px 50px rgba(0, 0, 0, 0.36);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-      line-height: 1.7;
-    }
-
-    main {
-      overflow: hidden;
-    }
-
-    .hero {
-      min-height: 58vh;
-      padding: 72px 7vw 56px;
-      background:
-        linear-gradient(135deg, var(--surface-dark), var(--surface-cool));
-      color: var(--badge-ink);
-      display: grid;
-      align-items: end;
-    }
-
-    .hero-inner {
-      max-width: 980px;
-    }
-
-    .kicker {
-      color: var(--opportunity);
-      font-weight: 700;
-      letter-spacing: 0;
-      margin-bottom: 16px;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(34px, 6vw, 72px);
-      line-height: 1.05;
-      letter-spacing: 0;
-    }
-
-    .original {
-      margin-top: 16px;
-      color: var(--muted);
-      font-size: 18px;
-    }
-
-    .one-line {
-      margin-top: 32px;
-      max-width: 780px;
-      font-size: 22px;
-      color: var(--badge-ink);
-      border-left: 6px solid var(--opportunity);
-      padding-left: 18px;
-    }
-
-    section {
-      padding: 54px 7vw;
-    }
-
-    .metrics {
-      background: var(--surface);
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 1px;
-      border-top: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
-    }
-
-    .metric {
-      padding: 26px;
-      background: var(--surface);
-    }
-
-    .metric strong {
-      display: block;
-      color: var(--data);
-      font-size: 36px;
-      line-height: 1;
-      margin-bottom: 10px;
-    }
-
-    .metric span {
-      color: var(--muted);
-      font-size: 15px;
-    }
-
-    .split {
-      background: var(--surface-alt);
-      display: grid;
-      grid-template-columns: 0.9fr 1.1fr;
-      gap: 42px;
-      align-items: start;
-    }
-
-    .section-title {
-      margin: 0 0 14px;
-      font-size: 30px;
-      line-height: 1.2;
-    }
-
-    .lead {
-      font-size: 19px;
-      color: var(--muted);
-      max-width: 680px;
-    }
-
-    .stack {
-      display: grid;
-      gap: 16px;
-    }
-
-    .bar {
-      border-left: 7px solid var(--opportunity);
-      background: var(--surface);
-      padding: 18px 20px;
-      box-shadow: var(--shadow);
-      border-radius: 0 var(--radius) var(--radius) 0;
-    }
-
-    .bar.risk {
-      border-left-color: var(--risk);
-      background: var(--surface-risk);
-    }
-
-    .bar.data {
-      border-left-color: var(--data);
-      background: var(--surface-cool);
-    }
-
-    .timeline {
-      background: var(--surface-dark);
-      color: var(--badge-ink);
-    }
-
-    .timeline .lead {
-      color: var(--muted);
-    }
-
-    .steps {
-      margin-top: 28px;
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 14px;
-    }
-
-    .step {
-      border-top: 4px solid var(--warning);
-      padding: 18px 8px 0;
-    }
-
-    .step b {
-      display: inline-grid;
-      place-items: center;
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: var(--warning);
-      color: var(--badge-ink);
-      margin-bottom: 12px;
-    }
-
-    .compare {
-      background: var(--surface-warm);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: var(--surface);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      border-radius: var(--radius);
-    }
-
-    th, td {
-      padding: 18px;
-      text-align: left;
-      border-bottom: 1px solid var(--line);
-      vertical-align: top;
-    }
-
-    th {
-      color: var(--conclusion);
-      font-size: 15px;
-      text-transform: uppercase;
-    }
-
-    .quote {
-      background: var(--surface-cool);
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      gap: 32px;
-      align-items: center;
-    }
-
-    .quote-mark {
-      font-size: 68px;
-      color: var(--conclusion);
-      line-height: 1;
-    }
-
-    .quote p {
-      font-size: 24px;
-      margin: 0;
-    }
-
-    .takeaways {
-      background: var(--bg);
-    }
-
-    .mosaic {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 14px;
-      margin-top: 24px;
-    }
-
-    .tile {
-      min-height: 150px;
-      padding: 20px;
-      border-radius: var(--radius);
-      background: var(--surface);
-      border: 1px solid var(--line);
-    }
-
-    .tile:nth-child(1) {
-      border-top: 6px solid var(--data);
-    }
-
-    .tile:nth-child(2) {
-      border-top: 6px solid var(--risk);
-    }
-
-    .tile:nth-child(3) {
-      border-top: 6px solid var(--opportunity);
-    }
-
-    .tile:nth-child(4) {
-      border-top: 6px solid var(--conclusion);
-    }
-
-    .tile strong {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 18px;
-    }
-
-    @media (max-width: 860px) {
-      .metrics, .split, .steps, .quote, .mosaic {
-        grid-template-columns: 1fr;
-      }
-
-      .hero {
-        min-height: auto;
-        padding-top: 56px;
-      }
-
-      .one-line {
-        font-size: 19px;
-      }
-    }
-  </style>
-  <script id="airs-digest-theme-boot">
+:root[data-theme="light"] {
+  color-scheme: light;
+--bg: #f4f1ea;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #18212b;
+  --muted: #66717d;
+  --line: #d9d2c5;
+  --accent: #235bd8;
+  --accent2: #00866f;
+  --accent3: #d56a18;
+  --accent4: #9d3f78;
+  --risk: #ba3548;
+  --opportunity: #087f5b;
+  --conclusion: #563bb7;
+  --data: #1765c1;
+  --hero-bg: #17243a;
+  --hero-ink: #f7f9ff;
+  --hero-muted: #bdc9dc;
+  --metric-bg: #e2eefc;
+  --risk-bg: #f9e3e6;
+  --opportunity-bg: #ddf3e9;
+  --conclusion-bg: #ebe5fa;
+  --warm-bg: #f7ead9;
+  --cool-bg: #e3f1ef;
+  --hl: #ffe08a;
+  --hl2: #aee8d3;
+  --shadow: 0 16px 45px rgba(28, 39, 52, .10);
+  --figure-bg: #ece8df;
+}
+</style>
+<script id="airs-digest-theme-boot">
     try {
       var saved = localStorage.getItem("theme");
       if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
     } catch (e) {}
   </script>
-  <style id="airs-digest-theme-style">
+<style id="airs-digest-theme-style">
     :root {
       color-scheme: light;
       --airs-digest-ink: #191816;
@@ -463,133 +522,275 @@
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+  <style id="airs-source-image-theme-style">
+    .source-figure .source-image-dark {
+      display: none;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .source-figure .source-image-light {
+        display: none;
+      }
+      :root:not([data-theme="light"]) .source-figure .source-image-dark {
+        display: block;
+      }
+    }
+    :root[data-theme="dark"] .source-figure .source-image-light {
+      display: none;
+    }
+    :root[data-theme="dark"] .source-figure .source-image-dark {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-light {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-dark {
+      display: none;
+    }
   </style>
 </head>
 <body>
-<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/cloud-agent-lessons" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
-  <main>
-    <header class="hero">
-      <div class="hero-inner">
-        <div class="kicker">一句话总括</div>
-        <h1>我们从构建云端智能体中学到的经验</h1>
-        <div class="original">What we’ve learned building cloud agents</div>
-        <p class="one-line">Cursor 的核心贡献是把云端智能体重新定义为一套运行层工程，而不只是本地智能体的远程版本。</p>
-      </div>
-    </header>
-
-    <section class="metrics" aria-label="关键数字">
-      <div class="metric">
-        <strong>1 年</strong>
-        <span>云端智能体从本地扩展思路，演化成独立虚拟机与运行系统。</span>
-      </div>
-      <div class="metric">
-        <strong>two 9s+</strong>
-        <span>迁移到 Temporal 后，可靠性从 early beta 的 one 9 提升到超过 two 9s。</span>
-      </div>
-      <div class="metric">
-        <strong>5000 万+</strong>
-        <span>Temporal 每天处理的 actions 数量，说明 agent workflow 已进入基础设施规模。</span>
-      </div>
-      <div class="metric">
-        <strong>40%+</strong>
-        <span>Cursor 内部 PR 来自云端智能体，显示它已不只是实验工具。</span>
-      </div>
-    </section>
-
-    <section class="split">
-      <div>
-        <h2 class="section-title">开发环境就是产品</h2>
-        <p class="lead">云端智能体的质量瓶颈，经常不是模型本身，而是它有没有像开发者一样完整的环境。</p>
-      </div>
-      <div class="stack">
-        <div class="bar data">本地智能体天然继承笔记本上的依赖、凭据、网络和工具。云端必须重新构建这一切。</div>
-        <div class="bar risk">环境不完整时，问题未必表现为崩溃。更常见的是输出质量悄悄下降。</div>
-        <div class="bar">因此，VM 休眠恢复、镜像 checkpoint、secret redaction、网络策略和凭据管理，都变成智能体产品的一部分。</div>
-      </div>
-    </section>
-
-    <section class="timeline">
-      <h2 class="section-title">长任务需要可持久执行</h2>
-      <p class="lead">云端任务可能运行数小时、数天甚至数周。一次节点故障不该让整段工作消失。</p>
-      <div class="steps">
-        <div class="step"><b>1</b><p>早期用 work-stealing 架构，让 worker 把 agent loop 跑到完成。</p></div>
-        <div class="step"><b>2</b><p>这种做法能借鉴本地模式，但面对 provider outage、pod 替换和 EC2 故障很脆弱。</p></div>
-        <div class="step"><b>3</b><p>Cursor 迁移到 Temporal，复用 retry、调度和跨节点持久化能力。</p></div>
-        <div class="step"><b>4</b><p>工作流从“永恒 agent”转向更短的单任务流程，升级更容易。</p></div>
-        <div class="step"><b>5</b><p>这说明 AI agent 的可靠性越来越像分布式系统问题。</p></div>
-      </div>
-    </section>
-
-    <section class="compare">
-      <h2 class="section-title">状态必须拆开</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>组件</th>
-            <th>为什么要解耦</th>
-            <th>带来的理解变化</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Agent loop</td>
-            <td>放在 Temporal 中，而不是绑死在某台 VM 上。</td>
-            <td>智能体可以跨 pod 生存，任务不再等同于一台机器上的一个进程。</td>
-          </tr>
-          <tr>
-            <td>Machine state</td>
-            <td>VM 可以休眠、恢复、预热、只读化或被替换。</td>
-            <td>环境成为可调度资源，而不是静态背景。</td>
-          </tr>
-          <tr>
-            <td>Conversation state</td>
-            <td>追加式存储和流式输出要能处理 retry 后的回滚。</td>
-            <td>用户看到的对话流，也需要分布式系统级一致性设计。</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section class="quote">
-      <div class="quote-mark">“</div>
-      <p>随着模型变强，harness 不应替智能体做所有决定。更好的方向是把硬编码流程变成智能体能主动使用的工具。</p>
-    </section>
-
-    <section class="split">
-      <div>
-        <h2 class="section-title">让路，不是放任</h2>
-        <p class="lead">Cursor 早期会在每个任务后强制检查、提交和推送。现在更多逻辑被移到 agent 可控工具里。</p>
-      </div>
-      <div class="stack">
-        <div class="bar">多仓库任务从硬编码 harness，变成提供 repo layout、branch 和 PR 工具。</div>
-        <div class="bar data">CI Autofix 从自动抓日志写入 VM，变成给 agent GitHub CLI，并把大输出保存为可搜索文件。</div>
-        <div class="bar risk">computer use 仍需要专门 subagent、模型路由、prompt 和录屏。模型还没准备好完全独立处理它。</div>
-      </div>
-    </section>
-
-    <section class="takeaways">
-      <h2 class="section-title">最值得带走的洞见</h2>
-      <div class="mosaic">
-        <div class="tile">
-          <strong>环境决定上限</strong>
-          <span>当模型足够聪明后，缺依赖、缺权限和缺网络会直接压低输出质量。</span>
-        </div>
-        <div class="tile">
-          <strong>可靠性是核心能力</strong>
-          <span>云端智能体越能跑长任务，就越需要 workflow、retry 和跨节点恢复。</span>
-        </div>
-        <div class="tile">
-          <strong>工具优于硬编码</strong>
-          <span>让 agent 自己调用分支、PR、CLI 和浏览器工具，比把每个流程写死更可扩展。</span>
-        </div>
-        <div class="tile">
-          <strong>下一步是自愈</strong>
-          <span>理想的云端智能体应能识别缺 secret、网络阻断和环境错误，并主动修复或报告。</span>
-        </div>
-      </div>
-    </section>
-  </main>
-  <script id="airs-digest-theme-script">
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">← 返回索引</a><a href="https://cursor.com/blog/cloud-agent-lessons" rel="noopener noreferrer" target="_blank">阅读原文 ↗</a></div><button class="airs-digest-theme-toggle" data-airs-theme-toggle="" type="button">主题 · 跟随系统</button></nav>
+<header class="hero">
+<div class="hero-inner">
+<div class="eyebrow">Cursor · Research · 2026 年 6 月 2 日</div>
+<h1>我们在构建云端智能体过程中学到的经验</h1>
+<p class="original-title">What we’ve learned building cloud agents</p>
+<p class="lede"><strong>一句话总括：</strong>Cursor 的核心发现是，云端智能体的上限不只由模型决定，更取决于围绕模型建设的完整开发环境、持久化执行系统和可恢复的编排层。</p>
+</div>
+</header>
+<main class="summary">
+<section aria-label="关键数据" class="metrics">
+<div class="metric"><strong>90% 左右</strong><span>早期测试版只有“一个 9”的可靠性</span></div>
+<div class="metric"><strong>&gt;99%</strong><span>迁移到 Temporal 后超过“两个 9”</span></div>
+<div class="metric"><strong>5000 万+</strong><span>Temporal 每天处理的操作次数</span></div>
+<div class="metric"><strong>40%+</strong><span>Cursor 内部由云端智能体贡献的 PR</span></div>
+</section>
+<section class="split">
+<article class="problem">
+<h3>环境缺陷会伪装成模型缺陷</h3>
+<p>本地智能体天然继承开发者的工具、依赖和配置。云端智能体没有这种便利。环境缺少一环时，系统往往不会直接报错，只会让结果质量悄悄下降。</p>
+<p>随着模型变强，模型越来越能利用外部环境。于是，<mark>完整开发环境</mark>从辅助条件变成了决定智能体能否发挥全部能力的关键因素。</p>
+</article>
+<article class="shift">
+<h3>云端智能体需要一层新的基础设施</h3>
+<p>Cursor 为此建设了虚拟机休眠与恢复、镜像检查点、分叉机制、客户端集成和受控网络访问。密钥脱敏、网络策略和凭据管理也成为必要能力。</p>
+<p>这改变了问题的性质。团队建设的已不再是“服务器上的本地智能体”，而是<mark class="alt">面向智能体的企业 IT 和运行层</mark>。</p>
+</article>
+</section>
+<section class="timeline-wrap">
+<h2>可靠性架构经历了三次关键转变</h2>
+<div class="timeline">
+<article class="step">
+<b>1</b>
+<h3>直接移植本地循环</h3>
+<p>最初采用工作窃取架构。工作节点领取智能体并持续运行，但节点和服务中断会破坏执行。早期可靠性只有一个 9。</p>
+</article>
+<article class="step">
+<b>2</b>
+<h3>迁移到 Temporal</h3>
+<p>重试、跨机器调度和节点故障恢复交给持久化执行系统。迁移后可靠性超过两个 9，任务可以持续数天甚至数周。</p>
+</article>
+<article class="step">
+<b>3</b>
+<h3>拆分状态与工作流</h3>
+<p>“永久”工作流被拆成完成单项任务后退出的短工作流。智能体循环、虚拟机和对话流也各自解耦，升级与恢复因此更容易。</p>
+</article>
+</div>
+</section>
+<section class="insight">
+<blockquote>更好的 harness 不是替智能体做更多决定，而是在模型尚未成熟的地方提供脚手架，并把其余能力交还给智能体。</blockquote>
+<p>Cursor 已把提交、推送、多仓库处理和 CI 日志分析等固定逻辑逐步移入工具。智能体可以自行选择调用方式。计算机操作仍需要专用子智能体、模型路由和录屏机制，但调用时机已经由智能体控制。</p>
+</section>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="mosaic">
+<article class="tile">
+<div class="num">01</div>
+<h3>环境就是产品</h3>
+<p>云端智能体的体验不能只靠模型升级。工具、依赖、网络和凭据共同决定结果质量。环境问题还很容易被误判为模型能力不足。</p>
+</article>
+<article class="tile">
+<div class="num">02</div>
+<h3>长任务必须可恢复</h3>
+<p>任务从几分钟延长到数小时、数天甚至数周后，推理服务和计算节点的短暂故障就会成为常态。持久化执行不是附加功能。</p>
+</article>
+<article class="tile">
+<div class="num">03</div>
+<h3>状态解耦带来弹性</h3>
+<p>把智能体循环、机器状态和对话状态分开，才能自由迁移 Pod、启用预热虚拟机，并正确处理流式输出后的重试。</p>
+</article>
+<article class="tile">
+<div class="num">04</div>
+<h3>下一步是环境自愈</h3>
+<p>理想系统会让智能体识别密钥缺失、网络受限等阻塞，并主动修复。这样就能越过“处处管控”和“完全放手”的二选一。</p>
+</article>
+</div>
+</section>
+</main>
+<section id="translation">
+<h2>完整译文</h2>
+<div class="toc">
+<strong>目录</strong>
+<ol>
+<li>开发环境就是产品</li>
+<li>长时间运行的智能体需要持久化执行</li>
+<li>将智能体、机器与对话状态解耦</li>
+<li>懂得何时放手</li>
+<li>可自愈的智能体环境</li>
+</ol>
+</div>
+<p>一年前，我们首次推出云端智能体。当时，它看起来只是本地智能体很自然的一次延伸。此后，云端智能体的能力有了大幅扩展。</p>
+<p>如今，云端智能体会在各自专用的虚拟机上运行。它们拥有独立的环境、依赖和网络访问权限。它们可以并行工作，也可以在无人看管时继续执行。相比运行在笔记本电脑上的本地智能体，它们还能承担耗时更长的任务。</p>
+<p>这些能力也带来了环境配置、可靠性和编排方面的挑战。当智能体只在你的笔记本电脑上运行时，这些问题不会如此突出。</p>
+<p>本文将分享我们在构建云端智能体过程中得到的最重要经验。我们也会解释，为什么这项工作越来越不像是把本地智能体搬到服务器上，而更像是在智能体周围建设一层操作系统式的运行基础设施。</p>
+<h3>开发环境就是产品</h3>
+<p>过去一年里，我们发现，影响云端智能体输出质量的首要因素，是它能否获得与开发者相当的完整开发环境。</p>
+<p>在本地使用智能体时，你不太需要考虑这个问题。因为本地智能体会直接继承笔记本电脑上已经可用的开发环境。在云端，你必须从零开始重建这一切。更棘手的是，环境没有完全搭好时，往往很难察觉。</p>
+<p>系统可能不会崩溃，也不会弹出错误消息。唯一的迹象往往只是输出质量略有下降。你一开始可能注意不到。即使发现了，也可能把问题归因于模型。</p>
+<p>但我们一次又一次追查后，都得出了同一个诊断结果：云端智能体缺少执行工作或验证结果所需的环境。一年前，这个问题还没有那么重要，因为当时的模型本来也无法充分利用周围环境。随着模型变得更聪明，环境配置已经成为决定它们能否发挥全部潜力的关键因素。</p>
+<div class="figure-pair">
+<figure class="source-figure" data-source-image="0"><img alt="Cloud agents architecture" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fcloud-agents-architecture-light.png&amp;w=1920&amp;q=70" width="800"/><img alt="Cloud agents architecture" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fcloud-agents-architecture-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+</div>
+<p>如今，要实现所谓的“完整环境”，就需要重建数量惊人的基础设施：</p>
+<ul>
+<li>为用户提供更好的工具，用来构建智能体环境。</li>
+<li>提供高效的方法，让智能体虚拟机可以在两次消息之间休眠并恢复。</li>
+<li>建设能够快速、可靠地创建检查点、恢复和分叉虚拟机镜像的流水线。</li>
+<li>让 harness 与客户端紧密集成，使智能体和人类都能理解环境，并与它交互。</li>
+</ul>
+<p>随着云端智能体承担更多工作，它们还需要受控的网络访问权限，以便创建 PR、拉取依赖和开展研究。久而久之，我们实际上为智能体建设了一套企业 IT 系统，其中包括密钥脱敏、网络策略和凭据管理。</p>
+<h3>长时间运行的智能体需要持久化执行</h3>
+<p>云端智能体面临的可靠性挑战与本地智能体不同。它们不会和笔记本电脑上的其他程序争抢本地资源，而是在各自隔离的虚拟机中运行。这样一来，开发者更容易并行启动多个智能体，也可以把长任务委派出去。这类任务通常需要数小时，而不是几分钟。</p>
+<p>不过，在虚拟机中运行也意味着系统会受到各种中断影响。例如，推理服务提供商可能发生故障，Pod 可能需要替换，EC2 节点也可能宕机。</p>
+<p>我们最初采用工作窃取架构来构建云端智能体。工作节点可以领取智能体，并持续运行循环直至任务完成。这相当于把本地有效的方案直接移植到服务器上，但整体十分脆弱。早期云端智能体测试版往往只有“一个 9”的可靠性。</p>
+<div class="figure-pair">
+<figure class="source-figure" data-source-image="1"><img alt="Original cloud agent architecture" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Foriginal-cloud-arch-light.png&amp;w=1920&amp;q=70" width="800"/><img alt="Original cloud agent architecture" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Foriginal-cloud-arch-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+</div>
+<p>随着云端智能体逐渐成熟，我们发现自己几乎要重新实现 Temporal 已经解决的许多持久化执行基础能力。例如重试机制、跨机器调度任务，以及节点发生故障时保持执行状态。因此，我们决定迁移到 Temporal。</p>
+<div class="figure-pair">
+<figure class="source-figure" data-source-image="2"><img alt="Current cloud agent architecture on Temporal" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Ftemporal-cloud-arch-light.png&amp;w=1920&amp;q=70" width="800"/><img alt="Current cloud agent architecture on Temporal" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Ftemporal-cloud-arch-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+</div>
+<p>现在，我们运行在 Temporal 上的智能体循环可以承受推理服务的短暂不稳定，也能应对 Pod 的休眠与恢复。即使一次运行持续数天甚至数周，它也能继续执行。仅这次迁移，就让我们的可靠性超过了“两个 9”。如今，Temporal 每天处理超过 5000 万次操作，覆盖逾 700 万个独立工作流。在 Cursor 内部，超过 40% 的 PR 来自云端智能体，而且这一比例还在增长。</p>
+<div class="figure-pair">
+<figure class="source-figure" data-source-image="3"><img alt="Percentage of PRs merged to the Cursor monorepo from cloud agents over time" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fprs-merged-light.png&amp;w=1920&amp;q=70" width="800"/><img alt="Percentage of PRs merged to the Cursor monorepo from cloud agents over time" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fprs-merged-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+</div>
+<p>随着时间推移，我们也学会了如何更合理地设计 Temporal 工作流。我们不再使用“永久运行”的智能体工作流，而是改为多个较短的工作流。每个工作流完成一项任务后便退出，这让版本升级变得更容易。我们还拆分了各项活动，以便更准确地处理超时和重试。异步工具调用、子智能体和推理服务中断已经改变了我们最初对系统的假设。</p>
+<div class="figure-pair">
+<figure class="source-figure" data-source-image="4"><img alt="Temporal actions per day across cloud agent workflows" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Ftemporal-actions-light.png&amp;w=1920&amp;q=70" width="800"/><img alt="Temporal actions per day across cloud agent workflows" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Ftemporal-actions-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+</div>
+<h3>将智能体、机器与对话状态解耦</h3>
+<p>云端智能体不再只是运行在一台机器上的单个循环。一个智能体可能先在一台机器上运行，再把异步子智能体分派到另外几台机器上。它也可能从本地启动，随后把工作委派给云端。子智能体甚至可能比父智能体存活得更久，或者运行在完全不同类型的 Pod 上。</p>
+<div class="figure-pair">
+<figure class="source-figure" data-source-image="5"><img alt="Cloud agent loop with decoupled agent, machine, and conversation state" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fconversation-state-light.png&amp;w=1920&amp;q=70" width="800"/><img alt="Cloud agent loop with decoupled agent, machine, and conversation state" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fconversation-state-dark-2.png&amp;w=1920&amp;q=70" width="800"/></figure>
+</div>
+<p>为了实现这些能力，我们发现，最好将智能体循环、机器状态和对话状态作为彼此解耦的组件。智能体循环存在于 Temporal 中，而不是虚拟机本身。因此，我们可以独立管理 Pod 的生命周期，也可以让智能体跨不同类型的 Pod 运行。这还支持只读虚拟机和预热虚拟机等优化方案。</p>
+<p>在对话方面，我们把存储和流式传输层从智能体核心工作流中分离出来。我们构建了一种高效的仅追加存储机制，用来把对话更新实时发送到网页端和桌面客户端。</p>
+<p>这一层也会处理重试。如果智能体循环中的某一步在已经发送部分输出后失败，随后又被重试，客户端就能识别这种情况。它会回退数据流，并显示重试产生的新数据，而不是继续展示旧数据。</p>
+<div class="figure-pair">
+<figure class="source-figure" data-source-image="6"><img alt="Cloud agent conversation flow" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fagent-conversation-light.png&amp;w=1920&amp;q=70" width="800"/><img alt="Cloud agent conversation flow" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fagent-conversation-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+</div>
+<h3>懂得何时放手</h3>
+<p>构建云端智能体 harness，意味着要持续重新评估两件事：哪些行为应该由确定性逻辑控制，哪些行为应该交给智能体决定。</p>
+<p>早期，我们不太信任智能体。因此，每项任务完成后，harness 都会复查它的工作，强制创建提交并推送。随着模型变得更聪明，我们开始把逻辑从 harness 中移出，转化成由智能体控制的工具。一年前，多仓库环境需要 harness 内置硬编码行为。现在，我们可以告诉智能体仓库布局，为它提供分支和 PR 工具，再让它自行决定如何完成工作。</p>
+<p>CI Autofix 也经历了同样的变化。早期版本的云端智能体 harness 包含一套逻辑，用来获取任务失败日志并把日志写入虚拟机。现在，我们只需要让智能体访问 GitHub CLI，并自动把大段输出写入它可以搜索的文件。发送给智能体的通知因此简单了许多。我们预计，这一趋势还会继续。</p>
+<p>harness 并不会消失，只是其中包含的内容正在变化。计算机操作就是当前很有代表性的例子。我们的云端智能体 harness 为计算机操作提供了一种专用子智能体。它拥有自己的模型路由、自定义提示词和屏幕录制功能。VNC 和 Chrome 属于运行环境，并由父智能体和子智能体共享。因此，父智能体也能直接使用它们。例如，它可以运行 Playwright 脚本。我们采用这套脚手架，是因为模型还没有完全准备好独立处理计算机操作。不过，是否调用这项能力，仍由智能体决定。</p>
+<p>云端智能体在 harness 中需要的提示方式也不同于本地智能体。我们会鼓励它们更加自主，因为阻塞的代价要高得多。在本地，你会知道智能体已经停止，正在等待许可。但在云端，它可能就这样停留数小时，直到你再次回来查看。</p>
+<h3>可自愈的智能体环境</h3>
+<p>展望未来，我们希望越过“全程手把手指导”和“完全放手不管”之间的二元选择。更好的模式，是为智能体提供理解周围系统的工具。</p>
+<p>我们希望云端智能体能够报告密钥缺失、网络访问受阻等问题。环境妨碍任务推进时，它也应该能够发现原因，随后以自愈方式采取行动。我们在最近的一篇研究博客中介绍过一条可能的实现路径，并把它称为“autoinstall”。</p>
+<p>仅仅在过去几个月里，云端智能体就取得了巨大进步。我们预计，接下来的变化还会进一步加速。Cursor 云端智能体让团队可以利用这一广阔的能力空间，而不必自行构建或维护底层基础设施。</p>
+<p class="meta">归类：research</p>
+<p class="meta">作者：Josh Ma</p>
+<div class="related">
+<strong>相关文章</strong>
+<ul>
+<li>介绍 Grok 4.5</li>
+<li>持续改进我们的智能体 harness</li>
+<li>保持 Cursor 应用稳定</li>
+</ul>
+</div>
+<hr/>
+<h2>我们在构建云端智能体过程中学到的经验</h2>
+<div class="toc">
+<strong>目录</strong>
+<ol>
+<li>开发环境就是产品</li>
+<li>长时间运行的智能体需要持久化执行</li>
+<li>将智能体、机器与对话状态解耦</li>
+<li>懂得何时放手</li>
+<li>可自愈的智能体环境</li>
+</ol>
+</div>
+<p>一年前，我们首次推出云端智能体。当时，它看起来只是本地智能体很自然的一次延伸。此后，云端智能体的能力有了大幅扩展。</p>
+<p>如今，云端智能体会在各自专用的虚拟机上运行。它们拥有独立的环境、依赖和网络访问权限。它们可以并行工作，也可以在无人看管时继续执行。相比运行在笔记本电脑上的本地智能体，它们还能承担耗时更长的任务。</p>
+<p>这些能力也带来了环境配置、可靠性和编排方面的挑战。当智能体只在你的笔记本电脑上运行时，这些问题不会如此突出。</p>
+<p>本文将分享我们在构建云端智能体过程中得到的最重要经验。我们也会解释，为什么这项工作越来越不像是把本地智能体搬到服务器上，而更像是在智能体周围建设一层操作系统式的运行基础设施。</p>
+<h3>开发环境就是产品</h3>
+<p>过去一年里，我们发现，影响云端智能体输出质量的首要因素，是它能否获得与开发者相当的完整开发环境。</p>
+<p>在本地使用智能体时，你不太需要考虑这个问题。因为本地智能体会直接继承笔记本电脑上已经可用的开发环境。在云端，你必须从零开始重建这一切。更棘手的是，环境没有完全搭好时，往往很难察觉。</p>
+<p>系统可能不会崩溃，也不会弹出错误消息。唯一的迹象往往只是输出质量略有下降。你一开始可能注意不到。即使发现了，也可能把问题归因于模型。</p>
+<p>但我们一次又一次追查后，都得出了同一个诊断结果：云端智能体缺少执行工作或验证结果所需的环境。一年前，这个问题还没有那么重要，因为当时的模型本来也无法充分利用周围环境。随着模型变得更聪明，环境配置已经成为决定它们能否发挥全部潜力的关键因素。</p>
+<p>如今，要实现所谓的“完整环境”，就需要重建数量惊人的基础设施：</p>
+<ul>
+<li>为用户提供更好的工具，用来构建智能体环境。</li>
+<li>提供高效的方法，让智能体虚拟机可以在两次消息之间休眠并恢复。</li>
+<li>建设能够快速、可靠地创建检查点、恢复和分叉虚拟机镜像的流水线。</li>
+<li>让 harness 与客户端紧密集成，使智能体和人类都能理解环境，并与它交互。</li>
+</ul>
+<p>随着云端智能体承担更多工作，它们还需要受控的网络访问权限，以便创建 PR、拉取依赖和开展研究。久而久之，我们实际上为智能体建设了一套企业 IT 系统，其中包括密钥脱敏、网络策略和凭据管理。</p>
+<h3>长时间运行的智能体需要持久化执行</h3>
+<p>云端智能体面临的可靠性挑战与本地智能体不同。它们不会和笔记本电脑上的其他程序争抢本地资源，而是在各自隔离的虚拟机中运行。这样一来，开发者更容易并行启动多个智能体，也可以把长任务委派出去。这类任务通常需要数小时，而不是几分钟。</p>
+<p>不过，在虚拟机中运行也意味着系统会受到各种中断影响。例如，推理服务提供商可能发生故障，Pod 可能需要替换，EC2 节点也可能宕机。</p>
+<p>我们最初采用工作窃取架构来构建云端智能体。工作节点可以领取智能体，并持续运行循环直至任务完成。这相当于把本地有效的方案直接移植到服务器上，但整体十分脆弱。早期云端智能体测试版往往只有“一个 9”的可靠性。</p>
+<p>随着云端智能体逐渐成熟，我们发现自己几乎要重新实现 Temporal 已经解决的许多持久化执行基础能力。例如重试机制、跨机器调度任务，以及节点发生故障时保持执行状态。因此，我们决定迁移到 Temporal。</p>
+<p>现在，我们运行在 Temporal 上的智能体循环可以承受推理服务的短暂不稳定，也能应对 Pod 的休眠与恢复。即使一次运行持续数天甚至数周，它也能继续执行。仅这次迁移，就让我们的可靠性超过了“两个 9”。如今，Temporal 每天处理超过 5000 万次操作，覆盖逾 700 万个独立工作流。在 Cursor 内部，超过 40% 的 PR 来自云端智能体，而且这一比例还在增长。</p>
+<p>随着时间推移，我们也学会了如何更合理地设计 Temporal 工作流。我们不再使用“永久运行”的智能体工作流，而是改为多个较短的工作流。每个工作流完成一项任务后便退出，这让版本升级变得更容易。我们还拆分了各项活动，以便更准确地处理超时和重试。异步工具调用、子智能体和推理服务中断已经改变了我们最初对系统的假设。</p>
+<h3>将智能体、机器与对话状态解耦</h3>
+<p>云端智能体不再只是运行在一台机器上的单个循环。一个智能体可能先在一台机器上运行，再把异步子智能体分派到另外几台机器上。它也可能从本地启动，随后把工作委派给云端。子智能体甚至可能比父智能体存活得更久，或者运行在完全不同类型的 Pod 上。</p>
+<p>为了实现这些能力，我们发现，最好将智能体循环、机器状态和对话状态作为彼此解耦的组件。智能体循环存在于 Temporal 中，而不是虚拟机本身。因此，我们可以独立管理 Pod 的生命周期，也可以让智能体跨不同类型的 Pod 运行。这还支持只读虚拟机和预热虚拟机等优化方案。</p>
+<p>在对话方面，我们把存储和流式传输层从智能体核心工作流中分离出来。我们构建了一种高效的仅追加存储机制，用来把对话更新实时发送到网页端和桌面客户端。</p>
+<p>这一层也会处理重试。如果智能体循环中的某一步在已经发送部分输出后失败，随后又被重试，客户端就能识别这种情况。它会回退数据流，并显示重试产生的新数据，而不是继续展示旧数据。</p>
+<h3>懂得何时放手</h3>
+<p>构建云端智能体 harness，意味着要持续重新评估两件事：哪些行为应该由确定性逻辑控制，哪些行为应该交给智能体决定。</p>
+<p>早期，我们不太信任智能体。因此，每项任务完成后，harness 都会复查它的工作，强制创建提交并推送。随着模型变得更聪明，我们开始把逻辑从 harness 中移出，转化成由智能体控制的工具。一年前，多仓库环境需要 harness 内置硬编码行为。现在，我们可以告诉智能体仓库布局，为它提供分支和 PR 工具，再让它自行决定如何完成工作。</p>
+<p>CI Autofix 也经历了同样的变化。早期版本的云端智能体 harness 包含一套逻辑，用来获取任务失败日志并把日志写入虚拟机。现在，我们只需要让智能体访问 GitHub CLI，并自动把大段输出写入它可以搜索的文件。发送给智能体的通知因此简单了许多。我们预计，这一趋势还会继续。</p>
+<p>harness 并不会消失，只是其中包含的内容正在变化。计算机操作就是当前很有代表性的例子。我们的云端智能体 harness 为计算机操作提供了一种专用子智能体。它拥有自己的模型路由、自定义提示词和屏幕录制功能。VNC 和 Chrome 属于运行环境，并由父智能体和子智能体共享。因此，父智能体也能直接使用它们。例如，它可以运行 Playwright 脚本。我们采用这套脚手架，是因为模型还没有完全准备好独立处理计算机操作。不过，是否调用这项能力，仍由智能体决定。</p>
+<p>云端智能体在 harness 中需要的提示方式也不同于本地智能体。我们会鼓励它们更加自主，因为阻塞的代价要高得多。在本地，你会知道智能体已经停止，正在等待许可。但在云端，它可能就这样停留数小时，直到你再次回来查看。</p>
+<h3>可自愈的智能体环境</h3>
+<p>展望未来，我们希望越过“全程手把手指导”和“完全放手不管”之间的二元选择。更好的模式，是为智能体提供理解周围系统的工具。</p>
+<p>我们希望云端智能体能够报告密钥缺失、网络访问受阻等问题。环境妨碍任务推进时，它也应该能够发现原因，随后以自愈方式采取行动。我们在最近的一篇研究博客中介绍过一条可能的实现路径，并把它称为“autoinstall”。</p>
+<p>仅仅在过去几个月里，云端智能体就取得了巨大进步。我们预计，接下来的变化还会进一步加速。Cursor 云端智能体让团队可以利用这一广阔的能力空间，而不必自行构建或维护底层基础设施。</p>
+<p class="meta">归类：research</p>
+<p class="meta">作者：Josh Ma</p>
+<div class="related">
+<strong>相关文章</strong>
+<ul>
+<li>介绍 Grok 4.5</li>
+<li>持续改进我们的智能体 harness</li>
+<li>保持 Cursor 应用稳定</li>
+</ul>
+</div>
+</section>
+<script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;
       const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));

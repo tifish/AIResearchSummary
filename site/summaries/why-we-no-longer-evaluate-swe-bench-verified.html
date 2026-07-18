@@ -1,257 +1,313 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<title>为什么 SWE-bench Verified 不再衡量前沿编码能力</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>为何 SWE-bench Verified 已无法衡量前沿编程能力</title>
 <style>
-:root {
-  --bg: #f7f3ea;
-  --ink: #1d2328;
-  --muted: #667078;
-  --line: #d9d1c2;
+:root,
+:root[data-theme="light"] {
+  --bg: #f7f4ee;
   --surface: #fffdf8;
-  --surface-alt: #eef4f1;
-  --surface-warm: #fbead7;
-  --surface-cool: #e8f0fb;
-  --surface-risk: #fde9e7;
-  --surface-dark: #172026;
-  --ink-on-dark: #f4f7f5;
-  --muted-on-dark: #b8c6c0;
-  --accent-data: #1f78b4;
-  --accent-risk: #c84630;
-  --accent-opportunity: #0f8b66;
-  --accent-conclusion: #7b4ab8;
-  --accent-gold: #b88720;
-  --shadow: 0 18px 50px rgba(30, 31, 28, 0.12);
-}
-:root[data-theme="dark"] {
-  --bg: #0f1418;
-  --ink: #e8ece9;
-  --muted: #a7b0b5;
-  --line: #2d3940;
-  --surface: #171e23;
-  --surface-alt: #12231e;
-  --surface-warm: #2a1d12;
-  --surface-cool: #142133;
-  --surface-risk: #2b1715;
-  --surface-dark: #070b0e;
-  --ink-on-dark: #f2f5f3;
-  --muted-on-dark: #aab8b2;
-  --accent-data: #54a8e8;
-  --accent-risk: #ff755f;
-  --accent-opportunity: #39c99a;
-  --accent-conclusion: #b691f2;
-  --accent-gold: #e0b24d;
-  --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  --card: #ffffff;
+  --ink: #18201f;
+  --muted: #68716e;
+  --line: #d9ddd8;
+  --accent: #176b5b;
+  --accent2: #2458a6;
+  --accent3: #b6473a;
+  --accent4: #7a4aa0;
+  --data-bg: #dff3ed;
+  --risk-bg: #fbe3de;
+  --opportunity-bg: #e4edfb;
+  --conclusion-bg: #eee4f7;
+  --warm-bg: #f8edcf;
+  --dark-panel: #172827;
+  --dark-panel-ink: #f2faf7;
+  --hl: #ffe79a;
+  --hl2: #bfe9dc;
+  --shadow: rgba(24, 32, 31, 0.09);
+  --code-bg: #edf0ee;
 }
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0f1418;
-    --ink: #e8ece9;
-    --muted: #a7b0b5;
-    --line: #2d3940;
-    --surface: #171e23;
-    --surface-alt: #12231e;
-    --surface-warm: #2a1d12;
-    --surface-cool: #142133;
-    --surface-risk: #2b1715;
-    --surface-dark: #070b0e;
-    --ink-on-dark: #f2f5f3;
-    --muted-on-dark: #aab8b2;
-    --accent-data: #54a8e8;
-    --accent-risk: #ff755f;
-    --accent-opportunity: #39c99a;
-    --accent-conclusion: #b691f2;
-    --accent-gold: #e0b24d;
-    --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  :root:not([data-theme="light"]) {
+    --bg: #101514;
+    --surface: #161d1b;
+    --card: #1c2422;
+    --ink: #e8efec;
+    --muted: #aab5b1;
+    --line: #34413d;
+    --accent: #58d0b5;
+    --accent2: #79a9f1;
+    --accent3: #f08375;
+    --accent4: #c89be7;
+    --data-bg: #17362f;
+    --risk-bg: #3b211f;
+    --opportunity-bg: #1c2e49;
+    --conclusion-bg: #32243d;
+    --warm-bg: #382f1d;
+    --dark-panel: #09100f;
+    --dark-panel-ink: #e9f5f1;
+    --hl: #715916;
+    --hl2: #175445;
+    --shadow: rgba(0, 0, 0, 0.28);
+    --code-bg: #222c29;
   }
 }
+:root[data-theme="dark"] {
+  --bg: #101514;
+  --surface: #161d1b;
+  --card: #1c2422;
+  --ink: #e8efec;
+  --muted: #aab5b1;
+  --line: #34413d;
+  --accent: #58d0b5;
+  --accent2: #79a9f1;
+  --accent3: #f08375;
+  --accent4: #c89be7;
+  --data-bg: #17362f;
+  --risk-bg: #3b211f;
+  --opportunity-bg: #1c2e49;
+  --conclusion-bg: #32243d;
+  --warm-bg: #382f1d;
+  --dark-panel: #09100f;
+  --dark-panel-ink: #e9f5f1;
+  --hl: #715916;
+  --hl2: #175445;
+  --shadow: rgba(0, 0, 0, 0.28);
+  --code-bg: #222c29;
+}
 * { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 body {
   margin: 0;
-  background: var(--bg);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", sans-serif;
-  line-height: 1.7;
+  background: var(--bg);
+  font-family: "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.75;
 }
-main { width: min(1120px, calc(100% - 36px)); margin: 0 auto; }
+a { color: var(--accent2); }
+code {
+  padding: 0.1em 0.35em;
+  border-radius: 0.35em;
+  background: var(--code-bg);
+  font-family: Consolas, monospace;
+}
 .hero {
-  margin: 26px auto 0;
-  padding: 54px 56px;
-  background: var(--surface-dark);
-  color: var(--ink-on-dark);
-  border-radius: 0 0 28px 28px;
-  box-shadow: var(--shadow);
+  padding: clamp(3rem, 8vw, 7rem) max(6vw, calc((100vw - 1120px) / 2));
+  color: var(--dark-panel-ink);
+  background: var(--dark-panel);
 }
-.kicker {
-  color: var(--accent-gold);
+.eyebrow {
+  color: var(--accent);
+  font-size: 0.78rem;
   font-weight: 800;
-  letter-spacing: 0;
-  margin: 0 0 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
-h1 {
+.hero h1 {
+  max-width: 900px;
+  margin: 0.4rem 0 0.5rem;
+  font-size: clamp(2.2rem, 6vw, 5rem);
+  line-height: 1.08;
+}
+.original-title {
+  max-width: 850px;
   margin: 0;
-  font-size: clamp(34px, 6vw, 68px);
-  line-height: 1.05;
-  letter-spacing: 0;
+  color: var(--muted);
+  font-size: clamp(1rem, 2vw, 1.3rem);
 }
-.original {
-  margin: 14px 0 24px;
-  color: var(--muted-on-dark);
-  font-size: 18px;
+.source-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-top: 2rem;
 }
-.lede {
-  max-width: 780px;
-  margin: 0;
-  font-size: 22px;
-  color: var(--ink-on-dark);
+.source-meta span,
+.source-meta a {
+  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--dark-panel-ink);
+  text-decoration: none;
 }
-.number-band {
+.summary-shell {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 4rem 1.25rem 5rem;
+}
+.lead {
+  margin: 0 0 3rem;
+  padding: 1.6rem 2rem;
+  border-left: 7px solid var(--accent4);
+  background: var(--conclusion-bg);
+  font-size: clamp(1.2rem, 2.5vw, 1.75rem);
+  font-weight: 700;
+}
+.metric-band {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  margin: 34px 0;
-  background: var(--line);
-  border: 1px solid var(--line);
+  overflow: hidden;
+  margin: 2rem 0 3.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 16px 42px var(--shadow);
 }
 .metric {
-  background: var(--surface);
-  padding: 24px;
+  min-height: 155px;
+  padding: 1.4rem;
+  background: var(--data-bg);
+  border-right: 1px solid var(--line);
 }
+.metric:nth-child(2) { background: var(--risk-bg); }
+.metric:nth-child(3) { background: var(--opportunity-bg); }
+.metric:nth-child(4) { background: var(--warm-bg); border-right: 0; }
 .metric strong {
   display: block;
-  color: var(--accent-data);
-  font-size: 34px;
+  color: var(--accent);
+  font-size: clamp(2rem, 4vw, 3.5rem);
   line-height: 1;
-  margin-bottom: 8px;
 }
-.metric span { color: var(--muted); font-size: 14px; }
+.metric:nth-child(2) strong { color: var(--accent3); }
+.metric:nth-child(3) strong { color: var(--accent2); }
+.metric:nth-child(4) strong { color: var(--accent4); }
+.metric small { display: block; margin-top: 0.8rem; color: var(--muted); }
 .split {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 28px;
-  margin: 42px 0;
+  gap: 1.5rem;
+  margin: 3rem 0;
 }
-.panel {
-  padding: 30px;
-  background: var(--surface-alt);
-  border-left: 8px solid var(--accent-opportunity);
+.split article {
+  padding: 2rem;
+  border-top: 6px solid var(--accent3);
+  background: var(--risk-bg);
 }
-.panel.risk {
-  background: var(--surface-risk);
-  border-left-color: var(--accent-risk);
+.split article:last-child {
+  border-color: var(--accent4);
+  background: var(--conclusion-bg);
 }
-h2 {
-  margin: 0 0 12px;
-  font-size: 26px;
-  line-height: 1.25;
-  letter-spacing: 0;
-}
-p { margin: 0 0 12px; }
-.flow {
-  margin: 42px 0;
-  padding: 34px;
-  background: var(--surface-cool);
-}
-.flow-row {
-  display: grid;
-  grid-template-columns: 160px 1fr;
-  gap: 22px;
-  padding: 20px 0;
-  border-top: 1px solid var(--line);
-}
-.flow-row:first-of-type { border-top: 0; }
-.time {
-  color: var(--accent-conclusion);
-  font-weight: 900;
-  font-size: 20px;
-}
-.table-wrap {
-  margin: 42px 0;
+.split h2, .timeline h2, .takeaways h2 { margin-top: 0; }
+.hl { background: var(--hl); font-weight: 800; }
+.hl2 { background: var(--hl2); font-weight: 800; }
+.timeline {
+  margin: 4rem 0;
+  padding: 2.5rem;
   background: var(--surface);
   border: 1px solid var(--line);
-  overflow-x: auto;
 }
-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 720px;
+.timeline ol { padding-left: 1.4rem; }
+.timeline li { margin: 1.4rem 0; padding-left: 0.7rem; }
+.timeline li::marker { color: var(--accent2); font-weight: 800; }
+.insight-strip {
+  margin: 3rem 0;
+  padding: 2.2rem;
+  color: var(--dark-panel-ink);
+  background: var(--dark-panel);
+  border-bottom: 8px solid var(--accent);
+  font-size: 1.18rem;
 }
-th, td {
-  padding: 18px;
-  text-align: left;
-  border-bottom: 1px solid var(--line);
-  vertical-align: top;
-}
-th {
-  background: var(--surface-warm);
-  color: var(--ink);
-}
-.tag-risk { color: var(--accent-risk); font-weight: 800; }
-.tag-data { color: var(--accent-data); font-weight: 800; }
-.tag-opportunity { color: var(--accent-opportunity); font-weight: 800; }
-.insight {
-  margin: 42px 0;
-  padding: 28px 34px;
-  background: var(--surface-dark);
-  color: var(--ink-on-dark);
-  border-left: 10px solid var(--accent-gold);
-}
-.insight p {
-  font-size: 23px;
-  line-height: 1.45;
-  margin: 0;
-}
-.mosaic {
+.takeaways { margin-top: 4rem; }
+.takeaway-grid {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr 1fr;
-  gap: 16px;
-  margin: 42px 0 60px;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 1rem;
 }
-.tile {
-  min-height: 170px;
-  padding: 24px;
+.takeaway {
+  padding: 1.5rem;
+  background: var(--opportunity-bg);
+  border: 1px solid var(--line);
+}
+.takeaway:nth-child(2) { background: var(--risk-bg); }
+.takeaway:nth-child(3) { background: var(--data-bg); }
+.takeaway:nth-child(4) { background: var(--conclusion-bg); }
+.translation {
   background: var(--surface);
-  border-top: 7px solid var(--accent-conclusion);
+  border-top: 1px solid var(--line);
 }
-.tile:nth-child(2) {
-  background: var(--surface-risk);
-  border-top-color: var(--accent-risk);
+.translation-inner {
+  max-width: 790px;
+  margin: 0 auto;
+  padding: 5rem 1.25rem 7rem;
 }
-.tile:nth-child(3) {
-  background: var(--surface-alt);
-  border-top-color: var(--accent-opportunity);
+.translation h2 {
+  margin: 0 0 2rem;
+  font-size: clamp(2rem, 5vw, 3.5rem);
 }
-.tile:nth-child(4) {
-  grid-column: span 2;
-  background: var(--surface-cool);
-  border-top-color: var(--accent-data);
+.translation h3 {
+  margin-top: 3.2rem;
+  padding-bottom: 0.45rem;
+  color: var(--accent);
+  border-bottom: 2px solid var(--line);
+  font-size: 1.65rem;
 }
-.tile:nth-child(5) {
-  background: var(--surface-warm);
-  border-top-color: var(--accent-gold);
+.translation h4 {
+  margin: 2rem 0 0.7rem;
+  color: var(--accent2);
+  font-size: 1.15rem;
 }
-.tile h3 {
-  margin: 0 0 10px;
-  font-size: 20px;
+.translation p, .translation li { font-size: 1.05rem; }
+.translation .standfirst {
+  padding: 1rem 1.2rem;
+  background: var(--warm-bg);
+  border-left: 5px solid var(--accent4);
+  font-size: 1.25rem;
+  font-weight: 700;
 }
-.badge {
-  display: inline-block;
-  padding: 4px 10px;
-  margin-bottom: 10px;
-  border-radius: 999px;
-  background: var(--surface-dark);
-  color: var(--ink-on-dark);
+.contents {
+  padding: 1.2rem 1.5rem;
+  background: var(--code-bg);
+  border-radius: 0.8rem;
+  columns: 2;
+}
+.contents li { break-inside: avoid; }
+.finding {
+  margin: 1rem 0;
+  padding: 1rem 1.2rem;
+  border-left: 5px solid var(--accent3);
+  background: var(--risk-bg);
+}
+.label {
+  margin-top: 1.5rem;
+  color: var(--muted);
+  font-size: 0.82rem;
   font-weight: 800;
-  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
-@media (max-width: 780px) {
-  main { width: min(100% - 22px, 1120px); }
-  .hero { padding: 36px 24px; border-radius: 0 0 20px 20px; }
-  .lede { font-size: 18px; }
-  .number-band, .split, .mosaic { grid-template-columns: 1fr; }
-  .flow-row { grid-template-columns: 1fr; gap: 6px; }
-  .tile:nth-child(4) { grid-column: auto; }
+.placeholder {
+  padding: 0.7rem 1rem;
+  color: var(--muted);
+  background: var(--code-bg);
+  border-left: 3px solid var(--line);
+  font-family: Consolas, monospace;
+}
+figure[data-source-image],
+.source-figure {
+  margin: 3.5rem 0;
+}
+figure[data-source-image] img,
+.source-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0.8rem;
+}
+figcaption {
+  margin-top: 0.65rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.footer-note {
+  margin-top: 4rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+}
+@media (max-width: 760px) {
+  .metric-band, .split, .takeaway-grid { grid-template-columns: 1fr; }
+  .metric { border-right: 0; border-bottom: 1px solid var(--line); }
+  .contents { columns: 1; }
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -383,134 +439,235 @@ th {
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/why-we-no-longer-evaluate-swe-bench-verified" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<header class="hero">
+<div class="eyebrow">OpenAI · Research · 2026</div>
+<h1>为何 SWE-bench Verified 已无法衡量前沿编程能力</h1>
+<p class="original-title" lang="en">Why SWE-bench Verified no longer measures frontier coding capabilities</p>
+<div class="source-meta">
+<span>2026 年 2 月 23 日</span>
+<span>研究</span>
+<a href="https://openai.com/index/why-we-no-longer-evaluate-swe-bench-verified">阅读原文</a>
+</div>
+</header>
 <main>
-  <section class="hero">
-    <p class="kicker">一句话总括</p>
-    <h1>为什么 SWE-bench Verified 不再衡量前沿编码能力</h1>
-    <p class="original">Why SWE-bench Verified no longer measures frontier coding capabilities</p>
-    <p class="lede">文章的核心贡献不是宣布一个榜单过时，而是解释为什么公开、自动评分的编程基准会在模型变强后失去信号：测试缺陷会压低真实能力，训练污染会抬高表面分数。</p>
-  </section>
-
-  <section class="number-band" aria-label="关键数字">
-    <div class="metric"><strong>500</strong><span>SWE-bench Verified 最终保留的问题数。</span></div>
-    <div class="metric"><strong>27.6%</strong><span>OpenAI 审计的数据集子集比例。</span></div>
-    <div class="metric"><strong>59.4%</strong><span>被审计问题存在实质测试或题面缺陷。</span></div>
-    <div class="metric"><strong>74.9%→80.9%</strong><span>近 6 个月最先进成绩的变化。</span></div>
-  </section>
-
-  <section class="split">
-    <div class="panel">
-      <h2>问题不只是模型失败</h2>
-      <p>SWE-bench Verified 最初是为修正原版 SWE-bench 的噪声而建。它从 1,699 个问题中筛出 500 个问题，并由三名专家独立审核。</p>
-      <p>但当前模型接近高分区后，剩余失败不再能直接解释为能力不足。测试和题面本身开始成为主要干扰源。</p>
+<section class="summary-shell" id="summary">
+<p class="lead">一句话总括：这项研究表明，当测试本身存在缺陷，又有题目和答案进入训练数据时，基准高分便不再等同于真实的软件工程能力进步。</p>
+<div aria-label="关键数据" class="metric-band">
+<div class="metric"><strong>138</strong><small>接受深入审计的题目，均是 o3 在 64 次运行中无法稳定解决的任务。</small></div>
+<div class="metric"><strong>59.4%</strong><small>受审题目存在实质性的测试设计或问题描述缺陷。</small></div>
+<div class="metric"><strong>74.9→80.9%</strong><small>最近 6 个月的领先成绩变化，提升已经明显放缓。</small></div>
+<div class="metric"><strong>3 家</strong><small>被测前沿模型提供商都出现了强污染证据。</small></div>
+</div>
+<div class="split">
+<article>
+<h2>测试会拒绝正确答案</h2>
+<p>审计覆盖完整数据集的 <span class="hl">27.6%</span>。在这 138 道高难题中，<span class="hl">35.5%</span> 的测试过窄，强制要求无关紧要的实现细节。</p>
+<p>另有 <span class="hl">18.8%</span> 的测试过宽，检查了题目没有提出的功能。还有 5.1% 存在其他问题。</p>
+<p>因此，模型失败不一定说明它不会修复缺陷，也可能只是没有猜中隐藏测试的具体期待。</p>
+</article>
+<article>
+<h2>训练数据暴露会抬高成绩</h2>
+<p>GPT-5.2、Claude Opus 4.5 和 Gemini 3 Flash Preview 都能复现某些题目的原始修复或逐字细节。</p>
+<p>见过答案的模型更容易补全题目没有写明的信息，从而通过本来就不充分的测试。</p>
+<p>这意味着成绩越来越多地反映<span class="hl2">训练时接触过多少基准材料</span>，而不是真实开发能力。</p>
+</article>
+</div>
+<section class="timeline">
+<h2>基准为何逐渐失去区分力</h2>
+<ol>
+<li><strong>2023 年：</strong>原始 SWE-bench 从 12 个开源 Python 仓库的 GitHub 问题和 PR 中构建。</li>
+<li><strong>2024 年：</strong>三名专家分别审查候选题。团队从 1,699 道题中筛出 500 道，形成 SWE-bench Verified。</li>
+<li><strong>能力逼近上限：</strong>领先成绩升至 80.9% 后，剩余失败越来越受数据集缺陷影响。</li>
+<li><strong>污染累积：</strong>公开仓库、题目、修复和讨论可能进入训练语料，模型由此获得额外线索。</li>
+<li><strong>评测迁移：</strong>OpenAI 停止报告 SWE-bench Verified，并暂时建议使用污染更少的 SWE-bench Pro。</li>
+</ol>
+</section>
+<div class="insight-strip">
+<strong>关键转变：</strong>过去，SWE-bench Verified 的进步能较好地代表自主软件工程能力提升。如今，同一分数混合了真实能力、隐藏测试猜测能力和训练数据暴露程度，三者已经难以分离。
     </div>
-    <div class="panel risk">
-      <h2>测试同时过窄和过宽</h2>
-      <p>在 138 个被审计问题中，35.5% 的测试强制特定实现细节。功能正确但形式不同的解法会被拒绝。</p>
-      <p>另有 18.8% 的测试覆盖题面没有说明的额外功能。模型修对了题面要求，仍会因为隐藏范围失败。</p>
-    </div>
-  </section>
-
-  <section class="flow">
-    <h2>基准信号如何变弱</h2>
-    <div class="flow-row">
-      <div class="time">2023</div>
-      <div>SWE-bench 发布。任务来自 12 个开源 Python 仓库的已解决 GitHub issue 和对应 PR。模型只能看 issue 和修复前仓库，不能看测试。</div>
-    </div>
-    <div class="flow-row">
-      <div class="time">2024 年 8 月</div>
-      <div>SWE-bench Verified 发布。它通过人工审核减少不可解题、过拟合测试和环境噪声，一度成为前沿模型发布中的标准指标。</div>
-    </div>
-    <div class="flow-row">
-      <div class="time">2026</div>
-      <div>OpenAI 发现剩余失败大量来自测试缺陷。同时，公开题目和 gold patch 已可能进入训练数据，得分越来越难代表真实工程能力。</div>
-    </div>
-  </section>
-
-  <section class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>失真来源</th>
-          <th>关键证据</th>
-          <th>为什么改变理解</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><span class="tag-risk">过窄测试</span></td>
-          <td>35.5% 的审计任务强制具体函数名、参数名或实现路径。</td>
-          <td>自动评分可能惩罚正确工程解法。模型分数低不一定代表模型不会做。</td>
-        </tr>
-        <tr>
-          <td><span class="tag-risk">过宽测试</span></td>
-          <td>18.8% 的审计任务测试了题面没有说明的额外功能。</td>
-          <td>模型无法从题面推断完整目标。失败可能来自需求缺失，而不是推理失败。</td>
-        </tr>
-        <tr>
-          <td><span class="tag-data">训练污染</span></td>
-          <td>GPT-5.2、Claude Opus 4.5 和 Gemini 3 Flash 都能复现部分 gold patch 或题面细节。</td>
-          <td>高分可能反映模型训练时见过答案。榜单提升不再等同于真实编码能力提升。</td>
-        </tr>
-        <tr>
-          <td><span class="tag-opportunity">替代方向</span></td>
-          <td>OpenAI 建议报告 SWE-bench Pro，并继续投入私有原创评测。</td>
-          <td>未来评测需要更少公开污染，并用更稳健的人工或综合评分补足单元测试缺陷。</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="insight">
-    <p>当模型足够强时，基准的质量会成为能力测量的上限。SWE-bench Verified 的问题显示，AI 编程评测不能只问“模型通过了多少测试”，还要问“这些测试是否真的代表任务”。</p>
-  </section>
-
-  <section class="split">
-    <div class="panel risk">
-      <h2>污染让高分变得可疑</h2>
-      <p>这些任务来自公开仓库。问题、PR、测试和讨论都可能被模型训练流程收集。</p>
-      <p>OpenAI 的红队流程让 GPT-5 反复探测目标模型。目标模型在部分任务上能说出原始补丁或非常具体的题面细节。</p>
-      <p>这说明污染不是抽象风险。它会把“解题能力”变成“是否见过答案”的混合信号。</p>
-    </div>
-    <div class="panel">
-      <h2>SWE-bench Pro 只是过渡答案</h2>
-      <p>文章没有声称 SWE-bench Pro 完美。它只是目前污染更少，且没有模型能完整逐字输出 gold patch。</p>
-      <p>更根本的方向是私有原创任务。比如 GDPVal 由领域专家私下编写任务，再由训练过的评审综合评分。</p>
-      <p>这种做法成本更高，但更适合测量真正的能力进步。</p>
-    </div>
-  </section>
-
-  <section class="mosaic">
-    <div class="tile">
-      <span class="badge">洞见 1</span>
-      <h3>公开基准会老化</h3>
-      <p>越成功的公开基准，越容易进入训练数据和社区讨论。它的影响力会反过来削弱它的测量价值。</p>
-    </div>
-    <div class="tile">
-      <span class="badge">洞见 2</span>
-      <h3>自动测试不是事实本身</h3>
-      <p>测试只是一种代理信号。过窄或过宽的测试都会让正确性判断偏离真实任务。</p>
-    </div>
-    <div class="tile">
-      <span class="badge">洞见 3</span>
-      <h3>高分可能来自记忆</h3>
-      <p>模型能复现 gold patch 时，评测就混入了训练暴露因素。榜单分数需要污染审计配套解释。</p>
-    </div>
-    <div class="tile">
-      <span class="badge">洞见 4</span>
-      <h3>前沿能力需要私有任务</h3>
-      <p>越接近前沿模型发布，越需要原创、未公开、难以被训练污染的评测。否则进步曲线会失真。</p>
-    </div>
-    <div class="tile">
-      <span class="badge">洞见 5</span>
-      <h3>读榜单要看评测机制</h3>
-      <p>真正有价值的指标不只是分数。还包括题目来源、测试质量、污染过滤和人工复核方式。</p>
-    </div>
-  </section>
+<section class="split">
+<article>
+<h2>这改变了我们如何理解 AI 编程能力</h2>
+<p>单个公开 benchmark 的高分不能直接证明模型更擅长现实开发。尤其当任务来自常见开源仓库时，必须先检查污染。</p>
+<p>自动测试也不是天然客观。测试若绑定特定函数名，或检查未说明的需求，就会把有效方案误判为失败。</p>
+</article>
+<article>
+<h2>更可靠的评测方向</h2>
+<p>公开数据集需要更严格的训练数据过滤、canary string 和额外污染检测。题目及答案的发布方式也要更谨慎。</p>
+<p>OpenAI 还主张建设由专家私下编写、采用整体人工评分的任务。GDPVal 体现了这种方向，代价则是更高的资源投入。</p>
+</article>
+</section>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="takeaway-grid">
+<div class="takeaway"><strong>高分可能不再代表进步。</strong><br/>当公开题目进入训练数据后，成绩会混入记忆和先验暴露带来的优势。</div>
+<div class="takeaway"><strong>失败也可能不是能力不足。</strong><br/>59.4% 的受审难题存在实质缺陷，隐藏测试会否定部分功能正确的方案。</div>
+<div class="takeaway"><strong>自动评分必须同时避免过窄和过宽。</strong><br/>它既不能强制无关实现细节，也不能检查题目未提出的功能。</div>
+<div class="takeaway"><strong>下一代评测会更昂贵。</strong><br/>私下原创题目、整体人工评分和持续污染检测，正成为衡量真实能力的必要成本。</div>
+</div>
+</section>
+</section>
+<section class="translation" id="translation">
+<div class="translation-inner">
+<h2>完整译文</h2>
+<p class="standfirst">SWE-bench Verified 正受到越来越严重的污染。我们建议改用 SWE-bench Pro。</p>
+<nav aria-label="文章目录">
+<ul class="contents">
+<li>背景</li>
+<li>测试范围过窄与过宽</li>
+<li>污染</li>
+<li>GPT-5.2</li>
+<li>Claude Opus 4.5</li>
+<li>Gemini 3 Flash</li>
+<li>讨论</li>
+</ul>
+</nav>
+<nav aria-label="重复的文章目录">
+<ul class="contents">
+<li>背景</li>
+<li>测试范围过窄与过宽</li>
+<li>污染</li>
+<li>GPT-5.2</li>
+<li>Claude Opus 4.5</li>
+<li>Gemini 3 Flash</li>
+<li>讨论</li>
+</ul>
+</nav>
+<p>自从我们在 2024 年 8 月首次发布 SWE-bench Verified 后，业界一直广泛使用它衡量模型执行自主软件工程任务的进展。发布之后，SWE-bench Verified 有效反映了能力提升，并成为前沿模型发布时普遍报告的标准指标。</p>
+<p>跟踪和预测这些能力的发展，也是 OpenAI《Preparedness Framework》的重要组成部分。最初创建 Verified benchmark 时，我们试图解决原始 SWE-bench 数据集中会导致某些任务根本无法完成的问题。</p>
+<p>经历早期的大幅跃升后，SWE-bench Verified 的领先成绩已经放缓。最近 6 个月，最佳成绩从 74.9% 提升到 80.9%。这引出了一个问题：剩余失败究竟反映了模型的局限，还是数据集本身的特性？</p>
+<p>在一项新分析中，我们发现 Verified 数据集存在两大问题。这些问题表明，在模型达到当前性能水平后，该 benchmark 已不再适合用于衡量前沿模型发布时的自主软件工程能力进展。</p>
+<div class="finding"><strong>测试会拒绝正确方案：</strong>我们审计了数据集中模型经常无法解决的 27.6% 子集。结果发现，至少 59.4% 的受审问题包含有缺陷的测试用例。这些测试会拒绝功能正确的提交。尽管我们最初创建 SWE-bench Verified 时已尽力改善这一点，问题仍然存在。</div>
+<div class="finding"><strong>使用解答进行训练：</strong>大型前沿模型可以从训练材料中学习信息，因此绝不能使用将要评测的问题和解答来训练模型。这就像在考试前把题目和答案交给学生。学生未必会死记答案，但看过答案的人肯定比没看过的人更有优势。</div>
+<p>SWE-bench 的问题来自开源仓库，而许多模型提供商都会使用这些仓库进行训练。我们的分析发现，所有受测前沿模型都能在某些任务中复现原始的人类修复。这个作为真值参考的修复被称为 gold patch。模型有时也能逐字复现题目陈述中的特定细节。这说明所有模型都至少在训练时见过一部分问题和解答。</p>
+<p>我们还发现，有证据表明，在训练时见过这些问题的模型更容易成功。原因是它们掌握了通过信息不充分的测试所需的额外信息。</p>
+<p>这意味着，SWE-bench Verified 的成绩提升已经无法反映模型在真实软件开发能力上的实质进步。相反，成绩越来越多地取决于模型在训练期间接触过多少 benchmark 内容。</p>
+<p>正因如此，我们已停止报告 SWE-bench Verified 成绩。我们也建议其他模型开发者停止报告这项成绩。</p>
+<p>我们正在构建新的、未受污染的评测，以便更准确地跟踪编程能力。我们认为，这也是整个研究界应重点投入的领域。在这些新评测完成之前，OpenAI 建议报告 SWE-bench Pro 的结果。</p>
+<h3>背景</h3>
+<p>最初的 SWE-bench 评测发布于 2023 年。每道题都来自 12 个开源 Python 仓库之一，其中一个已经解决的 GitHub issue。题目还会与对应的 pull request（PR）配对。</p>
+<p>为了判断模型生成的代码修改是否正确，每道题都配有两组测试：</p>
+<ul>
+<li>第一组测试在未修改的代码库上会失败，在问题得到正确修复后则会通过。</li>
+<li>回归测试在修复前后都应通过，用于确保无关功能没有受到破坏。</li>
+</ul>
+<p>模型看不到这些测试。它只能根据原始 issue 文本，以及修复前的仓库状态来生成代码修改。应用修改后，只有全部测试都通过，模型才算完成这道题。</p>
+<p>我们发现，原始评测存在许多可能低估模型能力的问题。</p>
+<ul>
+<li>部分单元测试过于具体，或者与任务不一致，因此可能拒绝正确修复。</li>
+<li>许多任务描述没有提供足够信息，因而可能存在多种合理理解，但测试只覆盖其中一种。</li>
+<li>某些测试会因环境配置不同而意外失败。例如，Linux 与 Windows 的差异，或 Python 版本的差异，都可能导致这种情况。</li>
+</ul>
+<p>我们在 2024 年创建了 SWE-bench Verified，以解决这些问题。我们与软件工程专家合作，审查了 1,699 道 SWE-bench 题目，并滤除存在上述问题的任务。</p>
+<p>每道题都由三名专家独立审查。这个过程最终产生了 SWE-bench Verified，其中包含经过筛选的 500 道题。</p>
+<h3>测试范围过窄与过宽</h3>
+<p>SWE-bench Verified 相比初始版本有很大改进，但仍然残留了一些问题。</p>
+<p>我们审计了 138 道 SWE-bench Verified 题目。OpenAI o3 在 64 次独立运行中无法稳定解决这些任务。每道题都由至少六名经验丰富的软件工程师独立审查。如果有专家标记出问题，另一个团队还会再次核验。</p>
+<p>我们发现，138 道题中有 59.4% 在测试设计、问题描述或两者上存在实质问题。即使对能力最强的模型或人类而言，这些问题也会变得极难解决，甚至不可能解决。</p>
+<ul>
+<li>受审任务中有 35.5% 包含严格测试。这些测试会强制要求特定实现细节，从而否定许多功能正确的提交。我们称之为“过窄测试用例”。</li>
+<li>受审任务中有 18.8% 的测试检查了问题描述中没有提出的额外功能。我们称之为“过宽测试用例”。</li>
+<li>剩余 5.1% 的任务存在其他问题，无法很好地归入上述分类。</li>
+</ul>
+<p>第一种失败模式的一个典型例子是 <code>pylint-dev__pylint-4551</code>。在该任务对应的 PR 中，整体解决方案引入了一个名为 <code>get_annotation</code> 的新函数。</p>
+<p>问题描述并未提到这个函数名，但测试会直接导入它。某些模型可能会凭直觉创建这个函数。然而，要正确解决问题，并不一定非要实现一个具有该名称的函数。许多有效方案最终都因导入错误而无法通过测试。</p>
+<h4>问题描述</h4>
+<p class="placeholder">纯文本</p>
+<h4>PR 测试片段</h4>
+<p class="placeholder">Python</p>
+<h4>PR 测试失败信息（为便于阅读，内容已截断）</h4>
+<p class="placeholder">Python</p>
+<p>测试范围过宽的一个例子是 <code>sympy__sympy-18199</code>。这道题来自一个 PR。该 PR 处理了 <code>nthroot_mod</code> 函数的三个不同问题，分别是 #17373、#17377 和 #18212。</p>
+<p>然而，SWE-bench Verified 的题目描述只涵盖了最后一个问题，也就是 #18212。这就造成了不匹配：PR 测试覆盖全部三个问题，题目描述却只说明了其中一个。</p>
+<p>在我们的运行中，模型经常能正确实现题目所描述的修复，随后却在另外两个问题对应的测试上失败。</p>
+<h4>原始 PR 描述（来自 GitHub PR）</h4>
+<p class="placeholder">纯文本</p>
+<h4>#18212 的问题描述</h4>
+<p class="placeholder">纯文本</p>
+<h4>SWE-bench Verified 任务的问题描述（仅取自 #18212）</h4>
+<p class="placeholder">纯文本</p>
+<h3>污染</h3>
+<p>SWE-bench Verified 及其使用的仓库，包括代码库和发布说明，都是开源内容。它们被广泛使用和讨论，因此模型开发者很难完全避开污染。</p>
+<p>我们最先在自己的模型中发现了污染迹象。例如，GPT-5.2 解决了 31 道我们认定几乎不可能完成的任务。</p>
+<p>在 <code>django__django-14725</code> 中，测试要求使用一个特定的新参数 <code>edit_only</code>，但题目并未明确提出这一要求。GPT-5.2 在解决问题时，其思维链显示它掌握了发布说明中的信息。这些说明详细记录了代码库的变化。模型还正确识别出，<code>edit_only</code> 参数是在 Django 4.1 中引入的。</p>
+<h4>GPT-5.2 思维链</h4>
+<p class="placeholder">纯文本</p>
+<p>为了评估污染在更大范围内有多严重，我们建立了一套自动化红队测试系统。针对每道 SWE-bench Verified 题目，我们让 GPT-5 探测 GPT-5.2-Chat、Claude Opus 4.5 和 Gemini 3 Flash Preview 是否受到污染。</p>
+<p>我们选择的都不是推理模型。不过，我们承认这些模型之间可能存在不可忽视的能力差距。</p>
+<p>在污染探测中，GPT-5 会获得 SWE-bench Verified 任务的 ID、描述、gold patch 和 PR 测试。在 15 轮交互中，我们允许 GPT-5 改变 system/developer prompt、user prompt、assistant prefill，并尝试不同的诱导策略。</p>
+<p>每轮结束后，一个 judge model 会判断响应中出现了多少新的、与特定任务有关的信息。每个响应还会得到污染严重程度标签，范围从“无”到“强”。</p>
+<p>GPT-5 可以根据前几轮的结果调整策略，逐步恢复任务特有的细节。对于每个被判定为强污染的例子，我们还会使用另一个 judge 确认 GPT-5 没有向目标模型泄露过多信息。</p>
+<p>最后，我们人工审查了判定为“强”的例子。本文展示的对话记录就来自这些样本。</p>
+<p>下面是不同模型提供商出现强污染的例子。</p>
+<h3>GPT-5.2</h3>
+<p>只给出题目描述中的一小段内容后，GPT-5.2 就输出了完全一致的 gold patch。具体来说，它知道准确的类名和方法名，也知道新加入的提前返回条件：<code>if username is None or password is None</code>。</p>
+<p><strong>任务 ID：</strong><code>django__django-11451</code></p>
+<h4>污染诱导</h4>
+<h4>问题陈述</h4>
+<h4>用户提示</h4>
+<h4>模型响应</h4>
+<h4>Gold patch</h4>
+<p class="placeholder">Python</p>
+<h3>Claude Opus 4.5</h3>
+<p>Opus 不仅能回忆出该 PR 引入的四行功能修改，还能准确指出修改涉及的文件名和方法。它甚至逐字引用了 diff 中的行内注释。</p>
+<p><strong>任务 ID：</strong><code>astropy__astropy-13236</code></p>
+<h4>污染诱导</h4>
+<h4>用户提示</h4>
+<h4>预填内容</h4>
+<h4>助手响应</h4>
+<h4>Gold patch</h4>
+<p class="placeholder">Python</p>
+<h3>Gemini 3 Flash</h3>
+<p>除了任务 ID 外，没有提供任何其他任务信息，Gemini 3 Flash 仍能逐字输出题目描述和 gold patch 中的细节。其中包括用于验证用户名的新正则表达式，以及修改发生的准确行号。</p>
+<p><strong>任务 ID：</strong><code>django__django-11099</code></p>
+<h4>污染诱导</h4>
+<h4>问题陈述</h4>
+<h4>用户提示</h4>
+<h4>预填内容</h4>
+<h4>模型响应</h4>
+<h4>Gold patch</h4>
+<p class="placeholder">Python</p>
+<h3>讨论</h3>
+<p>通过这次对 SWE-bench Verified 的审计，我们总结出两条更普遍的评测设计经验。</p>
+<p>第一，使用公开材料构建的 benchmark 会面临污染风险。训练数据暴露可能在不易察觉的情况下抬高成绩。如果 benchmark 使用公开抓取的数据构建，模型开发者就应增加额外的污染检测。</p>
+<p>公开发布的 benchmark，甚至它们的解答，都可能进入训练数据。无论是数据集的发布方式，还是训练数据过滤，都需要格外谨慎。例如，可以采用密码保护，并严格遵循 canary string。</p>
+<p>第二，自动评分很难做到准确。理想的测试用例应充分验证功能是否正确。它既不能依赖无关紧要的具体实现细节，也必须能抵御走捷径的方案。</p>
+<p>这些问题本身非常复杂，也很难解决。为了发现它们，我们开展了多轮大规模人工标注。</p>
+<p>我们已经将这些发现纳入近期的评测工作。过去几个月，我们选择报告 SWE-bench Pro 公开划分的结果。我们建议其他模型开发者也这样做。</p>
+<p>SWE-bench Pro 并不完美，但从实证结果看，它受到的污染似乎更少。我们的污染检测流程在其中发现了一些污染案例，但这些情况远少于 SWE-bench Verified，严重程度也低得多。没有任何模型能完整、逐字地输出 gold patch。</p>
+<p>我们会继续投资建设原创且由作者私下编写的 benchmark，也希望产业界和学术界共同投入。</p>
+<p>在 GDPVal 中，任务由领域专家私下编写，因此降低了暴露风险。解答则由经过培训的评审人员进行整体评分。</p>
+<p>这种方法需要投入大量资源。但要衡量真实的能力进步，它正变得越来越必要。</p>
+<p class="footer-note">2026</p>
+<p>作者</p>
+<p>继续阅读</p>
+<figure class="source-figure" data-source-image="0"><img alt="GPT-Red art card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/6q32m87ClqE8Ovn6vD424h/05ced72e47bbe42711fbac6a082cbff2/Art_Card.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="1"><img alt="Separating signal from noise &gt; Art Card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/7j6M3prKIsTmV6cbMaHjhZ/e66f7cdd98c66c99546853cbc22cfe84/Seperating-signal-from-noise-card.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="2"><img alt="Introducing GeneBench-Pro &gt; Cover image" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/7sbJaKBi5qLXAqbewh72aK/93197556e903eac9df6f077eb12b7581/GenebenchPro_Blog_ArtCard.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+</div>
+</section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

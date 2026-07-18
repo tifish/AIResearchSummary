@@ -1,261 +1,473 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>关于 Composer 2 的技术报告</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Composer 2 技术报告</title>
 <style>
 :root {
-  --bg: #f7f4ed;
-  --ink: #182026;
-  --muted: #66717a;
-  --line: #d9d2c3;
-  --surface: #fffaf0;
-  --surface2: #eef6f2;
-  --surface3: #f1efff;
-  --band: #17212b;
-  --band-ink: #f7f4ed;
-  --data: #1769aa;
-  --risk: #b6463a;
-  --opportunity: #267a4c;
-  --conclusion: #7b4bc4;
-  --hl: #ffe2a7;
-  --hl2: #d7ecff;
-  --shadow: rgba(24, 32, 38, .12);
+  color-scheme: light dark;
+  --bg: #f6f3ec;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #1c2430;
+  --muted: #68717d;
+  --line: #d8d5cc;
+  --accent: #3157c8;
+  --accent2: #00816f;
+  --accent3: #d15b32;
+  --accent4: #7b4bb7;
+  --data-bg: #e4ecff;
+  --risk-bg: #ffe7df;
+  --opportunity-bg: #dcf5ed;
+  --conclusion-bg: #eee4ff;
+  --hero-bg: #17213b;
+  --hero-ink: #f8f9ff;
+  --hero-muted: #c8d1e6;
+  --hl: #ffe38a;
+  --hl2: #bfeedd;
+  --quote-bg: #262c36;
+  --quote-ink: #f7f1df;
+  --translation-bg: #fffdf8;
+  --shadow: #17213b1c;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f6f3ec;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #1c2430;
+  --muted: #68717d;
+  --line: #d8d5cc;
+  --accent: #3157c8;
+  --accent2: #00816f;
+  --accent3: #d15b32;
+  --accent4: #7b4bb7;
+  --data-bg: #e4ecff;
+  --risk-bg: #ffe7df;
+  --opportunity-bg: #dcf5ed;
+  --conclusion-bg: #eee4ff;
+  --hero-bg: #17213b;
+  --hero-ink: #f8f9ff;
+  --hero-muted: #c8d1e6;
+  --hl: #ffe38a;
+  --hl2: #bfeedd;
+  --quote-bg: #262c36;
+  --quote-ink: #f7f1df;
+  --translation-bg: #fffdf8;
+  --shadow: #17213b1c;
 }
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #121416;
-    --ink: #ece8df;
-    --muted: #a9b1b8;
-    --line: #34383d;
-    --surface: #1d2024;
-    --surface2: #16241d;
-    --surface3: #221d32;
-    --band: #080b0f;
-    --band-ink: #f1eadf;
-    --data: #66b7ff;
-    --risk: #ff897e;
-    --opportunity: #62d18f;
-    --conclusion: #b99cff;
-    --hl: #5b3f12;
-    --hl2: #17364d;
-    --shadow: rgba(0, 0, 0, .35);
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #10141b;
+    --surface: #171c24;
+    --card: #1d2430;
+    --ink: #e7ebf2;
+    --muted: #a7b0bd;
+    --line: #353e4d;
+    --accent: #83a2ff;
+    --accent2: #42d3b5;
+    --accent3: #ff8e6b;
+    --accent4: #c49aff;
+    --data-bg: #1c2945;
+    --risk-bg: #3b2422;
+    --opportunity-bg: #17342e;
+    --conclusion-bg: #2c2340;
+    --hero-bg: #0b1020;
+    --hero-ink: #eef2ff;
+    --hero-muted: #aab6d0;
+    --hl: #715d13;
+    --hl2: #175d4d;
+    --quote-bg: #080b10;
+    --quote-ink: #f0e7cf;
+    --translation-bg: #151a21;
+    --shadow: #00000052;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #121416;
-  --ink: #ece8df;
-  --muted: #a9b1b8;
-  --line: #34383d;
-  --surface: #1d2024;
-  --surface2: #16241d;
-  --surface3: #221d32;
-  --band: #080b0f;
-  --band-ink: #f1eadf;
-  --data: #66b7ff;
-  --risk: #ff897e;
-  --opportunity: #62d18f;
-  --conclusion: #b99cff;
-  --hl: #5b3f12;
-  --hl2: #17364d;
-  --shadow: rgba(0, 0, 0, .35);
+  color-scheme: dark;
+  --bg: #10141b;
+  --surface: #171c24;
+  --card: #1d2430;
+  --ink: #e7ebf2;
+  --muted: #a7b0bd;
+  --line: #353e4d;
+  --accent: #83a2ff;
+  --accent2: #42d3b5;
+  --accent3: #ff8e6b;
+  --accent4: #c49aff;
+  --data-bg: #1c2945;
+  --risk-bg: #3b2422;
+  --opportunity-bg: #17342e;
+  --conclusion-bg: #2c2340;
+  --hero-bg: #0b1020;
+  --hero-ink: #eef2ff;
+  --hero-muted: #aab6d0;
+  --hl: #715d13;
+  --hl2: #175d4d;
+  --quote-bg: #080b10;
+  --quote-ink: #f0e7cf;
+  --translation-bg: #151a21;
+  --shadow: #00000052;
 }
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
+html {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans SC", sans-serif;
+  scroll-behavior: smooth;
+}
 body {
   margin: 0;
   background: var(--bg);
-  color: var(--ink);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  line-height: 1.65;
+  line-height: 1.75;
 }
-main { overflow: hidden; }
+a {
+  color: var(--accent);
+}
 .hero {
-  padding: 56px 7vw 44px;
-  background: var(--band);
-  color: var(--band-ink);
+  padding: clamp(3rem, 8vw, 7rem) max(6vw, calc((100vw - 1180px) / 2));
+  background: var(--hero-bg);
+  color: var(--hero-ink);
 }
-.hero small {
-  color: var(--hl);
-  font-weight: 700;
-  letter-spacing: 0;
+.eyebrow {
+  margin: 0 0 1rem;
+  color: var(--accent2);
+  font-size: .82rem;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
 }
 .hero h1 {
-  margin: 16px 0 6px;
-  font-size: clamp(32px, 6vw, 68px);
-  line-height: 1.05;
+  max-width: 900px;
+  margin: 0;
+  font-size: clamp(2.6rem, 7vw, 6.4rem);
+  line-height: 1.02;
+  letter-spacing: -.045em;
 }
-.hero .en {
-  margin: 0 0 28px;
-  color: var(--muted);
-  font-size: 18px;
+.original-title {
+  max-width: 800px;
+  margin: 1rem 0 0;
+  color: var(--hero-muted);
+  font-size: clamp(1rem, 2vw, 1.35rem);
 }
-.hero .thesis {
-  max-width: 920px;
-  padding-left: 18px;
-  border-left: 5px solid var(--opportunity);
-  font-size: clamp(20px, 2.4vw, 30px);
-  line-height: 1.35;
+.one-line {
+  max-width: 880px;
+  margin: 2.5rem 0 0;
+  padding-left: 1.2rem;
+  border-left: .35rem solid var(--accent3);
+  font-size: clamp(1.25rem, 2.5vw, 1.8rem);
+  font-weight: 650;
+}
+.summary-body {
+  max-width: 1180px;
+  margin: auto;
+  padding: 4rem 5vw 5rem;
+}
+.summary-body h2,
+.summary-body h3 {
+  line-height: 1.25;
 }
 .metrics {
   display: grid;
-  grid-template-columns: repeat(4, minmax(140px, 1fr));
-  gap: 1px;
-  background: var(--line);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0 0 4rem;
+  border: 1px solid var(--line);
+  background: var(--card);
+  box-shadow: 0 18px 45px var(--shadow);
 }
 .metric {
-  padding: 26px 7vw 24px;
-  background: var(--surface);
+  min-height: 170px;
+  padding: 1.5rem;
+  border-right: 1px solid var(--line);
 }
-.metric b {
+.metric:last-child {
+  border-right: 0;
+}
+.metric strong {
   display: block;
-  color: var(--data);
-  font-size: clamp(28px, 4vw, 46px);
+  color: var(--accent);
+  font-size: clamp(2rem, 5vw, 3.9rem);
   line-height: 1;
+}
+.metric:nth-child(2) strong {
+  color: var(--accent2);
+}
+.metric:nth-child(3) strong {
+  color: var(--accent3);
+}
+.metric:nth-child(4) strong {
+  color: var(--accent4);
 }
 .metric span {
   display: block;
-  margin-top: 8px;
+  margin-top: .8rem;
   color: var(--muted);
 }
 .split {
   display: grid;
-  grid-template-columns: 1.1fr .9fr;
-  gap: 36px;
-  padding: 54px 7vw;
-  background: var(--surface2);
+  grid-template-columns: .85fr 1.15fr;
+  gap: 0;
+  margin: 4rem 0;
 }
-.split h2, .timeline h2, .compare h2, .infra h2, .takeaways h2 {
-  margin: 0 0 18px;
-  font-size: clamp(24px, 3vw, 38px);
-  line-height: 1.15;
+.split-heading {
+  padding: 2.5rem;
+  background: var(--data-bg);
+  border-top: .45rem solid var(--accent);
 }
-.pill-list {
-  display: grid;
-  gap: 14px;
+.split-heading h2 {
+  margin: 0;
+  font-size: clamp(1.8rem, 4vw, 3rem);
 }
-.pill {
-  padding: 16px 18px;
-  border-left: 6px solid var(--opportunity);
-  background: var(--bg);
-  box-shadow: 0 10px 28px var(--shadow);
-}
-.pill:nth-child(2) { border-left-color: var(--conclusion); }
-.pill:nth-child(3) { border-left-color: var(--risk); }
-.timeline {
-  padding: 54px 7vw;
-  background: var(--surface);
-}
-.steps {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 22px;
-  counter-reset: step;
-}
-.step {
-  position: relative;
-  padding: 22px;
-  border-top: 5px solid var(--conclusion);
-  background: var(--surface3);
-}
-.step::before {
-  counter-increment: step;
-  content: counter(step);
-  display: inline-grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  margin-bottom: 14px;
-  border-radius: 50%;
-  background: var(--conclusion);
-  color: var(--band-ink);
-  font-weight: 800;
-}
-.compare {
-  padding: 54px 7vw;
-  background: var(--band);
-  color: var(--band-ink);
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--surface);
-  color: var(--ink);
-}
-th, td {
-  padding: 16px;
-  border-bottom: 1px solid var(--line);
-  text-align: left;
-  vertical-align: top;
-}
-th {
-  color: var(--data);
-  background: var(--hl2);
-}
-.insight {
-  margin-top: 24px;
-  padding: 20px 22px;
-  border-left: 7px solid var(--hl);
-  background: var(--surface3);
-  color: var(--ink);
-  font-size: 20px;
-}
-.infra {
-  padding: 54px 7vw;
-  background: var(--surface2);
-}
-.infra-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 22px;
-}
-.block {
-  padding: 24px;
-  background: var(--bg);
-  border-bottom: 5px solid var(--data);
-}
-.block:nth-child(2) { border-bottom-color: var(--risk); }
-.block:nth-child(3) { border-bottom-color: var(--opportunity); }
-.block:nth-child(4) { border-bottom-color: var(--conclusion); }
-.takeaways {
-  padding: 54px 7vw 70px;
-  background: var(--bg);
-}
-.mosaic {
-  display: grid;
-  grid-template-columns: 1.2fr .8fr 1fr;
-  gap: 16px;
-}
-.tile {
-  min-height: 150px;
-  padding: 22px;
+.split-copy {
+  padding: 2.5rem;
   background: var(--surface);
   border: 1px solid var(--line);
 }
-.tile.big {
-  grid-row: span 2;
-  background: var(--hl2);
+.split-copy p:first-child {
+  margin-top: 0;
 }
-.tile strong {
+.flow {
+  margin: 4rem 0;
+}
+.flow h2 {
+  font-size: clamp(1.8rem, 4vw, 3rem);
+}
+.flow-line {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: stretch;
+}
+.flow-step {
+  padding: 2rem;
+}
+.flow-step:first-child {
+  background: var(--opportunity-bg);
+  border-left: .4rem solid var(--accent2);
+}
+.flow-step:last-child {
+  background: var(--conclusion-bg);
+  border-right: .4rem solid var(--accent4);
+}
+.flow-arrow {
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  color: var(--accent3);
+  font-size: 2rem;
+  font-weight: 900;
+}
+.flow-step b {
   display: block;
-  margin-bottom: 8px;
-  color: var(--conclusion);
-  font-size: 20px;
+  margin-bottom: .7rem;
+  font-size: 1.25rem;
 }
-@media (max-width: 820px) {
-  .metrics, .split, .steps, .infra-grid, .mosaic {
+.benchmark {
+  margin: 4rem 0;
+  padding: clamp(2rem, 5vw, 4rem);
+  background: var(--quote-bg);
+  color: var(--quote-ink);
+}
+.benchmark h2 {
+  margin-top: 0;
+  color: var(--accent2);
+  font-size: clamp(1.8rem, 4vw, 3rem);
+}
+.benchmark-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+.benchmark-note {
+  padding-top: 1rem;
+  border-top: 2px solid var(--accent3);
+}
+.infrastructure {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+  margin: 4rem 0;
+}
+.infrastructure h2 {
+  grid-column: 1 / -1;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+}
+.infra-item {
+  padding: 1.5rem;
+  border-top: .4rem solid var(--accent);
+  background: var(--card);
+  box-shadow: 0 12px 30px var(--shadow);
+}
+.infra-item:nth-of-type(2) {
+  border-color: var(--accent3);
+  background: var(--risk-bg);
+}
+.infra-item:nth-of-type(3) {
+  border-color: var(--accent2);
+  background: var(--opportunity-bg);
+}
+.insight {
+  margin: 4rem 0;
+  padding: 2rem clamp(1.5rem, 5vw, 4rem);
+  border-left: .6rem solid var(--accent3);
+  background: var(--risk-bg);
+  font-size: clamp(1.15rem, 2.3vw, 1.55rem);
+  font-weight: 650;
+}
+.takeaways h2 {
+  font-size: clamp(1.8rem, 4vw, 3rem);
+}
+.takeaway-grid {
+  display: grid;
+  grid-template-columns: 1.2fr .8fr;
+  gap: 1rem;
+}
+.takeaway {
+  padding: 1.5rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+.takeaway:nth-child(2) {
+  background: var(--data-bg);
+  border-color: var(--accent);
+}
+.takeaway:nth-child(3) {
+  background: var(--opportunity-bg);
+  border-color: var(--accent2);
+}
+.takeaway:nth-child(4) {
+  background: var(--conclusion-bg);
+  border-color: var(--accent4);
+}
+.takeaway strong {
+  color: var(--accent3);
+}
+mark,
+.hl {
+  padding: .08em .3em;
+  background: var(--hl);
+  color: var(--ink);
+  font-weight: 750;
+}
+.hl2 {
+  padding: .08em .3em;
+  background: var(--hl2);
+  color: var(--ink);
+  font-weight: 750;
+}
+#translation {
+  background: var(--translation-bg);
+  border-top: 1px solid var(--line);
+  padding: 5rem 5vw 7rem;
+}
+.translation-inner {
+  max-width: 780px;
+  margin: auto;
+}
+#translation h2 {
+  margin: 0 0 2rem;
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  line-height: 1.1;
+}
+#translation h3 {
+  margin-top: 3rem;
+  color: var(--accent);
+  font-size: 1.7rem;
+  line-height: 1.3;
+}
+#translation h4 {
+  margin-top: 2.4rem;
+  color: var(--accent2);
+  font-size: 1.25rem;
+}
+#translation p,
+#translation li {
+  font-size: 1.05rem;
+}
+.translation-meta {
+  margin-bottom: 2.5rem;
+  padding: 1rem 1.25rem;
+  border-left: .3rem solid var(--accent4);
+  background: var(--conclusion-bg);
+  color: var(--muted);
+}
+.toc {
+  margin: 2rem 0 3rem;
+  padding: 1.5rem 2rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+.toc p {
+  margin: .35rem 0;
+}
+.source-figure {
+  margin: 2.8rem auto;
+}
+.source-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: .45rem;
+  box-shadow: 0 16px 40px var(--shadow);
+}
+.source-figure figcaption {
+  margin-top: .75rem;
+  color: var(--muted);
+  font-size: .9rem;
+  text-align: center;
+}
+.figure-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  width: min(1100px, 90vw);
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
+.related {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+}
+@media (max-width: 780px) {
+  .metrics,
+  .infrastructure,
+  .benchmark-grid,
+  .takeaway-grid,
+  .split,
+  .flow-line,
+  .figure-pair {
     grid-template-columns: 1fr;
   }
-  .metric { padding: 22px 7vw; }
+  .metric {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .metric:last-child {
+    border-bottom: 0;
+  }
+  .flow-arrow {
+    transform: rotate(90deg);
+  }
+  .figure-pair {
+    width: 100%;
+    margin-left: 0;
+    transform: none;
+  }
 }
 </style>
-  <script id="airs-digest-theme-boot">
+<script id="airs-digest-theme-boot">
     try {
       var saved = localStorage.getItem("theme");
       if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
     } catch (e) {}
   </script>
-  <style id="airs-digest-theme-style">
+<style id="airs-digest-theme-style">
     :root {
       color-scheme: light;
       --airs-digest-ink: #191816;
@@ -378,118 +590,213 @@ th {
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+  <style id="airs-source-image-theme-style">
+    .source-figure .source-image-dark {
+      display: none;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .source-figure .source-image-light {
+        display: none;
+      }
+      :root:not([data-theme="light"]) .source-figure .source-image-dark {
+        display: block;
+      }
+    }
+    :root[data-theme="dark"] .source-figure .source-image-light {
+      display: none;
+    }
+    :root[data-theme="dark"] .source-figure .source-image-dark {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-light {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-dark {
+      display: none;
+    }
   </style>
 </head>
 <body>
-<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/composer-2-technical-report" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">← 返回索引</a><a href="https://cursor.com/blog/composer-2-technical-report" rel="noopener noreferrer" target="_blank">阅读原文 ↗</a></div><button class="airs-digest-theme-toggle" data-airs-theme-toggle="" type="button">主题 · 跟随系统</button></nav>
 <main>
-  <section class="hero">
-    <small>Cursor · Research · Mar 27, 2026</small>
-    <h1>关于 Composer 2 的技术报告</h1>
-    <p class="en">A technical report on Composer 2</p>
-    <p class="thesis">一句话总括：Composer 2 的贡献不是单一 benchmark 提分，而是把真实开发会话放进训练、评测和基础设施闭环，让代码代理更接近开发者日常使用场景。</p>
-  </section>
-
-  <section class="metrics" aria-label="关键数字">
-    <div class="metric"><b>61.3</b><span>CursorBench 得分</span></div>
-    <div class="metric"><b>37%</b><span>相对 Composer 1.5 的提升</span></div>
-    <div class="metric"><b>73.7</b><span>SWE-bench Multilingual 得分</span></div>
-    <div class="metric"><b>61.7</b><span>Terminal-Bench 得分</span></div>
-  </section>
-
-  <section class="split">
-    <div>
-      <h2>真正的变化是训练对象变了</h2>
-      <p>Composer 2 先在偏代码的数据混合上继续预训练。目标是补强基础代码知识。</p>
-      <p>随后，模型在接近真实 Cursor 的会话中做大规模强化学习。它使用部署时相同的工具和 harness。</p>
-      <p>这改变了读者对 AI 编程模型的理解。模型能力不只来自更大的参数或更多题库，也来自训练环境是否足够像真实工作。</p>
-    </div>
-    <div class="pill-list">
-      <div class="pill"><strong>基础知识</strong><br>预训练 loss 降低后，下游 RL 表现也提高。更好的底座会转化为更好的代理。</div>
-      <div class="pill"><strong>解法探索</strong><br>RL 同时提升平均表现和 best-of-K 表现，说明模型可能学到了新的解决路径。</div>
-      <div class="pill"><strong>真实约束</strong><br>训练任务覆盖开发者会问 Composer 的多种问题，而不是只优化窄题。</div>
-    </div>
-  </section>
-
-  <section class="timeline">
-    <h2>从底座到代理的流程</h2>
-    <div class="steps">
-      <div class="step">
-        <h3>继续预训练</h3>
-        <p>Composer 2 基于开放模型 Kimi K2.5。Cursor 用更强调代码的数据继续训练，以深化编码知识。</p>
-      </div>
-      <div class="step">
-        <h3>真实会话 RL</h3>
-        <p>强化学习发生在仿真的 Cursor 会话里。模型看到的是工具、交互和任务分布的组合。</p>
-      </div>
-      <div class="step">
-        <h3>端到端评测</h3>
-        <p>CursorBench 贯穿训练和评估。它让模型优化目标更接近真实开发问题。</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="compare">
-    <h2>为什么 CursorBench 重要</h2>
-    <table>
-      <thead>
-        <tr><th>维度</th><th>常见公共 benchmark</th><th>CursorBench</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>任务描述</td>
-          <td>往往更明确，约束更完整。</td>
-          <td>来自真实工程会话，prompt 可能很短，也可能含糊。</td>
-        </tr>
-        <tr>
-          <td>代码改动</td>
-          <td>解法范围较窄，代码库较小。</td>
-          <td>可能需要跨很多文件修改数百行代码。</td>
-        </tr>
-        <tr>
-          <td>评测意义</td>
-          <td>适合衡量特定题型能力。</td>
-          <td>更能衡量交互式软件工程代理的可用性。</td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="insight">关键洞见：如果评测不包含模糊需求、跨文件修改和真实工具链，模型看起来会更强，但未必更能帮开发者完成工作。</div>
-  </section>
-
-  <section class="infra">
-    <h2>性能背后是工程系统</h2>
-    <div class="infra-grid">
-      <div class="block">
-        <h3>低精度 MoE kernel</h3>
-        <p>Cursor 为 Blackwell GPU 上的 MoE 训练做了自定义低精度 kernel。这说明模型训练收益依赖底层算子效率。</p>
-      </div>
-      <div class="block">
-        <h3>跨区域异步 RL</h3>
-        <p>强化学习 pipeline 是全异步并跨多个区域运行。系统要同时处理吞吐、同步和容错。</p>
-      </div>
-      <div class="block">
-        <h3>Anyrun 沙盒环境</h3>
-        <p>Anyrun 用来运行数十万个沙盒编码环境。它支撑了大规模、接近真实的代理训练。</p>
-      </div>
-      <div class="block">
-        <h3>成本与准确率</h3>
-        <p>文章强调 Composer 2 的推理成本显著低于可比模型。对交互式开发工具来说，低成本会直接影响可用频率。</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="takeaways">
-    <h2>最值得带走的洞见</h2>
-    <div class="mosaic">
-      <div class="tile big"><strong>真实环境是能力的一部分</strong>Composer 2 的训练重点是模拟 Cursor 的真实使用场景。代码代理的强弱，越来越取决于环境、工具和任务分布是否一致。</div>
-      <div class="tile"><strong>RL 不是只会压榨旧答案</strong>平均表现和 best-of-K 同时提升，说明模型可能在学习更多解题路径。</div>
-      <div class="tile"><strong>benchmark 要贴近工作流</strong>短而模糊的需求、跨文件修改和大规模代码库，才更接近开发者每天遇到的问题。</div>
-      <div class="tile"><strong>基础知识仍然关键</strong>继续预训练降低 loss 后，后续 RL 更有效。代理能力仍要建立在可靠底座上。</div>
-      <div class="tile"><strong>低成本决定产品化</strong>在准确率之外，推理成本是交互式 AI 编程工具能否长期高频使用的核心指标。</div>
-    </div>
-  </section>
+<article id="summary">
+<header class="hero">
+<p class="eyebrow">Cursor Research · 2026 年 3 月 27 日</p>
+<h1>Composer 2 技术报告</h1>
+<p class="original-title" lang="en">A technical report on Composer 2</p>
+<p class="one-line">一句话总括：Composer 2 展示了一条完整的代码智能体训练路线。它把更扎实的代码基础知识、贴近产品的强化学习环境和真实开发任务评测连接到了一起。</p>
+</header>
+<div class="summary-body">
+<section aria-label="关键指标" class="metrics">
+<div class="metric"><strong>61.3</strong><span>CursorBench 得分，衡量真实开发任务中的表现。</span></div>
+<div class="metric"><strong>+37%</strong><span>相对 Composer 1.5 的提升幅度。</span></div>
+<div class="metric"><strong>73.7</strong><span>SWE-bench Multilingual 得分。</span></div>
+<div class="metric"><strong>61.7</strong><span>Terminal-Bench 得分。</span></div>
+</section>
+<section class="split">
+<div class="split-heading">
+<p class="eyebrow">核心判断</p>
+<h2>更好的基础模型，会形成更好的智能体</h2>
+</div>
+<div class="split-copy">
+<p>Composer 2 先在偏重代码的数据混合上继续预训练，再进行大规模强化学习。实验显示，预训练损失下降后，下游强化学习表现也会改善。</p>
+<p>这改变了一个常见看法：智能体能力并不只取决于工具调用策略。<span class="hl">基础知识的质量</span>仍然会可靠地传递到端到端任务表现中。</p>
+</div>
+</section>
+<section class="flow">
+<h2>两阶段训练，不是两个孤立步骤</h2>
+<div class="flow-line">
+<div class="flow-step">
+<b>① 持续预训练</b>
+<p>训练数据更强调代码，以加深 Kimi K2.5 基础模型的编程知识。结果是强化学习拥有了更好的起点。</p>
+</div>
+<div aria-hidden="true" class="flow-arrow">→</div>
+<div class="flow-step">
+<b>② 大规模强化学习</b>
+<p>训练直接发生在真实感较强的 Cursor 会话中。模型使用与线上版本相同的工具和执行框架，并面对开发者实际提出的多样任务。</p>
+</div>
+</div>
+<p>强化学习同时提高了平均表现和 <span class="hl2">best-of-K</span> 表现。这表明模型学到了新的解决路径，而不是只提高已知做法的出现概率。</p>
+</section>
+<section class="benchmark">
+<h2>CursorBench 把评测拉回真实开发现场</h2>
+<div class="benchmark-grid">
+<div>
+<h3>公共 benchmark 的偏差</h3>
+<p>许多任务提供了过于充分的说明。答案范围较窄，代码库也偏小。这些条件与真实软件工程之间存在明显距离。</p>
+</div>
+<div>
+<h3>CursorBench 的取样方式</h3>
+<p>任务来自 Cursor 工程团队的真实编程会话。提示可能简短而模糊。解决方案可能要跨越多个文件，并产生数百行改动。</p>
+</div>
+</div>
+<p class="benchmark-note">CursorBench 被同时用于训练和评估。它的作用不只是给模型打分，更是持续约束模型，让它贴近开发者真正遇到的问题。</p>
+</section>
+<section class="infrastructure">
+<h2>性能背后是一整套训练基础设施</h2>
+<div class="infra-item">
+<h3>低精度 MoE</h3>
+<p>团队为 Blackwell GPU 编写了定制低精度内核，以提高混合专家模型训练效率。</p>
+</div>
+<div class="infra-item">
+<h3>跨区域异步 RL</h3>
+<p>强化学习流水线完全异步，并横跨多个区域。权重同步和故障容错因此成为核心工程问题。</p>
+</div>
+<div class="infra-item">
+<h3>Anyrun</h3>
+<p>内部计算平台可运行数十万个沙箱化编程环境，让训练规模与环境真实性能够同时提升。</p>
+</div>
+</section>
+<aside class="insight">
+        更重要的结果不是单项分数领先，而是 Composer 2 以显著更低的推理成本接近最强前沿模型。对需要频繁交互的开发工作流来说，<span class="hl">准确率与成本的共同边界</span>比孤立的最高分更有实际意义。
+      </aside>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="takeaway-grid">
+<div class="takeaway"><strong>01</strong><p>降低预训练损失能改善后续强化学习效果。代码智能体仍然受益于更扎实的基础知识。</p></div>
+<div class="takeaway"><strong>02</strong><p>训练环境与部署环境使用相同工具和执行框架，有助于缩小训练与真实使用之间的差距。</p></div>
+<div class="takeaway"><strong>03</strong><p>真实任务往往提示模糊、改动广泛。只依赖小型且说明充分的公共 benchmark，容易高估模型的工程能力。</p></div>
+<div class="takeaway"><strong>04</strong><p><span class="hl2">61.3、73.7 和 61.7</span> 证明 Composer 2 同时具备真实任务与公共测试竞争力。较低推理成本则决定了这些能力能否进入高频工作流。</p></div>
+</div>
+</section>
+</div>
+</article><section id="translation">
+<div class="translation-inner">
+<h2>完整译文</h2>
+<figure class="source-figure" data-source-image="0"><img alt="A technical report on Composer 2" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fog%2Fpaper-composer-2-technical-report-og-r2.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<div class="translation-meta">
+<strong>Composer 2 技术报告</strong><br/>
+        来源：Cursor<br/>
+        日期：2026 年 3 月 27 日<br/>
+        分类：研究<br/>
+        原文：<a href="https://cursor.com/blog/composer-2-technical-report">https://cursor.com/blog/composer-2-technical-report</a>
+</div>
+<nav aria-label="目录" class="toc">
+<h3>目录</h3>
+<p>持续预训练与强化学习</p>
+<p>使用 CursorBench 进行真实场景评估</p>
+<p>性能</p>
+<p>基础设施</p>
+</nav>
+<p>我们已在 arXiv 发布一份技术报告，介绍面向智能体软件工程的编程模型 Composer 2 如何训练。报告涵盖完整训练过程。它从开放基础模型 Kimi K2.5 的持续预训练讲起，一直讲到大规模强化学习。整个过程特别重视对真实 Cursor 环境的高度复现。</p>
+<h3>持续预训练与强化学习</h3>
+<p>Composer 2 分两个阶段训练。第一阶段是在更强调代码的数据混合上继续预训练，以加深基础模型的编程知识。随后进行大规模强化学习，以改善端到端的智能体表现。我们发现，降低预训练损失可以改善下游强化学习表现。更好的基础知识会可靠地转化为更优秀的智能体。</p>
+<p>Composer 2 的强化学习训练发生在真实感很强的 Cursor 会话中。训练使用的工具和执行框架与部署模型完全相同。任务分布也覆盖了开发者要求 Composer 完成的各类工作。我们发现，强化学习同时改善了平均表现和 best-of-K 表现。这说明模型正在学习新的解决路径，而不只是更集中地采用已有路径。</p>
+<h3>使用 CursorBench 进行真实场景评估</h3>
+<p>构建编程模型时，一个核心难题是公共 benchmark 往往无法反映开发者实际从事的工作。这些任务通常规定得过于详细，解决方案范围很窄，代码库也很小。</p>
+<p>我们根据工程团队的真实编程会话构建了 CursorBench。其中一些任务的提示简短而模糊，解决方案则需要跨多个文件完成数百行修改。我们在整个训练和评估过程中使用 CursorBench，让模型始终贴近真实问题。</p>
+<h3>性能</h3>
+<p>Composer 2 在 CursorBench 上得到 61.3 分，比 Composer 1.5 提高 37%，表现可与最强的前沿模型竞争。在公共 benchmark 上，Composer 2 在 SWE-bench Multilingual 上得到 73.7 分，在 Terminal-Bench 上得到 61.7 分。它取得这些成绩所需的推理成本显著低于同类模型。因此，对于交互式开发工作流，它在准确率和成本之间实现了帕累托最优的权衡。</p>
+<div class="figure-pair">
+<figure class="source-figure" data-source-image="1"><img alt="Composer 2 efficiency and quality on CursorBench" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fcomposer-2-scatter-r4.png&amp;w=1920&amp;q=70" width="800"/><img alt="Composer 2 efficiency and quality on CursorBench" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fcomposer-2-scatter-r4-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+</div>
+<div class="figure-pair">
+<figure class="source-figure" data-source-image="2"><img alt="Composer 2 fast variant speed and cost compared to other models" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fcomposer-speed-cost-r12.png&amp;w=1920&amp;q=70" width="800"/><img alt="Composer 2 fast variant speed and cost compared to other models" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fcomposer-speed-cost-r12-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+</div>
+<h3>基础设施</h3>
+<p>训练 Composer 2 需要大量基础设施开发工作。团队编写了定制低精度内核，以便在 Blackwell GPU 上高效训练混合专家模型（MoE）。团队还建设了横跨多个区域的完全异步强化学习流水线，以及内部计算平台 Anyrun。Anyrun 可运行数十万个沙箱化编程环境。报告介绍了这套完整技术栈，其中包括权重同步、故障容错和环境保真度方面的方法。</p>
+<p>报告还包含大量更深入的内容。其中包括训练方案的消融实验、塑造智能体行为的方法，以及评估套件的设计。</p>
+<p>感谢 Kimi K2.5、Ray、ThunderKittens、PyTorch 背后的团队，以及更广泛的开源社区。我们也要感谢 Fireworks 和 Colfax 的协作与支持。</p>
+<p>在这里阅读完整技术报告。</p>
+<p>归档分类：研究</p>
+<p>作者：Sasha Rush</p>
+<div class="related">
+<p>通过实时强化学习改进 Composer</p>
+<p>Composer 2 正式发布</p>
+<p>通过自动安装引导 Composer</p>
+<p>Composer 2 技术报告</p>
+</div>
+<nav aria-label="重复目录" class="toc">
+<h3>目录</h3>
+<p>持续预训练与强化学习</p>
+<p>使用 CursorBench 进行真实场景评估</p>
+<p>性能</p>
+<p>基础设施</p>
+</nav>
+<p>我们已在 arXiv 发布一份技术报告，介绍面向智能体软件工程的编程模型 Composer 2 如何训练。报告涵盖完整训练过程。它从开放基础模型 Kimi K2.5 的持续预训练讲起，一直讲到大规模强化学习。整个过程特别重视对真实 Cursor 环境的高度复现。</p>
+<h3>持续预训练与强化学习</h3>
+<p>Composer 2 分两个阶段训练。第一阶段是在更强调代码的数据混合上继续预训练，以加深基础模型的编程知识。随后进行大规模强化学习，以改善端到端的智能体表现。我们发现，降低预训练损失可以改善下游强化学习表现。更好的基础知识会可靠地转化为更优秀的智能体。</p>
+<p>Composer 2 的强化学习训练发生在真实感很强的 Cursor 会话中。训练使用的工具和执行框架与部署模型完全相同。任务分布也覆盖了开发者要求 Composer 完成的各类工作。我们发现，强化学习同时改善了平均表现和 best-of-K 表现。这说明模型正在学习新的解决路径，而不只是更集中地采用已有路径。</p>
+<h3>使用 CursorBench 进行真实场景评估</h3>
+<p>构建编程模型时，一个核心难题是公共 benchmark 往往无法反映开发者实际从事的工作。这些任务通常规定得过于详细，解决方案范围很窄，代码库也很小。</p>
+<p>我们根据工程团队的真实编程会话构建了 CursorBench。其中一些任务的提示简短而模糊，解决方案则需要跨多个文件完成数百行修改。我们在整个训练和评估过程中使用 CursorBench，让模型始终贴近真实问题。</p>
+<h3>性能</h3>
+<p>Composer 2 在 CursorBench 上得到 61.3 分，比 Composer 1.5 提高 37%，表现可与最强的前沿模型竞争。在公共 benchmark 上，Composer 2 在 SWE-bench Multilingual 上得到 73.7 分，在 Terminal-Bench 上得到 61.7 分。它取得这些成绩所需的推理成本显著低于同类模型。因此，对于交互式开发工作流，它在准确率和成本之间实现了帕累托最优的权衡。</p>
+<h3>基础设施</h3>
+<p>训练 Composer 2 需要大量基础设施开发工作。团队编写了定制低精度内核，以便在 Blackwell GPU 上高效训练混合专家模型（MoE）。团队还建设了横跨多个区域的完全异步强化学习流水线，以及内部计算平台 Anyrun。Anyrun 可运行数十万个沙箱化编程环境。报告介绍了这套完整技术栈，其中包括权重同步、故障容错和环境保真度方面的方法。</p>
+<p>报告还包含大量更深入的内容。其中包括训练方案的消融实验、塑造智能体行为的方法，以及评估套件的设计。</p>
+<p>感谢 Kimi K2.5、Ray、ThunderKittens、PyTorch 背后的团队，以及更广泛的开源社区。我们也要感谢 Fireworks 和 Colfax 的协作与支持。</p>
+<p>在这里阅读完整技术报告。</p>
+<p>归档分类：研究</p>
+<p>作者：Sasha Rush</p>
+<div class="related">
+<p>通过实时强化学习改进 Composer</p>
+<p>Composer 2 正式发布</p>
+<p>通过自动安装引导 Composer</p>
+</div>
+</div>
+</section>
 </main>
-  <script id="airs-digest-theme-script">
+<script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;
       const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));

@@ -1,293 +1,379 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>为本地智能体实现安全沙箱</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>为本地智能体构建安全沙箱</title>
 <style>
 :root {
-  --bg: #f7f8fb;
-  --paper: #ffffff;
-  --ink: #18202e;
-  --muted: #627084;
-  --line: #d9e0ea;
-  --hero-bg: #142238;
-  --hero-ink: #f4f8ff;
-  --band-bg: #edf5ff;
-  --risk-bg: #fff0f0;
-  --opportunity-bg: #eefbf4;
-  --process-bg: #f5f0ff;
-  --conclusion-bg: #fff7df;
-  --table-bg: #ffffff;
-  --accent-data: #226ce0;
-  --accent-risk: #d64545;
-  --accent-opportunity: #15995f;
-  --accent-process: #7a4dd8;
-  --accent-conclusion: #d18b00;
-  --shadow: 0 14px 40px rgba(24, 32, 46, .10);
+  color-scheme: light;
+  --bg: #f4f1ea;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #17202a;
+  --muted: #687079;
+  --line: #d9d4ca;
+  --accent: #086788;
+  --accent-soft: #dceff5;
+  --accent2: #c45124;
+  --accent2-soft: #fbe6dc;
+  --accent3: #657b2d;
+  --accent3-soft: #e9f1d2;
+  --accent4: #7651a8;
+  --accent4-soft: #eee5f8;
+  --risk: #b23a48;
+  --risk-soft: #f8dfe2;
+  --opportunity: #117864;
+  --opportunity-soft: #d9f0e8;
+  --conclusion: #6246a5;
+  --conclusion-soft: #e8e0f5;
+  --hl: #ffe08a;
+  --hl2: #aee8dc;
+  --dark-band: #172c3a;
+  --dark-band-ink: #f4f8fa;
+  --dark-band-muted: #bad0db;
+  --shadow: 0 18px 48px rgba(28, 37, 44, .10);
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f4f1ea;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #17202a;
+  --muted: #687079;
+  --line: #d9d4ca;
+  --accent: #086788;
+  --accent-soft: #dceff5;
+  --accent2: #c45124;
+  --accent2-soft: #fbe6dc;
+  --accent3: #657b2d;
+  --accent3-soft: #e9f1d2;
+  --accent4: #7651a8;
+  --accent4-soft: #eee5f8;
+  --risk: #b23a48;
+  --risk-soft: #f8dfe2;
+  --opportunity: #117864;
+  --opportunity-soft: #d9f0e8;
+  --conclusion: #6246a5;
+  --conclusion-soft: #e8e0f5;
+  --hl: #ffe08a;
+  --hl2: #aee8dc;
+  --dark-band: #172c3a;
+  --dark-band-ink: #f4f8fa;
+  --dark-band-muted: #bad0db;
+  --shadow: 0 18px 48px rgba(28, 37, 44, .10);
 }
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0f141c;
-    --paper: #171e29;
-    --ink: #e8edf5;
-    --muted: #a9b4c4;
-    --line: #2d3848;
-    --hero-bg: #07101f;
-    --hero-ink: #eef5ff;
-    --band-bg: #101f36;
-    --risk-bg: #2a1518;
-    --opportunity-bg: #10271c;
-    --process-bg: #1d1730;
-    --conclusion-bg: #2b2110;
-    --table-bg: #141b25;
-    --accent-data: #6da6ff;
-    --accent-risk: #ff7777;
-    --accent-opportunity: #54d990;
-    --accent-process: #b194ff;
-    --accent-conclusion: #ffc857;
-    --shadow: 0 18px 42px rgba(0, 0, 0, .32);
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0d1318;
+    --surface: #141c22;
+    --card: #19242c;
+    --ink: #e4edf2;
+    --muted: #9fb0ba;
+    --line: #33434d;
+    --accent: #5fc2e3;
+    --accent-soft: #163642;
+    --accent2: #f18a5f;
+    --accent2-soft: #47281f;
+    --accent3: #b4d36f;
+    --accent3-soft: #2c381d;
+    --accent4: #c29bea;
+    --accent4-soft: #342546;
+    --risk: #ff8792;
+    --risk-soft: #451f27;
+    --opportunity: #64d5b8;
+    --opportunity-soft: #173a32;
+    --conclusion: #c2a4f2;
+    --conclusion-soft: #302447;
+    --hl: #755b18;
+    --hl2: #16594e;
+    --dark-band: #071b27;
+    --dark-band-ink: #e8f3f7;
+    --dark-band-muted: #9ab7c5;
+    --shadow: 0 18px 48px rgba(0, 0, 0, .34);
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0f141c;
-  --paper: #171e29;
-  --ink: #e8edf5;
-  --muted: #a9b4c4;
-  --line: #2d3848;
-  --hero-bg: #07101f;
-  --hero-ink: #eef5ff;
-  --band-bg: #101f36;
-  --risk-bg: #2a1518;
-  --opportunity-bg: #10271c;
-  --process-bg: #1d1730;
-  --conclusion-bg: #2b2110;
-  --table-bg: #141b25;
-  --accent-data: #6da6ff;
-  --accent-risk: #ff7777;
-  --accent-opportunity: #54d990;
-  --accent-process: #b194ff;
-  --accent-conclusion: #ffc857;
-  --shadow: 0 18px 42px rgba(0, 0, 0, .32);
+  color-scheme: dark;
+  --bg: #0d1318;
+  --surface: #141c22;
+  --card: #19242c;
+  --ink: #e4edf2;
+  --muted: #9fb0ba;
+  --line: #33434d;
+  --accent: #5fc2e3;
+  --accent-soft: #163642;
+  --accent2: #f18a5f;
+  --accent2-soft: #47281f;
+  --accent3: #b4d36f;
+  --accent3-soft: #2c381d;
+  --accent4: #c29bea;
+  --accent4-soft: #342546;
+  --risk: #ff8792;
+  --risk-soft: #451f27;
+  --opportunity: #64d5b8;
+  --opportunity-soft: #173a32;
+  --conclusion: #c2a4f2;
+  --conclusion-soft: #302447;
+  --hl: #755b18;
+  --hl2: #16594e;
+  --dark-band: #071b27;
+  --dark-band-ink: #e8f3f7;
+  --dark-band-muted: #9ab7c5;
+  --shadow: 0 18px 48px rgba(0, 0, 0, .34);
 }
 * { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-  line-height: 1.68;
+  font-family: Inter, "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.75;
 }
-main { overflow: hidden; }
+a { color: var(--accent); text-underline-offset: .18em; }
 .hero {
-  background: var(--hero-bg);
-  color: var(--hero-ink);
-  padding: 72px 7vw 56px;
+  padding: clamp(4rem, 9vw, 8rem) max(1.4rem, calc((100vw - 1120px) / 2));
+  background:
+    linear-gradient(125deg, var(--dark-band), var(--conclusion-soft));
+  color: var(--dark-band-ink);
 }
-.hero p {
-  max-width: 860px;
-  margin: 0;
-  color: var(--hero-ink);
+.eyebrow {
+  color: var(--accent);
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
 }
-.kicker {
-  color: var(--accent-conclusion);
-  font-weight: 700;
-  letter-spacing: .08em;
-  font-size: 13px;
-  margin-bottom: 18px;
-}
-h1 {
-  margin: 0 0 10px;
-  font-size: clamp(32px, 5vw, 58px);
-  line-height: 1.08;
-  letter-spacing: 0;
-}
-.original {
-  font-size: 17px;
-  color: var(--muted);
-  margin-bottom: 26px;
-}
-.hero .original { color: #b8c7dd; }
-.lede {
-  font-size: 22px;
+.hero h1 {
   max-width: 900px;
-  margin-top: 24px;
+  margin: .35rem 0 .7rem;
+  font-size: clamp(2.6rem, 7vw, 5.8rem);
+  line-height: 1.05;
+  letter-spacing: -.05em;
 }
-.metric-band {
+.original-title {
+  max-width: 760px;
+  margin: 0;
+  color: var(--dark-band-muted);
+  font-size: clamp(1rem, 2.2vw, 1.35rem);
+}
+.dek {
+  max-width: 760px;
+  margin: 2.4rem 0 0;
+  padding-left: 1.25rem;
+  border-left: 5px solid var(--accent2);
+  font-size: clamp(1.12rem, 2.4vw, 1.45rem);
+}
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .7rem 1.5rem;
+  margin-top: 2rem;
+  color: var(--dark-band-muted);
+  font-size: .92rem;
+}
+.summary-shell { overflow: hidden; }
+.number-strip {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1px;
-  background: var(--line);
-  border-top: 1px solid var(--line);
+  grid-template-columns: repeat(3, 1fr);
+  background: var(--surface);
   border-bottom: 1px solid var(--line);
 }
 .metric {
-  background: var(--band-bg);
-  padding: 28px 6vw;
+  padding: 2.2rem 1.5rem;
+  text-align: center;
+  border-right: 1px solid var(--line);
 }
+.metric:last-child { border-right: 0; }
 .metric strong {
   display: block;
-  color: var(--accent-data);
-  font-size: 32px;
-  line-height: 1.1;
+  color: var(--accent);
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  line-height: 1;
 }
-.metric span {
-  color: var(--muted);
-  font-size: 14px;
+.metric:nth-child(2) strong { color: var(--accent2); }
+.metric:nth-child(3) strong { color: var(--accent4); }
+.metric span { color: var(--muted); }
+.content-wide {
+  width: min(1120px, calc(100% - 2.8rem));
+  margin: 0 auto;
 }
-.section {
-  padding: 58px 7vw;
-}
-.split {
+.problem-solution {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 34px;
-  align-items: start;
-  background: var(--paper);
-}
-.split h2, .process h2, .compare h2, .takeaways h2 {
-  margin: 0 0 18px;
-  font-size: 28px;
-  line-height: 1.2;
-}
-.panel-risk {
-  border-left: 6px solid var(--accent-risk);
-  background: var(--risk-bg);
-  padding: 26px;
+  gap: 0;
+  margin: 5rem auto;
+  border: 1px solid var(--line);
   box-shadow: var(--shadow);
 }
-.panel-opportunity {
-  border-top: 6px solid var(--accent-opportunity);
-  background: var(--opportunity-bg);
-  padding: 26px;
+.problem, .solution { padding: clamp(2rem, 5vw, 4rem); }
+.problem { background: var(--risk-soft); border-top: 7px solid var(--risk); }
+.solution { background: var(--opportunity-soft); border-top: 7px solid var(--opportunity); }
+.problem h2, .solution h2 { margin-top: 0; font-size: 1.6rem; }
+.platforms { margin: 5rem auto; }
+.platforms > h2 { font-size: clamp(2rem, 4vw, 3.2rem); }
+.platform-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
 }
-.panel-risk h3, .panel-opportunity h3 {
-  margin: 0 0 10px;
-  font-size: 20px;
-}
-.compare {
-  background: var(--table-bg);
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--paper);
-  overflow: hidden;
+.platform {
+  padding: 1.7rem;
   border: 1px solid var(--line);
+  border-radius: 1.2rem;
 }
-th, td {
-  padding: 16px;
-  border-bottom: 1px solid var(--line);
-  text-align: left;
-  vertical-align: top;
+.platform:nth-child(1) { background: var(--accent-soft); }
+.platform:nth-child(2) { background: var(--accent3-soft); transform: translateY(1.5rem); }
+.platform:nth-child(3) { background: var(--accent4-soft); }
+.platform b { color: var(--accent2); }
+.process-band {
+  padding: 5rem 0;
+  background: var(--dark-band);
+  color: var(--dark-band-ink);
 }
-th {
-  color: var(--accent-data);
-  font-size: 14px;
-  background: var(--band-bg);
-}
-td:first-child {
-  font-weight: 700;
-}
-.process {
-  background: var(--process-bg);
-}
+.process-band h2 { font-size: clamp(2rem, 4vw, 3.2rem); }
 .timeline {
   display: grid;
-  gap: 18px;
-  max-width: 920px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  counter-reset: steps;
 }
 .step {
-  display: grid;
-  grid-template-columns: 48px 1fr;
-  gap: 18px;
-  align-items: start;
+  position: relative;
+  padding: 3.5rem 1.25rem 1.4rem;
+  border-top: 3px solid var(--accent);
+  color: var(--dark-band-muted);
 }
-.badge {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: var(--accent-process);
-  color: var(--hero-ink);
-  font-weight: 800;
+.step::before {
+  counter-increment: steps;
+  content: "0" counter(steps);
+  position: absolute;
+  top: .6rem;
+  color: var(--accent2);
+  font-weight: 900;
+  font-size: 1.25rem;
 }
-.step p {
-  margin: 0;
-  padding-bottom: 18px;
-  border-bottom: 1px solid var(--line);
-}
+.step strong { color: var(--dark-band-ink); }
 .insight {
-  background: var(--conclusion-bg);
-  padding: 42px 7vw;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-}
-.insight blockquote {
-  margin: 0;
-  max-width: 900px;
-  font-size: 25px;
-  line-height: 1.45;
-  color: var(--ink);
-  border-left: 8px solid var(--accent-conclusion);
-  padding-left: 24px;
+  width: min(900px, calc(100% - 2.8rem));
+  margin: 5rem auto;
+  padding: 2rem 2.4rem;
+  background: var(--conclusion-soft);
+  border-left: 8px solid var(--conclusion);
+  font-size: clamp(1.15rem, 2.5vw, 1.55rem);
 }
 .takeaways {
-  background: var(--bg);
+  width: min(1120px, calc(100% - 2.8rem));
+  margin: 5rem auto;
 }
-.mosaic {
+.takeaways h2 { font-size: clamp(2rem, 4vw, 3.2rem); }
+.takeaway-grid {
   display: grid;
-  grid-template-columns: 1.2fr 1fr 1fr;
-  gap: 16px;
+  grid-template-columns: 1.25fr .75fr 1fr;
+  grid-template-areas: "a b c" "a d d";
+  gap: 1rem;
 }
-.tile {
-  background: var(--paper);
+.takeaway {
+  padding: 1.6rem;
+  border-radius: 1rem;
   border: 1px solid var(--line);
-  padding: 22px;
 }
-.tile.big {
-  grid-row: span 2;
-  background: var(--hero-bg);
-  color: var(--hero-ink);
+.takeaway:nth-child(1) { grid-area: a; background: var(--accent-soft); font-size: 1.2rem; }
+.takeaway:nth-child(2) { grid-area: b; background: var(--risk-soft); }
+.takeaway:nth-child(3) { grid-area: c; background: var(--accent3-soft); }
+.takeaway:nth-child(4) { grid-area: d; background: var(--accent4-soft); }
+.hl { background: var(--hl); padding: .05em .25em; font-weight: 800; }
+.hl2 { background: var(--hl2); padding: .05em .25em; font-weight: 800; }
+#translation {
+  background: var(--surface);
+  border-top: 10px solid var(--accent2);
+  padding: 5rem 1.4rem 7rem;
 }
-.tile h3 {
-  margin: 0 0 10px;
-  font-size: 19px;
+.translation-body {
+  width: min(760px, 100%);
+  margin: 0 auto;
+  font-family: "Noto Serif SC", "Songti SC", Georgia, serif;
+  font-size: 1.08rem;
+  line-height: 1.95;
 }
-.tile p { margin: 0; color: var(--muted); }
-.tile.big p { color: #c8d5e8; }
-.footer-note {
+.translation-body h2 {
+  margin: 0 0 2rem;
+  font-family: Inter, "Noto Sans SC", sans-serif;
+  font-size: clamp(2.4rem, 6vw, 4.6rem);
+  line-height: 1.1;
+}
+.translation-body h3 {
+  margin: 3.4rem 0 1rem;
+  padding-bottom: .45rem;
+  border-bottom: 2px solid var(--line);
+  color: var(--accent);
+  font-family: Inter, "Noto Sans SC", sans-serif;
+  font-size: 1.8rem;
+}
+.translation-body h4 {
+  margin: 2.8rem 0 .8rem;
+  color: var(--accent2);
+  font-family: Inter, "Noto Sans SC", sans-serif;
+  font-size: 1.35rem;
+}
+.translation-body p { margin: 0 0 1.35rem; }
+.translation-body ul { margin-bottom: 1.7rem; }
+.translation-body .toc {
+  margin: 2rem 0 3rem;
+  padding: 1.4rem 1.7rem;
+  background: var(--accent-soft);
+  border-left: 5px solid var(--accent);
+  font-family: Inter, "Noto Sans SC", sans-serif;
+}
+.source-figure {
+  margin: 2.8rem auto;
+  min-height: 4rem;
+}
+.source-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: .8rem;
+  box-shadow: var(--shadow);
+}
+.source-figure figcaption {
+  margin-top: .8rem;
   color: var(--muted);
-  font-size: 14px;
-  padding: 0 7vw 44px;
+  font-size: .9rem;
+  line-height: 1.6;
 }
-@media (max-width: 820px) {
-  .metric-band, .split, .mosaic {
+.related {
+  margin: 2.5rem 0;
+  padding: 1.4rem 1.7rem;
+  background: var(--accent4-soft);
+  border-left: 5px solid var(--accent4);
+}
+.byline, .filed { color: var(--muted); font-family: Inter, "Noto Sans SC", sans-serif; }
+.repeat-divider {
+  margin: 4rem 0;
+  border: 0;
+  border-top: 4px double var(--line);
+}
+@media (max-width: 800px) {
+  .number-strip, .platform-grid, .timeline { grid-template-columns: 1fr; }
+  .metric { border-right: 0; border-bottom: 1px solid var(--line); }
+  .problem-solution { grid-template-columns: 1fr; }
+  .platform:nth-child(2) { transform: none; }
+  .takeaway-grid {
     grid-template-columns: 1fr;
-  }
-  .hero {
-    padding-top: 48px;
-  }
-  .section {
-    padding: 42px 6vw;
-  }
-  .metric {
-    padding: 22px 6vw;
-  }
-  table {
-    display: block;
-    overflow-x: auto;
+    grid-template-areas: "a" "b" "c" "d";
   }
 }
 </style>
-  <script id="airs-digest-theme-boot">
+<script id="airs-digest-theme-boot">
     try {
       var saved = localStorage.getItem("theme");
       if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
     } catch (e) {}
   </script>
-  <style id="airs-digest-theme-style">
+<style id="airs-digest-theme-style">
     :root {
       color-scheme: light;
       --airs-digest-ink: #191816;
@@ -410,127 +496,230 @@ td:first-child {
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+  <style id="airs-source-image-theme-style">
+    .source-figure .source-image-dark {
+      display: none;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .source-figure .source-image-light {
+        display: none;
+      }
+      :root:not([data-theme="light"]) .source-figure .source-image-dark {
+        display: block;
+      }
+    }
+    :root[data-theme="dark"] .source-figure .source-image-light {
+      display: none;
+    }
+    :root[data-theme="dark"] .source-figure .source-image-dark {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-light {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-dark {
+      display: none;
+    }
   </style>
 </head>
 <body>
-<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/agent-sandboxing" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
-<main>
-  <section class="hero">
-    <div class="kicker">一句话总括</div>
-    <h1>为本地智能体实现安全沙箱</h1>
-    <p class="original">Implementing a secure sandbox for local agents</p>
-    <p class="lede">Cursor 的贡献不是单纯加一道权限弹窗，而是把本地编码智能体放进可执行、可解释、跨平台的边界里，让自动化能力增长时，系统风险不随之失控。</p>
-  </section>
-
-  <section class="metric-band" aria-label="关键数字">
-    <div class="metric"><strong>40%</strong><span>启用沙箱后，智能体中断次数比未启用时更少。</span></div>
-    <div class="metric"><strong>3 个月</strong><span>Cursor 在 macOS、Linux、Windows 上逐步推出沙箱。</span></div>
-    <div class="metric"><strong>1/3</strong><span>受支持平台上约三分之一请求已在沙箱内运行。</span></div>
-    <div class="metric"><strong>3 类系统</strong><span>同一 API 背后分别使用不同操作系统原语。</span></div>
-  </section>
-
-  <section class="section split">
-    <div class="panel-risk">
-      <h2>问题不是审批太少，而是审批会失效</h2>
-      <p>本地智能体能运行终端命令，就能探索环境、修改代码和执行构建。自动批准会提升效率，但错误命令可能删除数据库、发布损坏代码，或泄露密钥。</p>
-      <p>逐条人工审批只能短期缓解风险。审批越来越多时，用户会停止认真检查。多智能体并行工作会让这种疲劳更明显。</p>
-    </div>
-    <div class="panel-opportunity">
-      <h2>沙箱把自由放在边界内</h2>
-      <p>Cursor 的设计目标是减少打断，同时提高安全性。智能体可以在受控环境中自由工作，只有需要越界时才请求授权。</p>
-      <p>最常见的越界场景是访问互联网。这说明沙箱改变的是默认权限模型，而不只是增加提示文案。</p>
-    </div>
-  </section>
-
-  <section class="section compare">
-    <h2>跨平台实现各不相同</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>平台</th>
-          <th>采用方式</th>
-          <th>关键取舍</th>
-          <th>带来的理解变化</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>macOS</td>
-          <td>使用 Seatbelt，通过 sandbox-exec 运行子进程树。</td>
-          <td>App Sandbox、容器和虚拟机各有成本。Seatbelt 虽已废弃，但仍能细粒度限制系统调用和文件访问。</td>
-          <td>本地 AI 工具的安全工程常常依赖现实可用的系统能力，而不是最理想的抽象。</td>
-        </tr>
-        <tr>
-          <td>Linux</td>
-          <td>直接组合 Landlock 和 seccomp。</td>
-          <td>seccomp 阻止危险系统调用，Landlock 约束文件系统。Cursor 还用 overlay filesystem 处理被忽略文件。</td>
-          <td>安全边界不是一个开关。它需要把内核能力、工作区映射和忽略规则一起编排。</td>
-        </tr>
-        <tr>
-          <td>Windows</td>
-          <td>先在 WSL2 中运行 Linux 沙箱。</td>
-          <td>原生 Windows 沙箱更难，因为现有原语多面向浏览器，不适合通用开发工具。</td>
-          <td>智能体安全会推动操作系统暴露新的开发者级隔离能力。</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="section process">
-    <h2>让智能体理解沙箱，和实现沙箱一样重要</h2>
-    <div class="timeline">
-      <div class="step">
-        <div class="badge">1</div>
-        <p>Cursor 先更新 Shell 工具说明，让模型知道文件系统、Git、网络权限会受用户设置影响。这样智能体能预判哪些命令会失败。</p>
-      </div>
-      <div class="step">
-        <div class="badge">2</div>
-        <p>团队用常见 rollout 手工测试提示词。发现异常后调整 harness，再重复执行。这个过程把安全规则变成模型能操作的上下文。</p>
-      </div>
-      <div class="step">
-        <div class="badge">3</div>
-        <p>在 Cursor Bench 中，他们发现智能体会反复重试同一命令，却不改变权限。失败提示随后被改成明确指出是哪条沙箱约束造成了失败。</p>
-      </div>
-      <div class="step">
-        <div class="badge">4</div>
-        <p>上线后，智能体从沙箱失败中恢复得更好，离线评测表现明显改善。生产环境的渐进发布又验证了用户体验没有明显退化。</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="insight">
-    <blockquote>真正的安全自主权，不是让模型少做事，而是让模型知道自己在哪些边界内可以大胆做事。</blockquote>
-  </section>
-
-  <section class="section takeaways">
-    <h2>最值得带走的洞见</h2>
-    <div class="mosaic">
-      <div class="tile big">
-        <h3>审批不是长期扩展方案</h3>
-        <p>当智能体数量和命令数量上升时，人类审批会变成噪声。沙箱把注意力留给真正越界的操作。</p>
-      </div>
-      <div class="tile">
-        <h3>安全边界要贴近工作流</h3>
-        <p>如果沙箱阻断测试、构建和常见命令，它会被绕开。可用性本身就是安全设计的一部分。</p>
-      </div>
-      <div class="tile">
-        <h3>平台差异无法被抹平</h3>
-        <p>统一 API 之下仍要分别处理 Seatbelt、Landlock、seccomp 和 WSL2。</p>
-      </div>
-      <div class="tile">
-        <h3>模型也需要权限素养</h3>
-        <p>工具提示和错误渲染会影响智能体是否能正确升级权限，而不是原地重试。</p>
-      </div>
-      <div class="tile">
-        <h3>下一步是沙箱原生智能体</h3>
-        <p>如果训练时就理解环境约束，智能体可以更自由地写脚本和程序，而不只依赖工具调用。</p>
-      </div>
-    </div>
-  </section>
-
-  <p class="footer-note">来源：Cursor，Research，2026 年 2 月 18 日。作者：Ani Betts、Yash Gaitonde、Alex Haugland。</p>
-</main>
-  <script id="airs-digest-theme-script">
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">← 返回索引</a><a href="https://cursor.com/blog/agent-sandboxing" rel="noopener noreferrer" target="_blank">阅读原文 ↗</a></div><button class="airs-digest-theme-toggle" data-airs-theme-toggle="" type="button">主题 · 跟随系统</button></nav>
+<header class="hero">
+<div class="eyebrow">Cursor · Research</div>
+<h1>为本地智能体构建安全沙箱</h1>
+<p class="original-title" lang="en">Implementing a secure sandbox for local agents</p>
+<p class="dek"><strong>一句话总括：</strong>Cursor 用因平台而异的底层机制构建统一沙箱，让编码智能体获得更大的自主执行空间，同时把文件、网络和系统权限限制在明确边界内。</p>
+<div class="meta">
+<span>2026 年 2 月 18 日</span>
+<span>Ani Betts、Yash Gaitonde、Alex Haugland</span>
+<span>研究</span>
+</div>
+</header>
+<div class="summary-shell">
+<section aria-label="关键数字" class="number-strip">
+<div class="metric"><strong>40%</strong><span>沙箱化智能体减少的中断次数</span></div>
+<div class="metric"><strong>1/3</strong><span>受支持平台上已进入沙箱的请求</span></div>
+<div class="metric"><strong>3 个月</strong><span>跨三大平台逐步上线的时间</span></div>
+</section>
+<section class="problem-solution content-wide">
+<div class="problem">
+<h2>审批本身也会失效</h2>
+<p>自动批准命令会放大智能体能力，但也可能导致数据库被删除、故障代码上线或密钥泄露。</p>
+<p>逐条审批并非稳固的长期防线。提示积累后，用户会越来越少认真检查。并行运行多个智能体时，频繁切换上下文会进一步加剧<span class="hl">审批疲劳</span>。</p>
+<p><strong>洞见：</strong>安全不能只依赖人在每一次操作前保持高度警觉。</p>
+</div>
+<div class="solution">
+<h2>把自由放在边界之内</h2>
+<p>智能体可在受控环境中自由运行。只有需要越过边界时才申请批准，最常见的情形是访问互联网。</p>
+<p>生产数据表明，沙箱化智能体的中断次数<span class="hl2">减少了 40%</span>。这说明执行边界不仅提升安全性，也能显著改善工作流。</p>
+<p><strong>洞见：</strong>恰当的默认权限比不断弹出确认框更可靠，也更高效。</p>
+</div>
+</section>
+<section class="platforms content-wide">
+<h2>同一个 API，三套平台实现</h2>
+<div class="platform-grid">
+<article class="platform">
+<h3>macOS · Seatbelt</h3>
+<p>Cursor 排除了 App Sandbox、容器和虚拟机。最终选择通过 <b>sandbox-exec</b> 使用 Seatbelt。</p>
+<p>策略会结合工作区设置、管理员设置和 <code>.cursorignore</code> 在运行时生成。它可约束整个子进程树。</p>
+<p><strong>结论：</strong>成熟但已弃用的系统能力，在现实约束下仍可能是最实用的选择。</p>
+</article>
+<article class="platform">
+<h3>Linux · Landlock + seccomp</h3>
+<p>seccomp 阻止不安全的系统调用。Landlock 负责文件系统限制，并让被忽略文件对沙箱进程完全不可访问。</p>
+<p>工作区会映射到覆盖文件系统。查找并重新挂载相关文件是 Linux 实现中最慢的环节。</p>
+<p><strong>结论：</strong>Linux 提供了强大的原语，但把它们组合成好用的产品仍需大量工程工作。</p>
+</article>
+<article class="platform">
+<h3>Windows · WSL2</h3>
+<p>Windows 当前通过 WSL2 运行 Linux 沙箱。原生实现更困难，因为现有原语大多面向浏览器，而不是通用开发工具。</p>
+<p>Cursor 正与 Microsoft 合作，推动所需的底层能力落地。</p>
+<p><strong>结论：</strong>跨平台一致性不等于底层实现一致，过渡方案也可以形成有效边界。</p>
+</article>
+</div>
+</section>
+<section class="process-band">
+<div class="content-wide">
+<h2>沙箱还必须教会智能体使用</h2>
+<div class="timeline">
+<div class="step"><strong>描述约束</strong><br/>在 Shell 工具说明中明确文件系统、Git 和网络权限。</div>
+<div class="step"><strong>人工回放</strong><br/>反复运行常见任务，根据异常行为调整提示和工具描述。</div>
+<div class="step"><strong>发现失败模式</strong><br/>Cursor Bench 显示，智能体会在不改变权限的情况下重复同一命令。</div>
+<div class="step"><strong>显式反馈</strong><br/>工具结果指出具体沙箱限制，并在适当情况下建议升级权限。</div>
+</div>
+<p>这些提醒让智能体更从容地从沙箱错误中恢复，也显著改善了离线评测表现。<strong>结论是，安全机制的错误反馈也是智能体控制系统的一部分。</strong></p>
+</div>
+</section>
+<aside class="insight">
+    离线评测只覆盖了真实体验的一小部分。Cursor 因此采用渐进式生产发布，并结合内部和外部反馈验证体验。目前，受支持平台上已有<span class="hl">约三分之一</span>的请求在沙箱中运行，NVIDIA 等企业客户也已采用这项能力。
+  </aside>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="takeaway-grid">
+<article class="takeaway"><strong>执行边界比审批堆叠更可扩展。</strong><br/>当智能体数量和操作频率上升时，让安全性依赖人工逐条判断会迅速失效。</article>
+<article class="takeaway"><strong>可用性决定安全机制能否真正启用。</strong><br/>过度限制会让构建和测试流程无法运行。</article>
+<article class="takeaway"><strong>跨平台沙箱需要因地制宜。</strong><br/>统一的是权限模型和 API，不是底层技术。</article>
+<article class="takeaway"><strong>智能体必须理解自己所处的环境。</strong><br/>清晰的工具描述、失败原因和升级建议，能减少无效重试。未来的沙箱原生智能体还可直接编写并运行程序，而不必局限于工具调用。</article>
+</div>
+</section>
+</div>
+<section id="translation">
+<div class="translation-body">
+<h2>完整译文</h2>
+<figure class="source-figure" data-source-image="0"><img alt="Implementing a secure sandbox for local agents" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fog%2Fblog-sandboxing-og-r1.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<nav aria-label="目录" class="toc">
+<strong>目录</strong>
+<ul>
+<li>我们的沙箱目标</li>
+<li>实现方式</li>
+<li>教会智能体使用沙箱</li>
+</ul>
+</nav>
+<p>编码智能体执行终端命令的能力正在迅速提高。它们可以借此探索环境并进行修改。允许自动批准这些命令的用户，能够释放智能体更强大的能力，但同时也承担了更大的风险。智能体一旦出错，就可能删除数据库、发布存在故障的代码，或泄露敏感信息。</p>
+<p>要求每条命令都由人工批准，可以降低这种风险，但这种效果往往无法长久维持。随着审批不断积累，用户会逐渐不再仔细查看。工程师同时运行多个智能体时，情况会更加严重。他们必须在不同的审批提示之间频繁切换上下文，最终产生审批疲劳。这反而削弱了审批机制原本的意义。</p>
+<p>过去三个月，我们通过在 macOS、Linux 和 Windows 上逐步推出智能体沙箱来解决这个问题。沙箱中的智能体可以在受控环境内自由运行。只有需要越过边界时，它们才会申请批准。最常见的情况是访问互联网。</p>
+<p>这种方式大幅减少了中断。与未使用沙箱的智能体相比，沙箱化智能体的停止次数减少了 40%，为用户省下了数小时的人工审查和审批时间。</p>
+<figure class="source-figure" data-source-image="1"><img alt="Sandboxed agents stop 40% less often than unsandboxed ones" class="source-image source-image-light" decoding="async" height="1350" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fsandboxing-chart-r2.png&amp;w=3840&amp;q=70" width="2400"/><img alt="Sandboxed agents stop 40% less often than unsandboxed ones" class="source-image source-image-dark" decoding="async" height="1350" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fsandboxing-chart-r2-dark.png&amp;w=3840&amp;q=70" width="2400"/></figure>
+<h3>我们的沙箱目标</h3>
+<p>我们启动沙箱项目时，目标是在提升安全性的同时消除中断。我们希望赋予智能体足够的行动空间，使其能够有效工作，同时拒绝那些会带来风险的权限。</p>
+<p>要取得这种平衡，比看起来更困难。许多终端命令需要意料之外的权限。即使是基本的测试或构建步骤，也可能如此。简单粗暴的沙箱会阻止这些命令，导致智能体的工作流中断。设计一个真正可用的沙箱，需要在安全性和可用性之间不断权衡，同时还要受各个操作系统所提供能力的限制。</p>
+<h3>实现方式</h3>
+<p>我们对外提供统一的沙箱 API，但在每个平台上采用不同的实现。macOS、Linux 和 Windows 提供的沙箱原语各不相同，这决定了各平台底层设计的选择。</p>
+<h4>macOS</h4>
+<p>我们在 macOS 上评估了四种沙箱方案：App Sandbox、容器、虚拟机和 Seatbelt。App Sandbox 是为 Mac App Store 设计的。如果采用它，Cursor 必须为智能体可能执行的每个二进制文件签名。这不仅会显著增加复杂度，还会产生新的滥用途径。智能体生成或修改的二进制文件可能借此继承 Cursor 的信任。容器会把我们限制在 Linux 二进制文件上，而虚拟机的启动延迟和内存开销又无法接受。</p>
+<p>因此，只剩下通过 <code>sandbox-exec</code> 使用的 Seatbelt。它于 2007 年引入，并在 2016 年被弃用，但 Chrome 等重要的第三方应用至今仍在使用。它允许命令在沙箱策略下运行，并对完整的子进程树实施行为限制。</p>
+<p>这种策略能够细粒度定义权限。它使用一种颇为独特的策略语言，限制系统调用，并限制对特定文件和目录的读取或写入。我们会结合工作区级设置、管理员级设置以及用户的 <code>.cursorignore</code>，在运行时动态生成策略。</p>
+<h4>Linux</h4>
+<p>与 macOS 相比，Linux 既更容易，也更困难。内核通过 Landlock 和 seccomp 提供了所需的原语，但用户空间必须负责把它们组合成真正可用的沙箱。多个开源项目已经有效结合了这些机制，但没有一个支持 <code>.cursorignore</code> 等功能。</p>
+<p>我们决定直接使用 Landlock 和 seccomp。Seccomp 用于阻止不安全的系统调用，Landlock 则实施文件系统限制。这使我们可以让被忽略的文件对沙箱进程完全不可访问。我们把用户工作区映射到覆盖文件系统中，并用受 Landlock 保护、无法读取或修改的副本覆盖被忽略文件。</p>
+<p>查找并重新挂载这些文件，是 Linux 沙箱中最慢的环节。如果能像 macOS 一样延迟过滤文件系统操作，实现起来会更容易。但在 seccomp-bpf 上下文中，Linux 无法让我们轻松取得文件路径。</p>
+<h4>Windows</h4>
+<p>在 Windows 上，我们通过 WSL2 运行 Linux 沙箱。构建具有同等能力的原生 Windows 沙箱要困难得多，因为大多数现有沙箱原语都是为浏览器设计的，并不支持通用开发工具。我们正在与 Microsoft 合作，推动所需原语的提供。</p>
+<h3>教会智能体使用沙箱</h3>
+<p>只有当智能体能够预判哪些命令可以在沙箱内成功运行，并在需要时识别出必须升级权限，沙箱才能真正发挥作用。要让模型理解沙箱，就必须修改智能体运行框架。</p>
+<p>我们先更新了 Shell 工具的说明，用来解释沙箱约束。其中包括：根据用户设置，命令是否拥有文件系统、Git 或网络访问权限，以及智能体如何在需要时申请更高权限。为了得到一个令我们满意的基础运行框架改动，我们进行了大量人工测试。我们会运行几组常见任务，观察实际行为与预期的差异，调整提示，然后重新运行这些任务。</p>
+<p>随后，我们使用内部 benchmark Cursor Bench 评估这些变化的影响，对比启用和未启用沙箱的智能体。我们很快发现一种常见的失败模式：智能体会不断重试同一条终端命令，却不改变所申请的权限。</p>
+<p>为了解决这个问题，我们调整了 Shell 工具结果的呈现方式。现在，结果会明确指出造成失败的具体沙箱限制。在某些情况下，结果还会建议智能体升级权限。这些提醒发布后，智能体能够更从容地从沙箱相关失败中恢复，离线评测表现也得到显著改善。</p>
+<p>不过，离线评测只能呈现全貌的一小部分。为了进一步确认沙箱不会降低用户体验，我们在生产环境中逐步放量。内部和外部收到的反馈，让我们有信心正式推出这项功能。目前，在受支持的平台上，已有三分之一的请求运行在沙箱中。我们还帮助 NVIDIA 等众多企业客户完成了接入。</p>
+<p>随着智能体从生成代码走向操作生产系统，提供执行边界变得至关重要。我们当前的实现，是朝这个方向迈出的一步。展望未来，我们尤其期待针对环境约束进行训练的沙箱原生智能体。这些智能体可以获得直接编写并运行脚本和程序的自由，而不再局限于调用工具。</p>
+<p>如果你有兴趣参与与编码未来相关的深层技术问题研究，请联系 <a href="mailto:hiring@cursor.com">hiring@cursor.com</a>。</p>
+<p class="filed">归档分类：研究</p>
+<p class="byline">作者：Ani Betts、Yash Gaitonde 和 Alex Haugland</p>
+<aside class="related">
+<ul>
+<li>通过实时强化学习改进 Composer</li>
+<li>快速正则表达式搜索：为智能体工具建立文本索引</li>
+<li>Grok 4.5 发布</li>
+<li>为本地智能体构建安全沙箱</li>
+</ul>
+</aside>
+<hr class="repeat-divider"/>
+<nav aria-label="目录" class="toc">
+<strong>目录</strong>
+<ul>
+<li>我们的沙箱目标</li>
+<li>实现方式</li>
+<li>教会智能体使用沙箱</li>
+</ul>
+</nav>
+<p>编码智能体执行终端命令的能力正在迅速提高。它们可以借此探索环境并进行修改。允许自动批准这些命令的用户，能够释放智能体更强大的能力，但同时也承担了更大的风险。智能体一旦出错，就可能删除数据库、发布存在故障的代码，或泄露敏感信息。</p>
+<p>要求每条命令都由人工批准，可以降低这种风险，但这种效果往往无法长久维持。随着审批不断积累，用户会逐渐不再仔细查看。工程师同时运行多个智能体时，情况会更加严重。他们必须在不同的审批提示之间频繁切换上下文，最终产生审批疲劳。这反而削弱了审批机制原本的意义。</p>
+<p>过去三个月，我们通过在 macOS、Linux 和 Windows 上逐步推出智能体沙箱来解决这个问题。沙箱中的智能体可以在受控环境内自由运行。只有需要越过边界时，它们才会申请批准。最常见的情况是访问互联网。</p>
+<p>这种方式大幅减少了中断。与未使用沙箱的智能体相比，沙箱化智能体的停止次数减少了 40%，为用户省下了数小时的人工审查和审批时间。</p>
+<h3>我们的沙箱目标</h3>
+<p>我们启动沙箱项目时，目标是在提升安全性的同时消除中断。我们希望赋予智能体足够的行动空间，使其能够有效工作，同时拒绝那些会带来风险的权限。</p>
+<p>要取得这种平衡，比看起来更困难。许多终端命令需要意料之外的权限。即使是基本的测试或构建步骤，也可能如此。简单粗暴的沙箱会阻止这些命令，导致智能体的工作流中断。设计一个真正可用的沙箱，需要在安全性和可用性之间不断权衡，同时还要受各个操作系统所提供能力的限制。</p>
+<h3>实现方式</h3>
+<p>我们对外提供统一的沙箱 API，但在每个平台上采用不同的实现。macOS、Linux 和 Windows 提供的沙箱原语各不相同，这决定了各平台底层设计的选择。</p>
+<h4>macOS</h4>
+<p>我们在 macOS 上评估了四种沙箱方案：App Sandbox、容器、虚拟机和 Seatbelt。App Sandbox 是为 Mac App Store 设计的。如果采用它，Cursor 必须为智能体可能执行的每个二进制文件签名。这不仅会显著增加复杂度，还会产生新的滥用途径。智能体生成或修改的二进制文件可能借此继承 Cursor 的信任。容器会把我们限制在 Linux 二进制文件上，而虚拟机的启动延迟和内存开销又无法接受。</p>
+<p>因此，只剩下通过 <code>sandbox-exec</code> 使用的 Seatbelt。它于 2007 年引入，并在 2016 年被弃用，但 Chrome 等重要的第三方应用至今仍在使用。它允许命令在沙箱策略下运行，并对完整的子进程树实施行为限制。</p>
+<p>这种策略能够细粒度定义权限。它使用一种颇为独特的策略语言，限制系统调用，并限制对特定文件和目录的读取或写入。我们会结合工作区级设置、管理员级设置以及用户的 <code>.cursorignore</code>，在运行时动态生成策略。</p>
+<h4>Linux</h4>
+<p>与 macOS 相比，Linux 既更容易，也更困难。内核通过 Landlock 和 seccomp 提供了所需的原语，但用户空间必须负责把它们组合成真正可用的沙箱。多个开源项目已经有效结合了这些机制，但没有一个支持 <code>.cursorignore</code> 等功能。</p>
+<p>我们决定直接使用 Landlock 和 seccomp。Seccomp 用于阻止不安全的系统调用，Landlock 则实施文件系统限制。这使我们可以让被忽略的文件对沙箱进程完全不可访问。我们把用户工作区映射到覆盖文件系统中，并用受 Landlock 保护、无法读取或修改的副本覆盖被忽略文件。</p>
+<p>查找并重新挂载这些文件，是 Linux 沙箱中最慢的环节。如果能像 macOS 一样延迟过滤文件系统操作，实现起来会更容易。但在 seccomp-bpf 上下文中，Linux 无法让我们轻松取得文件路径。</p>
+<h4>Windows</h4>
+<p>在 Windows 上，我们通过 WSL2 运行 Linux 沙箱。构建具有同等能力的原生 Windows 沙箱要困难得多，因为大多数现有沙箱原语都是为浏览器设计的，并不支持通用开发工具。我们正在与 Microsoft 合作，推动所需原语的提供。</p>
+<h3>教会智能体使用沙箱</h3>
+<p>只有当智能体能够预判哪些命令可以在沙箱内成功运行，并在需要时识别出必须升级权限，沙箱才能真正发挥作用。要让模型理解沙箱，就必须修改智能体运行框架。</p>
+<p>我们先更新了 Shell 工具的说明，用来解释沙箱约束。其中包括：根据用户设置，命令是否拥有文件系统、Git 或网络访问权限，以及智能体如何在需要时申请更高权限。为了得到一个令我们满意的基础运行框架改动，我们进行了大量人工测试。我们会运行几组常见任务，观察实际行为与预期的差异，调整提示，然后重新运行这些任务。</p>
+<p>随后，我们使用内部 benchmark Cursor Bench 评估这些变化的影响，对比启用和未启用沙箱的智能体。我们很快发现一种常见的失败模式：智能体会不断重试同一条终端命令，却不改变所申请的权限。</p>
+<p>为了解决这个问题，我们调整了 Shell 工具结果的呈现方式。现在，结果会明确指出造成失败的具体沙箱限制。在某些情况下，结果还会建议智能体升级权限。这些提醒发布后，智能体能够更从容地从沙箱相关失败中恢复，离线评测表现也得到显著改善。</p>
+<p>不过，离线评测只能呈现全貌的一小部分。为了进一步确认沙箱不会降低用户体验，我们在生产环境中逐步放量。内部和外部收到的反馈，让我们有信心正式推出这项功能。目前，在受支持的平台上，已有三分之一的请求运行在沙箱中。我们还帮助 NVIDIA 等众多企业客户完成了接入。</p>
+<p>随着智能体从生成代码走向操作生产系统，提供执行边界变得至关重要。我们当前的实现，是朝这个方向迈出的一步。展望未来，我们尤其期待针对环境约束进行训练的沙箱原生智能体。这些智能体可以获得直接编写并运行脚本和程序的自由，而不再局限于调用工具。</p>
+<p>如果你有兴趣参与与编码未来相关的深层技术问题研究，请联系 <a href="mailto:hiring@cursor.com">hiring@cursor.com</a>。</p>
+<p class="filed">归档分类：研究</p>
+<p class="byline">作者：Ani Betts、Yash Gaitonde 和 Alex Haugland</p>
+<aside class="related">
+<ul>
+<li>通过实时强化学习改进 Composer</li>
+<li>快速正则表达式搜索：为智能体工具建立文本索引</li>
+<li>Grok 4.5 发布</li>
+</ul>
+</aside>
+</div>
+</section>
+<script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;
       const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));

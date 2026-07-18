@@ -1,279 +1,339 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>扩展长时间运行的自主编码</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>扩展长期运行的自主编程能力</title>
 <style>
 :root {
-  --bg: #f7f5ef;
-  --ink: #1d2228;
-  --muted: #66707a;
-  --line: #d8d2c4;
-  --panel: #ffffff;
-  --panel-soft: #f0eee5;
-  --band-data: #eaf4ff;
-  --band-risk: #fff0ec;
-  --band-opportunity: #edf8ef;
-  --band-conclusion: #f2edff;
-  --dark-block: #18212b;
-  --dark-ink: #f5f7fb;
-  --accent-data: #2374ab;
-  --accent-risk: #c2452d;
-  --accent-opportunity: #278557;
-  --accent-conclusion: #7357c8;
-  --accent-neutral: #b47a1f;
-  --shadow: rgba(29, 34, 40, 0.08);
+  color-scheme: light;
+  --bg:#f5f3ee;
+  --surface:#ffffff;
+  --surface-alt:#eee9df;
+  --ink:#17202a;
+  --muted:#66717c;
+  --line:#d7d0c4;
+  --accent:#3559e0;
+  --accent-ink:#ffffff;
+  --data:#007f73;
+  --risk:#c3473d;
+  --opportunity:#a36300;
+  --conclusion:#7147b8;
+  --hl:#d8f4ee;
+  --hl2:#fff0bd;
+  --data-soft:#dff5f1;
+  --risk-soft:#fbe4e1;
+  --opportunity-soft:#fff0c9;
+  --conclusion-soft:#eee4ff;
+  --deep:#172b3a;
+  --deep-ink:#f5fbff;
+  --shadow:#26344224;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg:#f5f3ee;
+  --surface:#ffffff;
+  --surface-alt:#eee9df;
+  --ink:#17202a;
+  --muted:#66717c;
+  --line:#d7d0c4;
+  --accent:#3559e0;
+  --accent-ink:#ffffff;
+  --data:#007f73;
+  --risk:#c3473d;
+  --opportunity:#a36300;
+  --conclusion:#7147b8;
+  --hl:#d8f4ee;
+  --hl2:#fff0bd;
+  --data-soft:#dff5f1;
+  --risk-soft:#fbe4e1;
+  --opportunity-soft:#fff0c9;
+  --conclusion-soft:#eee4ff;
+  --deep:#172b3a;
+  --deep-ink:#f5fbff;
+  --shadow:#26344224;
 }
 :root[data-theme="dark"] {
-  --bg: #111418;
-  --ink: #edf0f3;
-  --muted: #a7b0ba;
-  --line: #303842;
-  --panel: #1a2027;
-  --panel-soft: #202833;
-  --band-data: #13293a;
-  --band-risk: #351c18;
-  --band-opportunity: #163024;
-  --band-conclusion: #251d39;
-  --dark-block: #080b10;
-  --dark-ink: #f3f6fb;
-  --accent-data: #55aee8;
-  --accent-risk: #f0715c;
-  --accent-opportunity: #5ed18f;
-  --accent-conclusion: #a992ff;
-  --accent-neutral: #e0ad54;
-  --shadow: rgba(0, 0, 0, 0.32);
+  color-scheme: dark;
+  --bg:#101419;
+  --surface:#191f26;
+  --surface-alt:#222a32;
+  --ink:#e8edf2;
+  --muted:#aab5c0;
+  --line:#35404a;
+  --accent:#88a2ff;
+  --accent-ink:#101419;
+  --data:#55d7c8;
+  --risk:#ff8177;
+  --opportunity:#ffc45c;
+  --conclusion:#c7a3ff;
+  --hl:#173a36;
+  --hl2:#493b18;
+  --data-soft:#15332f;
+  --risk-soft:#3c2424;
+  --opportunity-soft:#3c311d;
+  --conclusion-soft:#302641;
+  --deep:#090d12;
+  --deep-ink:#e8f5ff;
+  --shadow:#00000055;
 }
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #111418;
-    --ink: #edf0f3;
-    --muted: #a7b0ba;
-    --line: #303842;
-    --panel: #1a2027;
-    --panel-soft: #202833;
-    --band-data: #13293a;
-    --band-risk: #351c18;
-    --band-opportunity: #163024;
-    --band-conclusion: #251d39;
-    --dark-block: #080b10;
-    --dark-ink: #f3f6fb;
-    --accent-data: #55aee8;
-    --accent-risk: #f0715c;
-    --accent-opportunity: #5ed18f;
-    --accent-conclusion: #a992ff;
-    --accent-neutral: #e0ad54;
-    --shadow: rgba(0, 0, 0, 0.32);
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg:#101419;
+    --surface:#191f26;
+    --surface-alt:#222a32;
+    --ink:#e8edf2;
+    --muted:#aab5c0;
+    --line:#35404a;
+    --accent:#88a2ff;
+    --accent-ink:#101419;
+    --data:#55d7c8;
+    --risk:#ff8177;
+    --opportunity:#ffc45c;
+    --conclusion:#c7a3ff;
+    --hl:#173a36;
+    --hl2:#493b18;
+    --data-soft:#15332f;
+    --risk-soft:#3c2424;
+    --opportunity-soft:#3c311d;
+    --conclusion-soft:#302641;
+    --deep:#090d12;
+    --deep-ink:#e8f5ff;
+    --shadow:#00000055;
   }
 }
-* { box-sizing: border-box; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
 body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-  line-height: 1.65;
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:Inter, "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height:1.75;
 }
-main { overflow: hidden; }
+a { color:var(--accent); }
 .hero {
-  padding: 64px 7vw 48px;
-  background: var(--dark-block);
-  color: var(--dark-ink);
+  padding:clamp(3.5rem,8vw,7rem) 1.25rem;
+  background:linear-gradient(135deg,var(--deep),var(--conclusion));
+  color:var(--deep-ink);
 }
-.kicker {
-  color: var(--accent-neutral);
-  font-weight: 700;
-  letter-spacing: 0;
-  margin-bottom: 18px;
+.hero-inner { max-width:1080px; margin:auto; }
+.eyebrow {
+  display:inline-block;
+  margin-bottom:1rem;
+  padding:.3rem .75rem;
+  border:1px solid var(--deep-ink);
+  border-radius:999px;
+  font-size:.82rem;
+  letter-spacing:.08em;
 }
-h1 {
-  margin: 0;
-  font-size: clamp(34px, 6vw, 72px);
-  line-height: 1.05;
-  letter-spacing: 0;
+.hero h1 {
+  max-width:900px;
+  margin:0;
+  font-size:clamp(2.6rem,7vw,5.8rem);
+  line-height:1.05;
+  letter-spacing:-.04em;
 }
-.original {
-  margin-top: 12px;
-  color: var(--muted);
-  font-size: 18px;
+.original-title {
+  margin:.9rem 0 0;
+  color:var(--deep-ink);
+  opacity:.72;
+  font-size:clamp(1rem,2vw,1.3rem);
 }
-.thesis {
-  max-width: 920px;
-  margin-top: 30px;
-  font-size: clamp(20px, 2.4vw, 30px);
-  line-height: 1.35;
+.lede {
+  max-width:760px;
+  margin:2.4rem 0 0;
+  font-size:clamp(1.18rem,2.4vw,1.65rem);
+  line-height:1.55;
 }
-.num-band {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1px;
-  background: var(--line);
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+.summary-main { max-width:1120px; margin:auto; padding:3.5rem 1.25rem 5rem; }
+.section-kicker {
+  margin:0 0 .45rem;
+  color:var(--accent);
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  font-size:.78rem;
 }
-.num {
-  background: var(--band-data);
-  padding: 28px 24px;
+.summary-main h2 { margin:.2rem 0 1rem; font-size:clamp(1.7rem,4vw,2.7rem); line-height:1.2; }
+.highlight { background:var(--hl); color:var(--data); padding:.05em .25em; font-weight:800; }
+.highlight-warm { background:var(--hl2); color:var(--opportunity); padding:.05em .25em; font-weight:800; }
+.stats-band {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  margin:0 0 4rem;
+  border:1px solid var(--line);
+  border-radius:1.3rem;
+  overflow:hidden;
+  background:var(--surface);
+  box-shadow:0 18px 45px var(--shadow);
 }
-.num strong {
-  display: block;
-  color: var(--accent-data);
-  font-size: clamp(28px, 4vw, 46px);
-  line-height: 1;
-}
-.num span {
-  display: block;
-  margin-top: 10px;
-  color: var(--muted);
-}
+.stat { padding:1.45rem; border-right:1px solid var(--line); }
+.stat:last-child { border-right:0; }
+.stat strong { display:block; color:var(--data); font-size:clamp(1.8rem,4vw,3rem); line-height:1.05; }
+.stat span { display:block; margin-top:.55rem; color:var(--muted); font-size:.92rem; }
 .split {
-  display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  gap: 42px;
-  padding: 54px 7vw;
-  background: var(--panel);
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:2rem;
+  margin:4rem 0;
+  align-items:center;
 }
-.split h2, .timeline h2, .table-wrap h2, .quote-zone h2, .takeaways h2 {
-  margin: 0 0 18px;
-  font-size: clamp(24px, 3vw, 38px);
-  line-height: 1.15;
+.split-copy { padding:1rem 0; }
+.failure-panel {
+  padding:2rem;
+  border-left:.55rem solid var(--risk);
+  background:var(--risk-soft);
+  border-radius:.4rem 1.4rem 1.4rem .4rem;
 }
-.lead {
-  font-size: 20px;
-  color: var(--muted);
+.failure-panel h3 { margin-top:0; color:var(--risk); font-size:1.45rem; }
+.failure-panel li + li { margin-top:.75rem; }
+.pipeline {
+  margin:4rem 0;
+  padding:2.5rem;
+  background:var(--surface-alt);
+  border-radius:1.5rem;
 }
-.problem-list {
-  display: grid;
-  gap: 16px;
+.flow {
+  display:grid;
+  grid-template-columns:1fr auto 1fr auto 1fr;
+  gap:1rem;
+  align-items:stretch;
+  margin-top:2rem;
 }
-.problem {
-  border-left: 5px solid var(--accent-risk);
-  background: var(--band-risk);
-  padding: 18px 20px;
+.flow-item {
+  padding:1.4rem;
+  background:var(--surface);
+  border-top:.35rem solid var(--accent);
+  border-radius:1rem;
 }
-.problem b { color: var(--accent-risk); }
-.timeline {
-  padding: 56px 7vw;
-  background: var(--panel-soft);
+.flow-item.worker { border-color:var(--data); }
+.flow-item.judge { border-color:var(--conclusion); }
+.flow-item h3 { margin:.1rem 0 .55rem; }
+.arrow { align-self:center; color:var(--muted); font-size:1.8rem; }
+.evidence {
+  margin:4rem 0;
+  padding:clamp(2rem,5vw,4rem);
+  background:var(--deep);
+  color:var(--deep-ink);
+  border-radius:1.8rem;
 }
-.steps {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 22px;
-  position: relative;
+.evidence h2 { color:var(--deep-ink); }
+.evidence-grid {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1rem;
+  margin-top:2rem;
 }
-.step {
-  border-top: 6px solid var(--accent-opportunity);
-  padding: 18px 0 0;
+.evidence-item {
+  padding:1.3rem;
+  border:1px solid var(--data);
+  border-radius:1rem;
 }
-.step .badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--accent-opportunity);
-  color: var(--dark-ink);
-  font-weight: 800;
+.evidence-item:nth-child(2) { border-color:var(--opportunity); }
+.evidence-item:nth-child(3) { border-color:var(--conclusion); }
+.evidence-item strong { display:block; font-size:1.65rem; color:var(--data); }
+.evidence-item:nth-child(2) strong { color:var(--opportunity); }
+.evidence-item:nth-child(3) strong { color:var(--conclusion); }
+.model-note {
+  margin:4rem 0;
+  padding:2.2rem;
+  border:1px solid var(--line);
+  border-radius:1.5rem;
+  background:linear-gradient(120deg,var(--conclusion-soft),var(--surface));
 }
-.step h3 { margin: 14px 0 8px; }
-.table-wrap {
-  padding: 54px 7vw;
-  background: var(--band-conclusion);
+.model-note blockquote {
+  margin:1.5rem 0 0;
+  padding-left:1.2rem;
+  border-left:.35rem solid var(--conclusion);
+  font-size:1.25rem;
+  font-weight:700;
 }
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--panel);
-  box-shadow: 0 12px 30px var(--shadow);
-}
-th, td {
-  padding: 16px 18px;
-  border-bottom: 1px solid var(--line);
-  text-align: left;
-  vertical-align: top;
-}
-th {
-  color: var(--accent-conclusion);
-  font-size: 14px;
-  text-transform: uppercase;
-}
-.quote-zone {
-  padding: 60px 7vw;
-  background: var(--dark-block);
-  color: var(--dark-ink);
-}
-.insight {
-  max-width: 940px;
-  border-left: 8px solid var(--accent-neutral);
-  padding-left: 24px;
-  font-size: clamp(24px, 3vw, 40px);
-  line-height: 1.25;
-}
-.note-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-  margin-top: 34px;
-}
-.note {
-  background: var(--panel);
-  color: var(--ink);
-  padding: 20px;
-  border: 1px solid var(--line);
-}
-.note.data { border-top: 5px solid var(--accent-data); }
-.note.risk { border-top: 5px solid var(--accent-risk); }
-.takeaways {
-  padding: 58px 7vw 70px;
-  background: var(--bg);
-}
+.takeaways { margin-top:4rem; }
 .mosaic {
-  display: grid;
-  grid-template-columns: 1.2fr 0.8fr 1fr;
-  gap: 18px;
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:1rem;
+  margin-top:1.5rem;
 }
-.tile {
-  min-height: 150px;
-  padding: 22px;
-  background: var(--panel);
-  border: 1px solid var(--line);
+.tile { padding:1.45rem; border-radius:1.1rem; }
+.tile strong { display:block; margin-bottom:.45rem; font-size:1.05rem; }
+.tile:nth-child(1) { grid-column:span 3; background:var(--data-soft); border-bottom:.3rem solid var(--data); }
+.tile:nth-child(2) { grid-column:span 3; background:var(--risk-soft); border-bottom:.3rem solid var(--risk); }
+.tile:nth-child(3) { grid-column:span 2; background:var(--opportunity-soft); border-bottom:.3rem solid var(--opportunity); }
+.tile:nth-child(4) { grid-column:span 2; background:var(--conclusion-soft); border-bottom:.3rem solid var(--conclusion); }
+.tile:nth-child(5) { grid-column:span 2; background:var(--surface-alt); border-bottom:.3rem solid var(--accent); }
+#translation {
+  background:var(--surface);
+  border-top:1px solid var(--line);
+  padding:5rem 1.25rem 7rem;
 }
-.tile:nth-child(1) { border-top: 6px solid var(--accent-data); }
-.tile:nth-child(2) { border-top: 6px solid var(--accent-risk); }
-.tile:nth-child(3) { border-top: 6px solid var(--accent-opportunity); }
-.tile:nth-child(4) {
-  grid-column: span 2;
-  border-top: 6px solid var(--accent-conclusion);
+.translation-inner { max-width:780px; margin:auto; }
+#translation h2 { margin:0 0 2.5rem; font-size:clamp(2.2rem,5vw,3.8rem); line-height:1.1; }
+#translation h3 {
+  margin:3.5rem 0 1rem;
+  padding-top:1rem;
+  border-top:1px solid var(--line);
+  font-size:1.75rem;
+  line-height:1.25;
 }
-.tile:nth-child(5) { border-top: 6px solid var(--accent-neutral); }
-.tile b {
-  display: block;
-  margin-bottom: 10px;
-  font-size: 18px;
+#translation p, #translation li { font-size:1.05rem; }
+.toc {
+  padding:1.4rem 1.6rem;
+  background:var(--surface-alt);
+  border-left:.35rem solid var(--accent);
+  border-radius:.5rem;
 }
-@media (max-width: 760px) {
-  .num-band, .split, .steps, .note-grid, .mosaic {
-    grid-template-columns: 1fr;
-  }
-  .tile:nth-child(4) { grid-column: auto; }
-  .hero, .split, .timeline, .table-wrap, .quote-zone, .takeaways {
-    padding-left: 22px;
-    padding-right: 22px;
-  }
-  table { font-size: 14px; }
-  th, td { padding: 12px; }
+.toc strong { display:block; margin-bottom:.5rem; }
+.meta, .related { color:var(--muted); }
+.metric-list {
+  margin:1.5rem 0;
+  padding:1.2rem 1.5rem;
+  background:var(--data-soft);
+  border-radius:.8rem;
+}
+.source-figure {
+  margin:2.5rem 0;
+  padding:1rem;
+  border:1px solid var(--line);
+  border-radius:1rem;
+  background:var(--surface-alt);
+}
+.source-figure img {
+  display:block;
+  max-width:100%;
+  height:auto;
+  margin:auto;
+  border-radius:.65rem;
+}
+.source-figure figcaption {
+  margin-top:.8rem;
+  color:var(--muted);
+  font-size:.9rem;
+  text-align:center;
+}
+.repeat-divider { margin:4rem 0; border:0; border-top:.2rem solid var(--line); }
+@media (max-width:760px) {
+  .stats-band { grid-template-columns:1fr 1fr; }
+  .stat { border-bottom:1px solid var(--line); }
+  .stat:nth-child(2) { border-right:0; }
+  .stat:nth-child(3), .stat:nth-child(4) { border-bottom:0; }
+  .split { grid-template-columns:1fr; }
+  .flow { grid-template-columns:1fr; }
+  .arrow { transform:rotate(90deg); justify-self:center; }
+  .evidence-grid { grid-template-columns:1fr; }
+  .tile, .tile:nth-child(n) { grid-column:span 6; }
 }
 </style>
-  <script id="airs-digest-theme-boot">
+<script id="airs-digest-theme-boot">
     try {
       var saved = localStorage.getItem("theme");
       if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
     } catch (e) {}
   </script>
-  <style id="airs-digest-theme-style">
+<style id="airs-digest-theme-style">
     :root {
       color-scheme: light;
       --airs-digest-ink: #191816;
@@ -396,115 +456,279 @@ th {
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+  <style id="airs-source-image-theme-style">
+    .source-figure .source-image-dark {
+      display: none;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .source-figure .source-image-light {
+        display: none;
+      }
+      :root:not([data-theme="light"]) .source-figure .source-image-dark {
+        display: block;
+      }
+    }
+    :root[data-theme="dark"] .source-figure .source-image-light {
+      display: none;
+    }
+    :root[data-theme="dark"] .source-figure .source-image-dark {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-light {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-dark {
+      display: none;
+    }
   </style>
 </head>
 <body>
-<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/scaling-agents" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
-<main>
-  <header class="hero">
-    <div class="kicker">一句话总括</div>
-    <h1>扩展长时间运行的自主编码</h1>
-    <div class="original">Scaling long-running autonomous coding</div>
-    <p class="thesis">Cursor 的核心贡献是把多代理编码从“能否并行”推进到“如何长期组织”。实验显示，代理规模能带来真实进展，但前提是角色分工、周期性重启和提示设计足够克制。</p>
-  </header>
-
-  <section class="num-band" aria-label="关键数字">
-    <div class="num"><strong>数百</strong><span>并发代理在同一项目上工作</span></div>
-    <div class="num"><strong>100万+</strong><span>浏览器实验生成代码行数</span></div>
-    <div class="num"><strong>1000</strong><span>浏览器实验涉及文件数</span></div>
-    <div class="num"><strong>数万亿</strong><span>投入到单一目标的 token 量级</span></div>
-  </section>
-
-  <section class="split">
-    <div>
-      <h2>平级协作不是自然答案</h2>
-      <p class="lead">文章先否定了一个直觉：让代理共享状态并自行抢任务，并不会自动形成高吞吐团队。</p>
-      <p>锁机制让二十个代理退化到两三个代理的有效吞吐。问题不只是工程实现粗糙，而是等待、遗忘释放锁和绕过锁会不断放大系统脆弱性。</p>
-    </div>
-    <div class="problem-list">
-      <div class="problem"><b>瓶颈：</b>锁让代理排队，等待时间吞掉并行收益。</div>
-      <div class="problem"><b>脆弱：</b>代理可能持锁失败、重复申请锁，或直接跳过协调协议。</div>
-      <div class="problem"><b>避险：</b>没有层级时，代理倾向挑小任务，困难任务无人负责。</div>
-    </div>
-  </section>
-
-  <section class="timeline">
-    <h2>有效结构来自角色拆分</h2>
-    <div class="steps">
-      <article class="step">
-        <span class="badge">1</span>
-        <h3>规划者探索代码库</h3>
-        <p>规划者持续发现工作，并能派生子规划者。规划本身也被并行化。</p>
-      </article>
-      <article class="step">
-        <span class="badge">2</span>
-        <h3>工人只完成任务</h3>
-        <p>工人不负责全局协调。它们领取任务、实现、处理冲突，然后推送结果。</p>
-      </article>
-      <article class="step">
-        <span class="badge">3</span>
-        <h3>评审者决定续跑</h3>
-        <p>每轮结束后由 judge agent 判断是否继续。新一轮可以减少漂移和视野收窄。</p>
-      </article>
-    </div>
-  </section>
-
-  <section class="table-wrap">
-    <h2>实验规模改变了判断标准</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>实验</th>
-          <th>关键数据</th>
-          <th>读者应如何理解</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>从零构建浏览器</td>
-          <td>接近一周，超过 100 万行代码，跨 1000 个文件。</td>
-          <td>重点不是浏览器已经可替代成熟产品，而是新代理仍能理解大代码库并继续推进。</td>
-        </tr>
-        <tr>
-          <td>Solid 到 React 迁移</td>
-          <td>超过三周，+266K/-193K 修改，通过 CI 和早期检查。</td>
-          <td>长周期代理可以承担真实迁移任务，但仍需要严肃人工审查。</td>
-        </tr>
-        <tr>
-          <td>视频渲染优化</td>
-          <td>Rust 版本让渲染快 25 倍，并加入缩放、平移和运动模糊。</td>
-          <td>多代理并不只会生成大量代码，也可能交付可合并的性能改进。</td>
-        </tr>
-        <tr>
-          <td>仍在运行的项目</td>
-          <td>Java LSP 7.4K commits、550K LoC；Windows 7 emulator 14.6K commits、1.2M LoC；Excel 12K commits、1.6M LoC。</td>
-          <td>这些数字显示实验已进入软件工程尺度，而不是短 demo 尺度。</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="quote-zone">
-    <h2>真正的变量不是代理数量</h2>
-    <div class="insight">结构太少会冲突、重复和漂移；结构太多会变脆。长期自主编码需要的是中等约束，而不是完全自治。</div>
-    <div class="note-grid">
-      <div class="note data"><b>模型差异会累积。</b>Cursor 认为 GPT-5.2 更适合长时间自主工作，尤其是在遵守指令、保持焦点和完整实现上。</div>
-      <div class="note risk"><b>复杂角色未必有用。</b>他们曾加入 integrator 做质量控制和冲突解决，但它反而制造瓶颈，最后被移除。</div>
-    </div>
-  </section>
-
-  <section class="takeaways">
-    <h2>最值得带走的洞见</h2>
-    <div class="mosaic">
-      <div class="tile"><b>并行不是免费午餐。</b>共享文件和锁看似简单，但会把代理群变成等待队列。</div>
-      <div class="tile"><b>层级解决责任问题。</b>规划者承担拆解和探索，工人承担交付，困难任务才不容易被绕开。</div>
-      <div class="tile"><b>提示是系统设计的一部分。</b>文章强调，协调、聚焦和避免病态行为，很大程度依赖反复打磨提示。</div>
-      <div class="tile"><b>长期运行需要刷新机制。</b>当前系统仍要周期性 fresh start，避免代理运行过久后漂移或陷入局部视角。</div>
-      <div class="tile"><b>AI 对软件工程的影响更像组织问题。</b>模型能力重要，但把代理组织成可持续推进的流程同样关键。</div>
-    </div>
-  </section>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">← 返回索引</a><a href="https://cursor.com/blog/scaling-agents" rel="noopener noreferrer" target="_blank">阅读原文 ↗</a></div><button class="airs-digest-theme-toggle" data-airs-theme-toggle="" type="button">主题 · 跟随系统</button></nav>
+<header class="hero">
+<div class="hero-inner">
+<span class="eyebrow">Cursor Research · 2026 年 1 月 14 日</span>
+<h1>扩展长期运行的自主编程能力</h1>
+<p class="original-title">Scaling long-running autonomous coding</p>
+<p class="lede"><strong>一句话总括：</strong>Cursor 通过数百个智能体连续运行数周的实验发现，大规模自主编程可以取得实质进展，但前提是用清晰的角色分工取代扁平协调，并为不同角色选择合适的模型。</p>
+</div>
+</header>
+<main class="summary-main">
+<section aria-labelledby="scale-heading">
+<p class="section-kicker">实验规模</p>
+<h2 id="scale-heading">这不只是增加智能体数量，而是重新设计协作方式</h2>
+<p>单个智能体擅长边界清晰的任务。面对需要人类团队数月完成的项目，它的速度和持续专注能力仍然不足。Cursor 因此让数百个智能体并行工作，并观察它们如何处理同一个大型代码库。</p>
+<p>实验累计使用了<span class="highlight">数万亿 token</span>。智能体写出了超过百万行代码。真正的发现是，规模本身并不能解决协作问题。系统结构决定了新增算力能否转化为有效进展。</p>
+</section>
+<section aria-label="关键数字" class="stats-band">
+<div class="stat"><strong>100 万+</strong><span>浏览器实验生成的代码行数</span></div>
+<div class="stat"><strong>1,000</strong><span>浏览器项目涉及的文件数</span></div>
+<div class="stat"><strong>3 周+</strong><span>Solid 到 React 的迁移时间</span></div>
+<div class="stat"><strong>25×</strong><span>Rust 版本带来的视频渲染提速</span></div>
+</section>
+<section aria-labelledby="coordination-heading" class="split">
+<div class="split-copy">
+<p class="section-kicker">失败路线</p>
+<h2 id="coordination-heading">平等自治容易变成等待和回避</h2>
+<p>第一套方案让所有智能体通过共享文件自行认领任务。锁用于避免重复领取，但很快成为瓶颈。<span class="highlight-warm">20 个智能体最终只发挥出约 2 到 3 个智能体的吞吐量</span>，大部分时间都耗在等待上。</p>
+<p>改用乐观并发控制后，状态写入更可靠，但更深层的问题没有消失。没有层级时，智能体会倾向于选择小而安全的修改。困难任务和端到端责任无人承担。</p>
+</div>
+<aside class="failure-panel">
+<h3>协调机制暴露的风险</h3>
+<ul>
+<li>智能体长时间持有锁，甚至忘记释放。</li>
+<li>执行失败时，锁和共享状态可能一起失效。</li>
+<li>所有智能体都能选择任务，却没有谁对整体结果负责。</li>
+</ul>
+<p><strong>结论：</strong>减少冲突并不等于推动项目。系统还需要明确的决策权和责任边界。</p>
+</aside>
+</section>
+<section aria-labelledby="pipeline-heading" class="pipeline">
+<p class="section-kicker">有效结构</p>
+<h2 id="pipeline-heading">规划者、执行者和裁判组成循环</h2>
+<div class="flow">
+<article class="flow-item">
+<h3>规划者</h3>
+<p>持续探索代码库并创建任务。它们还能派生子规划者，让规划本身并行展开。</p>
+</article>
+<div aria-hidden="true" class="arrow">→</div>
+<article class="flow-item worker">
+<h3>执行者</h3>
+<p>只关注分配到的任务。完成后直接推送修改，不承担全局协调工作。</p>
+</article>
+<div aria-hidden="true" class="arrow">→</div>
+<article class="flow-item judge">
+<h3>裁判</h3>
+<p>在每轮结束时判断是否继续。下一轮重新开始，以减轻漂移和视野变窄。</p>
+</article>
+</div>
+<p>这种流水线解决了大部分协调问题。单个智能体不再需要同时理解全局、争抢任务和完成实现。角色分离让数百名执行者可以并行工作，同时保持项目方向。</p>
+</section>
+<section aria-labelledby="evidence-heading" class="evidence">
+<p class="section-kicker">真实项目</p>
+<h2 id="evidence-heading">长时间运行已经产生可测量的工程成果</h2>
+<div class="evidence-grid">
+<article class="evidence-item">
+<strong>+26.6 万/-19.3 万</strong>
+<p>Cursor 代码库中的 Solid 到 React 原位迁移规模。实验持续超过三周，并已通过 CI 和早期检查，但仍需仔细审查。</p>
+</article>
+<article class="evidence-item">
+<strong>7,400 次提交</strong>
+<p>Java LSP 实验达到约 55 万行代码。它说明长时间自治不仅能生成一次性原型，也能持续积累大型工程修改。</p>
+</article>
+<article class="evidence-item">
+<strong>160 万行</strong>
+<p>Excel 实验在约 12,000 次提交后达到的规模。另一个 Windows 7 模拟器实验已有 14,600 次提交和 120 万行代码。</p>
+</article>
+</div>
+<p>这些数字不能直接证明代码已经达到生产质量。它们证明的是另一件事：新加入的智能体仍能理解不断扩大的代码库，并在冲突较少的情况下继续推进工作。</p>
+</section>
+<section aria-labelledby="model-heading" class="model-note">
+<p class="section-kicker">模型与提示词</p>
+<h2 id="model-heading">长期自治不是通用模型之间的简单排名</h2>
+<p>Cursor 发现，GPT-5.2 在长时间执行中更能遵循指令、保持专注、避免漂移，并完整落实要求。Opus 4.5 更容易提前停止，或在方便时采用捷径。</p>
+<p>角色差异也很重要。GPT-5.2 的规划表现优于 GPT-5.1-Codex，尽管后者专门面向编程训练。因此，Cursor 开始按角色选模型，而不是让一个模型承担全部职责。</p>
+<blockquote>框架和模型都会影响结果，但提示词对协调、专注和异常行为的影响更大。</blockquote>
+</section>
+<section aria-labelledby="takeaway-heading" class="takeaways">
+<p class="section-kicker">最值得带走的洞见</p>
+<h2 id="takeaway-heading">规模有效，但只有适度结构才能把规模变成进展</h2>
+<div class="mosaic">
+<article class="tile"><strong>角色分工优于扁平协调</strong>规划者负责方向，执行者负责交付，裁判负责决定是否进入下一轮。</article>
+<article class="tile"><strong>同步机制可能吞掉并行收益</strong>锁让 20 个智能体的吞吐量下降到约 2 至 3 个智能体的水平。</article>
+<article class="tile"><strong>简单结构往往更有效</strong>整合者角色增加了瓶颈，而执行者已经能自行解决多数冲突。</article>
+<article class="tile"><strong>模型应按角色选择</strong>编程专用模型不一定是更好的规划者，长期任务尤其需要持续专注能力。</article>
+<article class="tile"><strong>定期刷新仍不可少</strong>智能体会运行过久，也会出现漂移和视野变窄。当前系统离最优解仍有距离。</article>
+</div>
+</section>
 </main>
-  <script id="airs-digest-theme-script">
+<section id="translation">
+<div class="translation-inner">
+<h2>完整译文</h2>
+<div class="toc">
+<strong>目录</strong>
+<ol>
+<li>单个智能体的局限</li>
+<li>学习如何协调</li>
+<li>规划者与执行者</li>
+<li>连续运行数周</li>
+<li>我们的发现</li>
+<li>下一步</li>
+</ol>
+</div>
+<p>我们一直在尝试让编程智能体自主运行数周。</p>
+<p>我们的目标，是了解智能体编程的边界究竟能推进多远。实验针对的项目，通常需要人类团队花费数月才能完成。</p>
+<p>本文介绍了我们从实验中得到的经验。我们让数百个智能体在同一个项目上并发工作，协调它们的任务，并观察它们写出超过 100 万行代码、消耗数万亿 token。</p>
+<h3>单个智能体的局限</h3>
+<p>如今的智能体能够很好地完成目标明确的任务，但处理复杂项目时速度较慢。自然的下一步，是并行运行多个智能体。然而，如何协调它们并不容易。</p>
+<p>我们最初认为，预先规划会显得过于僵化。大型项目的推进路径并不明确，一开始也很难确定合理的任务分工。因此，我们先尝试了动态协调。每个智能体根据其他智能体正在进行的工作，自行决定下一步做什么。</p>
+<h3>学习如何协调</h3>
+<p>最初的方案让所有智能体地位平等，并通过一个共享文件自行协调。每个智能体会查看其他智能体正在做什么，认领一项任务，再更新任务状态。为了避免两个智能体拿到同一任务，我们加入了锁机制。</p>
+<p>这套方案以一些很有意思的方式失败了：</p>
+<p>智能体会长时间持有锁，有时甚至完全忘记释放。即使锁机制正常工作，它也会成为瓶颈。20 个智能体的有效吞吐量会下降到只相当于 2 到 3 个智能体。大部分时间都浪费在等待上。</p>
+<p>系统也很脆弱。智能体可能在持有锁时失败，尝试获取自己已经持有的锁，或者根本没有先获取锁就更新协调文件。</p>
+<p>我们尝试用乐观并发控制取代锁。智能体可以自由读取状态。如果状态在上次读取后发生变化，写入就会失败。这套机制更简单，也更可靠，但更深层的问题仍然存在。</p>
+<p>由于缺少层级，智能体会变得厌恶风险。它们避开困难任务，转而进行小而安全的修改。没有智能体愿意负责棘手问题，也没有谁承担端到端实现的责任。结果是系统长时间反复忙碌，却没有真正取得进展。</p>
+<h3>规划者与执行者</h3>
+<p>下一套方案拆分了不同角色。我们不再使用每个智能体什么都做的扁平结构，而是建立了一条职责明确的流水线。</p>
+<p>规划者持续探索代码库并创建任务。它们可以针对特定领域派生子规划者，让规划工作本身也能并行和递归展开。</p>
+<p>执行者领取任务后，只专注于完成任务。它们不与其他执行者协调，也不需要操心全局。它们会持续处理分配到的任务，直到任务完成，然后推送修改。</p>
+<p>每轮结束时，一个裁判智能体会判断是否继续。随后，下一轮会从全新的状态开始。这解决了大部分协调问题，也让系统可以扩展到非常大的项目，同时避免任何单个智能体陷入狭窄视角。</p>
+<h3>连续运行数周</h3>
+<p>为了测试这套系统，我们给它设定了一个雄心勃勃的目标：从零构建一个 Web 浏览器。智能体运行了接近一周，在 1,000 个文件中写出了超过 100 万行代码。你可以在 GitHub 上查看源代码。</p>
+<p>尽管代码库已经很大，新加入的智能体仍能理解它，并继续完成有意义的工作。数百名执行者同时运行，将修改推送到同一个分支，而冲突很少。</p>
+<p>从截图上看，它或许显得很简单，但从零构建浏览器是一项极其困难的工作。</p>
+<p>另一个实验，是在 Cursor 代码库中将 Solid 原位迁移到 React。这个过程持续了三周以上，产生了增加 26.6 万行、删除 19.3 万行的修改。它仍然需要仔细审查，但当时已经通过了我们的 CI 和早期检查。</p>
+<figure class="source-figure" data-source-image="0"><img alt="Pull request showing Solid to React migration" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Flong-running-agents-pr.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<p>我们还尝试改进一款即将推出的产品。一个长期运行的智能体用高效的 Rust 版本，将视频渲染速度提高了 25 倍。它还加入了平滑缩放和平移功能。画面会跟随光标，并使用自然的弹簧过渡和运动模糊。这些代码已经合并，很快会进入生产环境。</p>
+<p>我们还有几个正在运行的有趣实验：</p>
+<ul class="metric-list">
+<li>Java LSP：7,400 次提交，55 万行代码</li>
+<li>Windows 7 模拟器：14,600 次提交，120 万行代码</li>
+<li>Excel：12,000 次提交，160 万行代码</li>
+</ul>
+<h3>我们的发现</h3>
+<p>为了实现同一个目标，我们已让这些智能体消耗了数万亿 token。系统的效率并不完美，但效果远远超出我们的预期。</p>
+<p>对于运行时间极长的任务，模型选择非常重要。我们发现，GPT-5.2 系列更擅长长时间自主工作。它们更能遵循指令、保持专注、避免漂移，并精确而完整地落实要求。</p>
+<p>Opus 4.5 往往更早停止，也更容易在方便时采用捷径，并迅速交回控制权。我们还发现，不同模型擅长不同角色。GPT-5.2 比 GPT-5.1-Codex 更适合作为规划者，尽管后者是专门针对编程训练的模型。现在，我们会为每个角色选择最合适的模型，而不是使用一个通用模型承担所有工作。</p>
+<p>我们的许多改进来自减少复杂度，而不是增加复杂度。最初，我们设置了一个整合者角色，负责质量控制和冲突解决。后来我们发现，它造成的瓶颈比解决的问题更多。执行者本身已经能够处理冲突。</p>
+<p>最好的系统往往比想象中更简单。起初，我们尝试借鉴分布式计算和组织设计中的系统。但并不是所有这类系统都适用于智能体。</p>
+<p>合适的结构程度位于两个极端之间。结构太少，智能体就会彼此冲突、重复工作并偏离目标。结构太多，系统又会变得脆弱。</p>
+<p>令人意外的是，系统的许多行为最终都取决于我们如何提示智能体。要让它们顺利协调、避免病态行为，并在长时间运行中保持专注，需要进行大量实验。运行框架和模型都很重要，但提示词更重要。</p>
+<h3>下一步</h3>
+<p>多智能体协调仍是一个困难的问题。我们目前的系统可以工作，但离最优状态还很远。规划者应该在任务完成时自动唤醒，并规划下一步。有些智能体偶尔会运行得过久。为了对抗漂移和视野变窄，我们仍然需要定期重新开始。</p>
+<p>不过，对于那个核心问题，也就是能否通过投入更多智能体来扩展自主编程能力，我们得到的答案比预期更乐观。数百个智能体可以在同一个代码库中协作数周，并在雄心勃勃的项目上取得真正的进展。</p>
+<p>我们在这里开发的技术，最终会用于改进 Cursor 的智能体能力。如果你有兴趣参与 AI 辅助软件开发中最困难的问题，欢迎通过 hiring@cursor.com 与我们联系。</p>
+<p class="meta">分类：研究</p>
+<p class="meta">作者：Wilson Lin</p>
+<div class="related">
+<p>使用多智能体系统将 GPU kernel 提速 38%</p>
+<p>为本地智能体实现安全沙箱</p>
+<p>推出 Composer 1.5</p>
+<p>扩展长期运行的自主编程能力</p>
+</div>
+<hr class="repeat-divider"/>
+<div class="toc">
+<strong>目录</strong>
+<ol>
+<li>单个智能体的局限</li>
+<li>学习如何协调</li>
+<li>规划者与执行者</li>
+<li>连续运行数周</li>
+<li>我们的发现</li>
+<li>下一步</li>
+</ol>
+</div>
+<p>我们一直在尝试让编程智能体自主运行数周。</p>
+<p>我们的目标，是了解智能体编程的边界究竟能推进多远。实验针对的项目，通常需要人类团队花费数月才能完成。</p>
+<p>本文介绍了我们从实验中得到的经验。我们让数百个智能体在同一个项目上并发工作，协调它们的任务，并观察它们写出超过 100 万行代码、消耗数万亿 token。</p>
+<h3>单个智能体的局限</h3>
+<p>如今的智能体能够很好地完成目标明确的任务，但处理复杂项目时速度较慢。自然的下一步，是并行运行多个智能体。然而，如何协调它们并不容易。</p>
+<p>我们最初认为，预先规划会显得过于僵化。大型项目的推进路径并不明确，一开始也很难确定合理的任务分工。因此，我们先尝试了动态协调。每个智能体根据其他智能体正在进行的工作，自行决定下一步做什么。</p>
+<h3>学习如何协调</h3>
+<p>最初的方案让所有智能体地位平等，并通过一个共享文件自行协调。每个智能体会查看其他智能体正在做什么，认领一项任务，再更新任务状态。为了避免两个智能体拿到同一任务，我们加入了锁机制。</p>
+<p>这套方案以一些很有意思的方式失败了：</p>
+<p>智能体会长时间持有锁，有时甚至完全忘记释放。即使锁机制正常工作，它也会成为瓶颈。20 个智能体的有效吞吐量会下降到只相当于 2 到 3 个智能体。大部分时间都浪费在等待上。</p>
+<p>系统也很脆弱。智能体可能在持有锁时失败，尝试获取自己已经持有的锁，或者根本没有先获取锁就更新协调文件。</p>
+<p>我们尝试用乐观并发控制取代锁。智能体可以自由读取状态。如果状态在上次读取后发生变化，写入就会失败。这套机制更简单，也更可靠，但更深层的问题仍然存在。</p>
+<p>由于缺少层级，智能体会变得厌恶风险。它们避开困难任务，转而进行小而安全的修改。没有智能体愿意负责棘手问题，也没有谁承担端到端实现的责任。结果是系统长时间反复忙碌，却没有真正取得进展。</p>
+<h3>规划者与执行者</h3>
+<p>下一套方案拆分了不同角色。我们不再使用每个智能体什么都做的扁平结构，而是建立了一条职责明确的流水线。</p>
+<p>规划者持续探索代码库并创建任务。它们可以针对特定领域派生子规划者，让规划工作本身也能并行和递归展开。</p>
+<p>执行者领取任务后，只专注于完成任务。它们不与其他执行者协调，也不需要操心全局。它们会持续处理分配到的任务，直到任务完成，然后推送修改。</p>
+<p>每轮结束时，一个裁判智能体会判断是否继续。随后，下一轮会从全新的状态开始。这解决了大部分协调问题，也让系统可以扩展到非常大的项目，同时避免任何单个智能体陷入狭窄视角。</p>
+<h3>连续运行数周</h3>
+<p>为了测试这套系统，我们给它设定了一个雄心勃勃的目标：从零构建一个 Web 浏览器。智能体运行了接近一周，在 1,000 个文件中写出了超过 100 万行代码。你可以在 GitHub 上查看源代码。</p>
+<p>尽管代码库已经很大，新加入的智能体仍能理解它，并继续完成有意义的工作。数百名执行者同时运行，将修改推送到同一个分支，而冲突很少。</p>
+<p>从截图上看，它或许显得很简单，但从零构建浏览器是一项极其困难的工作。</p>
+<p>另一个实验，是在 Cursor 代码库中将 Solid 原位迁移到 React。这个过程持续了三周以上，产生了增加 26.6 万行、删除 19.3 万行的修改。它仍然需要仔细审查，但当时已经通过了我们的 CI 和早期检查。</p>
+<p>我们还尝试改进一款即将推出的产品。一个长期运行的智能体用高效的 Rust 版本，将视频渲染速度提高了 25 倍。它还加入了平滑缩放和平移功能。画面会跟随光标，并使用自然的弹簧过渡和运动模糊。这些代码已经合并，很快会进入生产环境。</p>
+<p>我们还有几个正在运行的有趣实验：</p>
+<ul class="metric-list">
+<li>Java LSP：7,400 次提交，55 万行代码</li>
+<li>Windows 7 模拟器：14,600 次提交，120 万行代码</li>
+<li>Excel：12,000 次提交，160 万行代码</li>
+</ul>
+<h3>我们的发现</h3>
+<p>为了实现同一个目标，我们已让这些智能体消耗了数万亿 token。系统的效率并不完美，但效果远远超出我们的预期。</p>
+<p>对于运行时间极长的任务，模型选择非常重要。我们发现，GPT-5.2 系列更擅长长时间自主工作。它们更能遵循指令、保持专注、避免漂移，并精确而完整地落实要求。</p>
+<p>Opus 4.5 往往更早停止，也更容易在方便时采用捷径，并迅速交回控制权。我们还发现，不同模型擅长不同角色。GPT-5.2 比 GPT-5.1-Codex 更适合作为规划者，尽管后者是专门针对编程训练的模型。现在，我们会为每个角色选择最合适的模型，而不是使用一个通用模型承担所有工作。</p>
+<p>我们的许多改进来自减少复杂度，而不是增加复杂度。最初，我们设置了一个整合者角色，负责质量控制和冲突解决。后来我们发现，它造成的瓶颈比解决的问题更多。执行者本身已经能够处理冲突。</p>
+<p>最好的系统往往比想象中更简单。起初，我们尝试借鉴分布式计算和组织设计中的系统。但并不是所有这类系统都适用于智能体。</p>
+<p>合适的结构程度位于两个极端之间。结构太少，智能体就会彼此冲突、重复工作并偏离目标。结构太多，系统又会变得脆弱。</p>
+<p>令人意外的是，系统的许多行为最终都取决于我们如何提示智能体。要让它们顺利协调、避免病态行为，并在长时间运行中保持专注，需要进行大量实验。运行框架和模型都很重要，但提示词更重要。</p>
+<h3>下一步</h3>
+<p>多智能体协调仍是一个困难的问题。我们目前的系统可以工作，但离最优状态还很远。规划者应该在任务完成时自动唤醒，并规划下一步。有些智能体偶尔会运行得过久。为了对抗漂移和视野变窄，我们仍然需要定期重新开始。</p>
+<p>不过，对于那个核心问题，也就是能否通过投入更多智能体来扩展自主编程能力，我们得到的答案比预期更乐观。数百个智能体可以在同一个代码库中协作数周，并在雄心勃勃的项目上取得真正的进展。</p>
+<p>我们在这里开发的技术，最终会用于改进 Cursor 的智能体能力。如果你有兴趣参与 AI 辅助软件开发中最困难的问题，欢迎通过 hiring@cursor.com 与我们联系。</p>
+<p class="meta">分类：研究</p>
+<p class="meta">作者：Wilson Lin</p>
+<div class="related">
+<p>使用多智能体系统将 GPU kernel 提速 38%</p>
+<p>为本地智能体实现安全沙箱</p>
+<p>推出 Composer 1.5</p>
+</div>
+</div>
+</section>
+<script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;
       const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));

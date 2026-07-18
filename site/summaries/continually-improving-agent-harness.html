@@ -1,350 +1,328 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
 <title>持续改进我们的智能体运行框架</title>
 <style>
-:root {
+:root{
+  color-scheme:light dark;
+  --bg:#f4f1ea;
+  --surface:#fffdf8;
+  --card:#ffffff;
+  --ink:#17202a;
+  --muted:#64707d;
+  --line:#d8d2c7;
+  --accent:#635bff;
+  --accent-soft:#eceaff;
+  --accent2:#00876c;
+  --accent2-soft:#dcf5ec;
+  --accent3:#d05b24;
+  --accent3-soft:#ffeadf;
+  --accent4:#b52762;
+  --accent4-soft:#fbe3ed;
+  --risk:#bd3038;
+  --risk-soft:#fde7e7;
+  --opportunity:#147a4b;
+  --opportunity-soft:#e0f4e8;
+  --conclusion:#5541a5;
+  --conclusion-soft:#ece8fb;
+  --data:#126da8;
+  --data-soft:#e0f1fb;
+  --deep:#172437;
+  --deep-ink:#f4f7fb;
+  --deep-muted:#b9c6d6;
+  --hl:#ffe29a;
+  --hl2:#bdebd9;
+  --shadow:0 16px 44px rgba(36,39,44,.09);
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0d1118;
+    --surface:#141a23;
+    --card:#19212c;
+    --ink:#e7edf5;
+    --muted:#a2adbb;
+    --line:#303b49;
+    --accent:#9b94ff;
+    --accent-soft:#28254a;
+    --accent2:#43c7a8;
+    --accent2-soft:#153b34;
+    --accent3:#ff9664;
+    --accent3-soft:#44281e;
+    --accent4:#f278a8;
+    --accent4-soft:#432333;
+    --risk:#ff747b;
+    --risk-soft:#431f25;
+    --opportunity:#58d394;
+    --opportunity-soft:#173b2b;
+    --conclusion:#b5a7ff;
+    --conclusion-soft:#2c2850;
+    --data:#67bbed;
+    --data-soft:#17364a;
+    --deep:#080c12;
+    --deep-ink:#e8eef7;
+    --deep-muted:#9cacbf;
+    --hl:#675016;
+    --hl2:#174a3c;
+    --shadow:0 18px 48px rgba(0,0,0,.32);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0d1118;
+  --surface:#141a23;
+  --card:#19212c;
+  --ink:#e7edf5;
+  --muted:#a2adbb;
+  --line:#303b49;
+  --accent:#9b94ff;
+  --accent-soft:#28254a;
+  --accent2:#43c7a8;
+  --accent2-soft:#153b34;
+  --accent3:#ff9664;
+  --accent3-soft:#44281e;
+  --accent4:#f278a8;
+  --accent4-soft:#432333;
+  --risk:#ff747b;
+  --risk-soft:#431f25;
+  --opportunity:#58d394;
+  --opportunity-soft:#173b2b;
+  --conclusion:#b5a7ff;
+  --conclusion-soft:#2c2850;
+  --data:#67bbed;
+  --data-soft:#17364a;
+  --deep:#080c12;
+  --deep-ink:#e8eef7;
+  --deep-muted:#9cacbf;
+  --hl:#675016;
+  --hl2:#174a3c;
+  --shadow:0 18px 48px rgba(0,0,0,.32);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
+  line-height:1.8;
+}
+a{color:var(--accent)}
+.hero{
+  padding:clamp(3rem,8vw,7rem) 1.25rem;
+  background:linear-gradient(135deg,var(--deep),var(--conclusion));
+  color:var(--deep-ink);
+}
+.hero-inner{max-width:1120px;margin:auto}
+.eyebrow{
+  color:var(--accent2);
+  font-size:.82rem;
+  font-weight:800;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+}
+h1{
+  max-width:900px;
+  margin:.4rem 0;
+  font-size:clamp(2.35rem,6vw,5.6rem);
+  line-height:1.06;
+  letter-spacing:-.045em;
+}
+.original{
+  max-width:780px;
+  margin:.8rem 0 1.7rem;
+  color:var(--deep-muted);
+  font:500 clamp(1rem,2vw,1.3rem)/1.5 Georgia,serif;
+}
+.lede{
+  max-width:850px;
+  margin:0;
+  font-size:clamp(1.15rem,2.4vw,1.65rem);
+  line-height:1.65;
+}
+.meta{margin-top:1.6rem;color:var(--deep-muted)}
+.summary-shell{max-width:1120px;margin:auto;padding:3rem 1.25rem 5rem}
+.section-kicker{color:var(--accent);font-weight:800}
+h2{font-size:clamp(1.8rem,4vw,3rem);line-height:1.2}
+h3{line-height:1.35}
+.number-band{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  margin:2.5rem 0;
+  border:1px solid var(--line);
+  background:var(--card);
+  box-shadow:var(--shadow);
+}
+.metric{padding:1.8rem;border-right:1px solid var(--line)}
+.metric:last-child{border-right:0}
+.metric strong{display:block;color:var(--data);font-size:2rem;line-height:1.2}
+.split{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.5rem;
+  margin:2.5rem 0;
+}
+.split article{padding:2rem}
+.context-old{
+  background:var(--risk-soft);
+  border-left:6px solid var(--risk);
+}
+.context-new{
+  background:var(--opportunity-soft);
+  border-left:6px solid var(--opportunity);
+}
+.measure{
+  margin:2.5rem 0;
+  padding:2.2rem;
+  background:var(--data-soft);
+  border-top:5px solid var(--data);
+}
+.measure-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:1rem;
+}
+.measure-grid div{
+  padding:1rem;
+  background:var(--surface);
+  border:1px solid var(--line);
+}
+.timeline{
+  margin:2.5rem 0;
+  padding:2.5rem;
+  background:var(--deep);
+  color:var(--deep-ink);
+}
+.timeline ol{padding-left:1.3rem}
+.timeline li{padding:.55rem 0 .9rem 1rem;border-left:2px solid var(--accent3)}
+.model-mosaic{
+  display:grid;
+  grid-template-columns:1.2fr .8fr;
+  gap:1rem;
+  margin:2.5rem 0;
+}
+.model-mosaic article{padding:2rem}
+.model-main{background:var(--accent-soft)}
+.model-quirk{background:var(--accent3-soft);border:1px solid var(--accent3)}
+.switch-strip{
+  margin:2.5rem 0;
+  padding:2rem;
+  background:var(--accent4-soft);
+  border-bottom:5px solid var(--accent4);
+}
+.insight{
+  margin:3rem 0;
+  padding:2rem;
+  border:2px solid var(--conclusion);
+  background:var(--conclusion-soft);
+  font-size:1.14rem;
+}
+.takeaways{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:1rem;
+}
+.takeaways article{
+  min-height:160px;
+  padding:1.6rem;
+  background:var(--card);
+  border:1px solid var(--line);
+}
+.takeaways article:nth-child(2){border-top:6px solid var(--risk)}
+.takeaways article:nth-child(3){border-top:6px solid var(--opportunity)}
+.takeaways article:nth-child(4){border-top:6px solid var(--conclusion)}
+mark{
+  padding:.05em .25em;
+  color:var(--ink);
+  background:var(--hl);
+}
+mark.alt{background:var(--hl2)}
+#translation{
+  background:var(--surface);
+  border-top:1px solid var(--line);
+  padding:4rem 1.25rem 6rem;
+}
+.translation-body{max-width:780px;margin:auto}
+.translation-body>h2{margin-bottom:2.5rem}
+.translation-body h3{margin-top:3rem;font-size:1.55rem}
+.translation-body p{margin:1.15rem 0}
+.translation-body ul{padding-left:1.5rem}
+.toc{
+  padding:1.3rem 1.5rem;
+  background:var(--accent-soft);
+  border-left:4px solid var(--accent);
+}
+.source-figure{
+  display:block;
+  min-height:5rem;
+  margin:2.5rem 0;
+  padding:1rem;
+  border:1px dashed var(--line);
+  background:var(--card);
+}
+.source-figure img{
+  display:block;
+  max-width:100%;
+  height:auto;
+  margin:auto;
+}
+.source-figure figcaption{
+  margin-top:.8rem;
+  color:var(--muted);
+  font-size:.9rem;
+  text-align:center;
+}
+.related{
+  margin-top:2.5rem;
+  padding:1.4rem;
+  background:var(--accent2-soft);
+}
+@media(max-width:720px){
+  .number-band,.split,.measure-grid,.model-mosaic,.takeaways{grid-template-columns:1fr}
+  .metric{border-right:0;border-bottom:1px solid var(--line)}
+  .metric:last-child{border-bottom:0}
+}
+
+:root[data-theme="light"] {
   color-scheme: light;
-  --bg: #f7f4ee;
-  --paper: #fffdf8;
-  --ink: #1f2528;
-  --muted: #667078;
-  --line: #d9d2c6;
-  --hero: #1f2528;
-  --hero-ink: #fff9ed;
-  --card: #ffffff;
-  --soft: #efe9dc;
-  --soft2: #e6f1ef;
-  --soft3: #f3e6ea;
-  --soft4: #e8ecf7;
-  --accent-data: #176f8c;
-  --accent-risk: #b64242;
-  --accent-opportunity: #2f7d4f;
-  --accent-conclusion: #7a4fb3;
-  --accent-warn: #b47413;
-  --shadow: rgba(31, 37, 40, 0.12);
-}
-:root[data-theme="dark"] {
-  color-scheme: dark;
-  --bg: #111315;
-  --paper: #191d20;
-  --ink: #ece7dc;
-  --muted: #a9b1b7;
-  --line: #31383d;
-  --hero: #0d1012;
-  --hero-ink: #f2eadb;
-  --card: #1d2327;
-  --soft: #242016;
-  --soft2: #132824;
-  --soft3: #2a1720;
-  --soft4: #171f33;
-  --accent-data: #48b9d6;
-  --accent-risk: #ff7a7a;
-  --accent-opportunity: #68d28d;
-  --accent-conclusion: #b99aff;
-  --accent-warn: #f0b24b;
-  --shadow: rgba(0, 0, 0, 0.38);
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --bg: #111315;
-    --paper: #191d20;
-    --ink: #ece7dc;
-    --muted: #a9b1b7;
-    --line: #31383d;
-    --hero: #0d1012;
-    --hero-ink: #f2eadb;
-    --card: #1d2327;
-    --soft: #242016;
-    --soft2: #132824;
-    --soft3: #2a1720;
-    --soft4: #171f33;
-    --accent-data: #48b9d6;
-    --accent-risk: #ff7a7a;
-    --accent-opportunity: #68d28d;
-    --accent-conclusion: #b99aff;
-    --accent-warn: #f0b24b;
-    --shadow: rgba(0, 0, 0, 0.38);
-  }
-}
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-  line-height: 1.65;
-}
-main { overflow: hidden; }
-.hero {
-  background: var(--hero);
-  color: var(--hero-ink);
-  padding: 56px 7vw 42px;
-}
-.hero-inner {
-  max-width: 1120px;
-  margin: 0 auto;
-}
-.kicker {
-  color: var(--accent-data);
-  font-weight: 700;
-  letter-spacing: 0;
-  margin: 0 0 14px;
-}
-h1 {
-  font-size: clamp(34px, 5vw, 68px);
-  line-height: 1.08;
-  margin: 0;
-  letter-spacing: 0;
-}
-.original {
-  margin: 14px 0 28px;
-  color: var(--muted);
-  font-size: 18px;
-}
-.lede {
-  max-width: 820px;
-  font-size: 22px;
-  line-height: 1.55;
-  margin: 0;
-  color: var(--hero-ink);
-}
-.meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 30px;
-}
-.meta span {
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 6px 12px;
-  color: var(--hero-ink);
-}
-.band {
-  background: var(--paper);
-  border-bottom: 1px solid var(--line);
-  padding: 26px 7vw;
-}
-.metrics {
-  max-width: 1120px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
-}
-.metric {
-  border-left: 5px solid var(--accent-data);
-  padding: 10px 12px;
-  background: var(--soft2);
-}
-.metric:nth-child(2) { border-left-color: var(--accent-opportunity); background: var(--soft); }
-.metric:nth-child(3) { border-left-color: var(--accent-risk); background: var(--soft3); }
-.metric:nth-child(4) { border-left-color: var(--accent-conclusion); background: var(--soft4); }
-.metric strong {
-  display: block;
-  font-size: 28px;
-  line-height: 1.15;
-}
-.metric span {
-  color: var(--muted);
-  font-size: 14px;
-}
-.split {
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 54px 7vw;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 34px;
-}
-.panel {
-  background: var(--card);
-  border: 1px solid var(--line);
-  box-shadow: 0 14px 40px var(--shadow);
-  padding: 28px;
-}
-.panel h2, .flow h2, .table-section h2, .dark-block h2, .takeaways h2 {
-  margin: 0 0 16px;
-  font-size: 26px;
-  line-height: 1.25;
-}
-.panel p, .flow p, .table-section p, .dark-block p, .takeaways p {
-  margin: 0 0 12px;
-}
-.label {
-  display: inline-block;
-  color: var(--accent-opportunity);
-  font-weight: 800;
-  margin-bottom: 10px;
-}
-.flow {
-  background: var(--soft);
-  padding: 54px 7vw;
-}
-.flow-inner {
-  max-width: 1120px;
-  margin: 0 auto;
-}
-.steps {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 14px;
-  margin-top: 22px;
-}
-.step {
-  position: relative;
-  background: var(--paper);
-  border-top: 5px solid var(--accent-warn);
-  padding: 18px;
-  min-height: 168px;
-}
-.step b {
-  display: inline-grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--accent-warn);
-  color: var(--hero);
-  margin-bottom: 12px;
-}
-.step h3 {
-  margin: 0 0 8px;
-  font-size: 18px;
-}
-.step p {
-  color: var(--muted);
-  font-size: 15px;
-}
-.table-section {
-  background: var(--paper);
-  padding: 54px 7vw;
-}
-.table-wrap {
-  max-width: 1120px;
-  margin: 0 auto;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  overflow: hidden;
-  background: var(--card);
-  border: 1px solid var(--line);
-}
-th, td {
-  text-align: left;
-  vertical-align: top;
-  padding: 16px;
-  border-bottom: 1px solid var(--line);
-}
-th {
-  background: var(--soft4);
-  color: var(--accent-conclusion);
-}
-td:first-child {
-  font-weight: 700;
-  width: 24%;
-}
-.dark-block {
-  background: var(--hero);
-  color: var(--hero-ink);
-  padding: 56px 7vw;
-}
-.dark-inner {
-  max-width: 1120px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  gap: 30px;
-  align-items: start;
-}
-.quote {
-  border-left: 6px solid var(--accent-data);
-  padding-left: 20px;
-  font-size: 24px;
-  line-height: 1.45;
-}
-.alert-list {
-  display: grid;
-  gap: 14px;
-}
-.alert {
-  background: var(--card);
-  color: var(--ink);
-  border: 1px solid var(--line);
-  padding: 18px;
-}
-.alert strong {
-  color: var(--accent-risk);
-}
-.takeaways {
-  background: var(--soft2);
-  padding: 54px 7vw 64px;
-}
-.mosaic {
-  max-width: 1120px;
-  margin: 22px auto 0;
-  display: grid;
-  grid-template-columns: 1.2fr 0.8fr 1fr;
-  gap: 16px;
-}
-.tile {
-  background: var(--card);
-  border: 1px solid var(--line);
-  padding: 22px;
-  min-height: 150px;
-}
-.tile.big {
-  grid-row: span 2;
-  background: var(--soft4);
-}
-.tile:nth-child(2) { border-top: 5px solid var(--accent-data); }
-.tile:nth-child(3) { border-top: 5px solid var(--accent-opportunity); }
-.tile:nth-child(4) { border-top: 5px solid var(--accent-risk); }
-.tile:nth-child(5) { border-top: 5px solid var(--accent-conclusion); }
-.tile h3 {
-  margin: 0 0 10px;
-  font-size: 20px;
-}
-.tile p {
-  color: var(--muted);
-}
-.footer-note {
-  max-width: 1120px;
-  margin: 24px auto 0;
-  color: var(--muted);
-}
-@media (max-width: 820px) {
-  .metrics, .split, .steps, .dark-inner, .mosaic {
-    grid-template-columns: 1fr;
-  }
-  .hero {
-    padding-top: 42px;
-  }
-  .split, .flow, .table-section, .dark-block, .takeaways {
-    padding-left: 5vw;
-    padding-right: 5vw;
-  }
-  th, td {
-    display: block;
-    width: 100%;
-  }
-  td:first-child {
-    width: 100%;
-  }
+--bg:#f4f1ea;
+  --surface:#fffdf8;
+  --card:#ffffff;
+  --ink:#17202a;
+  --muted:#64707d;
+  --line:#d8d2c7;
+  --accent:#635bff;
+  --accent-soft:#eceaff;
+  --accent2:#00876c;
+  --accent2-soft:#dcf5ec;
+  --accent3:#d05b24;
+  --accent3-soft:#ffeadf;
+  --accent4:#b52762;
+  --accent4-soft:#fbe3ed;
+  --risk:#bd3038;
+  --risk-soft:#fde7e7;
+  --opportunity:#147a4b;
+  --opportunity-soft:#e0f4e8;
+  --conclusion:#5541a5;
+  --conclusion-soft:#ece8fb;
+  --data:#126da8;
+  --data-soft:#e0f1fb;
+  --deep:#172437;
+  --deep-ink:#f4f7fb;
+  --deep-muted:#b9c6d6;
+  --hl:#ffe29a;
+  --hl2:#bdebd9;
+  --shadow:0 16px 44px rgba(36,39,44,.09);
 }
 </style>
-  <script id="airs-digest-theme-boot">
+<script id="airs-digest-theme-boot">
     try {
       var saved = localStorage.getItem("theme");
       if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
     } catch (e) {}
   </script>
-  <style id="airs-digest-theme-style">
+<style id="airs-digest-theme-style">
     :root {
       color-scheme: light;
       --airs-digest-ink: #191816;
@@ -467,201 +445,261 @@ td:first-child {
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+  <style id="airs-source-image-theme-style">
+    .source-figure .source-image-dark {
+      display: none;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .source-figure .source-image-light {
+        display: none;
+      }
+      :root:not([data-theme="light"]) .source-figure .source-image-dark {
+        display: block;
+      }
+    }
+    :root[data-theme="dark"] .source-figure .source-image-light {
+      display: none;
+    }
+    :root[data-theme="dark"] .source-figure .source-image-dark {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-light {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-dark {
+      display: none;
+    }
   </style>
 </head>
 <body>
-<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/continually-improving-agent-harness" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">← 返回索引</a><a href="https://cursor.com/blog/continually-improving-agent-harness" rel="noopener noreferrer" target="_blank">阅读原文 ↗</a></div><button class="airs-digest-theme-toggle" data-airs-theme-toggle="" type="button">主题 · 跟随系统</button></nav>
+<header class="hero">
+<div class="hero-inner">
+<div class="eyebrow">Cursor · Research · 2026</div>
+<h1>持续改进我们的智能体运行框架</h1>
+<p class="original">Continually improving our agent harness</p>
+<p class="lede"><strong>一句话总括：</strong>Cursor 展示了一套把模型能力转化为可靠软件工程产出的持续优化体系，其核心是动态上下文、真实使用评测、故障治理、模型定制和多智能体编排。</p>
+<p class="meta">2026 年 4 月 30 日 · Stefan Heule 与 Jediah Katz</p>
+</div>
+</header>
 <main>
-  <section class="hero">
-    <div class="hero-inner">
-      <p class="kicker">一句话总括</p>
-      <h1>持续改进我们的智能体运行框架</h1>
-      <p class="original">Continually improving our agent harness</p>
-      <p class="lede">这篇文章的真正贡献，是把“更强模型”之外的工程层说清楚：编码智能体的质量，来自上下文、工具、评估、错误修复和模型适配组成的运行框架。</p>
-      <div class="meta">
-        <span>Cursor</span>
-        <span>Research</span>
-        <span>Apr 30, 2026</span>
-        <span>Stefan Heule &amp; Jediah Katz</span>
-      </div>
-    </div>
-  </section>
-
-  <section class="band">
-    <div class="metrics">
-      <div class="metric">
-        <strong>2024 末</strong>
-        <span>Cursor 最早开发编码智能体时，仍大量依赖静态上下文和护栏。</span>
-      </div>
-      <div class="metric">
-        <strong>2 类测试</strong>
-        <span>离线 eval 与线上 A/B 测试共同判断 harness 是否真的变好。</span>
-      </div>
-      <div class="metric">
-        <strong>每周</strong>
-        <span>Automation 搜索日志、发现新问题，并把调查结果沉淀为工单。</span>
-      </div>
-      <div class="metric">
-        <strong>10 倍级</strong>
-        <span>一次集中 sprint 将 unexpected tool call errors 降低了一个数量级。</span>
-      </div>
-    </div>
-  </section>
-
-  <section class="split">
-    <article class="panel">
-      <span class="label">核心变化</span>
-      <h2>上下文从“预装”转向“动态获取”</h2>
-      <p>早期模型不擅长自己寻找信息。Cursor 因此把 lint、类型错误、文件结构、相关代码片段和压缩附件提前塞进上下文。</p>
-      <p>现在模型能力更强，许多护栏被拆掉。系统只保留少量稳定信息，例如操作系统、git 状态、当前文件和最近查看文件。</p>
-      <p>这改变了读者对 AI 编程的理解：好体验不是尽量把所有信息一次性给模型，而是让模型在工作中按需拉取正确上下文。</p>
-    </article>
-    <article class="panel">
-      <span class="label">评估方法</span>
-      <h2>benchmark 只是一层测量</h2>
-      <p>Cursor 使用公开 benchmark 和自有 CursorBench 获得快速、标准化的质量读数。但它们不能完全代表真实使用。</p>
-      <p>线上 A/B 测试补上了这一层。指标包括延迟、token 效率、工具调用次数、缓存命中率，以及更接近结果质量的 Keep Rate。</p>
-      <p>Keep Rate 关注智能体生成的代码在一段时间后有多少仍留在用户代码库中。这个指标比单次答案分数更接近真实生产力。</p>
-    </article>
-  </section>
-
-  <section class="flow">
-    <div class="flow-inner">
-      <h2>运行框架的改进像软件产品迭代</h2>
-      <p>文章反复强调一个模式：提出假设，部署实验，观测真实信号，再修复退化。模型只是其中一个变量。</p>
-      <div class="steps">
-        <div class="step">
-          <b>1</b>
-          <h3>形成体验假设</h3>
-          <p>团队先定义理想 agent 体验，再决定需要改变哪一层 harness。</p>
-        </div>
-        <div class="step">
-          <b>2</b>
-          <h3>离线评估</h3>
-          <p>CursorBench 和其他 eval 快速发现质量变化与模型困惑点。</p>
-        </div>
-        <div class="step">
-          <b>3</b>
-          <h3>线上 A/B</h3>
-          <p>多个 harness 版本并行进入真实使用，观察用户是否真的受益。</p>
-        </div>
-        <div class="step">
-          <b>4</b>
-          <h3>定位退化</h3>
-          <p>按工具和模型建立基线，区分未知错误、预期错误和供应商故障。</p>
-        </div>
-        <div class="step">
-          <b>5</b>
-          <h3>批量修复</h3>
-          <p>Automation 与 Cloud Agents 发现问题、创建工单，并推动多个修复并行启动。</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="table-section">
-    <div class="table-wrap">
-      <h2>不同模型需要不同 harness</h2>
-      <p>同一个模型放进不同运行框架，速度、聪明程度和成本都会变化。Cursor 的做法是让工具形态贴近模型训练经验。</p>
-      <table>
-        <thead>
-          <tr>
-            <th>维度</th>
-            <th>文章中的观察</th>
-            <th>为什么重要</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>编辑工具</td>
-            <td>OpenAI 模型更适合 patch-based 编辑格式。Anthropic 模型更熟悉字符串替换。</td>
-            <td>让模型使用不熟悉的工具，会消耗更多 reasoning tokens，并增加错误。</td>
-          </tr>
-          <tr>
-            <td>提示风格</td>
-            <td>OpenAI 模型更字面、更精确。Claude 对不精确指令更宽容，也更偏直觉。</td>
-            <td>通用提示不是最优解。harness 需要按 provider 和版本细调。</td>
-          </tr>
-          <tr>
-            <td>模型怪癖</td>
-            <td>团队曾观察到某个模型在上下文变满时出现“context anxiety”，开始拒绝或回避任务。</td>
-            <td>一些行为不是产品层误用，而是模型特性。合适的 prompt 可以缓解。</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="dark-block">
-    <div class="dark-inner">
-      <div class="quote">
-        真正的风险不是单个工具调用失败，而是错误留在上下文里，继续污染后续决策。
-      </div>
-      <div class="alert-list">
-        <div class="alert">
-          <strong>错误会产生 context rot。</strong>
-          <p>工具调用失败后，模型可能自我修正。但失败记录仍在上下文中，浪费 token，也会影响下一步判断。</p>
-        </div>
-        <div class="alert">
-          <strong>未知错误被当作 harness bug。</strong>
-          <p>Cursor 对 unknown error 设置固定阈值报警。对预期错误，则使用按工具和模型计算的异常检测基线。</p>
-        </div>
-        <div class="alert">
-          <strong>这改变了质量管理方式。</strong>
-          <p>智能体系统不能只看最终答案。工具错误率、超时、ProviderError 和 UserAborted 都是生产信号。</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="split">
-    <article class="panel">
-      <span class="label">模型切换</span>
-      <h2>中途换模型会破坏分布假设</h2>
-      <p>用户切换模型时，Cursor 会切到对应 harness。新模型得到自己的 prompt 和工具，但必须接手另一个模型留下的历史。</p>
-      <p>这段历史对新模型来说可能是 out of distribution。Cursor 因此加入指令，告诉模型它正在中途接管，并避免调用自己没有的旧工具。</p>
-      <p>缓存也是问题。缓存通常按 provider 和模型绑定。切换模型意味着首轮更慢、更贵。</p>
-    </article>
-    <article class="panel">
-      <span class="label">替代路径</span>
-      <h2>子智能体比强行接管更干净</h2>
-      <p>文章建议，复杂任务中最好持续使用同一个模型，除非确实有切换理由。</p>
-      <p>如果需要另一个模型完成特定子任务，更好的方式可能是启动 subagent。它拥有新的上下文窗口，不必继承旧会话的工具形状和缓存问题。</p>
-      <p>这说明多模型系统的难点不是“能不能切换”，而是如何保留任务连续性，同时避免上下文污染。</p>
-    </article>
-  </section>
-
-  <section class="takeaways">
-    <div class="flow-inner">
-      <h2>最值得带走的洞见</h2>
-      <p>文章最后把方向推向多智能体软件开发。未来的系统会把规划、快速编辑和调试分配给不同 agent，而编排能力会留在 harness 中。</p>
-    </div>
-    <div class="mosaic">
-      <div class="tile big">
-        <h3>harness 是 AI 编程产品的操作系统</h3>
-        <p>它决定上下文如何进入模型、工具如何暴露、错误如何处理，以及多个 agent 如何协作。模型越强，这一层越关键。</p>
-      </div>
-      <div class="tile">
-        <h3>质量要从真实使用里测</h3>
-        <p>benchmark 有用，但 Keep Rate 和用户后续反馈更接近“代码是否真的可用”。</p>
-      </div>
-      <div class="tile">
-        <h3>小优化会叠加成体验差异</h3>
-        <p>文章承认阶跃式进步少见。更多时候，进步来自持续压低错误、延迟和 token 浪费。</p>
-      </div>
-      <div class="tile">
-        <h3>错误分类本身就是产品能力</h3>
-        <p>InvalidArguments、UnexpectedEnvironment、ProviderError、Timeout 等分类，让团队能知道该修工具、调 prompt 还是等待供应商恢复。</p>
-      </div>
-      <div class="tile">
-        <h3>多智能体时代更依赖编排</h3>
-        <p>未来不是一个 agent 做所有事，而是系统选择合适 agent，并把结果拼成连贯工作流。</p>
-      </div>
-    </div>
-    <p class="footer-note">结论：这篇文章把 AI 编程的竞争焦点从“谁的模型更强”推进到“谁能把模型组织成可靠的软件生产系统”。</p>
-  </section>
+<div class="summary-shell">
+<p class="section-kicker">更短、更易读的总结</p>
+<h2>模型决定能力上限，运行框架决定能力能否稳定兑现</h2>
+<p>Cursor 不把智能体优化理解为单纯更换模型。团队先提出理想体验，再通过离线评测和线上实验检验假设。真正的进步通常不是一次突破，而是许多小改进的累积。</p>
+<div class="number-band">
+<div class="metric"><strong>2024 年末</strong><span>Cursor 开始开发编码智能体。当时模型需要大量固定护栏和静态上下文。</span></div>
+<div class="metric"><strong>2 种反馈</strong><span>代码保留率衡量产出是否留下；用户后续回复反映任务是否真正完成。</span></div>
+<div class="metric"><strong>10 倍级下降</strong><span>2026 年初的一次集中冲刺，让意外工具调用错误降低了一个数量级。</span></div>
+</div>
+<div class="split">
+<article class="context-old">
+<h3>早期：替模型预先做决定</h3>
+<p>系统会在每次编辑后主动显示 lint 和类型错误。它还会改写过窄的文件读取，并限制单轮工具调用数量。</p>
+<p><strong>问题在于：</strong>这类护栏会占用上下文，也可能限制更强模型的自主判断。</p>
+</article>
+<article class="context-new">
+<h3>现在：让模型按需取用信息</h3>
+<p>框架仍提供操作系统、Git 状态和近期文件等基础信息，但更多上下文改为动态获取。</p>
+<p><strong>洞见是：</strong><mark class="alt">模型越强，框架越应提供能力和接口，而不是提前替它选择所有信息。</mark></p>
+</article>
+</div>
+<section class="measure">
+<h3>评测必须越过 benchmark，观察真实产出</h3>
+<p>CursorBench 和公开 benchmark 提供快速、标准化的离线比较。真实使用中的 A/B 测试则同时观察效率和结果质量。</p>
+<div class="measure-grid">
+<div><strong>效率信号</strong><br/>延迟、令牌效率、工具调用次数和缓存命中率可以提示趋势，但不能单独证明任务完成得好。</div>
+<div><strong>代码保留率</strong><br/>系统追踪智能体生成的代码经过固定时间后还有多少留在代码库中。保留率低，往往意味着用户必须返工。</div>
+<div><strong>语义满意度</strong><br/>模型读取用户的后续回复。用户继续开发下一个功能是正面信号，贴出堆栈跟踪则是明确的失败信号。</div>
+<div><strong>成本约束</strong><br/>一次实验采用了更昂贵的上下文摘要模型，但质量改善可以忽略，因此没有抵消额外成本。</div>
+</div>
+<p><strong>结论：</strong>智能体质量不能由一个分数概括。<mark>可靠判断需要把标准化评测、行为数据和用户反馈放在一起。</mark></p>
+</section>
+<section class="timeline">
+<h3>把故障治理做成持续运转的软件工厂</h3>
+<ol>
+<li><strong>分类：</strong>未知错误一律视为框架缺陷。InvalidArguments、UnexpectedEnvironment、ProviderError、UserAborted 和 Timeout 等预期错误按原因归类。</li>
+<li><strong>检测：</strong>未知错误率越过固定阈值便触发告警。预期错误若显著偏离基线，也会触发异常检测。</li>
+<li><strong>细分：</strong>基线按工具和模型分别计算，因为不同模型调用工具的失误率并不相同。</li>
+<li><strong>修复：</strong>每周 Automation 搜索日志，发现新问题或异常增长，并创建或更新调查工单。Cloud Agents 可以并行启动修复。</li>
+</ol>
+<p><strong>理解上的变化：</strong>工具错误不只是一次失败。它们会留在上下文中，浪费令牌并造成“上下文腐化”，继而影响后续判断。</p>
+</section>
+<div class="model-mosaic">
+<article class="model-main">
+<h3>同一框架必须适配不同模型</h3>
+<p>OpenAI 模型接受过补丁式编辑训练，Anthropic 模型更熟悉字符串替换。Cursor 会为每个模型提供其训练期间熟悉的工具形式。</p>
+<p>提示词也会细化到提供商和模型版本。<strong>因此，同一底层模型在不同运行框架中，速度、准确性和效率可能明显不同。</strong></p>
+</article>
+<article class="model-quirk">
+<h3>框架还能缓解模型怪癖</h3>
+<p>Cursor 曾观察到一种“上下文焦虑”：窗口越接近填满，模型越容易拒绝任务，并声称工作规模太大。</p>
+<p>团队通过提示词调整减轻了这种行为。这说明部分模型缺陷可以在运行层得到控制。</p>
+</article>
+</div>
+<section class="switch-strip">
+<h3>中途换模型，会同时破坏上下文分布和缓存</h3>
+<p>切换后，Cursor 会加载新模型专属的提示词和工具，但新模型仍要接手另一模型产生的对话历史。框架会明确告知接管状态，并阻止它调用历史中出现、但自身并不具备的工具。</p>
+<p>缓存由提供商和模型分别维护。切换模型会造成缓存未命中，使第一轮更慢、更贵。切换时生成摘要可以减轻代价，却可能丢失复杂任务的细节。</p>
+<p><strong>实践结论：</strong>没有明确理由时，最好在一段对话中坚持使用同一模型。若需要另一模型，使用拥有全新上下文的子智能体通常更合适。</p>
+</section>
+<blockquote class="insight">
+      未来的软件开发不会让一个智能体包办所有事情。运行框架将负责挑选规划、快速编辑和调试等专业智能体，并把各自结果组织成连贯工作流。<strong>多智能体能力的真正控制面位于运行框架，而不是某个单独模型。</strong>
+</blockquote>
+<h2>最值得带走的洞见</h2>
+<div class="takeaways">
+<article><h3>01 · 减少过时护栏</h3><p>模型能力提升后，静态上下文和强制规则可能变成负担。动态取用信息更能发挥模型判断力。</p></article>
+<article><h3>02 · 评测真实后果</h3><p>benchmark 只能近似真实工作。代码是否被保留、用户是否继续下一项任务，更接近实际价值。</p></article>
+<article><h3>03 · 错误会持续污染上下文</h3><p>失败的工具调用不仅浪费一次机会，还会造成上下文腐化。错误分类、分模型基线和自动调查因此非常重要。</p></article>
+<article><h3>04 · 编排是下一阶段的核心</h3><p>未来竞争重点将从单个智能体的能力，转向框架能否正确分派专业智能体并整合结果。</p></article>
+</div>
+</div>
+<section id="translation">
+<div class="translation-body">
+<h2>完整译文</h2>
+<h3>目录</h3>
+<ul class="toc">
+<li>上下文窗口的演进</li>
+<li>评估运行框架改动的两种方法</li>
+<li>跟踪并修复性能退化</li>
+<li>为不同模型定制运行框架</li>
+<li>支持对话过程中切换模型</li>
+<li>运行框架与软件开发的未来</li>
+</ul>
+<p>我们打造 Cursor 智能体运行框架的方式，与开发任何一款雄心勃勃的软件产品并无不同。许多工作由愿景驱动。我们会先形成一个判断，设想理想的智能体体验应该是什么样子。</p>
+<p>接着，我们提出能够接近这一愿景的假设，通过实验加以验证，再根据评测与真实使用中的定量和定性信号反复迭代。这个过程依赖合适的线上和离线观测手段。只有这样，我们才能知道一次改动是否真的改善了运行框架。</p>
+<p>提前获得新模型的使用权限时，这些方法会汇聚到一起。我们会花费数周，根据模型的优势和特性定制运行框架。经过专门调优后，同一个模型会变得明显更快、更聪明，也更高效。</p>
+<p>有时，我们会发现带来跨越式提升的改进。但多数时候，改善运行框架意味着专注地叠加许多细小优化。这些优化共同让智能体更擅长构建软件。</p>
+<h3>上下文窗口的演进</h3>
+<p>与大语言模型交互的核心是上下文窗口。让智能体构建某个功能时，上下文窗口先包含系统提示词和工具说明，随后是当前对话状态，最后是用户的请求。</p>
+<p>在 Cursor 的发展过程中，我们填充和管理这个窗口的方式发生了很大变化。</p>
+<p>2024 年末，我们刚开始开发编码智能体时，模型还不善于自行选择上下文。因此，我们投入大量上下文工程工作来建立护栏。例如，每次编辑后都向智能体显示 lint 和类型错误；当它请求读取的文件行数太少时，改写读取请求；甚至限制它在一轮中能够调用工具的最大次数。</p>
+<p>我们还提供了大量静态上下文。每次会话开始时，这些信息始终对智能体可用。在不同阶段，它们包括代码库的目录结构、与查询在语义上相关的代码片段，以及用户手动附加文件的压缩版本。</p>
+<p>这些做法如今大多已经退出历史舞台。</p>
+<p>我们仍会包含一些有用的静态上下文，例如操作系统、Git 状态、当前文件和最近查看的文件。不过，随着模型能力增强，我们逐步撤掉护栏，并提供更多动态上下文。智能体可以在工作过程中自行获取这些信息。我们曾在一篇较早的文章中深入介绍动态上下文背后的部分技术，其中许多后来被其他编码智能体采用。如今，我们的大量工作都集中在为智能体提供更多动态拉取上下文和与外部世界交互的方式。</p>
+<figure class="source-figure" data-source-image="0"><img alt="With dynamic context, the model can decide when to pull additional information into the context window like past conversations, active terminal sessions, or relevant tools." class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fharness-dynamic-context-apr-2026-1.png&amp;w=1920&amp;q=70" width="800"/><img alt="With dynamic context, the model can decide when to pull additional information into the context window like past conversations, active terminal sessions, or relevant tools." class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fharness-dynamic-context-apr-2026-1-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<h3>评估运行框架改动的两种方法</h3>
+<p>运行框架和模型共同决定智能体的表现，但“表现好”很难准确定义。为了找到答案，我们建立了多层测量体系。</p>
+<p>除了公开 benchmark，我们还维护自己的评测套件 CursorBench。它可以快速、标准化地反映质量，也方便我们进行跨时间比较。然而，即使最好的 benchmark 也只能近似真实使用场景。完全依赖 benchmark，会让我们错过重要信号。</p>
+<p>因此，我们还会开展线上实验。我们同时部署两个或更多运行框架版本，并基于真实使用情况进行 A/B 测试。在这些测试中，我们通过多种指标衡量智能体质量。部分指标很直接，例如延迟、令牌效率、工具调用次数和缓存命中率。这些指标能够提示总体方向，却仍无法回答一个更模糊也更重要的问题：智能体是否真的把工作做好了。对此，我们采用两种衡量方法。</p>
+<p>第一种是智能体生成代码的“保留率”（Keep Rate）。针对智能体提出的一组代码变更，我们会跟踪经过若干固定时间间隔后，其中有多大比例仍然保留在用户的代码库中。通过这种方式，我们可以判断用户是否不得不手动调整智能体的输出，或者是否需要继续迭代并要求智能体修复问题。这些情况意味着智能体的首次响应质量较低。</p>
+<p>第二种方法是使用语言模型阅读用户对智能体初次输出的回复，从语义上判断用户是否满意。用户开始处理下一个功能，是智能体完成工作的强烈信号。用户贴出堆栈跟踪，则是智能体没有完成工作的可靠信号。</p>
+<p>有时，这些线上测试会促使我们搁置看似很有希望的想法。在一次实验中，我们尝试使用更昂贵的模型来总结上下文。结果显示，它对智能体质量的改善微乎其微，不值得为此支付更高成本。</p>
+<h3>跟踪并修复性能退化</h3>
+<p>随着模型和功能不断增加，运行框架会像其他软件一样变得更加复杂，并产生更多可能的状态。缺陷可能出现的范围随之扩大，其中许多问题只有在大规模运行时才能发现。</p>
+<p>智能体的工具是最容易出现缺陷的领域之一。工具调用错误可能严重破坏 Cursor 中的一次会话。智能体通常能够自行纠正，但错误仍会留在上下文里。它们会浪费令牌，并造成“上下文腐化”（context rot）。随着错误累积，模型后续决策的质量也会下降。</p>
+<p>一次工具调用失败后，智能体有时会陷入阻塞，甚至完全偏离任务。工具调用量和错误率等指标不能直接说明智能体是否完成了出色的工作，但它们可以作为指示器，帮助我们发现更广泛的问题。</p>
+<p>任何未知错误都代表运行框架存在缺陷，我们会按缺陷处理。不过，许多错误属于“预期错误”。例如，模型偶尔会提出错误的编辑，或尝试读取不存在的文件。我们按照原因对这些预期错误分类。InvalidArguments 和 UnexpectedEnvironment 用来表示模型失误以及上下文窗口中的矛盾。ProviderError 则表示 GenerateImage 或 WebSearch 等工具的供应商发生服务故障。</p>
+<p>我们还有 UserAborted 和 Timeout 等其他分类。它们合在一起涵盖了大多数预期错误。</p>
+<p>我们根据这些指标设置告警，用于捕捉进入生产环境的重大退化。未知错误始终属于缺陷，因此，只要任何工具的未知错误率超过固定阈值，我们就会收到告警。但预期错误究竟代表运行框架的缺陷，还是正常行为，往往不容易判断。</p>
+<p>例如，grep 搜索超时可能源于工具性能问题，也可能只是代码库规模太大，而模型又构造了低效查询。为了解决这个问题，我们设置了异常检测告警。当预期错误显著超过基线时，告警就会触发。我们会按工具和模型分别计算基线，因为不同模型在工具调用上的失误率可能不同。</p>
+<p>我们每周还会运行一个配有 skill 的 Automation。这个 skill 会教模型如何搜索日志，发现新出现或近期大幅增加的问题，并在待办列表中创建或更新工单，同时附上调查结果。我们大量使用 Cloud Agents，同时启动许多问题的修复工作，甚至可以直接从 Linear 触发这些智能体。</p>
+<p>这个流程是我们为智能体运行框架构建自动化“软件工厂”的一部分。在今年早些时候的一次集中冲刺中，我们将意外工具调用错误降低了一个数量级。</p>
+<figure class="source-figure" data-source-image="1"><img alt="In a focused sprint earlier this year, we drove all tool calls to at least 2 or often 3 9s of reliability." class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fchart-tool-error-rates-1.png&amp;w=1920&amp;q=70" width="800"/><img alt="In a focused sprint earlier this year, we drove all tool calls to at least 2 or often 3 9s of reliability." class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fchart-tool-error-rates-dark-1.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<h3>为不同模型定制运行框架</h3>
+<p>我们的所有运行框架抽象都与具体模型无关，同时也能针对支持的每个模型进行深度定制。例如，OpenAI 模型接受过使用补丁格式编辑文件的训练，而 Anthropic 模型接受的是字符串替换训练。两类模型都可以使用任一种工具，但让模型使用不熟悉的工具会消耗更多推理令牌，也会产生更多错误。因此，在我们的运行框架中，每个模型都会获得它在训练期间使用过的工具格式。</p>
+<p>这种定制非常深入，包括针对不同提供商甚至不同模型版本设计专用提示词。OpenAI 模型在遵循指令时往往更为字面和精确。Claude 则更依靠直觉，对不够精确的指令也更宽容。</p>
+<p>如果我们在新模型发布前获得提前使用权限，就会从最接近的现有模型运行框架开始迭代。我们运行离线评测，查找模型容易困惑的地方。团队成员也会亲自使用模型并反馈问题。我们再根据这些问题调整运行框架。这个过程不断重复，直到模型与运行框架的组合达到我们认为可以发布的水平。</p>
+<p>这项调优工作大多是让运行框架适配新模型的优势。不过，我们有时也会遇到真正的模型怪癖，并通过运行框架进行缓解。例如，我们发现某个模型出现了一种被我们称为“上下文焦虑”（context anxiety）的行为。随着上下文窗口逐渐填满，它会开始拒绝工作，并含糊地表示任务似乎太大。我们通过调整提示词减轻了这种行为。</p>
+<h3>支持对话过程中切换模型</h3>
+<p>支持用户在对话中途切换模型尤其棘手，因为不同模型有不同的行为、提示词和工具形式。</p>
+<p>用户切换模型时，Cursor 会自动切换到对应的运行框架，并加载为该模型定制的提示词和工具集合。然而，新模型仍要使用这些工具来处理另一个模型生成的对话历史。这种历史超出了它训练时的数据分布。</p>
+<p>为了解决这个问题，我们会加入专门指令，告诉模型它正在对话中途接替另一个模型。这些指令还会阻止它调用对话历史中出现、但不属于其自身工具集合的工具。</p>
+<figure class="source-figure" data-source-image="2"><img alt="Preventing models from calling tools that aren't in its toolset" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fharness-model-switching-apr-2026-1.png&amp;w=1920&amp;q=70" width="800"/><img alt="Preventing models from calling tools that aren't in its toolset" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fharness-model-switching-apr-2026-1-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<p>第二个挑战是，缓存由提供商和模型分别维护。切换模型意味着缓存未命中，导致切换后的第一轮更慢、成本更高。我们尝试过在切换时总结对话，为模型提供一份干净的摘要，从而减轻缓存损失。但是，如果用户已经深入处理一项复杂任务，摘要可能丢失重要细节。除非有明确的切换理由，否则我们通常建议在一段对话中始终使用同一个模型。</p>
+<p>另一种避开对话中途切换难题的方式，是改用拥有全新上下文窗口的子智能体。我们最近为运行框架增加了一项能力，用户可以直接要求使用指定模型运行一个子智能体。</p>
+<h3>运行框架与软件开发的未来</h3>
+<p>AI 辅助软件工程的未来将属于多智能体系统。系统不会再把每个子任务都交给同一个智能体，而是学会在专业智能体和子智能体之间进行委派。例如，一个负责规划，一个负责快速编辑，另一个负责调试。每个智能体只承担最适合自己的工作。</p>
+<p>要让这种模式良好运转，本质上是一个运行框架问题。系统需要知道应该派出哪个智能体，如何根据该智能体的优势描述任务，以及如何把各项结果衔接成连贯的工作流。编排这类协作的能力将存在于运行框架中，而不是任何单个智能体中。这意味着，运行框架工程一直是决定智能体能否成功的关键，而且今后只会变得更加重要。</p>
+<p><strong>分类：</strong>研究</p>
+<p><strong>作者：</strong>Stefan Heule 与 Jediah Katz</p>
+<div class="related">
+<p>我们在构建 Cloud Agents 过程中学到了什么</p>
+<p>更好的 AI 模型能够承担更有雄心的工作</p>
+<p>通过实时强化学习改进 Composer</p>
+<p>持续改进我们的智能体运行框架</p>
+</div>
+<h3>目录</h3>
+<ul class="toc">
+<li>上下文窗口的演进</li>
+<li>评估运行框架改动的两种方法</li>
+<li>跟踪并修复性能退化</li>
+<li>为不同模型定制运行框架</li>
+<li>支持对话过程中切换模型</li>
+<li>运行框架与软件开发的未来</li>
+</ul>
+<p>我们打造 Cursor 智能体运行框架的方式，与开发任何一款雄心勃勃的软件产品并无不同。许多工作由愿景驱动。我们会先形成一个判断，设想理想的智能体体验应该是什么样子。</p>
+<p>接着，我们提出能够接近这一愿景的假设，通过实验加以验证，再根据评测与真实使用中的定量和定性信号反复迭代。这个过程依赖合适的线上和离线观测手段。只有这样，我们才能知道一次改动是否真的改善了运行框架。</p>
+<p>提前获得新模型的使用权限时，这些方法会汇聚到一起。我们会花费数周，根据模型的优势和特性定制运行框架。经过专门调优后，同一个模型会变得明显更快、更聪明，也更高效。</p>
+<p>有时，我们会发现带来跨越式提升的改进。但多数时候，改善运行框架意味着专注地叠加许多细小优化。这些优化共同让智能体更擅长构建软件。</p>
+<h3>上下文窗口的演进</h3>
+<p>与大语言模型交互的核心是上下文窗口。让智能体构建某个功能时，上下文窗口先包含系统提示词和工具说明，随后是当前对话状态，最后是用户的请求。</p>
+<p>在 Cursor 的发展过程中，我们填充和管理这个窗口的方式发生了很大变化。</p>
+<p>2024 年末，我们刚开始开发编码智能体时，模型还不善于自行选择上下文。因此，我们投入大量上下文工程工作来建立护栏。例如，每次编辑后都向智能体显示 lint 和类型错误；当它请求读取的文件行数太少时，改写读取请求；甚至限制它在一轮中能够调用工具的最大次数。</p>
+<p>我们还提供了大量静态上下文。每次会话开始时，这些信息始终对智能体可用。在不同阶段，它们包括代码库的目录结构、与查询在语义上相关的代码片段，以及用户手动附加文件的压缩版本。</p>
+<p>这些做法如今大多已经退出历史舞台。</p>
+<p>我们仍会包含一些有用的静态上下文，例如操作系统、Git 状态、当前文件和最近查看的文件。不过，随着模型能力增强，我们逐步撤掉护栏，并提供更多动态上下文。智能体可以在工作过程中自行获取这些信息。我们曾在一篇较早的文章中深入介绍动态上下文背后的部分技术，其中许多后来被其他编码智能体采用。如今，我们的大量工作都集中在为智能体提供更多动态拉取上下文和与外部世界交互的方式。</p>
+<h3>评估运行框架改动的两种方法</h3>
+<p>运行框架和模型共同决定智能体的表现，但“表现好”很难准确定义。为了找到答案，我们建立了多层测量体系。</p>
+<p>除了公开 benchmark，我们还维护自己的评测套件 CursorBench。它可以快速、标准化地反映质量，也方便我们进行跨时间比较。然而，即使最好的 benchmark 也只能近似真实使用场景。完全依赖 benchmark，会让我们错过重要信号。</p>
+<p>因此，我们还会开展线上实验。我们同时部署两个或更多运行框架版本，并基于真实使用情况进行 A/B 测试。在这些测试中，我们通过多种指标衡量智能体质量。部分指标很直接，例如延迟、令牌效率、工具调用次数和缓存命中率。这些指标能够提示总体方向，却仍无法回答一个更模糊也更重要的问题：智能体是否真的把工作做好了。对此，我们采用两种衡量方法。</p>
+<p>第一种是智能体生成代码的“保留率”（Keep Rate）。针对智能体提出的一组代码变更，我们会跟踪经过若干固定时间间隔后，其中有多大比例仍然保留在用户的代码库中。通过这种方式，我们可以判断用户是否不得不手动调整智能体的输出，或者是否需要继续迭代并要求智能体修复问题。这些情况意味着智能体的首次响应质量较低。</p>
+<p>第二种方法是使用语言模型阅读用户对智能体初次输出的回复，从语义上判断用户是否满意。用户开始处理下一个功能，是智能体完成工作的强烈信号。用户贴出堆栈跟踪，则是智能体没有完成工作的可靠信号。</p>
+<p>有时，这些线上测试会促使我们搁置看似很有希望的想法。在一次实验中，我们尝试使用更昂贵的模型来总结上下文。结果显示，它对智能体质量的改善微乎其微，不值得为此支付更高成本。</p>
+<h3>跟踪并修复性能退化</h3>
+<p>随着模型和功能不断增加，运行框架会像其他软件一样变得更加复杂，并产生更多可能的状态。缺陷可能出现的范围随之扩大，其中许多问题只有在大规模运行时才能发现。</p>
+<p>智能体的工具是最容易出现缺陷的领域之一。工具调用错误可能严重破坏 Cursor 中的一次会话。智能体通常能够自行纠正，但错误仍会留在上下文里。它们会浪费令牌，并造成“上下文腐化”（context rot）。随着错误累积，模型后续决策的质量也会下降。</p>
+<p>一次工具调用失败后，智能体有时会陷入阻塞，甚至完全偏离任务。工具调用量和错误率等指标不能直接说明智能体是否完成了出色的工作，但它们可以作为指示器，帮助我们发现更广泛的问题。</p>
+<p>任何未知错误都代表运行框架存在缺陷，我们会按缺陷处理。不过，许多错误属于“预期错误”。例如，模型偶尔会提出错误的编辑，或尝试读取不存在的文件。我们按照原因对这些预期错误分类。InvalidArguments 和 UnexpectedEnvironment 用来表示模型失误以及上下文窗口中的矛盾。ProviderError 则表示 GenerateImage 或 WebSearch 等工具的供应商发生服务故障。</p>
+<p>我们还有 UserAborted 和 Timeout 等其他分类。它们合在一起涵盖了大多数预期错误。</p>
+<p>我们根据这些指标设置告警，用于捕捉进入生产环境的重大退化。未知错误始终属于缺陷，因此，只要任何工具的未知错误率超过固定阈值，我们就会收到告警。但预期错误究竟代表运行框架的缺陷，还是正常行为，往往不容易判断。</p>
+<p>例如，grep 搜索超时可能源于工具性能问题，也可能只是代码库规模太大，而模型又构造了低效查询。为了解决这个问题，我们设置了异常检测告警。当预期错误显著超过基线时，告警就会触发。我们会按工具和模型分别计算基线，因为不同模型在工具调用上的失误率可能不同。</p>
+<p>我们每周还会运行一个配有 skill 的 Automation。这个 skill 会教模型如何搜索日志，发现新出现或近期大幅增加的问题，并在待办列表中创建或更新工单，同时附上调查结果。我们大量使用 Cloud Agents，同时启动许多问题的修复工作，甚至可以直接从 Linear 触发这些智能体。</p>
+<p>这个流程是我们为智能体运行框架构建自动化“软件工厂”的一部分。在今年早些时候的一次集中冲刺中，我们将意外工具调用错误降低了一个数量级。</p>
+<h3>为不同模型定制运行框架</h3>
+<p>我们的所有运行框架抽象都与具体模型无关，同时也能针对支持的每个模型进行深度定制。例如，OpenAI 模型接受过使用补丁格式编辑文件的训练，而 Anthropic 模型接受的是字符串替换训练。两类模型都可以使用任一种工具，但让模型使用不熟悉的工具会消耗更多推理令牌，也会产生更多错误。因此，在我们的运行框架中，每个模型都会获得它在训练期间使用过的工具格式。</p>
+<p>这种定制非常深入，包括针对不同提供商甚至不同模型版本设计专用提示词。OpenAI 模型在遵循指令时往往更为字面和精确。Claude 则更依靠直觉，对不够精确的指令也更宽容。</p>
+<p>如果我们在新模型发布前获得提前使用权限，就会从最接近的现有模型运行框架开始迭代。我们运行离线评测，查找模型容易困惑的地方。团队成员也会亲自使用模型并反馈问题。我们再根据这些问题调整运行框架。这个过程不断重复，直到模型与运行框架的组合达到我们认为可以发布的水平。</p>
+<p>这项调优工作大多是让运行框架适配新模型的优势。不过，我们有时也会遇到真正的模型怪癖，并通过运行框架进行缓解。例如，我们发现某个模型出现了一种被我们称为“上下文焦虑”（context anxiety）的行为。随着上下文窗口逐渐填满，它会开始拒绝工作，并含糊地表示任务似乎太大。我们通过调整提示词减轻了这种行为。</p>
+<h3>支持对话过程中切换模型</h3>
+<p>支持用户在对话中途切换模型尤其棘手，因为不同模型有不同的行为、提示词和工具形式。</p>
+<p>用户切换模型时，Cursor 会自动切换到对应的运行框架，并加载为该模型定制的提示词和工具集合。然而，新模型仍要使用这些工具来处理另一个模型生成的对话历史。这种历史超出了它训练时的数据分布。</p>
+<p>为了解决这个问题，我们会加入专门指令，告诉模型它正在对话中途接替另一个模型。这些指令还会阻止它调用对话历史中出现、但不属于其自身工具集合的工具。</p>
+<p>第二个挑战是，缓存由提供商和模型分别维护。切换模型意味着缓存未命中，导致切换后的第一轮更慢、成本更高。我们尝试过在切换时总结对话，为模型提供一份干净的摘要，从而减轻缓存损失。但是，如果用户已经深入处理一项复杂任务，摘要可能丢失重要细节。除非有明确的切换理由，否则我们通常建议在一段对话中始终使用同一个模型。</p>
+<p>另一种避开对话中途切换难题的方式，是改用拥有全新上下文窗口的子智能体。我们最近为运行框架增加了一项能力，用户可以直接要求使用指定模型运行一个子智能体。</p>
+<h3>运行框架与软件开发的未来</h3>
+<p>AI 辅助软件工程的未来将属于多智能体系统。系统不会再把每个子任务都交给同一个智能体，而是学会在专业智能体和子智能体之间进行委派。例如，一个负责规划，一个负责快速编辑，另一个负责调试。每个智能体只承担最适合自己的工作。</p>
+<p>要让这种模式良好运转，本质上是一个运行框架问题。系统需要知道应该派出哪个智能体，如何根据该智能体的优势描述任务，以及如何把各项结果衔接成连贯的工作流。编排这类协作的能力将存在于运行框架中，而不是任何单个智能体中。这意味着，运行框架工程一直是决定智能体能否成功的关键，而且今后只会变得更加重要。</p>
+<p><strong>分类：</strong>研究</p>
+<p><strong>作者：</strong>Stefan Heule 与 Jediah Katz</p>
+<div class="related">
+<p>我们在构建 Cloud Agents 过程中学到了什么</p>
+<p>更好的 AI 模型能够承担更有雄心的工作</p>
+<p>通过实时强化学习改进 Composer</p>
+</div>
+</div>
+</section>
 </main>
-  <script id="airs-digest-theme-script">
+<script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;
       const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));

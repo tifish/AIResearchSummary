@@ -1,253 +1,343 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>在编码评估中区分信号与噪声</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>从编程评测中分离信号与噪声</title>
 <style>
 :root {
-  --bg: #f7f4ef;
-  --ink: #18202a;
-  --muted: #66717f;
-  --line: #d7d0c5;
-  --panel: #ffffff;
-  --panel-soft: #f0ebe3;
-  --panel-cool: #e7f0f3;
-  --panel-warm: #fff0d9;
-  --panel-risk: #ffe2df;
-  --panel-dark: #18202a;
-  --ink-on-dark: #f7f4ef;
-  --accent-data: #2166a5;
-  --accent-risk: #c43d32;
-  --accent-opportunity: #2d8a62;
-  --accent-conclusion: #8a4fd1;
-  --accent-warning: #d28217;
-  --shadow: 0 18px 50px rgba(24, 32, 42, .10);
+  --bg: #f5f1e9;
+  --surface: #fffdf8;
+  --surface2: #edf5f1;
+  --surface3: #f7e9e4;
+  --surface4: #e9eef8;
+  --ink: #17211d;
+  --muted: #66716b;
+  --line: #d6d8d0;
+  --accent: #087f5b;
+  --accent2: #2563a8;
+  --accent3: #c2415d;
+  --accent4: #a45c05;
+  --deep: #152d27;
+  --deep-ink: #f3f7f5;
+  --hl: #d6f3e5;
+  --hl2: #dce8ff;
+  --hl3: #f8dce2;
+  --hl4: #f8e6bd;
+  --shadow: rgba(23, 33, 29, .11);
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #111417;
-    --ink: #ece8df;
-    --muted: #a9b1bb;
-    --line: #303841;
-    --panel: #1b2026;
-    --panel-soft: #20242a;
-    --panel-cool: #16262d;
-    --panel-warm: #2b2318;
-    --panel-risk: #2d1b1b;
-    --panel-dark: #080a0d;
-    --ink-on-dark: #f3efe7;
-    --accent-data: #66b7ff;
-    --accent-risk: #ff7f76;
-    --accent-opportunity: #63d894;
-    --accent-conclusion: #b78cff;
-    --accent-warning: #ffbd5a;
-    --shadow: 0 18px 50px rgba(0, 0, 0, .35);
+    --bg: #101513;
+    --surface: #19201d;
+    --surface2: #142720;
+    --surface3: #2a1c1f;
+    --surface4: #182236;
+    --ink: #e7eee9;
+    --muted: #a5b0aa;
+    --line: #36423c;
+    --accent: #45d6a2;
+    --accent2: #75aaff;
+    --accent3: #ff7891;
+    --accent4: #f4b75e;
+    --deep: #091713;
+    --deep-ink: #e7f5ef;
+    --hl: #174c3b;
+    --hl2: #203e70;
+    --hl3: #5a2632;
+    --hl4: #594019;
+    --shadow: rgba(0, 0, 0, .35);
   }
 }
 :root[data-theme="dark"] {
-  --bg: #111417;
-  --ink: #ece8df;
-  --muted: #a9b1bb;
-  --line: #303841;
-  --panel: #1b2026;
-  --panel-soft: #20242a;
-  --panel-cool: #16262d;
-  --panel-warm: #2b2318;
-  --panel-risk: #2d1b1b;
-  --panel-dark: #080a0d;
-  --ink-on-dark: #f3efe7;
-  --accent-data: #66b7ff;
-  --accent-risk: #ff7f76;
-  --accent-opportunity: #63d894;
-  --accent-conclusion: #b78cff;
-  --accent-warning: #ffbd5a;
-  --shadow: 0 18px 50px rgba(0, 0, 0, .35);
+  --bg: #101513;
+  --surface: #19201d;
+  --surface2: #142720;
+  --surface3: #2a1c1f;
+  --surface4: #182236;
+  --ink: #e7eee9;
+  --muted: #a5b0aa;
+  --line: #36423c;
+  --accent: #45d6a2;
+  --accent2: #75aaff;
+  --accent3: #ff7891;
+  --accent4: #f4b75e;
+  --deep: #091713;
+  --deep-ink: #e7f5ef;
+  --hl: #174c3b;
+  --hl2: #203e70;
+  --hl3: #5a2632;
+  --hl4: #594019;
+  --shadow: rgba(0, 0, 0, .35);
 }
 * { box-sizing: border-box; }
 body {
   margin: 0;
-  background: var(--bg);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", sans-serif;
-  line-height: 1.68;
+  background: var(--bg);
+  font-family: "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.78;
 }
-main { max-width: 1120px; margin: 0 auto; }
 .hero {
-  padding: 64px 24px 36px;
-  display: grid;
-  grid-template-columns: 1.25fr .75fr;
-  gap: 32px;
-  align-items: end;
+  padding: 5.5rem max(6vw, 1.5rem) 4.5rem;
+  color: var(--deep-ink);
+  background: linear-gradient(130deg, var(--deep), var(--accent));
 }
-.kicker {
-  color: var(--accent-data);
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0;
+.hero-inner, .summary-wrap, #translation {
+  width: min(1100px, 100%);
+  margin: 0 auto;
 }
-h1 {
-  margin: 10px 0 8px;
-  font-size: clamp(34px, 6vw, 68px);
+.eyebrow {
+  color: var(--accent4);
+  font-size: .82rem;
+  font-weight: 800;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.hero h1 {
+  max-width: 820px;
+  margin: .55rem 0 .4rem;
+  font-size: clamp(2.35rem, 7vw, 5.7rem);
   line-height: 1.05;
-  letter-spacing: 0;
 }
-.original {
-  color: var(--muted);
-  font-size: 18px;
+.original-title {
+  max-width: 760px;
+  margin: 0;
+  color: var(--deep-ink);
+  font: 500 clamp(1rem, 2.2vw, 1.35rem)/1.5 Georgia, serif;
+  opacity: .74;
 }
-.one-line {
-  background: var(--panel-dark);
-  color: var(--ink-on-dark);
-  padding: 24px;
-  border-left: 6px solid var(--accent-conclusion);
-  box-shadow: var(--shadow);
+.dek {
+  max-width: 760px;
+  margin: 2.4rem 0 0;
+  padding-left: 1rem;
+  border-left: .28rem solid var(--accent4);
+  font-size: clamp(1.12rem, 2.3vw, 1.45rem);
+  font-weight: 650;
 }
-.one-line strong {
-  display: block;
-  color: var(--accent-warning);
-  margin-bottom: 8px;
-}
-.metrics {
+.summary-wrap { padding: 0 max(3vw, 1.25rem) 4.5rem; }
+.number-strip {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  background: var(--panel);
+  margin: -1.8rem 0 3.5rem;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 18px 45px var(--shadow);
 }
-.metric {
-  padding: 24px;
-  border-right: 1px solid var(--line);
-}
-.metric:last-child { border-right: 0; }
-.metric b {
+.stat { padding: 1.5rem; border-right: 1px solid var(--line); }
+.stat:last-child { border-right: 0; }
+.stat strong {
   display: block;
-  font-size: 34px;
-  color: var(--accent-data);
-  line-height: 1;
+  color: var(--accent2);
+  font-size: clamp(1.7rem, 4vw, 2.8rem);
+  line-height: 1.1;
 }
-.metric span {
-  display: block;
-  margin-top: 8px;
-  color: var(--muted);
-  font-size: 14px;
-}
+.stat span { color: var(--muted); font-size: .88rem; }
 .split {
-  padding: 44px 24px;
-  display: grid;
-  grid-template-columns: .9fr 1.1fr;
-  gap: 36px;
-  background: var(--panel-soft);
-}
-.section-title {
-  margin: 0 0 12px;
-  font-size: 26px;
-  line-height: 1.2;
-}
-.lede {
-  color: var(--muted);
-  margin: 0;
-}
-.issue-list {
-  display: grid;
-  gap: 14px;
-}
-.issue {
-  background: var(--panel);
-  padding: 16px 18px;
-  border-left: 5px solid var(--accent-risk);
-}
-.issue:nth-child(2) { border-left-color: var(--accent-warning); }
-.issue:nth-child(3) { border-left-color: var(--accent-data); }
-.issue:nth-child(4) { border-left-color: var(--accent-conclusion); }
-.issue b { display: block; margin-bottom: 4px; }
-.timeline {
-  padding: 48px 24px;
-  background: var(--panel);
-}
-.steps {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-  margin-top: 22px;
-}
-.step {
-  position: relative;
-  padding: 20px;
-  border-top: 4px solid var(--accent-opportunity);
-  background: var(--panel-cool);
-}
-.step .num {
-  display: inline-grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--accent-opportunity);
-  color: var(--panel-dark);
-  font-weight: 800;
-  margin-bottom: 10px;
-}
-.compare {
-  padding: 44px 24px;
-  background: var(--panel-risk);
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--panel);
-  box-shadow: var(--shadow);
-}
-th, td {
-  padding: 15px;
-  text-align: left;
-  border-bottom: 1px solid var(--line);
-  vertical-align: top;
-}
-th {
-  color: var(--accent-risk);
-  font-size: 14px;
-}
-td:first-child { font-weight: 700; }
-.callout {
-  margin: 0;
-  padding: 34px 24px;
-  background: var(--panel-dark);
-  color: var(--ink-on-dark);
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 24px;
-  align-items: center;
-}
-.callout b {
-  color: var(--accent-warning);
-  font-size: 28px;
-  line-height: 1.2;
-}
-.takeaways {
-  padding: 48px 24px 64px;
-  background: var(--bg);
-}
-.mosaic {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  margin-top: 20px;
+  gap: 2.3rem;
+  align-items: center;
+  margin: 3rem 0;
 }
-.tile {
-  padding: 20px;
-  background: var(--panel);
+.split h2, .band h2, .takeaways h2 { line-height: 1.25; }
+.explain {
+  padding: 2rem;
+  background: var(--surface2);
+  border-top: .35rem solid var(--accent);
+}
+.issue-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+.issue {
+  min-height: 170px;
+  padding: 1.35rem;
   border: 1px solid var(--line);
 }
-.tile:nth-child(1) { border-top: 6px solid var(--accent-data); }
-.tile:nth-child(2) { border-top: 6px solid var(--accent-risk); }
-.tile:nth-child(3) { border-top: 6px solid var(--accent-opportunity); }
-.tile:nth-child(4) { border-top: 6px solid var(--accent-conclusion); }
-.tile b { display: block; margin-bottom: 6px; }
+.issue:nth-child(1) { background: var(--surface3); border-top: .3rem solid var(--accent3); }
+.issue:nth-child(2) { background: var(--surface4); border-top: .3rem solid var(--accent2); }
+.issue:nth-child(3) { background: var(--surface2); border-top: .3rem solid var(--accent); }
+.issue:nth-child(4) { background: var(--surface); border-top: .3rem solid var(--accent4); }
+.issue h3 { margin-top: 0; line-height: 1.3; }
+.band {
+  margin: 3.5rem calc(50% - 50vw);
+  padding: 3.5rem max(6vw, calc((100vw - 1100px) / 2));
+  color: var(--deep-ink);
+  background: var(--deep);
+}
+.pipeline {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.4rem;
+  counter-reset: step;
+}
+.pipeline article {
+  position: relative;
+  padding: 1.4rem;
+  border: 1px solid var(--accent);
+}
+.pipeline article::before {
+  counter-increment: step;
+  content: counter(step);
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  margin-bottom: .8rem;
+  place-items: center;
+  color: var(--deep);
+  background: var(--accent4);
+  border-radius: 50%;
+  font-weight: 900;
+}
+.compare {
+  width: 100%;
+  margin: 3rem 0;
+  border-collapse: collapse;
+  background: var(--surface);
+}
+.compare th, .compare td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+.compare th { color: var(--accent2); background: var(--surface4); }
+.insight {
+  margin: 3rem 0;
+  padding: 1.5rem 1.8rem;
+  background: var(--hl4);
+  border-left: .4rem solid var(--accent4);
+  font-size: 1.16rem;
+  font-weight: 650;
+}
+.takeaways { margin-top: 3rem; }
+.mosaic {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr 1fr;
+  gap: 1rem;
+}
+.tile {
+  padding: 1.4rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.tile:first-child { grid-row: span 2; background: var(--surface4); }
+.tile:nth-child(2) { background: var(--surface2); }
+.tile:nth-child(3) { background: var(--surface3); }
+.tile:nth-child(4) { grid-column: span 2; border-left: .35rem solid var(--accent4); }
+mark, .hl, .hl2, .hl3, .hl4 {
+  padding: .05em .22em;
+  color: var(--ink);
+  font-weight: 800;
+}
+mark, .hl { background: var(--hl); }
+.hl2 { background: var(--hl2); }
+.hl3 { background: var(--hl3); }
+.hl4 { background: var(--hl4); }
+#translation {
+  padding: 4.5rem max(3vw, 1.25rem) 6rem;
+}
+#translation > h2 {
+  margin: 0 0 2rem;
+  padding-bottom: .8rem;
+  border-bottom: .3rem solid var(--accent);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+}
+.translation-body {
+  width: min(760px, 100%);
+  margin: 0 auto;
+}
+.translation-body h3 {
+  margin-top: 3.2rem;
+  color: var(--accent2);
+  font-size: 1.65rem;
+  line-height: 1.3;
+}
+.translation-body h4 {
+  margin-top: 2.3rem;
+  color: var(--accent3);
+  font-size: 1.25rem;
+}
+.translation-body p, .translation-body li { font-size: 1.04rem; }
+.translation-body ul { padding-left: 1.35rem; }
+.translation-body li { margin: .8rem 0; }
+.failure-example {
+  margin: 2rem 0;
+  padding: 1.4rem 1.6rem;
+  background: var(--surface3);
+  border-left: .35rem solid var(--accent3);
+}
+.code-sample {
+  padding: .8rem 1rem;
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  background: var(--surface4);
+  border: 1px solid var(--line);
+  font-family: Consolas, monospace;
+}
+.source-figure {
+  margin: 2.8rem 0;
+  padding: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 10px 28px var(--shadow);
+}
+.source-figure img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+.source-figure figcaption {
+  margin-top: .9rem;
+  color: var(--muted);
+  font-size: .9rem;
+  line-height: 1.55;
+}
+.meta, .footnotes {
+  color: var(--muted);
+  font-size: .92rem;
+}
+.keep-reading {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.keep-reading .source-figure { margin: 0; }
 @media (max-width: 760px) {
-  .hero, .split, .callout { grid-template-columns: 1fr; }
-  .metrics, .steps, .mosaic { grid-template-columns: 1fr; }
-  .metric { border-right: 0; border-bottom: 1px solid var(--line); }
+  .number-strip, .split, .pipeline, .mosaic, .keep-reading { grid-template-columns: 1fr; }
+  .stat { border-right: 0; border-bottom: 1px solid var(--line); }
+  .issue-grid { grid-template-columns: 1fr; }
+  .tile:first-child { grid-row: auto; }
+  .tile:nth-child(4) { grid-column: auto; }
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+--bg: #f5f1e9;
+  --surface: #fffdf8;
+  --surface2: #edf5f1;
+  --surface3: #f7e9e4;
+  --surface4: #e9eef8;
+  --ink: #17211d;
+  --muted: #66716b;
+  --line: #d6d8d0;
+  --accent: #087f5b;
+  --accent2: #2563a8;
+  --accent3: #c2415d;
+  --accent4: #a45c05;
+  --deep: #152d27;
+  --deep-ink: #f3f7f5;
+  --hl: #d6f3e5;
+  --hl2: #dce8ff;
+  --hl3: #f8dce2;
+  --hl4: #f8e6bd;
+  --shadow: rgba(23, 33, 29, .11);
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -379,109 +469,211 @@ td:first-child { font-weight: 700; }
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/separating-signal-from-noise-coding-evaluations" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
 <main>
-  <header class="hero">
-    <div>
-      <div class="kicker">OpenAI Research · 2026-07-08</div>
-      <h1>在编码评估中区分信号与噪声</h1>
-      <div class="original">Separating signal from noise in coding evaluations</div>
-    </div>
-    <div class="one-line">
-      <strong>一句话总括</strong>
-      这项审计显示，SWE-Bench Pro 的一大部分任务并不能可靠衡量模型的软件工程能力，而是在把测试缺陷误记为模型失败。
-    </div>
-  </header>
-
-  <section class="metrics">
-    <div class="metric"><b>731</b><span>SWE-Bench Pro 公共拆分任务数</span></div>
-    <div class="metric"><b>27.4%</b><span>数据点分析流水线确认的破坏性任务比例</span></div>
-    <div class="metric"><b>34.1%</b><span>人工标注活动确认的破坏性任务比例</span></div>
-    <div class="metric"><b>~30%</b><span>OpenAI 对整体破坏性任务比例的估计</span></div>
-  </section>
-
-  <section class="split">
-    <div>
-      <h2 class="section-title">基准分数上升，不等于信号可靠</h2>
-      <p class="lede">前沿模型在 8 个月内从 23.3% 通过率升至 80.3%。这个变化看起来像能力跃迁，但前提是任务本身必须公平。</p>
-      <p class="lede">审计发现，许多失败可能来自题目、测试和提示之间的不一致。这改变了读者对 AI 编码进展的理解：分数不仅测模型，也测数据集质量。</p>
-    </div>
-    <div class="issue-list">
-      <div class="issue"><b>过严测试</b>隐藏测试要求特定实现细节。功能正确的提交也可能失败。</div>
-      <div class="issue"><b>提示不完整</b>题目没有写出隐藏测试会检查的要求。模型无法合理推断。</div>
-      <div class="issue"><b>测试覆盖不足</b>不完整修复也能通过。高分可能夸大真实能力。</div>
-      <div class="issue"><b>误导性提示</b>题目把模型引向错误行为。失败不再代表能力不足。</div>
-    </div>
-  </section>
-
-  <section class="timeline">
-    <h2 class="section-title">审计流程把“疑似坏题”逐层压实</h2>
-    <p class="lede">初始自动过滤器先检查提示、模型尝试和评分测试，并标记 286 个疑似问题任务。随后，研究者用代理审计和人工标注两条路径复核。</p>
-    <div class="steps">
-      <div class="step"><span class="num">1</span><b>自动过滤</b><p>系统先寻找可能的提示、测试和失败轨迹异常。这一步扩大覆盖面。</p></div>
-      <div class="step"><span class="num">2</span><b>Codex 调查代理</b><p>代理进入任务仓库运行测试和读代码。它们区分合理歧义和真正的题目缺陷。</p></div>
-      <div class="step"><span class="num">3</span><b>五人工程师复审</b><p>每个任务由 5 名有经验的软件工程师审查。低信心和分歧案例会升级。</p></div>
-    </div>
-  </section>
-
-  <section class="compare">
-    <h2 class="section-title">人工审查比代理更常发现重叠问题</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>观察点</th>
-          <th>关键数据</th>
-          <th>说明了什么</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>破坏性任务比例</td>
-          <td>流水线为 27.4%，人工为 34.1%</td>
-          <td>自动方法能发现大量问题，但仍可能低估基准缺陷。</td>
-        </tr>
-        <tr>
-          <td>类别重合</td>
-          <td>人工判断与代理流水线重合率为 74%</td>
-          <td>两条路径抓到相同主要失效模式，但边界判断并不完全一致。</td>
-        </tr>
-        <tr>
-          <td>低覆盖测试</td>
-          <td>人工标为 9.4%，代理流水线为 4.1%</td>
-          <td>人类更容易发现“能过但没真正完成任务”的情况。</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="callout">
-    <b>一个字符也会扭曲评估。</b>
-    <p>OpenLibrary 示例中，提示给出的 Markdown 间距和隐藏测试要求不一致。模型如果严格遵循提示，仍会因为一个空格差异被判错。这个案例说明，编码评估的噪声可能非常细小，却会直接改变结果。</p>
-  </section>
-
-  <section class="split">
-    <div>
-      <h2 class="section-title">政策含义是：先验证评估，再相信排名</h2>
-      <p class="lede">OpenAI 表示，这类结果会影响部署、安全和研究优先级。坏任务会制造错误的安全感，也会误导模型能力判断。</p>
-    </div>
-    <div>
-      <p>文章最后撤回了此前建议采用 SWE-Bench Pro 的立场。它并不是否定高难度真实任务，而是强调基准必须由有经验的开发者专门设计，并配套更强的人类监督。</p>
-      <p>结论很直接：可靠评估要难以投机，也要容易信任。否则，分数越精确，误导也可能越精确。</p>
-    </div>
-  </section>
-
-  <section class="takeaways">
-    <h2 class="section-title">最值得带走的洞见</h2>
-    <div class="mosaic">
-      <div class="tile"><b>坏题会伪装成模型失败</b>当提示和隐藏测试不一致时，低分不能说明模型没有能力。</div>
-      <div class="tile"><b>高分也可能被低覆盖测试放大</b>如果测试没有覆盖关键行为，模型可能通过却没有真正解决问题。</div>
-      <div class="tile"><b>代理可以扩展数据质检</b>更强模型能检查提示、测试、补丁和失败轨迹，降低大规模审计成本。</div>
-      <div class="tile"><b>软件工程基准需要专门设计</b>真实仓库历史很有价值，但不能直接等同于干净、公平、可解释的评估任务。</div>
-    </div>
-  </section>
+<section aria-labelledby="page-title" class="hero">
+<div class="hero-inner">
+<div class="eyebrow">OpenAI Research · 2026-07-08</div>
+<h1 id="page-title">从编程评测中分离信号与噪声</h1>
+<p class="original-title" lang="en">Separating signal from noise in coding evaluations</p>
+<p class="dek">一句话总括：OpenAI 通过代理审计和工程师复核发现，SWE-Bench Pro 约有三成任务无法公平衡量模型能力，并据此撤回了此前的采用建议。</p>
+</div>
+</section>
+<section aria-label="中文总结" class="summary-wrap">
+<div class="number-strip">
+<div class="stat"><strong>~30%</strong><span>估计存在问题的任务</span></div>
+<div class="stat"><strong>200</strong><span>代理管线判定，占 27.4%</span></div>
+<div class="stat"><strong>249</strong><span>人工标注识别，占 34.1%</span></div>
+<div class="stat"><strong>731</strong><span>公开拆分中的任务总数</span></div>
+</div>
+<div class="split">
+<div>
+<div class="eyebrow">真正的问题</div>
+<h2>高通过率不一定等于能力大幅提升</h2>
+<p>SWE-Bench Pro 上，前沿模型的通过率在八个月内从 <span class="hl2">23.3%</span> 升至 <span class="hl">80.3%</span>。但审计显示，许多任务本身无法可靠区分正确与错误的实现。</p>
+<p>这改变了数字的解释方式。benchmark 分数既包含模型能力，也可能混入测试缺陷、提示遗漏和评测设计偏差。</p>
+</div>
+<div class="explain">
+<h3>为何会影响安全判断</h3>
+<p>评测结果会进入部署、安全和研究优先级决策。若任务把正确答案判错，或让不完整答案侥幸通过，能力边界就会被错误描绘。</p>
+<p><strong>结论：</strong>评测有效性不是数据清理的次要问题，而是安全论证成立的前提。</p>
+</div>
+</div>
+<div aria-label="四类主要问题" class="issue-grid">
+<article class="issue">
+<h3>过度严格的测试</h3>
+<p>隐藏测试强制采用提示中没有规定的实现细节。功能正确的提交也可能失败。</p>
+</article>
+<article class="issue">
+<h3>要求不完整的提示</h3>
+<p>隐藏测试检查了提示未说明、也无法从上下文合理推断的要求。</p>
+</article>
+<article class="issue">
+<h3>覆盖不足的测试</h3>
+<p>测试没有充分验证所要求的功能。不完整的修复因此可能通过。</p>
+</article>
+<article class="issue">
+<h3>误导性提示</h3>
+<p>提示把模型引向错误行为，甚至与测试所要求的结果直接冲突。</p>
+</article>
+</div>
+<div class="band">
+<h2>审计不是一次模型打分，而是一条证据链</h2>
+<div class="pipeline">
+<article>
+<h3>自动筛查</h3>
+<p>分析任务说明、模型尝试、评分测试、元数据和失败轨迹，筛出 <strong>286</strong> 个疑似问题任务。</p>
+</article>
+<article>
+<h3>调查代理深审</h3>
+<p>Codex 调查代理进入仓库运行测试、查看代码，并区分可合理消除的歧义与真正的要求缺失。</p>
+</article>
+<article>
+<h3>五人独立复核</h3>
+<p>每个任务由五名有经验的软件工程师判断。分歧和低置信度案例会继续升级审查。</p>
+</article>
+</div>
+</div>
+<table class="compare">
+<thead>
+<tr><th>观察维度</th><th>代理加研究员审查</th><th>人工标注</th></tr>
+</thead>
+<tbody>
+<tr><td>判定有问题的任务</td><td><span class="hl2">200 个，27.4%</span></td><td><span class="hl3">249 个，34.1%</span></td></tr>
+<tr><td>低覆盖测试占 benchmark 的比例</td><td>4.1%</td><td>9.4%</td></tr>
+<tr><td>分类关系</td><td colspan="2">人工判断与代理管线分类在 <span class="hl4">74%</span> 的案例中重合</td></tr>
+<tr><td>整体倾向</td><td>标签更保守，较少标注重叠问题</td><td>更常判定任务有问题，也更常选择多个标签</td></tr>
+</tbody>
+</table>
+<div class="insight">OpenLibrary 案例表明，一个前导空格的差异就足以让遵守提示的答案被判错。评测噪声有时并不宏大，却能直接改变模型得分。</div>
+<div class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="mosaic">
+<article class="tile"><h3>分数必须先经过任务质量审计</h3><p>当约三成任务可能失效时，单看排行榜无法可靠判断模型能力。开发者需要检查具体失败案例和测试设计。</p></article>
+<article class="tile"><h3>真实任务不天然等于公平任务</h3><p>开源 issue、补丁和测试源于人类协作过程，三者不一定能组成边界清晰的独立评测题。</p></article>
+<article class="tile"><h3>代理能降低审计成本</h3><p>能力更强的模型可以系统检查提示、测试、补丁和执行轨迹，让大规模质量审计变得可行。</p></article>
+<article class="tile"><h3>最终方向</h3><p>高质量 benchmark 应由有经验的软件开发者专门设计，并在全过程中保留充分的人类监督。OpenAI 因本次发现撤回了采用 SWE-Bench Pro 的建议。</p></article>
+</div>
+</div>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<div class="translation-body">
+<p><strong>经过详细审计，我们发现 SWE-Bench Pro 普遍存在任务质量问题，并估计约 30% 的任务已经失效。</strong></p>
+<p>方法</p>
+<p>人工监督的代理审查</p>
+<p>人工标注行动</p>
+<p>讨论</p>
+<p>方法</p>
+<p>人工监督的代理审查</p>
+<p>人工标注行动</p>
+<p>讨论</p>
+<p>准确衡量模型能力，对于作出稳健的部署和安全决策十分重要。这也包括 OpenAI《Preparedness Framework》下的相关决策。每次发布模型时，我们都会报告多项外部和内部 benchmark 的结果，用于追踪模型进展。</p>
+<p>如果评测存在会影响结果的缺陷，人们就可能错误理解模型能力。这会歪曲安全论证，也会影响研究工作的优先级。</p>
+<p>我们最近调查了使用最广泛的编程 benchmark 之一 SWE-bench Verified。调查发现，它存在根本性的设计问题和污染问题，已经无法再为软件开发能力提供有意义的信号。当时，我们鼓励更广泛的社区改用 SWE-Bench Pro。</p>
+<p>SWE-Bench Pro 的设计目标是改进 SWE-bench Verified。它通过更长周期、更贴近现实的编程任务，更好地追踪代理式编程能力。</p>
+<p>与 SWE-bench Verified 一样，这些任务通过程序化方式，从一组公开和私有仓库的功能变更历史中提取。模型需要实现一个解决方案。它必须通过针对新功能增加的测试，同时不能破坏已有功能。</p>
+<p>在包含 731 个任务的公开拆分中，前沿模型的通过率在八个月内从 23.3% 提升到 80.3%。</p>
+<p>此后，我们对 SWE-Bench Pro 进行了类似的审计。我们使用数据点分析管线检查数据集。管线会查看模型对任务的尝试、任务元数据和失败轨迹，从中标记可能存在的评测缺陷。</p>
+<p>随后，每个被标记的任务都经过多轮调查代理评估，并由五名有经验的软件工程师独立审查。如有分歧，则升级进行进一步调查。</p>
+<p>我们发现，数据集中相当大一部分任务存在足以破坏评测有效性的问题。数据点分析管线标记了 200 个问题任务，占 27.4%。人工标注行动识别出 249 个，占 34.1%。</p>
+<p>这些问题主要分为四类：</p>
+<ul>
+<li><strong>过度严格的测试</strong><sup>1</sup> 强制要求提示中没有规定的具体实现细节，因此会让许多功能正确的提交失效。</li>
+<li><strong>要求不完整的提示</strong><sup>2</sup> 遗漏了隐藏测试会强制检查、同时又无法合理推断出来的要求。</li>
+<li><strong>覆盖不足的测试</strong>没有充分检查所要求的功能，因此不完整的修复也可能通过。</li>
+<li><strong>误导性提示</strong>会把模型引向错误行为，或者与测试所要求的行为相矛盾。</li>
+</ul>
+<p>我们的发现表明，制作既困难又公平的 benchmark 十分不易。同时，代理在可扩展的数据质量检查中正变得越来越有用。</p>
+<p>根据这些结果，我们估计约 30% 的 SWE-bench Pro 任务存在问题，并建议模型开发者谨慎审视相关结果。</p>
+<h3>方法</h3>
+<p>我们的目标是确保任务失败反映的是真实模型局限，而任务成功反映的是满足提示要求的完整、有效解决方案。</p>
+<p>为了检查评测所用数据的质量，我们建立了一条质量保证管线，用来判断每个数据点能否准确反映模型能力。</p>
+<p>初步的数据质量管线会标记问题，供后续审查。随后，我们通过两条路径进行验证。一条是对被标记任务开展更深入的代理辅助审计。另一条是与有经验的工程师合作，开展人工标注行动。</p>
+<figure class="source-figure" data-source-image="0"><img alt="Quality assurance workflow combining automated screening and human review to assess task quality." decoding="async" height="407" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/4uTrAMFq4ZJu9wXWZ9gifK/44cf7007c7a81c4bb6214d0cab6a3221/Quality_assurance_pipeline_desktop_light.svg?w=3840&amp;q=90" width="802"/>
+<figcaption>初步的数据质量管线会标记问题，供后续审查。我们通过更深入的代理辅助审计，以及与有经验工程师合作开展的人工标注行动，对这些问题进行验证。</figcaption>
+</figure>
+<p>初步自动过滤器会检查提供给模型的指令、模型解决任务的尝试，以及用于给这些尝试评分的测试，从中标记可能失效或存在问题的样本。</p>
+<p>该过滤器标记了 286 个可能存在问题的任务。随后，我们用两种方式对这个子集进行深入审查。</p>
+<p>第一种方式是人工监督的代理审查。调查代理会进行广泛检查，最后由人工作出判断。第二种方式是与有经验的软件开发者合作开展人工标注行动。</p>
+<h3>人工监督的代理审查</h3>
+<p>每个被标记的问题都会交给基于 Codex 的调查代理审计。代理可以访问对应的任务仓库和环境。</p>
+<p>这种访问能力有助于区分两类情况。第一类是合理的任务歧义，通常可以通过研究附近代码和仓库惯例来消除。第二类是真正的要求缺失。</p>
+<p>代理可以运行测试，检查仓库中的文件，还可以调查模型的任务尝试，以及这些尝试中常见的失败模式。</p>
+<p>在多次独立重复这些深度审计后，一名研究人员会检查总结、作出最终判断，并标注可能存在的问题。</p>
+<h3>人工标注行动</h3>
+<p>与此同时，我们还对被标记的子集开展了人工标注行动。参与者是有经验的软件工程师。在开始审查任务前，他们接受了有关 benchmark 目标、问题分类和边界案例的培训。</p>
+<p>每个任务都由五名工程师审查。</p>
+<p>审查者首先根据可见的问题说明、测试用例和真实参考解决方案独立判断。这个参考解决方案也称为 gold patch。之后，他们才会把管线分析或执行记录作为辅助背景。</p>
+<p>接着，审查者会根据具体证据分配标签和严重程度评级。如果出现分歧，或案例的判断置信度较低，就会升级进行进一步审查。</p>
+<p>与调查代理相比，人工审查者更有可能把任务标记为有问题。两条审查路径在问题分类上也存在一些分歧。不过，在所有被标记的任务中，没有任何一个任务最常见的人工标签是“没有问题”。</p>
+<p>在代理管线标记的问题类别中，审查者的判断有 74% 与之重合。</p>
+<p>与代理管线相比，人工审查者也更常为一个任务选择多个标签。这意味着，他们发现一些任务同时以多种方式失效，或者无法被清晰归入单一类别。</p>
+<p>这表明，代理加研究员的审查管线给出了较为保守的标签。它捕捉到了人工审查者发现的同类主要失败模式，但低估了人工审查者认为存在额外问题或问题相互重叠的案例。</p>
+<p>最大的差异出现在覆盖不足的测试上。人工审查者将其选为最常见问题的任务占整个 benchmark 的 9.4%，代理管线给出的比例则为 4.1%。</p>
+<h3>失败模式</h3>
+<p>在一些案例中，任务提示规定了一种具体实现方式，但隐藏测试用例期待的却是另一种行为。</p>
+<div class="failure-example">
+<h4>OpenLibrary-77c16d5</h4>
+<p>这个任务涉及目录条目的规范化，以及通过 <code>TocEntry.to_markdown()</code> 将条目重新渲染为 Markdown。</p>
+<p>任务提示对序列化格式作出了细致到字符间距的规定。它说明会严格检查空格和竖线，并给出如下示例：</p>
+<div class="code-sample">" | Chapter 1 | 1"<br/>"** | Chapter 1 | 1"</div>
+<p>无</p>
+<p>然而，隐藏的 <code>test_to_markdown</code> 断言要求的是：</p>
+<div class="code-sample">"  | Chapter 1 | 1"<br/>"**  | Chapter 1 | 1"</div>
+<p>无</p>
+<p>隐藏测试中有两个前导空格，但提供给模型的示例只有一个前导空格。</p>
+<p>如果模型正确遵循提示，这一个字符的差异仍会导致隐藏测试失败，任务也会被判为错误。</p>
+</div>
+<h3>讨论</h3>
+<p>我们发现的这些问题，与 SWE-bench Verified 中的类似案例一起，凸显了严格检查 benchmark 的重要性。</p>
+<p>开源仓库中的 issue 和 pull request 最初是为了人类协作而创建的。维护者与贡献者之间往往会进行多轮、持续很久的沟通。</p>
+<p>因此，问题描述、最终合并的代码和单元测试并不总能彼此吻合，也未必能组成干净、独立、可用于可靠评测模型的任务。</p>
+<p>尤其需要注意的是，pull request 中包含的测试可能过度严格。这些测试原本是为了验证某项具体变更而编写，并不是为了定义一种与实现方式无关的任务解决标准。</p>
+<p>与此同时，现在发现评测缺陷已经比不久前容易得多。随着模型能力提升，我们可以利用这些模型，以更深、更一致的方式检查提示、测试、补丁、执行轨迹和边界案例。</p>
+<p>这有助于揭示过去因成本过高或难以规模化而无法发现的 benchmark 问题。</p>
+<p>我们希望更广泛的评测社区能够开发新的 benchmark。这些 benchmark 应由有经验的软件开发者专门构建，用于测试模型能力。</p>
+<p>这种方式既能维持我们希望衡量的高标准和真实性，也能让整个过程得到更充分的人工监督。</p>
+<p>鉴于本次分析发现的问题，我们撤回此前采用 SWE-Bench Pro 的建议。</p>
+<p>归根结底，评测应通过难以投机、容易信任，并且真正反映模型能力或对齐程度的 benchmark，提供有意义的信号。</p>
+<p>这些结果会影响 OpenAI 的部署与安全决策。因此，我们追踪的评测必须有效，也必须真正提供信息。</p>
+<p class="meta">2026</p>
+<p class="meta">软件与工程</p>
+<p class="meta">作者</p>
+<h3>脚注</h3>
+<ol class="footnotes">
+<li>我们此前把这一类别称为“狭窄测试”（narrow tests）。</li>
+<li>我们此前把这一类别称为“宽泛测试”（wide tests）。</li>
+</ol>
+<h3>继续阅读</h3>
+<div class="keep-reading">
+<figure class="source-figure" data-source-image="1"><img alt="GPT-Red art card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/6q32m87ClqE8Ovn6vD424h/05ced72e47bbe42711fbac6a082cbff2/Art_Card.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="2"><img alt="Introducing GeneBench-Pro &gt; Cover image" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/7sbJaKBi5qLXAqbewh72aK/93197556e903eac9df6f077eb12b7581/GenebenchPro_Blog_ArtCard.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="3"><img alt="A near-autonomous AI chemist improves a challenging reaction" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/QgPPg4etNE5C4Ao0G94sk/e5f2a50e5de4619d0e0fe8483698718b/molecule-one-art-card.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+</div>
+</div>
+</section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

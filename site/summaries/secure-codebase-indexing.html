@@ -1,316 +1,352 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>安全地索引大型代码库</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>安全地为大型代码库建立索引</title>
 <style>
-:root {
-  --bg: #f7f4ed;
-  --ink: #18212f;
-  --muted: #617083;
-  --line: #d9d3c7;
+:root,
+:root[data-theme="light"] {
+  --bg: #f4f1ea;
+  --surface: #fffdf8;
   --card: #ffffff;
-  --hero: #172033;
-  --hero-ink: #f8fbff;
-  --hero-muted: #c7d2e4;
-  --band: #e9f6f2;
-  --band2: #fff2d9;
-  --band3: #eef1ff;
-  --band4: #fdecef;
-  --soft: #fbfaf7;
-  --accent-data: #0b7f74;
-  --accent-risk: #b23a48;
-  --accent-opportunity: #d68612;
-  --accent-proof: #4f5fd5;
-  --accent-conclusion: #2f7d32;
-  --shadow: rgba(24, 33, 47, 0.12);
-  --table-head: #26334d;
-  --table-head-ink: #f8fbff;
-}
-:root[data-theme="dark"] {
-  --bg: #10151d;
-  --ink: #edf2f7;
-  --muted: #9eabbc;
-  --line: #2a3546;
-  --card: #171f2a;
-  --hero: #080d16;
-  --hero-ink: #f5f8ff;
-  --hero-muted: #a8b7ce;
-  --band: #102821;
-  --band2: #2a1d0b;
-  --band3: #161a35;
-  --band4: #30161c;
-  --soft: #151b24;
-  --accent-data: #20c9b7;
-  --accent-risk: #ff7786;
-  --accent-opportunity: #ffb44f;
-  --accent-proof: #9ba5ff;
-  --accent-conclusion: #79d87b;
-  --shadow: rgba(0, 0, 0, 0.35);
-  --table-head: #0d1320;
-  --table-head-ink: #f4f7fb;
+  --ink: #17201d;
+  --muted: #64706b;
+  --line: #d8ddd8;
+  --accent: #16695d;
+  --accent-soft: #dcefe9;
+  --accent2: #b66018;
+  --accent2-soft: #fff0dc;
+  --accent3: #7554a6;
+  --accent3-soft: #eee6fa;
+  --accent4: #17659a;
+  --accent4-soft: #e0f0fa;
+  --risk: #a43d4c;
+  --risk-soft: #f9e5e8;
+  --opportunity: #347944;
+  --opportunity-soft: #e4f3e5;
+  --conclusion: #2e438f;
+  --conclusion-soft: #e6eafb;
+  --hl: #ffe28a;
+  --hl2: #bcebd8;
+  --dark-panel: #152825;
+  --dark-panel-ink: #f4fbf8;
+  --dark-panel-muted: #b8cdc6;
+  --shadow: rgba(23, 32, 29, .09);
 }
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #10151d;
-    --ink: #edf2f7;
-    --muted: #9eabbc;
-    --line: #2a3546;
-    --card: #171f2a;
-    --hero: #080d16;
-    --hero-ink: #f5f8ff;
-    --hero-muted: #a8b7ce;
-    --band: #102821;
-    --band2: #2a1d0b;
-    --band3: #161a35;
-    --band4: #30161c;
-    --soft: #151b24;
-    --accent-data: #20c9b7;
-    --accent-risk: #ff7786;
-    --accent-opportunity: #ffb44f;
-    --accent-proof: #9ba5ff;
-    --accent-conclusion: #79d87b;
-    --shadow: rgba(0, 0, 0, 0.35);
-    --table-head: #0d1320;
-    --table-head-ink: #f4f7fb;
+  :root:not([data-theme="light"]) {
+    --bg: #101513;
+    --surface: #171d1a;
+    --card: #1c2420;
+    --ink: #e7eee9;
+    --muted: #a4b0aa;
+    --line: #34413b;
+    --accent: #62d2bb;
+    --accent-soft: #18352f;
+    --accent2: #f0a455;
+    --accent2-soft: #3a2919;
+    --accent3: #c1a3ef;
+    --accent3-soft: #302641;
+    --accent4: #72bee8;
+    --accent4-soft: #183247;
+    --risk: #f08091;
+    --risk-soft: #3b2027;
+    --opportunity: #7bc78a;
+    --opportunity-soft: #1d3522;
+    --conclusion: #9cacff;
+    --conclusion-soft: #242c4b;
+    --hl: #604c16;
+    --hl2: #1d5545;
+    --dark-panel: #0b2420;
+    --dark-panel-ink: #effbf7;
+    --dark-panel-muted: #a5c9be;
+    --shadow: rgba(0, 0, 0, .3);
   }
 }
+:root[data-theme="dark"] {
+  --bg: #101513;
+  --surface: #171d1a;
+  --card: #1c2420;
+  --ink: #e7eee9;
+  --muted: #a4b0aa;
+  --line: #34413b;
+  --accent: #62d2bb;
+  --accent-soft: #18352f;
+  --accent2: #f0a455;
+  --accent2-soft: #3a2919;
+  --accent3: #c1a3ef;
+  --accent3-soft: #302641;
+  --accent4: #72bee8;
+  --accent4-soft: #183247;
+  --risk: #f08091;
+  --risk-soft: #3b2027;
+  --opportunity: #7bc78a;
+  --opportunity-soft: #1d3522;
+  --conclusion: #9cacff;
+  --conclusion-soft: #242c4b;
+  --hl: #604c16;
+  --hl2: #1d5545;
+  --dark-panel: #0b2420;
+  --dark-panel-ink: #effbf7;
+  --dark-panel-muted: #a5c9be;
+  --shadow: rgba(0, 0, 0, .3);
+}
 * { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-  line-height: 1.65;
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.75;
 }
-main { overflow: hidden; }
-section { padding: 56px 22px; }
-.wrap { max-width: 1120px; margin: 0 auto; }
+a { color: var(--accent); }
 .hero {
-  background: var(--hero);
-  color: var(--hero-ink);
-  padding: 72px 22px 54px;
+  padding: 72px 24px 58px;
+  background: var(--dark-panel);
+  color: var(--dark-panel-ink);
 }
-.kicker {
-  color: var(--accent-opportunity);
-  font-weight: 700;
-  letter-spacing: 0;
-  margin-bottom: 18px;
+.hero-inner, .summary-wrap, #translation {
+  width: min(1080px, calc(100% - 40px));
+  margin-inline: auto;
 }
-h1 {
-  margin: 0;
-  font-size: clamp(2rem, 5vw, 4.4rem);
-  line-height: 1.05;
-  letter-spacing: 0;
+.eyebrow {
+  color: var(--accent);
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .16em;
+  text-transform: uppercase;
 }
-.english-title {
-  margin-top: 12px;
-  color: var(--hero-muted);
-  font-size: 1.05rem;
-}
-.one-line {
-  margin-top: 30px;
+.hero h1 {
   max-width: 820px;
-  font-size: 1.35rem;
-  color: var(--hero-ink);
-  border-left: 5px solid var(--accent-data);
-  padding-left: 18px;
+  margin: 12px 0 8px;
+  font-size: clamp(2.35rem, 7vw, 5.5rem);
+  line-height: 1.04;
+  letter-spacing: -.05em;
 }
-.meta {
+.original-title {
+  margin: 0;
+  color: var(--dark-panel-muted);
+  font-size: clamp(1rem, 2vw, 1.3rem);
+}
+.hero-meta {
   display: flex;
-  gap: 12px;
   flex-wrap: wrap;
+  gap: 10px 22px;
   margin-top: 28px;
-  color: var(--hero-muted);
+  color: var(--dark-panel-muted);
+  font-size: .92rem;
 }
-.meta span {
-  border: 1px solid var(--line);
-  padding: 6px 10px;
-  border-radius: 999px;
+.hero-meta a { color: var(--accent); }
+.summary-wrap { padding: 48px 0 72px; }
+.lede {
+  max-width: 900px;
+  margin: 0 0 38px;
+  padding-left: 24px;
+  border-left: 6px solid var(--accent2);
+  font-size: clamp(1.25rem, 2.7vw, 1.85rem);
+  font-weight: 720;
+  line-height: 1.5;
 }
-.numbers {
-  background: var(--band);
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-}
-.number-grid {
+.hl { background: var(--hl); padding: .08em .24em; }
+.hl2 { background: var(--hl2); padding: .08em .24em; }
+.metric-strip {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
-}
-.num {
-  padding: 18px;
-  background: var(--card);
-  border-top: 4px solid var(--accent-data);
-  box-shadow: 0 8px 24px var(--shadow);
-}
-.num strong {
-  display: block;
-  font-size: 2rem;
-  line-height: 1.1;
-  color: var(--accent-data);
-}
-.num span { color: var(--muted); }
-.split {
-  background: var(--soft);
-}
-.two-col {
-  display: grid;
-  grid-template-columns: 0.95fr 1.05fr;
-  gap: 34px;
-  align-items: start;
-}
-.lead h2, .flow h2, .proof h2, .compare h2, .takeaways h2 {
-  margin: 0 0 14px;
-  font-size: 1.9rem;
-  line-height: 1.2;
-}
-.lead p { color: var(--muted); font-size: 1.1rem; }
-.explain {
-  display: grid;
-  gap: 14px;
-}
-.explain article {
-  background: var(--card);
-  border-left: 5px solid var(--accent-proof);
-  padding: 18px;
-  box-shadow: 0 8px 20px var(--shadow);
-}
-.explain article:nth-child(2) { border-left-color: var(--accent-opportunity); }
-.explain article:nth-child(3) { border-left-color: var(--accent-conclusion); }
-.explain h3 { margin: 0 0 6px; }
-.explain p { margin: 0; color: var(--muted); }
-.flow {
-  background: var(--band2);
-}
-.steps {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0;
-  margin-top: 26px;
-  border: 1px solid var(--line);
-  background: var(--card);
-}
-.step {
-  padding: 22px;
-  border-right: 1px solid var(--line);
-  position: relative;
-}
-.step:last-child { border-right: 0; }
-.badge {
-  display: inline-grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--accent-opportunity);
-  color: var(--hero-ink);
-  font-weight: 800;
-  margin-bottom: 12px;
-}
-.step h3 { margin: 0 0 8px; }
-.step p { margin: 0; color: var(--muted); }
-.proof {
-  background: var(--hero);
-  color: var(--hero-ink);
-}
-.proof-layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-}
-.quote {
-  font-size: 1.45rem;
-  line-height: 1.45;
-  border-left: 6px solid var(--accent-risk);
-  padding: 10px 0 10px 22px;
-}
-.proof-list {
-  display: grid;
-  gap: 14px;
-}
-.proof-list div {
-  border: 1px solid var(--line);
-  padding: 16px;
-  background: var(--card);
-  color: var(--ink);
-}
-.proof-list strong { color: var(--accent-proof); }
-.compare {
-  background: var(--band3);
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--card);
-  box-shadow: 0 10px 28px var(--shadow);
+  grid-template-columns: repeat(3, 1fr);
   overflow: hidden;
+  margin: 36px 0;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 14px 40px var(--shadow);
 }
-th {
-  background: var(--table-head);
-  color: var(--table-head-ink);
-  text-align: left;
-  padding: 14px;
-}
-td {
-  padding: 14px;
-  border-bottom: 1px solid var(--line);
-}
-td:nth-child(3) {
-  color: var(--accent-conclusion);
-  font-weight: 800;
-}
-.note {
-  margin-top: 18px;
-  padding: 14px 16px;
+.metric {
+  padding: 28px 24px;
   background: var(--card);
-  border-left: 5px solid var(--accent-data);
+}
+.metric + .metric { border-left: 1px solid var(--line); }
+.metric:nth-child(2) { background: var(--accent2-soft); }
+.metric:nth-child(3) { background: var(--accent3-soft); }
+.metric strong {
+  display: block;
+  color: var(--accent);
+  font-size: clamp(2rem, 5vw, 3.35rem);
+  line-height: 1;
+}
+.metric:nth-child(2) strong { color: var(--accent2); }
+.metric:nth-child(3) strong { color: var(--accent3); }
+.metric span {
+  display: block;
+  margin-top: 10px;
   color: var(--muted);
 }
-.takeaways {
-  background: var(--band4);
-}
-.mosaic {
+.split {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr 1fr;
-  gap: 14px;
+  grid-template-columns: .9fr 1.1fr;
+  gap: 26px;
+  margin: 44px 0;
 }
-.tile {
+.split-title {
+  padding: 32px;
+  border-radius: 18px;
+  background: var(--accent-soft);
+}
+.split-title h2 { margin: 0 0 12px; font-size: 1.7rem; }
+.split-body {
+  padding: 12px 4px;
+}
+.split-body p:first-child { margin-top: 0; }
+.flow {
+  margin: 46px 0;
+  padding: 34px;
+  border-radius: 22px;
+  background: var(--dark-panel);
+  color: var(--dark-panel-ink);
+}
+.flow h2 { margin-top: 0; }
+.flow-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.step {
+  padding: 18px;
+  border-top: 4px solid var(--accent);
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+.step:nth-child(2) { border-color: var(--accent4); background: var(--accent4-soft); }
+.step:nth-child(3) { border-color: var(--accent3); background: var(--accent3-soft); }
+.step:nth-child(4) { border-color: var(--opportunity); background: var(--opportunity-soft); }
+.step b { display: block; margin-bottom: 6px; }
+.guardrail {
+  margin: 44px 0;
+  padding: 30px 34px;
+  border: 1px solid var(--risk);
+  border-left-width: 9px;
+  background: var(--risk-soft);
+}
+.guardrail h2 { margin-top: 0; color: var(--risk); }
+.percentiles {
+  margin: 44px 0;
+}
+.percentiles h2 { font-size: 1.8rem; }
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  background: var(--card);
+  box-shadow: 0 12px 36px var(--shadow);
+}
+.compare-table th, .compare-table td {
+  padding: 18px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+.compare-table th { background: var(--conclusion-soft); color: var(--conclusion); }
+.compare-table td:last-child {
+  color: var(--opportunity);
+  font-weight: 800;
+}
+.insight {
+  margin: 46px 0;
+  padding: 32px;
+  background: var(--accent4-soft);
+  border-top: 5px solid var(--accent4);
+  font-size: 1.18rem;
+}
+.takeaways h2 { margin-bottom: 20px; }
+.takeaway-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+.takeaway {
   min-height: 150px;
-  padding: 20px;
+  padding: 24px;
+  border-radius: 16px;
   background: var(--card);
   border: 1px solid var(--line);
 }
-.tile strong {
+.takeaway:nth-child(2) { background: var(--accent2-soft); }
+.takeaway:nth-child(3) { background: var(--accent3-soft); }
+.takeaway:nth-child(4) { background: var(--opportunity-soft); }
+.takeaway b {
   display: block;
   margin-bottom: 8px;
-  font-size: 1.15rem;
+  font-size: 1.08rem;
 }
-.tile.data { border-top: 6px solid var(--accent-data); }
-.tile.risk { border-top: 6px solid var(--accent-risk); }
-.tile.opp { border-top: 6px solid var(--accent-opportunity); }
-.tile.done { border-top: 6px solid var(--accent-conclusion); }
-.tile.wide { grid-column: span 2; }
-@media (max-width: 820px) {
-  section { padding: 42px 18px; }
-  .number-grid, .two-col, .steps, .proof-layout, .mosaic {
-    grid-template-columns: 1fr;
-  }
-  .step { border-right: 0; border-bottom: 1px solid var(--line); }
-  .step:last-child { border-bottom: 0; }
-  .tile.wide { grid-column: auto; }
-  table { font-size: 0.92rem; }
-  th, td { padding: 10px; }
+#translation {
+  margin-bottom: 80px;
+  padding: 50px clamp(22px, 6vw, 78px);
+  background: var(--surface);
+  box-shadow: 0 18px 55px var(--shadow);
+}
+#translation h2 {
+  margin: 0 0 32px;
+  padding-bottom: 14px;
+  border-bottom: 3px solid var(--accent);
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+#translation h3 {
+  margin: 52px 0 18px;
+  color: var(--accent);
+  font-size: 1.65rem;
+}
+#translation p, #translation li {
+  max-width: 780px;
+  font-family: "Noto Serif SC", "Songti SC", Georgia, serif;
+  font-size: 1.06rem;
+}
+#translation nav {
+  margin: 0 0 38px;
+  padding: 22px 28px;
+  background: var(--accent-soft);
+  border-left: 5px solid var(--accent);
+}
+#translation nav h3 { margin: 0 0 10px; font-size: 1.2rem; }
+#translation nav ol { margin-bottom: 0; }
+.post-meta {
+  margin-top: 48px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+}
+.related {
+  padding: 20px 24px;
+  background: var(--accent4-soft);
+}
+.source-figure {
+  margin: 36px auto;
+  max-width: 920px;
+}
+.source-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.source-figure figcaption {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: .9rem;
+}
+@media (max-width: 760px) {
+  .metric-strip, .split, .flow-grid, .takeaway-grid { grid-template-columns: 1fr; }
+  .metric + .metric { border-left: 0; border-top: 1px solid var(--line); }
+  .hero { padding-top: 48px; }
+  #translation { width: min(100% - 20px, 1080px); }
+  .compare-table { font-size: .88rem; }
+  .compare-table th, .compare-table td { padding: 12px 9px; }
 }
 </style>
-  <script id="airs-digest-theme-boot">
+<script id="airs-digest-theme-boot">
     try {
       var saved = localStorage.getItem("theme");
       if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
     } catch (e) {}
   </script>
-  <style id="airs-digest-theme-style">
+<style id="airs-digest-theme-style">
     :root {
       color-scheme: light;
       --airs-digest-ink: #191816;
@@ -433,154 +469,233 @@ td:nth-child(3) {
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+  <style id="airs-source-image-theme-style">
+    .source-figure .source-image-dark {
+      display: none;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .source-figure .source-image-light {
+        display: none;
+      }
+      :root:not([data-theme="light"]) .source-figure .source-image-dark {
+        display: block;
+      }
+    }
+    :root[data-theme="dark"] .source-figure .source-image-light {
+      display: none;
+    }
+    :root[data-theme="dark"] .source-figure .source-image-dark {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-light {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-dark {
+      display: none;
+    }
   </style>
 </head>
 <body>
-<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/secure-codebase-indexing" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">← 返回索引</a><a href="https://cursor.com/blog/secure-codebase-indexing" rel="noopener noreferrer" target="_blank">阅读原文 ↗</a></div><button class="airs-digest-theme-toggle" data-airs-theme-toggle="" type="button">主题 · 跟随系统</button></nav>
+<header class="hero">
+<div class="hero-inner">
+<div class="eyebrow">Cursor Research · 2026 年 1 月 27 日</div>
+<h1>安全地为大型代码库建立索引</h1>
+<p class="original-title" lang="en">Securely indexing large codebases</p>
+<div class="hero-meta">
+<span>作者：Jeremy Stribling</span>
+<span>分类：Research</span>
+<a href="https://cursor.com/blog/secure-codebase-indexing">阅读英文原文</a>
+</div>
+</div>
+</header>
 <main>
-  <section class="hero">
-    <div class="wrap">
-      <div class="kicker">Research · Cursor · Jan 27, 2026</div>
-      <h1>安全地索引大型代码库</h1>
-      <div class="english-title">Securely indexing large codebases</div>
-      <p class="one-line">一句话总括：Cursor 的贡献不是单纯加速索引，而是把团队内相似代码库的索引复用、安全证明和后台增量同步组合成一套可落地机制。</p>
-      <div class="meta">
-        <span>主题：语义搜索</span>
-        <span>核心技术：Merkle tree</span>
-        <span>关键约束：不能泄露未拥有代码</span>
-      </div>
-    </div>
-  </section>
-
-  <section class="numbers">
-    <div class="wrap">
-      <div class="number-grid">
-        <div class="num"><strong>12.5%</strong><span>语义搜索让回答准确率平均提升。</span></div>
-        <div class="num"><strong>92%</strong><span>同组织用户的代码库克隆平均相似度。</span></div>
-        <div class="num"><strong>3.2 MB</strong><span>5 万文件的文件名与 SHA-256 哈希规模。</span></div>
-        <div class="num"><strong>21 秒</strong><span>99 分位大型仓库复用索引后的首次查询时间。</span></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="split">
-    <div class="wrap two-col">
-      <div class="lead">
-        <h2>问题不是索引一次，而是每个人都重复索引</h2>
-        <p>大型代码库可能有数万文件。朴素索引会拖慢新成员和新机器的首次使用。</p>
-        <p>语义搜索要等到至少 80% 的索引完成后才可用。对 AI 编程助手来说，这会直接推迟上下文理解。</p>
-      </div>
-      <div class="explain">
-        <article>
-          <h3>先用 Merkle tree 减少同步</h3>
-          <p>每个文件和目录都有加密哈希。客户端只同步哈希不同的分支，而不是每次上传全部结构。</p>
-        </article>
-        <article>
-          <h3>再用 chunk 缓存降低嵌入成本</h3>
-          <p>文件变化后会切成语法块。未变化的块复用已有 embedding，昂贵计算被限制在真正变化的内容上。</p>
-        </article>
-        <article>
-          <h3>最后复用队友索引</h3>
-          <p>新用户上传 simhash。服务器在同团队或同用户的索引中找相似项，并把最接近的索引作为初始版本。</p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="flow">
-    <div class="wrap">
-      <h2>复用索引的流程</h2>
-      <div class="steps">
-        <div class="step">
-          <span class="badge">1</span>
-          <h3>本地建树</h3>
-          <p>客户端计算代码库的 Merkle tree。它保留文件层级和内容哈希。</p>
-        </div>
-        <div class="step">
-          <span class="badge">2</span>
-          <h3>生成 simhash</h3>
-          <p>simhash 把大量文件哈希压缩成一个相似性摘要。</p>
-        </div>
-        <div class="step">
-          <span class="badge">3</span>
-          <h3>向量检索</h3>
-          <p>服务器在团队内现有索引中搜索相似 simhash，并检查阈值。</p>
-        </div>
-        <div class="step">
-          <span class="badge">4</span>
-          <h3>边查边同步</h3>
-          <p>客户端先查询被复制的索引。后台同步再修正本地差异。</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="proof">
-    <div class="wrap proof-layout">
-      <div>
-        <h2>安全性来自“能证明自己拥有文件”</h2>
-        <p class="quote">如果客户端不能用自己的 Merkle tree 证明拥有某个文件，服务器就丢弃对应搜索结果。</p>
-      </div>
-      <div class="proof-list">
-        <div><strong>访问证明：</strong>每个节点哈希只能由拥有下方内容的一方计算出来。</div>
-        <div><strong>路径保护：</strong>客户端上传完整 Merkle tree，并把哈希关联到加密路径。</div>
-        <div><strong>临时过滤：</strong>服务器把这棵树作为内容证明集合，用它过滤复用索引的搜索结果。</div>
-        <div><strong>完成后清理：</strong>当客户端与服务器 Merkle root 一致后，内容证明会被删除，查询改走完整同步后的索引。</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="compare">
-    <div class="wrap">
-      <h2>速度提升随仓库规模放大</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>仓库分位</th>
-            <th>原首次查询时间</th>
-            <th>复用索引后</th>
-            <th>读者应改变的理解</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>中位数</td>
-            <td>7.87 秒</td>
-            <td>525 毫秒</td>
-            <td>即使普通仓库，等待感也能接近消失。</td>
-          </tr>
-          <tr>
-            <td>90 分位</td>
-            <td>2.82 分钟</td>
-            <td>1.87 秒</td>
-            <td>大型团队的常见仓库不再需要长时间预热。</td>
-          </tr>
-          <tr>
-            <td>99 分位</td>
-            <td>4.03 小时</td>
-            <td>21 秒</td>
-            <td>最大仓库的瓶颈从“无法使用”变成“短暂等待”。</td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="note">这些数字说明，AI 工具的可用性不只取决于模型能力，也取决于索引、缓存和权限证明等基础设施。</div>
-    </div>
-  </section>
-
-  <section class="takeaways">
-    <div class="wrap">
-      <h2>最值得带走的洞见</h2>
-      <div class="mosaic">
-        <div class="tile data wide"><strong>相似性是加速入口。</strong>团队成员的代码库平均 92% 相似，让索引复用成为高收益路径。</div>
-        <div class="tile risk"><strong>安全性不能事后补。</strong>复用索引必须先解决“不能看到自己没有的代码”。</div>
-        <div class="tile opp"><strong>Merkle tree 同时服务性能和权限。</strong>它既减少同步范围，也能作为内容证明的基础。</div>
-        <div class="tile done"><strong>后台同步保留正确性。</strong>用户先获得可用搜索，系统再把差异补齐。</div>
-        <div class="tile data wide"><strong>AI 编程体验依赖工程系统。</strong>当索引从小时级降到秒级，模型才有机会在大型代码库中稳定发挥。</div>
-      </div>
-    </div>
-  </section>
+<div class="summary-wrap">
+<p class="lede">一句话总括：Cursor 把团队成员已有的代码索引变成可安全复用的基础设施，让大型代码库的语义搜索在<span class="hl">数秒内可用</span>，同时避免泄露用户本地不存在的代码。</p>
+<div aria-label="关键数据" class="metric-strip">
+<div class="metric">
+<strong>12.5%</strong>
+<span>语义搜索带来的平均回答准确率提升</span>
+</div>
+<div class="metric">
+<strong>92%</strong>
+<span>同一组织内代码库副本的平均相似度</span>
+</div>
+<div class="metric">
+<strong>80%</strong>
+<span>传统索引至少完成到这一比例后，语义搜索才可用</span>
+</div>
+</div>
+<section class="split">
+<div class="split-title">
+<h2>重复索引才是真正的瓶颈</h2>
+<p>大型仓库可能包含数万份文件。若每位成员都从零开始处理，首次查询会等待数小时。</p>
+</div>
+<div class="split-body">
+<p>Cursor 观察到，同一组织内的代码库副本平均有 <span class="hl2"><strong>92% 相似度</strong></span>。大部分计算其实是在重复处理相同内容。</p>
+<p>因此，优化重点不只是让单次索引更快，而是识别最接近的已有索引并安全复用。这个变化把代码索引从个人任务转变为团队可以共享的计算成果。</p>
+</div>
+</section>
+<section class="flow">
+<h2>复用流程：从相似度判断到完整同步</h2>
+<div class="flow-grid">
+<div class="step"><b>1. 构建 Merkle 树</b>客户端计算文件和目录的加密哈希，只定位真正发生变化的分支。</div>
+<div class="step"><b>2. 计算 simhash</b>系统把整棵树压缩成代表代码内容的相似性哈希。</div>
+<div class="step"><b>3. 选择已有索引</b>服务器在同一团队或同一用户的索引中寻找超过阈值的匹配项。</div>
+<div class="step"><b>4. 边查询边同步</b>客户端立即查询共享内容，后台再补齐双方差异。</div>
+</div>
+</section>
+<section class="guardrail">
+<h2>速度不能以代码泄露为代价</h2>
+<p>复用索引带来一个核心风险：旧索引可能包含新用户没有的文件。Cursor 要求客户端用 Merkle 树中的哈希证明自己确实持有文件。无法证明的搜索结果会被服务器直接丢弃。</p>
+<p>这意味着用户可以提前使用正在复制的索引，却只能看到自己代码库中已有内容。这里的关键洞见是，<strong>内容证明让即时查询与访问隔离可以同时成立</strong>。</p>
+</section>
+<section class="percentiles">
+<h2>仓库越大，收益越明显</h2>
+<table class="compare-table">
+<thead>
+<tr><th>仓库分位</th><th>复用前</th><th>复用后</th></tr>
+</thead>
+<tbody>
+<tr><td>中位数</td><td>7.87 秒</td><td>525 毫秒</td></tr>
+<tr><td>第 90 百分位</td><td>2.82 分钟</td><td>1.87 秒</td></tr>
+<tr><td>第 99 百分位</td><td>4.03 小时</td><td>21 秒</td></tr>
+</tbody>
+</table>
+<p>在普通仓库中，优化已经能被用户感知。到了超大型仓库，变化则是从“当天稍后才能用”变为“打开项目后很快就能用”。这改变了 AI 编程工具在大型企业代码库中的可用性边界。</p>
+</section>
+<aside class="insight">
+      Merkle 树在这里承担了两项工作：它既是高效增量同步的差异检测结构，也是防止跨副本泄露文件的访问证明。复用同一套加密基础，降低了系统复杂度。
+    </aside>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="takeaway-grid">
+<div class="takeaway"><b>语义搜索直接影响代理质量</b>Cursor 的评估显示，语义搜索让回答准确率平均提高 12.5%，也让代码修改更可能被保留。</div>
+<div class="takeaway"><b>团队相似性是一种可利用的资产</b>同一组织内平均 92% 的代码重合，使索引复用比反复从零计算更合理。</div>
+<div class="takeaway"><b>内容证明划定安全边界</b>服务器只返回客户端能用哈希证明自己持有的文件，复制索引不会自动扩大访问范围。</div>
+<div class="takeaway"><b>最大仓库获得最大收益</b>第 99 百分位仓库的首次查询从 4.03 小时缩短到 21 秒，让大型代码库真正具备即时 AI 检索能力。</div>
+</div>
+</section>
+</div>
+<section id="translation">
+<h2>完整译文</h2>
+<nav>
+<h3>目录</h3>
+<ol>
+<li>构建首个索引</li>
+<li>寻找最适合复用的索引</li>
+<li>证明访问权限</li>
+<li>加快初次使用速度</li>
+</ol>
+</nav>
+<p>语义搜索是提升代理表现的主要因素之一。在我们最近的评估中，它让回答准确率平均提高了 12.5%。借助语义搜索生成的代码修改也更有可能被保留在代码库中，用户对整体请求结果的满意度同样有所提升。</p>
+<p>为了支持语义搜索，Cursor 会在你打开项目时为代码库建立可搜索的索引。小型项目几乎可以立即完成这项工作。但大型仓库可能包含数万份文件。如果采用简单直接的索引方式，整个过程可能耗时数小时。至少完成 80% 的工作后，语义搜索才可使用。</p>
+<p>我们注意到，大多数团队成员使用的其实是同一代码库中近乎相同的副本。因此，我们开始寻找加快索引的方法。事实上，在同一组织的不同用户之间，同一代码库的副本平均有 92% 的相似度。</p>
+<p>这意味着，当新成员加入团队或有人更换电脑时，我们不必每次都从零重建索引。系统可以安全地复用队友已有的索引。在规模最大的仓库中，这能把首次查询的等待时间从数小时缩短到数秒。</p>
+<h3>构建首个索引</h3>
+<p>Cursor 使用 Merkle 树建立对代码库的初始视图。它可以精确识别发生变化的文件和目录，无需重新处理全部内容。Merkle 树会记录每个文件的加密哈希。每个文件夹也有自己的哈希，而这个值由其子项的哈希计算得出。</p>
+<p>客户端上的小范围编辑只会改变被编辑文件的哈希，以及从该文件所在目录一直到代码库根目录之间各级父目录的哈希。Cursor 会把这些哈希与服务器上的版本进行比较，从而准确找出两棵 Merkle 树出现分歧的位置。哈希不同的条目会被同步，相同的条目则会跳过。客户端缺少的条目会从服务器删除，服务器缺少的条目会被添加。同步过程绝不会修改客户端上的文件。</p>
+<p>Merkle 树能显著减少每次同步所需传输的数据量。在一个包含五万份文件的工作区中，仅文件名和 SHA-256 哈希就约有 3.2 MB。如果没有这棵树，每次更新都需要传输这些数据。有了 Merkle 树，Cursor 只需遍历哈希发生变化的分支。</p>
+<p>当文件发生变化时，Cursor 会按照语法结构把它拆成多个内容块。随后，系统会把这些内容块转换为支持语义搜索的嵌入向量。创建嵌入向量是成本较高的步骤，因此 Cursor 会在后台异步完成这项工作。</p>
+<p>大多数编辑不会改变文件里的大部分内容块。Cursor 会根据内容块本身缓存嵌入向量。没有变化的内容块可以直接命中缓存，代理无需在推理时再次承担这项计算成本，回答速度也能保持稳定。最终得到的索引更新迅速，维护成本也很低。</p>
+<h3>寻找最适合复用的索引</h3>
+<p>对于 Cursor 从未见过的代码库，前述索引流程会上传其中的每一份文件。不过，同一组织中的新用户不需要再次经历整个过程。</p>
+<p>新用户加入时，客户端会为新的代码库计算 Merkle 树，并由这棵树生成一个称为相似性哈希（simhash）的值。它是一个单独的值，用来概括代码库中各个文件的内容哈希。</p>
+<p>客户端会把 simhash 上传到服务器。服务器随后把它作为向量，在一个向量数据库中执行搜索。这个数据库包含 Cursor 中同一团队其他索引的当前 simhash，也包括同一用户其他索引的当前 simhash。对于向量数据库返回的每项结果，我们都会检查它与客户端相似性哈希的匹配程度是否超过指定阈值。如果达到阈值，系统便把对应索引作为新代码库的初始索引。</p>
+<p>复制会在后台进行。在此期间，客户端可以针对正在复制的原始索引发起新的语义搜索。因此，客户端几乎可以立即执行首次查询。</p>
+<p>不过，这套方法成立需要满足两个条件。即使本地代码库与复制的索引存在差异，结果也必须反映用户的本地代码。客户端也绝不能看到自己尚未持有的代码所对应的结果。</p>
+<h3>证明访问权限</h3>
+<p>为了确保文件不会在代码库的不同副本之间泄露，我们再次利用了 Merkle 树的加密特性。</p>
+<p>树中的每个节点都是其下方内容的加密哈希。只有持有对应文件，才能计算出这个哈希。当工作区以复制的索引作为起点时，客户端会把完整的 Merkle 树和相似性哈希一并上传。这样，代码库中的每条加密路径都会与一个哈希建立关联。</p>
+<p>服务器会把这棵树保存为一组内容证明。在搜索过程中，服务器会对照客户端树中的哈希来过滤结果。如果客户端无法证明自己持有某份文件，相应结果就会被丢弃。</p>
+<p>这样一来，客户端可以立即发起查询，但只能看到自身代码库与复制索引共有的代码。后台同步会继续协调剩余差异。当客户端与服务器的 Merkle 树根哈希一致后，服务器会删除这些内容证明。后续查询将直接针对已经完全同步的索引运行。</p>
+<h3>加快初次使用速度</h3>
+<p>复用队友的索引可以缩短各种规模仓库的设置时间。仓库越大，效果越明显：</p>
+<ul>
+<li>对于中位数仓库，首次查询时间从 7.87 秒缩短到 525 毫秒。</li>
+<li>在第 90 百分位，首次查询时间从 2.82 分钟缩短到 1.87 秒。</li>
+<li>在第 99 百分位，首次查询时间从 4.03 小时缩短到 21 秒。</li>
+</ul>
+<p>这些变化消除了大量重复工作。即使面对非常庞大的代码库，Cursor 也能在数秒内理解其内容，而不再需要等待数小时。</p>
+<div class="post-meta">
+<p>归类于：Research</p>
+<p>作者：Jeremy Stribling</p>
+</div>
+<div class="related">
+<p>用于代理工具的快速正则表达式搜索：为文本建立索引</p>
+<p>迈向自动驾驶式代码库</p>
+<p>动态发现上下文</p>
+<p>安全地为大型代码库建立索引</p>
+</div>
+<nav>
+<h3>目录</h3>
+<ol>
+<li>构建首个索引</li>
+<li>寻找最适合复用的索引</li>
+<li>证明访问权限</li>
+<li>加快初次使用速度</li>
+</ol>
+</nav>
+<p>语义搜索是提升代理表现的主要因素之一。在我们最近的评估中，它让回答准确率平均提高了 12.5%。借助语义搜索生成的代码修改也更有可能被保留在代码库中，用户对整体请求结果的满意度同样有所提升。</p>
+<p>为了支持语义搜索，Cursor 会在你打开项目时为代码库建立可搜索的索引。小型项目几乎可以立即完成这项工作。但大型仓库可能包含数万份文件。如果采用简单直接的索引方式，整个过程可能耗时数小时。至少完成 80% 的工作后，语义搜索才可使用。</p>
+<p>我们注意到，大多数团队成员使用的其实是同一代码库中近乎相同的副本。因此，我们开始寻找加快索引的方法。事实上，在同一组织的不同用户之间，同一代码库的副本平均有 92% 的相似度。</p>
+<p>这意味着，当新成员加入团队或有人更换电脑时，我们不必每次都从零重建索引。系统可以安全地复用队友已有的索引。在规模最大的仓库中，这能把首次查询的等待时间从数小时缩短到数秒。</p>
+<h3>构建首个索引</h3>
+<p>Cursor 使用 Merkle 树建立对代码库的初始视图。它可以精确识别发生变化的文件和目录，无需重新处理全部内容。Merkle 树会记录每个文件的加密哈希。每个文件夹也有自己的哈希，而这个值由其子项的哈希计算得出。</p>
+<p>客户端上的小范围编辑只会改变被编辑文件的哈希，以及从该文件所在目录一直到代码库根目录之间各级父目录的哈希。Cursor 会把这些哈希与服务器上的版本进行比较，从而准确找出两棵 Merkle 树出现分歧的位置。哈希不同的条目会被同步，相同的条目则会跳过。客户端缺少的条目会从服务器删除，服务器缺少的条目会被添加。同步过程绝不会修改客户端上的文件。</p>
+<p>Merkle 树能显著减少每次同步所需传输的数据量。在一个包含五万份文件的工作区中，仅文件名和 SHA-256 哈希就约有 3.2 MB。如果没有这棵树，每次更新都需要传输这些数据。有了 Merkle 树，Cursor 只需遍历哈希发生变化的分支。</p>
+<p>当文件发生变化时，Cursor 会按照语法结构把它拆成多个内容块。随后，系统会把这些内容块转换为支持语义搜索的嵌入向量。创建嵌入向量是成本较高的步骤，因此 Cursor 会在后台异步完成这项工作。</p>
+<p>大多数编辑不会改变文件里的大部分内容块。Cursor 会根据内容块本身缓存嵌入向量。没有变化的内容块可以直接命中缓存，代理无需在推理时再次承担这项计算成本，回答速度也能保持稳定。最终得到的索引更新迅速，维护成本也很低。</p>
+<h3>寻找最适合复用的索引</h3>
+<p>对于 Cursor 从未见过的代码库，前述索引流程会上传其中的每一份文件。不过，同一组织中的新用户不需要再次经历整个过程。</p>
+<p>新用户加入时，客户端会为新的代码库计算 Merkle 树，并由这棵树生成一个称为相似性哈希（simhash）的值。它是一个单独的值，用来概括代码库中各个文件的内容哈希。</p>
+<p>客户端会把 simhash 上传到服务器。服务器随后把它作为向量，在一个向量数据库中执行搜索。这个数据库包含 Cursor 中同一团队其他索引的当前 simhash，也包括同一用户其他索引的当前 simhash。对于向量数据库返回的每项结果，我们都会检查它与客户端相似性哈希的匹配程度是否超过指定阈值。如果达到阈值，系统便把对应索引作为新代码库的初始索引。</p>
+<p>复制会在后台进行。在此期间，客户端可以针对正在复制的原始索引发起新的语义搜索。因此，客户端几乎可以立即执行首次查询。</p>
+<p>不过，这套方法成立需要满足两个条件。即使本地代码库与复制的索引存在差异，结果也必须反映用户的本地代码。客户端也绝不能看到自己尚未持有的代码所对应的结果。</p>
+<h3>证明访问权限</h3>
+<p>为了确保文件不会在代码库的不同副本之间泄露，我们再次利用了 Merkle 树的加密特性。</p>
+<p>树中的每个节点都是其下方内容的加密哈希。只有持有对应文件，才能计算出这个哈希。当工作区以复制的索引作为起点时，客户端会把完整的 Merkle 树和相似性哈希一并上传。这样，代码库中的每条加密路径都会与一个哈希建立关联。</p>
+<p>服务器会把这棵树保存为一组内容证明。在搜索过程中，服务器会对照客户端树中的哈希来过滤结果。如果客户端无法证明自己持有某份文件，相应结果就会被丢弃。</p>
+<p>这样一来，客户端可以立即发起查询，但只能看到自身代码库与复制索引共有的代码。后台同步会继续协调剩余差异。当客户端与服务器的 Merkle 树根哈希一致后，服务器会删除这些内容证明。后续查询将直接针对已经完全同步的索引运行。</p>
+<h3>加快初次使用速度</h3>
+<p>复用队友的索引可以缩短各种规模仓库的设置时间。仓库越大，效果越明显：</p>
+<ul>
+<li>对于中位数仓库，首次查询时间从 7.87 秒缩短到 525 毫秒。</li>
+<li>在第 90 百分位，首次查询时间从 2.82 分钟缩短到 1.87 秒。</li>
+<li>在第 99 百分位，首次查询时间从 4.03 小时缩短到 21 秒。</li>
+</ul>
+<p>这些变化消除了大量重复工作。即使面对非常庞大的代码库，Cursor 也能在数秒内理解其内容，而不再需要等待数小时。</p>
+<div class="post-meta">
+<p>归类于：Research</p>
+<p>作者：Jeremy Stribling</p>
+</div>
+<div class="related">
+<p>用于代理工具的快速正则表达式搜索：为文本建立索引</p>
+<p>迈向自动驾驶式代码库</p>
+<p>动态发现上下文</p>
+</div>
+</section>
 </main>
-  <script id="airs-digest-theme-script">
+<script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;
       const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));

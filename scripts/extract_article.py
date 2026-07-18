@@ -294,6 +294,119 @@ def meta_content(soup: Any, *names: str) -> str:
     return ""
 
 
+def resolve_image_url(page_url: str, value: str) -> str:
+    """Resolve an image URL and unwrap Next.js image-optimizer URLs."""
+    resolved = urllib.parse.urljoin(page_url, html.unescape(value).strip())
+    parsed = urllib.parse.urlsplit(resolved)
+    if parsed.path == "/_next/image":
+        original = urllib.parse.parse_qs(parsed.query).get("url", [""])[0]
+        if original:
+            return urllib.parse.urljoin(page_url, original)
+    return resolved
+
+
+def image_theme_variant(node: Any) -> str:
+    """Return the source site's declared light/dark variant for an image."""
+    classes = {str(value).lower() for value in node.get("class", [])}
+    if "media-light" in classes:
+        return "light"
+    if "media-dark" in classes:
+        return "dark"
+    return ""
+
+
+def paired_theme_images(node: Any) -> dict[str, Any]:
+    """Find Cursor-style light/dark sibling images representing one figure."""
+    variant = image_theme_variant(node)
+    if not variant or node.parent is None:
+        return {}
+    variants: dict[str, Any] = {}
+    for sibling in node.parent.find_all("img", recursive=False):
+        sibling_variant = image_theme_variant(sibling)
+        if sibling_variant and sibling_variant not in variants:
+            variants[sibling_variant] = sibling
+    return variants if set(variants) == {"light", "dark"} else {}
+
+
+def extract_article_images(url: str, container: Any, title: str, date_text: str, category: str) -> list[dict[str, Any]]:
+    """Extract content images in document order, with their nearby source captions."""
+    if not container:
+        return []
+
+    images: list[dict[str, Any]] = []
+    seen_sources: set[str] = set()
+    seen_nodes: set[int] = set()
+    block_index = 0
+    content_tags = {"h2", "h3", "h4", "p", "li", "blockquote"}
+    ignored_text = {title, date_text, category}
+
+    for node in container.find_all([*content_tags, "img"]):
+        if node.name in content_tags:
+            text = clean_text(node.get_text(" ", strip=True))
+            if text.lower() in {"related content", "more from anthropic", "share", "copy link"}:
+                break
+            if text and text not in ignored_text and len(text) >= 3:
+                block_index += 1
+            continue
+
+        if id(node) in seen_nodes:
+            continue
+        theme_nodes = paired_theme_images(node)
+        if theme_nodes:
+            # Cursor emits the same logical figure as adjacent media-light and
+            # media-dark images. Keep both resources, but expose one marker to
+            # the generator so the translated page does not render duplicates.
+            node = theme_nodes["light"]
+            seen_nodes.update(id(value) for value in theme_nodes.values())
+
+        raw_src = str(node.get("data-src") or node.get("src") or "").strip()
+        if not raw_src or raw_src.startswith("data:"):
+            continue
+        src = resolve_image_url(url, raw_src)
+        if not src or src in seen_sources:
+            continue
+
+        figure = node.find_parent("figure")
+        caption_node = figure.find("figcaption") if figure else None
+        caption = clean_text(caption_node.get_text(" ", strip=True)) if caption_node else ""
+        alt = clean_text(str(node.get("alt") or ""))
+        width_text = str(node.get("width") or "").strip()
+        height_text = str(node.get("height") or "").strip()
+        width = int(width_text) if width_text.isdigit() else None
+        height = int(height_text) if height_text.isdigit() else None
+
+        # Ignore small/decorative images unless they have an explicit figure caption.
+        if not caption and not alt:
+            continue
+        if not caption and width and height and max(width, height) < 300:
+            continue
+
+        seen_sources.add(src)
+        image: dict[str, Any] = {
+            "index": len(images),
+            "src": src,
+            "alt": alt,
+            "caption": caption,
+            "after_block": block_index,
+        }
+        if theme_nodes:
+            theme_sources: dict[str, str] = {}
+            for theme, theme_node in theme_nodes.items():
+                theme_src = str(theme_node.get("data-src") or theme_node.get("src") or "").strip()
+                if theme_src:
+                    resolved_theme_src = resolve_image_url(url, theme_src)
+                    theme_sources[theme] = resolved_theme_src
+                    seen_sources.add(resolved_theme_src)
+            if set(theme_sources) == {"light", "dark"}:
+                image["theme_sources"] = theme_sources
+        if width:
+            image["width"] = width
+        if height:
+            image["height"] = height
+        images.append(image)
+    return images
+
+
 def extract_with_bs4(url: str, markup: str) -> dict[str, Any]:
     BeautifulSoup = ensure_bs4()
     soup = BeautifulSoup(markup, "html.parser")
@@ -352,7 +465,9 @@ def extract_with_bs4(url: str, markup: str) -> dict[str, Any]:
                 blocks.append(text)
 
     article_text = "\n\n".join(blocks).strip()
-    source_hash = hashlib.sha256(article_text.encode("utf-8")).hexdigest()
+    article_images = extract_article_images(url, container, title, date_text, category)
+    hash_input = article_text + "\n" + json.dumps(article_images, ensure_ascii=False, sort_keys=True)
+    source_hash = hashlib.sha256(hash_input.encode("utf-8")).hexdigest()
     return {
         **source_for_url(url),
         "url": normalize_url(url),
@@ -361,6 +476,7 @@ def extract_with_bs4(url: str, markup: str) -> dict[str, Any]:
         "category": category,
         "source_hash": source_hash,
         "article_text": article_text,
+        "article_images": article_images,
     }
 
 
@@ -374,6 +490,11 @@ def extract_from_markup(url: str, markup: str) -> dict[str, Any]:
             parsed["date"] = fallback["date"]
         if fallback["category"]:
             parsed["category"] = fallback["category"]
+        parsed["article_images"] = fallback.get("article_images", [])
+        hash_input = parsed["article_text"] + "\n" + json.dumps(
+            parsed["article_images"], ensure_ascii=False, sort_keys=True
+        )
+        parsed["source_hash"] = hashlib.sha256(hash_input.encode("utf-8")).hexdigest()
         return parsed
     if parsed["title"] and not fallback["title"]:
         fallback["title"] = parsed["title"]

@@ -1,301 +1,281 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>介绍 LifeSciBench</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>推出 LifeSciBench</title>
 <style>
-:root {
-  --bg: #f7f4ee;
-  --ink: #18202a;
-  --muted: #657080;
-  --line: #d8d2c6;
-  --card: #ffffff;
-  --hero: #16213a;
-  --hero-ink: #f7f4ee;
-  --soft-data: #e9f4ff;
-  --soft-risk: #fff1e8;
-  --soft-opportunity: #edf8ef;
-  --soft-conclusion: #f3ecff;
-  --soft-neutral: #f8eadf;
-  --accent-data: #1f6feb;
-  --accent-risk: #d45b2f;
-  --accent-opportunity: #20845a;
-  --accent-conclusion: #7c4dff;
-  --accent-warn: #b88700;
-  --shadow: rgba(24, 32, 42, 0.12);
+:root{
+  color-scheme:light dark;
+  --bg:#f5f4ef;
+  --card:#ffffff;
+  --ink:#17201d;
+  --muted:#63706b;
+  --line:#d7ddd8;
+  --accent:#176b87;
+  --accent2:#8a4bc2;
+  --accent3:#d2652f;
+  --accent4:#247857;
+  --risk:#b9384f;
+  --deep:#142b31;
+  --deep-ink:#eef9f7;
+  --hl:#fff0a8;
+  --hl2:#cceee2;
+  --soft-blue:#e4f3f8;
+  --soft-violet:#f0e7fa;
+  --soft-orange:#fff0e4;
+  --soft-green:#e5f3eb;
+  --soft-red:#fbe7ea;
+  --quote:#edf0ff;
+  --translation:#fbfaf6;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #11151b;
-    --ink: #e9edf3;
-    --muted: #9ca8b7;
-    --line: #313a46;
-    --card: #171e27;
-    --hero: #080c14;
-    --hero-ink: #eef3fb;
-    --soft-data: #10233a;
-    --soft-risk: #321b13;
-    --soft-opportunity: #10291f;
-    --soft-conclusion: #21183a;
-    --soft-neutral: #2a211b;
-    --accent-data: #69a7ff;
-    --accent-risk: #ff8a5c;
-    --accent-opportunity: #64d49b;
-    --accent-conclusion: #ad8cff;
-    --accent-warn: #f0c24b;
-    --shadow: rgba(0, 0, 0, 0.35);
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#101514;
+    --card:#19201e;
+    --ink:#e5ece8;
+    --muted:#a8b4ae;
+    --line:#34403b;
+    --accent:#55c3e6;
+    --accent2:#c28af0;
+    --accent3:#f49a65;
+    --accent4:#64c99a;
+    --risk:#f07c8c;
+    --deep:#0a1c20;
+    --deep-ink:#e5f7f3;
+    --hl:#55491d;
+    --hl2:#17493b;
+    --soft-blue:#142f39;
+    --soft-violet:#30233d;
+    --soft-orange:#3b291e;
+    --soft-green:#18382a;
+    --soft-red:#3d2027;
+    --quote:#242943;
+    --translation:#151a18;
   }
 }
-:root[data-theme="dark"] {
-  --bg: #11151b;
-  --ink: #e9edf3;
-  --muted: #9ca8b7;
-  --line: #313a46;
-  --card: #171e27;
-  --hero: #080c14;
-  --hero-ink: #eef3fb;
-  --soft-data: #10233a;
-  --soft-risk: #321b13;
-  --soft-opportunity: #10291f;
-  --soft-conclusion: #21183a;
-  --soft-neutral: #2a211b;
-  --accent-data: #69a7ff;
-  --accent-risk: #ff8a5c;
-  --accent-opportunity: #64d49b;
-  --accent-conclusion: #ad8cff;
-  --accent-warn: #f0c24b;
-  --shadow: rgba(0, 0, 0, 0.35);
+:root[data-theme="dark"]{
+  --bg:#101514;
+  --card:#19201e;
+  --ink:#e5ece8;
+  --muted:#a8b4ae;
+  --line:#34403b;
+  --accent:#55c3e6;
+  --accent2:#c28af0;
+  --accent3:#f49a65;
+  --accent4:#64c99a;
+  --risk:#f07c8c;
+  --deep:#0a1c20;
+  --deep-ink:#e5f7f3;
+  --hl:#55491d;
+  --hl2:#17493b;
+  --soft-blue:#142f39;
+  --soft-violet:#30233d;
+  --soft-orange:#3b291e;
+  --soft-green:#18382a;
+  --soft-red:#3d2027;
+  --quote:#242943;
+  --translation:#151a18;
 }
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", sans-serif;
-  line-height: 1.65;
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:Inter,"Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
+  line-height:1.75;
 }
-main { overflow: hidden; }
-.hero {
-  background: var(--hero);
-  color: var(--hero-ink);
-  padding: 64px 22px 46px;
+.hero{
+  padding:clamp(3rem,8vw,7rem) max(6vw,calc((100vw - 1180px)/2));
+  background:var(--deep);
+  color:var(--deep-ink);
 }
-.wrap {
-  max-width: 1080px;
-  margin: 0 auto;
+.eyebrow{
+  color:var(--accent);
+  font-weight:800;
+  letter-spacing:.12em;
+  text-transform:uppercase;
 }
-.kicker {
-  color: var(--accent-opportunity);
-  font-weight: 700;
-  margin: 0 0 12px;
+.hero h1{
+  max-width:850px;
+  margin:.35rem 0 0;
+  font-size:clamp(2.7rem,7vw,6.2rem);
+  line-height:1.04;
 }
-h1 {
-  font-size: clamp(34px, 6vw, 68px);
-  line-height: 1.05;
-  margin: 0;
-  letter-spacing: 0;
+.original{
+  margin:.8rem 0 2rem;
+  color:var(--muted);
+  font-size:clamp(1rem,2vw,1.3rem);
 }
-.original {
-  margin: 14px 0 28px;
-  color: var(--muted);
-  font-size: 18px;
+.hero .original{color:#9ec1c5}
+.dek{
+  max-width:780px;
+  margin:0;
+  font-size:clamp(1.25rem,2.4vw,1.8rem);
+  line-height:1.55;
 }
-.hero .original { color: #b9c3d4; }
-.thesis {
-  max-width: 780px;
-  font-size: 22px;
-  line-height: 1.55;
-  border-left: 5px solid var(--accent-data);
-  padding-left: 18px;
+.summary{max-width:1180px;margin:auto;padding:4rem 1.25rem}
+.band{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:1px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:1.1rem;
+  background:var(--line);
 }
-.meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 28px;
+.metric{padding:1.7rem;background:var(--card)}
+.metric strong{display:block;font-size:2.3rem;line-height:1.1;color:var(--accent)}
+.metric:nth-child(2) strong{color:var(--accent2)}
+.metric:nth-child(3) strong{color:var(--accent3)}
+.metric:nth-child(4) strong{color:var(--accent4)}
+.metric span{color:var(--muted)}
+.split{
+  display:grid;
+  grid-template-columns:1.05fr .95fr;
+  gap:2rem;
+  margin:3.5rem 0;
+  align-items:start;
 }
-.pill {
-  border: 1px solid var(--line);
-  color: var(--hero-ink);
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 14px;
+.split h2{font-size:2rem;line-height:1.25}
+.explain{
+  padding:1.7rem;
+  border-left:5px solid var(--accent2);
+  background:var(--soft-violet);
 }
-.band {
-  background: var(--soft-data);
-  border-block: 1px solid var(--line);
-  padding: 24px 18px;
+.flow{
+  margin:3rem 0;
+  padding:2rem;
+  background:var(--soft-blue);
+  border-top:7px solid var(--accent);
 }
-.numbers {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
+.flow ol{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1.2rem;
+  padding:0;
+  list-style:none;
 }
-.num {
-  padding: 18px;
-  border-left: 4px solid var(--accent-data);
-  background: var(--card);
-  box-shadow: 0 10px 28px var(--shadow);
+.flow li{padding:1rem;border-bottom:3px solid var(--accent)}
+.num{font-size:2rem;font-weight:900;color:var(--accent)}
+.compare{
+  margin:3rem 0;
+  padding:2.2rem;
+  color:var(--deep-ink);
+  background:var(--deep);
+  border-radius:1.2rem;
 }
-.num strong {
-  display: block;
-  font-size: 34px;
-  line-height: 1;
-  color: var(--accent-data);
+.bars{display:grid;gap:1rem}
+.bar{display:grid;grid-template-columns:12rem 1fr 4rem;gap:1rem;align-items:center}
+.track{height:1rem;background:#263f44;border-radius:999px;overflow:hidden}
+.fill{display:block;height:100%;background:var(--accent)}
+.fill.purple{background:var(--accent2)}
+.fill.orange{background:var(--accent3)}
+.warning{
+  margin:3rem 0;
+  padding:2rem;
+  background:var(--soft-red);
+  border:2px solid var(--risk);
+  border-radius:.7rem;
 }
-.num span {
-  color: var(--muted);
-  font-size: 14px;
+.warning h2{color:var(--risk)}
+.insight{
+  margin:3rem 0;
+  padding:1.8rem 2rem;
+  background:var(--soft-orange);
+  border-left:8px solid var(--accent3);
+  font-size:1.2rem;
 }
-section {
-  padding: 46px 22px;
+.takeaways{margin-top:3rem}
+.mosaic{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:1rem;
 }
-h2 {
-  font-size: 28px;
-  line-height: 1.25;
-  margin: 0 0 16px;
+.tile{padding:1.4rem;border-radius:.8rem;background:var(--card);border:1px solid var(--line)}
+.tile:nth-child(1){grid-column:span 3;border-top:5px solid var(--accent)}
+.tile:nth-child(2){grid-column:span 3;border-top:5px solid var(--accent2)}
+.tile:nth-child(3){grid-column:span 2;background:var(--soft-orange);border-top:5px solid var(--accent3)}
+.tile:nth-child(4){grid-column:span 2;background:var(--soft-red);border-top:5px solid var(--risk)}
+.tile:nth-child(5){grid-column:span 2;background:var(--soft-green);border-top:5px solid var(--accent4)}
+mark{padding:.05em .25em;background:var(--hl);color:var(--ink)}
+mark.alt{background:var(--hl2)}
+#translation{
+  background:var(--translation);
+  border-top:1px solid var(--line);
+  padding:4rem 1.25rem 7rem;
 }
-.split {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 28px;
-  align-items: start;
+.prose{max-width:820px;margin:auto}
+.prose h2{font-size:2.5rem;margin:0 0 2rem}
+.prose h3{margin-top:3.2rem;font-size:1.75rem;line-height:1.3;color:var(--accent)}
+.prose h4{margin-top:2rem;font-size:1.2rem}
+.prose p,.prose li{font-family:"Noto Serif SC","Songti SC",serif}
+.prose blockquote{
+  margin:1.8rem 0;
+  padding:1rem 1.4rem;
+  background:var(--quote);
+  border-left:5px solid var(--accent2);
 }
-.panel {
-  background: var(--card);
-  border: 1px solid var(--line);
-  padding: 24px;
+.prose table{width:100%;border-collapse:collapse;margin:2rem 0;font-size:.94rem}
+.prose th,.prose td{padding:.85rem;vertical-align:top;border:1px solid var(--line)}
+.prose th{background:var(--soft-blue);text-align:left}
+.data-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:1rem;
+  margin:2rem 0;
 }
-.panel.data { border-top: 6px solid var(--accent-data); }
-.panel.risk { border-top: 6px solid var(--accent-risk); }
-.panel.opportunity { border-top: 6px solid var(--accent-opportunity); }
-.panel.conclusion { border-top: 6px solid var(--accent-conclusion); }
-.lede {
-  color: var(--muted);
-  margin-top: 0;
+.data-grid div{padding:1rem;background:var(--soft-green);border-left:4px solid var(--accent4)}
+.source-figure{
+  margin:2.5rem auto;
+  max-width:100%;
 }
-.flow {
-  background: var(--soft-neutral);
+.source-figure img{
+  display:block;
+  max-width:100%;
+  height:auto;
+  margin:auto;
 }
-.steps {
-  display: grid;
-  gap: 16px;
-  position: relative;
+.source-figure figcaption{
+  margin-top:.75rem;
+  color:var(--muted);
+  font-size:.9rem;
+  line-height:1.55;
 }
-.step {
-  display: grid;
-  grid-template-columns: 54px 1fr;
-  gap: 16px;
-  align-items: start;
+.small{color:var(--muted);font-size:.92rem}
+@media(max-width:760px){
+  .band,.split,.flow ol{grid-template-columns:1fr}
+  .mosaic{grid-template-columns:1fr}
+  .tile:nth-child(n){grid-column:span 1}
+  .bar{grid-template-columns:1fr}
+  .data-grid{grid-template-columns:1fr}
+  .prose table{display:block;overflow-x:auto}
 }
-.badge {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: var(--accent-conclusion);
-  color: var(--hero-ink);
-  font-weight: 800;
-}
-.step article {
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 14px;
-}
-.step h3 {
-  margin: 0 0 6px;
-  font-size: 18px;
-}
-.step p {
-  margin: 0;
-  color: var(--muted);
-}
-.dark-block {
-  background: var(--hero);
-  color: var(--hero-ink);
-}
-.dark-block h2,
-.dark-block p { color: var(--hero-ink); }
-.score-grid {
-  display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 24px;
-}
-.metric-list {
-  display: grid;
-  gap: 12px;
-}
-.metric {
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.16);
-  padding: 16px;
-}
-.metric strong {
-  color: var(--accent-opportunity);
-  font-size: 24px;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--card);
-  color: var(--ink);
-}
-th, td {
-  border: 1px solid var(--line);
-  padding: 12px;
-  text-align: left;
-  vertical-align: top;
-}
-th {
-  background: var(--soft-conclusion);
-  color: var(--ink);
-}
-.warning {
-  background: var(--soft-risk);
-}
-.quote {
-  margin: 0;
-  padding: 22px;
-  border-left: 7px solid var(--accent-risk);
-  background: var(--soft-risk);
-  font-size: 21px;
-}
-.quote footer {
-  margin-top: 10px;
-  color: var(--muted);
-  font-size: 15px;
-}
-.mosaic {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 12px;
-}
-.tile {
-  min-height: 150px;
-  padding: 18px;
-  color: var(--ink);
-  border: 1px solid var(--line);
-}
-.tile:nth-child(1) { background: var(--soft-data); }
-.tile:nth-child(2) { background: var(--soft-opportunity); }
-.tile:nth-child(3) { background: var(--soft-risk); }
-.tile:nth-child(4) { background: var(--soft-conclusion); }
-.tile:nth-child(5) { background: var(--card); }
-.tile b {
-  display: block;
-  margin-bottom: 8px;
-}
-@media (max-width: 820px) {
-  .numbers, .split, .score-grid, .mosaic {
-    grid-template-columns: 1fr;
-  }
-  .hero {
-    padding-top: 42px;
-  }
-  .thesis {
-    font-size: 19px;
-  }
+
+:root[data-theme="light"] {
+  color-scheme: light;
+--bg:#f5f4ef;
+  --card:#ffffff;
+  --ink:#17201d;
+  --muted:#63706b;
+  --line:#d7ddd8;
+  --accent:#176b87;
+  --accent2:#8a4bc2;
+  --accent3:#d2652f;
+  --accent4:#247857;
+  --risk:#b9384f;
+  --deep:#142b31;
+  --deep-ink:#eef9f7;
+  --hl:#fff0a8;
+  --hl2:#cceee2;
+  --soft-blue:#e4f3f8;
+  --soft-violet:#f0e7fa;
+  --soft-orange:#fff0e4;
+  --soft-green:#e5f3eb;
+  --soft-red:#fbe7ea;
+  --quote:#edf0ff;
+  --translation:#fbfaf6;
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -427,173 +407,251 @@ th {
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/introducing-life-sci-bench" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<header class="hero">
+<div class="eyebrow">OpenAI · Research · 2026-06-17</div>
+<h1>推出 LifeSciBench</h1>
+<p class="original">Introducing LifeSciBench</p>
+<p class="dek">一句话总括：LifeSciBench 把生命科学 AI 的考场从知识问答推进到真实科研判断，并用专家细则揭示模型“答得像”与“真正可用”之间的距离。</p>
+</header>
 <main>
-  <header class="hero">
-    <div class="wrap">
-      <p class="kicker">一句话总括</p>
-      <h1>介绍 LifeSciBench</h1>
-      <p class="original">Introducing LifeSciBench</p>
-      <p class="thesis">LifeSciBench 的贡献，是把生命科学 AI 评测放回真实研发语境：模型必须处理证据、附件、实验设计、转化风险和不确定性，而不只是答对生物知识题。</p>
-      <div class="meta">
-        <span class="pill">OpenAI</span>
-        <span class="pill">Research</span>
-        <span class="pill">Jun 17, 2026</span>
-      </div>
-    </div>
-  </header>
-
-  <section class="band">
-    <div class="wrap numbers">
-      <div class="num"><strong>750</strong><span>专家撰写任务</span></div>
-      <div class="num"><strong>1,062</strong><span>任务附件</span></div>
-      <div class="num"><strong>19,020</strong><span>评分标准</span></div>
-      <div class="num"><strong>453</strong><span>独立专家评审者</span></div>
-    </div>
-  </section>
-
-  <section>
-    <div class="wrap split">
-      <div class="panel data">
-        <h2>它测的是研究判断，不是知识回忆</h2>
-        <p>LifeSciBench 的任务像科学家交给合作者的真实请求。模型要读提示、看附件、写自由回答，并给出可被专家审阅的理由和边界。</p>
-        <p>这改变了评测重点。生命科学里的有用性不等于给出最终答案，还包括是否知道证据不足、实验限制和下一步该怎么做。</p>
-      </div>
-      <div class="panel opportunity">
-        <h2>任务来自产业研发工作流</h2>
-        <p>基准覆盖 evidence handling、analysis、design and optimization、scientific reasoning、validation and operations、translation、scientific communication 七类工作流。</p>
-        <p>这些类别来自对实践科学家的调研。它让评测更接近药物发现和生物技术研发，而不是只停留在教材式问题。</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="flow">
-    <div class="wrap">
-      <h2>数据集如何降低“漂亮但空泛”的风险</h2>
-      <div class="steps">
-        <div class="step">
-          <div class="badge">1</div>
-          <article>
-            <h3>专家写题</h3>
-            <p>173 名具有博士级训练和生物技术或制药经验的科学家创建任务。任务可以经历不限轮次修订。</p>
-          </article>
-        </div>
-        <div class="step">
-          <div class="badge">2</div>
-          <article>
-            <h3>多轮审查</h3>
-            <p>被接受的任务平均经过 6 轮自动化自审，并至少完成 2 轮专家评审。评审要求可验证答案或强专家共识。</p>
-          </article>
-        </div>
-        <div class="step">
-          <div class="badge">3</div>
-          <article>
-            <h3>细粒度评分</h3>
-            <p>每题平均约 25 条 rubric criteria。评分关注科学主张、计算、决策、理由、警示和格式。</p>
-          </article>
-        </div>
-        <div class="step">
-          <div class="badge">4</div>
-          <article>
-            <h3>独立验证</h3>
-            <p>453 名未参与写题的专家评审任务质量。每个类别的一致认可率都超过 96%。</p>
-          </article>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="dark-block">
-    <div class="wrap score-grid">
-      <div>
-        <h2>模型已经进步，但离可靠研究助手仍有距离</h2>
-        <p>GPT-Rosalind 的总体 exact pass rate 为 36.1%，高于 GPT-5.5 的 25.7%。这说明前沿模型在专家级任务上已有明显提升。</p>
-        <p>但绝对通过率仍不高。模型可以提供有价值的部分推理，却常在关键约束、附件解释或最终可执行答案上失败。</p>
-      </div>
-      <div class="metric-list">
-        <div class="metric"><strong>71.1%</strong><br>GPT-Rosalind 在科学沟通任务上的 pass rate，高于 GPT-5.5 的 56.3%。</div>
-        <div class="metric"><strong>57.7%</strong><br>转化任务 pass rate，高于 GPT-5.5 的 36.8%。</div>
-        <div class="metric"><strong>44.8%</strong><br>在处理不确定性和 caveat 的任务上获得的 rubric score。</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="warning">
-    <div class="wrap">
-      <h2>短板集中在附件、精确输出和设计类任务</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>任务形态</th>
-            <th>GPT-Rosalind 表现</th>
-            <th>为什么重要</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>纯文本任务</td>
-            <td>45.1% pass rate</td>
-            <td>当证据边界清楚时，模型更容易组织推理并给出有用结论。</td>
-          </tr>
-          <tr>
-            <td>含附件或 URL 的任务</td>
-            <td>28.1% pass rate</td>
-            <td>真实研究经常依赖图表、PDF、序列文件和结构文件。这个落差说明模型仍难以把复杂材料转成可靠判断。</td>
-          </tr>
-          <tr>
-            <td>数值任务</td>
-            <td>14.8% pass rate</td>
-            <td>生命科学设计常要求可直接使用的精确计算。小错误也可能改变实验结论。</td>
-          </tr>
-          <tr>
-            <td>序列或结构输出</td>
-            <td>24.0% pass rate</td>
-            <td>CRISPR、HDR donor、siRNA 等任务需要格式和内容都足够准确。部分正确不等于可用。</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section>
-    <div class="wrap">
-      <blockquote class="quote">
-        LifeSciBench 暴露的核心问题不是模型完全不会科学推理，而是它们常常“差一点就有用”。这在研发场景里仍然不够。
-        <footer>约 14% 的任务中，模型获得了可观 rubric credit，却没有达到完整通过阈值。</footer>
-      </blockquote>
-    </div>
-  </section>
-
-  <section>
-    <div class="wrap split">
-      <div class="panel risk">
-        <h2>评测不能替代真实部署研究</h2>
-        <p>LifeSciBench 是自包含任务集。它能衡量任务级能力，但不能直接证明模型会加速药物发现。</p>
-        <p>真实科研是迭代过程。科学家会收集新证据、修正假设、设计后续实验，并根据反馈改变计划。</p>
-      </div>
-      <div class="panel conclusion">
-        <h2>下一步是连接真实研发结果</h2>
-        <p>文章认为，后续需要把 benchmark 表现和真实研究工作流中的部署研究连接起来。</p>
-        <p>更关键的问题是：模型是否能在更长周期、多轮反馈和实验跟进中改善 R&D 结果。</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="band">
-    <div class="wrap">
-      <h2>最值得带走的洞见</h2>
-      <div class="mosaic">
-        <div class="tile"><b>1. 评测对象变了</b>AI 不再只被问生物知识，而是被要求承担研究合作者式任务。</div>
-        <div class="tile"><b>2. 进步最明显处</b>科学沟通和转化判断提升最快，说明模型更会组织证据和写给专家看。</div>
-        <div class="tile"><b>3. 最大现实缺口</b>附件、精确设计和操作约束仍是主要失败点，这些恰好是实验室最看重的能力。</div>
-        <div class="tile"><b>4. 部分正确仍有价值</b>rubric 分数显示模型常能给出有用片段，但还不稳定到可以直接托付关键决策。</div>
-        <div class="tile"><b>5. 真正影响还要验证</b>LifeSciBench 衡量任务级能力。是否能改变研发产出，需要在真实工作流中长期测试。</div>
-      </div>
-    </div>
-  </section>
+<article aria-label="中文总结" class="summary">
+<div class="band">
+<div class="metric"><strong>750</strong><span>项专家编写的任务</span></div>
+<div class="metric"><strong>1,062</strong><span>份任务附件</span></div>
+<div class="metric"><strong>173</strong><span>名科学家贡献者</span></div>
+<div class="metric"><strong>19,020</strong><span>条评分标准</span></div>
+</div>
+<div class="split">
+<div>
+<h2>它测的不是生物学记忆，而是科研协作能力</h2>
+<p>任务覆盖证据处理、分析、设计与优化、科学推理、验证与操作、转化、科学交流七类工作流。每道题都像科学家交给资深同事的真实请求。</p>
+<p>答案不只要正确。它还要有足够的依据、限定条件、细节和可执行性。</p>
+</div>
+<aside class="explain">
+<strong>为什么这会改变理解？</strong>
+<p><mark>79%</mark> 的任务包含多个推理或决策步骤，平均需要四步。<mark class="alt">53%</mark> 的任务至少要解读或综合一份附件。</p>
+<p>这说明生命科学 AI 的关键瓶颈不是背诵知识，而是把杂乱材料转化为可靠决策。</p>
+</aside>
+</div>
+<section class="flow">
+<h2>质量控制依赖反复修订与专家共识</h2>
+<ol>
+<li><span class="num">01</span><br/>173 名具备博士训练和产业经验的科学家编写任务。</li>
+<li><span class="num">02</span><br/>被接受的任务平均经历六轮自动化自审，并至少完成两轮专家评审。</li>
+<li><span class="num">03</span><br/>评审依据可验证答案或强专家共识，同领域评审者的一致率至少为 90%。</li>
+</ol>
+<p>因此，LifeSciBench 的可信度来自任务生产过程，而不只是更大的题目数量。</p>
+</section>
+<section class="compare">
+<h2>模型在进步，但绝对通过率仍然有限</h2>
+<div class="bars">
+<div class="bar"><span>GPT‑Rosalind 总体</span><span class="track"><span class="fill" style="width:36.1%"></span></span><strong>36.1%</strong></div>
+<div class="bar"><span>GPT‑5.5 总体</span><span class="track"><span class="fill purple" style="width:25.7%"></span></span><strong>25.7%</strong></div>
+<div class="bar"><span>科学交流</span><span class="track"><span class="fill orange" style="width:71.1%"></span></span><strong>71.1%</strong></div>
+<div class="bar"><span>转化工作</span><span class="track"><span class="fill" style="width:57.7%"></span></span><strong>57.7%</strong></div>
+</div>
+<p>GPT‑Rosalind 在科学交流和从实验台到临床的转化判断上提升最明显。不过，科学交流类别只有 9 项任务，结果需要谨慎解释。</p>
+</section>
+<section class="warning">
+<h2>一加入附件，能力就明显下滑</h2>
+<p>GPT‑Rosalind 在纯文本任务上的通过率为 <strong>45.1%</strong>。任务包含附件或 URL 后，通过率降至 <strong>28.1%</strong>。GPT‑5.5 也从 29.9% 降至 21.9%。</p>
+<p>精确输出更加困难。GPT‑Rosalind 在数值任务上的通过率只有 14.8%，序列或结构输出为 24.0%，构建设计任务为 27.3%。</p>
+<p>真正的风险不是模型完全不懂，而是它能给出看似合理的半成品，却遗漏一项足以改变实验或监管决定的约束。</p>
+</section>
+<div class="insight">
+<strong>关键洞见：</strong>评分细则允许模型因局部正确而获得分数。在约 14% 的任务中，模型取得了可观的细则得分，却仍未达到整题通过线。这让“部分有用”和“可以直接采用”成为两种不同结论。
+  </div>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="mosaic">
+<div class="tile"><strong>真实任务比标准问答更难。</strong><br/>研究工作需要处理冲突证据、不确定性和操作限制。</div>
+<div class="tile"><strong>专家细则比单一标准答案更合适。</strong><br/>它能区分最终结论、推理质量和科研实用性。</div>
+<div class="tile"><strong>交流与转化能力进步最快。</strong><br/>模型更善于组织证据并面向专家表达判断。</div>
+<div class="tile"><strong>附件和精确输出仍是高风险区。</strong><br/>图表、序列和计算会显著拉低通过率。</div>
+<div class="tile"><strong>基准成绩不等于科研影响。</strong><br/>是否加速发现，仍要通过长期、迭代的真实部署研究来验证。</div>
+</div>
+</section>
+</article><section id="translation">
+<div class="prose">
+<h2>完整译文</h2>
+<p><strong>由专家编写、经专家评审，并以真实生命科学研究为基础的基准测试</strong></p>
+<p>智能体式 AI 系统执行科学任务的能力正在不断增强。然而，它们对生命科学研究人员是否有用，取决于它们能否应对真实研究的复杂性。这类工作很少只是回答一道事实回忆题，也很少是边界清晰的预测问题。研究人员需要解读不完整的证据，协调相互冲突的结果，设计高难度实验，排查测定问题，评估转化风险，还要在不确定条件下决定下一步行动。</p>
+<p>现有基准尚未完整覆盖这些能力。许多生命科学评测集中在狭窄领域或孤立技能上，因此常采用结构化题型，并配有明确的参考答案。这些评测有其价值，但往往无法真正判断模型能否覆盖研究级工作的广泛环节并作出贡献。</p>
+<p>我们设计了 LifeSciBench，希望缩小这一差距。每项任务都建立在一线生命科学家的专业判断之上。这些科学家接受过博士层级训练，并有在生物技术或制药环境中推进药物发现项目的直接经验。</p>
+<p>LifeSciBench 包含 750 项由专家编写的任务，覆盖七类工作流和七个生物学领域。</p>
+<div class="data-grid">
+<div><strong>1,062</strong><br/>份任务附件</div>
+<div><strong>173</strong><br/>名科学家贡献者</div>
+<div><strong>19,020</strong><br/>条评分标准</div>
+<div><strong>453</strong><br/>名专家评审者</div>
+</div>
+<h3>LifeSciBench 衡量什么</h3>
+<p>LifeSciBench 衡量 AI 系统能否支持真实的生命科学研究任务，而不只是回答生物学问题。为了确定基准的分类体系，我们调查了一线生命科学家，了解他们在应用研究中最常采用的工作流程。随后，我们把反馈归纳为七个反复出现的类别：证据处理、分析、设计与优化、科学推理、验证与操作、转化，以及科学交流。</p>
+<p>每项任务都采用科学家可能向知识丰富的合作者提出请求的形式。任务包含科学问题、相关背景或附件，以及需要自由作答的答案。由专家编写的评分细则会判断模型能否针对具体问题给出正确答案，并达到科学家所期待的细节程度、论证质量、限定说明和格式要求。</p>
+<h3>数据集构建</h3>
+<p>LifeSciBench 既评估科学推理，也评估真实科研应用所需、但边界没有那么清晰的实践技能。任务要求模型处理逼真的研究问题，包括解读证据、作出符合领域知识的判断，以及向专家评审者传达有用的结论。许多任务还要求模型处理不确定性，并根据配套数据文件进行推理，而不能只依赖提示词中的文字。</p>
+<p>该基准旨在体现生命科学工作的复杂性。总体而言，79% 的任务需要多个推理或决策步骤，平均每项任务包含四个步骤。LifeSciBench 还包含 1,062 份附件，涉及图像、PDF、表格、序列文件、结构或化学文件，以及网页资料。超过一半的任务，也就是 53%，要求模型解读或综合至少一份附件中的信息。</p>
+<figure class="source-figure" data-source-image="0"><img alt="Diagram showing LifeSciBench tasks that combine life-science data sources such as genomic sequences, molecular structures, figures, documents, spreadsheets, and web links with multi-step reasoning and expert review." decoding="async" height="433" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/716oBPKMZGd3LIw5YmA9Yl/55b22e84602f6bf833ac1472f4ad120b/Diagram1-desktop-light.svg?w=3840&amp;q=90" width="803"/></figure>
+<p>这些任务由来自不同生命科学学科的 173 名专家创建。每位专家都接受过博士层级训练，并具备生物技术或制药行业经验。任务在被接受前可以进行任意多轮修订，轮数没有上限。最终被接受的任务平均经历了六轮自主自动化审查，并至少完成两轮专家评审。评审依据要么是可验证的正确答案，要么是强有力的专家共识。同一领域的评审者需要达到至少 90% 的一致意见。这个流程有助于确保入选任务具备科学依据，表述清楚且可评分，并能代表应用研究实践。</p>
+<h3>评分方式与细则构成</h3>
+<p>LifeSciBench 使用细致且针对具体任务的评分细则。评分细则把预期回答拆分为明确的科学主张、计算、决策、论证等内容。整个基准的专家评分细则共包含 19,020 条标准，平均每项任务 25 条，用于同时评估科学正确性和对研究决策的实际帮助。</p>
+<p>这种设计反映了现实中的科研评价方式。许多生命科学任务不能只检查最终答案。回答可能得出了正确的高层结论，但如果忽视关键的测定局限，或没有主动指出影响重大的生物学细节，仍然会被判定为不完整。反过来，即使回答没有完整解决任务，其中仍可能包含高质量推理。</p>
+<p>细粒度评分细则能够捕捉这种差别。LifeSciBench 不只评估最终答案是否准确，也会判断模型得出答案的过程是否符合科学规范，以及结果在操作上是否有用。</p>
+<h4>从论文、图像、表格和实验记录中提取、协调并审计科学证据</h4>
+<h3>评测示例</h3>
+<p>我们正准备就 AAV9-microDys-X 与 FDA 举行 B 类会议。它是一种面向杜氏肌营养不良症的 AAV9 微型抗肌萎缩蛋白基因疗法，通过 MCK 启动子表达一个 138 kDa 构建体。我们希望你严格审视现有材料，判断它是否真的支持加速批准，也就是能否把微型抗肌萎缩蛋白表达量作为一个有合理可能预测临床获益的替代终点。</p>
+<p>研究背景：这是一项开放标签的 1b/2 期研究，纳入 12 名 4 至 7 岁、仍可行走的男孩。患者均确诊为 DMD，并存在杆状结构域的移码缺失。现有材料如下：</p>
+<ul>
+<li>治疗前的股外侧肌活检：采用识别 N 端肌动蛋白结合域的 MANEX1A 进行定量 Western blot。测得抗肌萎缩蛋白为健康对照的 0% 至 3%。</li>
+<li>治疗 12 周后，对侧股外侧肌活检：采用同一种 Western blot，测得微型抗肌萎缩蛋白均值为健康对照的 38%，范围为 18% 至 61%。结果通过考马斯染色按总蛋白归一化。</li>
+<li>治疗后免疫荧光：使用多克隆抗肌萎缩蛋白 C 端抗体，在 75% 至 95% 的肌纤维中观察到肌膜信号。</li>
+<li>第 48 周功能结果：NSAA 较基线平均增加 1.4 分。外部已发表自然史登记队列则下降 0.6 分。采用非配对 t 检验得到 p = 0.03。</li>
+<li>安全性：12 名患者中有 8 名出现短暂转氨酶升高，通过逐步减量的类固醇治疗得到控制。另有一例已经恢复的心肌炎。没有死亡病例。</li>
+<li>生物分布与持续性：第 12 周仍可在肌肉中检测到 AAV9 载体基因组，平均每个细胞核含 2.3 个载体基因组。</li>
+<li>入组条件：基线时不存在抗 AAV9 中和抗体，滴度低于 1:400，并且不存在第 44 号外显子缺失。</li>
+</ul>
+<p>请逐项严格检验这些材料：FDA 或持怀疑态度的评审者会认为现有证据在哪些地方不足以支持我们的结论？如果可能，还需要增加哪些数据、分析或设计调整才能弥补差距？对于没有明确说明的事项，请假定截至 2025 年 12 月 31 日，其他临床级 138 kDa 微型抗肌萎缩蛋白项目及相关临床试验的已知信息同样适用。</p>
+<h3>候选回答</h3>
+<p><strong>核心结论：</strong>按照目前的呈现方式，这套材料不足以支持以微型抗肌萎缩蛋白表达量作为有合理可能预测临床获益的替代终点来申请加速批准。持怀疑态度的 FDA 评审者很可能认为，生物标志物、功能、持久性、安全性和普适性证据都存在实质性不足。</p>
+<table>
+<thead>
+<tr>
+<th>材料项目</th>
+<th>关键失败点</th>
+<th>需要补充的内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Western blot 定量</td>
+<td>MANEX1A 结合的是内源性全长抗肌萎缩蛋白和微型抗肌萎缩蛋白转基因共有的 N 端表位，因此无法清楚区分转基因产物与残余或回复突变产生的抗肌萎缩蛋白。用健康人的全长抗肌萎缩蛋白标准品定量 138 kDa 微型抗肌萎缩蛋白也不成立。</td>
+<td>应使用重组微型抗肌萎缩蛋白标准品，并采用能区分转基因产物和内源性抗肌萎缩蛋白的正交方法，例如靶向质谱，或转基因特异性、表位特异性测定。</td>
+</tr>
+<tr>
+<td>免疫荧光</td>
+<td>该 138 kDa 构建体缺少 C 端结构域，因此 C 端多克隆抗体并不合适。许多 DMD 患者存在回复纤维，其中的抗肌萎缩蛋白可能保留 C 端表位。回复纤维还可能随年龄增长发生克隆性扩增，导致免疫荧光信号偏高，尤其是在年龄较大的男孩中。</td>
+<td>应使用一种能够识别转基因产物所含、但回复突变抗肌萎缩蛋白不含的表位的抗体，重新进行免疫荧光检测。还应把转基因阳性纤维与回复纤维分开定量。</td>
+</tr>
+<tr>
+<td>替代终点有效性</td>
+<td>现有材料混淆了蛋白含量与临床功能。“相当于健康对照蛋白质量的 38%”并不代表具备正常抗肌萎缩蛋白 38% 的功能，因为微型抗肌萎缩蛋白的结构经过截短。</td>
+<td>在把表达量视为替代终点前，应通过实证验证微型抗肌萎缩蛋白质量百分比、肌膜定位、下游功能恢复和临床获益之间的关系。</td>
+</tr>
+<tr>
+<td>活检设计</td>
+<td>治疗前后分别活检左右两侧股外侧肌，会引入左右差异和肌肉内部的空间差异。疾病进展和纤维脂肪替代也会改变按总蛋白归一化后的信号。</td>
+<td>应使用一致的解剖标志规范活检位置，按肌肉特异性蛋白归一化，并同步测量纤维脂肪组成。</td>
+</tr>
+<tr>
+<td>NSAA 对照与统计方法</td>
+<td>外部自然史队列不是随机同期对照。试验入组条件、支持治疗、参与试验的效应、基线 NSAA、类固醇方案、年龄和外显子类型都可能造成比较偏差。非配对 t 检验也不充分。此外，对于这个年龄段，NSAA 增加 1.4 分仍在重测变异范围内。</td>
+<td>应开展随机、同期、安慰剂对照研究。至少也要进行校正分析，纳入基线 NSAA、年龄、类固醇方案、外显子类型和其他混杂因素。</td>
+</tr>
+<tr>
+<td>年龄窗口的混杂</td>
+<td>4 至 7 岁的男孩正处在发育窗口。未经治疗、仍可行走的 DMD 患者在明显衰退前，也可能出现运动功能上升。因此，48 周的 NSAA 变化混合了发育带来的改善、疾病进展和潜在治疗效果。</td>
+<td>应采用同期随机对照，并按年龄分层，从而把发育轨迹与治疗效果分开。</td>
+</tr>
+<tr>
+<td>既往临床先例</td>
+<td>开放标签研究中微型抗肌萎缩蛋白呈现的功能信号，并不能可靠预测验证性研究中的获益。已发表的先例包括：微型抗肌萎缩蛋白基因疗法的验证性试验未能重现开放标签研究中的 NSAA 改善。</td>
+<td>不能把开放标签研究中的 NSAA 变化作为决定性支持证据。必须提供对照条件下的功能证据。</td>
+</tr>
+<tr>
+<td>构建体的结构限制</td>
+<td>这个 138 kDa 构建体删除了含有 nNOS 结合位点的血影蛋白重复结构域 R16/17。失去 nNOS 募集能力可能损害运动时的功能性交感松解和缺血保护。无论表达量多高，这都可能对功能恢复形成机制上的上限。</td>
+<td>应增加机制研究，证明该特定构建体能否恢复相关的抗肌萎缩蛋白复合体功能、nNOS 定位、运动生理功能和肌肉保护能力。</td>
+</tr>
+<tr>
+<td>AAV 持久性</td>
+<td>第 12 周检测到载体基因组，并不能证明表达具有持久性。AAV9 基因组大多以不整合的游离体形式存在，可能随时间减少。载体基因组持续存在，也不等于蛋白持续表达。</td>
+<td>应在超过 12 周的时间尺度上，纵向测量转基因蛋白表达和功能性生物标志物的持久性。</td>
+</tr>
+<tr>
+<td>免疫与安全性特征</td>
+<td>12 名患者中有 8 名出现转氨酶升高，这与针对 AAV 转导细胞的免疫反应一致，但具体机制尚未确定。考虑到 AAV9 的心脏嗜性，一例心肌炎值得警惕。</td>
+<td>应提供更深入的免疫监测、更完整的肝脏和心脏安全性分析，并加强心脏随访。</td>
+</tr>
+<tr>
+<td>患者选择与普适性</td>
+<td>排除抗 AAV9 中和抗体阳性患者会限制结果的普适性。排除第 44 号外显子缺失患者，也会限制结论对该 DMD 亚组的适用性。12 人的样本量太小，无法描述更广泛 DMD 人群中的安全性和疗效。</td>
+<td>应在可行范围内放宽入组条件，或预先规定按抗体状态、基因型或外显子类型、年龄和基线功能进行分层分析，再考虑用结果支持广泛批准。</td>
+</tr>
+</tbody>
+</table>
+<p><strong>监管结论：</strong>这套材料或许能证明生物活性，但尚不能证明所测得的微型抗肌萎缩蛋白表达量是一个可靠的替代终点，并且有合理可能预测临床获益。主要缺口包括测定特异性不足、定量标准无效、回复纤维可能造成混杂、缺少随机对照、NSAA 受年龄影响、持久性不确定，以及尚未解决的安全性和普适性问题。</p>
+<p>要弥补差距，该项目需要采用有对照且按年龄分层的临床设计，并加入转基因特异性表达测定、正交蛋白定量、组织组成控制和纵向持久性数据。还需要针对截短构建体开展机制性功能测定，并加强安全监测，尤其是肝脏和心脏监测。</p>
+<h3>评分标准与成绩</h3>
+<h3>验证 LifeSciBench</h3>
+<p>我们通过独立专家评审验证了 LifeSciBench。反馈来自 453 名没有参与任务编写的评审者。其中，97% 拥有博士学位或同等博士学位，平均具备 12 年领域经验，并发表过 14 篇同行评审论文；88% 表示至少获得过一项奖项或研究资助。</p>
+<p>评审者需要判断每项任务是否具备优秀基准问题应有的特征，包括：是否与真实研究工作一致，是否恰当地检验科学推理和领域专业能力，是否以证据或专家共识为基础，以及是否整体适合评估模型表现。所有类别的一致率都超过 96%。</p>
+<h4>真实世界相关性</h4>
+<p>这项任务是否反映真实的生命科学工作？</p>
+<h4>科学推理／领域技能</h4>
+<p>这项任务是否检验并评价了正确的科学推理能力和生命科学领域技能？</p>
+<h4>科学依据</h4>
+<p>这项任务是否有科学依据、能够作答，并以适当的证据、数据、附件或专家共识为基础？</p>
+<h4>整体实用性</h4>
+<p>总体而言，这是否是一项优秀的生命科学评测任务？</p>
+<p>评审者的评论进一步印证了定量评分：</p>
+<blockquote>“总体而言，这是一项很强的任务。它有一个正确的核心解释，同时也能根据回答界定不确定性的严谨程度，区分出更优秀的答案。”</blockquote>
+<blockquote>“这是一个出色的问题……它综合了结构生物学、药物化学、受体药理学和配体作用机制等要素。”</blockquote>
+<blockquote>“它不只是测试模型能否回忆信息，而是测试模型能否根据当下提供的证据进行推理。”</blockquote>
+<p><strong>具备不确定性意识</strong></p>
+<p><strong>跨领域</strong></p>
+<p><strong>以证据为基础</strong></p>
+<p><strong>具备不确定性意识</strong></p>
+<p><strong>跨领域</strong></p>
+<p><strong>以证据为基础</strong></p>
+<h3>结果</h3>
+<p>我们报告两个互补指标。“通过率”是模型达到任务级成功门槛的任务比例，该门槛设为 70%。“得分”是评分细则奖励的平均值。即使模型没有完整解决任务，这个指标也会为符合单项标准的内容提供部分分数。两个指标都很重要，因为对科学任务的回答即使没有满足完整答案的所有要求，也可能有部分内容正确或有用。</p>
+<p>不同任务类型、工作流和回答格式下的模型表现存在显著差异。</p>
+<h3>AI 系统已初步展现优势的领域</h3>
+<p>LifeSciBench 显示，前沿模型在科学综合、交流和结构化解读任务上相对最强。绝对通过率仍然不高，因此这些基准领域远未达到饱和。不过，GPT‑Rosalind 相较 GPT‑5.5 已取得明显进展，总体精确通过率从 25.7% 提升至 36.1%。</p>
+<p>模型能力进步最明显的方向是科学交流和转化。例如，科学交流任务的通过率从 GPT‑5.5 的 56.3% 提升至 GPT‑Rosalind 的 71.1%。这个类别规模很小，只有 9 项任务，因此需要谨慎解读。不过，结果表明前沿模型在组织证据和生成有说服力、面向专家的解释方面正在迅速进步。“转化”指药物开发中从实验台到临床的过程。该类别也呈现类似趋势，通过率从 GPT‑5.5 的 36.8% 提升至 GPT‑Rosalind 的 57.7%。这说明模型在连接临床前证据与临床意义方面进步很快。</p>
+<p>评分细则层面的结果也指向相同方向。在要求输出对专家有用或可以采取行动的任务上，GPT‑Rosalind 得分为 44.7%，GPT‑5.5 为 29.1%。在要求处理不确定性和限定条件的任务上，GPT‑Rosalind 得分为 44.8%，GPT‑5.5 为 29.3%。这一模式表明，当任务有清晰的证据边界，并要求进行结构化科学判断时，模型最能发挥作用。</p>
+<p>在产业界和学术界专家认定具有科学价值的任务上，GPT‑Rosalind 的表现领先。</p>
+<p>在生命科学的核心工作流中，GPT‑Rosalind 相较 GPT‑5.5 均有提升，其中转化和科学交流方面的进步最为明显。</p>
+<h3>AI 系统仍然不足的领域</h3>
+<p>在高度依赖附件、设计要求复杂或操作限制严格的科学工作中，模型表现仍然弱得多。具体而言，“设计、优化与预测”仍是最难的工作流之一，GPT‑Rosalind 的通过率为 30.7%；“分析”同样困难，通过率为 30.3%。</p>
+<p>附件使用是一个尤其明显的短板。虽然 GPT‑Rosalind 在附件密集型任务上的表现优于 GPT‑5.5，但它的通过率仍从纯文本任务的 45.1% 降至带有附件或 URL 的任务的 28.1%。GPT‑5.5 也呈现相同模式，通过率从 29.9% 降至 21.9%。更详细的分析证实，前沿模型很难从复杂图像或大型序列文件中提取信息，并把这些信息整合到最终答案中。</p>
+<p><strong>当任务要求基于来源进行推理或使用附件时，通过率会下降。</strong></p>
+<p>答案格式也会影响结果。要求给出精确序列、结构或构建体级输出的任务通过率更低。GPT‑Rosalind 在数值任务上的通过率仅为 14.8%，在序列或结构输出任务上为 24.0%。构建体生成任务同样脆弱，GPT‑Rosalind 的通过率为 27.3%，相较 GPT‑5.5 几乎没有改善。部分差距可能来自精确答案任务更严格的评分界面。在这类任务中，计算或格式上的微小差异就可能使回答低于通过门槛。不过，这些失败仍具有重要的科学意义，因为许多生命科学工作流需要足够精确、能够直接使用的输出，例如 CRISPR/HDR 供体设计或 siRNA 设计。</p>
+<p>模型也经常只能完成一部分，无法彻底解决任务。在大约 14% 的任务中，模型虽然没有达到精确通过门槛，却获得了可观的评分细则分数。对于 GPT‑Rosalind，有 109 项任务的通过率低于 20%，但评分细则奖励仍达到至少 50%。在实践中，这意味着模型可能识别了相关证据，或给出了看似合理的部分答案，却仍会因为遗漏关键约束、采用错误证据、计算不完整，或没有把推理连接到有科学实用价值的最终决定而失败。</p>
+<h3>局限与后续工作</h3>
+<p>LifeSciBench 是衡量 AI 系统对生命科学研究有多大帮助的一步，但它不能代替在真实研究环境中开展的模型研究。该基准聚焦能够独立完成、并能反映产业中常见工作流的任务，但仍有许多科学专业方向和任务类型未被纳入。真实研究是一个迭代过程。科学家会收集新证据、修改假设、设计后续实验，并根据结果调整计划。</p>
+<p>因此，在 LifeSciBench 上表现优秀，应被解释为模型具备现实的任务级能力，而不是对下游科研影响的直接衡量。这个基准以产业工作流为基础，但无法覆盖真实研究项目的全部多样性和动态变化。在真实项目中，进展取决于许多随时间展开的因素。</p>
+<p>下一步是把基准表现与真实研究工作流中的部署研究连接起来。LifeSciBench 虽然由一线科学家参与开发，但要判断 AI 系统是否能加速发现或改善研发成果，仍需研究模型在真实科研环境中的使用和表现。这类研究需要覆盖更长时间，并包含多轮推理、反馈和实验跟进。</p>
+<h3>参与其中</h3>
+<h3>作者</h3>
+<h3>继续阅读</h3>
+<figure class="source-figure" data-source-image="1"><img alt="GPT-Red art card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/6q32m87ClqE8Ovn6vD424h/05ced72e47bbe42711fbac6a082cbff2/Art_Card.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="2"><img alt="Separating signal from noise &gt; Art Card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/7j6M3prKIsTmV6cbMaHjhZ/e66f7cdd98c66c99546853cbc22cfe84/Seperating-signal-from-noise-card.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="3"><img alt="Introducing GeneBench-Pro &gt; Cover image" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/7sbJaKBi5qLXAqbewh72aK/93197556e903eac9df6f077eb12b7581/GenebenchPro_Blog_ArtCard.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+</div>
+</section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

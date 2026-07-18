@@ -1,328 +1,405 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>保持 Cursor 应用稳定</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>让 Cursor 应用保持稳定</title>
 <style>
 :root {
-  color-scheme: light;
-  --bg: #f6f7fb;
-  --ink: #172033;
-  --muted: #667085;
-  --line: #d7deea;
-  --panel: #ffffff;
-  --panel-soft: #eef4ff;
-  --panel-warm: #fff4df;
-  --panel-risk: #fff0f1;
-  --panel-opportunity: #ecfdf5;
-  --panel-deep: #101828;
-  --text-on-deep: #f8fafc;
-  --accent-data: #2563eb;
-  --accent-risk: #e11d48;
-  --accent-opportunity: #059669;
-  --accent-conclusion: #7c3aed;
-  --accent-process: #f59e0b;
-  --shadow: 0 20px 50px rgba(18, 34, 64, 0.12);
+  color-scheme: light dark;
+  --bg: #f5f2eb;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #17202a;
+  --muted: #65717e;
+  --line: #d8d5cc;
+  --data: #1769aa;
+  --risk: #c33c54;
+  --opportunity: #16836b;
+  --conclusion: #7856b8;
+  --hl: #dcecff;
+  --hl2: #ffe6a8;
+  --soft-data: #e5f1fc;
+  --soft-risk: #fde7eb;
+  --soft-opportunity: #dff5ed;
+  --soft-conclusion: #eee8fa;
+  --deep: #182438;
+  --deep-ink: #f3f6fa;
+  --shadow: rgba(31, 43, 55, 0.12);
+  --transparent: transparent;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    color-scheme: dark;
-    --bg: #0c111d;
-    --ink: #e8edf7;
-    --muted: #9aa8bd;
-    --line: #263247;
-    --panel: #151d2b;
-    --panel-soft: #10233f;
-    --panel-warm: #33230b;
-    --panel-risk: #341520;
-    --panel-opportunity: #0f2d25;
-    --panel-deep: #050814;
-    --text-on-deep: #f4f7fb;
-    --accent-data: #60a5fa;
-    --accent-risk: #fb7185;
-    --accent-opportunity: #34d399;
-    --accent-conclusion: #a78bfa;
-    --accent-process: #fbbf24;
-    --shadow: 0 22px 60px rgba(0, 0, 0, 0.38);
+    --bg: #10151d;
+    --surface: #171e28;
+    --card: #1d2632;
+    --ink: #e5eaf0;
+    --muted: #a8b3c0;
+    --line: #354252;
+    --data: #66b7ff;
+    --risk: #ff7489;
+    --opportunity: #4ed4ad;
+    --conclusion: #bd9cff;
+    --hl: #173754;
+    --hl2: #4a391c;
+    --soft-data: #152d43;
+    --soft-risk: #3e2029;
+    --soft-opportunity: #17382f;
+    --soft-conclusion: #2d2542;
+    --deep: #090d13;
+    --deep-ink: #e8edf5;
+    --shadow: rgba(0, 0, 0, 0.32);
+    --transparent: transparent;
   }
 }
 :root[data-theme="dark"] {
-  color-scheme: dark;
-  --bg: #0c111d;
-  --ink: #e8edf7;
-  --muted: #9aa8bd;
-  --line: #263247;
-  --panel: #151d2b;
-  --panel-soft: #10233f;
-  --panel-warm: #33230b;
-  --panel-risk: #341520;
-  --panel-opportunity: #0f2d25;
-  --panel-deep: #050814;
-  --text-on-deep: #f4f7fb;
-  --accent-data: #60a5fa;
-  --accent-risk: #fb7185;
-  --accent-opportunity: #34d399;
-  --accent-conclusion: #a78bfa;
-  --accent-process: #fbbf24;
-  --shadow: 0 22px 60px rgba(0, 0, 0, 0.38);
+  --bg: #10151d;
+  --surface: #171e28;
+  --card: #1d2632;
+  --ink: #e5eaf0;
+  --muted: #a8b3c0;
+  --line: #354252;
+  --data: #66b7ff;
+  --risk: #ff7489;
+  --opportunity: #4ed4ad;
+  --conclusion: #bd9cff;
+  --hl: #173754;
+  --hl2: #4a391c;
+  --soft-data: #152d43;
+  --soft-risk: #3e2029;
+  --soft-opportunity: #17382f;
+  --soft-conclusion: #2d2542;
+  --deep: #090d13;
+  --deep-ink: #e8edf5;
+  --shadow: rgba(0, 0, 0, 0.32);
+  --transparent: transparent;
 }
 * { box-sizing: border-box; }
+html { background: var(--bg); scroll-behavior: smooth; }
 body {
   margin: 0;
-  background: var(--bg);
   color: var(--ink);
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  line-height: 1.65;
+  background: var(--bg);
+  font-family: Inter, "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.75;
 }
 main { overflow: hidden; }
 .hero {
-  background: linear-gradient(135deg, var(--panel-deep), var(--accent-data));
-  color: var(--text-on-deep);
-  padding: 64px 7vw 48px;
+  padding: 5.5rem max(6vw, 1.25rem) 4.5rem;
+  color: var(--deep-ink);
+  background: var(--deep);
 }
-.hero-inner {
-  max-width: 1120px;
+.hero-inner, .summary-wrap {
+  width: min(1120px, 100%);
   margin: 0 auto;
 }
-.label {
-  display: inline-flex;
-  gap: 10px;
-  align-items: center;
-  color: var(--text-on-deep);
-  border: 1px solid var(--accent-opportunity);
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 13px;
-}
-h1 {
-  margin: 22px 0 8px;
-  font-size: clamp(34px, 6vw, 72px);
-  line-height: 1.05;
-  letter-spacing: 0;
-}
-.original {
-  margin: 0 0 28px;
-  color: var(--muted);
-  font-size: 18px;
-}
-.hero .original { color: var(--text-on-deep); opacity: 0.78; }
-.lead {
-  max-width: 820px;
-  font-size: clamp(20px, 2.4vw, 30px);
-  line-height: 1.35;
-  margin: 0;
-}
-.meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 34px;
-}
-.meta span {
-  background: var(--panel);
-  color: var(--ink);
-  padding: 9px 12px;
-  border-radius: 6px;
-}
-.metrics {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1px;
-  background: var(--line);
-  max-width: 1120px;
-  margin: -22px auto 0;
-  box-shadow: var(--shadow);
-}
-.metric {
-  background: var(--panel);
-  padding: 28px;
-}
-.metric b {
-  display: block;
-  color: var(--accent-data);
-  font-size: clamp(30px, 5vw, 54px);
-  line-height: 1;
-}
-.metric span {
-  display: block;
-  margin-top: 10px;
-  color: var(--muted);
-  font-size: 15px;
-}
-.split {
-  max-width: 1120px;
-  margin: 72px auto;
-  padding: 0 24px;
-  display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  gap: 44px;
-  align-items: start;
-}
-.section-title {
-  margin: 0 0 14px;
-  font-size: 28px;
-  line-height: 1.2;
-}
-.pill {
-  color: var(--accent-conclusion);
-  font-weight: 700;
-  font-size: 14px;
+.eyebrow {
+  margin: 0 0 1rem;
+  color: var(--opportunity);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
-.callout {
-  border-left: 6px solid var(--accent-risk);
-  background: var(--panel-risk);
-  padding: 22px 24px;
-  border-radius: 0 8px 8px 0;
+h1 {
+  max-width: 850px;
+  margin: 0;
+  font-size: clamp(2.7rem, 7vw, 5.8rem);
+  line-height: 1.02;
+  letter-spacing: -0.05em;
 }
-.callout strong { color: var(--accent-risk); }
-.explain {
-  background: var(--panel-soft);
-  padding: 26px;
-  border-radius: 8px;
-  border: 1px solid var(--line);
+.original-title {
+  margin: 1rem 0 0;
+  color: var(--muted);
+  font-size: clamp(1rem, 2vw, 1.25rem);
 }
-.explain p { margin: 0 0 14px; }
-.process {
-  background: var(--panel-deep);
-  color: var(--text-on-deep);
-  padding: 64px 7vw;
+.dek {
+  max-width: 830px;
+  margin: 2.5rem 0 0;
+  font-size: clamp(1.2rem, 2.4vw, 1.7rem);
+  line-height: 1.55;
 }
-.process-wrap {
-  max-width: 1120px;
-  margin: 0 auto;
-}
-.steps {
+.dek strong { color: var(--opportunity); }
+.metric-strip {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 14px;
-  margin-top: 28px;
-}
-.step {
-  border-top: 4px solid var(--accent-process);
-  background: var(--panel);
-  color: var(--ink);
-  padding: 18px;
-  min-height: 170px;
-}
-.step b {
-  color: var(--accent-process);
-  font-size: 24px;
-}
-.step h3 {
-  margin: 10px 0 8px;
-  font-size: 18px;
-}
-.patterns {
-  max-width: 1120px;
-  margin: 72px auto;
-  padding: 0 24px;
-}
-.table-wrap {
-  overflow-x: auto;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--panel);
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 760px;
-}
-th, td {
-  padding: 18px;
-  text-align: left;
+  grid-template-columns: repeat(3, 1fr);
   border-bottom: 1px solid var(--line);
-  vertical-align: top;
+  background: var(--surface);
 }
-th {
-  background: var(--panel-warm);
+.metric {
+  min-height: 180px;
+  padding: 2rem max(3vw, 1.25rem);
+  border-right: 1px solid var(--line);
+}
+.metric:last-child { border-right: 0; }
+.metric-data { border-top: 6px solid var(--data); }
+.metric-risk { border-top: 6px solid var(--risk); }
+.metric-conclusion { border-top: 6px solid var(--conclusion); }
+.metric strong {
+  display: block;
+  margin-bottom: 0.3rem;
   color: var(--ink);
+  font-size: clamp(2.4rem, 5vw, 4.2rem);
+  line-height: 1;
 }
-td:first-child {
-  color: var(--accent-risk);
+.metric span { color: var(--muted); }
+.summary-wrap { padding: 4.5rem 1.25rem 5rem; }
+.section-kicker {
+  margin-bottom: 0.7rem;
+  color: var(--conclusion);
   font-weight: 800;
 }
-.quote-band {
-  background: var(--panel-opportunity);
-  border-block: 1px solid var(--line);
-  padding: 46px 7vw;
+.summary-wrap h2 {
+  margin: 0 0 2rem;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 1.2;
 }
-.quote-band blockquote {
-  max-width: 920px;
-  margin: 0 auto;
-  color: var(--ink);
-  font-size: clamp(23px, 3vw, 36px);
-  line-height: 1.35;
-  font-weight: 750;
-}
-.quote-band cite {
-  display: block;
-  margin-top: 18px;
-  color: var(--accent-opportunity);
-  font-style: normal;
-  font-size: 16px;
-}
-.grid-section {
-  max-width: 1120px;
-  margin: 72px auto;
-  padding: 0 24px;
-}
-.mosaic {
+.split {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr 1fr;
-  gap: 16px;
-  margin-top: 22px;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 1.5rem;
+  margin: 2rem 0 3rem;
 }
-.tile {
-  padding: 24px;
-  border-radius: 8px;
-  min-height: 170px;
+.split-heading {
+  padding: 2rem;
+  color: var(--deep-ink);
+  background: var(--deep);
+  border-radius: 1.25rem;
 }
-.tile h3 {
-  margin: 0 0 10px;
-  font-size: 20px;
+.split-heading h3 {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.2;
 }
-.tile.data { background: var(--panel-soft); border-top: 5px solid var(--accent-data); }
-.tile.risk { background: var(--panel-risk); border-top: 5px solid var(--accent-risk); }
-.tile.opp { background: var(--panel-opportunity); border-top: 5px solid var(--accent-opportunity); }
-.tile.conclusion {
-  grid-column: 1 / -1;
-  background: var(--panel-deep);
-  color: var(--text-on-deep);
-  border-top: 5px solid var(--accent-conclusion);
+.split-body {
+  padding: 2rem;
+  background: var(--soft-data);
+  border-left: 6px solid var(--data);
+  border-radius: 0 1.25rem 1.25rem 0;
 }
-.footer-note {
-  max-width: 1120px;
-  margin: 0 auto 64px;
-  padding: 28px 24px;
-  border-top: 1px solid var(--line);
+.split-body p { margin: 0 0 1rem; }
+.split-body p:last-child { margin-bottom: 0; }
+.flow {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 3rem 0;
+}
+.flow-step {
+  padding: 1.5rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  box-shadow: 0 10px 28px var(--shadow);
+}
+.flow-step:nth-child(1) { border-top: 5px solid var(--data); }
+.flow-step:nth-child(2) { border-top: 5px solid var(--risk); }
+.flow-step:nth-child(3) { border-top: 5px solid var(--opportunity); }
+.flow-step b {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 1.08rem;
+}
+.patterns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 3rem 0;
+  border: 1px solid var(--line);
+}
+.pattern {
+  padding: 2rem;
+}
+.pattern:first-child {
+  background: var(--soft-risk);
+  border-right: 1px solid var(--line);
+}
+.pattern:last-child { background: var(--soft-opportunity); }
+.pattern h3 { margin-top: 0; }
+.pattern .badge {
+  display: inline-block;
+  margin-bottom: 0.8rem;
+  padding: 0.2rem 0.65rem;
+  color: var(--deep-ink);
+  background: var(--risk);
+  border-radius: 99px;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+.pattern:last-child .badge { background: var(--opportunity); }
+.insight-band {
+  margin: 3rem calc(50% - 50vw);
+  padding: 3.5rem max(calc((100vw - 1095px) / 2), 1.25rem);
+  color: var(--deep-ink);
+  background: var(--deep);
+}
+.insight-band blockquote {
+  max-width: 980px;
+  margin: 0 auto;
+  font-size: clamp(1.45rem, 3vw, 2.35rem);
+  font-weight: 700;
+  line-height: 1.45;
+}
+.insight-band em {
+  color: var(--opportunity);
+  font-style: normal;
+}
+.takeaways {
+  display: grid;
+  grid-template-columns: 1.25fr 0.75fr;
+  gap: 1rem;
+}
+.takeaway {
+  padding: 1.5rem;
+  border-radius: 1rem;
+}
+.takeaway:nth-child(1) {
+  grid-row: span 2;
+  color: var(--deep-ink);
+  background: var(--conclusion);
+}
+.takeaway:nth-child(2) { background: var(--soft-data); }
+.takeaway:nth-child(3) { background: var(--soft-risk); }
+.takeaway:nth-child(4) {
+  grid-column: span 2;
+  background: var(--soft-opportunity);
+  border-left: 6px solid var(--opportunity);
+}
+.takeaway b {
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.hl {
+  padding: 0.04em 0.25em;
+  background: var(--hl);
+  font-weight: 800;
+}
+.hl2 {
+  padding: 0.04em 0.25em;
+  background: var(--hl2);
+  font-weight: 800;
+}
+#translation {
+  width: min(840px, calc(100% - 2.5rem));
+  margin: 0 auto;
+  padding: 5rem 0 7rem;
+}
+#translation > h2 {
+  margin: 0 0 2.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 4px solid var(--conclusion);
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  line-height: 1.2;
+}
+#translation h3 {
+  margin: 3.3rem 0 1rem;
+  color: var(--data);
+  font-size: 1.75rem;
+  line-height: 1.35;
+}
+#translation h4 {
+  margin: 2.5rem 0 0.8rem;
+  color: var(--conclusion);
+  font-size: 1.35rem;
+}
+#translation p { margin: 0 0 1.25rem; }
+#translation ul {
+  margin: 0 0 1.7rem;
+  padding-left: 1.4rem;
+}
+#translation li { margin: 0.55rem 0; }
+.toc {
+  margin-bottom: 2.5rem;
+  padding: 1.5rem 1.75rem;
+  background: var(--soft-conclusion);
+  border-left: 5px solid var(--conclusion);
+}
+.toc h3 {
+  margin: 0 0 0.7rem !important;
+  color: var(--ink) !important;
+  font-size: 1.15rem !important;
+}
+.meta {
+  margin: 2rem 0;
+  padding: 1rem 1.25rem;
   color: var(--muted);
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
 }
-.footer-note strong { color: var(--accent-conclusion); }
-@media (max-width: 820px) {
-  .metrics, .steps, .split, .mosaic {
+.related {
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+.source-figure {
+  margin: 2.8rem 0;
+  padding: 0.8rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  box-shadow: 0 12px 32px var(--shadow);
+}
+.source-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0.55rem;
+}
+.source-figure figcaption {
+  padding: 0.8rem 0.4rem 0.2rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+@media (max-width: 760px) {
+  .metric-strip, .split, .flow, .patterns, .takeaways {
     grid-template-columns: 1fr;
   }
-  .metrics {
-    margin: 0 16px;
+  .metric {
+    min-height: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
   }
-  .hero {
-    padding-top: 46px;
+  .split-heading, .split-body { border-radius: 1rem; }
+  .pattern:first-child {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
   }
-  .tile.conclusion {
-    grid-column: auto;
-  }
+  .takeaway:nth-child(1) { grid-row: auto; }
+  .takeaway:nth-child(4) { grid-column: auto; }
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+--bg: #f5f2eb;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #17202a;
+  --muted: #65717e;
+  --line: #d8d5cc;
+  --data: #1769aa;
+  --risk: #c33c54;
+  --opportunity: #16836b;
+  --conclusion: #7856b8;
+  --hl: #dcecff;
+  --hl2: #ffe6a8;
+  --soft-data: #e5f1fc;
+  --soft-risk: #fde7eb;
+  --soft-opportunity: #dff5ed;
+  --soft-conclusion: #eee8fa;
+  --deep: #182438;
+  --deep-ink: #f3f6fa;
+  --shadow: rgba(31, 43, 55, 0.12);
+  --transparent: transparent;
 }
 </style>
-  <script id="airs-digest-theme-boot">
+<script id="airs-digest-theme-boot">
     try {
       var saved = localStorage.getItem("theme");
       if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
     } catch (e) {}
   </script>
-  <style id="airs-digest-theme-style">
+<style id="airs-digest-theme-style">
     :root {
       color-scheme: light;
       --airs-digest-ink: #191816;
@@ -445,162 +522,265 @@ td:first-child {
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+  <style id="airs-source-image-theme-style">
+    .source-figure .source-image-dark {
+      display: none;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .source-figure .source-image-light {
+        display: none;
+      }
+      :root:not([data-theme="light"]) .source-figure .source-image-dark {
+        display: block;
+      }
+    }
+    :root[data-theme="dark"] .source-figure .source-image-light {
+      display: none;
+    }
+    :root[data-theme="dark"] .source-figure .source-image-dark {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-light {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-dark {
+      display: none;
+    }
   </style>
 </head>
 <body>
-<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/app-stability" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">← 返回索引</a><a href="https://cursor.com/blog/app-stability" rel="noopener noreferrer" target="_blank">阅读原文 ↗</a></div><button class="airs-digest-theme-toggle" data-airs-theme-toggle="" type="button">主题 · 跟随系统</button></nav>
 <main>
-  <section class="hero">
-    <div class="hero-inner">
-      <div class="label">一句话总括</div>
-      <h1>保持 Cursor 应用稳定</h1>
-      <p class="original">Keeping the Cursor app stable</p>
-      <p class="lead">Cursor 的真正贡献不是修掉几个崩溃，而是把 AI 编程应用的内存稳定性变成一套可观测、可自动定位、可防回归的发布系统。</p>
-      <div class="meta">
-        <span>来源：Cursor</span>
-        <span>日期：2026-04-21</span>
-        <span>分类：Research</span>
-      </div>
+<header class="hero">
+<div class="hero-inner">
+<p class="eyebrow">Cursor Research · 2026 年 4 月 21 日</p>
+<h1>让 Cursor 应用保持稳定</h1>
+<p class="original-title" lang="en">Keeping the Cursor app stable</p>
+<p class="dek"><strong>一句话总括：</strong>Cursor 把崩溃遥测、内存分析、自动修复和回归防护连成闭环，在功能快速扩张的同时显著降低了 OOM。</p>
+</div>
+</header>
+<div aria-label="关键数据" class="metric-strip">
+<div class="metric metric-data">
+<strong>80%</strong>
+<span>全版本每会话 OOM 率较 2 月下旬峰值的降幅</span>
+</div>
+<div class="metric metric-risk">
+<strong>73%</strong>
+<span>每请求 OOM 率自 3 月 1 日以来的降幅</span>
+</div>
+<div class="metric metric-conclusion">
+<strong>数分钟</strong>
+<span>崩溃发生后，监控看板即可反映新数据</span>
+</div>
+</div>
+<div class="summary-wrap">
+<p class="section-kicker">更短、更易读的中文总结</p>
+<h2>稳定性不是一次修复，而是一套持续运转的系统</h2>
+<div class="split">
+<div class="split-heading">
+<h3>问题集中在内存，而最严重的故障发生在渲染进程</h3>
+</div>
+<div class="split-body">
+<p>Cursor 建立在 Visual Studio Code 和 Electron 之上。多进程架构让编辑器、Agent、扩展和存储分别运行，但也增加了故障来源。</p>
+<p>渲染进程崩溃会让编辑器完全不可用。团队发现，这类崩溃大多与达到 <span class="hl">V8 内存上限</span>有关，因此将其列为治理重点。</p>
+<p><strong>洞见：</strong>AI 编程工具的稳定性问题并不只是模型服务问题。客户端的数据流、对象生命周期和进程边界同样关键。</p>
+</div>
+</div>
+<div class="flow">
+<div class="flow-step">
+<b>1. 发现</b>
+      遥测记录进程、崩溃类型、设备信息、应用元数据，以及可获得的 minidump 和堆栈。
     </div>
-  </section>
-
-  <section class="metrics" aria-label="关键数字">
-    <div class="metric">
-      <b>80%</b>
-      <span>OOM-per-session 从 2 月下旬峰值下降。它说明影响用户会话的崩溃明显减少。</span>
+<div class="flow-step">
+<b>2. 定位</b>
+      团队结合 A/B 测试、超大消息监控、breadcrumbs、崩溃堆栈、堆快照和持续分配采样寻找根因。
     </div>
-    <div class="metric">
-      <b>73%</b>
-      <span>OOM-per-request 自 3 月 1 日下降。它说明受影响会话中的崩溃强度也在降低。</span>
+<div class="flow-step">
+<b>3. 验证</b>
+      每日自动化分析高置信度堆栈，提交优化 PR，并跨版本确认问题是否真正消失。
     </div>
-    <div class="metric">
-      <b>分钟级</b>
-      <span>崩溃仪表盘在事件后数分钟更新。发布回归可以被更快发现。</span>
+</div>
+<div class="patterns">
+<article class="pattern">
+<span class="badge">突发风险</span>
+<h3>急性 OOM：一次加载太多数据</h3>
+<p>内存会在短时间内猛增，进程随即退出。这类问题常见于一次读取超大文件，或通过 IPC 传递完整的大块内容。</p>
+<p>有效措施包括加入 killswitch，或将大块数据拆成多个小块处理。</p>
+<p><strong>结论：</strong>面对不可控的用户工作区，系统必须主动限制单次工作量。</p>
+</article>
+<article class="pattern">
+<span class="badge">累积风险</span>
+<h3>缓慢 OOM：资源没有正确释放</h3>
+<p>内存会在整个会话中持续爬升，最终越过进程上限。常见原因是手动管理的状态没有销毁，或多余的强引用长期保留对象。</p>
+<p>堆快照可以稳定呈现这类问题。团队通过追踪 retainer 和修正长生命周期对象来消除泄漏。</p>
+<p><strong>结论：</strong>长期稳定性取决于清晰、可验证的资源生命周期。</p>
+</article>
+</div>
+<div class="insight-band">
+<blockquote>真正改变理解的不是单一优化，而是把<span class="hl2">用户现场、全量趋势与自动修复</span>连接起来。稳定性由此从事后救火变成持续反馈系统。</blockquote>
+</div>
+<h2>最值得带走的洞见</h2>
+<div class="takeaways">
+<div class="takeaway">
+<b>指标必须区分覆盖面和严重程度</b>
+      每会话崩溃率反映多少会话受到影响。每请求崩溃率更接近受影响会话中的问题严重度。两个指标结合，才能避免单一数字掩盖真实体验。
     </div>
-    <div class="metric">
-      <b>每日</b>
-      <span>自动化分析崩溃栈并生成高置信修复 PR。诊断不再完全依赖人工排查。</span>
+<div class="takeaway">
+<b>自上而下与自下而上缺一不可</b>
+      功能实验用于衡量某项能力的整体影响。单次崩溃分析则负责找到具体代码路径。
     </div>
-  </section>
-
-  <section class="split">
-    <div>
-      <div class="pill">核心问题</div>
-      <h2 class="section-title">AI 功能越强，内存压力越难靠直觉管理</h2>
-      <p>Cursor 建在 VS Code 和 Electron 之上。编辑器、agent 窗口、扩展、存储和工具运行在多个进程里。</p>
-      <p>这种架构让功能扩展更灵活，也让崩溃来源更分散。最严重的是 renderer 崩溃，因为它会直接让编辑器不可用。</p>
+<div class="takeaway">
+<b>隐私约束必须进入诊断设计</b>
+      堆快照可能含有编辑器和聊天内容，因此只能由用户自愿提交。低采样率的持续分析则提供全局趋势。
     </div>
-    <div class="callout">
-      <p><strong>关键结论：</strong>多数崩溃来自 OOM，尤其是触及 V8 内存限制。对 AI 工具来说，稳定性不只是“少写 bug”，还要控制工作区文件、IPC 消息、agent 并发和长期对象生命周期。</p>
+<div class="takeaway">
+<b>更快开发需要更强护栏</b>
+      Agent 让功能交付更快，也会加快缺陷进入产品的速度。Bugbot 规则、压力测试、自动性能测试和指标回退机制，是维持速度的必要基础设施。
     </div>
-  </section>
-
-  <section class="process">
-    <div class="process-wrap">
-      <div class="pill">治理流程</div>
-      <h2 class="section-title">Cursor 用两条调试路径把崩溃变成可处理的数据</h2>
-      <div class="steps">
-        <div class="step">
-          <b>01</b>
-          <h3>遥测归因</h3>
-          <p>每次 fatal crash 都带上进程、崩溃类型、设备、应用版本、minidump 和栈信息。</p>
-        </div>
-        <div class="step">
-          <b>02</b>
-          <h3>指标拆分</h3>
-          <p>按版本统计 per-session 和 per-request。前者看有多少会话受影响，后者看问题有多严重。</p>
-        </div>
-        <div class="step">
-          <b>03</b>
-          <h3>自上而下</h3>
-          <p>把高内存功能和 Statsig feature flag 关联，用 A/B 测试衡量它对崩溃率的贡献。</p>
-        </div>
-        <div class="step">
-          <b>04</b>
-          <h3>自下而上</h3>
-          <p>用 CDP 和 Electron 补丁捕获 OOM 崩溃栈，再由自动化每日分析并提出修复。</p>
-        </div>
-        <div class="step">
-          <b>05</b>
-          <h3>回归闭环</h3>
-          <p>用性能测试、Bugbot 规则和指标回滚，把“修复之后不再坏”纳入发布流程。</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="patterns">
-    <div class="pill">两类 OOM</div>
-    <h2 class="section-title">突发峰值和慢性泄漏需要不同证据</h2>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>类型</th>
-            <th>典型表现</th>
-            <th>主要证据</th>
-            <th>对应修复</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>急性 OOM</td>
-            <td>内存突然飙升，进程快速死亡。常见原因是一次性加载过多工作区数据。</td>
-            <td>崩溃栈最有效。heap dump 和持续 profile 往往不明显。</td>
-            <td>增加 killswitch，限制大文件路径，把大 blob 拆成多段处理。</td>
-          </tr>
-          <tr>
-            <td>慢性 OOM</td>
-            <td>会话运行越久内存越高，直到越过限制。常见原因是手动管理状态没有释放。</td>
-            <td>heap snapshot 能看到对象和 retainer。低采样 allocation profiling 能看全量用户趋势。</td>
-            <td>清理长生命周期对象，消除强引用泄漏，并把部分修复 upstream 到 VS Code。</td>
-          </tr>
-          <tr>
-            <td>扩展 OOM</td>
-            <td>扩展进程耗尽内存，可能影响语言服务等能力，但通常比 renderer 崩溃更可恢复。</td>
-            <td>进程级崩溃事件和扩展隔离后的影响范围。</td>
-            <td>让扩展运行在隔离进程中，避免一个扩展拖垮其他功能，代价是略增系统内存。</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="quote-band">
-    <blockquote>
-      AI 编程工具的稳定性不是单点优化问题，而是“功能实验、崩溃证据、自动修复、发布防护”之间的反馈系统。
-      <cite>这改变了对 AI 影响的理解：agent 提高开发速度，也放大了性能回归进入产品的速度。</cite>
-    </blockquote>
-  </section>
-
-  <section class="grid-section">
-    <div class="pill">最值得带走的洞见</div>
-    <h2 class="section-title">高质量 AI 软件仍然依赖基础工程，但工具链要升级</h2>
-    <div class="mosaic">
-      <div class="tile data">
-        <h3>数据要按体验拆开</h3>
-        <p>per-session 衡量有多少用户会话遇到崩溃。per-request 衡量受影响会话中的问题强度。两个指标合在一起，才不会误判稳定性改善。</p>
-      </div>
-      <div class="tile risk">
-        <h3>大工作区是隐性风险</h3>
-        <p>AI 工具会频繁读取文件、传递上下文和保存 agent 状态。超大文件或超大 IPC payload 会把普通功能变成 OOM 触发器。</p>
-      </div>
-      <div class="tile opp">
-        <h3>自动化可以进入修复链路</h3>
-        <p>Cursor 不只自动报警，还让崩溃栈进入每日分析和 PR 生成。稳定性工作开始具备 agentic workflow。</p>
-      </div>
-      <div class="tile conclusion">
-        <h3>结论</h3>
-        <p>新一代软件会更快引入功能，也会更快引入性能问题。真正的护城河不是只追求更快发布，而是在发布速度旁边建立同样快的观测、定位和回滚能力。</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="footer-note">
-    <p><strong>最终洞见：</strong>第一，OOM 是 AI 桌面应用的核心稳定性风险。第二，崩溃指标必须和版本、功能开关、调用栈关联。第三，急性峰值和慢性泄漏要分开处理。第四，agentic development 需要 agentic stability tooling。第五，速度只有和防回归机制绑定，才不会把产品质量抵消掉。</p>
-  </section>
+</div>
+</div>
+<section id="translation">
+<h2>完整译文</h2>
+<div class="toc">
+<h3>目录</h3>
+<ul>
+<li>发现并衡量不稳定性</li>
+<li>两种调试策略</li>
+<li>自上而下</li>
+<li>自下而上</li>
+<li>针对性缓解措施</li>
+<li>防止回归，同时保持速度</li>
+<li>面向新一代软件的稳定性</li>
+</ul>
+</div>
+<p>许多用户整天都在使用 Cursor。这意味着，即使崩溃很少发生，也可能造成极大干扰。与此同时，随着用户数量增长，以及 subagents、instant grep、browser use 等更具雄心的功能陆续发布，让应用保持稳定也变得越来越困难。</p>
+<p>这些崩溃大多源于应用内存不足（OOM）。过去几个月里，我们构建了一系列系统，用于观察崩溃和内存压力。我们也针对热点路径实施了高置信度修复和优化，并设置护栏，在回归问题发布前将其发现。</p>
+<p>汇总 Cursor 应用所有版本后，我们的每会话 OOM 率较 2 月下旬的峰值下降了 80%。每请求 OOM 率自 3 月 1 日以来下降了 73%。本文将详细介绍我们为实现这些改进而构建的系统。</p>
+<figure class="source-figure" data-source-image="0"><img alt="OOM per session rate over time, showing an 80% decline since late February" class="source-image source-image-light" decoding="async" height="1800" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Foom-per-session-5.png&amp;w=3840&amp;q=70" width="2400"/><img alt="OOM per session rate over time, showing an 80% decline since late February" class="source-image source-image-dark" decoding="async" height="1800" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Foom-per-session-5-dark.png&amp;w=3840&amp;q=70" width="2400"/></figure>
+<h3>发现并衡量不稳定性</h3>
+<p>我们的桌面应用建立在开源的 Visual Studio Code 和 Electron 基础之上，因此采用多进程架构。崩溃可能发生在为编辑器和新 Agent 窗口提供支持的渲染进程中，也可能发生在为扩展、存储和 Agent 功能提供支持的实用进程中。</p>
+<p>渲染进程崩溃最为严重，因为它会让用户完全无法使用编辑器。我们发现，这类崩溃大多是达到 V8 内存上限造成的，也是近期工作的重点。扩展崩溃也会中断语言服务等重要功能，但通常可以自行恢复，对用户造成的干扰没有那么严重。</p>
+<p>每次致命崩溃都会通过遥测上报。上报信息包括受影响的进程、崩溃类型、设备和应用元数据，以及能够获得的 minidump 和堆栈跟踪。</p>
+<p>基于这些崩溃事件，我们建立了可以按应用版本拆分的指标，并分别按会话和请求计算发生率。前者大致反映有多少会话遭遇崩溃。后者则反映崩溃问题对受影响会话有多严重。这些看板会在崩溃事件发生后的数分钟内更新，因此我们可以密切跟踪新版本发布，并迅速发现潜在回归。</p>
+<figure class="source-figure" data-source-image="1"><img alt="OOM crashes over time, showing a 73% decline since March 1" class="source-image source-image-light" decoding="async" height="1000" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Foom-crashes-6.png&amp;w=3840&amp;q=70" width="2400"/><img alt="OOM crashes over time, showing a 73% decline since March 1" class="source-image source-image-dark" decoding="async" height="1000" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Foom-crashes-6-dark.png&amp;w=3840&amp;q=70" width="2400"/></figure>
+<h3>两种调试策略</h3>
+<p>在调试应用崩溃和内存不足问题时，我们采用双管齐下的策略。</p>
+<h4>自上而下</h4>
+<p>第一种是自上而下的调查，重点关注内存消耗最大的功能。如果已知某项功能会大量占用内存，我们就可以将崩溃指标与实验平台 Statsig 中对应的功能标记关联起来。随后，我们通过 A/B 测试衡量它对崩溃率的影响。</p>
+<p>我们还会跟踪与崩溃高度相关、在开发环境中也更容易观察的代理指标。超大消息载荷就是其中之一。由于应用采用多进程架构，数据会不断通过进程间通道和持久化层，在编辑器、扩展与 Agent 之间传递。我们在这两个环节加入监测，追踪超过一定阈值的消息。这类消息与内存问题高度相关。我们还会附上调用栈，以便将每条消息追溯到应用代码中的来源。</p>
+<p>为了还原某次崩溃发生时的情况，我们会为并行 Agent 使用、工具调用和终端等功能加入 breadcrumbs。breadcrumbs 是附加到错误上的特殊元数据日志。这样，每个崩溃事件都会带有一份记录，说明崩溃前发生了哪些活动。</p>
+<h4>自下而上</h4>
+<p>在自下而上的调查中，我们会把单个崩溃事件追溯到根本原因。第一步是捕获进程死亡时发生的情况。我们在主进程中运行崩溃监视服务。它使用 Chrome DevTools Protocol（CDP）检测内存不足错误，并实时捕获崩溃堆栈。我们还向上游 Electron 提交了补丁，让系统无需使用笨重的 CDP 机制也能取得这些堆栈。这些崩溃堆栈会进入一套每日运行的自动化流程。该流程详细分析每个堆栈，为存在高置信度修复方案的堆栈创建优化 PR，并通过版本间对比验证问题是否已经解决。</p>
+<p>为了了解内存在一次会话中如何逐渐累积，我们会查看堆快照。当检测到 Cursor 使用了过多内存时，我们会提示用户捕获并发送快照。这些快照可能包含敏感信息，例如已打开编辑器或聊天中的内容，因此提交完全由用户自行选择。不过，堆快照对于把不断累积的内存压力追溯到具体对象和 retainer 非常有价值。用户愿意参与时，我们对此十分感谢。</p>
+<figure class="source-figure" data-source-image="2"><img alt="Heap snapshot tooling in Cursor showing memory retainers" class="source-image source-image-light" decoding="async" height="800" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Foom-cursor-snapshot-2.png&amp;w=3840&amp;q=70" width="2400"/><img alt="Heap snapshot tooling in Cursor showing memory retainers" class="source-image source-image-dark" decoding="async" height="800" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Foom-cursor-snapshot-2-dark.png&amp;w=3840&amp;q=70" width="2400"/></figure>
+<p>为了了解整个用户群体的内存使用模式，我们会以较低的采样率持续进行堆分配分析。我们按应用版本汇总这些数据，得到按调用栈划分的内存压力明细。这让我们能够从全局观察各次应用会话中的内存压力。我们甚至可以比较不同版本，从而了解新版本中某条分配路径相较旧版本有所改善还是发生了回归，以及变化幅度有多大。</p>
+<h3>针对性缓解措施</h3>
+<p>通过这两种调查方法，我们发现崩溃通常可以归入两种模式。</p>
+<p>第一种是急性 OOM。内存会突然飙升，随后进程退出。这类问题通常通过崩溃堆栈发现，很少出现在堆转储或持续分析数据中。一个非常常见的原因是，某项功能一次加载了过多数据。我们的应用需要广泛处理用户工作区中的内容，因此经常从磁盘读取完整文件，或通过 IPC 加载完整文件内容。一些用户的工作区可能包含极其庞大的文件，导致应用无法承受。为相关功能加入 killswitch，或将大块数据拆分成多个小块处理，至关重要。</p>
+<p>第二种是缓慢而持续的 OOM。内存会在整个会话过程中逐渐增加，直到把进程推过上限。当手动管理的状态没有正确销毁，或游离的强引用造成资源泄漏时，就会出现这种问题。它们能够稳定地出现在堆转储中。我们可以通过追踪 retainer，并清理长生命周期对象的生命周期来修复问题。我们已经向 VSCode 上游提交了几项内存泄漏修复，并计划继续提交更多修复。</p>
+<p>扩展也可能因为内存不足而崩溃。我们使用进程隔离来缓解部分影响。粗略来说，把扩展分别放在独立进程中运行，可以避免某个扩展的崩溃或长时间任务影响其他扩展的功能。这与 Chrome 隔离不同标签页的方式相似，代价是系统内存占用会略微增加。</p>
+<h3>防止回归，同时保持速度</h3>
+<p>修复应用崩溃通常比防止新崩溃进入产品更直接，因为修复可以针对具体问题。预防则要求每位开发者都了解自己的工作对稳定性的影响，同时不能牺牲我们借助 Agent 获得的开发速度。这意味着我们必须同时投资流程和工具。</p>
+<p>我们采取的方法包括：</p>
+<ul>
+<li>为遇到过的每一类主要 OOM 或应用崩溃编写 Bugbot 规则。</li>
+<li>创建 Skills，让我们能够通过 Agent 式计算机操作轻松对应用进行压力测试。</li>
+<li>消除容易误用的设计。例如，用垃圾回收取代手动管理的资源，避免内存泄漏。</li>
+<li>在每次代码变更后运行传统的自动化性能测试。</li>
+<li>完善从检测到处置的闭环。例如，在指标发生回归时自动回滚。</li>
+</ul>
+<h3>面向新一代软件的稳定性</h3>
+<p>Agent 式软件开发让新功能的交付比以往任何时候都更容易，但也让性能问题和缺陷更容易进入产品。与此同时，实现应用稳定性仍然依赖相同的软件工程基本功。只不过面向新一代软件，这些方法也需要演进。我们需要采用 Agent 式策略来修复问题，并防止问题发生。</p>
+<p>打造高质量软件一直很难，如今它比以往任何时候都更加重要。如果你也对此充满热情，我们很希望收到你的消息。</p>
+<div class="meta">
+<p>分类：研究</p>
+<p>作者：Andrew Chan、Kevin Nguyen</p>
+</div>
+<div class="related">
+<p>构建云端 Agent 带给我们的经验</p>
+<p>用自动安装引导 Composer</p>
+<p>使用 warp decode 改进 MoE 模型推理</p>
+<p>让 Cursor 应用保持稳定</p>
+</div>
+<div class="toc">
+<h3>目录</h3>
+<ul>
+<li>发现并衡量不稳定性</li>
+<li>两种调试策略</li>
+<li>自上而下</li>
+<li>自下而上</li>
+<li>针对性缓解措施</li>
+<li>防止回归，同时保持速度</li>
+<li>面向新一代软件的稳定性</li>
+</ul>
+</div>
+<p>许多用户整天都在使用 Cursor。这意味着，即使崩溃很少发生，也可能造成极大干扰。与此同时，随着用户数量增长，以及 subagents、instant grep、browser use 等更具雄心的功能陆续发布，让应用保持稳定也变得越来越困难。</p>
+<p>这些崩溃大多源于应用内存不足（OOM）。过去几个月里，我们构建了一系列系统，用于观察崩溃和内存压力。我们也针对热点路径实施了高置信度修复和优化，并设置护栏，在回归问题发布前将其发现。</p>
+<p>汇总 Cursor 应用所有版本后，我们的每会话 OOM 率较 2 月下旬的峰值下降了 80%。每请求 OOM 率自 3 月 1 日以来下降了 73%。本文将详细介绍我们为实现这些改进而构建的系统。</p>
+<h3>发现并衡量不稳定性</h3>
+<p>我们的桌面应用建立在开源的 Visual Studio Code 和 Electron 基础之上，因此采用多进程架构。崩溃可能发生在为编辑器和新 Agent 窗口提供支持的渲染进程中，也可能发生在为扩展、存储和 Agent 功能提供支持的实用进程中。</p>
+<p>渲染进程崩溃最为严重，因为它会让用户完全无法使用编辑器。我们发现，这类崩溃大多是达到 V8 内存上限造成的，也是近期工作的重点。扩展崩溃也会中断语言服务等重要功能，但通常可以自行恢复，对用户造成的干扰没有那么严重。</p>
+<p>每次致命崩溃都会通过遥测上报。上报信息包括受影响的进程、崩溃类型、设备和应用元数据，以及能够获得的 minidump 和堆栈跟踪。</p>
+<p>基于这些崩溃事件，我们建立了可以按应用版本拆分的指标，并分别按会话和请求计算发生率。前者大致反映有多少会话遭遇崩溃。后者则反映崩溃问题对受影响会话有多严重。这些看板会在崩溃事件发生后的数分钟内更新，因此我们可以密切跟踪新版本发布，并迅速发现潜在回归。</p>
+<h3>两种调试策略</h3>
+<p>在调试应用崩溃和内存不足问题时，我们采用双管齐下的策略。</p>
+<h4>自上而下</h4>
+<p>第一种是自上而下的调查，重点关注内存消耗最大的功能。如果已知某项功能会大量占用内存，我们就可以将崩溃指标与实验平台 Statsig 中对应的功能标记关联起来。随后，我们通过 A/B 测试衡量它对崩溃率的影响。</p>
+<p>我们还会跟踪与崩溃高度相关、在开发环境中也更容易观察的代理指标。超大消息载荷就是其中之一。由于应用采用多进程架构，数据会不断通过进程间通道和持久化层，在编辑器、扩展与 Agent 之间传递。我们在这两个环节加入监测，追踪超过一定阈值的消息。这类消息与内存问题高度相关。我们还会附上调用栈，以便将每条消息追溯到应用代码中的来源。</p>
+<p>为了还原某次崩溃发生时的情况，我们会为并行 Agent 使用、工具调用和终端等功能加入 breadcrumbs。breadcrumbs 是附加到错误上的特殊元数据日志。这样，每个崩溃事件都会带有一份记录，说明崩溃前发生了哪些活动。</p>
+<h4>自下而上</h4>
+<p>在自下而上的调查中，我们会把单个崩溃事件追溯到根本原因。第一步是捕获进程死亡时发生的情况。我们在主进程中运行崩溃监视服务。它使用 Chrome DevTools Protocol（CDP）检测内存不足错误，并实时捕获崩溃堆栈。我们还向上游 Electron 提交了补丁，让系统无需使用笨重的 CDP 机制也能取得这些堆栈。这些崩溃堆栈会进入一套每日运行的自动化流程。该流程详细分析每个堆栈，为存在高置信度修复方案的堆栈创建优化 PR，并通过版本间对比验证问题是否已经解决。</p>
+<p>为了了解内存在一次会话中如何逐渐累积，我们会查看堆快照。当检测到 Cursor 使用了过多内存时，我们会提示用户捕获并发送快照。这些快照可能包含敏感信息，例如已打开编辑器或聊天中的内容，因此提交完全由用户自行选择。不过，堆快照对于把不断累积的内存压力追溯到具体对象和 retainer 非常有价值。用户愿意参与时，我们对此十分感谢。</p>
+<p>为了了解整个用户群体的内存使用模式，我们会以较低的采样率持续进行堆分配分析。我们按应用版本汇总这些数据，得到按调用栈划分的内存压力明细。这让我们能够从全局观察各次应用会话中的内存压力。我们甚至可以比较不同版本，从而了解新版本中某条分配路径相较旧版本有所改善还是发生了回归，以及变化幅度有多大。</p>
+<h3>针对性缓解措施</h3>
+<p>通过这两种调查方法，我们发现崩溃通常可以归入两种模式。</p>
+<p>第一种是急性 OOM。内存会突然飙升，随后进程退出。这类问题通常通过崩溃堆栈发现，很少出现在堆转储或持续分析数据中。一个非常常见的原因是，某项功能一次加载了过多数据。我们的应用需要广泛处理用户工作区中的内容，因此经常从磁盘读取完整文件，或通过 IPC 加载完整文件内容。一些用户的工作区可能包含极其庞大的文件，导致应用无法承受。为相关功能加入 killswitch，或将大块数据拆分成多个小块处理，至关重要。</p>
+<p>第二种是缓慢而持续的 OOM。内存会在整个会话过程中逐渐增加，直到把进程推过上限。当手动管理的状态没有正确销毁，或游离的强引用造成资源泄漏时，就会出现这种问题。它们能够稳定地出现在堆转储中。我们可以通过追踪 retainer，并清理长生命周期对象的生命周期来修复问题。我们已经向 VSCode 上游提交了几项内存泄漏修复，并计划继续提交更多修复。</p>
+<p>扩展也可能因为内存不足而崩溃。我们使用进程隔离来缓解部分影响。粗略来说，把扩展分别放在独立进程中运行，可以避免某个扩展的崩溃或长时间任务影响其他扩展的功能。这与 Chrome 隔离不同标签页的方式相似，代价是系统内存占用会略微增加。</p>
+<h3>防止回归，同时保持速度</h3>
+<p>修复应用崩溃通常比防止新崩溃进入产品更直接，因为修复可以针对具体问题。预防则要求每位开发者都了解自己的工作对稳定性的影响，同时不能牺牲我们借助 Agent 获得的开发速度。这意味着我们必须同时投资流程和工具。</p>
+<p>我们采取的方法包括：</p>
+<ul>
+<li>为遇到过的每一类主要 OOM 或应用崩溃编写 Bugbot 规则。</li>
+<li>创建 Skills，让我们能够通过 Agent 式计算机操作轻松对应用进行压力测试。</li>
+<li>消除容易误用的设计。例如，用垃圾回收取代手动管理的资源，避免内存泄漏。</li>
+<li>在每次代码变更后运行传统的自动化性能测试。</li>
+<li>完善从检测到处置的闭环。例如，在指标发生回归时自动回滚。</li>
+</ul>
+<h3>面向新一代软件的稳定性</h3>
+<p>Agent 式软件开发让新功能的交付比以往任何时候都更容易，但也让性能问题和缺陷更容易进入产品。与此同时，实现应用稳定性仍然依赖相同的软件工程基本功。只不过面向新一代软件，这些方法也需要演进。我们需要采用 Agent 式策略来修复问题，并防止问题发生。</p>
+<p>打造高质量软件一直很难，如今它比以往任何时候都更加重要。如果你也对此充满热情，我们很希望收到你的消息。</p>
+<div class="meta">
+<p>分类：研究</p>
+<p>作者：Andrew Chan、Kevin Nguyen</p>
+</div>
+<div class="related">
+<p>构建云端 Agent 带给我们的经验</p>
+<p>用自动安装引导 Composer</p>
+<p>使用 warp decode 改进 MoE 模型推理</p>
+</div>
+</section>
 </main>
-  <script id="airs-digest-theme-script">
+<script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;
       const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));

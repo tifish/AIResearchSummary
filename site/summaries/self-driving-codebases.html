@@ -1,267 +1,401 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>迈向自动驾驶代码库</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>迈向自动驾驶的代码库</title>
 <style>
 :root {
-  --bg: #f7f3ea;
-  --ink: #17202a;
-  --muted: #5d6673;
-  --line: #d8d0c2;
-  --paper: #fffaf1;
-  --panel: #f0e7d6;
-  --panel2: #e9f2ee;
-  --panel3: #f4e3dc;
-  --panel4: #e8e6f5;
-  --dark-block: #19212b;
-  --dark-ink: #f7f0e5;
-  --accent-data: #2066d1;
-  --accent-risk: #c84532;
-  --accent-opportunity: #138a5b;
-  --accent-conclusion: #7a4cc2;
-  --accent-warn: #b87912;
-  --shadow: rgba(30, 34, 40, 0.12);
+  color-scheme: light dark;
+  --bg: #f4f1ea;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #182124;
+  --muted: #647074;
+  --line: #d8d5ca;
+  --accent: #176b87;
+  --accent2: #b14c2f;
+  --accent3: #6b4bb6;
+  --accent4: #14775a;
+  --data: #075e78;
+  --risk: #a53c35;
+  --opportunity: #167255;
+  --conclusion: #6444a8;
+  --hero: #122c35;
+  --hero-ink: #f6fbf8;
+  --hero-muted: #bfd0d2;
+  --hl: #ffe7a3;
+  --hl2: #ccefe2;
+  --hl3: #e5d8ff;
+  --data-bg: #dff3f8;
+  --risk-bg: #fbe3df;
+  --opportunity-bg: #daf1e7;
+  --conclusion-bg: #eee5ff;
+  --stripe: #e8e1d4;
+  --quote-bg: #243e48;
+  --quote-ink: #f2fbf8;
+  --translation-bg: #fffdf8;
+  --shadow: 0 16px 45px rgba(28, 38, 39, .10);
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f4f1ea;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #182124;
+  --muted: #647074;
+  --line: #d8d5ca;
+  --accent: #176b87;
+  --accent2: #b14c2f;
+  --accent3: #6b4bb6;
+  --accent4: #14775a;
+  --data: #075e78;
+  --risk: #a53c35;
+  --opportunity: #167255;
+  --conclusion: #6444a8;
+  --hero: #122c35;
+  --hero-ink: #f6fbf8;
+  --hero-muted: #bfd0d2;
+  --hl: #ffe7a3;
+  --hl2: #ccefe2;
+  --hl3: #e5d8ff;
+  --data-bg: #dff3f8;
+  --risk-bg: #fbe3df;
+  --opportunity-bg: #daf1e7;
+  --conclusion-bg: #eee5ff;
+  --stripe: #e8e1d4;
+  --quote-bg: #243e48;
+  --quote-ink: #f2fbf8;
+  --translation-bg: #fffdf8;
+  --shadow: 0 16px 45px rgba(28, 38, 39, .10);
 }
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #101418;
-    --ink: #efe8dc;
-    --muted: #b8b0a4;
-    --line: #343b43;
-    --paper: #171d22;
-    --panel: #1f211c;
-    --panel2: #15231f;
-    --panel3: #261c1b;
-    --panel4: #1e1b2b;
-    --dark-block: #090d12;
-    --dark-ink: #f3eadc;
-    --accent-data: #6ea2ff;
-    --accent-risk: #ff7b66;
-    --accent-opportunity: #5bd49b;
-    --accent-conclusion: #b89cff;
-    --accent-warn: #f3b84f;
-    --shadow: rgba(0, 0, 0, 0.35);
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0d1316;
+    --surface: #141c20;
+    --card: #192328;
+    --ink: #e6edef;
+    --muted: #9eacb1;
+    --line: #354249;
+    --accent: #62c8e7;
+    --accent2: #ff8d6e;
+    --accent3: #bba1ff;
+    --accent4: #5bd1a8;
+    --data: #69d6f3;
+    --risk: #ff8b82;
+    --opportunity: #67d8ae;
+    --conclusion: #c1a8ff;
+    --hero: #10252d;
+    --hero-ink: #eaf8f7;
+    --hero-muted: #9eb9bc;
+    --hl: #624f18;
+    --hl2: #174d3e;
+    --hl3: #413467;
+    --data-bg: #123843;
+    --risk-bg: #492622;
+    --opportunity-bg: #173d31;
+    --conclusion-bg: #33284d;
+    --stripe: #252e32;
+    --quote-bg: #0c2028;
+    --quote-ink: #e8f7f5;
+    --translation-bg: #121a1e;
+    --shadow: 0 18px 48px rgba(0, 0, 0, .34);
   }
 }
 :root[data-theme="dark"] {
-  --bg: #101418;
-  --ink: #efe8dc;
-  --muted: #b8b0a4;
-  --line: #343b43;
-  --paper: #171d22;
-  --panel: #1f211c;
-  --panel2: #15231f;
-  --panel3: #261c1b;
-  --panel4: #1e1b2b;
-  --dark-block: #090d12;
-  --dark-ink: #f3eadc;
-  --accent-data: #6ea2ff;
-  --accent-risk: #ff7b66;
-  --accent-opportunity: #5bd49b;
-  --accent-conclusion: #b89cff;
-  --accent-warn: #f3b84f;
-  --shadow: rgba(0, 0, 0, 0.35);
+  color-scheme: dark;
+  --bg: #0d1316;
+  --surface: #141c20;
+  --card: #192328;
+  --ink: #e6edef;
+  --muted: #9eacb1;
+  --line: #354249;
+  --accent: #62c8e7;
+  --accent2: #ff8d6e;
+  --accent3: #bba1ff;
+  --accent4: #5bd1a8;
+  --data: #69d6f3;
+  --risk: #ff8b82;
+  --opportunity: #67d8ae;
+  --conclusion: #c1a8ff;
+  --hero: #10252d;
+  --hero-ink: #eaf8f7;
+  --hero-muted: #9eb9bc;
+  --hl: #624f18;
+  --hl2: #174d3e;
+  --hl3: #413467;
+  --data-bg: #123843;
+  --risk-bg: #492622;
+  --opportunity-bg: #173d31;
+  --conclusion-bg: #33284d;
+  --stripe: #252e32;
+  --quote-bg: #0c2028;
+  --quote-ink: #e8f7f5;
+  --translation-bg: #121a1e;
+  --shadow: 0 18px 48px rgba(0, 0, 0, .34);
 }
 * { box-sizing: border-box; }
 body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-  line-height: 1.65;
+  font-family: Inter, "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.75;
 }
+main { overflow: hidden; }
 .hero {
-  background: var(--dark-block);
-  color: var(--dark-ink);
-  padding: 56px 24px 42px;
-}
-.wrap {
-  width: min(1120px, calc(100% - 40px));
-  margin: 0 auto;
-}
-.kicker {
-  color: var(--accent-opportunity);
-  font-weight: 700;
-  letter-spacing: 0;
-}
-h1 {
-  margin: 14px 0 8px;
-  font-size: 44px;
-  line-height: 1.12;
-  letter-spacing: 0;
-}
-.original {
-  color: var(--muted);
-  font-size: 18px;
-}
-.hero .original { color: #cfc7ba; }
-.lede {
-  margin-top: 26px;
-  max-width: 820px;
-  font-size: 22px;
-  line-height: 1.55;
-}
-.stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  background: var(--line);
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-}
-.stat {
-  background: var(--paper);
-  padding: 24px;
-}
-.num {
-  color: var(--accent-data);
-  font-size: 32px;
-  font-weight: 800;
-}
-.label {
-  color: var(--muted);
-  margin-top: 6px;
-}
-.split {
-  background: var(--panel2);
-  padding: 48px 0;
-}
-.two {
-  display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  gap: 34px;
-  align-items: start;
-}
-h2 {
-  margin: 0 0 14px;
-  font-size: 28px;
-  line-height: 1.25;
-}
-.bigpoint {
-  border-left: 6px solid var(--accent-opportunity);
-  padding-left: 18px;
-  font-size: 20px;
-  font-weight: 700;
-}
-.text p { margin: 0 0 14px; }
-.timeline {
-  background: var(--paper);
-  padding: 52px 0;
-}
-.steps {
-  display: grid;
-  gap: 18px;
-  border-left: 3px solid var(--accent-conclusion);
-  padding-left: 24px;
-}
-.step {
+  padding: clamp(4rem, 9vw, 8rem) max(6vw, calc((100vw - 1160px) / 2));
+  background: var(--hero);
+  color: var(--hero-ink);
   position: relative;
-  padding: 2px 0 14px;
 }
-.step::before {
+.hero::after {
   content: "";
   position: absolute;
-  left: -33px;
-  top: 8px;
-  width: 15px;
-  height: 15px;
+  right: -6rem;
+  bottom: -8rem;
+  width: 24rem;
+  height: 24rem;
+  border: 4rem solid var(--accent2);
   border-radius: 50%;
-  background: var(--accent-conclusion);
+  opacity: .23;
 }
-.step b { color: var(--accent-conclusion); }
-.tableband {
-  background: var(--panel3);
-  padding: 50px 0;
+.eyebrow {
+  color: var(--accent4);
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
 }
-table {
+.hero h1 {
+  max-width: 900px;
+  margin: .5rem 0 .2rem;
+  font-size: clamp(2.7rem, 7vw, 6rem);
+  line-height: 1.06;
+  letter-spacing: -.045em;
+}
+.original-title {
+  margin: 0 0 2.5rem;
+  color: var(--hero-muted);
+  font-size: clamp(1rem, 2vw, 1.3rem);
+}
+.lede {
+  max-width: 850px;
+  margin: 0;
+  font-size: clamp(1.25rem, 2.5vw, 1.8rem);
+  line-height: 1.55;
+}
+.summary-wrap {
+  width: min(1160px, 90vw);
+  margin: 0 auto;
+  padding: 4.5rem 0 5rem;
+}
+.number-band {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin: -6.5rem 0 4rem;
+  position: relative;
+  box-shadow: var(--shadow);
+}
+.metric {
+  padding: 1.5rem;
+  background: var(--card);
+  border-right: 1px solid var(--line);
+}
+.metric:last-child { border-right: 0; }
+.metric strong {
+  display: block;
+  color: var(--data);
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1.1;
+}
+.metric span { color: var(--muted); font-size: .92rem; }
+.split {
+  display: grid;
+  grid-template-columns: .9fr 1.1fr;
+  gap: 3rem;
+  align-items: start;
+  margin: 4rem 0;
+}
+.split h2 {
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 1.12;
+  margin: 0;
+}
+.split-copy {
+  border-left: 5px solid var(--accent);
+  padding-left: 1.5rem;
+}
+.split-copy p:first-child { margin-top: 0; }
+.failure-flow {
+  background: var(--risk-bg);
+  border-top: 7px solid var(--risk);
+  padding: clamp(2rem, 5vw, 4rem);
+  margin: 4rem calc(50% - 50vw);
+  padding-left: max(5vw, calc((100vw - 1160px) / 2));
+  padding-right: max(5vw, calc((100vw - 1160px) / 2));
+}
+.failure-flow h2 { color: var(--risk); margin-top: 0; }
+.flow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: .8rem;
+  counter-reset: step;
+}
+.flow article {
+  counter-increment: step;
+  padding: 1.2rem;
+  background: var(--surface);
+  border-bottom: 4px solid var(--risk);
+}
+.flow article::before {
+  content: "0" counter(step);
+  color: var(--risk);
+  font-weight: 900;
+  font-size: .82rem;
+}
+.architecture {
+  margin: 4rem 0;
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 1.5rem;
+}
+.architecture .dark-panel {
+  background: var(--quote-bg);
+  color: var(--quote-ink);
+  padding: 2.5rem;
+}
+.architecture .dark-panel h2 { color: var(--accent4); margin-top: 0; }
+.roles {
+  display: grid;
+  gap: .8rem;
+}
+.role {
+  background: var(--conclusion-bg);
+  padding: 1.1rem 1.3rem;
+  border-left: 5px solid var(--conclusion);
+}
+.role strong { color: var(--conclusion); }
+.tradeoff {
+  margin: 4rem 0;
+  border: 1px solid var(--line);
+  overflow-x: auto;
+}
+.tradeoff table {
   width: 100%;
   border-collapse: collapse;
-  background: var(--paper);
-  box-shadow: 0 12px 32px var(--shadow);
+  min-width: 650px;
 }
-th, td {
-  padding: 16px;
-  border-bottom: 1px solid var(--line);
+.tradeoff th, .tradeoff td {
+  padding: 1rem 1.2rem;
   text-align: left;
-  vertical-align: top;
+  border-bottom: 1px solid var(--line);
 }
-th {
-  color: var(--accent-risk);
-  font-size: 15px;
-}
-.insight {
-  background: var(--dark-block);
-  color: var(--dark-ink);
-  padding: 46px 0;
-}
-.quote {
-  max-width: 880px;
-  border-left: 8px solid var(--accent-warn);
-  padding-left: 22px;
-  font-size: 25px;
-  line-height: 1.45;
-}
-.quote small {
-  display: block;
-  margin-top: 16px;
-  color: #cfc7ba;
-  font-size: 16px;
-}
-.gridsection {
-  background: var(--panel4);
-  padding: 52px 0;
+.tradeoff th { background: var(--stripe); }
+.tradeoff td:first-child { color: var(--risk); font-weight: 750; }
+.tradeoff td:last-child { color: var(--opportunity); font-weight: 650; }
+.insight-strip {
+  padding: 2rem;
+  margin: 4rem 0;
+  background: var(--opportunity-bg);
+  border-left: 9px solid var(--opportunity);
+  font-size: 1.2rem;
 }
 .mosaic {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr 1fr;
-  gap: 16px;
+  grid-template-columns: 1.15fr .85fr 1fr;
+  gap: 1rem;
+  margin-top: 2rem;
 }
-.tile {
-  background: var(--paper);
-  padding: 22px;
-  border-top: 5px solid var(--accent-data);
+.mosaic article {
+  min-height: 12rem;
+  padding: 1.5rem;
+  background: var(--card);
+  border: 1px solid var(--line);
 }
-.tile:nth-child(2) { border-top-color: var(--accent-risk); }
-.tile:nth-child(3) { border-top-color: var(--accent-opportunity); }
-.tile:nth-child(4) { border-top-color: var(--accent-conclusion); }
-.tile:nth-child(5) { border-top-color: var(--accent-warn); }
-.tile.wide { grid-column: span 2; }
-.tile b {
+.mosaic article:nth-child(2) {
+  background: var(--data-bg);
+  transform: translateY(1rem);
+}
+.mosaic article:nth-child(3) {
+  background: var(--conclusion-bg);
+}
+.mosaic article:nth-child(4) {
+  grid-column: span 2;
+  background: var(--opportunity-bg);
+}
+.mosaic article:nth-child(5) {
+  background: var(--risk-bg);
+}
+.mosaic h3 { margin-top: 0; }
+.highlight { background: var(--hl); padding: .08em .28em; font-weight: 750; }
+.highlight2 { background: var(--hl2); padding: .08em .28em; font-weight: 750; }
+.highlight3 { background: var(--hl3); padding: .08em .28em; font-weight: 750; }
+#translation {
+  background: var(--translation-bg);
+  border-top: 1px solid var(--line);
+  padding: 5rem max(5vw, calc((100vw - 820px) / 2));
+}
+#translation h2 {
+  margin: 0 0 2.5rem;
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  line-height: 1.15;
+}
+#translation h3 {
+  margin: 3.3rem 0 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  color: var(--accent);
+  font-size: 1.8rem;
+}
+#translation h4 { margin-top: 2rem; color: var(--accent3); }
+#translation p, #translation li { font-size: 1.05rem; }
+#translation a { color: var(--accent); }
+.toc {
+  padding: 1.5rem 2rem;
+  background: var(--data-bg);
+  border-left: 5px solid var(--data);
+}
+.toc ul { columns: 2; padding-left: 1.2rem; }
+.source-figure {
+  margin: 2.8rem 0;
+  padding: .75rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+.source-figure img {
   display: block;
-  margin-bottom: 8px;
+  width: 100%;
+  height: auto;
+  border-radius: .35rem;
 }
-.final {
-  background: var(--panel);
-  padding: 50px 0 58px;
+.source-figure figcaption {
+  margin-top: .8rem;
+  color: var(--muted);
+  font-size: .92rem;
 }
-.takeaways {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
+.meta, .related {
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+  margin-top: 2rem;
+  padding-top: 1rem;
 }
-.take {
-  background: var(--paper);
-  padding: 20px;
-  border-left: 6px solid var(--accent-conclusion);
-}
-@media (max-width: 820px) {
-  h1 { font-size: 34px; }
-  .lede { font-size: 19px; }
-  .stats, .two, .mosaic, .takeaways {
-    grid-template-columns: 1fr;
-  }
-  .tile.wide { grid-column: auto; }
+@media (max-width: 780px) {
+  .number-band, .flow, .split, .architecture, .mosaic { grid-template-columns: 1fr; }
+  .metric { border-right: 0; border-bottom: 1px solid var(--line); }
+  .mosaic article:nth-child(2) { transform: none; }
+  .mosaic article:nth-child(4) { grid-column: auto; }
+  .toc ul { columns: 1; }
 }
 </style>
-  <script id="airs-digest-theme-boot">
+<script id="airs-digest-theme-boot">
     try {
       var saved = localStorage.getItem("theme");
       if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
     } catch (e) {}
   </script>
-  <style id="airs-digest-theme-style">
+<style id="airs-digest-theme-style">
     :root {
       color-scheme: light;
       --airs-digest-ink: #191816;
@@ -384,146 +518,402 @@ th {
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+  <style id="airs-source-image-theme-style">
+    .source-figure .source-image-dark {
+      display: none;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .source-figure .source-image-light {
+        display: none;
+      }
+      :root:not([data-theme="light"]) .source-figure .source-image-dark {
+        display: block;
+      }
+    }
+    :root[data-theme="dark"] .source-figure .source-image-light {
+      display: none;
+    }
+    :root[data-theme="dark"] .source-figure .source-image-dark {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-light {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-dark {
+      display: none;
+    }
   </style>
 </head>
 <body>
-<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/self-driving-codebases" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">← 返回索引</a><a href="https://cursor.com/blog/self-driving-codebases" rel="noopener noreferrer" target="_blank">阅读原文 ↗</a></div><button class="airs-digest-theme-toggle" data-airs-theme-toggle="" type="button">主题 · 跟随系统</button></nav>
+<main>
 <header class="hero">
-  <div class="wrap">
-    <div class="kicker">Cursor Research · 2026-02-05</div>
-    <h1>迈向自动驾驶代码库</h1>
-    <div class="original">Towards self-driving codebases</div>
-    <p class="lede">一句话总括：Cursor 的贡献不是证明“很多智能体一起写代码”很热闹，而是给出了一套能持续运行、能收敛、能解释失败原因的多智能体代码库架构。</p>
-  </div>
+<div class="eyebrow">Cursor Research · 2026</div>
+<h1>迈向自动驾驶的代码库</h1>
+<p class="original-title">Towards self-driving codebases</p>
+<p class="lede"><strong>一句话总括：</strong>这项研究找到了让数百乃至数千个编程智能体持续协作的简洁架构，并证明大规模自治开发的关键不是消灭所有错误，而是建立清晰的任务所有权、信息回流和最终收敛机制。</p>
 </header>
-
-<section class="stats" aria-label="关键数字">
-  <div class="stat">
-    <div class="num">1 周</div>
-    <div class="label">系统稳定连续运行，并承担研究浏览器项目的大多数提交。</div>
-  </div>
-  <div class="stat">
-    <div class="num">~1,000</div>
-    <div class="label">峰值每小时提交数。吞吐量成为显式设计目标。</div>
-  </div>
-  <div class="stat">
-    <div class="num">10M</div>
-    <div class="label">一周内累计工具调用量。小低效会被规模放大。</div>
-  </div>
-  <div class="stat">
-    <div class="num">20 → 1-3</div>
-    <div class="label">共享锁让 20 个智能体退化到约 1-3 个智能体的吞吐。</div>
-  </div>
+<div class="summary-wrap">
+<section aria-label="关键数据" class="number-band">
+<div class="metric"><strong>1 周</strong><span>系统连续自主运行时间</span></div>
+<div class="metric"><strong>1000 万</strong><span>一周内工具调用总量</span></div>
+<div class="metric"><strong>≈1000</strong><span>峰值每小时提交数</span></div>
+<div class="metric"><strong>数百个</strong><span>单机并行运行的智能体</span></div>
 </section>
-
 <section class="split">
-  <div class="wrap two">
-    <div>
-      <h2>真正的问题是协调，而不是会不会写代码</h2>
-      <p class="bigpoint">单个模型能写好小块代码，但浏览器这种任务会让它丢失全局状态、提前宣布成功，并卡在复杂细节里。</p>
-    </div>
-    <div class="text">
-      <p>文章从一个浏览器项目开始。浏览器足够复杂，渲染、架构、性能和工具链会互相牵制。</p>
-      <p>直接让一个模型“继续做下去”很快失败。把任务拆成并行子任务后，吞吐量提高了，但没有解决沟通、反馈和全局责任问题。</p>
-      <p>这改变了对 AI 编程能力的理解。瓶颈不是单个补丁的能力，而是系统能否让很多补丁朝同一个方向收敛。</p>
-    </div>
-  </div>
+<h2>规模不是答案，<br/>组织方式才是</h2>
+<div class="split-copy">
+<p>Cursor 最初让地位相同的智能体通过共享状态文件自行协调。结果是锁争用、职责逃避和整体停滞。<span class="highlight">20 个智能体只能得到约 1 至 3 个智能体的吞吐量</span>。</p>
+<p>这改变了一个常见判断：给模型更多并发和算力，并不会自动带来等比例产出。系统必须明确谁理解全局，谁负责完成任务，以及结果如何向上反馈。</p>
+</div>
 </section>
-
-<section class="timeline">
-  <div class="wrap">
-    <h2>系统设计一路从自由协作走向递归所有权</h2>
-    <div class="steps">
-      <div class="step"><b>平等智能体加共享文件。</b> 方案看似简单，但锁竞争、忘记释放锁和非法更新让系统快速失控。</div>
-      <div class="step"><b>planner、executor、judge 分工。</b> 角色分离带来责任感，worker 能专注执行，系统开始有线性吞吐。</div>
-      <div class="step"><b>连续 executor。</b> 去掉独立 planner 后更灵活，但一个智能体同时负责规划、派工、审查、合并和判断完成，最终被角色压力压垮。</div>
-      <div class="step"><b>最终架构。</b> root planner 拥有全局目标，subplanner 递归拥有窄切片，worker 在独立仓库副本中完成任务，并用单次 handoff 回传发现。</div>
-    </div>
-  </div>
+<section class="failure-flow">
+<h2>从失败架构中逐步爬坡</h2>
+<div class="flow">
+<article><h3>单智能体</h3><p>浏览器工程过于庞大。模型会迷失方向、过早宣布成功，也会卡在复杂细节中。</p></article>
+<article><h3>共享协调</h3><p>智能体错误使用锁，并倾向于选择安全的小任务。并发反而造成严重阻塞。</p></article>
+<article><h3>连续执行者</h3><p>同一个智能体同时规划、研究、编码、合并和验收。角色过载带来了新的病态行为。</p></article>
+<article><h3>递归所有权</h3><p>规划者只拆解和追踪目标，工作者只完成任务。单向交接让系统持续收敛。</p></article>
+</div>
 </section>
-
-<section class="tableband">
-  <div class="wrap">
-    <h2>吞吐量来自接受不完美，而不是强行消灭所有错误</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>设计选择</th>
-          <th>直接后果</th>
-          <th>改变了什么理解</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>每次提交都要求 100% 正确</td>
-          <td>一个 API 变化或拼写错误就会让系统串行化。很多 worker 会越界去修同一个问题。</td>
-          <td>大规模自治编码不适合把每个中间状态都当成发布状态。</td>
-        </tr>
-        <tr>
-          <td>允许小而稳定的错误率</td>
-          <td>错误会出现，但其他智能体会继续修复。系统保持 steady state，而不是停摆。</td>
-          <td>高效系统更像持续收敛的流水线，需要最后的 green branch 或发布前修复通道。</td>
-        </tr>
-        <tr>
-          <td>接受局部文件冲突</td>
-          <td>会消耗额外 token，也会有短期波动。</td>
-          <td>过度同步会比局部混乱更贵。简单可观测的系统更容易扩展。</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+<section class="architecture">
+<div class="dark-panel">
+<h2>最终架构：信息向上汇聚，工作向下展开</h2>
+<p>根规划者拥有用户目标的全部范围。它可以递归创建子规划者。工作者在自己的仓库副本中独立完成任务，再提交一次完整交接。</p>
+<p><span class="highlight2">智能体不进行全局同步，也不彼此交谈。</span>重要发现会逐级回到拥有更广视角的规划者手中。系统因此保持动态，又避免了全局协调成本。</p>
+</div>
+<div class="roles">
+<div class="role"><strong>根规划者</strong><br/>理解当前状态，覆盖完整目标，只负责产生具体任务。</div>
+<div class="role"><strong>子规划者</strong><br/>完整接管一个较窄范围，并继续递归拆解。</div>
+<div class="role"><strong>工作者</strong><br/>不知道全局，只对一个任务从开始到完成负责。</div>
+<div class="role"><strong>交接信息</strong><br/>包含改动、偏差、风险、发现和反馈，让所有者继续决策。</div>
+</div>
 </section>
-
-<section class="insight">
-  <div class="wrap">
-    <div class="quote">
-      架构和指令会被规模放大。模糊目标不会被更多智能体自动修正，只会更快地扩散成错误方向。
-      <small>这也是文章最实用的工程结论：提示词不是装饰，而是系统规格的一部分。</small>
-    </div>
-  </div>
+<section class="tradeoff">
+<table>
+<thead><tr><th>看似理想的要求</th><th>规模化后的问题</th><th>研究采用的取舍</th></tr></thead>
+<tbody>
+<tr><td>每次提交都 100% 正确</td><td>任何小错误都会阻塞全局，许多智能体争抢同一个修复</td><td>允许小而稳定的错误率，发布前再生成“绿色”分支</td></tr>
+<tr><td>彻底避免文件冲突</td><td>同步机制会增加复杂度，并压低整体吞吐量</td><td>接受短暂扰动，让系统通过后续任务自然收敛</td></tr>
+<tr><td>一个中央集成者把关</td><td>数百名工作者共用一道关卡，形成明显瓶颈</td><td>移除集成者，让各工作副本直接推动工作</td></tr>
+<tr><td>单体工程便于统一管理</td><td>数百次并行编译让磁盘达到每秒数 GB 的读写量</td><td>拆成自包含的 crate，减少编译等待并提升数倍吞吐量</td></tr>
+</tbody>
+</table>
 </section>
-
-<section class="gridsection">
-  <div class="wrap">
-    <h2>基础设施也会变成 AI 吞吐瓶颈</h2>
-    <div class="mosaic">
-      <div class="tile wide"><b>磁盘 I/O 成为热点。</b> 限制 RAM 后，数百个智能体同时编译会产生每秒数 GB 的构建读写。代码库结构会直接影响 agent 的产出速度。</div>
-      <div class="tile"><b>单机更易观察。</b> 每次多智能体运行都放在一台大型机器上，避免过早引入分布式复杂性。</div>
-      <div class="tile"><b>开发工具假设被挑战。</b> Git 和 Cargo 的共享锁对单用户合理，但在数百个 agent 同机运行时会放大成瓶颈。</div>
-      <div class="tile"><b>仓库架构影响 token。</b> 从单体迁到多个自包含 crate 后，系统减少等待编译的时间，吞吐量提升到原来的数倍。</div>
-      <div class="tile wide"><b>潜在机会在底层原语。</b> copy-on-write、去重和数据库式并发控制可能让传统开发环境更适合多智能体工作负载。</div>
-    </div>
-  </div>
+<aside class="insight-strip">
+<strong>关键洞见：</strong>自治开发系统的质量目标不应只盯住单次提交。真正重要的是错误率是否稳定、任务是否有人负责，以及系统能否在持续运行中自行修复并回到可发布状态。
+  </aside>
+<section>
+<h2>最值得带走的洞见</h2>
+<div class="mosaic">
+<article><h3>01 · 所有权优先于自由协作</h3><p>没有角色结构时，智能体会回避冲突和大任务。递归规划让每一层都有明确所有者。</p></article>
+<article><h3>02 · 提示会被规模放大</h3><p>模糊目标在单个智能体上只是小偏差，在千万级工具调用中会变成巨大的资源浪费。</p></article>
+<article><h3>03 · 约束比提醒有效</h3><p>“不得留下 TODO”比“记得完成”更清楚。只需教授模型不知道的流程和领域规则。</p></article>
+<article><h3>04 · 吞吐量需要主动设计</h3><p>接受少量临时错误和局部冲突，可以避免全局串行化。发布前的集中修复负责最终质量。</p></article>
+<article><h3>05 · 开发体验就是 AI 基础设施</h3><p>编译速度、磁盘布局、锁和仓库结构会直接限制 token 与提交吞吐量。</p></article>
+</div>
 </section>
-
-<section class="split">
-  <div class="wrap two">
-    <div>
-      <h2>给智能体的指令要像工程规格</h2>
-      <p class="bigpoint">模型会严格沿着指令走。坏规格不会因为算力增加而变好，只会更快地产生坏结果。</p>
-    </div>
-    <div class="text">
-      <p>“实现规范”这种指令太宽泛，智能体会深入冷门特性，而不是按用户价值排序。</p>
-      <p>性能、超时、依赖哲学、禁止使用的库和资源回收策略，都需要明确写出来。否则系统会把沉默当成许可。</p>
-      <p>文章还给出提示经验：不要重复教模型会做的通用工程动作。重点说明协作规则、项目流程和领域边界。</p>
-      <p>约束比提醒更有效。“不要 TODO、不要半成品”比“记得完成实现”更能定义边界。</p>
-    </div>
-  </div>
+</div>
+<section id="translation">
+<h2>完整译文</h2>
+<figure class="source-figure" data-source-image="0"><img alt="Towards self-driving codebases" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fog%2Fblog-self-driving-codebases-og-r2.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<nav class="toc">
+<h3>目录</h3>
+<ul>
+<li>背景</li>
+<li>从单智能体到多智能体</li>
+<li>自主协调</li>
+<li>增加结构与角色</li>
+<li>观察与爬坡优化</li>
+<li>连续执行者</li>
+<li>确保信息新鲜</li>
+<li>病态行为</li>
+<li>最终系统设计</li>
+<li>移除集成者</li>
+<li>吞吐量与取舍</li>
+<li>提交正确性</li>
+<li>同步开销</li>
+<li>基础设施方面的经验</li>
+<li>向智能体明确意图</li>
+<li>优化提示词</li>
+<li>系统设计经验</li>
+<li>结论</li>
+</ul>
+</nav>
+<p>我们此前发表了关于扩展长时间自主编程的研究。它获得了热烈反响，令我们十分振奋。</p>
+<p>这项工作最初是一项内部研究，目的是探索当前模型的能力极限。研究期间，我们创建了一套新的智能体运行框架，用于编排数千个智能体并观察其行为。截至上个月，这套系统已经足够稳定，可以连续运行一周。我们研究项目中的绝大多数提交都由它完成。该项目是一款 Web 浏览器。我们并不打算让外部用户使用这款浏览器，也预料到代码中会有一些不完善之处。</p>
+<p>不过，即使存在这些瑕疵，数千个智能体能够共同产出几乎不需要人工干预就能运行的成果，依然是一个值得分享的里程碑。此后，我们继续推进这项研究。现在，我们想更深入地介绍这套运行框架是如何构建的。</p>
+<p>我们也在向部分用户开放这项研究的一部分，供其试用。</p>
+<h3>背景</h3>
+<p>这个研究项目最初只是我的个人业余项目。</p>
+<p>浏览器似乎是一个很有意思的 benchmark。它足够复杂，可以暴露前沿模型的局限。同时，它还包含许多需要协同工作的不同子系统。</p>
+<p>我最初计划支持渲染不使用 JavaScript 的网页。我先向 Opus 4.5 发出提示，请它为构建浏览器引擎制定一份详细计划。之后，我不断催促它“继续”，看看它能沿着这份计划走多远。</p>
+<p>这个尝试很快就失败了。模型忘记了自己正在做什么。它经常在离目标还很远时停下来宣告成功，也会卡在复杂的实现细节中。不过，它确实展现出了深厚的知识和智能。面对较小的局部任务时，它能够写出优秀的代码。</p>
+<p>核心问题在于，构建浏览器是一项过于庞大的任务，必须拆成多个子任务。接下来，我让智能体规划一张主要工作的依赖图，以便多个智能体并行处理。我会手动创建智能体来执行这些任务，并在它们停下来时继续催促。这提高了吞吐量，但结果并没有好多少。智能体无法相互沟通，也无法从项目整体角度提供反馈。系统需要变得更加动态。</p>
+<p>与此同时，GPT-5.1 以及后来的 GPT-5.2 在精确遵循指令方面开始表现得更好。这似乎很适合长时间运行的智能体。因此，我们根据这些实验，将运行框架改为使用 OpenAI 模型。</p>
+<p>此时，这套框架已经能够构建一个不支持 JavaScript 的简单 Web 浏览器。不过，如果只用一个智能体构建完整的浏览器引擎，速度会慢到难以接受。</p>
+<p>于是，我们开始了下一轮研究：能否投入 <strong>10 倍</strong>算力，并获得 <strong>10 倍</strong>有意义的吞吐量？</p>
+<h3>从单智能体到多智能体</h3>
+<p>我们新建了一个仓库，并实现了一套基于 Rust 的简单运行框架。</p>
+<p>我们没有立即处理分布式系统的复杂性，而是把运行框架部署在一台资源充足的大型 Linux VM（虚拟机）上。我们通过 SSH 登录这台虚拟机，并使用简单的终端界面控制系统。</p>
+<p>我们预先投入了更多精力，为系统建立完善的可观测性。所有智能体消息、系统操作和命令输出都会连同时间戳一起记录，以便分析和重放会话。这些记录不仅方便人工审查，也可以重新输入 Cursor。Cursor 能够筛查大量数据，并快速找出行为模式。</p>
+<h3>自主协调</h3>
+<p>我们的第一个多智能体方案非常简单：让角色平等的智能体使用一个共享状态文件，查看其他智能体正在做什么，自行决定要做的工作，然后更新这个文件。</p>
+<p>我们尽可能少地规定具体做法，希望智能体自行找出协调方式。这个方案很快就失败了。</p>
+<p>协调文件迅速制造了更多问题。智能体持有锁的时间过长，忘记释放锁，还会在不允许的情况下尝试加锁或解锁。总体而言，它们并不理解持有协调文件锁意味着什么。锁机制很容易出错，而且只有很窄的正确使用方式。增加提示也没有帮助。</p>
+<p>锁还造成了严重争用。<strong>20 个智能体的吞吐量会降到只相当于 1 至 3 个智能体</strong>，因为大多数时间都花在等待锁上。我们曾为智能体提供一个工具，让它明确等待另一个智能体的工作，但它们很少使用。我们也试过无锁的乐观并发控制方案。它降低了开销，却没有消除混乱。</p>
+<p>智能体之间缺乏结构，也意味着没有任何一个智能体会接手庞大而复杂的任务。它们会避免争用和冲突，倾向于选择规模更小、风险更低的改动，而不是对整个项目负责。</p>
+<figure class="source-figure" data-source-image="1"><img alt="Self-coordination diagram showing agents connecting to a shared coordination file" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fautonomy-diagram-1-3.png&amp;w=1920&amp;q=70" width="800"/><img alt="Self-coordination diagram showing agents connecting to a shared coordination file" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fautonomy-diagram-1-3-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<h3>增加结构与角色</h3>
+<p>接下来，我们拆分了不同角色，让智能体拥有明确的所有权和责任：</p>
+<p>规划者首先制定具体方法和交付内容，以推动用户指令的落实。计划随后交给执行者。执行者是唯一的主导智能体，负责确保计划得到完整实现。执行者可以为工作者创建任务，从而获得线性扩展和吞吐量提升。</p>
+<p>为了让系统持续推进并明确责任，执行者完成工作后，会有一个独立的评审者判断任务是否已经完成，以及是否需要再进行一轮迭代。这解决了许多协调问题。由一个角色专门负责拥有并监督执行过程，工作者就可以专注于自己的狭窄任务，同时系统整体仍能交付结果。</p>
+<figure class="source-figure" data-source-image="2"><img alt="Structured roles diagram showing Planner, Executor, Workers, and Judge in a pipeline" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fautonomy-diagram-2-3.png&amp;w=1920&amp;q=70" width="800"/><img alt="Structured roles diagram showing Planner, Executor, Workers, and Judge in a pipeline" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fautonomy-diagram-2-3-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<h3>观察与爬坡优化</h3>
+<p>我们需要密切观察系统，才能逐步形成这套设计。</p>
+<p>如果存在重大问题，它通常会在许多智能体和工具调用中反复出现。例如，我们发现争用过多，是因为许多智能体同时运行 <code>git restore</code>。我们使用 Cursor 分析日志，并把行为记录与提示词进行对照，以理解实际行为为什么偏离预期。</p>
+<p>最终，我们发现这套系统受制于最慢的工作者。它过于僵化。</p>
+<p>预先完成所有规划，也让系统难以在发现新问题后动态调整。一些智能体会走向适得其反的方向，而且在进入下一轮循环前无法自行纠正。</p>
+<h3>连续执行者</h3>
+<p>下一版系统移除了独立规划者。</p>
+<p>执行者现在既可以规划如何实现目标，也可以创建任务。因为它是唯一的主导智能体，所以不需要把计划写在任何地方，不必遵守一份静态不变的计划，也不用僵硬地等待所有工作者结束。</p>
+<h3>确保信息新鲜</h3>
+<p>为了避免所有角色的智能体在长时间运行中逐渐偏离目标，我们引入了多种信息保鲜机制：</p>
+<ul>
+<li><code>scratchpad.md</code> 应该频繁重写，而不是不断追加内容。</li>
+<li>单个智能体达到上下文限制时，应自动进行总结。</li>
+<li>我们在系统提示中加入了自我反思和目标对齐提醒。</li>
+<li>我们鼓励智能体随时转向，并质疑已有假设。</li>
+</ul>
+<p>此时的系统高度动态且灵活。它可以主动探索代码，重新考虑决策，管理工作者，交错安排任务，并持续反映最新信息。我们发现，智能体通常能较好地按照指令完成工作。因此，我们移除了评审者，让系统保持简洁。</p>
+<figure class="source-figure" data-source-image="3"><img alt="Continuous executor diagram showing an infinite executor loop with workers" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fautonomy-diagram-3-3.png&amp;w=1920&amp;q=70" width="800"/><img alt="Continuous executor diagram showing an infinite executor loop with workers" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fautonomy-diagram-3-3-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<h3>病态行为</h3>
+<p>尽管做了这些改进，连续执行者还是开始出现一些病态行为。它会毫无原因地休眠，停止正在运行的智能体，亲自做本应委派的工作，拒绝规划并创建超过少量的狭窄任务，也不能正确合并工作者的改动，还会过早声称任务已经完成。</p>
+<p>我们发现，它同时承担了太多角色和目标，包括规划、探索、研究、创建任务、检查工作者、审查代码、执行编辑、合并输出，以及判断循环是否应该结束。现在回头看，它不堪重负是很合理的结果。</p>
+<h3>最终系统设计</h3>
+<p>最终设计融合了我们得到的全部经验：</p>
+<p>根规划者拥有用户指令的全部范围。它负责理解当前状态，并给出具体且有针对性的任务，以推动目标实现。它自己不编写代码，也不知道任务是否被领取，更不知道由谁领取。</p>
+<p>当规划者认为自己的范围可以进一步拆分时，它会创建子规划者。子规划者完整拥有被委派的狭窄范围。它以同样的方式承担全部责任，但只负责这个局部范围。这个过程可以递归进行。</p>
+<p>工作者领取任务，并独自负责把任务推进到完成。它们不了解更大的系统，也不会与其他规划者或工作者沟通。每个工作者都在自己的仓库副本中工作。完成后，它会写出一份交接说明，由系统提交给发出任务的规划者。</p>
+<p>有趣的是，这种方式确实很像如今一些软件团队的运作模式。</p>
+<p>子规划者可以迅速把任务扇出给多个工作者，从而提高吞吐量。同时，系统中的每个项目和任务仍然由某个智能体完整拥有并负责。这也有助于处理大型项目和大型任务。否则，单个规划者可能不堪重负，形成隧道视野。</p>
+<p>交接说明不只包含完成了什么，还会记录重要备注、顾虑、偏差、发现、想法和反馈。规划者会通过后续消息收到这些内容。这样一来，系统就能持续运动。即使规划者认为自己已经“完成”，它仍会继续收到更新，拉取仓库的最新状态，然后继续规划并作出后续决策。</p>
+<p>所有智能体都具备这种机制。信息可以在无需全局同步或交叉沟通的情况下，逐级向上传递给视野越来越广的所有者。系统因此能够保持极强的动态性，并自行收敛。</p>
+<figure class="source-figure" data-source-image="4"><img alt="Final system design showing recursive planners, sub-planners, workers, and git" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fautonomy-diagram-4-3.png&amp;w=1920&amp;q=70" width="800"/><img alt="Final system design showing recursive planners, sub-planners, workers, and git" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fautonomy-diagram-4-3-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<h3>移除集成者</h3>
+<p>我们最初加入了一个集成者，用于执行全局感知的集中质量控制。它还可以减少大量工作者同时推送、变基、解决冲突和合并造成的争用。</p>
+<p>但它很快成为一个明显的瓶颈。数百个工作者只有一个关卡，所有工作都必须通过这道关卡，也就是所谓的“繁文缛节”。我们尝试修改提示词，但最终认为集成者并无必要，可以移除以简化系统。</p>
+<h3>吞吐量与取舍</h3>
+<p>系统在一周内执行了 <strong>1000 万次工具调用</strong>，峰值达到<strong>每小时约 1000 次提交</strong>。系统启动后，不再需要我们的任何干预。</p>
+<p>为了达到这样的吞吐量，我们有意做出了一些取舍。</p>
+<h3>提交正确性</h3>
+<p>当我们要求每次提交前都达到 100% 正确时，系统会出现严重的串行化，实际吞吐量也会大幅下降。即使只是 API 变更或拼写错误这样的小问题，也会让整个系统几乎停转。工作者会超出自己的任务范围，开始修复无关问题。许多智能体还会蜂拥而上，相互干扰，争着修复同一个问题。</p>
+<p>这种行为既没有帮助，也没有必要。允许一定余量，意味着智能体可以相信其他问题很快会由同伴修复。由于系统对整个代码库建立了有效的所有权和委派机制，这种信任是有依据的。错误会出现，也会很快得到修复。错误率维持在较低而稳定的水平。代码可能很少彻底没有错误，但状态始终稳定且可控，不会不断恶化。</p>
+<p>这可能意味着，理想的高效系统应该接受一定错误率。不过，它仍然需要一条最终的“绿色”分支。某个智能体可以定期创建快照，并在发布前快速完成一轮修复。</p>
+<h3>同步开销</h3>
+<p>有时，多个智能体会修改同一个文件，或者重构同一段代码。我们没有试图彻底杜绝这种情况，也没有为此过度设计复杂方案。我们接受短暂的扰动，让系统在较短时间内自然收敛并稳定下来。</p>
+<p>这会多消耗一些 token，也会造成局部争用，但能让系统整体保持简洁。模型更容易与目标对齐，不会承受过多负担。系统也更容易管理和观察，摩擦更少，全局生产力更高。此外，它还避免了过于复杂的方案。</p>
+<h3>基础设施方面的经验</h3>
+<p>每次多智能体运行都部署在一台资源充足的大型机器上，以避免过早引入分布式系统的复杂性。这种方式非常合适。大多数运行会达到数百个智能体的峰值，通常会让这些机器接近饱和，但不会超出其设计范围。这种架构也便于观察系统指标，并在必要时共享和复制状态。</p>
+<p>限制智能体的 RAM 使用量后，磁盘成为了热点。尤其是在单体项目中，数百个智能体同时编译，会让构建产物产生每秒数 GB 的读写量。这显著影响了运行框架的整体吞吐量，也带来了一个很有意思的经验：项目结构、架构决策和开发体验都能影响 token 与提交吞吐量。原因很简单，处理代码库的过程，例如编译，会占据大部分时间，而不是让智能体把时间主要用于思考和编码。</p>
+<p>通用开发环境中也存在一些限制和低效之处。某些机制在单用户工作区中很合理，或者影响并不明显。但当数百个智能体在一台机器上重复同样的操作时，这些问题就会凸显出来。一个简单的解决办法是为每个智能体提供独立机器。不过，只要重新思考并设计某些基础机制和工具，也可能以较低成本获得显著的效率提升。</p>
+<p>例如，Git 和 Cargo 等许多工具会使用共享锁。这主要是一种简单的并发控制机制。我们能否引入数据库等并发系统中早已成熟的机制，让这些工具同样适用于多智能体系统？所有智能体都有自己的仓库副本，但绝大部分文件和产物都完全相同。更成熟的生产存储系统普遍使用写时复制和去重功能。如果给通常面向“单用户”的系统加入这些简单能力，是否也能轻松获益，而不必构建一套独立基础设施？</p>
+<h3>向智能体明确意图</h3>
+<p>提供给这套多智能体系统的指令非常重要。</p>
+<p>最初，我们没有把指令设计当作首要目标，而是专注于实现稳定且有效的运行框架。不过，指令的重要性很快显现出来。我们本质上仍在与普通编程智能体交互，只是给了它高出多个数量级的时间和算力。这会放大一切，包括欠佳或含糊的指令。</p>
+<p>在初始指令上投入更多时间是合理的。归根结底，智能体仍然是智能体。它们经过训练，会严格遵循你的指令，沿着指定路径前进，不会改变或推翻指令。即使指令本身很糟，它们也是如此。</p>
+<p>我们希望研究项目取得成功，所以会随着项目和运行框架的演进调整初始指令。我们在学习如何构建浏览器，同时也在学习如何运行这套新的多智能体系统。输出中经常会反映出糟糕或不完整的规格。这并不是运行框架本身的问题。运行框架只是在完全照着我们的指令做事。</p>
+<p>下面是浏览器项目中的几个例子：</p>
+<p>最初，指令侧重于实现规格和消除 bug。“实现规格”这类说法过于含糊。智能体会深入处理冷门且很少使用的功能，而不是有判断力地安排优先级。</p>
+<p>我们默认认为，性能应该处于用户可接受的范围内。但后来必须加入明确指令并强制执行超时，智能体才会在性能与其他目标之间取得平衡。</p>
+<p>面对系统中的复杂部分，智能体可能写出存在内存泄漏或会导致死锁的代码。人类会注意到这些问题，但智能体未必总能意识到。我们必须提供明确的、基于进程的资源管理工具，让系统可以平稳恢复，并采取更稳健的防御措施。</p>
+<p>第一版不支持 JavaScript 的简单浏览器最终形成了一套不适合继续演进为完整浏览器的架构。这是初始规格的失败。</p>
+<p>同样，虽然我们告诉智能体这个项目要从头构建浏览器，它们仍然引入了一些本可以自行实现的依赖。有时，它们会把依赖当作临时脚手架，等待后续完成正式实现。这也是指令中的疏漏。后来的一次运行明确规定了依赖理念，以及禁止使用哪些库，从而纠正了这个问题。</p>
+<p>在后来的那次运行中，系统还进行了一次重大重构。项目从单体结构转向许多自包含的 crate。仓库一度处于严重损坏的状态，但多智能体系统在几天内逐渐收敛到可运行的代码。这说明，系统具备强大的协作与智能工作能力。即使整体状态完全损坏，它也能继续推进，而不是进一步恶化或陷入停滞。由于编译等待时间大幅减少，这次运行的吞吐量也达到了此前的数倍。</p>
+<p>架构和指令都很重要。智能体具备强大的工程能力，但无论指令好坏，它们都会一路遵循到底。要在过于狭窄的指标和毫无结构的自由之间找到平衡并不容易。判断哪些内容不言自明，哪些内容必须明确说明，同样很困难。</p>
+<p>这一切都表明，引导、明确和理解意图非常重要。系统规模越大，这件事就越重要。可操控性和可观测性将是值得继续探索的研究方向。</p>
+<h3>优化提示词</h3>
+<p>提示词设计是系统演进过程中的重要部分。</p>
+<p>我们发现，没有必要教模型做它已经知道如何完成的事情。只需告诉它不了解的内容，例如多智能体协作方式，或者与具体领域有关的规则，例如如何运行测试和部署流水线。可以把模型当作一名才华出众的新员工。它懂工程，但还不了解你的特定代码库和工作流程。</p>
+<p>约束比指令更有效。“不得留下 TODO，不得只完成部分实现”比“记得完成实现”效果更好。模型通常默认会做正确的事。约束的作用是划定边界。</p>
+<p>面对高层次或更深入的任务，应避免清单式思维。你可以详细说明自己的意图，但也要记住，一旦给出明确的操作事项，模型就会集中完成这些事项，而不是关注更广的范围。没有列出的事项也会被隐性降低优先级。通常，让模型运用自己的判断力和自主性会更好。</p>
+<p>在说明工作范围的数量时，给出具体数字和区间确实很有帮助。“生成许多任务”通常只会得到少量任务。模型会采用保守默认值，以安全方式满足字面要求。“生成 20 至 100 个任务”则能表达出范围更大、应该更有雄心的意图。我们观察到，这种写法会带来明显不同且更广泛的行为。</p>
+<h3>系统设计经验</h3>
+<p>我们通过研究总结出了一些原则：</p>
+<p><strong>系统应该具有反脆弱性。</strong>同时运行的智能体越多，出现故障的概率也会越高。系统必须能够承受单个智能体失败，并允许其他智能体恢复工作或尝试替代方案。</p>
+<p><strong>经验数据优先于假设驱动。</strong>我们希望根据数据和观察结果调整系统，而不是依据对人类组织或现有系统设计的预设，提前认定系统应该如何工作。</p>
+<p><strong>明确围绕吞吐量设计。</strong>这意味着要在编码工作的其他方面作出取舍。例如，接受较小但稳定的错误率，并在最后执行一次协调修复，而不是要求代码始终 100% 正确，从而大幅降低系统速度。</p>
+<p>这类系统设计正确时，往往简洁而优雅。不过，在探索许多不同方案之前，我们并不知道哪种简单方案真正有效。当前系统设计一直以极低开销运行，并能让 token 吞吐量以有意义的方式线性扩展。此后，这套运行框架不再需要重大迭代。</p>
+<h3>结论</h3>
+<p>品味、判断和方向来自人类，而 AI 则成为强大的力量倍增器，帮助我们快速迭代并探索这项研究。</p>
+<p>这有些类似所谓的“良性”AI 循环。AI 被用于开发 AI。随着模型、智能体和运行框架不断改进，这个过程会反过来推动自身，以越来越快的速度加速。我们塑造工具，工具也塑造我们。</p>
+<p>这项研究与当今一些软件团队的运作方式有一种富有诗意的相似之处。这些模型并未接受过以这种方式工作的明确训练。这说明相关行为可能是自然涌现的，也可能表明这终究是组织软件项目的正确方式。</p>
+<p>我们将继续研究运行时间极长的智能体，并用这些研究发现指导产品未来的发展。</p>
+<p class="meta">归档分类：研究</p>
+<p class="meta">作者：Wilson Lin</p>
+<div class="related">
+<p>让 Composer 适应更长的工作周期</p>
+<p>安全索引大型代码库</p>
+<p>动态发现上下文</p>
+<p>迈向自动驾驶的代码库</p>
+</div>
+<nav class="toc">
+<h3>目录</h3>
+<ul>
+<li>背景</li>
+<li>从单智能体到多智能体</li>
+<li>自主协调</li>
+<li>增加结构与角色</li>
+<li>观察与爬坡优化</li>
+<li>连续执行者</li>
+<li>确保信息新鲜</li>
+<li>病态行为</li>
+<li>最终系统设计</li>
+<li>移除集成者</li>
+<li>吞吐量与取舍</li>
+<li>提交正确性</li>
+<li>同步开销</li>
+<li>基础设施方面的经验</li>
+<li>向智能体明确意图</li>
+<li>优化提示词</li>
+<li>系统设计经验</li>
+<li>结论</li>
+</ul>
+</nav>
+<p>我们此前发表了关于扩展长时间自主编程的研究。它获得了热烈反响，令我们十分振奋。</p>
+<p>这项工作最初是一项内部研究，目的是探索当前模型的能力极限。研究期间，我们创建了一套新的智能体运行框架，用于编排数千个智能体并观察其行为。截至上个月，这套系统已经足够稳定，可以连续运行一周。我们研究项目中的绝大多数提交都由它完成。该项目是一款 Web 浏览器。我们并不打算让外部用户使用这款浏览器，也预料到代码中会有一些不完善之处。</p>
+<p>不过，即使存在这些瑕疵，数千个智能体能够共同产出几乎不需要人工干预就能运行的成果，依然是一个值得分享的里程碑。此后，我们继续推进这项研究。现在，我们想更深入地介绍这套运行框架是如何构建的。</p>
+<p>我们也在向部分用户开放这项研究的一部分，供其试用。</p>
+<h3>背景</h3>
+<p>这个研究项目最初只是我的个人业余项目。</p>
+<p>浏览器似乎是一个很有意思的 benchmark。它足够复杂，可以暴露前沿模型的局限。同时，它还包含许多需要协同工作的不同子系统。</p>
+<p>我最初计划支持渲染不使用 JavaScript 的网页。我先向 Opus 4.5 发出提示，请它为构建浏览器引擎制定一份详细计划。之后，我不断催促它“继续”，看看它能沿着这份计划走多远。</p>
+<p>这个尝试很快就失败了。模型忘记了自己正在做什么。它经常在离目标还很远时停下来宣告成功，也会卡在复杂的实现细节中。不过，它确实展现出了深厚的知识和智能。面对较小的局部任务时，它能够写出优秀的代码。</p>
+<p>核心问题在于，构建浏览器是一项过于庞大的任务，必须拆成多个子任务。接下来，我让智能体规划一张主要工作的依赖图，以便多个智能体并行处理。我会手动创建智能体来执行这些任务，并在它们停下来时继续催促。这提高了吞吐量，但结果并没有好多少。智能体无法相互沟通，也无法从项目整体角度提供反馈。系统需要变得更加动态。</p>
+<p>与此同时，GPT-5.1 以及后来的 GPT-5.2 在精确遵循指令方面开始表现得更好。这似乎很适合长时间运行的智能体。因此，我们根据这些实验，将运行框架改为使用 OpenAI 模型。</p>
+<p>此时，这套框架已经能够构建一个不支持 JavaScript 的简单 Web 浏览器。不过，如果只用一个智能体构建完整的浏览器引擎，速度会慢到难以接受。</p>
+<p>于是，我们开始了下一轮研究：能否投入 10 倍算力，并获得 10 倍有意义的吞吐量？</p>
+<h3>从单智能体到多智能体</h3>
+<p>我们新建了一个仓库，并实现了一套基于 Rust 的简单运行框架。</p>
+<p>我们没有立即处理分布式系统的复杂性，而是把运行框架部署在一台资源充足的大型 Linux VM（虚拟机）上。我们通过 SSH 登录这台虚拟机，并使用简单的终端界面控制系统。</p>
+<p>我们预先投入了更多精力，为系统建立完善的可观测性。所有智能体消息、系统操作和命令输出都会连同时间戳一起记录，以便分析和重放会话。这些记录不仅方便人工审查，也可以重新输入 Cursor。Cursor 能够筛查大量数据，并快速找出行为模式。</p>
+<h3>自主协调</h3>
+<p>我们的第一个多智能体方案非常简单：让角色平等的智能体使用一个共享状态文件，查看其他智能体正在做什么，自行决定要做的工作，然后更新这个文件。</p>
+<p>我们尽可能少地规定具体做法，希望智能体自行找出协调方式。这个方案很快就失败了。</p>
+<p>协调文件迅速制造了更多问题。智能体持有锁的时间过长，忘记释放锁，还会在不允许的情况下尝试加锁或解锁。总体而言，它们并不理解持有协调文件锁意味着什么。锁机制很容易出错，而且只有很窄的正确使用方式。增加提示也没有帮助。</p>
+<p>锁还造成了严重争用。20 个智能体的吞吐量会降到只相当于 1 至 3 个智能体，因为大多数时间都花在等待锁上。我们曾为智能体提供一个工具，让它明确等待另一个智能体的工作，但它们很少使用。我们也试过无锁的乐观并发控制方案。它降低了开销，却没有消除混乱。</p>
+<p>智能体之间缺乏结构，也意味着没有任何一个智能体会接手庞大而复杂的任务。它们会避免争用和冲突，倾向于选择规模更小、风险更低的改动，而不是对整个项目负责。</p>
+<h3>增加结构与角色</h3>
+<p>接下来，我们拆分了不同角色，让智能体拥有明确的所有权和责任：</p>
+<p>规划者首先制定具体方法和交付内容，以推动用户指令的落实。计划随后交给执行者。执行者是唯一的主导智能体，负责确保计划得到完整实现。执行者可以为工作者创建任务，从而获得线性扩展和吞吐量提升。</p>
+<p>为了让系统持续推进并明确责任，执行者完成工作后，会有一个独立的评审者判断任务是否已经完成，以及是否需要再进行一轮迭代。这解决了许多协调问题。由一个角色专门负责拥有并监督执行过程，工作者就可以专注于自己的狭窄任务，同时系统整体仍能交付结果。</p>
+<h3>观察与爬坡优化</h3>
+<p>我们需要密切观察系统，才能逐步形成这套设计。</p>
+<p>如果存在重大问题，它通常会在许多智能体和工具调用中反复出现。例如，我们发现争用过多，是因为许多智能体同时运行 <code>git restore</code>。我们使用 Cursor 分析日志，并把行为记录与提示词进行对照，以理解实际行为为什么偏离预期。</p>
+<p>最终，我们发现这套系统受制于最慢的工作者。它过于僵化。</p>
+<p>预先完成所有规划，也让系统难以在发现新问题后动态调整。一些智能体会走向适得其反的方向，而且在进入下一轮循环前无法自行纠正。</p>
+<h3>连续执行者</h3>
+<p>下一版系统移除了独立规划者。</p>
+<p>执行者现在既可以规划如何实现目标，也可以创建任务。因为它是唯一的主导智能体，所以不需要把计划写在任何地方，不必遵守一份静态不变的计划，也不用僵硬地等待所有工作者结束。</p>
+<h3>确保信息新鲜</h3>
+<p>为了避免所有角色的智能体在长时间运行中逐渐偏离目标，我们引入了多种信息保鲜机制：</p>
+<ul>
+<li><code>scratchpad.md</code> 应该频繁重写，而不是不断追加内容。</li>
+<li>单个智能体达到上下文限制时，应自动进行总结。</li>
+<li>我们在系统提示中加入了自我反思和目标对齐提醒。</li>
+<li>我们鼓励智能体随时转向，并质疑已有假设。</li>
+</ul>
+<p>此时的系统高度动态且灵活。它可以主动探索代码，重新考虑决策，管理工作者，交错安排任务，并持续反映最新信息。我们发现，智能体通常能较好地按照指令完成工作。因此，我们移除了评审者，让系统保持简洁。</p>
+<h3>病态行为</h3>
+<p>尽管做了这些改进，连续执行者还是开始出现一些病态行为。它会毫无原因地休眠，停止正在运行的智能体，亲自做本应委派的工作，拒绝规划并创建超过少量的狭窄任务，也不能正确合并工作者的改动，还会过早声称任务已经完成。</p>
+<p>我们发现，它同时承担了太多角色和目标，包括规划、探索、研究、创建任务、检查工作者、审查代码、执行编辑、合并输出，以及判断循环是否应该结束。现在回头看，它不堪重负是很合理的结果。</p>
+<h3>最终系统设计</h3>
+<p>最终设计融合了我们得到的全部经验：</p>
+<p>根规划者拥有用户指令的全部范围。它负责理解当前状态，并给出具体且有针对性的任务，以推动目标实现。它自己不编写代码，也不知道任务是否被领取，更不知道由谁领取。</p>
+<p>当规划者认为自己的范围可以进一步拆分时，它会创建子规划者。子规划者完整拥有被委派的狭窄范围。它以同样的方式承担全部责任，但只负责这个局部范围。这个过程可以递归进行。</p>
+<p>工作者领取任务，并独自负责把任务推进到完成。它们不了解更大的系统，也不会与其他规划者或工作者沟通。每个工作者都在自己的仓库副本中工作。完成后，它会写出一份交接说明，由系统提交给发出任务的规划者。</p>
+<p>有趣的是，这种方式确实很像如今一些软件团队的运作模式。</p>
+<p>子规划者可以迅速把任务扇出给多个工作者，从而提高吞吐量。同时，系统中的每个项目和任务仍然由某个智能体完整拥有并负责。这也有助于处理大型项目和大型任务。否则，单个规划者可能不堪重负，形成隧道视野。</p>
+<p>交接说明不只包含完成了什么，还会记录重要备注、顾虑、偏差、发现、想法和反馈。规划者会通过后续消息收到这些内容。这样一来，系统就能持续运动。即使规划者认为自己已经“完成”，它仍会继续收到更新，拉取仓库的最新状态，然后继续规划并作出后续决策。</p>
+<p>所有智能体都具备这种机制。信息可以在无需全局同步或交叉沟通的情况下，逐级向上传递给视野越来越广的所有者。系统因此能够保持极强的动态性，并自行收敛。</p>
+<h3>移除集成者</h3>
+<p>我们最初加入了一个集成者，用于执行全局感知的集中质量控制。它还可以减少大量工作者同时推送、变基、解决冲突和合并造成的争用。</p>
+<p>但它很快成为一个明显的瓶颈。数百个工作者只有一个关卡，所有工作都必须通过这道关卡，也就是所谓的“繁文缛节”。我们尝试修改提示词，但最终认为集成者并无必要，可以移除以简化系统。</p>
+<h3>吞吐量与取舍</h3>
+<p>系统在一周内执行了 1000 万次工具调用，峰值达到每小时约 1000 次提交。系统启动后，不再需要我们的任何干预。</p>
+<p>为了达到这样的吞吐量，我们有意做出了一些取舍。</p>
+<h3>提交正确性</h3>
+<p>当我们要求每次提交前都达到 100% 正确时，系统会出现严重的串行化，实际吞吐量也会大幅下降。即使只是 API 变更或拼写错误这样的小问题，也会让整个系统几乎停转。工作者会超出自己的任务范围，开始修复无关问题。许多智能体还会蜂拥而上，相互干扰，争着修复同一个问题。</p>
+<p>这种行为既没有帮助，也没有必要。允许一定余量，意味着智能体可以相信其他问题很快会由同伴修复。由于系统对整个代码库建立了有效的所有权和委派机制，这种信任是有依据的。错误会出现，也会很快得到修复。错误率维持在较低而稳定的水平。代码可能很少彻底没有错误，但状态始终稳定且可控，不会不断恶化。</p>
+<p>这可能意味着，理想的高效系统应该接受一定错误率。不过，它仍然需要一条最终的“绿色”分支。某个智能体可以定期创建快照，并在发布前快速完成一轮修复。</p>
+<h3>同步开销</h3>
+<p>有时，多个智能体会修改同一个文件，或者重构同一段代码。我们没有试图彻底杜绝这种情况，也没有为此过度设计复杂方案。我们接受短暂的扰动，让系统在较短时间内自然收敛并稳定下来。</p>
+<p>这会多消耗一些 token，也会造成局部争用，但能让系统整体保持简洁。模型更容易与目标对齐，不会承受过多负担。系统也更容易管理和观察，摩擦更少，全局生产力更高。此外，它还避免了过于复杂的方案。</p>
+<h3>基础设施方面的经验</h3>
+<p>每次多智能体运行都部署在一台资源充足的大型机器上，以避免过早引入分布式系统的复杂性。这种方式非常合适。大多数运行会达到数百个智能体的峰值，通常会让这些机器接近饱和，但不会超出其设计范围。这种架构也便于观察系统指标，并在必要时共享和复制状态。</p>
+<p>限制智能体的 RAM 使用量后，磁盘成为了热点。尤其是在单体项目中，数百个智能体同时编译，会让构建产物产生每秒数 GB 的读写量。这显著影响了运行框架的整体吞吐量，也带来了一个很有意思的经验：项目结构、架构决策和开发体验都能影响 token 与提交吞吐量。原因很简单，处理代码库的过程，例如编译，会占据大部分时间，而不是让智能体把时间主要用于思考和编码。</p>
+<p>通用开发环境中也存在一些限制和低效之处。某些机制在单用户工作区中很合理，或者影响并不明显。但当数百个智能体在一台机器上重复同样的操作时，这些问题就会凸显出来。一个简单的解决办法是为每个智能体提供独立机器。不过，只要重新思考并设计某些基础机制和工具，也可能以较低成本获得显著的效率提升。</p>
+<p>例如，Git 和 Cargo 等许多工具会使用共享锁。这主要是一种简单的并发控制机制。我们能否引入数据库等并发系统中早已成熟的机制，让这些工具同样适用于多智能体系统？所有智能体都有自己的仓库副本，但绝大部分文件和产物都完全相同。更成熟的生产存储系统普遍使用写时复制和去重功能。如果给通常面向“单用户”的系统加入这些简单能力，是否也能轻松获益，而不必构建一套独立基础设施？</p>
+<h3>向智能体明确意图</h3>
+<p>提供给这套多智能体系统的指令非常重要。</p>
+<p>最初，我们没有把指令设计当作首要目标，而是专注于实现稳定且有效的运行框架。不过，指令的重要性很快显现出来。我们本质上仍在与普通编程智能体交互，只是给了它高出多个数量级的时间和算力。这会放大一切，包括欠佳或含糊的指令。</p>
+<p>在初始指令上投入更多时间是合理的。归根结底，智能体仍然是智能体。它们经过训练，会严格遵循你的指令，沿着指定路径前进，不会改变或推翻指令。即使指令本身很糟，它们也是如此。</p>
+<p>我们希望研究项目取得成功，所以会随着项目和运行框架的演进调整初始指令。我们在学习如何构建浏览器，同时也在学习如何运行这套新的多智能体系统。输出中经常会反映出糟糕或不完整的规格。这并不是运行框架本身的问题。运行框架只是在完全照着我们的指令做事。</p>
+<p>下面是浏览器项目中的几个例子：</p>
+<p>最初，指令侧重于实现规格和消除 bug。“实现规格”这类说法过于含糊。智能体会深入处理冷门且很少使用的功能，而不是有判断力地安排优先级。</p>
+<p>我们默认认为，性能应该处于用户可接受的范围内。但后来必须加入明确指令并强制执行超时，智能体才会在性能与其他目标之间取得平衡。</p>
+<p>面对系统中的复杂部分，智能体可能写出存在内存泄漏或会导致死锁的代码。人类会注意到这些问题，但智能体未必总能意识到。我们必须提供明确的、基于进程的资源管理工具，让系统可以平稳恢复，并采取更稳健的防御措施。</p>
+<p>第一版不支持 JavaScript 的简单浏览器最终形成了一套不适合继续演进为完整浏览器的架构。这是初始规格的失败。</p>
+<p>同样，虽然我们告诉智能体这个项目要从头构建浏览器，它们仍然引入了一些本可以自行实现的依赖。有时，它们会把依赖当作临时脚手架，等待后续完成正式实现。这也是指令中的疏漏。后来的一次运行明确规定了依赖理念，以及禁止使用哪些库，从而纠正了这个问题。</p>
+<p>在后来的那次运行中，系统还进行了一次重大重构。项目从单体结构转向许多自包含的 crate。仓库一度处于严重损坏的状态，但多智能体系统在几天内逐渐收敛到可运行的代码。这说明，系统具备强大的协作与智能工作能力。即使整体状态完全损坏，它也能继续推进，而不是进一步恶化或陷入停滞。由于编译等待时间大幅减少，这次运行的吞吐量也达到了此前的数倍。</p>
+<p>架构和指令都很重要。智能体具备强大的工程能力，但无论指令好坏，它们都会一路遵循到底。要在过于狭窄的指标和毫无结构的自由之间找到平衡并不容易。判断哪些内容不言自明，哪些内容必须明确说明，同样很困难。</p>
+<p>这一切都表明，引导、明确和理解意图非常重要。系统规模越大，这件事就越重要。可操控性和可观测性将是值得继续探索的研究方向。</p>
+<h3>优化提示词</h3>
+<p>提示词设计是系统演进过程中的重要部分。</p>
+<p>我们发现，没有必要教模型做它已经知道如何完成的事情。只需告诉它不了解的内容，例如多智能体协作方式，或者与具体领域有关的规则，例如如何运行测试和部署流水线。可以把模型当作一名才华出众的新员工。它懂工程，但还不了解你的特定代码库和工作流程。</p>
+<p>约束比指令更有效。“不得留下 TODO，不得只完成部分实现”比“记得完成实现”效果更好。模型通常默认会做正确的事。约束的作用是划定边界。</p>
+<p>面对高层次或更深入的任务，应避免清单式思维。你可以详细说明自己的意图，但也要记住，一旦给出明确的操作事项，模型就会集中完成这些事项，而不是关注更广的范围。没有列出的事项也会被隐性降低优先级。通常，让模型运用自己的判断力和自主性会更好。</p>
+<p>在说明工作范围的数量时，给出具体数字和区间确实很有帮助。“生成许多任务”通常只会得到少量任务。模型会采用保守默认值，以安全方式满足字面要求。“生成 20 至 100 个任务”则能表达出范围更大、应该更有雄心的意图。我们观察到，这种写法会带来明显不同且更广泛的行为。</p>
+<h3>系统设计经验</h3>
+<p>我们通过研究总结出了一些原则：</p>
+<p><strong>系统应该具有反脆弱性。</strong>同时运行的智能体越多，出现故障的概率也会越高。系统必须能够承受单个智能体失败，并允许其他智能体恢复工作或尝试替代方案。</p>
+<p><strong>经验数据优先于假设驱动。</strong>我们希望根据数据和观察结果调整系统，而不是依据对人类组织或现有系统设计的预设，提前认定系统应该如何工作。</p>
+<p><strong>明确围绕吞吐量设计。</strong>这意味着要在编码工作的其他方面作出取舍。例如，接受较小但稳定的错误率，并在最后执行一次协调修复，而不是要求代码始终 100% 正确，从而大幅降低系统速度。</p>
+<p>这类系统设计正确时，往往简洁而优雅。不过，在探索许多不同方案之前，我们并不知道哪种简单方案真正有效。当前系统设计一直以极低开销运行，并能让 token 吞吐量以有意义的方式线性扩展。此后，这套运行框架不再需要重大迭代。</p>
+<h3>结论</h3>
+<p>品味、判断和方向来自人类，而 AI 则成为强大的力量倍增器，帮助我们快速迭代并探索这项研究。</p>
+<p>这有些类似所谓的“良性”AI 循环。AI 被用于开发 AI。随着模型、智能体和运行框架不断改进，这个过程会反过来推动自身，以越来越快的速度加速。我们塑造工具，工具也塑造我们。</p>
+<p>这项研究与当今一些软件团队的运作方式有一种富有诗意的相似之处。这些模型并未接受过以这种方式工作的明确训练。这说明相关行为可能是自然涌现的，也可能表明这终究是组织软件项目的正确方式。</p>
+<p>我们将继续研究运行时间极长的智能体，并用这些研究发现指导产品未来的发展。</p>
+<p class="meta">归档分类：研究</p>
+<p class="meta">作者：Wilson Lin</p>
+<div class="related">
+<p>让 Composer 适应更长的工作周期</p>
+<p>安全索引大型代码库</p>
+<p>动态发现上下文</p>
+</div>
 </section>
-
-<section class="final">
-  <div class="wrap">
-    <h2>最值得带走的洞见</h2>
-    <div class="takeaways">
-      <div class="take">多智能体系统的核心是责任边界。递归 planner 和独立 worker 比平等协商更稳。</div>
-      <div class="take">吞吐量需要被明确优化。要求每个中间提交完美，会把系统拖回串行模式。</div>
-      <div class="take">可观测性是研究和调参的前提。日志、时间戳和回放能力让团队能发现重复失败模式。</div>
-      <div class="take">提示词是规格。模糊目标、隐含性能要求和依赖边界都会在规模下变成真实工程问题。</div>
-      <div class="take">开发工具链需要重新面向并发。仓库结构、构建缓存、文件锁和磁盘 I/O 会决定 AI 编程系统的上限。</div>
-    </div>
-  </div>
-</section>
-  <script id="airs-digest-theme-script">
+</main>
+<script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;
       const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));

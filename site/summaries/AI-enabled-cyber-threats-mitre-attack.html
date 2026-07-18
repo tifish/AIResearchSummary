@@ -1,273 +1,469 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>我们从绘制一年 AI 赋能网络威胁图谱中学到了什么</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>梳理一整年的 AI 赋能网络威胁，我们发现了什么</title>
 <style>
 :root {
-  --bg: #f7f4ee;
-  --paper: #fffdf8;
-  --ink: #162026;
-  --muted: #5e6a71;
-  --line: #d8d0c3;
-  --soft: #f0eadf;
-  --soft2: #e8f2ee;
-  --soft3: #eef0fb;
-  --soft4: #fbebe5;
-  --deep: #182532;
-  --deep-ink: #f8faf7;
-  --accent-data: #2563eb;
-  --accent-risk: #dc2626;
-  --accent-opportunity: #059669;
-  --accent-conclusion: #7c3aed;
-  --accent-warning: #d97706;
-  --shadow: rgba(31, 41, 55, 0.12);
+  color-scheme: light dark;
+  --bg: #f5f1e8;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #17202a;
+  --muted: #66707b;
+  --line: #d7d0c3;
+  --accent: #1565c0;
+  --accent2: #00856a;
+  --accent3: #d2691e;
+  --accent4: #9b2c64;
+  --risk: #b42318;
+  --opportunity: #087f5b;
+  --conclusion: #5b3cc4;
+  --data: #006d9c;
+  --hero-bg: #15263d;
+  --hero-ink: #f4f7fb;
+  --hero-muted: #b9c8da;
+  --data-bg: #e6f4fa;
+  --risk-bg: #fce9e7;
+  --opportunity-bg: #e5f5ef;
+  --conclusion-bg: #eee9fb;
+  --warm-bg: #fff1df;
+  --cool-bg: #e9f0fb;
+  --hl: #ffe0a3;
+  --hl2: #bdebdc;
+  --shadow: rgba(23, 32, 42, 0.12);
+  --quote-bg: #202f45;
+  --quote-ink: #f3f6fa;
+  --figure-bg: #ece7dc;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #111417;
-    --paper: #191f24;
-    --ink: #eef3f5;
-    --muted: #aeb8bd;
-    --line: #303941;
-    --soft: #20262b;
-    --soft2: #142923;
-    --soft3: #1d2235;
-    --soft4: #321f1b;
-    --deep: #090d12;
-    --deep-ink: #f4f7f8;
-    --accent-data: #60a5fa;
-    --accent-risk: #f87171;
-    --accent-opportunity: #34d399;
-    --accent-conclusion: #a78bfa;
-    --accent-warning: #fbbf24;
-    --shadow: rgba(0, 0, 0, 0.35);
+    --bg: #0e141c;
+    --surface: #151d27;
+    --card: #1b2531;
+    --ink: #e7edf4;
+    --muted: #a8b4c1;
+    --line: #344252;
+    --accent: #62a9ff;
+    --accent2: #3dd7b0;
+    --accent3: #ff9b54;
+    --accent4: #ef78b2;
+    --risk: #ff7b72;
+    --opportunity: #4bddae;
+    --conclusion: #aa91ff;
+    --data: #62c7ed;
+    --hero-bg: #101b2a;
+    --hero-ink: #edf4fc;
+    --hero-muted: #9fb1c5;
+    --data-bg: #132c39;
+    --risk-bg: #351d21;
+    --opportunity-bg: #123128;
+    --conclusion-bg: #28213e;
+    --warm-bg: #35271a;
+    --cool-bg: #18283d;
+    --hl: #59431d;
+    --hl2: #174a3d;
+    --shadow: rgba(0, 0, 0, 0.34);
+    --quote-bg: #0c1724;
+    --quote-ink: #e7eef7;
+    --figure-bg: #1b2430;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #111417;
-  --paper: #191f24;
-  --ink: #eef3f5;
-  --muted: #aeb8bd;
-  --line: #303941;
-  --soft: #20262b;
-  --soft2: #142923;
-  --soft3: #1d2235;
-  --soft4: #321f1b;
-  --deep: #090d12;
-  --deep-ink: #f4f7f8;
-  --accent-data: #60a5fa;
-  --accent-risk: #f87171;
-  --accent-opportunity: #34d399;
-  --accent-conclusion: #a78bfa;
-  --accent-warning: #fbbf24;
-  --shadow: rgba(0, 0, 0, 0.35);
+  --bg: #0e141c;
+  --surface: #151d27;
+  --card: #1b2531;
+  --ink: #e7edf4;
+  --muted: #a8b4c1;
+  --line: #344252;
+  --accent: #62a9ff;
+  --accent2: #3dd7b0;
+  --accent3: #ff9b54;
+  --accent4: #ef78b2;
+  --risk: #ff7b72;
+  --opportunity: #4bddae;
+  --conclusion: #aa91ff;
+  --data: #62c7ed;
+  --hero-bg: #101b2a;
+  --hero-ink: #edf4fc;
+  --hero-muted: #9fb1c5;
+  --data-bg: #132c39;
+  --risk-bg: #351d21;
+  --opportunity-bg: #123128;
+  --conclusion-bg: #28213e;
+  --warm-bg: #35271a;
+  --cool-bg: #18283d;
+  --hl: #59431d;
+  --hl2: #174a3d;
+  --shadow: rgba(0, 0, 0, 0.34);
+  --quote-bg: #0c1724;
+  --quote-ink: #e7eef7;
+  --figure-bg: #1b2430;
 }
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-  line-height: 1.68;
+  font-family: "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.75;
 }
-main { overflow: hidden; }
+a {
+  color: var(--accent);
+}
 .hero {
-  background: var(--deep);
-  color: var(--deep-ink);
-  padding: 64px 7vw 48px;
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+  padding: clamp(3.5rem, 9vw, 7rem) 1.4rem;
 }
-.kicker {
-  color: var(--accent-opportunity);
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0;
+.hero-inner {
+  width: min(1080px, 100%);
+  margin: auto;
 }
-h1 {
-  max-width: 980px;
-  margin: 14px 0 10px;
-  font-size: 42px;
-  line-height: 1.15;
-  letter-spacing: 0;
+.eyebrow {
+  color: var(--accent2);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
-.original {
-  max-width: 860px;
-  color: var(--muted);
-  font-size: 17px;
+.hero h1 {
+  max-width: 850px;
+  margin: 0.55rem 0 0.7rem;
+  font-size: clamp(2.2rem, 6vw, 4.8rem);
+  line-height: 1.12;
 }
-.thesis {
-  margin-top: 30px;
-  max-width: 920px;
-  padding: 20px 24px;
-  border-left: 6px solid var(--accent-conclusion);
-  background: rgba(255,255,255,0.06);
-  font-size: 22px;
+.original-title {
+  max-width: 780px;
+  margin: 0;
+  color: var(--hero-muted);
+  font-family: Georgia, serif;
+  font-size: clamp(1rem, 2.2vw, 1.35rem);
+}
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem 1.4rem;
+  margin-top: 1.5rem;
+  color: var(--hero-muted);
+  font-size: 0.92rem;
+}
+.one-line {
+  max-width: 930px;
+  margin: 2.2rem 0 0;
+  padding-left: 1rem;
+  border-left: 5px solid var(--accent3);
+  font-size: clamp(1.2rem, 2.5vw, 1.7rem);
   line-height: 1.55;
 }
-.metrics {
+.summary {
+  width: min(1100px, calc(100% - 2rem));
+  margin: -2rem auto 5rem;
+}
+.stat-band {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1px;
-  background: var(--line);
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  grid-template-columns: repeat(4, 1fr);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--card);
+  box-shadow: 0 16px 35px var(--shadow);
 }
-.metric {
-  background: var(--paper);
-  padding: 28px 7vw 26px;
+.stat {
+  padding: 1.6rem 1.2rem;
+  border-right: 1px solid var(--line);
 }
-.metric strong {
+.stat:last-child {
+  border-right: 0;
+}
+.stat strong {
   display: block;
-  color: var(--accent-data);
-  font-size: 34px;
-  line-height: 1.1;
+  color: var(--data);
+  font-size: clamp(1.7rem, 4vw, 2.65rem);
+  line-height: 1.15;
 }
-.metric span {
+.stat span {
   color: var(--muted);
-  font-size: 14px;
+  font-size: 0.9rem;
 }
 .split {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 36px;
-  padding: 56px 7vw;
-  background: var(--paper);
+  grid-template-columns: 0.92fr 1.08fr;
+  gap: 2rem;
+  margin-top: 4rem;
+  align-items: stretch;
 }
-.split h2, .timeline h2, .table-zone h2, .takeaways h2 {
-  margin: 0 0 14px;
-  font-size: 28px;
+.split h2,
+.timeline h2,
+.takeaways h2 {
+  margin-top: 0;
+  font-size: clamp(1.65rem, 3vw, 2.4rem);
   line-height: 1.25;
-  letter-spacing: 0;
 }
-.panel {
-  padding: 24px;
-  border-left: 6px solid var(--accent-risk);
-  background: var(--soft4);
+.question-panel {
+  padding: 2rem;
+  background: var(--warm-bg);
+  border-top: 7px solid var(--accent3);
+  border-radius: 4px 22px 4px 22px;
 }
-.panel.alt {
-  border-left-color: var(--accent-opportunity);
-  background: var(--soft2);
+.answer-panel {
+  padding: 2rem;
+  background: var(--cool-bg);
+  border-left: 7px solid var(--accent);
 }
-.panel p, .timeline p, .table-zone p, .takeaways p { margin: 8px 0 0; }
-.insight-strip {
-  padding: 32px 7vw;
-  background: var(--soft3);
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  display: grid;
-  grid-template-columns: 180px 1fr;
-  gap: 28px;
-  align-items: center;
-}
-.insight-label {
-  color: var(--accent-conclusion);
+.mark-data {
+  background: var(--hl);
+  color: var(--ink);
+  padding: 0.05em 0.28em;
+  border-radius: 0.3em;
   font-weight: 800;
-  font-size: 15px;
 }
-.insight-strip blockquote {
-  margin: 0;
-  font-size: 24px;
-  line-height: 1.5;
+.mark-shift {
+  background: var(--hl2);
+  color: var(--ink);
+  padding: 0.05em 0.28em;
+  border-radius: 0.3em;
+  font-weight: 800;
 }
-.timeline {
-  padding: 56px 7vw;
-  background: var(--soft);
+.risk-flow {
+  margin: 4rem calc(50% - 50vw);
+  padding: 3.5rem max(1rem, calc(50vw - 550px));
+  background: var(--quote-bg);
+  color: var(--quote-ink);
+}
+.risk-flow h2 {
+  margin-top: 0;
+  color: var(--accent3);
+  font-size: clamp(1.7rem, 3vw, 2.5rem);
 }
 .flow {
   display: grid;
-  gap: 18px;
-  margin-top: 24px;
+  grid-template-columns: 1fr auto 1fr auto 1fr;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 2rem;
 }
-.step {
+.flow-step {
+  min-height: 155px;
+  padding: 1.35rem;
+  border: 1px solid var(--accent);
+  border-radius: 16px;
+}
+.flow-step:nth-child(3) {
+  border-color: var(--accent2);
+}
+.flow-step:nth-child(5) {
+  border-color: var(--accent4);
+}
+.flow-step b {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 1.12rem;
+}
+.arrow {
+  color: var(--accent3);
+  font-size: 1.7rem;
+  font-weight: 900;
+}
+.timeline {
+  margin-top: 4rem;
+}
+.timeline-row {
   display: grid;
-  grid-template-columns: 44px 1fr;
-  gap: 18px;
-  align-items: start;
+  grid-template-columns: 110px 1fr;
+  gap: 1.3rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--line);
 }
-.badge {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: var(--accent-warning);
-  color: var(--deep);
-  font-weight: 800;
-}
-.step-body {
-  padding-bottom: 18px;
+.timeline-row:last-child {
   border-bottom: 1px solid var(--line);
 }
-.step-body strong { color: var(--accent-risk); }
-.table-zone {
-  padding: 56px 7vw;
-  background: var(--paper);
+.timeline-tag {
+  color: var(--accent4);
+  font-weight: 900;
 }
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-  overflow: hidden;
-  box-shadow: 0 10px 30px var(--shadow);
+.timeline-row:nth-child(3) .timeline-tag {
+  color: var(--risk);
 }
-th {
-  text-align: left;
-  background: var(--deep);
-  color: var(--deep-ink);
-  padding: 14px 16px;
+.timeline-row:nth-child(4) .timeline-tag {
+  color: var(--opportunity);
 }
-td {
-  padding: 15px 16px;
-  border-bottom: 1px solid var(--line);
-  background: var(--paper);
-  vertical-align: top;
+.insight-strip {
+  margin-top: 4rem;
+  padding: 2.2rem;
+  background: var(--conclusion-bg);
+  border: 2px solid var(--conclusion);
+  border-radius: 28px 4px 28px 4px;
 }
-td:nth-child(2) { color: var(--accent-data); font-weight: 700; }
-td:nth-child(3) { color: var(--accent-risk); }
-.dark-band {
-  padding: 48px 7vw;
-  background: var(--deep);
-  color: var(--deep-ink);
-}
-.dark-band h2 {
-  margin: 0 0 12px;
-  font-size: 28px;
-}
-.dark-band p {
-  max-width: 900px;
+.insight-strip blockquote {
   margin: 0;
-  color: var(--deep-ink);
+  color: var(--conclusion);
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  font-weight: 800;
+  line-height: 1.5;
+}
+.insight-strip p {
+  margin-bottom: 0;
 }
 .takeaways {
-  padding: 56px 7vw 70px;
-  background: var(--soft2);
+  margin-top: 4rem;
 }
 .mosaic {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 16px;
-  margin-top: 24px;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 1rem;
 }
 .tile {
-  padding: 22px;
-  background: var(--paper);
-  border-top: 5px solid var(--accent-conclusion);
-  box-shadow: 0 8px 24px var(--shadow);
+  padding: 1.6rem;
+  border-radius: 18px;
 }
-.tile:nth-child(2) { border-top-color: var(--accent-risk); }
-.tile:nth-child(3) { border-top-color: var(--accent-data); }
-.tile:nth-child(4) { border-top-color: var(--accent-opportunity); }
-.tile strong {
+.tile:nth-child(1) {
+  grid-row: span 2;
+  background: var(--data-bg);
+  border-left: 6px solid var(--data);
+}
+.tile:nth-child(2) {
+  background: var(--risk-bg);
+  border-top: 6px solid var(--risk);
+}
+.tile:nth-child(3) {
+  background: var(--opportunity-bg);
+  border-bottom: 6px solid var(--opportunity);
+}
+.tile:nth-child(4) {
+  grid-column: 1 / -1;
+  background: var(--conclusion-bg);
+  border-left: 6px solid var(--conclusion);
+}
+.tile b {
   display: block;
-  margin-bottom: 8px;
-  font-size: 18px;
+  margin-bottom: 0.45rem;
+  font-size: 1.08rem;
 }
-@media (max-width: 820px) {
-  h1 { font-size: 32px; }
-  .metrics, .split, .insight-strip, .mosaic { grid-template-columns: 1fr; }
-  .metric { padding: 22px 7vw; }
-  table { font-size: 14px; }
+#translation {
+  width: min(790px, calc(100% - 2rem));
+  margin: 0 auto 5rem;
+  padding-top: 4rem;
+  border-top: 3px solid var(--ink);
+}
+#translation h2 {
+  margin: 0 0 2rem;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  line-height: 1.2;
+}
+#translation h3 {
+  margin: 3.5rem 0 1rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 3px solid var(--accent2);
+  font-size: 1.55rem;
+  line-height: 1.35;
+}
+#translation p,
+#translation li {
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-size: 1.06rem;
+}
+#translation p {
+  margin: 1.15rem 0;
+}
+#translation ul {
+  padding-left: 1.4rem;
+}
+#translation li {
+  margin: 0.8rem 0;
+}
+.lead-question {
+  padding: 1.2rem 1.4rem;
+  background: var(--data-bg);
+  border-left: 5px solid var(--data);
+  font-size: 1.15rem;
+}
+.source-figure {
+  min-height: 180px;
+  margin: 2rem 0 3rem;
+  padding: 0;
+  overflow: hidden;
+  background: var(--figure-bg);
+  border-radius: 14px;
+}
+.source-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.source-figure figcaption {
+  padding: 0.85rem 1rem;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+@media (max-width: 760px) {
+  .stat-band {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .stat:nth-child(2) {
+    border-right: 0;
+  }
+  .stat:nth-child(-n+2) {
+    border-bottom: 1px solid var(--line);
+  }
+  .split,
+  .mosaic {
+    grid-template-columns: 1fr;
+  }
+  .tile:nth-child(1) {
+    grid-row: auto;
+  }
+  .tile:nth-child(4) {
+    grid-column: auto;
+  }
+  .flow {
+    grid-template-columns: 1fr;
+  }
+  .arrow {
+    transform: rotate(90deg);
+    justify-self: center;
+  }
+  .timeline-row {
+    grid-template-columns: 1fr;
+    gap: 0.3rem;
+  }
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+--bg: #f5f1e8;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #17202a;
+  --muted: #66707b;
+  --line: #d7d0c3;
+  --accent: #1565c0;
+  --accent2: #00856a;
+  --accent3: #d2691e;
+  --accent4: #9b2c64;
+  --risk: #b42318;
+  --opportunity: #087f5b;
+  --conclusion: #5b3cc4;
+  --data: #006d9c;
+  --hero-bg: #15263d;
+  --hero-ink: #f4f7fb;
+  --hero-muted: #b9c8da;
+  --data-bg: #e6f4fa;
+  --risk-bg: #fce9e7;
+  --opportunity-bg: #e5f5ef;
+  --conclusion-bg: #eee9fb;
+  --warm-bg: #fff1df;
+  --cool-bg: #e9f0fb;
+  --hl: #ffe0a3;
+  --hl2: #bdebdc;
+  --shadow: rgba(23, 32, 42, 0.12);
+  --quote-bg: #202f45;
+  --quote-ink: #f3f6fa;
+  --figure-bg: #ece7dc;
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -399,125 +595,152 @@ td:nth-child(3) { color: var(--accent-risk); }
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/news/AI-enabled-cyber-threats-mitre-attack" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<header class="hero">
+<div class="hero-inner">
+<div class="eyebrow">Anthropic · Policy · 2026</div>
+<h1>梳理一整年的 AI 赋能网络威胁，我们发现了什么</h1>
+<p class="original-title" lang="en">What we learned mapping a year’s worth of AI-enabled cyber threats</p>
+<div class="meta">
+<span>来源：Anthropic</span>
+<span>发布日期：2026 年 6 月 3 日</span>
+<span><a href="https://www.anthropic.com/news/AI-enabled-cyber-threats-mitre-attack">查看英文原文</a></span>
+</div>
+<p class="one-line">一句话总括：研究用真实滥用案例证明，AI 正把高难度的入侵后操作和攻击链编排交给模型完成，使传统威胁分级方法与 MITRE ATT&amp;CK 的覆盖范围同时面临挑战。</p>
+</div>
+</header>
 <main>
-  <section class="hero">
-    <div class="kicker">Anthropic · Policy · Jun 3, 2026</div>
-    <h1>我们从绘制一年 AI 赋能网络威胁图谱中学到了什么</h1>
-    <div class="original">What we learned mapping a year’s worth of AI-enabled cyber threats</div>
-    <p class="thesis">一句话总括：这项分析把 AI 网络滥用从笼统担忧变成了可观察的攻击链变化，核心发现是攻击者正在把模型从“写代码工具”推进成“低人工介入的攻击编排层”。</p>
-  </section>
-
-  <section class="metrics">
-    <div class="metric"><strong>832</strong><span>个被封禁账号进入详细映射样本</span></div>
-    <div class="metric"><strong>67.3%</strong><span>使用 AI 编写恶意软件或准备攻击</span></div>
-    <div class="metric"><strong>56%</strong><span>后 6 个月达到中高风险</span></div>
-    <div class="metric"><strong>100</strong><span>代理式间谍行动获得最高风险分</span></div>
-  </section>
-
-  <section class="split">
-    <div>
-      <h2>AI 的危险不只在入口阶段</h2>
-      <p>最常见的用途仍是攻击准备。560 个账号用 AI 编写恶意软件，占样本的 67.3%。</p>
-      <p>但更重要的变化发生在入侵之后。账号发现增加 8.9%，横向移动已有 54 个账号使用 AI 辅助。攻击者开始把 AI 用在更需要判断、耐心和操作能力的位置。</p>
-    </div>
-    <div class="panel">
-      <h2>这改变了技能门槛</h2>
-      <p>过去，深入受害网络、寻找账号、升级权限，通常需要更高技术能力。现在，低技能攻击者也可以让模型承担部分复杂操作。</p>
-      <p>因此，AI 不是简单提高效率。它在扩大能执行高级步骤的人群。</p>
-    </div>
-  </section>
-
-  <section class="insight-strip">
-    <div class="insight-label">关键判断</div>
-    <blockquote>真正需要警惕的不是攻击者用了多少技术，而是他们是否让模型把攻击步骤串起来，并减少人的介入。</blockquote>
-  </section>
-
-  <section class="timeline">
-    <h2>风险信号正在迁移</h2>
-    <p>Anthropic 的样本覆盖 2025 年 3 月至 2026 年 3 月。前后两个 6 个月的对比显示，AI 滥用正在从浅层任务转向操作性更强的阶段。</p>
-    <div class="flow">
-      <div class="step">
-        <div class="badge">1</div>
-        <div class="step-body"><strong>前 6 个月：</strong>33% 的行为主体被评为中等风险或更高。传统指标仍能提供一些参考。</div>
+<section aria-labelledby="summary-title" class="summary">
+<div aria-label="关键数字" class="stat-band">
+<div class="stat"><strong>832</strong><span>个可供深入评估的封禁账号</span></div>
+<div class="stat"><strong>67.3%</strong><span>使用 AI 编写恶意软件</span></div>
+<div class="stat"><strong>33% → 56%</strong><span>中等及以上风险占比变化</span></div>
+<div class="stat"><strong>100</strong><span>代理式间谍行动的风险得分</span></div>
+</div>
+<div class="split">
+<div class="question-panel">
+<h2 id="summary-title">AI 把攻击能力推向了哪里？</h2>
+<p>最常见的用途仍是攻击准备。<span class="mark-data">560 个账号</span>用 AI 编写恶意软件，占全部样本的 <span class="mark-data">67.3%</span>。</p>
+<p>但更值得警惕的变化发生在入侵之后。使用 AI 进行账号发现的比例上升 <span class="mark-shift">8.9%</span>。AI 辅助网络钓鱼则下降 <span class="mark-data">8.6%</span>。</p>
+<p><strong>结论：</strong>AI 不再只帮助攻击者敲开大门。它正越来越多地帮助攻击者在网络内部行动。</p>
+</div>
+<div class="answer-panel">
+<h2>复杂技术不再只属于高手</h2>
+<p>横向移动需要攻击者深入已被攻破的网络。样本中有 <span class="mark-shift">54 个账号</span>借助 AI 完成这类操作，占 <span class="mark-shift">6.5%</span>。</p>
+<p>中等及以上风险攻击者的占比从前半年的 <strong>33%</strong> 升至后半年的 <strong>56%</strong>。增幅约为 <strong>1.7 倍</strong>。</p>
+<p><strong>洞见：</strong>过去需要丰富技术经验的入侵后能力，现在可以由 AI 代替较低技能的操作者执行。</p>
+</div>
+</div>
+<div class="risk-flow">
+<h2>真正的风险来自攻击链编排</h2>
+<p>平台类型和技术数量都没有表现出可靠的风险相关性。更危险的攻击者会在模型周围搭建一套执行架构。</p>
+<div class="flow">
+<div class="flow-step"><b>离散任务</b>发现账号、利用漏洞、窃取凭据，各自原本需要单独操作。</div>
+<div class="arrow">→</div>
+<div class="flow-step"><b>代理式编排</b>模型按顺序连接任务，并根据现场结果决定下一步。</div>
+<div class="arrow">→</div>
+<div class="flow-step"><b>低人工介入</b>攻击者只在少数关键节点参与，攻击可以持续自主推进。</div>
+</div>
+<p><strong>结论：</strong>风险判断的重点应从“攻击者用了多少技术”转向“模型能以多高的自主性串联攻击阶段”。</p>
+</div>
+<div class="timeline">
+<h2>旧的风险信号为何逐渐失效</h2>
+<div class="timeline-row">
+<div class="timeline-tag">旧信号</div>
+<div>安全团队过去会查看攻击者用了多少种技术，以及使用了 Claude Code、API 还是聊天界面。</div>
+</div>
+<div class="timeline-row">
+<div class="timeline-tag">数据反证</div>
+<div>最低技能的攻击者平均使用约 <strong>16 种</strong>技术，最高技能者约使用 <strong>20 种</strong>。差距很小，所用平台也与风险等级无关。</div>
+</div>
+<div class="timeline-row">
+<div class="timeline-tag">暂时信号</div>
+<div>AI 被用在账号发现、横向移动和权限提升等高要求阶段时，通常意味着更高风险。但更多普通攻击者也正在进入这些阶段。</div>
+</div>
+<div class="timeline-row">
+<div class="timeline-tag">持久信号</div>
+<div>更可靠的区别在于模型外围的脚手架。高风险架构能把不同攻击步骤串起来，并以极少的人工输入执行。</div>
+</div>
+</div>
+<div class="insight-strip">
+<blockquote>MITRE ATT&amp;CK 能描述攻击者做了什么，却还不能充分表达 AI 如何自主组织并推进整条攻击链。</blockquote>
+<p>2025 年 11 月被阻断的一次国家支持网络间谍行动使用了 13 类战术下的 30 种技术。按技术数量看，它与许多中等风险攻击者相近。但 Anthropic 的评分方法给出了最高的 <strong>100 分</strong>。缺失的关键维度正是代理式编排与自主决策。</p>
+</div>
+<div class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="mosaic">
+<div class="tile">
+<b>AI 的影响正在向攻击后段深入</b>
+        恶意软件编写仍是最常见用途，但账号发现、横向移动和权限提升更能体现风险升级。AI 已经开始替操作者完成真正复杂的网络内行动。
       </div>
-      <div class="step">
-        <div class="badge">2</div>
-        <div class="step-body"><strong>后 6 个月：</strong>中高风险比例升至 56%，约为原来的 1.7 倍。更多攻击者开始使用 AI 处理深入攻击链的任务。</div>
+<div class="tile">
+<b>技能水平不再等于攻击能力</b>
+        模型可以替低技能攻击者完成高技术任务。以操作者经验推断最终威胁，越来越容易低估风险。
       </div>
-      <div class="step">
-        <div class="badge">3</div>
-        <div class="step-body"><strong>趋势：</strong>AI 辅助钓鱼下降 8.6%，AI 辅助账号发现上升 8.9%。这说明风险不再集中于“如何进入系统”，而是转向“进入后做什么”。</div>
+<div class="tile">
+<b>工具界面不是有效分级依据</b>
+        Claude Code、API 或聊天界面与攻击者风险等级没有明显相关性。关键在于模型被放进了怎样的执行架构。
       </div>
-    </div>
-  </section>
-
-  <section class="table-zone">
-    <h2>旧指标为什么不够用了</h2>
-    <p>安全团队过去常看技术数量、工具界面和攻击者技能。文章显示，这些指标在 AI 参与后会低估真实风险。</p>
-    <table>
-      <thead>
-        <tr>
-          <th>判断方法</th>
-          <th>文章中的发现</th>
-          <th>带来的问题</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>看使用了多少种技术</td>
-          <td>低技能攻击者平均约 16 种，高技能攻击者约 20 种</td>
-          <td>差距太小，难以区分真实威胁</td>
-        </tr>
-        <tr>
-          <td>看使用 Claude Code、API 还是聊天界面</td>
-          <td>平台类型与风险等级没有明显相关</td>
-          <td>接口形式不能代表攻击能力</td>
-        </tr>
-        <tr>
-          <td>看 AI 用在攻击链的哪个阶段</td>
-          <td>账号发现、横向移动、权限提升更能提示高风险</td>
-          <td>这个信号也在变弱，因为更多人正转向这些阶段</td>
-        </tr>
-        <tr>
-          <td>看模型外部脚手架</td>
-          <td>高风险主体会搭建能串联阶段的架构</td>
-          <td>这是更耐用的风险识别线索</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="dark-band">
-    <h2>MITRE ATT&CK 需要补上代理式行为</h2>
-    <p>2025 年 11 月被 Anthropic 阻断的一次国家支持型网络间谍行动，在 MITRE ATT&CK 中映射为 13 类战术、30 项技术，看起来只接近许多中风险主体。但该行动让 Claude Code 执行命令、利用漏洞、窃取凭证并作出战术决策，按 Anthropic 方法评分为 100。差异说明，现有框架尚未充分表达“模型编排攻击链”的危险。</p>
-  </section>
-
-  <section class="split">
-    <div class="panel alt">
-      <h2>对防守方的机会</h2>
-      <p>文章没有只停在风险描述。Anthropic 表示，这些发现已用于模型安全防护，例如识别和阻断恶意软件开发、大规模数据外传等活动。</p>
-      <p>它还与 Verizon DBIR 和 MITRE 的讨论相连，目标是让安全框架能描述 AI 代理带来的新行为。</p>
-    </div>
-    <div>
-      <h2>对读者的洞见</h2>
-      <p>AI 影响网络安全的核心，不是让每个步骤都变得更快。更大的变化是攻击链可以被自动串接。</p>
-      <p>当模型能实时选择下一步，攻击者的个人技能就不再是主要上限。防守方需要观察系统架构，而不只是观察单次提示或单项技术。</p>
-    </div>
-  </section>
-
-  <section class="takeaways">
-    <h2>最值得带走的洞见</h2>
-    <div class="mosaic">
-      <div class="tile"><strong>AI 正深入攻击链后半段。</strong>从钓鱼到账号发现的转移，说明攻击者正在把模型用于入侵后的操作。</div>
-      <div class="tile"><strong>风险评估不能只数技术。</strong>30 项技术可能低估代理式攻击，16 项技术也可能来自低技能但被 AI 放大的主体。</div>
-      <div class="tile"><strong>最强信号是编排能力。</strong>能否把步骤串联、实时决策、减少人工输入，比使用哪个界面更重要。</div>
-      <div class="tile"><strong>安全框架需要更新。</strong>MITRE ATT&CK 若不能表达代理式编排，就会低估新型 AI 攻击的危险。</div>
-    </div>
-  </section>
+<div class="tile">
+<b>安全框架需要记录“如何编排”</b>
+        技术清单不足以覆盖实时决策、自主执行和攻击链串联。防御体系需要把这些代理行为纳入分类、检测与风险评分。
+      </div>
+</div>
+</div>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<figure class="source-figure" data-source-image="0"><img alt="What we learned mapping a year’s worth of AI-enabled cyber threats" decoding="async" height="1000" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/802260d34a0653f23fd4944fae43064df367aa44-1000x1000.svg" width="1000"/></figure>
+<p class="lead-question">AI 正在改变网络攻击的性质和实施方式。面对这种变化，安全社区沿用的技术分类与分析框架还能发挥多大作用？</p>
+<p>我们试图在一份新报告中回答这个问题。我们研究了 2025 年 3 月至 2026 年 3 月间因恶意网络活动而被封禁的 832 个账号，并将其行为映射到 MITRE ATT&amp;CK。MITRE ATT&amp;CK 是一个长期使用的数据库，记录网络攻击者采用的战术与技术。我们已在 Verizon 的《2026 年数据泄露调查报告》（Data Breach Investigations Report，DBIR）中发布了部分结果。本文将提供更详细的分析。</p>
+<p>这 832 个案例只是同期全部封禁账号的一部分。我们选择它们，是因为掌握的细节足以支持对攻击技术的深入评估。</p>
+<p>分析得出了三个主要结论：</p>
+<ul>
+<li>恶意行为者正在以更具危险性的方式使用 AI。更具体地说，威胁行为者正把 AI 用于网络行动中更靠后、也更复杂的阶段。</li>
+<li>网络攻击正变得更加自主。AI 可以把攻击的多个环节串联起来。因此，过去区分高风险和低风险行为者的方法已经不再那么有效。</li>
+<li>MITRE ATT&amp;CK 框架尚未充分覆盖那些让 AI 赋能攻击者变得如此危险的工具和活动。</li>
+</ul>
+<p>下面将逐一概述这些结论。更长的分析可以在我们的 Frontier Red Team 博客中阅读。</p>
+<h3>AI 如何让攻击者变得更加危险</h3>
+<p>在我们的数据库中，最常见的 AI 赋能活动与网络攻击的准备工作有关，例如编写恶意软件。研究涉及的 832 个账号中，有 560 个将 AI 用于这一目的，占 67.3%。使用 AI 处理更复杂活动的行为者相对较少。例如，832 个行为者中有 54 个借助 AI 进行“横向移动”，占 6.5%。横向移动是指在已经被攻破的网络内部深入活动。</p>
+<p>我们发现的证据与这样一种判断相符：AI 正在帮助攻击者提高威胁等级。在分析期的前六个月，按我们的风险评分系统，有 33% 的行为者被归为中等或更高风险。到了后六个月，这一比例升至 56%，约为原来的 1.7 倍。</p>
+<p>在整个研究期内，攻击者使用 AI 的重点发生了变化。它从获取系统初始访问权的技术，转向进入系统后实施的活动。例如，使用 AI 发现账号的比例上升了 8.9%。账号发现是指识别已被攻破环境中的有效账号。与此同时，AI 辅助网络钓鱼的比例下降了 8.6%。网络钓鱼是获取系统访问权的常见技术。这说明，攻击者正越来越多地把 AI 用在攻击生命周期的更深处。</p>
+<p>过去，这类“入侵后”技术只有具备相应专业知识的行为者才能使用。我们的调查显示，如今可以让 AI 代替技术水平较低的行为者完成这些活动。</p>
+<h3>为什么更难评估攻击者的威胁等级</h3>
+<p>安全团队如何评估网络攻击者的风险等级？传统方法会参考攻击者使用了多少种不同技术，以及他们采用了哪些工具或界面。但我们的分析表明，这些信号已经无法准确反映特定威胁行为者的风险水平。</p>
+<p>现在，AI 可以代替行为者执行高技术任务。因此，威胁行为者的技能与其使用的技术数量几乎没有相关性。数据集中技能最低的行为者平均使用约 16 种不同技术，技能最高者平均使用约 20 种。同样，具体使用的平台也与风险等级无关，无论是 Claude Code、API 还是聊天界面。</p>
+<p>高风险行为者的区别往往在于，他们会在攻击生命周期的哪些位置应用 AI。例如，他们会把 AI 集中用于操作要求更高的技术。这些技术通常需要投入大量时间，需要持续监督，或者要求实时决策。账号发现、横向移动和权限提升都属于这类技术。他们不会只把 AI 用于获取系统初始访问权的任务。</p>
+<p>不过，就连这个信号也正在失去区分能力。正如上一节所述，随着更多行为者被归为高风险，整体攻击者群体也在朝这些操作型技术发展。更持久的区别在于攻击者围绕模型搭建了什么样的脚手架。高风险行为者设计的架构可以让模型串联网络攻击的各个独立阶段，并在极少人工输入的情况下执行这些阶段。</p>
+<h3>为什么安全框架需要改变</h3>
+<p>许多用于区分最高风险行为者的行为，尚未被 MITRE ATT&amp;CK 框架列为攻击者技术。这些行为包括使用 AI 依次编排攻击链中的步骤，实时决定下一步行动，以及在无人干预的情况下执行操作。</p>
+<p>以我们在 2025 年 11 月阻断的一次国家支持网络间谍行动为例。在这起事件中，一名恶意行为者操纵 Claude Code，试图在极少人工干预的情况下渗透世界各地的目标。映射到 MITRE ATT&amp;CK 框架后可以看到，该行为者在 13 类战术下使用了 30 种技术。这个数量与数据集中许多中等风险行为者相当。显然，只关注其使用的技术数量，会低估它真正的危险程度。相比之下，用我们的风险评分方法评估这次攻击，结果是最高的 100 分。</p>
+<p>在这次攻击中，模型以自主代理的方式工作。它执行命令，利用漏洞，窃取凭据，并作出战术决策。只有少数关键时刻需要人工输入。ATT&amp;CK 目前没有用于描述这类代理式编排的 ID。然而，随着 AI 代理能力增强，我们预计未来会越来越多地看到这类行为。</p>
+<h3>展望未来</h3>
+<p>这项分析的发现为我们在模型中构建安全防护措施提供了参考。例如，我们已经在能力最强的模型上开发并部署网络安全防护机制，用于检测和阻止本文发现的部分活动，包括开发恶意软件和大规模窃取数据。继与 Verizon 合作之后，我们也在与 MITRE 讨论 ATT&amp;CK 框架可以如何演进，从而纳入我们观察到的 AI 赋能行为。</p>
+<p>前沿模型正在迅速改变攻击者和防御者可以使用的工具。我们致力于帮助防御者提前应对不断演变的战术，并优先把最强大的工具交到防御者手中。我们将继续分享从 Project Glasswing、本文所用数据集以及其他网络安全活动中得到的经验。</p>
+<p>我们还在 Red 博客文章中分享了一项交互式可视化，展示攻击者使用的技术，帮助防御者领先应对 AI 赋能的威胁。</p>
+</section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

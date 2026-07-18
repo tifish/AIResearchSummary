@@ -1,121 +1,88 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
 <title>Anthropic 经济指数报告：经济原语</title>
 <style>
-:root{
-  --bg:#f7f4ee;
-  --ink:#1b1d21;
-  --muted:#60656f;
-  --line:#d9d2c7;
-  --card:#ffffff;
-  --hero:#17202a;
-  --hero-ink:#f7f4ee;
-  --data:#2563eb;
-  --risk:#dc2626;
-  --opp:#059669;
-  --conclusion:#7c3aed;
-  --accent:#0f766e;
-  --accent2:#b45309;
-  --accent3:#be123c;
-  --hl:#e9f0ff;
-  --hl2:#fff1d6;
-  --hl3:#e7f8ef;
-  --hl4:#f3e8ff;
-  --soft:#fdfaf4;
-  --table:#f1f5f9;
+:root,
+:root[data-theme="light"]{
+  --bg:#f5f1e8;--surface:#fffdf8;--ink:#18211f;--muted:#66706b;--line:#d8d3c8;
+  --accent:#245bdb;--accent2:#07866d;--accent3:#c15423;--accent4:#7a48b4;
+  --data-bg:#e5efff;--risk-bg:#ffe9df;--chance-bg:#dcf5ec;--conclusion-bg:#eee5fb;
+  --dark-panel:#172724;--dark-panel-ink:#f3faf7;--hl:#fff0a8;--hl2:#bfeede;
+  --quote-bg:#fff4d7;--translation-bg:#fffdf9;--caption-bg:#ede9df;
+  --shadow:0 14px 35px rgba(36,43,39,.10);
 }
-@media (prefers-color-scheme: dark){
-  :root{
-    --bg:#101316;
-    --ink:#eceff3;
-    --muted:#a7adb7;
-    --line:#343a42;
-    --card:#171b21;
-    --hero:#05080c;
-    --hero-ink:#f2f5f8;
-    --data:#60a5fa;
-    --risk:#fb7185;
-    --opp:#34d399;
-    --conclusion:#a78bfa;
-    --accent:#2dd4bf;
-    --accent2:#f59e0b;
-    --accent3:#fb7185;
-    --hl:#152238;
-    --hl2:#302513;
-    --hl3:#10251c;
-    --hl4:#241936;
-    --soft:#17130d;
-    --table:#151b23;
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1514;--surface:#17201e;--ink:#e8efec;--muted:#a4b0aa;--line:#34413d;
+    --accent:#77a6ff;--accent2:#43d5b1;--accent3:#ff9368;--accent4:#c59aef;
+    --data-bg:#172943;--risk-bg:#3b211c;--chance-bg:#15342c;--conclusion-bg:#2d2340;
+    --dark-panel:#09100f;--dark-panel-ink:#edf7f3;--hl:#725c12;--hl2:#145d4d;
+    --quote-bg:#382e16;--translation-bg:#131b19;--caption-bg:#242e2b;
+    --shadow:0 14px 35px rgba(0,0,0,.28);
   }
 }
 :root[data-theme="dark"]{
-  --bg:#101316;
-  --ink:#eceff3;
-  --muted:#a7adb7;
-  --line:#343a42;
-  --card:#171b21;
-  --hero:#05080c;
-  --hero-ink:#f2f5f8;
-  --data:#60a5fa;
-  --risk:#fb7185;
-  --opp:#34d399;
-  --conclusion:#a78bfa;
-  --accent:#2dd4bf;
-  --accent2:#f59e0b;
-  --accent3:#fb7185;
-  --hl:#152238;
-  --hl2:#302513;
-  --hl3:#10251c;
-  --hl4:#241936;
-  --soft:#17130d;
-  --table:#151b23;
+  --bg:#0f1514;--surface:#17201e;--ink:#e8efec;--muted:#a4b0aa;--line:#34413d;
+  --accent:#77a6ff;--accent2:#43d5b1;--accent3:#ff9368;--accent4:#c59aef;
+  --data-bg:#172943;--risk-bg:#3b211c;--chance-bg:#15342c;--conclusion-bg:#2d2340;
+  --dark-panel:#09100f;--dark-panel-ink:#edf7f3;--hl:#725c12;--hl2:#145d4d;
+  --quote-bg:#382e16;--translation-bg:#131b19;--caption-bg:#242e2b;
+  --shadow:0 14px 35px rgba(0,0,0,.28);
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65}
-main{max-width:1120px;margin:0 auto}
-.hero{background:var(--hero);color:var(--hero-ink);padding:56px 28px 42px;border-bottom:6px solid var(--accent)}
-.kicker{color:var(--accent);font-weight:700;letter-spacing:.08em;font-size:13px;text-transform:uppercase}
-h1{font-size:clamp(30px,5vw,58px);line-height:1.05;margin:14px 0 10px;letter-spacing:0}
-.original{color:var(--muted);font-size:18px}
-.lede{max-width:820px;font-size:22px;margin-top:28px}
-.band{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);margin:0 18px;transform:translateY(-18px)}
-.metric{background:var(--card);padding:22px}
-.metric b{display:block;font-size:30px;color:var(--data)}
-.metric span{font-size:14px;color:var(--muted)}
-.split{display:grid;grid-template-columns:1.1fr .9fr;gap:28px;padding:34px 28px}
-.split h2,.flow h2,.table-wrap h2,.coverage h2,.takeaways h2{font-size:26px;line-height:1.2;margin:0 0 14px}
-.panel{border-left:5px solid var(--opp);padding-left:18px}
-.callout{background:var(--hl2);border-top:4px solid var(--accent2);padding:22px;font-size:18px}
-.flow{background:var(--soft);padding:38px 28px}
-.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:18px}
-.step{padding:18px;border-top:5px solid var(--conclusion);background:var(--card)}
-.step strong{display:block;color:var(--conclusion);margin-bottom:8px}
-.table-wrap{padding:38px 28px;background:var(--table)}
-table{width:100%;border-collapse:collapse;background:var(--card);overflow:hidden}
-th,td{padding:15px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
-th{color:var(--muted);font-size:14px}
-td:first-child{font-weight:700}
-.coverage{padding:38px 28px}
-.ribbon{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.note{padding:22px;background:var(--hl);border-left:6px solid var(--data)}
-.note.risk{background:var(--hl4);border-color:var(--risk)}
-.quote{margin:34px 0 0;padding:24px 28px;background:var(--hero);color:var(--hero-ink);font-size:22px;border-left:8px solid var(--opp)}
-.takeaways{padding:40px 28px 54px;background:var(--card)}
-.mosaic{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
-.tile{min-height:150px;padding:18px;border:1px solid var(--line);background:var(--hl3)}
-.tile:nth-child(2){background:var(--hl)}
-.tile:nth-child(3){background:var(--hl2)}
-.tile:nth-child(4){background:var(--hl4)}
-.tile:nth-child(5){background:var(--soft)}
-.tile b{display:block;color:var(--accent3);margin-bottom:8px}
-@media (max-width:820px){
-  .band,.steps,.ribbon,.mosaic,.split{grid-template-columns:1fr}
-  .hero{padding:42px 20px 34px}
-  .band{margin:0 12px;transform:none}
-  .split,.flow,.table-wrap,.coverage,.takeaways{padding:30px 20px}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;line-height:1.78}
+main{max-width:1180px;margin:auto;padding:28px 22px 80px}
+.hero{padding:64px 7%;background:var(--dark-panel);color:var(--dark-panel-ink);border-radius:26px;box-shadow:var(--shadow)}
+.eyebrow{color:var(--accent2);font-weight:800;letter-spacing:.12em}
+h1{font-size:clamp(2.15rem,5vw,4.8rem);line-height:1.08;margin:.25em 0}
+.original{color:var(--muted);font-size:1.05rem}
+.hero .original{color:var(--dark-panel-ink);opacity:.65}
+.lede{max-width:880px;font-size:clamp(1.18rem,2vw,1.55rem);margin-top:32px}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:24px 0}
+.metric{padding:22px;border-top:5px solid var(--accent);background:var(--data-bg);border-radius:8px}
+.metric:nth-child(2){border-color:var(--accent2);background:var(--chance-bg)}
+.metric:nth-child(3){border-color:var(--accent3);background:var(--risk-bg)}
+.metric:nth-child(4){border-color:var(--accent4);background:var(--conclusion-bg)}
+.metric strong{display:block;font-size:2rem;line-height:1.1}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:24px 0}
+.panel{padding:28px;background:var(--surface);border:1px solid var(--line);border-radius:18px}
+.panel.risk{border-left:7px solid var(--accent3);background:var(--risk-bg)}
+.panel.opportunity{border-left:7px solid var(--accent2);background:var(--chance-bg)}
+.flow{margin:28px 0;padding:30px;background:var(--data-bg);border-radius:18px}
+.flow ol{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;padding:0;list-style:none}
+.flow li{padding:18px;background:var(--surface);border-bottom:4px solid var(--accent4);border-radius:12px}
+.insight{margin:28px 0;padding:28px 34px;background:var(--quote-bg);border-left:8px solid var(--accent3);font-size:1.22rem}
+.takeaways{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:28px 0}
+.takeaways article{padding:22px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
+.takeaways article:nth-child(1){grid-column:span 3;background:var(--data-bg)}
+.takeaways article:nth-child(2){grid-column:span 3;background:var(--risk-bg)}
+.takeaways article:nth-child(3){grid-column:span 2;background:var(--chance-bg)}
+.takeaways article:nth-child(4){grid-column:span 2;background:var(--conclusion-bg)}
+.takeaways article:nth-child(5){grid-column:span 2;background:var(--quote-bg)}
+.hl{background:var(--hl);padding:.05em .25em;border-radius:.25em;font-weight:800}
+.hl2{background:var(--hl2);padding:.05em .25em;border-radius:.25em;font-weight:800}
+#translation{max-width:880px;margin:60px auto 0;padding:clamp(24px,5vw,58px);background:var(--translation-bg);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow)}
+#translation h2{font-size:2.2rem;border-bottom:4px solid var(--accent);padding-bottom:.35em}
+#translation h3{font-size:1.65rem;margin-top:2.4em;color:var(--accent)}
+#translation h4{font-size:1.25rem;margin-top:1.9em;color:var(--accent4)}
+#translation p,#translation li{font-family:"Noto Serif SC","SimSun",serif;font-size:1.05rem}
+#translation a{color:var(--accent);overflow-wrap:anywhere}
+#translation table{width:100%;border-collapse:collapse;margin:24px 0}
+#translation th,#translation td{padding:12px;border:1px solid var(--line);vertical-align:top}
+#translation th{background:var(--data-bg)}
+figure,.source-figure{margin:38px 0;padding:14px;background:var(--caption-bg);border-radius:14px}
+figure img,.source-figure img{display:block;max-width:100%;height:auto;margin:auto}
+figcaption{margin-top:12px;color:var(--muted);font-size:.92rem;line-height:1.55}
+.note{padding:16px 20px;border-left:4px solid var(--accent4);background:var(--conclusion-bg)}
+@media(max-width:760px){
+  main{padding:12px 10px 50px}.hero{padding:36px 24px}.metrics,.split,.flow ol{grid-template-columns:1fr}
+  .takeaways{grid-template-columns:1fr}.takeaways article{grid-column:auto!important}
+  #translation{padding:22px 18px;border-radius:12px}
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -247,102 +214,481 @@ td:first-child{font-weight:700}
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/anthropic-economic-index-january-2026-report" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
 <main>
-  <section class="hero">
-    <div class="kicker">Economic Research · Jan 15, 2026</div>
-    <h1>Anthropic 经济指数报告：经济原语</h1>
-    <div class="original">Anthropic Economic Index report: Economic primitives</div>
-    <p class="lede">一句话总括：报告把 Claude 的真实使用拆成可测量的经济原语，使 AI 影响经济的讨论从“用了多少”转向“做什么、能否成功、替代还是协作、对哪些工作真正重要”。</p>
-  </section>
-
-  <section class="band" aria-label="关键数字">
-    <div class="metric"><b>200万</b><span>样本包括 100 万条 Claude.ai 对话和 100 万条第一方 API 记录。</span></div>
-    <div class="metric"><b>24% / 32%</b><span>Claude.ai 与 API 的前 10 类任务占比，说明使用仍高度集中。</span></div>
-    <div class="metric"><b>52%</b><span>Claude.ai 增强式使用占比，重新超过自动化使用。</span></div>
-    <div class="metric"><b>1.0-1.2pp</b><span>计入成功率后的年劳动生产率增幅估计，低于原始 1.8pp。</span></div>
-  </section>
-
-  <section class="split">
-    <div class="panel">
-      <h2>真正的新意是衡量“使用质量”</h2>
-      <p>Anthropic 引入五类经济原语：任务复杂度、用户与 AI 技能、使用场景、AI 自主性和任务成功率。</p>
-      <p>这改变了分析口径。一次 Claude 使用不再只是映射到某个职业任务，还要看任务是否复杂、是否成功、用户是否在协作，以及这项任务在工作中是否核心。</p>
-      <p>因此，职业暴露不等于职业会被替代。只有当 AI 能稳定完成高频且耗时的核心任务时，影响才会变大。</p>
-    </div>
-    <div class="callout">
-      <strong>核心洞见</strong>
-      <p>AI 经济影响的关键变量不是覆盖多少任务，而是成功率、任务权重和人类是否仍需判断质量。</p>
-    </div>
-  </section>
-
-  <section class="flow">
-    <h2>使用正在扩散，但扩散方式不均匀</h2>
-    <div class="steps">
-      <div class="step"><strong>1. 全球差异</strong>GDP 人均仍强烈解释 Claude 人均使用差异。低使用国家没有明显追赶。</div>
-      <div class="step"><strong>2. 美国收敛</strong>州际 AUI 基尼系数从 0.37 降至 0.32。低使用州增长更快。</div>
-      <div class="step"><strong>3. 任务集中</strong>编码和计算机数学任务仍占主导。API 中这类任务接近一半。</div>
-      <div class="step"><strong>4. 用途分化</strong>低收入国家课程用途更高。高收入国家个人用途和协作式使用更多。</div>
-      <div class="step"><strong>5. 技能放大</strong>用户提示所需教育年限与 Claude 回复所需教育年限高度相关，r 超过 0.92。</div>
-    </div>
-  </section>
-
-  <section class="table-wrap">
-    <h2>Claude.ai 与 API 呈现两种经济形态</h2>
-    <table>
-      <thead>
-        <tr><th>维度</th><th>Claude.ai</th><th>第一方 API</th><th>含义</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>互动方式</td><td>更多来回迭代和学习。</td><td>更多单轮、指令式自动化。</td><td>聊天产品更像协作工具，API 更像生产流程组件。</td></tr>
-        <tr><td>工作用途</td><td>约 46% 为工作用途。</td><td>约 74% 为工作用途。</td><td>企业部署更直接指向劳动替代或流程提效。</td></tr>
-        <tr><td>任务时长</td><td>人类独立完成约 3.1 小时，AI 协作约 15 分钟。</td><td>人类独立完成约 1.7 小时，AI 协作约 5 分钟。</td><td>API 更偏短任务和可程序化任务。</td></tr>
-        <tr><td>成功率</td><td>约 67%。</td><td>约 49%。</td><td>多轮反馈可能提高完成率，也说明自动化可靠性仍是瓶颈。</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="coverage">
-    <h2>生产率估计被成功率明显下修</h2>
-    <div class="ribbon">
-      <div class="note">
-        <strong>机会：复杂任务的速度提升更大</strong>
-        <p>高中水平任务在 Claude.ai 中约有 9 倍速度提升，大学水平任务约有 12 倍速度提升。AI 的收益更多出现在高教育、高知识密度工作中。</p>
-      </div>
-      <div class="note risk">
-        <strong>风险：复杂任务也更容易失败</strong>
-        <p>API 中，低于 1 小时的任务成功率约 60%，5 小时以上任务降至约 45%。可靠性会把宏观生产率收益从 1.8pp 下修到约 1.0-1.2pp。</p>
-      </div>
-    </div>
-    <div class="quote">报告最重要的提醒是：AI 看似覆盖一个职业的很多任务，但真正改变工作的是它能否成功完成最耗时、最高频、最核心的部分。</div>
-  </section>
-
-  <section class="split">
-    <div>
-      <h2>职业影响不是单向“替代”</h2>
-      <p>Claude 覆盖的任务平均需要更高教育年限。经济中普通任务的预测教育年限均值为 13.2 年，而 Claude 数据中出现的任务约为 14.4 年。</p>
-      <p>如果这些任务从人类工作中被移除，许多职业会出现“去技能化”。技术写作、旅行代理和部分教学职业可能留下更例行的任务。</p>
-      <p>但也有相反情况。房地产管理者的日常记录和租金核对可被 AI 处理，留下贷款、谈判和董事会沟通等高判断任务，职业可能转向更高技能。</p>
-    </div>
-    <div class="callout">
-      <strong>结论</strong>
-      <p>AI 不是平均地改变工作。它会重新分配职业内部的任务组合，并让瓶颈任务变得更有价值。</p>
-    </div>
-  </section>
-
-  <section class="takeaways">
-    <h2>最值得带走的洞见</h2>
-    <div class="mosaic">
-      <div class="tile"><b>一</b>AI 使用量不是充分指标。成功率和任务权重决定真实经济影响。</div>
-      <div class="tile"><b>二</b>Claude 仍主要集中在编码、办公和知识密集任务，长尾应用正在扩大但尚未主导。</div>
-      <div class="tile"><b>三</b>全球 AI 红利可能被收入、教育和制度条件放大或限制。</div>
-      <div class="tile"><b>四</b>多轮协作能延长有效任务边界，说明人类反馈本身是能力的一部分。</div>
-      <div class="tile"><b>五</b>生产率收益仍可能很大，但可靠性和不可替代任务会决定兑现速度。</div>
-    </div>
-  </section>
+<header class="hero">
+<div class="eyebrow">ANTHROPIC ECONOMIC INDEX · 2026</div>
+<h1>Anthropic 经济指数报告：经济原语</h1>
+<p class="original">Anthropic Economic Index report: Economic primitives</p>
+<p class="lede"><strong>一句话总括：</strong>这份报告把真实世界中的 Claude 使用方式拆成五项可测量的经济原语，使研究者能够同时判断 AI 在做什么、是否做成、需要多少自主权，以及这些能力会怎样改变职业和生产率。</p>
+</header>
+<section aria-label="关键数字" class="metrics">
+<div class="metric"><strong>200 万</strong>Claude.ai 对话与 API 记录样本总量</div>
+<div class="metric"><strong>52%</strong>Claude.ai 对话属于增强式协作</div>
+<div class="metric"><strong>67% / 49%</strong>Claude.ai 与 API 的任务成功率</div>
+<div class="metric"><strong>1.8 → 1.0</strong>API 可靠性修正后的生产率年增幅估算</div>
+</section>
+<section class="flow">
+<h2>五项经济原语，把“使用量”变成“经济影响”</h2>
+<ol>
+<li><strong>任务复杂度</strong><br/>人类独立完成需要多久，使用 AI 后又需要多久。</li>
+<li><strong>人员与 AI 技能</strong><br/>理解输入和输出需要多少教育程度。</li>
+<li><strong>使用目的</strong><br/>区分工作、课程学习和个人用途。</li>
+<li><strong>AI 自主度</strong><br/>用户把多少决策权交给 Claude。</li>
+<li><strong>任务成功率</strong><br/>Claude 是否真正完成了用户交付的任务。</li>
+</ol>
+<p><span class="hl2">核心改变</span>在于：任务出现在 Claude 记录中，不再等同于任务已经可以自动化。还必须考虑成功率、任务在职业中的重要程度，以及未被加速的瓶颈工作。</p>
+</section>
+<section class="split">
+<article class="panel opportunity">
+<h2>更复杂的任务，速度收益更大</h2>
+<p>理解门槛相当于高中教育的任务，平均加速约 <span class="hl2">9 倍</span>。大学教育水平的任务约为 <span class="hl2">12 倍</span>。</p>
+<p>这说明高人力资本工作可能获得更大的效率收益。AI 的早期红利并不只集中在简单、重复的事务上。</p>
+</article>
+<article class="panel risk">
+<h2>但复杂度会侵蚀可靠性</h2>
+<p>Claude.ai 中，低于高中教育门槛的任务成功率约为 <span class="hl">70%</span>。大学水平任务降至 <span class="hl">66%</span>。</p>
+<p>API 任务超过数小时后下降得更明显。因此，速度增益不能直接视为可兑现的生产率。</p>
+</article>
+</section>
+<aside class="insight">
+<strong>现实任务时域：</strong>API 的拟合成功率在约 <span class="hl">3.5 小时</span>处降至 50%。Claude.ai 的外推值约为 <span class="hl2">19 小时</span>。多轮交流可能把大任务拆成连续的小步骤，让用户及时纠偏。不过，这些数字也受到用户主动筛选任务的影响，不能视为纯粹的模型能力上限。
+</aside>
+<section class="split">
+<article class="panel">
+<h2>地区差异不会自行消失</h2>
+<p>国家层面，人均 GDP 每提高 <span class="hl2">1%</span>，Claude 人均使用量平均提高 <span class="hl2">0.7%</span>。低收入国家更多把 Claude 用于课程学习，高收入国家则出现更多工作和个人用途。</p>
+<p>用户输入与 Claude 输出所需教育年限的相关系数超过 <span class="hl">0.92</span>。这意味着接入 AI 并不自动消除技能差距。</p>
+</article>
+<article class="panel">
+<h2>美国各州出现初步趋同</h2>
+<p>各州使用差异的基尼系数从 <span class="hl2">0.37</span>降至 <span class="hl2">0.32</span>。模型估计显示，如果这段短期趋势延续，人均使用量可能在 <span class="hl">2—5 年</span>内大体趋同。</p>
+<p>但估计只依赖三个月变化，长期扩散速度仍有很大不确定性。</p>
+</article>
+</section>
+<section class="panel risk">
+<h2>生产率估算为何被大幅下调</h2>
+<p>只按任务加速计算，Claude.ai 与 API 都对应未来十年每年约 <span class="hl">1.8 个百分点</span>的美国劳动生产率增幅。</p>
+<p>按任务成功率折算后，Claude.ai 降至 <strong>1.2 个百分点</strong>，API 降至 <strong>1.0 个百分点</strong>。如果职业内部任务互补、未加速任务形成瓶颈，结果还可能降至 Claude.ai 的 <strong>0.8</strong> 和 API 的 <strong>0.6 个百分点</strong>。</p>
+<p><strong>结论：</strong>AI 的经济价值取决于可靠性和工作重组，而不只是单项任务跑得多快。</p>
+</section>
+<section>
+<h2>最值得带走的洞见</h2>
+<div class="takeaways">
+<article><strong>覆盖不等于替代。</strong><p>任务曾被 Claude 处理，只能证明存在使用场景。要判断职业冲击，还需看成功率、耗时权重和使用频率。</p></article>
+<article><strong>高技能工作同时拥有高收益和高风险。</strong><p>复杂任务的加速幅度更大，但失败率也更高。专业人员的审查能力可能因此更加重要。</p></article>
+<article><strong>AI 可能让多数职业“去技能化”。</strong><p>Claude 当前覆盖的任务平均需要 14.4 年教育，高于经济中全部任务的 13.2 年。</p></article>
+<article><strong>人的能力会映射到 AI 输出。</strong><p>输入与输出的教育要求高度相关。有效使用 AI 所需的人力资本分布并不均匀。</p></article>
+<article><strong>政策不能只解决接入问题。</strong><p>扩大可用性之外，还要培养能提出复杂问题、验证结果并重组流程的能力。</p></article>
+</div>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<figure class="source-figure" data-source-image="0"><img alt="Anthropic Economic Index report: Economic primitives" decoding="async" height="1080" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/9b02ac64661e5bddae4953af316ac8e45125cb65-1920x1080.jpg" width="1920"/></figure>
+<h3>引言</h3>
+<h4>AI 正在怎样重塑经济？</h4>
+<p>本报告引入了一组新的 AI 使用指标，力求完整呈现 2025 年 11 月人们与 Claude 互动的情况。取样时间正好在 Opus 4.5 发布之前。</p>
+<p>我们把这些指标称为“原语”。它们是衡量 Claude 使用方式的简单基础指标。我们让 Claude 针对匿名化的 Claude.ai 对话和第一方（1P）API 记录回答特定问题，由此生成这些指标。</p>
+<p>原语覆盖五个与 AI 经济影响有关的维度：用户与 AI 的技能、任务复杂度、Claude 获得的自主权、Claude 的任务成功率，以及 Claude 是用于个人、教育还是工作目的。</p>
+<p>结果揭示了显著的地区差异，也给出了真实世界中的 AI 任务时域估计，并为重新评估 Claude 的宏观经济影响提供了依据。</p>
+<p>我们随报告发布的数据是迄今最全面的一版。它涵盖 AI 使用的五个新维度，同时包含消费者和企业用途，以及 Claude.ai 在国家和地区层面的细分数据。</p>
+<h4>与上一份报告相比发生了什么</h4>
+<p>第一章重新检视了我们在 2025 年 9 月发布的上一份经济指数报告中的发现。我们得到以下结果。</p>
+<p><strong>Claude 的使用仍集中在少数任务上，其中大多与编程有关。</strong>Claude.ai 中虽然出现了 3,000 多种不同的工作任务，但最常见的前 10 类任务占样本对话的 24%，较上一份报告略有上升。Claude.ai 中的增强式互动，即用户学习、反复修改任务或获得 Claude 反馈的对话，已略微超过全部对话的一半。第一方 API 流量则仍以自动化使用为主，这与 API 的程序化特征一致。</p>
+<p><strong>全球使用差异持续存在，美国各州却在趋同。</strong>美国、印度、日本、英国和韩国的 Claude.ai 总体使用量居前。全球采用程度仍很不均衡，而人均 GDP 可以较好地解释这种差异。在美国，各州劳动力构成是影响采用差异的重要因素。计算机和数学专业人员占比更高的州，Claude 使用量也系统性地更高。</p>
+<p>虽然使用集中度仍然很高，但与上一份报告相比，Claude 在美国各州之间的分布已经明显变得更均衡。如果趋势持续，各州人均使用量可能在 2—5 年内趋于一致。</p>
+<h4>新经济原语的提出与分析</h4>
+<p>第二章介绍了这些新经济原语的研究动机、选择方式、具体实现和局限。我们还将原语与外部基准进行比较。证据显示，它们可以在方向上准确反映真实的使用模式。</p>
+<p>第三章和第四章使用这些原语，进一步研究 AI 采用和生产率的影响。我们发现了以下现象。</p>
+<p><strong>Claude 的用途会随采用率和收入提高而多样化。</strong>Claude 最常见的用途是工作。课程学习用途在最低人均 GDP 国家中的占比最高，富裕国家的个人用途占比最高。这符合一条简单的采用曲线：欠发达国家的早期采用者通常是拥有特定高价值应用的技术用户，或者将 Claude 用于教育；成熟市场则逐渐扩展到休闲和个人用途。</p>
+<p><strong>Claude 能成功完成大多数任务，但最复杂的任务除外。</strong>总体来看，Claude 通常能够完成收到的任务，其回复所需的教育水平也往往与用户输入相匹配。Claude 在复杂任务上表现较差。人类完成任务所需时间越长，Claude 的成功率就越低。这与评估 AI 能可靠完成多长任务的知名测评结果相似。</p>
+<p><strong>计入成功率后，职业的 AI 暴露程度会呈现不同面貌。</strong>我们使用成功率原语重新衡量职业暴露程度。具体做法是同时按任务成功率和任务在职业中的重要性，对任务覆盖率加权。对于数据录入员和数据库架构师等职业，Claude 已在很大一部分工作内容上表现出熟练能力。</p>
+<p><strong>Claude 所处理任务的技能要求高于整体经济中的任务。</strong>我们观察到的 Claude 任务，通常比整体经济中的任务需要更多教育。如果假定 AI 辅助任务在劳动者职责中的占比逐渐缩小，那么移除这些任务后，剩下的工作会更偏低技能。</p>
+<p>不过，这种简单的任务替代不会对所有白领产生相同影响。有些职业被移除的是技能要求最高的任务，另一些职业被移除的却是技能要求最低的任务。</p>
+<p>如果去掉我们观察到 Claude 正在执行的任务，旅行代理的工作会出现去技能化：复杂行程规划让位于常规的购票和收款。物业经理则会出现技能提升：簿记工作让位于合同谈判和利益相关者管理。</p>
+<h4>理解 AI 经济影响的新窗口</h4>
+<p>这些结果为理解 AI 当前怎样影响经济提供了一个新窗口。掌握任务成功率，可以更准确地判断哪些任务可能被自动化、哪些职业会受到多大影响，以及劳动生产率将怎样变化。衡量用户教育程度对应的性能差异，也有助于理解不平等效应。</p>
+<p>事实上，输入与输出的教育水平高度相关。这说明，即使不考虑采用率差异，教育程度较高的国家也可能更有条件从 AI 中获益。</p>
+<p>本次数据发布旨在帮助研究人员和公众更好地理解 AI 的经济影响，并研究这项变革性技术已经产生作用的具体方式。</p>
+<h3>第一章：与上一份报告相比发生了什么</h3>
+<h4>概述</h4>
+<p>前沿 AI 模型的能力正在快速进步，采用速度也很快。因此，我们需要定期评估个人和企业如何使用这些系统，以及这些使用方式对更广泛的经济意味着什么。<sup>1</sup></p>
+<p>本章分析 Claude 的使用方式和扩散模式从 2025 年 8 月到 11 月发生了怎样的变化。取样时间仍在 Opus 4.5 发布之前。我们有四项观察。</p>
+<p><strong>任务使用仍高度集中。</strong>Claude.ai 中最常见的 10 类任务占观察使用量的 24%，上一份报告为 23%。对于第一方 API 企业客户，任务集中度上升得更明显：前 10 类任务如今占流量的 32%，上一份报告为 28%。</p>
+<p><strong>Claude.ai 上的增强式使用再次超过自动化使用。</strong>上一份报告发现，Claude.ai 的自动化使用已经超过增强式使用。这可能同时反映了模型能力进步，以及用户更加熟悉大语言模型。</p>
+<p>2025 年 11 月的数据则显示，Claude.ai 广泛转回增强式使用。被归类为增强的对话占比上升 5 个百分点，达到 52%；被归类为自动化的占比下降 4 个百分点，达到 45%。<sup>2</sup></p>
+<p>这段时间内出现的产品变化，包括文件创建能力、持久记忆和用于定制工作流的 Skills，可能推动使用模式转向更多协作和人类参与的互动。</p>
+<p><strong>美国使用量较低的州，采用率增长相对更快。</strong>在美国，人均使用量仍主要取决于各州劳动力是否与 Claude 的主要用途相匹配。例如，计算机和数学职业从业者占比较高的州，使用量通常也更高。</p>
+<p>事实上，使用量最高的五个州贡献了接近一半的总使用量，而它们只占劳动年龄人口的 38%。不过，采用率已经出现快速地区趋同的早期迹象。上一份报告中使用量较低的州，随后增长得相对更快。</p>
+<p>如果趋势持续，美国各地的人均使用量将在 2—5 年内趋于一致。这一扩散速度大约是 20 世纪其他重要经济技术的 10 倍。<sup>3</sup></p>
+<p>这个结果与 AI 的快速采用和扩散相符。但估计只依据三个月内的变化，因此存在不确定性。未来几个月或几年，扩散速度最终可能更慢。</p>
+<p><strong>全球使用量没有明显的地区趋同或分化迹象。</strong>以 Anthropic AI 使用指数（AUI）衡量，全球 Claude 人均使用量仍然很不均衡，并与 GDP 高度相关。这些差距保持稳定。我们既没有发现低使用国家正在追赶，也没有发现高使用国家正在进一步拉开差距。</p>
+<h4>任务及相关职业的使用模式变化</h4>
+<p>前沿大语言模型具备覆盖现代经济各个方面的广泛能力，但 Claude 的实际使用仍集中在少数任务上。</p>
+<p>与近一年前相比，Claude.ai 的消费者使用集中度略有提高。2025 年 11 月，最常见的 10 项 O*NET 任务占对话的 24%，比 8 月高 1 个百分点，也高于 2025 年 1 月的 21%。2025 年 11 月最常见的任务是修改软件以修复错误，单独占使用量的 6%。</p>
+<p>上一份 Anthropic 经济指数报告开始通过第一方 API 客户研究企业采用模式。API 记录中最常见的 10 类任务占比从 8 月的 28%升至 11 月的 32%。</p>
+<p>一小批任务的集中度继续上升，说明即使模型能处理的任务范围扩大，价值最高的应用仍创造了格外突出的经济价值。与 Claude.ai 一样，API 客户最常见的任务也是修改软件以修复错误，每 10 条记录中就有一条属于此类。</p>
+<figure class="source-figure" data-source-image="1"><img alt="Figure 1.1: Usage shares among top 10 tasks over time by platform, Claude.ai and 1P API." decoding="async" height="2067" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/3ac68d3e69e15d38876c4ef0012b1d8c5befa921-2969x2067.png" width="2969"/><figcaption>图 1.1：不同平台上前 10 类任务的使用占比随时间的变化，涵盖 Claude.ai 和第一方 API。图中按平台和报告版本展示被归入最常见 10 项 O*NET 任务的对话占比。</figcaption></figure>
+<p>计算机和数学类任务继续主导 Claude 的整体使用，其中包括修改软件以修复错误等任务。它们占 Claude.ai 对话的三分之一，也占第一方 API 流量的近一半。</p>
+<p>不过，这种主导地位在 Claude.ai 上有所减弱。此类任务大多与编程有关，其对话占比从 2025 年 3 月的峰值 40%降至 11 月的 34%。与此同时，第一方 API 流量中计算机和数学任务的占比从 8 月的 44%小幅升至 11 月的 46%（图 1.2）。</p>
+<figure class="source-figure" data-source-image="2"><img alt="Figure 1.2: Claude.ai and API usage over time." decoding="async" height="2439" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/b67d78d056f86d9d4a46002d60fd5efe79e59372-4762x2439.png" width="4762"/><figcaption>图 1.2：Claude.ai 和 API 的使用情况随时间的变化。各面板显示 Claude.ai 样本对话和第一方 API 记录中，与标准职业分类（SOC）各主要职业组任务相关的占比。</figcaption></figure>
+<p>2025 年 11 月，Claude.ai 使用量第二大的类别是教育、教学与图书馆。这主要对应课程学习和复习帮助，以及教学材料开发。这类使用从第一份报告以来持续增长，由 2025 年 1 月的 9%升至 11 月的 15%。</p>
+<p>2025 年 8 月至 11 月，Claude.ai 上艺术、设计、娱乐、体育和媒体任务的占比上升。越来越多对话使用 Claude 处理写作任务，主要包括文字编辑，以及虚构作品的创作和润色。</p>
+<p>设计和写作任务的这次回升，扭转了此前几份报告中的持续下降趋势。Claude.ai 与 API 客户涉及生命科学、物理科学和社会科学任务的对话或记录占比都出现下降。</p>
+<p>API 客户最显著的变化，可能是办公室和行政支持任务占比上升。该占比在 8 月提高 3 个百分点，到 2025 年 11 月达到 13%。</p>
+<p>API 使用以自动化为主。这说明企业越来越多地使用 Claude 自动处理常规后台工作流，例如电子邮件管理、文档处理、客户关系管理和日程安排。<sup>4</sup></p>
+<h4>Claude.ai 再次由增强式使用主导</h4>
+<p>AI 将怎样影响经济，不仅取决于 Claude 被用于哪些任务，也取决于用户如何访问底层模型能力以及如何与其互动。从第一份报告开始，我们一直将对话划分为五种互动类型，再归纳为自动化和增强两大类。<sup>5</sup></p>
+<p>图 1.3 展示自一年前开始收集数据以来，自动化和增强式使用如何变化。2025 年 1 月，增强式使用占主导：56%的对话被归为增强，41%被归为自动化。<sup>6</sup></p>
+<p>到 2025 年 8 月，被归类为自动化的对话已经超过增强式对话。</p>
+<p>这是一个值得注意的发展。它表明，模型能力和平台功能迅速进步的同时，用户越来越倾向于把完整任务交给 Claude。</p>
+<p>这种变化在“指令式”协作模式中表现得很明显。该模式被归入自动化。指令式对话是指用户交给 Claude 一项任务，而 Claude 在很少来回沟通的情况下直接完成。2025 年 1 月至 8 月，这类对话从 27%升至 39%。<sup>7</sup></p>
+<p>三个月后，指令式对话占比下降 7 个百分点，到 2025 年 11 月降至 32%。增强式使用再次超过 Claude.ai 上的自动化使用。</p>
+<p>不过，与近一年前首次追踪这项指标时相比，自动化占比仍然较高。这说明底层趋势仍指向更高程度的自动化，只是 8 月的峰值夸大了这一趋势实现的速度。</p>
+<figure class="source-figure" data-source-image="3"><img alt="Figure 1.3: Collaboration mode share over time by platform, Claude.ai and 1P API." decoding="async" height="2979" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/57bcb894a6e050647e09229565a4381c4778b981-2966x2979.png" width="2966"/><figcaption>图 1.3：不同平台的协作模式占比随时间的变化，涵盖 Claude.ai 和第一方 API。图中展示历次 Anthropic 经济指数报告中的协作模式出现频率。</figcaption></figure>
+<p>Claude.ai 上出现了一些转向软技能任务的迹象，设计、管理和教育任务占比都已提高。不过，11 月转回增强式使用的变化广泛存在于各类任务中（图 1.4）。</p>
+<p>增强式使用的增长主要来自用户与 Claude 共同反复修改并完成任务，也就是“任务迭代”，而不是请 Claude 解释概念的“学习”。图 1.5 展示三种最常见互动模式在 O*NET 任务名称和自下而上归纳的请求描述中对应的常见词语。</p>
+<figure class="source-figure" data-source-image="4"><img alt="Figure 1.4: Directive, Task Iteration, and Learning collaboration shares by Standard Occupation Classification (SOC) major group." decoding="async" height="2807" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/6de662b51d696c7cd287a814cc11e502e0dc7c9b-5369x2807.png" width="5369"/><figcaption>图 1.4：按标准职业分类（SOC）主要职业组划分的指令式、任务迭代和学习式协作占比。我们针对每个 SOC 主要职业组，计算 Claude.ai 对话中指令式、任务迭代和学习模式的占比。计算仅纳入样本中至少出现 100 次的 O*NET 任务，并按记录数量加权，以构造有代表性的样本。</figcaption></figure>
+<figure class="source-figure" data-source-image="5"><img alt="Figure 1.5: Prominent words from among O*NET task titles and bottom-up request groupings by key collaboration type." decoding="async" height="976" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/b1c3ab216c4a1f1abafe5c6ceeaffd5bea2337d1-1750x976.png" width="1750"/><figcaption>图 1.5：各主要协作类型在 O*NET 任务标题和自下而上归纳的请求分组中的突出词语。词云取自 O*NET 任务和请求分组的前四分之一，并根据指令式、任务迭代和学习模式的记录占比排序。只纳入至少有 1,000 条观察的任务或请求。指令式互动强调产出，如“创建”“开发”“起草”；任务迭代围绕改进和反复修改，如“编辑”“重写”“修订”；学习侧重解释和知识传递，如“帮助”“解释”“提供”。两种分类方法得到的模式一致。本分析依据通过隐私保护方法构造的分组，而不是底层对话中实际使用的词语。</figcaption></figure>
+<h4>持续存在的地区集中</h4>
+<p>上一份报告提出了 Anthropic AI 使用指数（AUI）。该指标衡量某个地区的 Claude 使用量，相对于当地劳动年龄人口规模是高估还是低估。AUI 的定义如下。</p>
+<figure class="source-figure" data-source-image="6"><img alt="Anthropic AI Usage Index c = Country c's share of Claude Usage divided by Country c's share of working-age population" decoding="async" height="22" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/ab8a54e2d3fbf99628aa7a1300c953c70759ac6b-314x22.svg" width="314"/></figure>
+<p>AUI 高于 1，表示一个国家使用 Claude 的强度超过仅按人口规模推算的水平。AUI 低于 1，则表示使用量低于预期。</p>
+<p>例如，丹麦的 AUI 为 2.1。这意味着丹麦居民使用 Claude 的比率，大约是其劳动年龄人口占全球份额所对应水平的两倍。</p>
+<p>Claude 全球使用的一个关键事实，是其地理分布高度集中。少数国家贡献了远超人口占比的使用量。从全球角度看，2025 年 8 月至 11 月，这种状况几乎没有变化。图 1.6 左侧面板显示，本报告和上一份报告的国家间 AUI 集中度基本相同。</p>
+<p>相比之下，2025 年 8 月至 11 月，美国各州的使用分布变得更加均衡。作为衡量不平等程度的标准指标，基尼系数从 0.37 降至 0.32。</p>
+<p>解读短期变化时必须谨慎，但这次变化幅度相对较大，方向是趋向完全平等。完全平等意味着每个州的 AUI 都等于 1，基尼系数为 0。如果美国的基尼系数此后每三个月继续下降 0.05，各州使用水平将在大约两年内达到一致。</p>
+<figure class="source-figure" data-source-image="7"><img alt="Figure 1.6: AUI concentration around the world and within the US in this and the prior report." decoding="async" height="1781" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/a4f75f5d87d01446ca65a204f61a1e063e16e878-4170x1781.png" width="4170"/><figcaption>图 1.6：本报告与上一份报告中，全球及美国内部的 AUI 集中程度。图中展示 2025 年 8 月和 11 月全球及美国内部 Anthropic AI 使用指数（AUI）的洛伦兹曲线。曲线越接近 45 度线，集中度越低。例如，右图显示美国排名前 20%的州贡献了全国经人口调整后使用量的 40%。</figcaption></figure>
+<p>什么因素影响美国和全球的使用模式？上一份报告强调了全球收入差异的关键作用。各国 Claude 使用量的差异，在很大程度上可以由人均 GDP 差异解释。第三章将再次讨论收入如何影响全球使用强度和使用模式。</p>
+<p>在美国，收入与使用量之间的关系没有那么清晰。最重要的因素似乎是各州的劳动力构成，以及劳动力与 Claude 在任务层面能力的匹配程度。</p>
+<p>计算机和数学职业从业者占比较高的地区，例如华盛顿特区、弗吉尼亚州和华盛顿州，人均使用量通常更高。量化结果显示，这类技术从业者在一个州的占比每提高 1%，该州人均使用量就会提高 0.36%（图 1.7）。这一因素单独就能解释近三分之二的州际 AUI 差异。</p>
+<figure class="source-figure" data-source-image="8"><img alt="Figure 1.7: AUI and share of workers in Computer &amp; Mathematical occupations in each US State." decoding="async" height="2518" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/fe706b1c52a1df7bd54cc6ebf3b3a698bf046e88-3568x2518.png" width="3568"/><figcaption>图 1.7：美国各州 AUI 与计算机和数学职业从业者占比。图中显示，美国各州计算机和数学职业从业者占比与 Anthropic AI 使用指数（AUI）高度相关。这与一种解释一致：Claude 的整体使用模式及其对应能力正在影响美国内部的地区采用模式。如果正式计算各州劳动力分布与 Claude.ai 全球使用量在 SOC 主要职业组间分布的 KL 散度，这一规律仍然成立。</figcaption></figure>
+<p>Claude 在技术工作者较多的州使用量更高，符合直觉。但这一规律也可以推广。某州在 Claude 使用量高于美国劳动力占比的职业中拥有更多从业者，例如艺术、设计、娱乐、体育和媒体，那么该州人均使用量会更高。</p>
+<p>反过来，如果一个州在 Claude 使用率低于全国经济水平的职业中从业者较少，例如运输和物料搬运，该州人均使用量也会更高。</p>
+<p>我们可以计算各州劳动力构成与 Claude 全球使用构成之间的 Kullback–Leibler（KL）散度。KL 散度越低，表示该州劳动力越接近 Claude 的使用模式，其人均使用量通常也越高。</p>
+<h4>美国低使用州出现更快的 Claude 扩散迹象</h4>
+<p>劳动力构成差异似乎会影响美国内部的地区采用。不过，早期证据显示，Claude 的扩散速度远高于历史先例。</p>
+<p>具有重要经济影响的技术，过去通常需要约半个世纪才能在美国全面扩散（Kalanyi 等，2025）。相比之下，把 2025 年 11 月的 Claude 采用率与三个月前比较，我们估计美国各州人均采用率可能在 2—5 年内达到大致一致。</p>
+<p>这一估计的不确定性很高。现有估计精度仍无法排除扩散速度远慢于此的可能。</p>
+<p>我们通过一个简单的扩散模型生成这一估计。这里简要说明模型。我们把扩散描述为向共同稳态按比例收敛。在稳态下，每个州 s 的 AUI 都等于 1。</p>
+<figure class="source-figure" data-source-image="9"><img alt="AUI s, t = AUI beta s, t-1', beta within (0, 1)" decoding="async" height="15" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/0ae56b8b3a1e0b0e85afdd42d02c911ab0cd05db-350x15.svg" width="350"/></figure>
+<p>在这个模型中，AUI 相对稳态值 1 的对数偏差，每三个月会按系数 β 缩小。其半衰期为 ln(.5)/ln(β) 个季度。</p>
+<p>例如，在季度数据中，β=0.99 对应约 17 年的半衰期。若初始 AUI 为 2，17 年后会降至约 1.4，50 年后降至约 1.1。</p>
+<p>我们把 β=0.99 作为合理基准，因为它对应的扩散速度接近 20 世纪具有重要经济影响的技术。</p>
+<p>这一收敛模型引出了下面的回归设定。<sup>8</sup></p>
+<figure class="source-figure" data-source-image="10"><img alt="ln AUI s,t = alpha + beta × ln AUI s,t-1 + epsilon s,t'" decoding="async" height="14" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/df31b122952f51d76d08eaae36edd1e2ddf1a0ed-350x14.svg" width="350"/></figure>
+<p>直接用普通最小二乘法（OLS）估计该方程，可得到 β̂≈0.77。按各州劳动力规模加权的加权最小二乘法（WLS）得到 β̂≈0.76（图 1.8）。两者在常用显著性水平上都与 1 有统计差异。</p>
+<p>如果直接按这些估计解释，各州 AUI 要缩小相对于 1 的大部分差距，只需略多于两年。</p>
+<p>这种估计方法的问题在于，AUI 估计包含抽样噪声和其他与扩散无关的变化。这可能产生经典的衰减偏差。即使 AUI 实际没有改变，估计出的 β 也可能明显低于 1。</p>
+<p>为解决这个问题，我们使用两阶段最小二乘法（2SLS）估计模型。我们以各州劳动力构成作为 2025 年 8 月 AUI 对数值的工具变量，并通过该构成与 Claude 整体使用模式的接近程度来衡量。</p>
+<p>这个工具变量的逻辑是：劳动力构成可以有力预测 Claude 使用量，满足相关性；同时它是独立测量的，预计不会与 AUI 估计中的抽样噪声相关，满足有效性。如前所述，高 Claude 使用职业的从业者越多，一个州的人均使用量确实会系统性地更高。</p>
+<p>2SLS 估计显示收敛速度略慢。不加权时 β̂≈0.89；按各州劳动年龄人口加权时 β̂≈0.86。不过，这些估计的精度较低，只有前者在 10%的水平上与 1 有统计差异。</p>
+<p>虽然 2SLS 表明收敛慢于 OLS，但仍意味着快速扩散。每个州 AUI 对数偏差缩小 90%，只需四到五年。</p>
+<figure class="source-figure" data-source-image="11"><img alt="Figure 1.8: Anthropic AI Usage Index (AUI) across the US, August 2025 (V3) and November 2025 (V4)." decoding="async" height="2973" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/6db6a9dbf7e110d5095fea4acc43d9b8ee24f795-3569x2973.png" width="3569"/><figcaption>图 1.8：2025 年 8 月（V3）和 11 月（V4）美国各州的 Anthropic AI 使用指数（AUI）。比较两个时间点的 AUI，可以估计 Claude 在美国内部的扩散速度。在各州 AUI 最终都等于 1 的比例收敛模型下，估计弹性可以用于计算扩散速度，详情见正文。估计区间意味着 AUI 的地区趋同需要 2—5 年。</figcaption></figure>
+<p>尽管如此，我们的估计只依据三个月的数据。2SLS 设定或许能缓解抽样噪声，但仍有很大不确定性。未来报告将重新讨论扩散速度问题。</p>
+<div class="note">
+<p><sup>1</sup> 与此前报告一样，全部分析都采用隐私保护方法。整份报告分析了来自 Claude.ai Free、Pro 和 Max 的 100 万次随机抽样对话。我们也称其为“消费者数据”，因为它主要代表消费者使用。报告还分析了第一方 API 流量中的 100 万条记录。我们称其为“企业数据”，因为它主要代表企业使用。两个样本均来自 2025 年 11 月 13 日至 20 日。我们继续按照隐私和保留政策管理数据，分析也符合服务条款、政策和合同约定。第一方 API 数据中的每条记录都是样本期内的一组提示与回复。对于多轮互动，它有时处在会话中间。</p>
+<p><sup>2</sup> Claude.ai 对话中既未归入自动化，也未归入增强类别的占比，从 3.9%降至 3.0%。</p>
+<p><sup>3</sup> 例如，Kalanyi 等（2025）指出：随着技术成熟、相关岗位增多，招聘会在地理上扩散。这个过程非常缓慢，完全扩散大约需要 50 年。</p>
+<p><sup>4</sup> 在第一方 API 流量的自下而上分析中，我们看到 Claude 被用于“生成个性化 B2B 陌生销售邮件”（0.47%）、“分析邮件并起草商务回复”（0.28%）、“构建和维护发票处理系统”（0.24%）、“按预设标签对邮件分类”（0.23%），以及“管理日历排期、会议协调和预约”（0.16%）。</p>
+<p><sup>5</sup> 我们从总体上区分 Claude 使用中的自动化和增强模式。自动化侧重完成任务，包括：指令式，用户给 Claude 一项任务，由其在很少往返沟通的情况下完成；反馈循环，用户让任务自动运行，并按需向 Claude 提供反馈。增强侧重协作，包括：学习，用户向 Claude 询问信息或解释；任务迭代，用户与 Claude 共同反复修改任务；验证，用户请 Claude 对自己的工作提供反馈。</p>
+<p><sup>6</sup> 这些互动模式并未覆盖所有情况。有时 Claude 会判断抽样对话不属于五种模式中的任何一种。</p>
+<p><sup>7</sup> 本报告使用 Sonnet 4.5 进行分类，上一份经济指数报告使用 Sonnet 4。我们此前发现，不同模型可能产生不同的分类结果，不过影响通常较小。</p>
+<p><sup>8</sup> 回归中包含常数项，因为在零假设下它应等于零。在所有设定中，估计出的常数项都接近零，并且在统计上与零没有显著差异。</p>
+</div>
+<h3>第二章：引入经济原语</h3>
+<p>Anthropic 经济指数的优势，不只是展示 AI 使用了多少，还展示 AI 是怎样被使用的。此前报告说明了 Claude 被用于哪些任务，以及人们如何与 Claude 协作。这些数据已经帮助外部研究人员分析劳动力市场变化，例如 Brynjolfsson、Chandar 与 Chen（2025）的研究。</p>
+<p>本期 Anthropic 经济指数扩大了可供外部研究人员使用的数据范围，提供五类经济“原语”的信息。这里的原语，是 Claude 使用方式的简单基础指标。我们让 Claude 针对样本中的匿名对话回答特定问题，再由此生成指标。有些原语包含多个问题，另一些只使用一个指标。</p>
+<p>AI 能力进步得非常快，其经济影响也会分布不均。因此，我们需要广泛的信号。它们不仅用于揭示 Claude 的使用方式，也用于判断这项技术可能产生什么影响。</p>
+<h4>关系到经济影响的 AI 使用维度</h4>
+<p>除我们已在衡量的协作模式，即用户是用 Claude 自动执行任务还是增强自身能力之外，本报告又提出五项经济原语。</p>
+<p>这些原语覆盖人机对话的五个维度：一是任务复杂度；二是人员与 AI 技能；三是工作、课程学习或个人用途；四是 AI 自主程度；五是任务成功率，见表 2.1。</p>
+<p>AI 自主度与已有的自动化和增强之分并不相同。例如，“把这段文字翻译成法语”属于高度自动化，因为它是指令式任务，几乎不需往返沟通；但 AI 自主度很低，因为 Claude 几乎不需要自行决策。</p>
+<figure class="source-figure" data-source-image="12"><img alt="Table 2.1: Economic primitives added in this report." decoding="async" height="2980" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/8895717443700329aa757b3614ede0f8dc8d2c52-1920x2980.svg" width="1920"/><figcaption>表 2.1：本报告新增的经济原语。表格列出新增原语，不包括此前报告已采用的协作模式，即自动化和增强。第一列是原语类别，第二列是原语名称，第三列说明原语如何操作化，也就是提供给 Claude 的提示。我们把 Claude 用作分类器，将对话映射为各项原语。完整提示文本见<a href="https://huggingface.co/datasets/Anthropic/EconomicIndex">在线附录</a>。</figcaption></figure>
+<p><strong>任务复杂度</strong>体现任务在复杂程度上的差异，包括完成时间和难度。同一个 O*NET“调试”任务，既可能指 Claude 修复函数里的一个小错误，也可能指全面重构代码库。两者对劳动需求的影响完全不同。</p>
+<p>我们通过三项指标衡量复杂度：不使用 AI 时人类完成任务的估计时间；使用 AI 后完成任务所花的时间；用户是否在一次对话中处理多个任务。</p>
+<p><strong>人员与 AI 技能</strong>用于分析自动化如何与技能水平互动。如果 AI 主要替代专业要求较低的任务，同时补充高技能工作，它可能构成另一种技能偏向型技术变革。高技能劳动需求会上升，低技能劳动则可能被替代。</p>
+<p>我们衡量用户能否在没有 Claude 的情况下完成任务，以及理解用户提示和 Claude 回复各自需要多少年教育。</p>
+<p><strong>使用目的</strong>区分职业、教育和个人用途。劳动力市场影响最直接地来自工作用途。教育用途则可能表明，未来劳动力正在何处培养与 AI 互补的技能。</p>
+<p><strong>AI 自主度</strong>衡量用户向 Claude 委派决策的程度。上一份报告记录了“指令式”使用增加，也就是用户把任务完整交给 Claude。持续追踪从主动协作到完全委派的自主程度，有助于预测自动化速度。</p>
+<p><strong>任务成功率</strong>衡量 Claude 对自己是否成功完成任务的判断。成功率可以帮助评估任务能否有效自动化，也可以评估自动化的效率，例如需要尝试多少次才能完成。因此，任务成功率同时关系到劳动任务自动化的可行性与成本。</p>
+<h4>新指标的选择与验证</h4>
+<p>新维度的选择参考了我们近期关于 Claude 生产率影响的研究、外部研究人员的反馈，以及从人力资本和专业知识角度研究 AI 经济影响的近期文献，如 Vendraminell 等（2025）。Anthropic 经济研究团队也进行了内部讨论。</p>
+<p>主要选择标准包括预期经济相关性、各维度之间的互补性，以及 Claude 能否在相应维度上对对话作出方向准确的分类。</p>
+<p>我们的主张是，即使多个简单原语单独看有一定噪声，也不完全准确，它们结合起来仍能提供有关 AI 使用方式的重要信号。因此，我们主要测试方向准确性。</p>
+<p>在区分使用和不使用 AI 的任务耗时时，我们采用了此前生产率研究中只做少量修改的方法。</p>
+<p>对于通过隐私保护工具实现的新分类器，<sup>1</sup>验证过程如下。我们先设计多种可能的指标，用于描述任务复杂度等概念。</p>
+<p>对于 Claude.ai，我们选择一小批用户曾向 Claude.ai 提供反馈的对话，将分类器表现与人类研究人员的判断进行比较。我们已获得查看这些底层对话的许可。</p>
+<p>对于第一方 API 数据，我们使用内部数据和合成数据共同验证分类器。两类数据都不能完整代表 Claude.ai 或第一方 API 流量，但可以在保护隐私的同时，检验分类器能否处理接近真实使用的数据。</p>
+<p>根据初步表现，我们调整了需要改进的分类器，也舍弃了表现不佳的分类器。有趣的是，在任务成功率等部分场景中，与人类评分相比，简单分类器反而优于细致复杂的分类器。</p>
+<p>随后，我们比较了使用和不使用思维链提示的分类器版本。最终只在三个方面保留思维链提示：人类独立完成的时间估计、人类使用 AI 后的时间估计，以及 AI 自主度。思维链在这三项上明显改善了表现。</p>
+<p>最后，我们为五项原语选定九个新分类器。它们在方向上都准确，不过具体数值可能与人类评分存在偏差。</p>
+<h4>原语的价值在于它们能够预测什么</h4>
+<p>我们的目标是创建容易实施的分类器。它们组合后可以提供重要的经济信号。</p>
+<p>我们对新指标的方向准确性很有信心。例如，理解用户提示所需平均教育年限更高的任务，很可能也更加复杂。不过，任何一项指标都不应被视为精确或最终结论。例如，Claude.ai 可能低估许多任务所需的人类教育年限。</p>
+<p>即便如此，原语仍丰富了我们对 AI 使用方式的理解。不同原语、地区和任务之间呈现出系统性关系。第三章和第四章将深入研究这些模式。这些关系既符合直觉，又相互一致，说明原语捕捉到了个人和企业使用 Claude 的相关特征。</p>
+<p>外部基准也支持这一判断。在生产率研究中，Claude 对时间的估计与软件工程任务的实际耗时相关。图 2.1 显示，我们的人类教育指标与各职业从业者的实际教育水平相关。</p>
+<figure class="source-figure" data-source-image="13"><img alt="Figure 2.1: Education years needed to understand the human prompt and share of workers with at least a Bachelor’s Degree." decoding="async" height="569" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/d0734c80fab2e2308e01b647de6979c77f5c8c2e-713x569.svg" width="713"/><figcaption>图 2.1：理解用户提示所需的教育年限，与至少拥有学士学位的从业者占比。教育数据来自美国劳工统计局“25 岁及以上劳动者按详细职业划分的教育程度”，依据 2022 年和 2023 年美国社区调查微观数据。我们先计算与某一职业相关任务所需的平均教育年限，再计算该职业中拥有学士或更高学位的劳动者占比。</figcaption></figure>
+<p>这些验证说明，单个原语在方向上是正确的。组合原语还可能带来更多分析价值，例如用任务成功率丰富生产率估算，或者构建新的职业暴露指标。</p>
+<p>最终，最有力的验证将来自这些原语能否捕捉劳动力市场结果中的重要差异。我们发布的数据让外部研究人员能够以新的方式分析经济变化。早期研究已经带来积极信号。此前报告中的自动化和增强区分，已经被外部研究人员用于分析劳动力市场变化，如 Brynjolfsson、Chandar 与 Chen（2025）。</p>
+<h4>原语揭示不同使用场景之间的差异</h4>
+<p>为说明原语如何区分不同 AI 用途，我们考察两组形成鲜明对比的请求：软件开发，即“帮助调试、开发和优化多个编程领域的软件”；个人生活管理，即“协助管理个人生活和日常事务”。图 2.2 将两类请求的原语特征与整体平均值并列展示。</p>
+<figure class="source-figure" data-source-image="14"><img alt="Figure 2.2: Descriptive statistics of economic primitives overall and for two example request clusters." decoding="async" height="480" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/2751a76b95fce503a5ff6338abbc4d2edd9b6374-1140x480.svg" width="1140"/><figcaption>图 2.2：经济原语的整体描述性统计，以及两个示例请求集群的统计。本图展示整个 Claude.ai 样本及两个最细粒度请求集群的原语描述性统计。N 表示对话总数，或属于相应请求集群的对话数量。</figcaption></figure>
+<p><strong>任务复杂度。</strong>Claude 估计，一名胜任工作的专业人员在没有 AI 的情况下完成软件开发请求，平均需要约 3.3 小时，接近 3.1 小时的整体平均值。个人生活管理任务较简单，平均需要 1.8 小时。两类任务的人机协作估计时间相近，均约为 15 分钟。这项原语在两类任务间的差异小于其他原语。</p>
+<p><strong>人员与 AI 技能。</strong>软件开发请求需要更多专业知识。理解用户提示和 AI 回复，估计都需要约 13.8 年教育。个人生活管理请求则需要 9.1—9.4 年。</p>
+<p>Claude 估计，用户有 96%的概率能够独立完成个人生活管理请求，而软件开发请求只有 82%。这说明 Claude 为技术工作提供的支持更加关键。</p>
+<p><strong>使用目的。</strong>Claude 将 64%的软件开发请求归为工作用途，个人生活管理请求只有 17%。这说明 Claude 可以服务于非常不同的目的。整体而言，Claude.ai 使用中工作占 46%，课程学习占 19%，个人用途占 35%。</p>
+<p><strong>AI 自主度。</strong>两类请求的估计自主度相近，在 1 到 5 的量表上均约为 3.5，也接近整体平均值。这表示软件开发和个人生活管理任务平均赋予 Claude 相近的自主决策空间。</p>
+<p><strong>任务成功率。</strong>Claude 判断个人任务的成功完成率为 78%，软件开发任务为 61%。需要更多专业知识、用户也难以独立完成的任务，估计成功率更低。</p>
+<h4>Claude.ai 与 API 用户的任务和原语不同</h4>
+<p>与上一份报告一样，Claude.ai 对话和第一方 API 数据在任务及原语上存在显著差异。部分差异来自互动形式。Claude.ai 记录可以包括多轮对话，而我们分析的 API 数据只包含单次输入和输出。</p>
+<p>这是因为 API 请求彼此独立到达，没有元数据可以把它们与之前的交互关联。因此，我们只能把 API 数据视为孤立的用户和助手配对，而不是完整的对话过程。</p>
+<p>总体来看，API 使用绝大多数与工作有关，占 74%，Claude.ai 为 46%。API 的指令式使用占 64%，Claude.ai 为 32%。四分之三的 API 互动被归类为自动化，而 Claude.ai 不到一半，见图 1.3。</p>
+<p>相比之下，Claude.ai 用户会进行更多来回沟通。任务迭代和学习模式常见得多，任务通常也更长。使用 AI 后的人类时间分别为 15 分钟和 5 分钟；人类独立完成任务的估计时间分别为 3.1 小时和 1.7 小时。</p>
+<p>Claude.ai 的任务成功率也更高，分别为 67%和 49%。这可能反映多轮对话的优势。用户可以澄清要求、纠正方向，并反复修改直到得到解决方案。Claude.ai 用户平均也会给予 AI 更多自主权，而且更常带来自己无法独立完成的任务。</p>
+<p>职业任务分布也体现了这些差异。API 使用高度集中在计算机和数学任务，占 52%，Claude.ai 为 36%。这符合 API 常用于代码生成和数据处理等程序化、适合自动化的工作流。</p>
+<p>办公室和行政任务在 API 中也更常见，占 15%，Claude.ai 为 8%。这反映了适合委派的常规业务运营。</p>
+<p>相比之下，Claude.ai 的教育教学任务明显更多，占 16%，API 为 4%。这些任务包括课程帮助、辅导和教学材料开发。艺术、设计和娱乐任务也更多，占 11%，API 为 6%。</p>
+<p>Claude.ai 还有更多面向人的长尾类别，例如社区和社会服务、医疗从业者等。用户会在个人事务上寻求建议、辅导或信息。</p>
+<p>这些模式表明，第一方 API 部署集中于适合系统化自动执行的任务。Claude.ai 则服务于更广泛的用途，包括学习、创意工作和个人协助。</p>
+<p>第四章将更深入地分析任务层面的差异。</p>
+<div class="note">
+<p><sup>1</sup> 分类器是一种模型，它把给定输入，例如用户对话，分配到一个具体输出，例如“工作”用途。本报告使用 Claude 作为分类器，也就是提示 Claude 选择一个具体输出，再把 Claude 的回复作为分类结果。提示见表 2.1。</p>
+<p><sup>2</sup> 整份报告使用分箱散点图展示双变量关系。我们根据横轴变量把观察值分成 20 个数量相等的区间，再绘制各区间横轴和纵轴变量的平均值。例如，最左侧的点代表横轴分布最低 5%观察值的平均值。</p>
+</div>
+<h3>第三章：Claude 的使用方式如何因地区而异</h3>
+<h4>概述</h4>
+<p>本章使用隐私保护方法，<sup>1</sup>分析 100 万次 Claude.ai 对话的地区使用差异。<sup>2</sup>我们有五项观察。</p>
+<p><strong>Claude 主要用于工作，但用途会随采用率提高而多样化。</strong>在高收入国家，工作和个人用途更常见；在低收入国家，课程学习用途更常见。这与此前报告的发现相呼应，也符合 Microsoft 的近期研究。</p>
+<p><strong>GDP 和人类教育水平可以预测全球及美国内部的采用。</strong>在国家层面，人均 GDP 每提高 1%，Claude 人均使用量平均提高 0.7%。人类教育指标，即 Claude 对理解用户提示所需正规教育年限的估计，在国家和美国州两个层面都与 Anthropic AI 使用指数正相关。</p>
+<p><strong>其他原语在全球和美国层面对采用率的预测不同。</strong>在国家层面，较高使用量与较短任务和较低 AI 自主度相关。在美国州层面，这些关系没有统计显著性，但工作用途与采用率正相关。</p>
+<p><strong>原语之间的关系取决于情境。</strong>国家层面上，任务成功率与人类教育水平负相关；美国州层面则呈正相关。不过，在控制其他原语后，美国的关系变得不显著。</p>
+<p><strong>人类怎样提问，Claude 就怎样回答。</strong>用户提示和 AI 回复的教育水平几乎完全相关，两个层面的相关系数都超过 0.92。人均使用量更高的国家也表现出更多增强式使用，也就是把 Claude 当作协作者，而不是把决策完整交给它。</p>
+<h4>Claude 主要用于工作，但用途随采用率提高而多样化</h4>
+<p>我们通过隐私保护方法，<sup>1</sup>分析 100 万次 Claude.ai 对话。<sup>2</sup>数据揭示了显著的地区采用差异。</p>
+<p>无论在全球还是美国，Claude 都主要用于工作。不过，具体用途存在地区差异。在全球层面，巴尔干地区和巴西的工作用途相对占比最高，见图 3.1；印度尼西亚的课程学习占比最高。在美国，纽约州将 Claude 用于工作的相对占比最高。</p>
+<figure class="source-figure" data-source-image="15"><img alt="Figure 3.1: Share of work use of Claude.ai globally." decoding="async" height="1980" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/9a8dd21e96b56cd818e7574a3335f8bcdc20d03c-3931x1980.png" width="3931"/><figcaption>图 3.1：Claude.ai 在全球用于工作的占比。该指标表示某一国家的对话中，被归类为工作而非个人或课程学习的比例。不同层级反映该国在第一章定义的 Anthropic AI 使用指数全球分布中的位置。由于随机样本中低使用国家的估计存在较大不确定性，本图只纳入至少有 200 条观察的国家。底层数据包括 Claude.ai Free、Pro 和 Max 的使用。</figcaption></figure>
+<p>用途差异与国家人均收入有关，而人均收入又与人均 AI 采用率相关。我们发现，Claude 的工作和个人用途在高收入国家更常见，课程学习用途在低收入国家更常见，见图 3.2。</p>
+<p>值得注意的是，这与 Microsoft 的近期研究结果一致。该研究发现，AI 用于学校学习与较低人均收入相关，用于休闲则与较高人均收入相关。</p>
+<figure class="source-figure" data-source-image="16"><img alt="Figure 3.2: Per capita income predicts how Claude is used across countries." decoding="async" height="356" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/6d102cf4365e7743de4413f22dda33035de71038-1072x356.svg" width="1072"/><figcaption>图 3.2：人均收入可以预测各国使用 Claude 的方式。各图展示 Claude.ai 对话中某类用途占比，即工作、课程学习或个人用途，与人均 GDP 对数之间的双变量关系。标签使用 ISO-3166-1 国家代码。由于低使用国家在随机样本中的估计不确定性较大，本图只纳入至少有 200 条观察的国家。底层数据包括 Claude.ai Free、Pro 和 Max 的使用。</figcaption></figure>
+<p>多种因素可能共同造成这些模式。</p>
+<ul>
+<li>随着 AI 采用率提高，用户群会更加多样，个人用途可能因此增加。现有用户也可能开始探索更广泛的 AI 应用。相比之下，人均采用率较低的国家通常也具有较低人均收入，用户可能更集中于编程或课程学习等特定用途。</li>
+<li>各国用户支付 Claude 服务的能力不同。与软件工程等复杂工作用途相比，课程学习可能更适合免费版 Claude。</li>
+<li>高收入国家的用户可能拥有更多资源，例如空闲时间和持续的互联网连接，从而支持非必要的个人用途。</li>
+</ul>
+<h4>经济原语对应的国际与美国采用模式不同</h4>
+<p>本报告引入的经济原语，让我们能够分析可能推动采用差异的部分因素。</p>
+<p>分析 Anthropic AI 使用指数与核心经济原语及 GDP 的关系时，我们发现一些模式在国家和美国州层面都成立。例如，我们重复验证了上一份报告的发现：GDP 与 AUI 高度相关，见图 3.3 和图 3.4。</p>
+<p>在国家层面，人均 GDP 每提高 1%，Claude 人均使用量平均提高 0.7%。人类教育水平，即理解对话中用户书面提示需要多少年教育，在国家和美国州两个层面都与 AUI 呈显著正相关。</p>
+<figure class="source-figure" data-source-image="17"><img alt="Figure 3.3: Relationship between the Anthropic AI Usage Index and five core economic primitives and GDP per capita at the country level." decoding="async" height="639" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/7e10b24b1e0624a933d6d9ad7484924e22fbd0ff-1072x639.svg" width="1072"/><figcaption>图 3.3：国家层面的 Anthropic AI 使用指数与五项核心经济原语及人均 GDP 的关系。各图展示 AUI 自然对数与某项核心经济原语，以及人均 GDP 对数之间的双变量关系。标签使用 ISO-3166-1 国家代码。由于随机样本中低使用国家的指标不确定性较大，只纳入至少有 200 条观察的国家。底层数据包括 Claude.ai Free、Pro 和 Max 的使用。人类独立完成时间、人类教育、AI 自主度、工作用途和任务成功率的详细定义见第二章。</figcaption></figure>
+<figure class="source-figure" data-source-image="18"><img alt="Figure 3.4: Relationship between the Anthropic AI Usage Index and five core economic primitives and GDP per capita at the US state level." decoding="async" height="639" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/91f7b300177dc293d58d23a48fb82c4e0571faaf-1072x639.svg" width="1072"/><figcaption>图 3.4：美国州层面的 Anthropic AI 使用指数与五项核心经济原语及人均 GDP 的关系。各图展示 AUI 自然对数与某项核心经济原语，以及人均 GDP 对数之间的双变量关系。标签使用 ISO-3166-2 地区代码。由于低使用州在随机样本中的指标不确定性较大，只纳入至少有 100 条观察的州。底层数据包括 Claude.ai Free、Pro 和 Max 的使用。人类独立完成时间、人类教育、AI 自主度、工作用途和任务成功率的详细定义见第二章。</figcaption></figure>
+<p>不过，AUI 与原语的关系在国家和美国州层面经常不同。例如，在国家层面，AUI 与人类独立完成任务所需时间负相关，也与交给 AI 的决策自主权负相关。</p>
+<p>在美国州层面，这些关系没有统计显著性。这也可能源于美国州样本量更小。此外，我们在美国州层面观察到 AUI 与 Claude.ai 工作用途呈正相关，但国家层面没有这种关系。</p>
+<p>重要的是，这些原语不一定是因果因素。我们不知道收入或教育是否真正推动采用，也可能只是其他底层条件的替代指标。许多因素彼此高度相关。</p>
+<p>例如，在美国州层面，人类教育年限单独看与 AUI 高度相关。但在控制 GDP 和其他原语后，这种关系就消失了。这说明教育可能捕捉到了一些更适合由经济发展和其他因素解释的差异。</p>
+<h4>制度因素影响任务成功率与教育年限的关系</h4>
+<p>经济和制度环境，包括一个地区内部教育水平如何分布，会影响 AI 的使用方式。</p>
+<p>一个有趣现象是，任务成功率在国家层面与人类教育水平负相关，在美国州层面却呈正相关。但控制其他原语后，美国州层面的正相关变得不显著，见图 3.5。</p>
+<p>这意味着，在一种观察层级，也就是国家层面出现的关系，与另一种观察层级，也就是美国州层面出现的关系相反。跨国比较时，教育水平较高的人群可能尝试更困难的任务，因此成功率更低。在更加同质的环境内部，教育水平未必会提高任务成功率。</p>
+<figure class="source-figure" data-source-image="19"><img alt="Figure 3.5: Relationship between task success and human education." decoding="async" height="709" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/5da220beff93001f3f5a95cde9d631d0946614cd-856x709.svg" width="856"/><figcaption>图 3.5：任务成功率与人类教育水平的关系。左侧各图展示任务成功率与理解用户提示所需教育年限之间的双变量相关。右侧各图展示偏回归结果，并额外控制人均 GDP、AI 自主度、自动化占比、工作和课程学习用途占比、人类不使用 AI 和使用 AI 的耗时、多任务处理及人员独立完成能力。变量的详细定义见第二章。标签使用 ISO-3166-1 国家代码和 ISO-3166-2 地区代码。由于低使用地区在随机样本中的指标不确定性较大，只纳入至少有 200 条观察的国家和至少有 100 条观察的州。底层数据包括 Claude.ai Free、Pro 和 Max 的使用。</figcaption></figure>
+<h4>人类怎样提问，Claude 就怎样回答</h4>
+<p>我们发现，人类教育和 AI 教育指标高度相关。这里的教育指标，是理解用户提示或 AI 回复需要多少年教育。</p>
+<p>国家层面的相关系数为 r=0.925，p&lt;0.001，N=117；美国州层面为 r=0.928，p&lt;0.001，N=50。</p>
+<p>这一结果凸显了技能的重要性，也说明人类怎样提示 AI，会影响 AI 能发挥多大作用。它同时凸显模型设计与训练的重要性。Claude 虽然能够给出高度复杂的回答，但通常只有在用户输入也足够复杂时才会这样做。</p>
+<p>模型的训练、微调和指令会影响它怎样回应用户。例如，一个 AI 模型的系统提示可能要求它始终使用初中生能理解的简单语言；另一个模型则可能只使用需要博士教育才能理解的复杂语言。</p>
+<p>在 Claude 上，我们观察到更动态的模式。用户提示 Claude 的方式，与 Claude 回应的方式存在对应关系。</p>
+<h4>更高收入和更高使用量与更多增强式互动相关</h4>
+<p>人均使用量较高的国家通常也有较高人均收入。这些国家的自动化程度较低，交给 Claude 的决策自主权也较少。换句话说，高收入国家更多把 AI 当作助手和协作者，而不是让它独立工作。</p>
+<p>这一关系在美国州层面并不显著。原因可能是美国内部的收入差异和用途多样性小于全球。</p>
+<p>这一发现与第三份经济指数报告一致。该报告发现，Anthropic AI 使用指数较高的国家更倾向于与 Claude 协作，也就是采用增强模式，而不是让 Claude 独立执行，也就是自动化模式。</p>
+<h4>结论</h4>
+<p>数据中的显著地区差异表明，世界各地使用 Claude 的方式并不相同。GDP 可以预测国家和美国州层面的 Anthropic AI 使用指数。人类教育水平，也就是用户提示的复杂程度，也在两个层面与采用率相关。</p>
+<p>其他关系取决于具体环境。在国家层面，较高使用量与较短任务和较低 AI 自主度相关；在美国内部，这些规律并不存在。任务成功率与人类教育水平在全球和美国内部也呈现相反关系。</p>
+<p>人员与 AI 教育年限接近完全相关。这再次说明用户怎样提示 Claude，会影响 Claude 怎样回答。</p>
+<p>再结合高使用国家更倾向于把 Claude 当作协作者的发现，可以看出，有效使用 AI 所需的技能本身也可能分布不均。</p>
+<p>通过衡量 Claude 对话的特征，我们发现了它们与人力资本等广泛经济因素的重要关系。这些关系可能有助于预测劳动力市场结果，并支持经济平稳过渡到 AI 时代。这个过程将需要不同的技能组合。</p>
+<div class="note">
+<p><sup>1</sup> 出于隐私原因，自动分析系统会过滤任何低于 15 次对话和 5 个独立用户账户的单元格，例如国家以及“国家—任务”交叉单元。对于自下而上的请求集群，我们采用更高的隐私门槛，至少需要 500 次对话和 250 个独立账户。</p>
+<p><sup>2</sup> 本节数据涵盖 2025 年 11 月 13 日至 20 日的 100 万次 Claude.ai Free、Pro 和 Max 对话。这些对话从该期间全部对话中随机抽取。随后，我们排除了被标记为潜在信任与安全违规的内容。观察单位是 Claude.ai 上的一次对话，而不是一名用户，因此样本可能包含同一用户的多次对话。不过，我们此前的研究表明，随机抽取对话与按用户分层抽样并不会产生实质不同的结果。国家和美国州层面的汇总地区统计，根据每次对话的 IP 地址判断并制表。由于 IP 地理位置服务商采用 ISO-3166 标准，我们也使用该标准。国际位置使用 ISO-3166-1 国家代码；美国州数据使用 ISO-3166-2 地区代码，覆盖全部 50 个州和华盛顿特区。我们排除了经地理位置服务商认定来自 VPN、任播或托管服务的对话。</p>
+<p><sup>3</sup> 世界地图使用 Natural Earth 的地图，并按照 ISO 标准处理争议领土，因此可能不包含部分争议地区。除图中标为灰色的“Claude 不可用”国家外，我们也不在乌克兰的克里米亚、顿涅茨克、赫尔松、卢甘斯克和扎波罗热地区运营。根据国际制裁规定以及我们支持乌克兰领土完整的承诺，俄罗斯占领区无法使用我们的服务。</p>
+<p><sup>4</sup> “无数据”适用于部分数据缺失的国家。一些地区，例如西撒哈拉和法属圭亚那，拥有自己的 ISO-3611 代码。其中一些地区有使用记录，另一些没有。AUI 按劳动年龄人口计算，但世界银行没有为所有这些地区提供方便取得的劳动年龄人口数据，因此无法计算这些地区的 AUI。</p>
+<p><sup>5</sup> 我们把塞舌尔排除在全部地理分析之外，因为抽样期间观察到的很大一部分使用属于滥用流量。</p>
+<p><sup>6</sup> 我们把怀俄明州排除在全部美国州分析之外，因为抽样期间观察到的很大一部分使用属于滥用流量。</p>
+</div>
+<h3>第四章：任务与生产率</h3>
+<p>本章研究节省时间、成功率和自主度如何随任务类型变化，以及这对职业和生产率的潜在影响意味着什么。</p>
+<p>这些模式显示，越复杂的任务可以节省越多时间，但需要以可靠性为代价。</p>
+<p>在一个受 Autor 与 Thompson（2025）启发的简单任务移除实验中，Claude 倾向于覆盖教育要求较高的任务。这使多数职业出现净去技能化，因为 AI 处理的往往是职业中技能要求更高的部分。</p>
+<p>Claude 的使用已经覆盖越来越多职业中的相当一部分任务。我们把成功率加入更丰富的职业覆盖模型。部分职业的任务覆盖率并不高，但由于 AI 能成功处理其中最耗时的工作，实际影响仍然很大。</p>
+<p>按任务可靠性调整后，生产率增幅估算大致减半。未来十年劳动生产率年增长的估算，从 1.8 个百分点降至约 1.0 个百分点。</p>
+<p>不过，这些估计反映的是当前模型能力。各种迹象都表明，AI 对持续时间越来越长的任务将变得更加可靠。</p>
+<h4>任务加速中的权衡</h4>
+<p>我们的估计显示，数据中越复杂的任务，通常能从 AI 获得越大的时间节省，也就是更高的“加速倍数”。</p>
+<p>我们让 Claude 估计人类独立完成任务的时间，以及人与 AI 合作完成的时间。此前研究已经验证了这种方法。加速倍数等于人类独立完成时间除以人机合作时间。例如，把一小时任务缩短到 10 分钟，就得到 6 倍加速。</p>
+<p>图 4.1 左侧面板展示平均加速倍数与任务复杂度核心指标之间的关系。复杂度以理解输入需要多少年正规教育来衡量，数据均汇总到 O*NET 任务层面。<sup>1</sup></p>
+<p>例如，在 Claude.ai 对话中，需要 12 年教育，也就是高中教育才能理解的提示，平均获得 9 倍加速。需要 16 年教育，也就是大学学位水平的提示，平均获得 12 倍加速。</p>
+<p>这说明人力资本要求更高的使用场景，生产率收益也更加明显。它与白领劳动者更可能采用 AI 的证据一致，例如 Bick 等（2025）。</p>
+<p>在整个任务复杂度范围内，API 用户的加速倍数都更高。这可能反映 API 数据只包含单轮互动，也可能因为 API 任务本来就经过筛选，更适合自动化。</p>
+<p>不过，结果也揭示了一种权衡。图中右侧面板显示，更复杂任务的成功率更低。</p>
+<p>例如，在 Claude.ai 上，教育要求低于高中的任务，如回答基本产品问题，成功率达到 70%。大学水平的对话，如制定分析计划，则降至 66%。</p>
+<p>即使按两种方式计入成功率差异，教育梯度也不会消失。一种方式是排除成功率较低的任务；另一种是按成功概率折算加速倍数。两种方式下，复杂任务仍有更高的净生产率收益。</p>
+<figure class="source-figure" data-source-image="20"><img alt="Figure 4.1: Speed up (panel a) and Success rate (panel b) vs. Human years of schooling." decoding="async" height="792" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/748b522964169a031f15579194d8c8976ba80a79-1920x792.svg" width="1920"/><figcaption>图 4.1：加速倍数（面板 a）和成功率（面板 b）与人类教育年限的关系。左侧面板展示加速倍数与人类教育年限之间的双变量分箱散点关系。指标均在 O*NET 任务层面测量，并按平台区分。虚线表示线性回归拟合。右侧面板展示相同关系，但纵轴改为成功率。</figcaption></figure>
+<p>研究教育梯度影响的一种方式，是比较理解输入所需不同教育水平上的自动化占比。如果高教育任务的自动化程度更高，可能意味着白领劳动者面临更高暴露。</p>
+<p>但这里的信息并不明确。自动化占比与编写提示所需的人类教育水平基本无关，见附录图 A.1。<sup>2</sup>无论 Claude.ai 还是第一方 API，各教育水平任务的自动化比例大体相同。</p>
+<p>用户会在什么情境下更多服从 Claude？Claude.ai 用户处理更复杂任务时，会给 AI 略多一些自主权。相比之下，API 使用在所有复杂度水平上的自主度都普遍较低。</p>
+<figure class="source-figure" data-source-image="21"><img alt="Figure 4.2: AI autonomy vs. human education." decoding="async" height="1400" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/49fd2c300230c54349c92dee9653e46da898fdc9-1920x1400.svg" width="1920"/><figcaption>图 4.2：AI 自主度与人类教育水平的关系。图中展示 AI 自主度与所需人类教育水平之间的双变量分箱散点关系，指标均在 O*NET 任务层面测量。虚线表示线性回归拟合。</figcaption></figure>
+<p>不过，两种平台的分布并不覆盖相同任务。第一章的集中度图已经表明，API 使用只覆盖经济中较窄的一组任务。</p>
+<p>API 数据中使用量较大的高教育任务包括安全分析、测试与质量保证，以及代码审查。Claude.ai 用户则更可能进行反复修改和指导式会话。</p>
+<h4>真实世界使用中的任务时域</h4>
+<p>近期关于 AI“任务时域”的研究（Kwa 等，2025）发现，AI 成功率会随任务持续时间增长而下降。任务越长，模型越难完成。</p>
+<p>不过，每一代新模型的下降曲线都变得更加平缓，因为模型可以成功完成越来越长的任务。METR 主要把任务时域定义为模型至少达到 50%成功率时所能完成的最长任务时长。该指标的增长已成为衡量 AI 进步的重要标准。</p>
+<p>图 4.3 使用我们的原语展示类似指标。图中把 O*NET 任务层面的任务成功率，与人类完成任务所需时间进行比较。</p>
+<p>在 API 数据中，不足一小时任务的成功率约为 60%。人类完成时间达到 5 小时以上时，成功率降至约 45%。拟合线在 3.5 小时处与 50%成功率水平线相交。这说明 API 调用处理 3.5 小时人类任务时，成功率约为 50%。</p>
+<p>METR 的软件工程基准中，Sonnet 4.5 的对应估计为 2 小时，Opus 4.5 约为 5 小时。本报告的数据早于 Opus 4.5 发布。</p>
+<p>Claude.ai 数据呈现不同结果。成功率随任务长度增加而下降得慢得多。使用线性拟合外推，Claude.ai 大约在 19 小时处降至 50%成功率。</p>
+<p>这可能是因为多轮对话能把复杂任务拆成更小步骤。每一轮都形成反馈回路，让用户及时纠正方向。</p>
+<figure class="source-figure" data-source-image="22"><img alt="Figure 4.3: Task success vs. human-only time." decoding="async" height="1400" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/e86ca40632399589ebdd5520e8702761dcfeb792-1920x1400.svg" width="1920"/><figcaption>图 4.3：任务成功率与人类独立完成时间的关系。图中展示任务成功率与人类独立完成任务所需时间之间的双变量分箱散点关系。指标均在 O*NET 任务层面测量，并按平台区分。虚线表示线性回归拟合。</figcaption></figure>
+<p>需要注意，我们的数据与 METR 场景之间存在一个根本区别：任务选择。</p>
+<p>METR 构建基准，并把一组固定任务交给模型。我们的数据中，用户会自行决定把哪些任务交给 Claude。</p>
+<p>因此，观察到的成功率不只反映模型能力，还反映用户对任务能否成功的判断、为 Claude 设置问题的成本，以及任务成功后的预期时间收益。</p>
+<p>例如，如果用户会回避预计失败的任务，观察到的成功率就会高估模型在全部潜在任务分布上的真实能力。</p>
+<p>这种选择同时存在于两个平台，但方式不同。API 客户选择适合自动化的任务；Claude.ai 用户选择可以通过反复沟通获益的任务。</p>
+<p>同样因为这种选择效应，性能更强的模型未必会在图中显示改善。用户可能在新模型出现后，为原本相似的 O*NET 任务提出更具挑战性的要求。</p>
+<p>METR 等受控基准衡量自主能力的前沿。我们的真实世界数据则衡量有效任务时域。它同时反映模型能力和用户行为，而且超出了编程任务。两种方法都发现，AI 可以有效处理原本需要人类投入数小时的任务。</p>
+<h4>以有效 AI 覆盖重新审视职业渗透</h4>
+<p>我们此前发现，36%的职业至少有四分之一任务出现 AI 使用，约 4%的职业达到 75%的任务覆盖率。</p>
+<p>不过，这一指标只依据某项任务是否出现在数据中。新原语可以帮助我们更准确地描述 AI 如何改变职业的工作内容。<sup>3</sup></p>
+<p>首先，任务覆盖正在增加。合并历次报告后，49%的职业至少有四分之一任务出现过 AI 使用。但如果同时考虑任务在职业中的时间占比和 Claude 的平均成功率，受影响职业的构成就会改变。</p>
+<p>我们把“有效 AI 覆盖”定义为 Claude 能够成功完成的一名劳动者工作日占比。</p>
+<p>计算方式是对任务成功率加权求和。每项任务的权重，是它在劳动者工作时间中的占比，并按任务出现频率调整。成功率来自本报告的原语，工时估计来自此前的生产率影响研究，频率估计来自 O*NET 数据。O*NET 调查会询问劳动者执行各项任务的频率。</p>
+<p>图中纵轴展示有效 AI 覆盖，横轴展示单纯任务覆盖率。两者高度相关，但存在关键差异。</p>
+<p>图中右侧的职业拥有较高任务覆盖率，几乎所有任务都曾在 Claude 数据中出现，但通常位于 45 度线下方。这说明即使任务覆盖率达到 90%，也不一定代表职业会受到巨大影响。Claude 可能无法完成关键任务，或者没有覆盖最耗时的任务。</p>
+<figure class="source-figure" data-source-image="23"><img alt="Figure 4.4: Effective AI coverage vs. Task coverage" decoding="async" height="712" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/1fc34cf7333c83157f586f908b8f7ec2dc92afe2-857x712.svg" width="857"/><figcaption>图 4.4：有效 AI 覆盖与任务覆盖率。图中展示职业层面的有效 AI 覆盖率与任务覆盖率之间的双变量散点关系。有效 AI 覆盖根据 Claude.ai 数据，衡量 AI 能够成功完成的劳动者时间加权职责占比。任务覆盖率是出现在 Claude.ai 使用数据中的任务占比。虚线表示有效 AI 覆盖率等于任务覆盖率的位置。</figcaption></figure>
+<p>进一步观察，可以看到部分职业的有效 AI 覆盖与任务覆盖率差异很大。</p>
+<p>例如，数据录入员拥有最高水平之一的有效 AI 覆盖。他们九项任务中虽然只有两项被覆盖，但其中最大的一项任务，也就是从源文件读取并录入数据，Claude 的成功率很高。AI 擅长处理他们耗时最多的工作。</p>
+<p>医疗转录员和放射科医师的排名也会上升，因为被覆盖的任务正好是最耗时、频率最高的工作。</p>
+<p>对于放射科医师，两项首要任务是解读诊断影像和编写解释报告，Claude 在这两项上的成功率较高。这些职业的任务覆盖率低，是因为 AI 无法完成职业描述中的现场操作或行政工作。但 AI 能成功处理占据大部分工作时间的核心知识工作。</p>
+<p>微生物学家位于 45 度线下方，说明其有效 AI 覆盖低于单纯按任务覆盖率预测的水平。Claude 覆盖了其一半任务，却没有覆盖最耗时的部分，也就是使用专业实验设备进行现场研究。</p>
+<p>这一指标可以说提供了更现实的职业 AI 渗透图景。不过，它的意义取决于 Claude 对话多大程度上真正替代或增强了原本由人类完成的工作。</p>
+<p>对于数据录入员，AI 很可能确实替代过去手工执行的任务。但如果一次 Claude 对话被映射到教师讲课任务，就不清楚它会怎样减少教师实际讲课时间。</p>
+<p>未来研究可以利用第一方 API 数据，理解其中哪些任务已经集成到生产工作流。</p>
+<h4>AI 对职业任务内容的影响</h4>
+<p>除了 AI 能成功完成多少工作时间，还有一个不同的问题：AI 覆盖的是哪些任务，这些任务属于职业中的高技能部分还是低技能部分。</p>
+<p>近期研究通过职业内部任务组合的变化，理解 AI 对工资和就业的影响，如 Autor 与 Thompson（2025）、Hampole 等（2025）。一个关键洞见是，自动化的影响不只取决于覆盖多少任务，也取决于覆盖了哪些任务。</p>
+<p>为观察移除 AI 能执行的任务后职业怎样变化，我们首先为每项任务构建技能水平指标。</p>
+<p>O*NET 不提供任务层面的教育要求。因此，我们使用任务嵌入训练一个预测受教育年限的模型，并把美国劳工统计局的职业层面教育数据作为预测目标。<sup>4</sup></p>
+<p>这样，即使某个职业总体教育要求较低，只要其中某项任务与常见于高教育职业的任务相似，它仍可能被认定为高技能。</p>
+<p>例如，法律秘书是一个对应 12 年教育的职业。但任务“查阅法律出版物并检索数据库，以找出与待审案件相关的法律和法院判决”预计需要 17.7 年教育，因为它与律师和律师助理通常执行的任务相似。</p>
+<p>数据显示，Claude 倾向于覆盖需要较高教育水平的任务。经济中全部任务的预测教育要求平均为 13.2 年。我们在数据中看到的任务平均约高一年，达到 14.4 年，相当于副学士学位。</p>
+<p>这与此前报告的职业层面结果一致，即白领职业中的 Claude 使用更多。</p>
+<figure class="source-figure" data-source-image="24"><img alt="Figure 4.5: Education level of all tasks vs. Claude-covered tasks" decoding="async" height="425" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/ee80542ac5b4dc9fd097a391284e628ab5f5d239-713x425.svg" width="713"/><figcaption>图 4.5：全部任务与 Claude 覆盖任务的教育水平。图中包含两组直方图。蓝色柱表示 O*NET 数据库全部任务的预测教育要求分布，并按就业人数加权。橙色柱使用同样方法，但只纳入 Claude.ai 数据中出现的任务。</figcaption></figure>
+<p>接下来，我们计算移除 AI 已覆盖任务后，剩余任务的平均教育水平如何变化。</p>
+<p>总体而言，一阶净影响是职业去技能化，因为 AI 移除的是教育要求相对更高的任务。</p>
+<p>技术写作人员会出现这种去技能化。他们失去的任务包括“分析特定领域的发展，以判断是否需要修订”，对应 18.7 年教育；以及“审阅已发布材料，并对范围和格式的修订或更改提出建议”，对应 16.4 年教育。</p>
+<p>剩下的任务包括“绘制草图以说明指定材料”，对应 13.6 年教育；以及“观察生产、开发和实验活动”，对应 13.5 年教育。</p>
+<p>旅行代理也会出现去技能化，因为 AI 覆盖了“规划、说明、安排和销售行程旅游套餐”，对应 13.5 年教育；以及“计算旅行和住宿成本”，对应 13.4 年教育。</p>
+<p>留下的任务包括“打印或申请承运人的交通票据”，对应 12.0 年教育；以及“收取交通和住宿费用”，对应 11.5 年教育。</p>
+<p>多个教学职业也会出现去技能化。AI 可以处理评分、学生指导、撰写资助申请和开展研究等任务，却无法完成现场授课和管理课堂等实际工作。</p>
+<p>另一些职业的平均教育水平会上升。房地产经理会出现技能提升，因为 AI 覆盖日常行政任务，例如维护销售记录，对应 12.8 年教育；将租金与市场价格比较，对应 12.6 年教育。</p>
+<p>剩下的任务需要更高层次的专业判断和面对面互动，例如获得贷款、与建筑公司谈判，以及参加董事会会议。</p>
+<p>这些模式展示了未来几年职业可能如何随着任务内容调整而演变。</p>
+<p>如果教育水平可以像 Autor 与 Thompson 的分析那样被解释为专业能力，他们的框架可能预测技术写作人员和旅行代理的工资下降、就业增加。房地产经理则会专注复杂谈判和利益相关者管理，就业人数减少，工资上升。<sup>5</sup></p>
+<p>不过，我们基于教育的指标不同于 Autor 与 Thompson 的专业能力概念。他们的框架会把一些任务标记为高专业能力，而我们的模型却认定教育要求较低。</p>
+<p>例如，电工任务“把电线连接到断路器、变压器或其他组件”就属于这种情况。</p>
+<p>这些预测也依据 Claude 当前的使用模式。随着模型学习新能力、用户发现新用途，使用模式会改变。这可能改变哪些任务受到覆盖，以及净影响究竟是去技能化还是技能提升。</p>
+<h4>重新评估 Claude 使用的总体生产率影响</h4>
+<p>我们此前估计，广泛采用 AI 可能使美国未来十年的劳动生产率年增速提高 1.8 个百分点。</p>
+<p>这里重新进行分析，加入本报告的任务成功率原语，并采用更丰富的任务互补性处理方式。</p>
+<p>根据 100 万次 Claude.ai 对话样本中至少出现 200 次的任务加速倍数，<sup>6</sup>我们再次得到此前结果：当前一代 AI 模型和当前使用模式，对应未来十年每年 1.8 个百分点的生产率影响。<sup>7</sup></p>
+<p>加入第一方 API 数据后，我们可以判断企业部署 Claude 所对应的劳动生产率影响是否不同。</p>
+<p>这里存在两股相反力量。API 使用集中在更窄的任务和职业范围，尤其是编程工作。这会降低潜在影响。但 API 任务的平均加速倍数更高，如图 4.1 所示。</p>
+<p>两股力量大致抵消。API 样本同样对应未来十年劳动生产率提高 1.8 个百分点。</p>
+<p>这项分析面临一个突出的批评：它没有考虑模型可靠性。如果劳动者必须验证 AI 输出，生产率收益就会低于原始加速倍数所显示的水平。</p>
+<p>为量化这一渠道的重要性，我们加入任务成功率原语。具体做法是，先把任务层面的时间节省乘以任务成功率，再汇总。<sup>8</sup></p>
+<p>这一调整产生了明显影响。按 Claude.ai 使用估计，未来十年的年生产率增幅从 1.8 个百分点降至 1.2 个百分点；按 API 流量估计，则降至 1.0 个百分点。</p>
+<p>即使考虑可靠性，估计影响仍具有重要经济意义。未来十年每年持续提高 1.0 个百分点，可以让美国生产率增速恢复到 20 世纪 90 年代末和 21 世纪初的水平。</p>
+<p>第二项批评涉及任务互补性。如果部分任务不可或缺，又难以被替代，那么无论其他任务加速多少，整体生产率影响都会受限。教师可能用 AI 更快准备教案，但这不会减少与学生共同待在课堂中的时间。</p>
+<p>为把这个想法操作化，我们对职业内部任务时间节省的汇总方式施加一定结构。职业间的效率增益仍按主要分析中的方法相加。</p>
+<p>具体而言，我们假设每个职业内部的任务通过固定替代弹性（CES）聚合器组合。每项任务的权重，是此前 Claude 使用生产率影响研究所估计的任务耗时。<sup>9</sup></p>
+<p>关键参数是任务之间的替代弹性 σ。替代弹性低于 1 时，任务互为补充。没有被 AI 加速的任务会形成瓶颈，限制更广泛的生产率收益。</p>
+<p>替代弹性高于 1 时，劳动者可以把资源转向生产率更高的任务，从而放大职业层面的整体时间节省。替代弹性等于 1 是一个特殊情况，它会重现前面的主要分析。</p>
+<p>图 4.6 展示不同任务可替代程度下的结果。正如预期，替代弹性等于 1 时，估计生产率影响与基准分析相同。Claude.ai 和 API 样本都意味着，未来十年的劳动生产率年增速提高约 1.8 个百分点。</p>
+<p>但当任务互为补充时，整体劳动生产率影响会快速下降，因为 AI 加速最少的任务形成经济瓶颈。</p>
+<p>例如，当 σ=0.5 时，总体劳动生产率影响为每年 0.7—0.9 个百分点，大约只有基准估计的一半。如果再按任务成功率调整，Claude.ai 对应的影响降至 0.8 个百分点，API 降至 0.6 个百分点。</p>
+<p>另一方面，当替代弹性高于 1 时，基于 Opus 4.5 发布前使用模式估计的劳动生产率影响会明显上升。</p>
+<p>例如，当 σ=1.5 时，劳动生产率影响提高到每年 2.2—2.6 个百分点。这与劳动者进一步专门从事 AI 加速幅度最大任务的情况一致。</p>
+<p>在两种情况下，API 流量对应的生产率影响都对任务可替代程度更加敏感。这与 API 流量更集中于少数任务和相关职业的事实一致。</p>
+<p>当任务互补时，这种集中会放大瓶颈问题；当任务可替代时，它会放大任务专业化产生的生产率收益。</p>
+<figure class="source-figure" data-source-image="25"><img alt="Figure 4.6 Implied labor productivity effect from AI as a function of within-occupation task substitutability" decoding="async" height="423" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/6e43bc093ca1baa35fc51f1bb8891419085db0da-713x423.svg" width="713"/><figcaption>图 4.6：AI 所带来的劳动生产率估计影响与职业内部任务可替代程度的关系。图中根据 100 万次 Claude.ai 对话和 100 万条第一方 API 流量记录，使用至少出现 200 次的任务效率收益，展示未来十年的总体劳动生产率增长估计。替代弹性决定在以职业产出为任务 CES 指数的模型中，未被 AI 增强的任务会在多大程度上限制 Claude 使用所对应的职业生产率收益。弹性等于 1 时，会重现未经调整的基准结果，即未来十年劳动生产率年增长提高 1.8 个百分点。按成功率调整的曲线，会根据任务可靠性折算任务层面的加速倍数。详情见正文。</figcaption></figure>
+<p>这项分析表明，自动化带来的生产率影响，最终可能受到暂时无法被 AI 自动化的瓶颈任务限制。能力不断提高的 AI 对劳动力市场的影响，也可能受到类似力量约束。</p>
+<p>例如，Gans 与 Goldfarb（2026）认为，职业内部存在瓶颈任务时，部分 AI 自动化可能提高劳动收入，因为这些任务的经济价值会上升，至少在整个职业被完全自动化之前如此。</p>
+<h4>结论</h4>
+<p>本章的核心结论是，AI 对经济的影响不太可能均匀分布。有效 AI 覆盖框架显示，不同劳动者受到的劳动力市场影响，将取决于前沿 AI 工具能否可靠处理其最核心的任务。</p>
+<p>劳动力市场影响还可能取决于 AI 能熟练处理任务的技能要求，以及这些要求与经济中其他任务的相对关系。</p>
+<p>我们发现，如果从经济中移除 Claude 已经能够处理的任务，会产生净去技能化效应。留给人类的任务，教育要求低于 AI 处理的任务。</p>
+<p>这一结果很有启发性，但可能遗漏一个重要细节：Claude 所处理的最复杂任务，也往往是它表现最困难的任务。</p>
+<p>这种情况未必会替代高技能专业人员。相反，它可能强化专业知识的价值，因为专业人员需要理解 AI 的工作并评估其质量。</p>
+<p>这些劳动力市场转变的另一面，是 AI 对增长和生产率的广泛影响。</p>
+<p>一方面，把任务可靠性纳入分析后，依据 Claude 当前使用模式估计的劳动生产率增幅会下降。如果瓶颈任务形成约束，估计影响会进一步下降。</p>
+<p>另一方面，模型能力持续增长，意味着任务覆盖和任务成功率都可能提高，进而扩大生产率影响。</p>
+<div class="note">
+<p><sup>1</sup> 研究原语与 O*NET 的相关性时，我们只纳入至少出现在 100 次对话中的任务，以减少测量误差。在覆盖率分析中，则使用所有高于 15 条隐私门槛的任务。</p>
+<p><sup>2</sup> 在线附录位于 <a href="https://huggingface.co/datasets/Anthropic/EconomicIndex">https://huggingface.co/datasets/Anthropic/EconomicIndex</a>。</p>
+<p><sup>3</sup> 另见 Tomlinson 等（2025）提出的相关 AI 适用性评分。</p>
+<p><sup>4</sup> 我们使用预训练句子转换器 all-mpnet-base-v2 为每条任务陈述生成嵌入，再使用岭回归预测教育年限。</p>
+<p><sup>5</sup> 另一方面，一些历史证据显示，当自动执行职业任务的技术出现在专利数据中时，受影响职业的就业和工资随后都会下降，见 Webb（2020）。</p>
+<p><sup>6</sup> 首次评估 Claude 使用的总体生产率影响时，我们采用了 2025 年秋季 10 万次 Claude.ai 对话的样本。根据观察到加速倍数的任务集合，我们估计未来十年劳动生产率每年可能提高 1.8 个百分点。样本扩展到 100 万条后，必须决定如何处理出现频率极低的任务。由于使用量遵循此前报告记录的幂律分布，这类任务非常多。我们选择 0.02%的门槛，因为它可以在 Claude.ai 对话样本中重现此前结果。出于隐私保护原因，我们只分析至少有 15 条观察的任务。对于 10 万条样本，这对应 0.015%的门槛。因此，各样本之间的处理保持内部一致。如果不对 100 万条样本施加限制，并假定样本中任何任务都有相应效率增益，即使它只出现 15 次，那么未来十年的总体劳动生产率年增长估计会达到约 5 个百分点。这只是纳入任务集合大幅扩大后产生的机械性增长。</p>
+<p><sup>7</sup> 与此前一样，这一结果把 Hulten 定理应用于任务层面的生产率冲击，并假设相应的一次性全要素生产率提高，会在十年内与资本深化效应共同实现。</p>
+<p><sup>8</sup> 汇总劳动生产率影响时，我们把任务层面的效率增益计算为人类不使用 AI 与使用 AI 的耗时对数差。还可以使用其他方式按任务可靠性调整。如果样本任务由 AI 适用程度不同的子任务组成，而劳动者只在 AI 有效的子任务上进行最优部署，那么按成功率缩放效率增益，可以描述任务内部 AI 采用的广延边际。</p>
+<p><sup>9</sup> 我们使用 CES，即固定替代弹性生产函数，把任务层面的时间节省汇总为整个经济的生产率影响。弹性参数 σ 控制劳动者在任务之间进行替代的难易程度。σ=1 时，直接应用 Hulten 定理：总体生产率收益等于各任务对数加速倍数按工资份额加权之和。σ≠1 时使用两级汇总。首先，在每个职业内部，以时间占比为权重，使用 ρ=(σ−1)/σ 对任务加速倍数进行 CES 汇总，得到职业层面的加速倍数。随后把 Hulten 定理应用于职业层面的加速倍数。σ&lt;1 时，任务互补，生产率收益受加速最小的任务制约。σ&gt;1 时，劳动者可以专门处理 AI 加速最大的任务，从而放大总体收益。对于没有观察到 AI 加速数据的任务，我们假设生产率不变。感谢 Pascual Restrepo 建议开展这项分析。</p>
+</div>
+<h3>结束语</h3>
+<p>第四份 Anthropic 经济指数报告引入了经济原语，也就是描述 AI 使用方式的基础特征。它们展示消费者和企业如何使用 Claude。</p>
+<p>我们使用 Claude 估计使用情况在这些维度上的差异。即使单项分类并不完美，这些指标在方向上仍然准确，结合起来也能提供重要信号。</p>
+<p>研究结果对理解 AI 如何重塑经济和劳动力市场具有重要意义。Claude 更常用于教育要求较高的任务，也似乎能在这些任务上提供更大的生产率提升。</p>
+<p>如果这些任务在美国劳动者的职责中缩减，净影响可能是职业去技能化。不过，结果关键取决于任务之间的互补关系，以及某项任务的生产率提高是否会增加对它的需求。</p>
+<p>全球层面上，人均收入与使用模式高度相关。高收入国家更多以协作方式使用 Claude，低收入国家则集中于课程学习和特定应用。这说明 AI 的影响会受到现有制度结构调节，而不会均匀展开。</p>
+<p>地理扩散模式进一步支持这一判断。在美国内部，人均使用量出现轻微趋同；全球扩散则更慢。</p>
+<p>再结合收入驱动的使用方式差异，一个重要问题随之出现：AI 最终会缩小还是扩大国家之间的经济差距？</p>
+<p>与本报告记录的当前模式同样重要的，是本报告与未来报告之间可能出现的变化。</p>
+<p>随着 AI 能力进步，Claude 的成功率可能提高，使用模式可能赋予它更多自主权，用户可能尝试更新、更复杂的任务。被证明可以自动化的任务，也可能从交互式聊天转移到 API 部署。</p>
+<p>我们将持续追踪这些变化，从纵向角度观察 AI 在经济中的作用。</p>
+<p>在此前数据发布的基础上，本期报告显著扩大了共享使用数据的范围和透明度。新增内容包括任务层面的新维度分类，也首次提供了全球地区细分。</p>
+<p>我们发布这些数据，是为了让研究人员、记者和公众探索有关 AI 经济影响的新问题，并为政策应对建立实证基础。</p>
+<p>用户愿意在多大程度上尝试 AI，以及政策制定者能否建立同时促进安全与创新的监管环境，将共同决定 AI 如何改变经济。</p>
+<p>要让 AI 惠及全球用户，仅扩大接入还不够。发展支持有效使用 AI 的人力资本，尤其是低收入经济体的人力资本，同样不可或缺。</p>
+<h3>作者与致谢</h3>
+<h4>第一作者组*</h4>
+<p>Ruth Appel、Maxim Massenkoff、Peter McCrory</p>
+<p>*报告主要作者</p>
+<h4>第二作者组</h4>
+<p>Miles McCain、Ryan Heller、Tyler Neylon、Alex Tamkin</p>
+<h4>致谢</h4>
+<p>Xabi Azagirre、Tim Belonax、Keir Bradwell、Andy Braden、Dexter Callender III、Sylvie Carr、Miriam Chaum、Ronan Davy、Evan Frondorf、Deep Ganguli、Kunal Handa、Andrew Ho、Rebecca Jacobs、Owen Kaye-Kauderer、Bianca Lindner、Kelly Loftus、James Ma、Jennifer Martinez、Jared Mueller、Kelsey Nanan、Kim O'Rourke、Dianne Penn、Sarah Pollack、Ankur Rathi、Zoe Richards、Alexandra Sanderford、David Saunders、Michael Sellitto、Thariq Shihipar、Michael Stern、Kim Withee、Mengyi Xu、Tony Zeng、Xiuruo Zhang、Shuyi Zheng、Emily Pastewka、Angeli Jain、Sarah Heck、Jared Kaplan、Jack Clark、Dario Amodei</p>
+<h3>引用</h3>
+</section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

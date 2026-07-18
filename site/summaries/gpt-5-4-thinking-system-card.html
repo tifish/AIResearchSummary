@@ -1,180 +1,352 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>GPT-5.4 Thinking 系统卡</title>
 <style>
-:root{
-  --bg:#f6f8fb;
-  --ink:#16202a;
-  --muted:#5f6b7a;
-  --line:#d8e0ea;
-  --hero-bg:#101827;
-  --hero-ink:#f7fbff;
-  --panel:#ffffff;
-  --panel-alt:#edf4fb;
-  --data-bg:#e8f3ff;
-  --risk-bg:#fff0ed;
-  --opportunity-bg:#edf8ef;
-  --conclusion-bg:#f4efff;
-  --table-bg:#ffffff;
-  --quote-bg:#fff8df;
-  --take-bg:#eef2f7;
-  --accent-data:#1976d2;
-  --accent-risk:#d64b35;
-  --accent-opportunity:#178a55;
-  --accent-conclusion:#7252d6;
-  --accent-warn:#b97800;
-  --shadow:rgba(23,32,42,.12);
+:root {
+  color-scheme: light dark;
+  --bg: #f4f1ea;
+  --card: #ffffff;
+  --ink: #18211e;
+  --muted: #63706a;
+  --line: #d5ddd8;
+  --accent: #176b5b;
+  --accent2: #315bb8;
+  --accent3: #b45d1d;
+  --accent4: #9b3564;
+  --risk: #9d342e;
+  --opportunity: #157052;
+  --conclusion: #563eaa;
+  --hero-bg: #172a26;
+  --hero-ink: #f7fbf9;
+  --data-bg: #dceee8;
+  --risk-bg: #f6ded9;
+  --opportunity-bg: #dff0e5;
+  --conclusion-bg: #e9e2f7;
+  --translation-bg: #fffdf8;
+  --hl: #f3d78a;
+  --hl2: #bfe2d5;
+  --shadow: rgba(24, 33, 30, 0.12);
 }
-@media (prefers-color-scheme: dark){
-  :root{
-    --bg:#0e131a;
-    --ink:#e8edf4;
-    --muted:#a9b4c2;
-    --line:#2a3442;
-    --hero-bg:#080c12;
-    --hero-ink:#f0f6ff;
-    --panel:#151c25;
-    --panel-alt:#121b26;
-    --data-bg:#102235;
-    --risk-bg:#2a1715;
-    --opportunity-bg:#10251b;
-    --conclusion-bg:#1d1730;
-    --table-bg:#131a22;
-    --quote-bg:#2a220f;
-    --take-bg:#151d27;
-    --accent-data:#5ab0ff;
-    --accent-risk:#ff7b64;
-    --accent-opportunity:#47d486;
-    --accent-conclusion:#a890ff;
-    --accent-warn:#f3be43;
-    --shadow:rgba(0,0,0,.35);
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f4f1ea;
+  --card: #ffffff;
+  --ink: #18211e;
+  --muted: #63706a;
+  --line: #d5ddd8;
+  --accent: #176b5b;
+  --accent2: #315bb8;
+  --accent3: #b45d1d;
+  --accent4: #9b3564;
+  --risk: #9d342e;
+  --opportunity: #157052;
+  --conclusion: #563eaa;
+  --hero-bg: #172a26;
+  --hero-ink: #f7fbf9;
+  --data-bg: #dceee8;
+  --risk-bg: #f6ded9;
+  --opportunity-bg: #dff0e5;
+  --conclusion-bg: #e9e2f7;
+  --translation-bg: #fffdf8;
+  --hl: #f3d78a;
+  --hl2: #bfe2d5;
+  --shadow: rgba(24, 33, 30, 0.12);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #101614;
+    --card: #19211e;
+    --ink: #e8efeb;
+    --muted: #aab8b1;
+    --line: #34433d;
+    --accent: #57c6ad;
+    --accent2: #7fa4ff;
+    --accent3: #f2a45d;
+    --accent4: #eb7eb2;
+    --risk: #ff8c82;
+    --opportunity: #70d6ad;
+    --conclusion: #b7a1ff;
+    --hero-bg: #0b2420;
+    --hero-ink: #eaf8f3;
+    --data-bg: #18352f;
+    --risk-bg: #3c211f;
+    --opportunity-bg: #17352a;
+    --conclusion-bg: #29233e;
+    --translation-bg: #141b18;
+    --hl: #70561e;
+    --hl2: #205748;
+    --shadow: rgba(0, 0, 0, 0.35);
   }
 }
-:root[data-theme="dark"]{
-  --bg:#0e131a;
-  --ink:#e8edf4;
-  --muted:#a9b4c2;
-  --line:#2a3442;
-  --hero-bg:#080c12;
-  --hero-ink:#f0f6ff;
-  --panel:#151c25;
-  --panel-alt:#121b26;
-  --data-bg:#102235;
-  --risk-bg:#2a1715;
-  --opportunity-bg:#10251b;
-  --conclusion-bg:#1d1730;
-  --table-bg:#131a22;
-  --quote-bg:#2a220f;
-  --take-bg:#151d27;
-  --accent-data:#5ab0ff;
-  --accent-risk:#ff7b64;
-  --accent-opportunity:#47d486;
-  --accent-conclusion:#a890ff;
-  --accent-warn:#f3be43;
-  --shadow:rgba(0,0,0,.35);
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #101614;
+  --card: #19211e;
+  --ink: #e8efeb;
+  --muted: #aab8b1;
+  --line: #34433d;
+  --accent: #57c6ad;
+  --accent2: #7fa4ff;
+  --accent3: #f2a45d;
+  --accent4: #eb7eb2;
+  --risk: #ff8c82;
+  --opportunity: #70d6ad;
+  --conclusion: #b7a1ff;
+  --hero-bg: #0b2420;
+  --hero-ink: #eaf8f3;
+  --data-bg: #18352f;
+  --risk-bg: #3c211f;
+  --opportunity-bg: #17352a;
+  --conclusion-bg: #29233e;
+  --translation-bg: #141b18;
+  --hl: #70561e;
+  --hl2: #205748;
+  --shadow: rgba(0, 0, 0, 0.35);
 }
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",Arial,sans-serif;
-  line-height:1.65;
+* {
+  box-sizing: border-box;
 }
-main{max-width:1080px;margin:0 auto}
-.hero{
-  background:var(--hero-bg);
-  color:var(--hero-ink);
-  padding:56px 28px 42px;
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Inter, "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  line-height: 1.75;
 }
-.kicker{color:var(--accent-data);font-weight:700;letter-spacing:0}
-h1{font-size:clamp(30px,5vw,56px);line-height:1.08;margin:12px 0 10px}
-.original{color:var(--muted);font-size:18px}
-.lede{font-size:21px;max-width:820px;margin-top:28px}
-.band{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:1px;
-  background:var(--line);
+main {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 72px;
 }
-.metric{
-  background:var(--data-bg);
-  padding:24px;
+.hero {
+  padding: clamp(32px, 7vw, 76px);
+  border-radius: 30px;
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+  box-shadow: 0 20px 50px var(--shadow);
 }
-.metric strong{display:block;color:var(--accent-data);font-size:28px}
-.split{
-  display:grid;
-  grid-template-columns:1.1fr .9fr;
-  gap:28px;
-  padding:42px 28px;
-  background:var(--panel);
+.eyebrow {
+  margin: 0 0 14px;
+  color: var(--accent3);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
-.split aside{
-  border-left:5px solid var(--accent-risk);
-  background:var(--risk-bg);
-  padding:22px;
+h1 {
+  max-width: 850px;
+  margin: 0;
+  font-size: clamp(2.2rem, 6vw, 5.2rem);
+  line-height: 1.08;
+  letter-spacing: -0.04em;
 }
-h2{font-size:24px;margin:0 0 14px}
-.timeline{
-  background:var(--panel-alt);
-  padding:42px 28px;
+.original-title {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: clamp(1rem, 2vw, 1.25rem);
 }
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.step{
-  border-top:4px solid var(--accent-opportunity);
-  padding:18px 0 0;
+.hero .original-title {
+  color: var(--hero-ink);
+  opacity: 0.66;
 }
-.step b{color:var(--accent-opportunity)}
-.compare{
-  background:var(--table-bg);
-  padding:42px 28px;
+.lede {
+  max-width: 800px;
+  margin: 34px 0 0;
+  font-size: clamp(1.18rem, 2.5vw, 1.65rem);
+  line-height: 1.55;
 }
-table{width:100%;border-collapse:collapse;overflow:hidden}
-th,td{border-bottom:1px solid var(--line);padding:14px;text-align:left;vertical-align:top}
-th{color:var(--accent-conclusion);background:var(--conclusion-bg)}
-.insight{
-  margin:0;
-  padding:34px 28px;
-  background:var(--quote-bg);
-  border-left:8px solid var(--accent-warn);
-  font-size:22px;
-  font-weight:700;
+.hl {
+  padding: 0.08em 0.26em;
+  background: var(--hl);
+  color: var(--ink);
+  font-weight: 800;
 }
-.takeaways{
-  background:var(--take-bg);
-  padding:42px 28px 56px;
+.hl2 {
+  padding: 0.08em 0.26em;
+  background: var(--hl2);
+  color: var(--ink);
+  font-weight: 800;
 }
-.grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:16px;
+.data-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 28px 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--data-bg);
 }
-.tile{
-  background:var(--panel);
-  border:1px solid var(--line);
-  box-shadow:0 8px 22px var(--shadow);
-  padding:20px;
+.datum {
+  padding: 24px;
+  border-right: 1px solid var(--line);
 }
-.tile:nth-child(1){border-top:5px solid var(--accent-data)}
-.tile:nth-child(2){border-top:5px solid var(--accent-risk)}
-.tile:nth-child(3){border-top:5px solid var(--accent-opportunity)}
-.tile:nth-child(4){border-top:5px solid var(--accent-conclusion)}
-.label{
-  display:inline-block;
-  color:var(--hero-ink);
-  background:var(--accent-conclusion);
-  padding:2px 9px;
-  border-radius:999px;
-  font-size:13px;
-  margin-bottom:8px;
+.datum:last-child {
+  border-right: 0;
 }
-@media (max-width:760px){
-  .band,.split,.steps,.grid{grid-template-columns:1fr}
-  .hero{padding:42px 20px 32px}
-  .split,.timeline,.compare,.takeaways{padding:34px 20px}
+.datum strong {
+  display: block;
+  color: var(--accent);
+  font-size: 1.45rem;
+  line-height: 1.2;
+}
+.datum span {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+}
+.split {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 24px;
+  margin: 28px 0;
+}
+.explainer {
+  padding: 30px;
+  border-left: 7px solid var(--accent2);
+  background: var(--card);
+}
+.risk-panel {
+  padding: 30px;
+  border-radius: 4px 26px 26px 4px;
+  background: var(--risk-bg);
+}
+.explainer h2,
+.risk-panel h2,
+.takeaways h2 {
+  margin-top: 0;
+  line-height: 1.25;
+}
+.explainer h2 {
+  color: var(--accent2);
+}
+.risk-panel h2 {
+  color: var(--risk);
+}
+.insight-band {
+  margin: 28px 0;
+  padding: 28px clamp(24px, 5vw, 54px);
+  border-top: 4px solid var(--conclusion);
+  border-bottom: 4px solid var(--conclusion);
+  background: var(--conclusion-bg);
+  color: var(--conclusion);
+  font-size: clamp(1.15rem, 2.4vw, 1.55rem);
+  font-weight: 750;
+}
+.takeaways {
+  margin: 28px 0 48px;
+}
+.takeaway-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 14px;
+}
+.takeaway {
+  grid-column: span 3;
+  min-height: 150px;
+  padding: 24px;
+  border-radius: 20px;
+  background: var(--card);
+  box-shadow: 0 8px 24px var(--shadow);
+}
+.takeaway:nth-child(2) {
+  background: var(--opportunity-bg);
+  border-top: 5px solid var(--opportunity);
+}
+.takeaway:nth-child(3) {
+  grid-column: span 2;
+  border-top: 5px solid var(--accent3);
+}
+.takeaway:nth-child(4) {
+  grid-column: span 4;
+  border-top: 5px solid var(--accent4);
+}
+.takeaway b {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--accent);
+}
+#translation {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: clamp(28px, 6vw, 62px);
+  border-radius: 28px;
+  background: var(--translation-bg);
+  box-shadow: 0 16px 42px var(--shadow);
+}
+#translation h2 {
+  margin: 0 0 28px;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  color: var(--accent);
+}
+#translation h3 {
+  margin: 42px 0 16px;
+  color: var(--accent2);
+  font-size: 1.45rem;
+}
+#translation p {
+  margin: 0 0 1.25em;
+}
+.source-figure {
+  width: 100%;
+  margin: 32px 0;
+}
+.source-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 18px;
+}
+.source-figure figcaption {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-align: center;
+}
+.source-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 38px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+.source-meta span {
+  padding: 5px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.related-label {
+  margin-top: 34px;
+  color: var(--accent4);
+  font-weight: 800;
+}
+@media (max-width: 760px) {
+  .data-strip,
+  .split {
+    grid-template-columns: 1fr;
+  }
+  .datum {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .datum:last-child {
+    border-bottom: 0;
+  }
+  .takeaway,
+  .takeaway:nth-child(3),
+  .takeaway:nth-child(4) {
+    grid-column: 1 / -1;
+  }
+  main {
+    width: min(100% - 20px, 1120px);
+  }
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -306,72 +478,101 @@ th{color:var(--accent-conclusion);background:var(--conclusion-bg)}
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/gpt-5-4-thinking-system-card" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
 <main>
-  <header class="hero">
-    <div class="kicker">OpenAI System Card · 2026-03-05</div>
-    <h1>GPT-5.4 Thinking 系统卡</h1>
-    <div class="original">GPT-5.4 Thinking System Card</div>
-    <p class="lede">一句话总括：这份系统卡的核心贡献，是说明 OpenAI 已把针对高等级网络安全能力的缓解措施推进到通用推理模型 GPT-5.4 Thinking 上。</p>
-  </header>
-
-  <section class="band" aria-label="关键数字">
-    <div class="metric"><strong>2026-03-05</strong><span>发布日明确，便于追踪模型安全策略的时间线。</span></div>
-    <div class="metric"><strong>5.4</strong><span>定位为 GPT-5 系列中的最新推理模型。</span></div>
-    <div class="metric"><strong>High</strong><span>网络安全能力级别进入重点缓解范围。</span></div>
-    <div class="metric"><strong>5.2</strong><span>主要比较基线是 GPT-5.2 Thinking。</span></div>
-  </section>
-
-  <section class="split">
-    <div>
-      <h2>真正的新点不是模型名，而是安全边界的前移</h2>
-      <p>正文说，GPT-5.4 Thinking 的综合安全缓解方案与 GPT-5 系列此前模型相似。</p>
-      <p>变化在于网络安全。它是首个实施 High capability 网络安全缓解措施的通用模型。这说明风险控制不再只围绕专门编码模型展开。</p>
-    </div>
-    <aside>
-      <h2>为什么这会改变理解</h2>
-      <p>推理模型会被用于更广泛任务。网络安全能力一旦进入通用模型，就会影响普通 ChatGPT 和 API 场景的风险评估。</p>
-      <p>系统卡把这一点写明，读者可以据此判断模型发布不只是能力升级，也是治理边界调整。</p>
-    </aside>
-  </section>
-
-  <section class="timeline">
-    <h2>安全做法的继承路径</h2>
-    <div class="steps">
-      <div class="step"><b>系列延续</b><p>GPT-5.4 Thinking 沿用 GPT-5 系列的综合安全缓解思路。</p></div>
-      <div class="step"><b>网络安全加固</b><p>High capability 缓解措施被用于通用模型，而不是停留在更窄的产品形态。</p></div>
-      <div class="step"><b>落地来源</b><p>相关方法借鉴 GPT-5.3 Codex 在 ChatGPT 和 API 中的最新实现。</p></div>
-    </div>
-  </section>
-
-  <section class="compare">
-    <h2>模型关系要读清楚</h2>
-    <table>
-      <thead>
-        <tr><th>对象</th><th>正文给出的定位</th><th>读者应得到的判断</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>GPT-5.4 Thinking</td><td>GPT-5 系列最新推理模型。</td><td>关注点应放在推理模型的安全发布机制。</td></tr>
-        <tr><td>GPT-5.2 Thinking</td><td>主要基线模型。</td><td>比较 5.4 时，不应寻找不存在的 5.3 Thinking。</td></tr>
-        <tr><td>GPT-5.3 Codex</td><td>网络安全缓解方法的实践来源之一。</td><td>编码模型的安全经验正在迁移到通用模型。</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <p class="insight">核心洞见：当通用推理模型开始承接高等级网络安全缓解，AI 安全评估的对象就从“某个专用模型”扩大到“普通用户会直接接触的模型能力”。</p>
-
-  <section class="takeaways">
-    <h2>最值得带走的洞见</h2>
-    <div class="grid">
-      <div class="tile"><span class="label">数据</span><p>发布日期、模型名、基线模型和能力级别都被明确列出。这让后续比较有了可核验锚点。</p></div>
-      <div class="tile"><span class="label">风险</span><p>网络安全 High capability 被单独强调。说明该能力已经重要到需要在通用模型系统卡中前置说明。</p></div>
-      <div class="tile"><span class="label">机会</span><p>GPT-5.3 Codex 的缓解经验被迁移到 ChatGPT 和 API 相关场景。这有助于把专用模型安全做法产品化。</p></div>
-      <div class="tile"><span class="label">结论</span><p>这份文章的信息量集中但很关键。它表明模型发布的重点正在从单纯能力提升，转向能力、风险和部署渠道的同步治理。</p></div>
-    </div>
-  </section>
+<header class="hero">
+<p class="eyebrow">OpenAI · Publication · 2026</p>
+<h1>GPT-5.4 Thinking 系统卡</h1>
+<p class="original-title" lang="en">GPT-5.4 Thinking System Card</p>
+<p class="lede"><strong>一句话总括：</strong>GPT-5.4 Thinking 首次把针对网络安全<span class="hl">“高能力”等级</span>的缓解措施带到通用模型中，并沿用了 GPT-5 系列的综合安全方案。</p>
+</header>
+<section aria-label="关键信息" class="data-strip">
+<div class="datum">
+<strong>2026-03-05</strong>
+<span>系统卡发布日期</span>
+</div>
+<div class="datum">
+<strong>首次</strong>
+<span>通用模型针对网络安全“高能力”等级实施缓解措施</span>
+</div>
+<div class="datum">
+<strong>GPT-5.2 Thinking</strong>
+<span>主要比较基线，而非不存在的 GPT-5.3 Thinking</span>
+</div>
+</section>
+<section class="split">
+<article class="explainer">
+<h2>安全方案延续，但网络安全门槛发生变化</h2>
+<p>GPT-5.4 Thinking 的综合安全缓解思路与 GPT-5 系列此前模型相近。真正的新变化集中在网络安全领域。</p>
+<p>它是首个部署<span class="hl2">高能力级网络安全缓解措施</span>的通用模型。这说明安全设计正在随模型能力上限一起前移。</p>
+</article>
+<aside class="risk-panel">
+<h2>网络安全实践来自 GPT-5.3 Codex</h2>
+<p>这套方法建立在 GPT-5.3 Codex 的最新实践之上。相关方案此前已经用于 ChatGPT 和 API。</p>
+<p>这表明 OpenAI 没有从零设计防护。它把面向编码模型的经验延伸到了通用推理模型。</p>
+</aside>
+</section>
+<div class="insight-band">
+    模型命名容易造成错误比较：文中明确说明不存在 GPT-5.3 Thinking，因此应以 <span class="hl">GPT-5.2 Thinking</span> 为主要基线。
+  </div>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="takeaway-grid">
+<article class="takeaway">
+<b>能力定位</b>
+        GPT-5.4 Thinking 是 GPT-5 系列最新的推理模型。
+      </article>
+<article class="takeaway">
+<b>安全进展</b>
+        首次有通用模型针对网络安全“高能力”等级实施缓解措施。
+      </article>
+<article class="takeaway">
+<b>技术承接</b>
+        网络安全方案承接了 GPT-5.3 Codex 在 ChatGPT 和 API 中的实践。
+      </article>
+<article class="takeaway">
+<b>证据边界</b>
+        所提供正文只有引言，没有量化评测、benchmark 结果或样本量。当前只能确认安全方案的定位，无法据此判断实际缓解效果。
+      </article>
+</div>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<figure class="source-figure" data-source-image="0"><img alt="5.4 Thinking Art Card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/5HSBM48XFBkni6rNv5CAbR/46fe1d133c1440563245262a5fa59c79/5.4_Thinking_Art_Card.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<h3>引言</h3>
+<p>GPT-5.4 Thinking 是 GPT-5 系列最新的推理模型。我们的博客文章对它作了介绍。</p>
+<p>该模型采用的综合安全缓解方案与本系列此前模型相近。不过，GPT-5.4 Thinking 是首个针对网络安全“高能力”等级实施缓解措施的通用模型。其网络安全方案建立在 GPT-5.3 Codex 所采用的最新方法之上。这些方法已用于 ChatGPT 和 API。</p>
+<p>在本系统卡中，我们也会将 GPT-5.4 Thinking 称为 gpt-5.4-thinking。请注意，并不存在名为 GPT-5.3 Thinking 的模型。因此，主要的对照基线是 GPT-5.2 Thinking。</p>
+<div aria-label="原文元信息" class="source-meta">
+<span>2026</span>
+<span>系统卡</span>
+<span>作者</span>
+</div>
+<p class="related-label">继续阅读</p>
+<figure class="source-figure" data-source-image="1"><img alt="5.3 Instant System Card 1x1" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/4uroPUdtKnsU6iDtNXJlDh/73e62d7760308a792504e8861fe37bd9/5.3_Instant_System_Card_1x1.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="2"><img alt="5.3 Instant Art Card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/72xhlkMHldxPfwGsZttoiI/3ada2b7e0cdb129d0779fbc8b700a7af/5.3_Instant_Art_Card__1_.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+</section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

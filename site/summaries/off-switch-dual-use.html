@@ -1,266 +1,386 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>AI 模型中双重用途知识的关闭开关</title>
 <style>
 :root {
-  --bg: #f7f3ea;
-  --ink: #17211c;
-  --muted: #5e6a63;
-  --line: #d7d0c3;
-  --surface: #fffaf0;
-  --surface-alt: #ecf4ef;
-  --deep: #172b24;
-  --deep-ink: #f7f3ea;
-  --band-data: #e7f0ff;
-  --band-risk: #ffe9e5;
-  --band-opportunity: #e9f7dc;
-  --band-conclusion: #fff1bf;
-  --accent-data: #2f68d8;
-  --accent-risk: #d94a38;
-  --accent-opportunity: #3b8f4f;
-  --accent-conclusion: #b87800;
-  --accent-violet: #7857c8;
-  --shadow: rgba(23, 33, 28, 0.12);
+  color-scheme: light dark;
+  --bg: #f5f3ed;
+  --card: #ffffff;
+  --ink: #18202a;
+  --muted: #66717d;
+  --line: #d8d5cc;
+  --accent: #3157c8;
+  --accent2: #00806f;
+  --accent3: #d15b27;
+  --accent4: #8a45a8;
+  --data-soft: #e8efff;
+  --risk-soft: #fff0e8;
+  --opportunity-soft: #e4f5ef;
+  --conclusion-soft: #f1e8f7;
+  --translation-bg: #fffdf8;
+  --dark-panel: #18283a;
+  --dark-panel-ink: #f3f7fb;
+  --dark-panel-muted: #bdcad8;
+  --hl: #ffe58a;
+  --hl2: #bdeee2;
+  --badge-ink: #ffffff;
+  --shadow: rgba(30, 37, 45, 0.12);
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #101512;
-    --ink: #edf2ea;
-    --muted: #a8b5ad;
-    --line: #344139;
-    --surface: #18201b;
-    --surface-alt: #14241d;
-    --deep: #07100c;
-    --deep-ink: #edf2ea;
-    --band-data: #10223f;
-    --band-risk: #351913;
-    --band-opportunity: #112b1a;
-    --band-conclusion: #33260b;
-    --accent-data: #78a7ff;
-    --accent-risk: #ff7b66;
-    --accent-opportunity: #70d38b;
-    --accent-conclusion: #ffc94a;
-    --accent-violet: #ad94ff;
-    --shadow: rgba(0, 0, 0, 0.35);
+    --bg: #101419;
+    --card: #181e25;
+    --ink: #e7edf4;
+    --muted: #a4afbb;
+    --line: #323c47;
+    --accent: #8ca7ff;
+    --accent2: #42d3bb;
+    --accent3: #ff9665;
+    --accent4: #d496ec;
+    --data-soft: #17233e;
+    --risk-soft: #342017;
+    --opportunity-soft: #132d28;
+    --conclusion-soft: #2b1e32;
+    --translation-bg: #151a20;
+    --dark-panel: #0c2633;
+    --dark-panel-ink: #e9f8ff;
+    --dark-panel-muted: #abc4cf;
+    --hl: #5d4d11;
+    --hl2: #174d43;
+    --badge-ink: #101419;
+    --shadow: rgba(0, 0, 0, 0.34);
   }
 }
 :root[data-theme="dark"] {
-  --bg: #101512;
-  --ink: #edf2ea;
-  --muted: #a8b5ad;
-  --line: #344139;
-  --surface: #18201b;
-  --surface-alt: #14241d;
-  --deep: #07100c;
-  --deep-ink: #edf2ea;
-  --band-data: #10223f;
-  --band-risk: #351913;
-  --band-opportunity: #112b1a;
-  --band-conclusion: #33260b;
-  --accent-data: #78a7ff;
-  --accent-risk: #ff7b66;
-  --accent-opportunity: #70d38b;
-  --accent-conclusion: #ffc94a;
-  --accent-violet: #ad94ff;
-  --shadow: rgba(0, 0, 0, 0.35);
+  color-scheme: dark;
+  --bg: #101419;
+  --card: #181e25;
+  --ink: #e7edf4;
+  --muted: #a4afbb;
+  --line: #323c47;
+  --accent: #8ca7ff;
+  --accent2: #42d3bb;
+  --accent3: #ff9665;
+  --accent4: #d496ec;
+  --data-soft: #17233e;
+  --risk-soft: #342017;
+  --opportunity-soft: #132d28;
+  --conclusion-soft: #2b1e32;
+  --translation-bg: #151a20;
+  --dark-panel: #0c2633;
+  --dark-panel-ink: #e9f8ff;
+  --dark-panel-muted: #abc4cf;
+  --hl: #5d4d11;
+  --hl2: #174d43;
+  --badge-ink: #101419;
+  --shadow: rgba(0, 0, 0, 0.34);
 }
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", sans-serif;
-  line-height: 1.65;
+  font-family: "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.75;
 }
-main { overflow: hidden; }
+a {
+  color: var(--accent);
+}
 .hero {
-  background: var(--deep);
-  color: var(--deep-ink);
-  padding: 56px 7vw 44px;
+  padding: clamp(3rem, 8vw, 7rem) 1.4rem 3rem;
+  background: linear-gradient(135deg, var(--data-soft), var(--conclusion-soft));
+  border-bottom: 1px solid var(--line);
+}
+.hero-inner,
+.summary,
+.translation-inner {
+  width: min(1100px, 100%);
+  margin: 0 auto;
 }
 .kicker {
-  color: var(--accent-conclusion);
+  color: var(--accent3);
+  font-size: 0.84rem;
   font-weight: 800;
-  letter-spacing: 0;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 h1 {
-  max-width: 920px;
-  margin: 12px 0 8px;
-  font-size: clamp(2rem, 6vw, 4.6rem);
+  max-width: 900px;
+  margin: 0.6rem 0 0.35rem;
+  font-size: clamp(2.25rem, 6vw, 5.2rem);
   line-height: 1.08;
-  letter-spacing: 0;
+  letter-spacing: -0.045em;
 }
-.original {
+.original-title {
+  margin: 0;
   color: var(--muted);
-  max-width: 860px;
-  font-size: 1.05rem;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1rem, 2vw, 1.35rem);
 }
-.hero-summary {
-  max-width: 840px;
-  margin-top: 30px;
-  font-size: clamp(1.15rem, 2vw, 1.55rem);
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem 1.4rem;
+  margin-top: 1.8rem;
+  color: var(--muted);
+  font-size: 0.92rem;
 }
-.stats {
+.lede {
+  max-width: 820px;
+  margin: 2rem 0 0;
+  padding-left: 1.2rem;
+  border-left: 5px solid var(--accent2);
+  font-size: clamp(1.15rem, 2.4vw, 1.55rem);
+  font-weight: 650;
+}
+.summary {
+  padding: 3.5rem 1.4rem 4.5rem;
+}
+.summary h2,
+#translation h2 {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  line-height: 1.2;
+}
+.number-band {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  background: var(--line);
+  margin: 2.5rem 0;
+  overflow: hidden;
+  background: var(--dark-panel);
+  color: var(--dark-panel-ink);
+  border-radius: 20px;
 }
-.stat {
-  background: var(--band-data);
-  padding: 26px 24px;
+.metric {
+  padding: 1.7rem 1.2rem;
+  border-right: 1px solid var(--line);
 }
-.stat:nth-child(2) { background: var(--band-opportunity); }
-.stat:nth-child(3) { background: var(--band-conclusion); }
-.stat:nth-child(4) { background: var(--band-risk); }
-.num {
+.metric:last-child {
+  border-right: 0;
+}
+.metric strong {
   display: block;
-  color: var(--accent-data);
-  font-size: clamp(2rem, 4vw, 3.4rem);
-  font-weight: 900;
+  color: var(--accent2);
+  font-size: clamp(2rem, 5vw, 3.2rem);
   line-height: 1;
 }
-.stat:nth-child(2) .num { color: var(--accent-opportunity); }
-.stat:nth-child(3) .num { color: var(--accent-conclusion); }
-.stat:nth-child(4) .num { color: var(--accent-risk); }
-.stat span:last-child {
+.metric span {
   display: block;
-  margin-top: 8px;
-  color: var(--ink);
+  margin-top: 0.65rem;
+  color: var(--dark-panel-muted);
+  font-size: 0.9rem;
 }
 .split {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 42px;
-  padding: 64px 7vw;
-  background: var(--surface);
+  gap: 1.25rem;
+  margin: 2.5rem 0;
 }
-.split h2, .flow h2, .compare h2, .limits h2, .takeaways h2 {
-  margin: 0 0 18px;
-  font-size: clamp(1.5rem, 3vw, 2.4rem);
-  line-height: 1.2;
+.split article {
+  padding: 1.7rem;
+  border-top: 6px solid var(--accent);
+  background: var(--card);
+  box-shadow: 0 12px 32px var(--shadow);
 }
-.explain {
-  border-left: 6px solid var(--accent-opportunity);
-  padding-left: 22px;
+.split article:last-child {
+  border-color: var(--accent3);
+  background: var(--risk-soft);
 }
-.explain.risk {
-  border-color: var(--accent-risk);
+.split h3,
+.flow h3,
+.comparison h3,
+.takeaways h3 {
+  margin-top: 0;
+  line-height: 1.3;
 }
 .flow {
-  padding: 62px 7vw;
-  background: var(--surface-alt);
+  margin: 2.8rem 0;
+  padding: 2rem;
+  background: var(--opportunity-soft);
+  border-radius: 28px 6px 28px 6px;
 }
-.steps {
+.flow-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 22px;
-  margin-top: 28px;
+  gap: 1rem;
 }
 .step {
   position: relative;
-  padding: 24px;
-  border-top: 5px solid var(--accent-violet);
-  background: var(--bg);
-  box-shadow: 0 12px 28px var(--shadow);
+  padding: 1.25rem;
+  background: var(--card);
+  border-bottom: 4px solid var(--accent2);
 }
 .step b {
-  color: var(--accent-violet);
-  font-size: 1.4rem;
+  display: inline-grid;
+  width: 2rem;
+  height: 2rem;
+  margin-bottom: 0.6rem;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent2);
+  color: var(--badge-ink);
 }
-.compare {
-  padding: 62px 7vw;
-  background: var(--deep);
-  color: var(--deep-ink);
+.comparison {
+  margin: 2.8rem 0;
+  padding: 2rem;
+  background: var(--data-soft);
 }
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 24px;
-  background: var(--surface);
-  color: var(--ink);
+  background: var(--card);
 }
-th, td {
-  padding: 18px;
-  border-bottom: 1px solid var(--line);
+th,
+td {
+  padding: 1rem;
   text-align: left;
   vertical-align: top;
+  border: 1px solid var(--line);
 }
 th {
-  color: var(--accent-data);
-  font-size: 0.95rem;
+  color: var(--accent);
 }
-.quote {
-  margin: 0;
-  padding: 34px 7vw;
-  background: var(--band-conclusion);
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  font-size: clamp(1.25rem, 2.4vw, 2rem);
-  line-height: 1.45;
-  color: var(--ink);
+.insight-strip {
+  margin: 2.8rem 0;
+  padding: 2.2rem;
+  background: var(--dark-panel);
+  color: var(--dark-panel-ink);
+  border-left: 8px solid var(--accent3);
+  font-size: 1.15rem;
 }
-.quote strong { color: var(--accent-conclusion); }
+.insight-strip strong {
+  color: var(--accent3);
+}
 .limits {
-  padding: 62px 7vw;
-  background: var(--band-risk);
-}
-.limit-grid {
-  display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
-  gap: 28px;
-  align-items: start;
-}
-.badge-list {
-  display: grid;
-  gap: 14px;
-}
-.badge {
-  border-left: 5px solid var(--accent-risk);
-  background: var(--surface);
-  padding: 16px 18px;
+  margin: 2.8rem 0;
+  padding: 1.8rem 2rem;
+  background: var(--risk-soft);
+  border-right: 8px solid var(--accent3);
 }
 .takeaways {
-  padding: 64px 7vw;
-  background: var(--bg);
+  margin-top: 3rem;
 }
 .mosaic {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr 1fr;
-  gap: 16px;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 1rem;
 }
 .tile {
-  min-height: 150px;
-  padding: 22px;
-  background: var(--surface);
+  padding: 1.4rem;
+  background: var(--card);
   border: 1px solid var(--line);
 }
-.tile.data { border-top: 6px solid var(--accent-data); }
-.tile.risk { border-top: 6px solid var(--accent-risk); }
-.tile.opp { border-top: 6px solid var(--accent-opportunity); }
-.tile.end {
-  grid-column: span 2;
-  background: var(--band-conclusion);
-  border-top: 6px solid var(--accent-conclusion);
+.tile:nth-child(2) {
+  background: var(--opportunity-soft);
+  border-color: var(--accent2);
 }
-.tile b {
+.tile:nth-child(3) {
+  background: var(--conclusion-soft);
+  border-color: var(--accent4);
+}
+.tile:nth-child(4) {
+  background: var(--data-soft);
+  border-color: var(--accent);
+}
+mark {
+  padding: 0.08em 0.28em;
+  background: var(--hl);
+  color: var(--ink);
+}
+mark.alt {
+  background: var(--hl2);
+}
+#translation {
+  background: var(--translation-bg);
+  border-top: 1px solid var(--line);
+}
+.translation-inner {
+  max-width: 820px;
+  padding: 4rem 1.4rem 6rem;
+}
+.translation-inner > p,
+.translation-inner > ol,
+.translation-inner > ul {
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-size: 1.06rem;
+}
+.translation-inner h3 {
+  margin-top: 3.2rem;
+  padding-bottom: 0.55rem;
+  color: var(--accent);
+  font-size: 1.55rem;
+  border-bottom: 2px solid var(--line);
+}
+.source-figure {
+  margin: 2.5rem auto 3.2rem;
+}
+.source-figure img {
   display: block;
-  margin-bottom: 8px;
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
 }
-@media (max-width: 820px) {
-  .stats, .split, .steps, .limit-grid, .mosaic {
+.source-figure figcaption {
+  margin-top: 0.75rem;
+  color: var(--muted);
+  font-size: 0.88rem;
+  text-align: center;
+}
+.footnotes {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+@media (max-width: 760px) {
+  .number-band,
+  .flow-grid,
+  .split,
+  .mosaic {
     grid-template-columns: 1fr;
   }
-  .tile.end {
-    grid-column: auto;
+  .metric {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
   }
-  .hero, .split, .flow, .compare, .limits, .takeaways {
-    padding-left: 22px;
-    padding-right: 22px;
+  .metric:last-child {
+    border-bottom: 0;
   }
+  th,
+  td {
+    padding: 0.75rem;
+  }
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+--bg: #f5f3ed;
+  --card: #ffffff;
+  --ink: #18202a;
+  --muted: #66717d;
+  --line: #d8d5cc;
+  --accent: #3157c8;
+  --accent2: #00806f;
+  --accent3: #d15b27;
+  --accent4: #8a45a8;
+  --data-soft: #e8efff;
+  --risk-soft: #fff0e8;
+  --opportunity-soft: #e4f5ef;
+  --conclusion-soft: #f1e8f7;
+  --translation-bg: #fffdf8;
+  --dark-panel: #18283a;
+  --dark-panel-ink: #f3f7fb;
+  --dark-panel-muted: #bdcad8;
+  --hl: #ffe58a;
+  --hl2: #bdeee2;
+  --badge-ink: #ffffff;
+  --shadow: rgba(30, 37, 45, 0.12);
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -392,108 +512,163 @@ th {
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/off-switch-dual-use" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
-<main>
-  <section class="hero">
-    <div class="kicker">一句话总括</div>
-    <h1>AI 模型中双重用途知识的关闭开关</h1>
-    <div class="original">An off switch for dual-use knowledge in AI models</div>
-    <p class="hero-summary">GRAM 的真正贡献，是把一部分高风险知识从“全模型到处扩散”改成“进入可删除模块”，让同一个模型可以按部署场景打开或关闭特定能力。</p>
-  </section>
-
-  <section class="stats" aria-label="关键数字">
-    <div class="stat"><span class="num">4</span><span>双重用途类别：病毒学、网络安全、核物理和小众编程语言。</span></div>
-    <div class="stat"><span class="num">16</span><span>一次训练后形成的开关组合。每个类别都可独立开启或关闭。</span></div>
-    <div class="stat"><span class="num">7</span><span>模型规模实验点，从 5000 万到 50 亿参数。</span></div>
-    <div class="stat"><span class="num">0</span><span>文中强调尚未用于 Anthropic 的生产模型或 Claude 模型。</span></div>
-  </section>
-
-  <section class="split">
-    <div class="explain">
-      <h2>问题不是拒答，而是知识仍在模型里</h2>
-      <p>当前安全层主要拦截危险输入和输出。它们能降低风险，但不会移除模型内部已经学到的双重用途知识。</p>
-      <p>这会留下一个缺口。足够执着的攻击者仍可能通过越狱或微调，绕过拒答机制并重新触达危险能力。</p>
-    </div>
-    <div class="explain risk">
-      <h2>过滤数据有效，但太笨重</h2>
-      <p>预训练前过滤危险数据可以让模型少学某些能力。但它只能产出一套固定能力的模型。</p>
-      <p>如果不同部署场景需要不同能力组合，就要训练多套大模型。对前沿模型来说，这个成本很高。</p>
-    </div>
-  </section>
-
-  <section class="flow">
-    <h2>GRAM 的机制：把学习路由到专用隔间</h2>
-    <div class="steps">
-      <div class="step"><b>01</b><p>模型每一层加入额外神经元。这些神经元按风险类别分组，形成可拆卸模块。</p></div>
-      <div class="step"><b>02</b><p>遇到普通文本时，模型正常训练。遇到病毒学等双重用途文本时，通用权重暂时冻结。</p></div>
-      <div class="step"><b>03</b><p>对应模块负责学习该类别知识。训练后删除模块，就能关闭相关能力。</p></div>
-    </div>
-  </section>
-
-  <section class="compare">
-    <h2>实验结果：接近过滤训练，但只需训练一次</h2>
-    <table>
-      <thead>
-        <tr><th>测试场景</th><th>看到的效果</th><th>为什么重要</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>儿童故事合成数据</td>
-          <td>小型 GRAM 模型能按主题“遗忘”指定内容，效果接近从头过滤训练。</td>
-          <td>说明模块化遗忘不是只在危险领域才成立，而是可控学习本身可行。</td>
-        </tr>
-        <tr>
-          <td>真实混合语料</td>
-          <td>在网页、代码和科学论文混合数据上，删除模块能接近从未训练该类数据的效果。</td>
-          <td>这让“同一模型，不同能力配置”变得更接近工程现实。</td>
-        </tr>
-        <tr>
-          <td>攻击恢复测试</td>
-          <td>少量恶意数据微调下，GRAM 的抗恢复能力接近数据过滤。后训练 unlearning 更容易被恢复。</td>
-          <td>它提示安全能力不应只靠训练后的抑制，还要改变知识存放方式。</td>
-        </tr>
-        <tr>
-          <td>规模扩展</td>
-          <td>从 5000 万到 50 亿参数，GRAM 都匹配数据过滤。模型越大，模块开关差距越明显。</td>
-          <td>如果趋势成立，绕过保护的计算代价会随规模上升。</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <blockquote class="quote">
-    <strong>核心洞见：</strong>安全控制可以从“请求层面的拒绝”前移到“能力层面的配置”。这会改变我们理解 AI 风险治理的方式。
-  </blockquote>
-
-  <section class="limits">
-    <div class="limit-grid">
-      <div>
-        <h2>这还不是生产答案</h2>
-        <p>作者反复强调，GRAM 是早期研究。它没有在前沿规模或真实生产训练管线中验证，也没有用于 Claude。</p>
-        <p>当前评估主要看 next-token prediction。它还不能证明真实下游任务中的高风险能力会被同样干净地关闭。</p>
-      </div>
-      <div class="badge-list">
-        <div class="badge">风险：某些双重用途能力可能与通用知识高度纠缠。</div>
-        <div class="badge">限制：模块删除是否会影响复杂任务，仍需真实任务评估。</div>
-        <div class="badge">政策意义：可信用户访问和普通部署限制，可能不必依赖两套模型。</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="takeaways">
-    <h2>最值得带走的洞见</h2>
-    <div class="mosaic">
-      <div class="tile data"><b>知识位置很关键</b>危险能力如果分散在全模型中，就很难可靠关闭。GRAM 试图改变知识的存储结构。</div>
-      <div class="tile risk"><b>拒答不是终点</b>拒答和分类器仍重要，但它们无法单独解决模型内部能力仍然存在的问题。</div>
-      <div class="tile opp"><b>一次训练，多种部署</b>4 个类别带来 16 种配置，展示了更经济的访问控制思路。</div>
-      <div class="tile end"><b>规模趋势值得关注</b>实验显示模型越大，模块开启与关闭的能力差距越明显。这让能力开关在前沿模型时代更有研究价值。</div>
-      <div class="tile data"><b>真正难题仍在</b>如果某些危险能力和普通能力无法分离，任何过滤或模块化方法都会遇到边界。</div>
-    </div>
-  </section>
-</main>
+<header class="hero">
+<div class="hero-inner">
+<div class="kicker">Anthropic × AE Studio · Alignment</div>
+<h1>AI 模型中双重用途知识的关闭开关</h1>
+<p class="original-title" lang="en">An off switch for dual-use knowledge in AI models</p>
+<div class="meta">
+<span>来源：Anthropic</span>
+<span>日期：2026 年 7 月 8 日</span>
+<span><a href="https://www.anthropic.com/research/off-switch-dual-use">查看原文</a></span>
+</div>
+<p class="lede">一句话总括：GRAM 尝试把高风险知识集中到可拆卸模块中，让同一个模型能够按部署场景开启或关闭特定能力。</p>
+</div>
+</header>
+<main class="summary">
+<h2>更短、更易读的中文总结</h2>
+<div aria-label="关键数字" class="number-band">
+<div class="metric"><strong>4</strong><span>个独立的双重用途领域</span></div>
+<div class="metric"><strong>16</strong><span>种模块开关组合</span></div>
+<div class="metric"><strong>7</strong><span>种不同模型规模</span></div>
+<div class="metric"><strong>5000万–50亿</strong><span>实验覆盖的参数范围</span></div>
+</div>
+<div class="split">
+<article>
+<h3>现有防护挡住输出，却没有改变模型知道什么</h3>
+<p>拒答训练和内容分类器可以拦截危险回答。但双重用途知识仍保存在模型权重中。坚定的攻击者可能通过越狱绕过这些防线。</p>
+<p>真正更稳健的控制，需要深入到模型的<mark>知识存储方式</mark>。</p>
+</article>
+<article>
+<h3>数据过滤有效，却只能得到固定版本</h3>
+<p>过滤训练数据可以阻止模型学到某类知识。但若可信实验室需要高级病毒学能力，而公开版本不能具备它，开发者就要分别训练两个模型。</p>
+<p>对于昂贵的前沿模型，这种重复训练的成本可能<mark>高到难以承受</mark>。</p>
+</article>
+</div>
+<section class="flow">
+<h3>GRAM 如何把知识导入可拆卸隔间</h3>
+<div class="flow-grid">
+<div class="step">
+<b>1</b>
+<p>GRAM 在标准 Transformer 的每一层增加额外神经元，并为每类双重用途知识设置一个模块。</p>
+</div>
+<div class="step">
+<b>2</b>
+<p>模型遇到病毒学等特定数据时，通用权重会暂时冻结。只有对应模块能够从这些数据中学习。</p>
+</div>
+<div class="step">
+<b>3</b>
+<p>训练完成后，删除模块即可关闭对应能力。保留模块，则能在可信部署中继续使用该知识。</p>
+</div>
+</div>
+<p><strong>关键洞见：</strong>GRAM 不是在回答阶段压制知识，而是尝试控制知识在训练阶段被存到哪里。</p>
+</section>
+<section class="comparison">
+<h3>三组实验得到什么结果</h3>
+<table>
+<thead>
+<tr>
+<th>实验设置</th>
+<th>关键结果</th>
+<th>它改变了什么认识</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>带主题标签的儿童故事合成数据</td>
+<td>小型 GRAM 模型可以选择性“忘记”任意主题。表现几乎等同于过滤该主题后从头训练的独立模型。</td>
+<td>一次训练有可能替代多次使用不同数据集的训练。</td>
+</tr>
+<tr>
+<td>网页、代码和科学论文的真实混合数据</td>
+<td>病毒学、网络安全、核物理和一种小众编程语言分别进入独立模块。删除模块后，能力移除效果接近从未训练过相应数据，且通用性能没有下降。</td>
+<td>精细移除高风险能力，不一定要牺牲无关任务表现。</td>
+</tr>
+<tr>
+<td>从 5000 万到 50 亿参数的 7 种规模</td>
+<td>GRAM 在每个规模上都达到与数据过滤相当的效果。模型越大，模块开启与关闭之间的能力差距越明显。</td>
+<td>扩展模型规模没有削弱这种隔离效果，绕过保护的相对计算成本反而上升。</td>
+</tr>
+</tbody>
+</table>
+</section>
+<aside class="insight-strip">
+<strong>对攻击恢复的测试：</strong>使用少量恶意数据重新训练时，GRAM 的抵抗力与数据过滤大致相当。相比之下，训练后采用的“遗忘”技术只是压制知识，少量微调就能轻易恢复它。
+  </aside>
+<section class="limits">
+<h3>现在还不能把它当作成熟的安全开关</h3>
+<p>GRAM 尚未在前沿模型规模或生产训练流程中测试，也没有用于任何 Claude 模型。当前评估关注的是下一词元预测能力，而不是真实下游任务。</p>
+<p>更深层的问题仍未解决。有些双重用途能力可能与通用知识紧密交织，任何方法都未必能把它们干净分开。</p>
+<p><strong>结论：</strong>GRAM 展示了更稳健访问控制的可能方向，但现有证据仍属于<mark class="alt">初步实验结果</mark>。</p>
+</section>
+<section class="takeaways">
+<h3>最值得带走的洞见</h3>
+<div class="mosaic">
+<div class="tile"><strong>知识控制比输出过滤更深入。</strong><br/>它试图减少越狱成功后仍可获取的高风险能力。</div>
+<div class="tile"><strong>一次训练可以支持多种部署配置。</strong><br/>4 个模块形成 16 种开启或关闭组合。</div>
+<div class="tile"><strong>移除效果接近数据过滤。</strong><br/>同时，实验没有发现通用性能因此下降。</div>
+<div class="tile"><strong>可分离性仍是根本限制。</strong><br/>若危险能力与通用知识纠缠过深，模块化方法也可能失效。</div>
+</div>
+</section>
+</main><section id="translation">
+<div class="translation-inner">
+<h2>完整译文</h2>
+<figure class="source-figure" data-source-image="0"><img alt="An off switch for dual-use knowledge in AI models" decoding="async" height="1000" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/ba5df68fde631a953fcaca4ec56cd20d285bdd5d-1000x1000.svg" width="1000"/></figure>
+<p>本文介绍了 AE Studio 与 Anthropic 合作开展的一项研究。</p>
+<p>前沿 AI 模型可以看作一个巨大的知识库。其中一些知识具有双重用途，也就是既能用于善意目的，也能被用于恶意目的。例如，网络安全知识可以帮助修复严重的安全漏洞，也可以被用来利用这些漏洞。病毒学知识可以帮助研究人员开发疫苗，也可以帮助恶意行为者设计致命病原体。</p>
+<p>理想情况下，我们希望同时兼顾三个目标。第一，尽可能精准地限制对双重用途能力的访问。第二，允许可信用户为了有益目的使用这些能力。第三，在实现前两个目标时，不影响模型在其他任务上的表现。</p>
+<p>目前的安全措施并不完善。我们训练模型拒绝有害请求，也使用分类器筛查输入和输出中的危险内容。这些保护层可以防范危险输出，但不会改变底层模型中存储的知识。尽管存在这些防护，意志坚定的攻击者仍可能尝试越狱。他们会设法绕过模型的防线，以获取双重用途知识。</p>
+<p>如果要更有力地防止滥用，一种方法是控制模型知道什么。我们此前已经探索过这一方向。在早期工作中，我们从预训练数据中滤除了化学、生物、放射性和核武器相关信息。之后，我们还证明，双重用途知识可以被限制在模型权重中一个能够移除的部分。</p>
+<p>但过滤是一种粗放的工具。它只能产生一个能力集合固定的模型。如果采用过滤方法，同时需要一个能够讨论高级病毒学的版本，例如部署在经过审查的生物安全实验室中，以及另一个不能讨论这些内容的版本，就必须分别训练两个模型。前沿模型规模庞大，训练成本也很高，因此开发者可能无法承受这种做法的费用。</p>
+<p>在与 AE Studio 合作者共同开展的新研究中，我们探索了一种新方法。它有望获得分别训练多个过滤模型的好处，但只需要承担训练一个模型的成本。我们把它称为 GRAM，即梯度路由辅助模块（Gradient-Routed Auxiliary Modules）。需要强调的是，本文实验结果仍属初步成果。GRAM 尚未应用于 Anthropic 的任何生产模型，我们也不确定它未来是否会投入使用。</p>
+<h3>GRAM 的工作方式</h3>
+<p>GRAM 的核心思路，是为每一类双重用途知识在模型中设置专用且可移除的隔间。模型从双重用途数据中学习时，只更新相应的隔间。</p>
+<p>具体来说，GRAM 会在标准 Transformer 的每一层中加入额外神经元。Transformer 是大语言模型所采用的神经网络架构。这些神经元被划分成若干组，也就是“模块”。每类双重用途知识对应一个模块。</p>
+<p>训练期间，模型遇到通用文本时，会按通常方式学习。但模型遇到某个双重用途类别的文本时，例如病毒学文本，学习规则就会改变。模型仍然可以使用通用知识进行预测，但只有病毒学模块能够从这些文本中学习。通用权重会暂时被冻结。<sup><a href="#footnote-1">1</a></sup></p>
+<p>这样一来，病毒学知识会积累在病毒学模块中，不会扩散到整个网络。训练完成后，只要删除这个模块，相应能力也会随之消失。如果可信部署需要病毒学知识，则可以保留该模块。</p>
+<p>还可以根据具体部署需求，对知识进行细致配置。在实验中，我们定义了四类双重用途知识。因此，一次采用 GRAM 的训练可以得到一个拥有 16 种配置方式的模型。四个类别都可以分别设为“开启”或“关闭”。</p>
+<h3>测试 GRAM</h3>
+<p>我们在三个真实程度逐步提高的环境中测试了 GRAM。</p>
+<p>第一项实验使用了一个合成数据集。数据集包含按主题标记的儿童故事。小型 GRAM 模型可以重新配置，从而“忘记”任意指定主题。每一种配置的表现，都与从头训练、且事先过滤掉相应主题的独立模型几乎完全相同。换句话说，我们只付出训练一个模型的成本，就取得了通常需要在不同数据集上进行多次训练才能获得的结果。</p>
+<p>第二项实验使用了一个更大的模型。训练数据是网页文本、代码和科学论文的真实混合内容，其中包含四个双重用途领域：病毒学、网络安全、核物理，以及一种小众编程语言。最后一个领域用于模拟具有特殊双重用途的代码。</p>
+<p>每个双重用途领域对应的能力都会被导入自己的模块。删除一个模块后，相应能力也会被移除。移除效果大致相当于训练时从未接触过该领域的数据。尤其值得注意的是，我们发现这种移除并未降低模型的通用性能。</p>
+<p>我们还测试了攻击者能否利用少量恶意数据进行训练，从而恢复已经移除的知识。GRAM 对这种攻击的抵抗力与数据过滤大致相当。相比之下，在训练结束后应用的一种“遗忘”技术只压制了相应知识。使用少量数据进行微调，就能轻易恢复这些知识。</p>
+<p>第三项实验覆盖了七种模型规模，参数量从 5000 万到 50 亿不等。GRAM 在每种规模上都达到了与数据过滤相当的表现。随着模型变大，“模块开启”和“模块关闭”之间的差距也越来越明显。从计算成本来看，随着规模扩大，试图绕过保护措施会变得相对更加困难，也更加昂贵。</p>
+<h3>结论</h3>
+<p>随着 AI 公司训练出能力更强的模型，限制双重用途能力访问的需求也会增加。目前，公司主要通过分类器和拒答训练来限制访问。不过，要让这些安全措施足够稳健，同时又不降低模型处理无害请求的表现，并不容易。GRAM 之类的方法可能为更稳健的访问控制提供一条路径。</p>
+<p>这项研究仍处于早期阶段，也存在明显的局限。我们尚未在前沿规模或生产训练流程中测试 GRAM。如前所述，它也没有应用于任何 Claude 模型。我们的评估使用下一词元预测能力衡量模型表现，而不是考察模型在真实下游任务中的表现。</p>
+<p>此外，还有一个更深层的开放问题。这个问题同样适用于数据过滤和 GRAM 一类的方法。有些双重用途能力可能与通用知识紧密交织，以至于任何方法都无法把它们干净地分离出来。</p>
+<p>如果希望进一步了解实验细节，请阅读我们在 Alignment Science 博客上发布的文章。</p>
+<div class="footnotes">
+<h3>脚注</h3>
+<ol>
+<li id="footnote-1">还有一个技术细节：模型从通用文本中学习时，有时也会开启病毒学模块。我们发现，这有助于不同模块更有效地协同工作。</li>
+</ol>
+</div>
+</div>
+</section>
   <script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;

@@ -1,284 +1,346 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>通过 API 中的新模型推进语音智能</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>用 API 新模型推进语音智能</title>
 <style>
-:root {
-  --bg: #f7f3ec;
-  --ink: #17201b;
-  --muted: #65706a;
-  --line: #d9d2c5;
-  --panel: #fffaf1;
-  --panel-2: #eef7f1;
-  --panel-3: #eef3ff;
-  --panel-4: #fff1f1;
-  --deep: #10231c;
-  --deep-ink: #f6fbf6;
-  --accent-data: #2563eb;
-  --accent-risk: #c2410c;
-  --accent-opportunity: #0f8b6f;
-  --accent-conclusion: #7c3aed;
-  --accent-safety: #b91c1c;
-  --chip: #e7ecff;
-  --chip-2: #e2f4ec;
-  --chip-3: #ffe8d8;
-  --shadow: rgba(25, 32, 28, 0.12);
+:root{
+  color-scheme:light dark;
+  --bg:#f5f1e8;
+  --surface:#fffdf8;
+  --card:#ffffff;
+  --ink:#17212b;
+  --muted:#64707d;
+  --line:#d8d1c5;
+  --accent:#5a35d6;
+  --accent-soft:#eee9ff;
+  --accent2:#007f72;
+  --accent2-soft:#ddf7f1;
+  --accent3:#c94f18;
+  --accent3-soft:#ffeadf;
+  --accent4:#a12863;
+  --accent4-soft:#fbe4ef;
+  --risk:#b32d34;
+  --risk-soft:#fde8e8;
+  --opportunity:#087f5b;
+  --opportunity-soft:#dcf5e9;
+  --conclusion:#174ea6;
+  --conclusion-soft:#e3edff;
+  --hl:#ffe58f;
+  --hl2:#bceee2;
+  --deep:#17213d;
+  --deep-ink:#f5f7ff;
+  --deep-muted:#bdc7e2;
+  --quote:#2c214f;
+  --quote-ink:#f5f0ff;
+  --shadow:0 18px 45px rgba(35,28,20,.12);
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #111512;
-    --ink: #eef4ef;
-    --muted: #a8b5ad;
-    --line: #2d3932;
-    --panel: #1a201c;
-    --panel-2: #14251e;
-    --panel-3: #161d2b;
-    --panel-4: #2a1919;
-    --deep: #07100c;
-    --deep-ink: #f2fbf5;
-    --accent-data: #78a6ff;
-    --accent-risk: #ff9b6a;
-    --accent-opportunity: #43d2ad;
-    --accent-conclusion: #b99cff;
-    --accent-safety: #ff7a7a;
-    --chip: #1c2b55;
-    --chip-2: #14392e;
-    --chip-3: #4a2a19;
-    --shadow: rgba(0, 0, 0, 0.35);
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0f1218;
+    --surface:#171b22;
+    --card:#1d222b;
+    --ink:#e7ebf2;
+    --muted:#a8b0bd;
+    --line:#343c49;
+    --accent:#a98cff;
+    --accent-soft:#292243;
+    --accent2:#49d5c1;
+    --accent2-soft:#173c39;
+    --accent3:#ff9869;
+    --accent3-soft:#44291f;
+    --accent4:#f28abb;
+    --accent4-soft:#442536;
+    --risk:#ff7c82;
+    --risk-soft:#421f25;
+    --opportunity:#5bd7a6;
+    --opportunity-soft:#183c30;
+    --conclusion:#84b4ff;
+    --conclusion-soft:#1c3151;
+    --hl:#69551d;
+    --hl2:#174c45;
+    --deep:#11182a;
+    --deep-ink:#edf1ff;
+    --deep-muted:#aeb9d8;
+    --quote:#251d3b;
+    --quote-ink:#f1eaff;
+    --shadow:0 18px 45px rgba(0,0,0,.32);
   }
 }
-:root[data-theme="dark"] {
-  --bg: #111512;
-  --ink: #eef4ef;
-  --muted: #a8b5ad;
-  --line: #2d3932;
-  --panel: #1a201c;
-  --panel-2: #14251e;
-  --panel-3: #161d2b;
-  --panel-4: #2a1919;
-  --deep: #07100c;
-  --deep-ink: #f2fbf5;
-  --accent-data: #78a6ff;
-  --accent-risk: #ff9b6a;
-  --accent-opportunity: #43d2ad;
-  --accent-conclusion: #b99cff;
-  --accent-safety: #ff7a7a;
-  --chip: #1c2b55;
-  --chip-2: #14392e;
-  --chip-3: #4a2a19;
-  --shadow: rgba(0, 0, 0, 0.35);
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0f1218;
+  --surface:#171b22;
+  --card:#1d222b;
+  --ink:#e7ebf2;
+  --muted:#a8b0bd;
+  --line:#343c49;
+  --accent:#a98cff;
+  --accent-soft:#292243;
+  --accent2:#49d5c1;
+  --accent2-soft:#173c39;
+  --accent3:#ff9869;
+  --accent3-soft:#44291f;
+  --accent4:#f28abb;
+  --accent4-soft:#442536;
+  --risk:#ff7c82;
+  --risk-soft:#421f25;
+  --opportunity:#5bd7a6;
+  --opportunity-soft:#183c30;
+  --conclusion:#84b4ff;
+  --conclusion-soft:#1c3151;
+  --hl:#69551d;
+  --hl2:#174c45;
+  --deep:#11182a;
+  --deep-ink:#edf1ff;
+  --deep-muted:#aeb9d8;
+  --quote:#251d3b;
+  --quote-ink:#f1eaff;
+  --shadow:0 18px 45px rgba(0,0,0,.32);
 }
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-  line-height: 1.65;
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:Inter,"Noto Sans SC","Microsoft YaHei",sans-serif;
+  line-height:1.75;
 }
-main { overflow: hidden; }
-.hero {
-  background: var(--deep);
-  color: var(--deep-ink);
-  padding: 64px 7vw 48px;
+a{color:var(--accent);text-underline-offset:.18em}
+.hero{
+  padding:clamp(3.5rem,8vw,7rem) max(1.25rem,calc((100vw - 1120px)/2));
+  background:var(--deep);
+  color:var(--deep-ink);
 }
-.kicker {
-  color: var(--accent-opportunity);
-  font-size: 15px;
-  font-weight: 700;
+.eyebrow{
+  margin:0 0 1rem;
+  color:var(--accent2);
+  font-size:.78rem;
+  font-weight:800;
+  letter-spacing:.16em;
+  text-transform:uppercase;
 }
-h1 {
-  margin: 12px 0 8px;
-  font-size: clamp(32px, 6vw, 68px);
-  line-height: 1.08;
-  letter-spacing: 0;
+.hero h1{
+  max-width:900px;
+  margin:0;
+  font-size:clamp(2.5rem,7vw,5.8rem);
+  line-height:1.03;
+  letter-spacing:-.045em;
 }
-.original {
-  color: var(--muted);
-  max-width: 760px;
-  font-size: 18px;
+.original-title{
+  max-width:760px;
+  margin:1.2rem 0 0;
+  color:var(--deep-muted);
+  font-size:clamp(1rem,2vw,1.3rem);
 }
-.thesis {
-  margin-top: 30px;
-  max-width: 900px;
-  font-size: clamp(20px, 2.4vw, 30px);
-  line-height: 1.45;
-  border-left: 6px solid var(--accent-conclusion);
-  padding-left: 20px;
+.hero-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.65rem 1.5rem;
+  margin-top:2rem;
+  color:var(--deep-muted);
+  font-size:.92rem;
 }
-.metrics {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(160px, 1fr));
-  gap: 1px;
-  background: var(--line);
+.overview{
+  max-width:1120px;
+  margin:0 auto;
+  padding:4rem 1.25rem 1.5rem;
 }
-.metric {
-  background: var(--panel);
-  padding: 28px;
+.one-line{
+  display:grid;
+  grid-template-columns:minmax(120px,.35fr) minmax(0,1.65fr);
+  gap:2rem;
+  align-items:start;
+  padding:2.3rem;
+  background:var(--surface);
+  border-left:7px solid var(--accent);
+  box-shadow:var(--shadow);
 }
-.metric strong {
-  display: block;
-  color: var(--accent-data);
-  font-size: clamp(28px, 4vw, 46px);
-  line-height: 1;
+.one-line h2{margin:0;color:var(--accent);font-size:1rem}
+.one-line p{margin:0;font-size:clamp(1.2rem,2.4vw,1.75rem);line-height:1.5;font-weight:700}
+.metrics{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  margin:3rem 0;
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
 }
-.metric span {
-  display: block;
-  margin-top: 10px;
-  color: var(--muted);
+.metric{padding:1.8rem 1.2rem;border-right:1px solid var(--line)}
+.metric:last-child{border-right:0}
+.metric strong{display:block;font-size:clamp(1.7rem,4vw,3rem);line-height:1.05}
+.metric:nth-child(1) strong{color:var(--accent)}
+.metric:nth-child(2) strong{color:var(--accent2)}
+.metric:nth-child(3) strong{color:var(--accent3)}
+.metric:nth-child(4) strong{color:var(--accent4)}
+.metric span{display:block;margin-top:.65rem;color:var(--muted);font-size:.9rem}
+.split{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.25rem;
+  margin:2rem 0 3rem;
 }
-.split {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 44px;
-  padding: 56px 7vw;
-  background: var(--panel-2);
+.split article{padding:2rem;border:1px solid var(--line)}
+.split article:first-child{background:var(--accent2-soft);border-top:6px solid var(--accent2)}
+.split article:last-child{background:var(--accent3-soft);border-top:6px solid var(--accent3)}
+.split h3{margin-top:0;font-size:1.35rem}
+.split p:last-child{margin-bottom:0;font-weight:700}
+.flow{
+  margin:3rem 0;
+  padding:2.5rem;
+  background:var(--deep);
+  color:var(--deep-ink);
 }
-h2 {
-  margin: 0 0 16px;
-  font-size: clamp(24px, 3vw, 38px);
-  line-height: 1.18;
+.flow h2{margin-top:0}
+.flow-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
+.flow-step{position:relative;padding-top:1rem;border-top:4px solid var(--accent)}
+.flow-step:nth-child(2){border-color:var(--accent2)}
+.flow-step:nth-child(3){border-color:var(--accent3)}
+.flow-step b{display:block;margin-bottom:.5rem;font-size:1.12rem}
+.flow-step p{margin:0;color:var(--deep-muted)}
+.evidence{
+  display:grid;
+  grid-template-columns:.8fr 1.2fr;
+  gap:2rem;
+  margin:3rem 0;
+  padding:2.4rem;
+  background:var(--conclusion-soft);
 }
-.pill {
-  display: inline-block;
-  margin-bottom: 14px;
-  padding: 5px 10px;
-  border-radius: 999px;
-  background: var(--chip-2);
-  color: var(--accent-opportunity);
-  font-weight: 700;
-  font-size: 13px;
+.evidence h2{margin:0;color:var(--conclusion)}
+.evidence p{margin:0}
+.insight-strip{
+  margin:3rem 0;
+  padding:1.6rem 2rem;
+  background:var(--quote);
+  color:var(--quote-ink);
+  font-size:1.2rem;
+  font-weight:700;
 }
-.explain {
-  padding: 28px;
-  border-left: 8px solid var(--accent-opportunity);
-  background: var(--panel);
-  box-shadow: 0 18px 40px var(--shadow);
+.takeaways{padding:3rem 0 4.5rem}
+.takeaways h2{font-size:2rem}
+.takeaway-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:1rem}
+.takeaway{
+  padding:1.4rem;
+  min-height:180px;
+  border:1px solid var(--line);
+  background:var(--card);
 }
-.flow {
-  padding: 58px 7vw;
-  background: var(--panel-3);
+.takeaway:nth-child(1){grid-column:span 2;border-top:6px solid var(--accent)}
+.takeaway:nth-child(2){grid-column:span 2;border-top:6px solid var(--accent2)}
+.takeaway:nth-child(3){grid-column:span 2;border-top:6px solid var(--accent3)}
+.takeaway:nth-child(4){grid-column:span 3;background:var(--risk-soft);border-left:6px solid var(--risk)}
+.takeaway:nth-child(5){grid-column:span 3;background:var(--opportunity-soft);border-left:6px solid var(--opportunity)}
+.takeaway b{display:block;margin-bottom:.6rem}
+.mark{background:var(--hl);color:var(--ink);padding:.05em .25em}
+.mark2{background:var(--hl2);color:var(--ink);padding:.05em .25em}
+#translation{
+  background:var(--surface);
+  border-top:1px solid var(--line);
+  padding:4.5rem 1.25rem 7rem;
 }
-.steps {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 16px;
-  margin-top: 26px;
+.translation-inner{max-width:760px;margin:0 auto}
+#translation h2{
+  margin:0 0 2.5rem;
+  font-size:clamp(2rem,5vw,3.5rem);
+  line-height:1.15;
 }
-.step {
-  position: relative;
-  padding: 22px 18px;
-  border-top: 5px solid var(--accent-data);
-  background: var(--bg);
+#translation h3{margin:3.2rem 0 1rem;font-size:1.65rem;line-height:1.3}
+#translation h4{margin:2rem 0 .6rem;font-size:1.12rem;color:var(--accent)}
+#translation p{margin:0 0 1.15rem}
+#translation ul,#translation ol{padding-left:1.4rem;margin:0 0 1.5rem}
+#translation li{margin:.5rem 0}
+.toc{
+  margin:1.5rem 0;
+  padding:1.3rem 1.5rem;
+  background:var(--accent-soft);
+  border-left:4px solid var(--accent);
 }
-.step b {
-  display: inline-grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--accent-data);
-  color: var(--deep-ink);
-  margin-bottom: 12px;
+.toc ul{margin:0!important}
+.timestamp{color:var(--muted);font-variant-numeric:tabular-nums}
+.model-list{padding:1.5rem 1.5rem 1rem;background:var(--accent2-soft);border-top:5px solid var(--accent2)}
+.demo{
+  margin:1.6rem 0 2rem;
+  padding:1.5rem;
+  background:var(--accent3-soft);
+  border:1px solid var(--line);
 }
-.compare {
-  padding: 54px 7vw;
-  background: var(--bg);
+.notice{font-size:.9rem;color:var(--muted)}
+blockquote{
+  margin:2rem 0;
+  padding:1.6rem 1.8rem;
+  background:var(--quote);
+  color:var(--quote-ink);
+  border-left:6px solid var(--accent4);
 }
-table {
-  width: 100%;
-  border-collapse: collapse;
-  overflow: hidden;
-  background: var(--panel);
-  box-shadow: 0 16px 34px var(--shadow);
+blockquote p:last-child{margin-bottom:0!important}
+.source-figure{margin:2.5rem 0}
+.source-figure img{display:block;max-width:100%;height:auto;margin:0 auto}
+.source-figure figcaption{
+  margin-top:.8rem;
+  color:var(--muted);
+  font-size:.88rem;
+  line-height:1.55;
 }
-th, td {
-  padding: 18px;
-  text-align: left;
-  border-bottom: 1px solid var(--line);
-  vertical-align: top;
+.pricing{
+  width:100%;
+  margin:1.5rem 0;
+  border-collapse:collapse;
 }
-th {
-  color: var(--deep-ink);
-  background: var(--deep);
+.pricing th,.pricing td{padding:.8rem;border:1px solid var(--line);text-align:left}
+.pricing th{background:var(--conclusion-soft)}
+.footer-meta{
+  margin-top:3rem;
+  padding-top:1.5rem;
+  border-top:1px solid var(--line);
+  color:var(--muted);
 }
-td:first-child {
-  color: var(--accent-conclusion);
-  font-weight: 800;
+@media (max-width:800px){
+  .metrics{grid-template-columns:1fr 1fr}
+  .metric:nth-child(2){border-right:0}
+  .metric:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .split,.evidence,.flow-grid{grid-template-columns:1fr}
+  .takeaway:nth-child(n){grid-column:span 6}
 }
-.quote {
-  display: grid;
-  grid-template-columns: 0.7fr 1.3fr;
-  gap: 32px;
-  padding: 58px 7vw;
-  color: var(--deep-ink);
-  background: var(--deep);
+@media (max-width:560px){
+  .one-line{grid-template-columns:1fr;gap:.75rem;padding:1.5rem}
+  .metrics{grid-template-columns:1fr}
+  .metric{border-right:0;border-bottom:1px solid var(--line)}
+  .metric:last-child{border-bottom:0}
+  .flow{padding:1.5rem}
 }
-.quote .badge {
-  align-self: start;
-  padding: 20px;
-  border: 2px solid var(--accent-risk);
-  color: var(--accent-risk);
-  font-size: 28px;
-  font-weight: 900;
-}
-.quote blockquote {
-  margin: 0;
-  font-size: clamp(22px, 3vw, 36px);
-  line-height: 1.35;
-}
-.safety {
-  padding: 52px 7vw;
-  background: var(--panel-4);
-}
-.safety-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-}
-.safety-item {
-  padding: 22px;
-  border-left: 6px solid var(--accent-safety);
-  background: var(--panel);
-}
-.takeaways {
-  padding: 58px 7vw 72px;
-  background: var(--panel);
-}
-.mosaic {
-  display: grid;
-  grid-template-columns: 1.2fr 0.8fr 1fr;
-  gap: 16px;
-}
-.tile {
-  min-height: 150px;
-  padding: 24px;
-  border: 1px solid var(--line);
-  background: var(--bg);
-}
-.tile:nth-child(1) {
-  grid-row: span 2;
-  border-top: 8px solid var(--accent-conclusion);
-}
-.tile:nth-child(2) { border-top: 8px solid var(--accent-data); }
-.tile:nth-child(3) { border-top: 8px solid var(--accent-opportunity); }
-.tile:nth-child(4) { border-top: 8px solid var(--accent-risk); }
-.tile h3 {
-  margin: 0 0 10px;
-  font-size: 22px;
-}
-@media (max-width: 860px) {
-  .metrics, .split, .steps, .quote, .safety-grid, .mosaic {
-    grid-template-columns: 1fr;
-  }
-  .hero, .split, .flow, .compare, .quote, .safety, .takeaways {
-    padding-left: 24px;
-    padding-right: 24px;
-  }
-  th, td { display: block; }
-  tr { border-bottom: 1px solid var(--line); }
+
+:root[data-theme="light"] {
+  color-scheme: light;
+--bg:#f5f1e8;
+  --surface:#fffdf8;
+  --card:#ffffff;
+  --ink:#17212b;
+  --muted:#64707d;
+  --line:#d8d1c5;
+  --accent:#5a35d6;
+  --accent-soft:#eee9ff;
+  --accent2:#007f72;
+  --accent2-soft:#ddf7f1;
+  --accent3:#c94f18;
+  --accent3-soft:#ffeadf;
+  --accent4:#a12863;
+  --accent4-soft:#fbe4ef;
+  --risk:#b32d34;
+  --risk-soft:#fde8e8;
+  --opportunity:#087f5b;
+  --opportunity-soft:#dcf5e9;
+  --conclusion:#174ea6;
+  --conclusion-soft:#e3edff;
+  --hl:#ffe58f;
+  --hl2:#bceee2;
+  --deep:#17213d;
+  --deep-ink:#f5f7ff;
+  --deep-muted:#bdc7e2;
+  --quote:#2c214f;
+  --quote-ink:#f5f0ff;
+  --shadow:0 18px 45px rgba(35,28,20,.12);
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -410,125 +472,216 @@ td:first-child {
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/advancing-voice-intelligence-with-new-models-in-the-api" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<header class="hero">
+<p class="eyebrow">OpenAI · Product · 2026</p>
+<h1>用 API 新模型推进语音智能</h1>
+<p class="original-title" lang="en">Advancing voice intelligence with new models in the API</p>
+<div class="hero-meta">
+<span>发布日期：2026 年 5 月 7 日</span>
+<span>来源：OpenAI</span>
+<span>类别：产品</span>
+</div>
+</header>
 <main>
-  <section class="hero">
-    <div class="kicker">Product · OpenAI · May 7, 2026</div>
-    <h1>通过 API 中的新模型推进语音智能</h1>
-    <div class="original">Advancing voice intelligence with new models in the API</div>
-    <p class="thesis">一句话总括：OpenAI 的贡献不是只发布更自然的声音，而是把实时语音变成能推理、调用工具、翻译和转写的产品运行层。</p>
-  </section>
-
-  <section class="metrics" aria-label="关键数字">
-    <div class="metric"><strong>3</strong><span>个新音频模型进入 Realtime API，覆盖语音代理、实时翻译和流式转写。</span></div>
-    <div class="metric"><strong>128K</strong><span>GPT‑Realtime‑2 的上下文窗口从 32K 扩大到 128K，支持更长任务流。</span></div>
-    <div class="metric"><strong>70+</strong><span>GPT‑Realtime‑Translate 支持 70+ 输入语言，并输出到 13 种语言。</span></div>
-    <div class="metric"><strong>95%</strong><span>Zillow 早测中，提示优化后最难对抗基准的通话成功率达到 95%。</span></div>
-  </section>
-
-  <section class="split">
-    <div>
-      <span class="pill">核心变化</span>
-      <h2>语音接口正在从“轮流说话”变成“边聊边办事”</h2>
-      <p>文章把语音 AI 的门槛重新定义为任务能力。好用的语音代理需要听懂意图，记住上下文，处理用户改口，还要在不中断对话的情况下调用工具。</p>
-      <p>这改变了读者对 AI 影响的理解。语音不再只是输入方式，而是软件行动的前台界面。</p>
-    </div>
-    <div class="explain">
-      <h2>三种产品模式</h2>
-      <p><strong>Voice-to-action：</strong>用户说出目标，系统推理、查工具并完成任务。</p>
-      <p><strong>Systems-to-voice：</strong>软件把后台状态转成即时语音提示，例如航班延误后的路线建议。</p>
-      <p><strong>Voice-to-voice：</strong>跨语言、跨任务、跨上下文的实时对话继续进行。</p>
-      <p>结论是，语音 AI 的商业价值来自任务闭环，而不是单点识别准确率。</p>
-    </div>
-  </section>
-
-  <section class="flow">
-    <h2>GPT‑Realtime‑2 把代理行为做进了实时对话</h2>
-    <p>它支持 preambles、并行工具调用、工具透明提示、更强恢复、更长上下文、专业术语保持和可调 reasoning effort。每个能力都指向同一个趋势：用户不该等待一个沉默的系统。</p>
-    <div class="steps">
-      <div class="step"><b>1</b><strong>先回应</strong><p>短句提示“我来查一下”，让用户知道请求已被接住。</p></div>
-      <div class="step"><b>2</b><strong>同时查</strong><p>模型可并行调用多个工具，减少实时任务中的停顿感。</p></div>
-      <div class="step"><b>3</b><strong>说清动作</strong><p>把“正在查日历”等动作说出来，提升可理解性。</p></div>
-      <div class="step"><b>4</b><strong>恢复失败</strong><p>出错时给出自然解释，而不是静默或断线式失败。</p></div>
-      <div class="step"><b>5</b><strong>继续推进</strong><p>128K 上下文让长会话和复杂任务更连贯。</p></div>
-    </div>
-  </section>
-
-  <section class="compare">
-    <h2>评测数字说明：能力提升集中在真实语音代理场景</h2>
-    <table>
-      <thead>
-        <tr><th>模型或场景</th><th>关键数据</th><th>为什么重要</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>GPT‑Realtime‑2 high</td>
-          <td>Big Bench Audio 上比 GPT‑Realtime‑1.5 高 15.2%。</td>
-          <td>提升发生在音频推理任务上，说明语音输入本身正在成为复杂推理入口。</td>
-        </tr>
-        <tr>
-          <td>GPT‑Realtime‑2 xhigh</td>
-          <td>Audio MultiChallenge 上比 GPT‑Realtime‑1.5 高 13.8%。</td>
-          <td>多轮指令跟随、上下文整合和自然纠错更强，贴近真实客服和助理对话。</td>
-        </tr>
-        <tr>
-          <td>Zillow 早测</td>
-          <td>最难对抗基准中，通话成功率从 69% 升至 95%。</td>
-          <td>语音代理能否上线，取决于复杂请求和合规边界下的稳定表现。</td>
-        </tr>
-        <tr>
-          <td>印度多语言场景</td>
-          <td>Hindi、Tamil、Telugu 评测中，Word Error Rate 低 12.5%。</td>
-          <td>实时翻译的挑战不只是词义，还包括地区发音、低延迟和任务完成率。</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="quote">
-    <div class="badge">风险与信任</div>
-    <blockquote>实时语音越像人类协作，安全边界就越要进入会话本身，而不是只停留在事后审核。</blockquote>
-    <div>
-      <p>OpenAI 描述了多层防护，包括 Realtime API 会话中的主动分类器。某些违反有害内容规则的对话可以被中止。</p>
-      <p>开发者还可以用 Agents SDK 增加自己的 guardrails。政策要求也很明确：不能把输出用于垃圾信息、欺骗或其他有害目的，并且通常要让终端用户知道自己在和 AI 互动。</p>
-      <p>这让读者看到一个关键点：语音代理进入生产环境后，低延迟和合规同样是基础设施问题。</p>
-    </div>
-  </section>
-
-  <section class="safety">
-    <h2>价格与可用性决定了落地节奏</h2>
-    <div class="safety-grid">
-      <div class="safety-item"><strong>GPT‑Realtime‑2</strong><p>音频输入 $32 / 1M tokens，缓存输入 $0.40 / 1M tokens，音频输出 $64 / 1M tokens。</p></div>
-      <div class="safety-item"><strong>GPT‑Realtime‑Translate</strong><p>$0.034 / 分钟，适合实时客服、教育、活动、媒体和创作者平台。</p></div>
-      <div class="safety-item"><strong>GPT‑Realtime‑Whisper</strong><p>$0.017 / 分钟，面向低延迟字幕、会议记录和持续语音理解。</p></div>
-    </div>
-    <p>结论是，OpenAI 把语音能力拆成不同成本结构。开发者可以按任务选择推理、翻译或转写，而不是用一个模型承担所有工作。</p>
-  </section>
-
-  <section class="takeaways">
-    <h2>最值得带走的洞见</h2>
-    <div class="mosaic">
-      <div class="tile">
-        <h3>语音正在成为操作系统级入口</h3>
-        <p>文章最重要的信号是，用户可以通过自然语言直接触发软件动作。未来的语音体验会更像协作界面，而不是语音搜索框。</p>
-      </div>
-      <div class="tile">
-        <h3>实时性不是只看延迟</h3>
-        <p>真正的实时包括边说边理解、边查工具、边恢复错误。响应方式会影响用户是否信任代理。</p>
-      </div>
-      <div class="tile">
-        <h3>多语言体验进入现场生产</h3>
-        <p>70+ 输入语言和 13 种输出语言让实时翻译适合客服、活动和教育场景。跨语言沟通不必等待后期制作。</p>
-      </div>
-      <div class="tile">
-        <h3>安全会成为语音代理的产品功能</h3>
-        <p>实时会话中的主动分类器、开发者 guardrails 和 AI 身份披露，会直接影响语音产品能否进入敏感行业。</p>
-      </div>
-    </div>
-  </section>
+<div class="overview">
+<section class="one-line">
+<h2>一句话总括</h2>
+<p>三款新模型把实时语音从简单的问答界面，推进为能够<span class="mark">理解、推理、调用工具、翻译和转写</span>的工作入口。</p>
+</section>
+<section aria-label="关键数据" class="metrics">
+<div class="metric"><strong>128K</strong><span>GPT‑Realtime‑2 上下文窗口，由 32K 扩大至此</span></div>
+<div class="metric"><strong>+15.2%</strong><span>高推理档在 Big Bench Audio 上相对 GPT‑Realtime‑1.5 的提升</span></div>
+<div class="metric"><strong>70+ → 13</strong><span>GPT‑Realtime‑Translate 的输入与输出语言覆盖</span></div>
+<div class="metric"><strong>95%</strong><span>Zillow 最难对抗 benchmark 经优化后的通话成功率</span></div>
+</section>
+<section class="split">
+<article>
+<h3>变化不只是响应更快</h3>
+<p>GPT‑Realtime‑2 可以在通话继续进行时推理、调用多个工具，并处理纠正和打断。它还能先说“让我查一下”，让用户知道系统仍在工作。</p>
+<p>这意味着语音代理开始具备完整的任务执行能力，而不只是生成自然的声音。</p>
+</article>
+<article>
+<h3>评测提升指向真实工作流</h3>
+<p>高推理档在 Big Bench Audio 上提升 <span class="mark">15.2%</span>。xhigh 档在 Audio MultiChallenge 上提升 <span class="mark">13.8%</span>。</p>
+<p>提升集中在推理、上下文管理和指令遵循。这些能力直接决定语音代理能否可靠完成复杂请求。</p>
+</article>
+</section>
+<section class="flow">
+<h2>三条语音应用路径</h2>
+<div class="flow-grid">
+<div class="flow-step">
+<b>语音到行动</b>
+<p>用户说出目标。系统理解约束，调用工具，并完成任务。</p>
+</div>
+<div class="flow-step">
+<b>系统到语音</b>
+<p>软件把航班、日历或客户支持信息转成即时口头指引。</p>
+</div>
+<div class="flow-step">
+<b>语音到语音</b>
+<p>模型跨语言实时传递对话，让交流在任务和语境变化中继续。</p>
+</div>
+</div>
+</section>
+<section class="evidence">
+<h2>企业实测给出了更直观的尺度</h2>
+<p>Zillow 在最难的对抗 benchmark 上进行提示词优化后，通话成功率从 <span class="mark">69%</span> 升至 <span class="mark2">95%</span>，提高了 26 个百分点。印度市场的 Hindi、Tamil 和 Telugu 评测中，GPT‑Realtime‑Translate 的词错误率比其他受测模型低 <span class="mark">12.5%</span>。这些结果说明，生产价值取决于任务完成率、合规性和对区域语音的适应能力，而不只是声音是否自然。</p>
+</section>
+<aside class="insight-strip">真正的转折点，是语音模型开始一边维持自然交流，一边完成需要上下文、工具和判断的工作。</aside>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="takeaway-grid">
+<article class="takeaway"><b>语音成为操作入口</b>用户不必先理解软件界面。只要说出目标和限制，代理便可规划并行动。</article>
+<article class="takeaway"><b>实时翻译走向双向体验</b>70 多种输入语言和 13 种输出语言，让跨语言支持更接近自然对话。</article>
+<article class="takeaway"><b>转写进入流式工作流</b>字幕、会议记录和后续任务可以在对话尚未结束时开始生成。</article>
+<article class="takeaway"><b>可靠性仍是主要风险</b>主动分类器、开发者护栏和 AI 身份披露不可省略。企业部署还要持续衡量失败恢复与合规表现。</article>
+<article class="takeaway"><b>成本边界已经清晰</b>GPT‑Realtime‑Translate 每分钟 0.034 美元，GPT‑Realtime‑Whisper 每分钟 0.017 美元。开发者可以据此评估大规模实时应用。</article>
+</div>
+</section>
+</div>
+<section id="translation">
+<div class="translation-inner">
+<h2>完整译文</h2>
+<p class="lead">新一代实时语音模型，可以在人们说话的同时进行推理、翻译和转写。</p>
+<p class="timestamp">00:00</p>
+<nav aria-label="文章目录" class="toc">
+<ul>
+<li>语音：连接用户与产品的界面</li>
+<li>实时语音：帮助语音模型推理并采取行动</li>
+<li>实时翻译：构建实时多语言语音体验</li>
+<li>实时转写：构建低延迟转写体验</li>
+<li>安全</li>
+<li>价格与可用性</li>
+<li>开始使用</li>
+</ul>
+</nav>
+<nav aria-label="重复文章目录" class="toc">
+<ul>
+<li>语音：连接用户与产品的界面</li>
+<li>实时语音：帮助语音模型推理并采取行动</li>
+<li>实时翻译：构建实时多语言语音体验</li>
+<li>实时转写：构建低延迟转写体验</li>
+<li>安全</li>
+<li>价格与可用性</li>
+<li>开始使用</li>
+</ul>
+</nav>
+<p>我们在 API 中推出三款音频模型，为开发者开启一类全新的语音应用。借助这些模型，开发者可以构建更自然的语音体验。应用能够更智能地响应，也能实时采取行动：</p>
+<div class="model-list">
+<p><strong>GPT‑Realtime‑2</strong>：我们首款具备 GPT‑5 级推理能力的语音模型。它可以处理更困难的请求，并自然地推动对话继续。</p>
+<p><strong>GPT‑Realtime‑Translate</strong>：一款新的实时翻译模型。它可以跟上说话者的速度，把 70 多种输入语言的语音翻译成 13 种输出语言。</p>
+<p><strong>GPT‑Realtime‑Whisper</strong>：一款新的流式语音转文字模型。它能在人们说话时实时转写语音。</p>
+</div>
+<div class="demo">
+<h3>试用 GPT-Realtime-2</h3>
+<p>启动会话后，可以尝试说出以下任一句话：</p>
+<ul>
+<li>我今晚临时要请客吃饭。我只有 30 分钟，两位朋友吃素，其中一人讨厌蘑菇，而且厨房很小。请帮我安排一份简单的菜单。</li>
+<li>我要在日本的一场现场活动中欢迎来宾。请用日语说一段温暖、自然的欢迎词，就像主持人在开启一场特别活动。</li>
+<li>我的订单号是 Orbit-742Q。请清楚地重复一遍，让我确认是否正确。</li>
+<li>请帮我练习告诉团队，我们已经达成发布里程碑。先用沉稳自信的语气说一遍，再用更兴奋的语气说一遍。</li>
+<li>我正在为公路旅行准备知识问答。请给我三道看似简单、实际容易答错的问题，然后各用一句话解释答案。</li>
+</ul>
+<p class="notice">本演示有时间限制。使用本演示即表示你同意 OpenAI 的条款，并确认知悉我们的隐私政策。</p>
+</div>
+<p>语音正在成为人们使用软件时最自然的方式之一。开车时，用户可以开口寻求帮助。穿过机场时，用户可以调整旅行计划。用户还能用自己偏好的语言获得支持，或在不必停下来打字的情况下完成任务。</p>
+<p>但要打造真正有用的语音产品，仅有快速的对话轮转或自然的声音还不够。语音代理需要理解用户的真实意图，持续掌握上下文，并在请求发生变化时恢复。它还要在对话继续时使用工具，并以符合当下情境的方式回应。</p>
+<p>本次发布的模型共同推动实时音频摆脱简单的一问一答，走向真正能够工作的语音界面。随着对话展开，它们可以倾听、推理、翻译、转写并采取行动。</p>
+<h3>语音：连接用户与产品的界面</h3>
+<p>随着语音逐渐成为更自然的软件使用方式，我们看到开发者正围绕语音 AI 的三种新模式构建产品：</p>
+<p><strong>语音到行动（Voice-to-action）</strong>：用户描述自己的需求，系统理解并推理这项请求，调用工具，然后完成任务。例如，Zillow 正在构建一款助手。它能够听取请求、进行推理并采取行动，例如：“帮我寻找 BuyAbility 预算范围内的房子，避开繁忙街道，并预约周六看房。”</p>
+<p><strong>系统到语音（Systems-to-voice）</strong>：软件把已有上下文转化为实时语音指引。例如，旅行应用可以主动告诉旅客：“你抵达本站的航班延误了，但仍然赶得上转机。我找到了新的登机口，规划了穿过航站楼的最快路线。你的行李预计也仍能顺利转运。”</p>
+<p><strong>语音到语音（Voice-to-voice）</strong>：AI 可以帮助实时对话跨越语言、任务或不断变化的上下文。例如，Deutsche Telekom 正在构建语音支持体验。客户可以使用自己最习惯的语言说话，模型则实时翻译对话。</p>
+<figure class="source-figure" data-source-image="0"><img alt="Diagram showing three voice AI workflows: voice-to-action connecting speech to apps like code and dev, shopping, in-car, and scheduling tools; systems-to-voice connecting apps, calendars, CRM, and support dashboards to speech; and voice-to-voice connecting two voice agents." decoding="async" height="404" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/32pQSj9Ayvkt9QSZpOPdky/470716092a7230e92e9670dba0ad410d/OAI_GPT-Realtime-2_Three_ways_to_build_with_voice_AI_desktop-light.svg?w=3840&amp;q=90" width="1010"/></figure>
+<p>这些模式也可以结合使用。Priceline 正在为一种未来体验做准备：旅客只需使用语音，就能管理整段旅程。他们可以通过对话搜索航班和酒店，也能处理行程变化。例如，在航班延误后调整酒店预订，或实时查询 TSA 安检等待时间。到达目的地后，他们还可以翻译现场对话。</p>
+<p class="timestamp">00:00</p>
+<h3>实时语音：帮助语音模型推理并采取行动</h3>
+<p>GPT‑Realtime‑2 面向实时语音交互构建。模型可以一边对请求进行推理，一边维持对话。它能调用工具，处理纠正或打断，并以符合当下情境的方式回应。</p>
+<h4>开场提示语</h4>
+<p>开发者可以让模型在主要回复前先说一句简短的话，例如“让我查一下”或“请稍等，我正在查询”。这样，用户就知道代理正在处理请求。</p>
+<h4>并行工具调用与工具透明度</h4>
+<p>模型可以同时调用多个工具，还能通过“正在查看你的日历”或“现在为你查询”等话语，把这些操作告知用户。代理在完成任务时仍能及时回应。</p>
+<h4>更强的故障恢复能力</h4>
+<p>模型可以用更自然的方式应对问题。例如，它会说“我现在处理这件事遇到了一些困难”，而不是无声失败或直接让对话中断。</p>
+<h4>面向代理式工作流的更长上下文</h4>
+<p>我们把上下文窗口从 32K 扩展至 128K，以支持更长、更连贯的会话，以及更复杂的任务流程。</p>
+<h4>更强的领域理解能力</h4>
+<p>模型能够更好地保留专业术语、专有名词、医疗健康术语，以及生产环境中重要的其他词汇。</p>
+<h4>更可控的语气与表达</h4>
+<p>模型能更准确地调整语气。解决问题时，它可以保持冷静。用户感到沮丧时，它可以表达共情。确认操作成功时，它也可以表现得轻快积极。</p>
+<h4>可调节的推理强度</h4>
+<p>开发者现在可以选择 minimal、low、medium、high 和 xhigh 五档推理强度，默认值为 low。面对简单交互时，可以用较低延迟换取快速响应。遇到复杂请求时，则可以选择更审慎的推理。</p>
+<p>这些进步也体现在与生产级语音代理高度相关的音频评测中。GPT‑Realtime‑2（high）在衡量音频智能的 Big Bench Audio 上，比 GPT‑Realtime‑1.5 高 15.2%。GPT‑Realtime‑2（xhigh）在衡量指令遵循的 Audio MultiChallenge 上高 13.8%。它优于 GPT‑Realtime‑1.5，也展现出更强的推理、上下文管理和实时对话控制能力。</p>
+<p>Big Bench Audio 用于评估支持音频输入的语言模型所具备的高难度推理能力。Audio MultiChallenge 用于评估口语对话系统的多轮对话智能，包括指令遵循、上下文整合、自洽性，以及处理自然口语纠正的能力。</p>
+<p>GPT‑Realtime‑2 的出色能力体现在多种不同的使用场景中：</p>
+<p><strong>GPT-Realtime-2</strong></p>
+<p><strong>GPT-Realtime-1.5</strong></p>
+<p>在早期测试期间，企业使用 GPT‑Realtime‑2 构建语音代理，帮助客户和员工通过自然对话完成工作：</p>
+<blockquote>
+<p>“GPT-Realtime-2 最突出的地方，是它为复杂语音交互带来的智能水平和工具调用可靠性。在我们难度最高的对抗 benchmark 上，经过提示词优化后，通话成功率提高了 26 个百分点，从 69% 上升至 95%。GPT-Realtime-2 在《公平住房法》合规方面也明显更稳健，这对我们的业务至关重要。代理能力与护栏强度的结合，让它真正适合用于 Zillow 的生产级语音应用。”</p>
+</blockquote>
+<h3>实时翻译：构建实时多语言语音体验</h3>
+<p>GPT‑Realtime‑Translate 可以帮助开发者构建实时多语言语音体验。每个人都能使用自己偏好的语言说话，实时听到翻译结果，同时阅读实时转写文本。它支持 70 多种输入语言和 13 种输出语言，适用于客户支持、跨境销售、教育、活动、媒体，以及服务全球受众的创作者平台。</p>
+<p>对开发者而言，实时翻译必须在跟上说话速度的同时保留原意。即使人们采用自然口语、切换上下文，或使用地区发音和领域术语，也必须做到这一点。例如，Deutsche Telekom 正在测试该模型的多语言语音交互能力。更低的延迟和更流畅的表达，可以让跨语言对话更加自然。</p>
+<p>在这段视频中，Vimeo 展示了 GPT‑Realtime‑Translate 如何在产品教学视频播放时进行实时翻译。全球客户无需等待单独制作的版本，就能用自己偏好的语言听取最新内容。</p>
+<p class="timestamp">00:00</p>
+<blockquote>
+<p>“在印度构建语音 AI，意味着必须应对各地区多样的语音特征。在覆盖 Hindi、Tamil 和 Telugu 的评测中，GPT-Realtime-Translate 的词错误率比我们测试的其他任何模型低 12.5%。它还拥有更低的回退率、更高的任务完成率，延迟也足以维持自然对话。它为多语言语音 AI 树立了新的标准。”</p>
+</blockquote>
+<h3>实时转写：构建低延迟转写体验</h3>
+<p>GPT‑Realtime‑Whisper 是一款新的流式转写模型，专为低延迟语音转文字而构建。它在人们说话时转写音频，让实时产品变得更快、更灵敏，也更自然。字幕可以即时出现，会议记录也能跟上对话节奏。</p>
+<p>模型让实时语音在发生的同时就能进入业务工作流。团队可以为会议、课堂、广播和活动生成字幕。在对话仍在进行时，他们就能生成记录和摘要。他们也可以构建需要持续理解用户的语音代理，并为客户支持、医疗健康、销售、招聘及其他具有大量语音交互的场景建立更快的后续工作流。</p>
+<h3>安全</h3>
+<p>Realtime API 包含多层防护和缓解措施，用于帮助防止滥用。我们会在 Realtime API 会话中运行主动分类器。这意味着，如果系统检测到某些对话违反有害内容准则，就可以中止会话。开发者也可以使用 Agents SDK，方便地加入自己的额外安全护栏。</p>
+<p>我们的使用政策禁止把服务输出改作或分发于垃圾信息、欺骗或其他有害用途。开发者还必须明确告知最终用户，他们正在与 AI 互动。只有在上下文已经明显表明这一点时，才可以不再另行说明。</p>
+<p>Realtime API 完整支持欧盟数据驻留，适用于基于欧盟的应用，也受到我们的企业隐私承诺保护。</p>
+<h3>价格与可用性</h3>
+<p>GPT‑Realtime‑2、GPT‑Realtime‑Translate 和 GPT‑Realtime‑Whisper 均已在 Realtime API 中提供。</p>
+<table class="pricing">
+<thead>
+<tr><th>模型</th><th>价格</th></tr>
+</thead>
+<tbody>
+<tr><td>GPT‑Realtime‑2</td><td>音频输入每 100 万 token 32 美元；缓存输入 token 每 100 万个 0.40 美元；音频输出每 100 万 token 64 美元</td></tr>
+<tr><td>GPT‑Realtime‑Translate</td><td>每分钟 0.034 美元</td></tr>
+<tr><td>GPT‑Realtime‑Whisper</td><td>每分钟 0.017 美元</td></tr>
+</tbody>
+</table>
+<h3>开始使用</h3>
+<p>你可以在 Playground 中测试新的实时语音模型。</p>
+<p>要开始构建，可以在 Codex 中打开此提示词，把 GPT‑Realtime‑2 添加到现有应用，或创建一个新应用。如果你还没有 Codex，请先下载 Codex 应用。</p>
+<div class="footer-meta">
+<p>2026</p>
+<p>API 平台</p>
+<p>作者</p>
+<p>继续阅读</p>
+</div>
+<figure class="source-figure" data-source-image="1"><img alt="GPT-5.6 is now the preferred model in Microsoft 365 Copilot &gt; Cover image" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/3MPipvFMxS8m3kTyCtwFgj/015747dcd34cb667a221688cfca64e0f/Frame.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="2"><img alt="GPT 5-6 &gt; Card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/1a9IPPV5nXWydTBosgmgYI/8e03f28ca04f26edc8bc81cdba387df1/5-6.jpg?w=3840&amp;q=90&amp;fm=webp"/></figure>
+</div>
+</section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

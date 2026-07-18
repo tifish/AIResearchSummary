@@ -1,388 +1,471 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<title>GPT-5 降低了无细胞蛋白合成的成本</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>GPT-5 降低无细胞蛋白质合成成本</title>
 <style>
 :root {
-  --bg: #f7f5ef;
-  --ink: #17202a;
-  --muted: #667085;
-  --line: #d8d2c4;
+  color-scheme: light dark;
+  --bg: #f5f7fb;
   --surface: #ffffff;
-  --surface-alt: #eef4f7;
-  --surface-warm: #fbeddc;
-  --surface-risk: #f7e6e8;
-  --surface-deep: #132033;
-  --surface-mint: #e6f4ee;
-  --hero-bg: #183247;
-  --hero-ink: #f8fafc;
-  --hero-muted: #c9d6df;
-  --data: #1877b9;
-  --data-soft: #d9edf8;
-  --risk: #c44a5b;
-  --risk-soft: #f7d9df;
-  --opportunity: #1f9d76;
-  --opportunity-soft: #d9f0e6;
-  --conclusion: #7b4bc9;
-  --conclusion-soft: #eadff8;
-  --warning: #c77b1a;
-  --warning-soft: #f6e3bd;
-  --shadow: rgba(23, 32, 42, 0.10);
+  --surface2: #eef2f8;
+  --ink: #172033;
+  --muted: #667085;
+  --line: #d7deea;
+  --hero: #121a31;
+  --hero-ink: #f8faff;
+  --shadow: rgba(24, 33, 54, 0.12);
+  --accent: #e87427;
+  --data: #1268c4;
+  --risk: #c43b4d;
+  --opportunity: #16835b;
+  --conclusion: #7750bf;
+  --data-soft: #e4f1ff;
+  --risk-soft: #ffe9ec;
+  --opportunity-soft: #e2f7ed;
+  --conclusion-soft: #efe8ff;
+  --warm-soft: #fff1df;
+  --hl: #ffe3a8;
+  --hl2: #cfe8ff;
+  --quote-ink: #24345d;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f5f7fb;
+  --surface: #ffffff;
+  --surface2: #eef2f8;
+  --ink: #172033;
+  --muted: #667085;
+  --line: #d7deea;
+  --hero: #121a31;
+  --hero-ink: #f8faff;
+  --shadow: rgba(24, 33, 54, 0.12);
+  --accent: #e87427;
+  --data: #1268c4;
+  --risk: #c43b4d;
+  --opportunity: #16835b;
+  --conclusion: #7750bf;
+  --data-soft: #e4f1ff;
+  --risk-soft: #ffe9ec;
+  --opportunity-soft: #e2f7ed;
+  --conclusion-soft: #efe8ff;
+  --warm-soft: #fff1df;
+  --hl: #ffe3a8;
+  --hl2: #cfe8ff;
+  --quote-ink: #24345d;
 }
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0e1116;
-    --ink: #e8edf2;
-    --muted: #a5b0bd;
-    --line: #2b3440;
-    --surface: #151a21;
-    --surface-alt: #172330;
-    --surface-warm: #2b2116;
-    --surface-risk: #2a1720;
-    --surface-deep: #0b1220;
-    --surface-mint: #13251f;
-    --hero-bg: #0b1622;
-    --hero-ink: #f2f7fb;
-    --hero-muted: #aebdca;
-    --data: #5bb8f4;
-    --data-soft: #102a3a;
-    --risk: #ff7f91;
-    --risk-soft: #331923;
-    --opportunity: #55d6a5;
-    --opportunity-soft: #123126;
-    --conclusion: #b595ff;
-    --conclusion-soft: #241b3a;
-    --warning: #f0ad4e;
-    --warning-soft: #332411;
-    --shadow: rgba(0, 0, 0, 0.35);
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0d111b;
+    --surface: #171d2a;
+    --surface2: #202838;
+    --ink: #e7ebf3;
+    --muted: #a8b2c3;
+    --line: #344055;
+    --hero: #080d1a;
+    --hero-ink: #eef3ff;
+    --shadow: rgba(0, 0, 0, 0.34);
+    --accent: #ff9a52;
+    --data: #55aaff;
+    --risk: #ff7587;
+    --opportunity: #55d5a1;
+    --conclusion: #b99aff;
+    --data-soft: #122b45;
+    --risk-soft: #3b1e28;
+    --opportunity-soft: #12372c;
+    --conclusion-soft: #2b2346;
+    --warm-soft: #3b2a19;
+    --hl: #604719;
+    --hl2: #173c60;
+    --quote-ink: #d7e2ff;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0e1116;
-  --ink: #e8edf2;
-  --muted: #a5b0bd;
-  --line: #2b3440;
-  --surface: #151a21;
-  --surface-alt: #172330;
-  --surface-warm: #2b2116;
-  --surface-risk: #2a1720;
-  --surface-deep: #0b1220;
-  --surface-mint: #13251f;
-  --hero-bg: #0b1622;
-  --hero-ink: #f2f7fb;
-  --hero-muted: #aebdca;
-  --data: #5bb8f4;
-  --data-soft: #102a3a;
-  --risk: #ff7f91;
-  --risk-soft: #331923;
-  --opportunity: #55d6a5;
-  --opportunity-soft: #123126;
-  --conclusion: #b595ff;
-  --conclusion-soft: #241b3a;
-  --warning: #f0ad4e;
-  --warning-soft: #332411;
-  --shadow: rgba(0, 0, 0, 0.35);
+  color-scheme: dark;
+  --bg: #0d111b;
+  --surface: #171d2a;
+  --surface2: #202838;
+  --ink: #e7ebf3;
+  --muted: #a8b2c3;
+  --line: #344055;
+  --hero: #080d1a;
+  --hero-ink: #eef3ff;
+  --shadow: rgba(0, 0, 0, 0.34);
+  --accent: #ff9a52;
+  --data: #55aaff;
+  --risk: #ff7587;
+  --opportunity: #55d5a1;
+  --conclusion: #b99aff;
+  --data-soft: #122b45;
+  --risk-soft: #3b1e28;
+  --opportunity-soft: #12372c;
+  --conclusion-soft: #2b2346;
+  --warm-soft: #3b2a19;
+  --hl: #604719;
+  --hl2: #173c60;
+  --quote-ink: #d7e2ff;
 }
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
 body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", sans-serif;
-  line-height: 1.7;
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.75;
 }
-main { overflow: hidden; }
-section { padding: 56px 6vw; }
+a {
+  color: var(--data);
+}
 .hero {
-  min-height: 72vh;
-  display: grid;
-  align-items: end;
-  background:
-    linear-gradient(135deg, var(--hero-bg), var(--surface-deep));
+  padding: clamp(3rem, 8vw, 7rem) 1.4rem;
+  background: var(--hero);
   color: var(--hero-ink);
 }
-.hero-inner {
-  max-width: 1080px;
+.hero-inner,
+.summary-wrap,
+.translation-inner {
+  width: min(1080px, 100%);
   margin: 0 auto;
-  width: 100%;
 }
-.kicker {
-  color: var(--opportunity);
-  font-weight: 700;
-  letter-spacing: 0;
+.eyebrow {
+  margin: 0 0 1rem;
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
-h1 {
-  margin: 16px 0 10px;
-  font-size: clamp(2.1rem, 6vw, 5rem);
-  line-height: 1.05;
-  letter-spacing: 0;
+.hero h1 {
+  max-width: 880px;
+  margin: 0;
+  font-size: clamp(2.25rem, 6vw, 5.3rem);
+  line-height: 1.08;
+  letter-spacing: -0.045em;
 }
-.english-title {
-  color: var(--hero-muted);
-  font-size: clamp(1rem, 2vw, 1.35rem);
+.original-title {
+  max-width: 760px;
+  margin: 1.1rem 0 0;
+  color: var(--muted);
+  font-size: clamp(1rem, 2vw, 1.25rem);
 }
-.one-line {
-  margin-top: 28px;
+.hero-summary {
   max-width: 820px;
-  font-size: 1.18rem;
+  margin: 2.2rem 0 0;
+  padding-left: 1.2rem;
   border-left: 5px solid var(--opportunity);
-  padding-left: 18px;
+  font-size: clamp(1.15rem, 2.4vw, 1.55rem);
+  line-height: 1.6;
 }
-.meta {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-top: 30px;
-}
-.meta span {
-  border: 1px solid var(--line);
-  color: var(--hero-muted);
-  padding: 6px 12px;
-  border-radius: 999px;
+.summary-wrap {
+  padding: 3rem 1.4rem 5rem;
 }
 .metrics {
-  background: var(--surface);
-  border-bottom: 1px solid var(--line);
-}
-.metric-grid {
-  max-width: 1120px;
-  margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
+  overflow: hidden;
+  margin-top: -4.8rem;
+  border: 1px solid var(--line);
+  border-radius: 1.2rem;
+  background: var(--surface);
+  box-shadow: 0 20px 55px var(--shadow);
 }
 .metric {
-  padding: 22px;
-  background: var(--data-soft);
-  border-top: 5px solid var(--data);
+  min-height: 155px;
+  padding: 1.5rem;
+  border-right: 1px solid var(--line);
 }
-.metric:nth-child(2) {
-  background: var(--opportunity-soft);
-  border-color: var(--opportunity);
-}
-.metric:nth-child(3) {
-  background: var(--conclusion-soft);
-  border-color: var(--conclusion);
-}
-.metric:nth-child(4) {
-  background: var(--warning-soft);
-  border-color: var(--warning);
+.metric:last-child {
+  border-right: 0;
 }
 .metric strong {
   display: block;
-  font-size: clamp(1.8rem, 4vw, 3rem);
-  line-height: 1;
+  color: var(--data);
+  font-size: clamp(1.85rem, 4vw, 3rem);
+  line-height: 1.1;
+}
+.metric:nth-child(2) strong {
+  color: var(--opportunity);
+}
+.metric:nth-child(3) strong {
+  color: var(--conclusion);
+}
+.metric:nth-child(4) strong {
+  color: var(--accent);
 }
 .metric span {
   display: block;
+  margin-top: 0.65rem;
   color: var(--muted);
-  margin-top: 10px;
+  font-size: 0.94rem;
 }
 .split {
-  background: var(--surface-alt);
-}
-.split-grid {
-  max-width: 1080px;
-  margin: 0 auto;
   display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  gap: 32px;
-  align-items: start;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 2rem;
+  margin-top: 4rem;
+  align-items: stretch;
 }
-.label {
-  color: var(--data);
-  font-weight: 800;
+.split-main {
+  padding: 2.2rem;
+  border-top: 7px solid var(--data);
+  background: var(--data-soft);
 }
-h2 {
-  margin: 0 0 16px;
-  font-size: clamp(1.6rem, 3vw, 2.5rem);
-  line-height: 1.18;
-  letter-spacing: 0;
+.split-side {
+  padding: 2.2rem;
+  border-radius: 2rem 0.4rem 2rem 0.4rem;
+  background: var(--opportunity-soft);
 }
-.text-block {
-  font-size: 1.05rem;
+.summary-wrap h2 {
+  margin-top: 0;
+  font-size: clamp(1.55rem, 3vw, 2.25rem);
+  line-height: 1.25;
 }
-.callout {
+.summary-wrap h3 {
+  margin-bottom: 0.6rem;
+  line-height: 1.35;
+}
+mark {
+  padding: 0.05em 0.3em;
+  background: var(--hl);
+  color: var(--ink);
+}
+mark.cool {
+  background: var(--hl2);
+}
+.process {
+  margin: 4rem 0;
+  padding: 2.5rem;
+  border: 1px solid var(--line);
   background: var(--surface);
-  border-left: 6px solid var(--data);
-  padding: 24px;
-  box-shadow: 0 16px 40px var(--shadow);
 }
-.callout strong { color: var(--data); }
-.flow {
-  background: var(--surface-warm);
-}
-.flow-wrap {
-  max-width: 1080px;
-  margin: 0 auto;
-}
-.steps {
+.process-line {
   display: grid;
-  grid-template-columns: repeat(6, minmax(130px, 1fr));
-  gap: 10px;
-  margin-top: 28px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-top: 2rem;
 }
 .step {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  padding: 18px;
   position: relative;
+  padding-top: 1.2rem;
+  border-top: 4px solid var(--conclusion);
+}
+.step:nth-child(2) {
+  border-color: var(--accent);
+}
+.step:nth-child(3) {
+  border-color: var(--data);
+}
+.step:nth-child(4) {
+  border-color: var(--opportunity);
 }
 .step b {
-  display: inline-grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--warning);
-  color: var(--surface);
-  margin-bottom: 12px;
+  display: block;
+  margin-bottom: 0.45rem;
 }
-.step p { margin: 0; }
-.dark-band {
-  background: var(--surface-deep);
+.insight-bar {
+  margin: 0 -1.4rem;
+  padding: 2.8rem max(1.4rem, calc((100vw - 1080px) / 2));
+  background: var(--hero);
   color: var(--hero-ink);
 }
-.dark-band .inner {
-  max-width: 1080px;
-  margin: 0 auto;
-}
-.insight-strip {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
-  margin-top: 24px;
-}
-.insight {
-  border: 1px solid var(--line);
-  padding: 24px;
-  background: var(--hero-bg);
-}
-.insight strong {
-  color: var(--opportunity);
-  display: block;
-  margin-bottom: 8px;
-}
-.table-zone {
-  background: var(--surface);
-}
-.table-wrap {
-  max-width: 1080px;
-  margin: 0 auto;
-  overflow-x: auto;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 720px;
-}
-th {
-  text-align: left;
-  background: var(--data);
-  color: var(--surface);
-  padding: 14px;
-}
-td {
-  padding: 16px 14px;
-  border-bottom: 1px solid var(--line);
-  vertical-align: top;
-}
-td:first-child {
-  font-weight: 800;
-  color: var(--data);
-}
-.risk-zone {
-  background: var(--surface-risk);
-}
-.risk-grid {
-  max-width: 1080px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 26px;
-}
-.risk-box {
-  background: var(--surface);
-  padding: 24px;
-  border-top: 6px solid var(--risk);
-}
-.risk-box:last-child {
-  border-top-color: var(--conclusion);
-}
-.quote {
-  background: var(--surface-mint);
-}
-.quote-inner {
+.insight-bar blockquote {
   max-width: 900px;
-  margin: 0 auto;
-  font-size: clamp(1.4rem, 3vw, 2.25rem);
-  line-height: 1.35;
-  border-left: 8px solid var(--opportunity);
-  padding-left: 26px;
+  margin: 0;
+  color: var(--quote-ink);
+  font-size: clamp(1.3rem, 3vw, 2.15rem);
+  font-weight: 700;
+  line-height: 1.5;
 }
-.quote-inner small {
-  display: block;
-  color: var(--muted);
-  font-size: 1rem;
-  margin-top: 18px;
+.risk-opportunity {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 4rem;
+}
+.opportunity-panel,
+.risk-panel {
+  padding: 2.4rem;
+}
+.opportunity-panel {
+  background: var(--opportunity-soft);
+  border-left: 6px solid var(--opportunity);
+}
+.risk-panel {
+  background: var(--risk-soft);
+  border-right: 6px solid var(--risk);
 }
 .takeaways {
-  background: var(--bg);
+  margin-top: 4rem;
 }
 .mosaic {
-  max-width: 1080px;
-  margin: 0 auto;
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr 1fr;
-  gap: 14px;
+  grid-template-columns: 1.25fr 0.75fr;
+  gap: 1rem;
 }
 .tile {
-  min-height: 160px;
-  padding: 22px;
-  color: var(--ink);
+  padding: 1.6rem;
   background: var(--surface);
   border: 1px solid var(--line);
 }
 .tile:nth-child(1) {
   grid-row: span 2;
   background: var(--conclusion-soft);
-  border-color: var(--conclusion);
+  border-bottom: 7px solid var(--conclusion);
 }
 .tile:nth-child(2) {
-  background: var(--data-soft);
-  border-color: var(--data);
+  background: var(--warm-soft);
+  border-left: 5px solid var(--accent);
 }
 .tile:nth-child(3) {
-  background: var(--opportunity-soft);
-  border-color: var(--opportunity);
+  background: var(--data-soft);
+  border-left: 5px solid var(--data);
 }
 .tile:nth-child(4) {
-  background: var(--warning-soft);
-  border-color: var(--warning);
+  grid-column: 1 / -1;
+  background: var(--opportunity-soft);
+  border-left: 5px solid var(--opportunity);
 }
-.tile:nth-child(5) {
+.tile .number {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+#translation {
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+}
+.translation-inner {
+  max-width: 820px;
+  padding: 4.5rem 1.4rem 6rem;
+}
+#translation h2 {
+  margin: 0 0 2rem;
+  font-size: clamp(2rem, 5vw, 3.6rem);
+  line-height: 1.15;
+}
+#translation h3 {
+  margin: 3.2rem 0 1rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 2px solid var(--line);
+  font-size: clamp(1.45rem, 3vw, 2rem);
+  line-height: 1.3;
+}
+#translation p,
+#translation li {
+  font-size: 1.05rem;
+}
+.translation-deck {
+  padding: 1.4rem 1.6rem;
+  border-left: 5px solid var(--accent);
+  background: var(--warm-soft);
+  font-size: 1.18rem;
+  font-weight: 650;
+}
+.contents {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 2rem 0 3rem;
+}
+.contents ol {
+  margin: 0;
+  padding: 1.2rem 1.2rem 1.2rem 2.7rem;
+  background: var(--surface2);
+  border: 1px solid var(--line);
+}
+.source-figure {
+  margin: 2.8rem 0;
+  padding: 1rem;
+  min-height: 9rem;
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+  background: var(--surface2);
+}
+.source-figure figcaption {
+  margin-top: 0.9rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+.chart-note {
+  margin: 2rem 0;
+  padding: 1.6rem;
+  border-left: 6px solid var(--data);
+  background: var(--data-soft);
+}
+.limits {
+  padding: 0.2rem 1.5rem 1.5rem;
+  border-left: 5px solid var(--risk);
   background: var(--risk-soft);
-  border-color: var(--risk);
 }
-.tile b {
-  display: block;
-  font-size: 1.1rem;
-  margin-bottom: 8px;
+.source-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
 }
-@media (max-width: 860px) {
-  section { padding: 42px 5vw; }
-  .metric-grid, .split-grid, .risk-grid, .insight-strip, .mosaic {
-    grid-template-columns: 1fr;
-  }
-  .steps {
+.source-meta span {
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: var(--surface2);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.keep-reading {
+  margin-top: 3rem;
+}
+.keep-reading .source-figure {
+  min-height: 12rem;
+  border-color: var(--conclusion);
+}
+@media (max-width: 760px) {
+  .metrics,
+  .process-line {
     grid-template-columns: 1fr 1fr;
   }
+  .metric:nth-child(2) {
+    border-right: 0;
+  }
+  .metric:nth-child(-n+2) {
+    border-bottom: 1px solid var(--line);
+  }
+  .split,
+  .risk-opportunity,
+  .contents,
+  .mosaic {
+    grid-template-columns: 1fr;
+  }
+  .tile:nth-child(1) {
+    grid-row: auto;
+  }
+  .tile:nth-child(4) {
+    grid-column: auto;
+  }
 }
-@media (max-width: 520px) {
-  .steps { grid-template-columns: 1fr; }
-  .meta { gap: 8px; }
+@media (max-width: 470px) {
+  .metrics,
+  .process-line {
+    grid-template-columns: 1fr;
+  }
+  .metric {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .metric:last-child {
+    border-bottom: 0;
+  }
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -514,180 +597,207 @@ td:first-child {
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/gpt-5-lowers-protein-synthesis-cost" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<header class="hero">
+<div class="hero-inner">
+<p class="eyebrow">OpenAI · Research · 2026</p>
+<h1>GPT-5 降低无细胞蛋白质合成成本</h1>
+<p class="original-title" lang="en">GPT-5 lowers the cost of cell-free protein synthesis</p>
+<p class="hero-summary"><strong>一句话总括：</strong>这项工作的真正贡献，是让 GPT-5 与机器人实验室形成可执行的实验闭环，并在数万次真实反应中把蛋白生产成本降低 <mark>40%</mark>。</p>
+</div>
+</header>
 <main>
-  <section class="hero">
-    <div class="hero-inner">
-      <div class="kicker">一句话总括</div>
-      <h1>GPT-5 降低了无细胞蛋白合成的成本</h1>
-      <div class="english-title">GPT-5 lowers the cost of cell-free protein synthesis</div>
-      <p class="one-line">这项工作真正的贡献，是把 GPT-5 放进真实自动化湿实验闭环，让模型通过大规模实验迭代找出更便宜、更稳健的蛋白生产配方。</p>
-      <div class="meta">
-        <span>OpenAI Research</span>
-        <span>Ginkgo Bioworks</span>
-        <span>2026-02-05</span>
-        <span>CFPS</span>
-      </div>
-    </div>
-  </section>
-
-  <section class="metrics">
-    <div class="metric-grid">
-      <div class="metric">
-        <strong>40%</strong>
-        <span>蛋白生产成本下降。它说明 AI 不只是提出假设，也能影响真实制造成本。</span>
-      </div>
-      <div class="metric">
-        <strong>57%</strong>
-        <span>试剂成本改善。成本结构会改变优化目标，而不只是追求单项原料更便宜。</span>
-      </div>
-      <div class="metric">
-        <strong>36,000+</strong>
-        <span>独特反应配方被测试。高通量让生物实验从少量经验判断转向密集搜索。</span>
-      </div>
-      <div class="metric">
-        <strong>580</strong>
-        <span>自动化实验板完成执行。规模是从噪声中找信号的前提。</span>
-      </div>
-    </div>
-  </section>
-
-  <section class="split">
-    <div class="split-grid">
-      <div>
-        <div class="label">为什么重要</div>
-        <h2>CFPS 的瓶颈不是概念，而是反复试错的成本。</h2>
-      </div>
-      <div class="text-block">
-        <p>无细胞蛋白合成不需要培养活细胞。它把蛋白制造所需的细胞机器放进可控混合物里，让研究人员当天就能测试很多方案。</p>
-        <p>问题在于配方复杂。DNA 模板、细胞裂解液、能量来源、盐和多胺等成分相互影响。靠直觉很难判断哪组组合最便宜、产量最高。</p>
-        <div class="callout">
-          <strong>洞见：</strong>当实验可以自动化并快速回传数据，AI 的价值不在一次猜中答案，而在持续缩短“设计、执行、学习、再设计”的周期。
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="flow">
-    <div class="flow-wrap">
-      <div class="label">闭环流程</div>
-      <h2>GPT-5 不是只写实验方案，而是在实验结果中继续学习。</h2>
-      <div class="steps">
-        <div class="step"><b>1</b><p>读取论文、数据和约束。</p></div>
-        <div class="step"><b>2</b><p>设计 384 孔板实验批次。</p></div>
-        <div class="step"><b>3</b><p>程序校验机器人是否能执行。</p></div>
-        <div class="step"><b>4</b><p>云端实验室运行反应。</p></div>
-        <div class="step"><b>5</b><p>结果回传给模型分析。</p></div>
-        <div class="step"><b>6</b><p>生成下一轮假设和配方。</p></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="dark-band">
-    <div class="inner">
-      <div class="label">结果如何出现</div>
-      <h2>成本下降来自更好的组合，而不是单一神奇成分。</h2>
-      <div class="insight-strip">
-        <div class="insight">
-          <strong>高通量改变了可见范围</strong>
-          <p>GPT-5 找到了一些人类此前没有在这种配置下测试过的低成本配方。大量并行实验让可行区域从经验盲区里浮现出来。</p>
-        </div>
-        <div class="insight">
-          <strong>自动化环境也改变了答案</strong>
-          <p>微孔板、低体积、混合和氧气条件会影响产量。GPT-5 提出的许多组合更能适应自动化实验室常见的低氧条件。</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="table-zone">
-    <div class="table-wrap">
-      <div class="label">关键对比</div>
-      <h2>同一个生物流程，在手工台面和机器人平台上面对不同约束。</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>维度</th>
-            <th>传统优化</th>
-            <th>GPT-5 闭环优化</th>
-            <th>读者应更新的理解</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>实验规模</td>
-            <td>人工团队通常一次只能推进有限数量实验。</td>
-            <td>6 轮测试超过 36,000 种配方。</td>
-            <td>AI 对生物学的影响取决于能否接上真实实验吞吐量。</td>
-          </tr>
-          <tr>
-            <td>优化目标</td>
-            <td>常关注既有配方和局部改良。</td>
-            <td>同时权衡成本、产量和自动化条件下的稳健性。</td>
-            <td>成本优化不是少用原料这么简单，而是提高昂贵输入的产出。</td>
-          </tr>
-          <tr>
-            <td>执行约束</td>
-            <td>文本方案可能看似合理但无法被机器人执行。</td>
-            <td>实验前加入程序校验，过滤不可执行方案。</td>
-            <td>自动化科学需要把模型输出转成可验证的机器操作。</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="risk-zone">
-    <div class="risk-grid">
-      <div class="risk-box">
-        <div class="label">限制</div>
-        <h2>结果仍然是窄场景证明，不是所有蛋白生产的通用结论。</h2>
-        <p>实验只展示在一个蛋白 sfGFP 和一个 CFPS 系统上。其他蛋白、其他体系和不同尺度下是否同样有效，还需要继续验证。</p>
-        <p>氧气、反应几何形状和体积会显著影响产量。结论不能直接外推到所有实验室流程。</p>
-      </div>
-      <div class="risk-box">
-        <div class="label">治理</div>
-        <h2>湿实验能力提升也带来更强的生物安全要求。</h2>
-        <p>文章明确提到相关能力可能影响生物安全。OpenAI 表示会通过 Preparedness Framework 评估和缓解风险。</p>
-        <p>真正的结论是双重的：闭环实验能加速科学，也必须配套模型和系统层面的安全边界。</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="quote">
-    <div class="quote-inner">
-      “这项工作的核心不是 GPT-5 知道了哪种配方最好，而是它能在真实实验反馈中更快找到下一批值得测试的配方。”
-      <small>这改变了 AI 在生命科学中的角色：从给建议的工具，变成压缩实验迭代周期的系统组件。</small>
-    </div>
-  </section>
-
-  <section class="takeaways">
-    <div class="mosaic">
-      <div class="tile">
-        <b>最值得带走的洞见 1</b>
-        <p>生命科学中的 AI 价值，经常要通过实验闭环兑现。没有湿实验反馈，模型很难把想法变成可用结果。</p>
-      </div>
-      <div class="tile">
-        <b>洞见 2</b>
-        <p>36,000 多种配方让模型能从噪声中识别趋势。</p>
-      </div>
-      <div class="tile">
-        <b>洞见 3</b>
-        <p>40% 成本下降说明闭环自动化可以影响真实制造经济性。</p>
-      </div>
-      <div class="tile">
-        <b>洞见 4</b>
-        <p>CFPS 的成本现在更多受 lysate 和 DNA 支配，因此提高产量是高杠杆策略。</p>
-      </div>
-      <div class="tile">
-        <b>洞见 5</b>
-        <p>单蛋白、单体系结果不能过度外推。下一步的关键是跨蛋白、跨体系和安全评估。</p>
-      </div>
-    </div>
-  </section>
+<div class="summary-wrap">
+<section aria-label="关键数据" class="metrics">
+<div class="metric"><strong>36,000+</strong><span>测试的独特 CFPS 反应配方</span></div>
+<div class="metric"><strong>580</strong><span>块自动化实验孔板</span></div>
+<div class="metric"><strong>6 轮</strong><span>设计、执行、分析与再设计的闭环实验</span></div>
+<div class="metric"><strong>−40%</strong><span>相对既有最佳基线的蛋白生产成本变化</span></div>
+</section>
+<section class="split">
+<div class="split-main">
+<h2>成本下降来自真实实验，而非纸面推演</h2>
+<p>GPT-5 负责提出成批实验方案。Ginkgo Bioworks 的云实验室负责执行，并把测量结果传回模型。</p>
+<p>系统在运行实验前还会进行严格的程序校验。无法由机器人实际完成的“纸面实验”不会进入实验环节。</p>
+<p><strong>这改变了理解 AI 科研能力的方式：</strong>衡量标准不再只是模型能否提出合理想法，还包括这些想法能否在物理实验中执行、测量和迭代。</p>
+</div>
+<aside class="split-side">
+<h2>三轮实验刷新低成本水平</h2>
+<p>模型获得计算机、浏览器和相关论文后，用 <mark class="cool">3 轮实验和 2 个月</mark>建立了新的低成本 CFPS 最佳结果。</p>
+<p>试剂成本指标同时改善 <strong>57%</strong>。系统还找到了在自动化实验室常见反应条件下更稳健的新配方。</p>
+<p><strong>洞见：</strong>前沿模型的价值不只在于搜索文献，也在于把文献、数据分析和下一轮实验设计连续接起来。</p>
+</aside>
+</section>
+<section class="process">
+<h2>闭环把实验迭代变成连续流程</h2>
+<p>CFPS 配方包含 DNA 模板、细胞裂解液、能量来源、盐和多种生化成分。变量彼此影响，单凭直觉很难找到低成本组合。</p>
+<div class="process-line">
+<div class="step"><b>01 · 设计</b><span>GPT-5 提出一批 384 孔板实验。</span></div>
+<div class="step"><b>02 · 校验</b><span>程序检查方案是否能由自动化平台执行。</span></div>
+<div class="step"><b>03 · 实验</b><span>机器人完成液体处理、培养与测量。</span></div>
+<div class="step"><b>04 · 学习</b><span>结果返回模型，用于生成假设和下一轮设计。</span></div>
+</div>
+<p><strong>结论：</strong>生物实验有噪声。足够高的吞吐量和多轮迭代，能帮助系统分辨稳定信号与随机波动。</p>
+</section>
+<section class="insight-bar">
+<blockquote>模型发现的不只是“更便宜的成分”，而是能在高通量孔板、较低氧合和不同混合条件下共同发挥作用的组合。</blockquote>
+</section>
+<section class="risk-opportunity">
+<div class="opportunity-panel">
+<h2>机会：重新检验被视为背景条件的变量</h2>
+<p>缓冲体系、能量再生成分和多胺的细微变化，对结果产生了与其成本不成比例的影响。</p>
+<p>CFPS 当前成本主要由裂解液和 DNA 构成。因此，提高每单位昂贵投入所产生的蛋白产量，比在低价成分上继续压缩边际成本更有效。</p>
+<p><strong>洞见：</strong>高通量自动化让过去很少优先测试的变量，也能成为系统化验证的假设。</p>
+</div>
+<div class="risk-panel">
+<h2>边界：一次成功不能代表普遍适用</h2>
+<p>实验只覆盖一种蛋白 <strong>sfGFP</strong> 和一种 CFPS 系统。结果能否推广到其他蛋白与体系，仍需验证。</p>
+<p>氧合、反应几何形态和实验尺度都会显著影响产量。协议改进和试剂处理也仍需要人类监督。</p>
+<p><strong>结论：</strong>研究证明了闭环方法的潜力，但尚未证明它能无条件迁移到其他生物实验。</p>
+</div>
+</section>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="mosaic">
+<article class="tile">
+<span class="number">01 · 核心变化</span>
+<h3>AI 开始进入实验执行闭环</h3>
+<p>模型提出实验、读取真实结果，再决定下一轮做什么。科研能力因此从文本推理延伸到了物理世界中的连续验证。</p>
+</article>
+<article class="tile">
+<span class="number">02 · 规模</span>
+<h3>吞吐量本身就是方法的一部分</h3>
+<p>超过 36,000 次反应提供了分离信号与噪声所需的数据规模。</p>
+</article>
+<article class="tile">
+<span class="number">03 · 实践</span>
+<h3>自动化条件会改变最佳配方</h3>
+<p>孔板中的氧合、混合和几何条件不同于试管。面向自动化实验室优化，不能直接照搬台式实验经验。</p>
+</article>
+<article class="tile">
+<span class="number">04 · 责任</span>
+<h3>更强的湿实验推理能力也带来生物安全问题</h3>
+<p>OpenAI 表示会依据 Preparedness Framework 评估风险，并在模型与系统层面建立防护和能力评测。</p>
+</article>
+</div>
+</section>
+</div>
+<section id="translation">
+<div class="translation-inner">
+<h2>完整译文</h2>
+<p class="translation-deck">我们与 Ginkgo Bioworks 合作，建立了一个由 AI 驱动的自主实验室，并将蛋白生产成本降低了 40%。</p>
+<nav aria-label="原文重复显示的章节目录" class="contents">
+<ol>
+<li>为什么无细胞蛋白质合成很重要</li>
+<li>无细胞蛋白质合成难以优化，而且成本高昂</li>
+<li>将 GPT-5 接入机器人实验室</li>
+<li>我们的发现</li>
+<li>局限性</li>
+<li>下一步</li>
+</ol>
+<ol>
+<li>为什么无细胞蛋白质合成很重要</li>
+<li>无细胞蛋白质合成难以优化，而且成本高昂</li>
+<li>将 GPT-5 接入机器人实验室</li>
+<li>我们的发现</li>
+<li>局限性</li>
+<li>下一步</li>
+</ol>
+</nav>
+<p>我们已经看到，AI 在数学和物理等领域取得了快速进展。在这些领域，很多想法无需接触物理世界就能得到检验。生物学则不同。生物学的进步离不开实验室，科学家需要投入时间和资金开展实验。</p>
+<p>这种情况正在开始改变。前沿模型如今可以直接连接实验室自动化系统。它们能够提出实验方案，大规模执行实验，从结果中学习，再决定下一步做什么。生命科学的瓶颈往往在于迭代速度，而自主实验室正是为消除这一限制而建立的。</p>
+<p>在此前的工作中，我们证明了 GPT-5 可以通过闭环实验改进湿实验协议。本文进一步表明，同样的方法还可以降低蛋白质的生产成本。</p>
+<p>我们与 Ginkgo Bioworks 合作，将 GPT-5 接入一个云实验室。云实验室是一座可通过软件远程操作的自动化湿实验室。机器人在其中执行实验并返回数据。我们利用这套“实验室参与闭环”的系统，优化了一项广泛使用的生物过程：无细胞蛋白质合成（cell-free protein synthesis，CFPS）。</p>
+<p>系统进行了六轮闭环实验，在 580 块自动化孔板上测试了超过 36,000 种独特的 CFPS 反应配方。GPT-5 获得计算机、网页浏览器和相关论文后，只用了三轮实验就建立了低成本 CFPS 的新最佳水平。蛋白生产成本降低了 40%，试剂成本指标改善了 57%。系统还发现了新的反应配方。这些配方对自主实验室常见的反应条件更为稳健。</p>
+<figure class="source-figure" data-source-image="0"><img alt="Diagram titled “AI-driven autonomous lab.” GPT-5 performs data analysis, biochemical reasoning, and hypothesis generation, sending experimental designs to Reconfigurable Automation Carts (RACs), which execute physical experiments, automate liquid handling, incubate samples, and measure fluorescence. RACs return experimental data and metrics back to GPT-5, forming a closed feedback loop." decoding="async" height="1118" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/2TbblhnZK2vp1IFVnn8KaY/502e325bb6b8996c9f5e91d6e93e783e/AI-driven_autonomous_lab___light_mode.png?w=3840&amp;q=90&amp;fm=webp" width="1192"/>
+<figcaption>GPT-5 使用标准的 384 孔板格式设计成批实验，并在 Ginkgo Bioworks 的云实验室中运行。实验完成后，云实验室把数据传回 GPT-5。模型随后分析结果，生成新假设，并设计下一轮实验。</figcaption>
+</figure>
+<h3>为什么无细胞蛋白质合成很重要</h3>
+<p>无细胞蛋白质合成是一种无需培养活细胞就能制造蛋白质的方法。传统做法是把 DNA 放入细胞，再等待细胞产生蛋白质。CFPS 则把制造蛋白质所需的细胞机器放在可控的混合物中直接运行。</p>
+<p>这种方法很适合快速制作原型和开展测试。科学家可以迅速进行大量实验，并在当天测得结果。</p>
+<p>蛋白质是现代生物技术众多成果的重要组成部分。许多重要药物以蛋白质为基础。许多诊断工具和研究检测也依赖蛋白质。在工业环境中，蛋白质可以充当酶，让化学过程变得更清洁、更高效。甚至洗衣液中也含有蛋白质。</p>
+<p>蛋白质生产变得更快、更便宜后，科学家通常可以更早测试更多想法，也能降低把早期研究转化为日常可用成果的成本。</p>
+<p>CFPS 已经很适合这类快速迭代。问题在于，它很难优化，而且规模扩大后成本很高。</p>
+<h3>无细胞蛋白质合成难以优化，而且成本高昂</h3>
+<p>无细胞蛋白质合成依赖多种复杂且彼此影响的成分。其中包括用于编码目标蛋白的 DNA 模板、细胞裂解液，也就是由细胞内部机器构成的混合物，以及从能量来源到盐类的大量生化成分。</p>
+<p>把整个系统作为一个整体来推理极其困难。此前已有许多研究尝试使用不同类型的机器学习来降低蛋白生产成本。</p>
+<p>标准 CFPS 配方和商业试剂盒通常按人类实验团队的工作速度定价。自主实验室能在人工团队完成几十次反应的时间里运行数千次反应。达到这种规模后，试剂成本便会成为主要限制。</p>
+<p>只依靠直觉也很难优化 CFPS。这个混合体系包含许多相互作用的成分。微小变化可能产生影响，但影响方向并不总是显而易见。如果不开展大量实验，就很难找到最佳组合。</p>
+<p>以前的方法已经降低了一部分成本，但进步通常比较缓慢。这是因为全面探索整个组合空间需要大量人力。</p>
+<h3>将 GPT-5 接入机器人实验室</h3>
+<p>我们把 GPT-5 与 Ginkgo Bioworks 的云实验室结合起来，形成了一套用于优化 CFPS 的闭环自主系统。</p>
+<p>GPT-5 负责设计成批实验。实验室负责执行。实验结果随后返回模型，模型利用这些数据提出下一轮方案。这个循环一共重复了六次。</p>
+<p>GPT-5 使用标准的 384 孔板格式设计成批实验，并在 Ginkgo Bioworks 的云实验室中运行。实验完成后，云实验室把数据传回 GPT-5。模型随后分析结果，生成新假设，并设计下一轮实验。</p>
+<p>为了确保闭环中的方案符合自主实验室的实际能力，我们在每项实验运行前加入了严格的程序校验。这项校验保证 AI 设计的实验能在自动化平台上实际执行。它会拦截那些文字描述看似合理，却无法由机器人工作流完成的“纸面实验”。</p>
+<p>在整个实验过程中，系统使用 580 块自动化孔板执行了超过 36,000 次 CFPS 反应。这样的规模很重要，因为它能让规律逐渐显现。</p>
+<p>生物实验中的单次结果往往带有噪声。高吞吐量和反复迭代，能帮助研究人员把真实信号与随机噪声区分开来。</p>
+<p>GPT-5 获得相关论文和工具后，用三轮实验和两个月时间建立了新的最佳水平。与此前最好的基线相比，蛋白生产成本降低了 40%。</p>
+<p><strong>Ginkgo Bioworks 的可重构自动化推车。图片来源：Ginkgo Bioworks。</strong></p>
+<h3>我们的发现</h3>
+<p>我们发现，这些改进来自两类配方。第一类是彼此配合良好的成分组合。第二类是在高通量自动化的实际条件下仍能稳定工作的组合。</p>
+<p>GPT-5 找到了此前没有人以这种配置测试过的低成本反应配方。CFPS 已经经过多年研究，但可能的混合配方空间仍然很大。</p>
+<p>如果能够快速提出并执行数千种组合，就可能找到人工工作流很容易错过的可行区域。</p>
+<p>我们还发现，高通量孔板实验往往不同于人工进行的台式实验。高通量反应格式中的氧合水平可能更低，混合方式和几何形态也可能不同。</p>
+<p>多数 CFPS 反应在试管中产生的蛋白质远多于微孔板。这是因为更大的反应规模通常能获得更多氧气，也能实现更充分的混合。</p>
+<p>事实上，对于低容量孔板反应，GPT-5 一获得用于数据分析的计算机和用于查找相关论文的网页浏览器，就提出了许多优于此前最佳方案的反应配方。</p>
+<p>总体而言，GPT-5 提出了许多能在高通量限制下良好工作的试剂组合。其中不少组合对自动化实验室常见的低氧环境具有更强的稳健性。</p>
+<p>此外，我们发现，缓冲体系、能量再生成分和多胺的微小变化，带来的影响远远超过了它们在成本中的占比。这些通常不是人们最先调整的参数。但在高通量条件下，它们不再只是被默认接受的背景条件，而是可以接受检验的假设。</p>
+<p>最后，成本结构本身也决定了什么因素最重要。现在，CFPS 的成本主要来自裂解液和 DNA。因此，提高产量是杠杆效应最大的策略。</p>
+<p>如果每单位昂贵投入可以产生更多蛋白质，即使还没有继续压缩其他方面的边际成本，也能在总成本上取得明显进展。</p>
+<div class="chart-note">
+<h3>自主实验室迭代在提高蛋白产量的同时降低成本</h3>
+<p>经过六轮自主实验，系统持续改进无细胞蛋白质合成。成本不断下降，蛋白质产量则逐步提高。</p>
+<p>结果以每一轮的反应成本与蛋白滴度表示。最佳的成本与产量权衡形成了一条前沿线。较大的数据点表示每轮达到的最低单位克成本。星形和虚线参照则表示 Olsen 等人在 2025 年针对 384 孔板给出的此前最佳 benchmark。</p>
+<p>对后期轮次的进一步观察显示了最后阶段取得的改进。逐轮汇总结果也表明，最佳单位克成本随时间持续下降。</p>
+</div>
+<h3>局限性</h3>
+<div class="limits">
+<p>这些结果只在一种蛋白质 sfGFP 和一种 CFPS 系统上得到验证。它能否推广到其他蛋白质和其他 CFPS 系统，仍有待证明。</p>
+<p>氧合程度和反应几何形态会显著影响产量，而且这些因素可能随着实验尺度变化。部分改进可能对这些条件较为敏感。下一步工作将包括理解这些敏感性。</p>
+<p>协议改进和试剂处理仍然需要人类监督。系统能够设计和解释实验，但实验室工作仍包含许多实际细节，需要经验丰富的操作人员处理。</p>
+</div>
+<h3>下一步</h3>
+<p>我们计划把“实验室参与闭环”的优化方法应用到其他生物工作流中。在这些领域，更快的迭代可能推动新的进展。</p>
+<p>我们认为，自主实验室与模型是互补的。模型可以生成设计，但生物学最终仍然需要测试和迭代。只有打通生成与实验之间的闭环，才可能把有潜力的想法变成真正有效的成果。</p>
+<p>在努力以安全、负责任的方式加快科学进步时，我们也在评估并降低相关风险，尤其是生物安全风险。</p>
+<p>这些结果表明，模型可以在湿实验环境中进行推理并改进协议。这种能力可能对生物安全产生影响。我们会通过 Preparedness Framework 评估并缓解相关风险。</p>
+<p>我们致力于在模型和系统层面建立必要且细致的防护措施，以降低这些风险。我们也会开发评测，用于持续跟踪当前的能力水平。</p>
+<p>感谢 Ginkgo Bioworks 的合作伙伴，以及所有参与设计、运行和支持本项工作所用自动化云实验室的团队。</p>
+<div aria-label="原文元数据" class="source-meta">
+<span>2026</span>
+<span>GPT</span>
+<span>科学</span>
+<span>作者</span>
+</div>
+<div class="keep-reading">
+<h3>继续阅读</h3>
+<figure class="source-figure" data-source-image="1"><img alt="GPT-Red art card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/6q32m87ClqE8Ovn6vD424h/05ced72e47bbe42711fbac6a082cbff2/Art_Card.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="2"><img alt="Separating signal from noise &gt; Art Card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/7j6M3prKIsTmV6cbMaHjhZ/e66f7cdd98c66c99546853cbc22cfe84/Seperating-signal-from-noise-card.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="3"><img alt="Introducing GeneBench-Pro &gt; Cover image" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/7sbJaKBi5qLXAqbewh72aK/93197556e903eac9df6f077eb12b7581/GenebenchPro_Blog_ArtCard.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+</div>
+</div>
+</section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

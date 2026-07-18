@@ -1,322 +1,338 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<title>通过多智能体系统将 GPU kernels 加速 38%</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>用多智能体系统将 GPU 内核提速 38%</title>
 <style>
 :root {
-  --bg: #f7f3ec;
-  --ink: #1b1e24;
-  --muted: #5f6877;
-  --line: #d9d0c3;
-  --panel: #ffffff;
-  --panel2: #efe7da;
-  --data-bg: #e7f0ff;
-  --risk-bg: #ffe8e2;
-  --chance-bg: #e5f5ec;
-  --result-bg: #fff0bf;
-  --deep-bg: #171b2a;
-  --deep-ink: #f5f7fb;
-  --accent-data: #2563eb;
-  --accent-risk: #dc2626;
-  --accent-chance: #059669;
-  --accent-result: #b7791f;
-  --accent-purple: #7c3aed;
-  --shadow: 0 18px 45px rgba(31, 28, 22, 0.12);
+  color-scheme: light dark;
+  --bg: #f5f3ee;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #17202a;
+  --muted: #64707d;
+  --line: #d9d6ce;
+  --accent: #165dff;
+  --accent2: #00876a;
+  --accent3: #d35400;
+  --accent4: #8e44ad;
+  --risk: #c0392b;
+  --opportunity: #087f5b;
+  --conclusion: #5b3cc4;
+  --hl: #fff0a8;
+  --hl2: #ccefe4;
+  --hl3: #dce7ff;
+  --hero-bg: #14213d;
+  --hero-ink: #f8fbff;
+  --hero-muted: #bdc9dc;
+  --data-bg: #eaf1ff;
+  --risk-bg: #fff0ed;
+  --opportunity-bg: #e8f7f1;
+  --conclusion-bg: #f1edff;
+  --stripe-bg: #202b3c;
+  --stripe-ink: #f7f9fc;
+  --quote-bg: #fff7df;
+  --translation-bg: #fffdf8;
+  --figure-bg: #eef1f5;
+  --shadow: 0 18px 45px rgba(31, 42, 55, .10);
+}
+:root[data-theme="light"] {
+  --bg: #f5f3ee;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #17202a;
+  --muted: #64707d;
+  --line: #d9d6ce;
+  --accent: #165dff;
+  --accent2: #00876a;
+  --accent3: #d35400;
+  --accent4: #8e44ad;
+  --risk: #c0392b;
+  --opportunity: #087f5b;
+  --conclusion: #5b3cc4;
+  --hl: #fff0a8;
+  --hl2: #ccefe4;
+  --hl3: #dce7ff;
+  --hero-bg: #14213d;
+  --hero-ink: #f8fbff;
+  --hero-muted: #bdc9dc;
+  --data-bg: #eaf1ff;
+  --risk-bg: #fff0ed;
+  --opportunity-bg: #e8f7f1;
+  --conclusion-bg: #f1edff;
+  --stripe-bg: #202b3c;
+  --stripe-ink: #f7f9fc;
+  --quote-bg: #fff7df;
+  --translation-bg: #fffdf8;
+  --figure-bg: #eef1f5;
+  --shadow: 0 18px 45px rgba(31, 42, 55, .10);
 }
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #111318;
-    --ink: #edf1f7;
-    --muted: #a7b0bf;
-    --line: #323845;
-    --panel: #191d26;
-    --panel2: #202636;
-    --data-bg: #122340;
-    --risk-bg: #3a1c1a;
-    --chance-bg: #123426;
-    --result-bg: #352a12;
-    --deep-bg: #090b12;
-    --deep-ink: #f4f7ff;
-    --accent-data: #60a5fa;
-    --accent-risk: #fb7185;
-    --accent-chance: #34d399;
-    --accent-result: #fbbf24;
-    --accent-purple: #a78bfa;
-    --shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+  :root:not([data-theme="light"]) {
+    --bg: #0d1118;
+    --surface: #121923;
+    --card: #18212d;
+    --ink: #e8edf5;
+    --muted: #9ca9ba;
+    --line: #303b4a;
+    --accent: #74a1ff;
+    --accent2: #45d4ad;
+    --accent3: #ff9b57;
+    --accent4: #d99bff;
+    --risk: #ff8175;
+    --opportunity: #54d8ae;
+    --conclusion: #b9a1ff;
+    --hl: #55450e;
+    --hl2: #123e34;
+    --hl3: #1d335c;
+    --hero-bg: #111b31;
+    --hero-ink: #edf4ff;
+    --hero-muted: #a8b7cc;
+    --data-bg: #142747;
+    --risk-bg: #3b2020;
+    --opportunity-bg: #12372f;
+    --conclusion-bg: #292343;
+    --stripe-bg: #080d14;
+    --stripe-ink: #edf2fa;
+    --quote-bg: #342d19;
+    --translation-bg: #121923;
+    --figure-bg: #1a2330;
+    --shadow: 0 18px 45px rgba(0, 0, 0, .32);
   }
 }
 :root[data-theme="dark"] {
-  --bg: #111318;
-  --ink: #edf1f7;
-  --muted: #a7b0bf;
-  --line: #323845;
-  --panel: #191d26;
-  --panel2: #202636;
-  --data-bg: #122340;
-  --risk-bg: #3a1c1a;
-  --chance-bg: #123426;
-  --result-bg: #352a12;
-  --deep-bg: #090b12;
-  --deep-ink: #f4f7ff;
-  --accent-data: #60a5fa;
-  --accent-risk: #fb7185;
-  --accent-chance: #34d399;
-  --accent-result: #fbbf24;
-  --accent-purple: #a78bfa;
-  --shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+  --bg: #0d1118;
+  --surface: #121923;
+  --card: #18212d;
+  --ink: #e8edf5;
+  --muted: #9ca9ba;
+  --line: #303b4a;
+  --accent: #74a1ff;
+  --accent2: #45d4ad;
+  --accent3: #ff9b57;
+  --accent4: #d99bff;
+  --risk: #ff8175;
+  --opportunity: #54d8ae;
+  --conclusion: #b9a1ff;
+  --hl: #55450e;
+  --hl2: #123e34;
+  --hl3: #1d335c;
+  --hero-bg: #111b31;
+  --hero-ink: #edf4ff;
+  --hero-muted: #a8b7cc;
+  --data-bg: #142747;
+  --risk-bg: #3b2020;
+  --opportunity-bg: #12372f;
+  --conclusion-bg: #292343;
+  --stripe-bg: #080d14;
+  --stripe-ink: #edf2fa;
+  --quote-bg: #342d19;
+  --translation-bg: #121923;
+  --figure-bg: #1a2330;
+  --shadow: 0 18px 45px rgba(0, 0, 0, .32);
 }
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", sans-serif;
-  line-height: 1.65;
-}
-main {
-  overflow: hidden;
+  font-family: Inter, "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.78;
 }
 .hero {
-  background: var(--deep-bg);
-  color: var(--deep-ink);
-  padding: 72px 24px 48px;
+  padding: clamp(3rem, 8vw, 7rem) max(1.5rem, calc((100% - 1120px) / 2));
+  background: var(--hero-bg);
+  color: var(--hero-ink);
 }
-.wrap {
-  width: min(1120px, calc(100% - 40px));
-  margin: 0 auto;
-}
-.kicker {
-  color: var(--accent-result);
-  font-weight: 700;
-  letter-spacing: 0;
-  margin-bottom: 18px;
-}
-h1 {
-  font-size: clamp(34px, 6vw, 76px);
-  line-height: 1.05;
-  margin: 0 0 16px;
-  letter-spacing: 0;
-}
-.original {
-  color: var(--muted);
-  font-size: 18px;
-  margin-bottom: 32px;
-}
-.lede {
-  max-width: 760px;
-  font-size: clamp(20px, 2.5vw, 30px);
-  line-height: 1.35;
-  color: var(--deep-ink);
-}
-.metrics {
-  background: var(--data-bg);
-  border-block: 1px solid var(--line);
-}
-.metric-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  padding: 0;
-}
-.metric {
-  padding: 28px 22px;
-  background: var(--panel);
-}
-.metric strong {
-  display: block;
-  color: var(--accent-data);
-  font-size: clamp(30px, 5vw, 52px);
-  line-height: 1;
-  margin-bottom: 10px;
-}
-.metric span {
-  color: var(--muted);
-  font-size: 15px;
-}
-.split {
-  padding: 64px 0;
-}
-.two-col {
-  display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  gap: 42px;
-  align-items: start;
-}
-.label {
-  display: inline-flex;
-  color: var(--accent-purple);
+.eyebrow {
+  color: var(--accent2);
+  font-size: .78rem;
   font-weight: 800;
-  margin-bottom: 12px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
 }
-h2 {
-  margin: 0 0 18px;
-  font-size: clamp(26px, 3vw, 40px);
-  line-height: 1.18;
-  letter-spacing: 0;
+.hero h1 {
+  max-width: 900px;
+  margin: .55rem 0 .35rem;
+  font-size: clamp(2.4rem, 7vw, 5.7rem);
+  line-height: 1.03;
+  letter-spacing: -.05em;
 }
-p {
-  margin: 0 0 14px;
+.original-title {
+  max-width: 860px;
+  margin: 0;
+  color: var(--hero-muted);
+  font-size: clamp(1rem, 2.2vw, 1.35rem);
 }
-.note-box {
-  border-left: 6px solid var(--accent-chance);
-  background: var(--chance-bg);
-  padding: 24px;
-  box-shadow: var(--shadow);
+.meta { margin-top: 1.5rem; color: var(--hero-muted); }
+.summary { max-width: 1120px; margin: 0 auto; padding: 3.5rem 1.4rem 5rem; }
+.overview {
+  max-width: 860px;
+  margin-bottom: 3rem;
+  padding-left: 1.3rem;
+  border-left: 7px solid var(--accent3);
+  font-size: clamp(1.2rem, 2.4vw, 1.7rem);
+  line-height: 1.55;
 }
-.process {
-  background: var(--panel2);
-  padding: 64px 0;
-}
-.steps {
+.overview strong { background: var(--hl); padding: .08em .25em; }
+.number-band {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 18px;
-  margin-top: 28px;
-}
-.step {
-  position: relative;
-  padding: 24px;
-  border-top: 5px solid var(--accent-data);
-  background: var(--panel);
-}
-.step b {
-  display: inline-grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 999px;
-  background: var(--accent-data);
-  color: var(--deep-ink);
-  margin-bottom: 14px;
-}
-.step:nth-child(2) {
-  border-color: var(--accent-purple);
-}
-.step:nth-child(2) b {
-  background: var(--accent-purple);
-}
-.step:nth-child(3) {
-  border-color: var(--accent-result);
-}
-.step:nth-child(3) b {
-  background: var(--accent-result);
-}
-.step:nth-child(4) {
-  border-color: var(--accent-chance);
-}
-.step:nth-child(4) b {
-  background: var(--accent-chance);
-}
-.cases {
-  padding: 66px 0;
-  background: var(--bg);
-}
-.case-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--panel);
-  box-shadow: var(--shadow);
+  margin: 2.7rem 0;
+  background: var(--stripe-bg);
+  color: var(--stripe-ink);
+  border-radius: 22px;
   overflow: hidden;
+  box-shadow: var(--shadow);
 }
-.case-table th,
-.case-table td {
-  padding: 18px;
-  border-bottom: 1px solid var(--line);
-  text-align: left;
-  vertical-align: top;
+.metric { padding: 1.7rem; border-right: 1px solid var(--line); }
+.metric:last-child { border-right: 0; }
+.metric b { display: block; color: var(--accent2); font-size: 2.2rem; line-height: 1.1; }
+.metric span { display: block; margin-top: .55rem; color: var(--hero-muted); font-size: .9rem; }
+.split {
+  display: grid;
+  grid-template-columns: 1.05fr .95fr;
+  gap: 1.5rem;
+  margin: 3rem 0;
 }
-.case-table th {
-  background: var(--deep-bg);
-  color: var(--deep-ink);
+.split > div { padding: 2rem; border-radius: 20px; }
+.method { background: var(--data-bg); border-top: 6px solid var(--accent); }
+.limit { background: var(--risk-bg); border-top: 6px solid var(--risk); }
+.split h2, .strategy h2, .takeaways h2 { margin-top: 0; line-height: 1.25; }
+.flow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: .8rem;
+  margin: 2.8rem 0;
 }
-.case-table td:first-child {
-  color: var(--accent-data);
-  font-weight: 800;
+.flow div {
+  position: relative;
+  padding: 1.15rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
 }
-.warning {
-  background: var(--risk-bg);
-  padding: 46px 0;
-  border-block: 1px solid var(--line);
+.flow b { display: block; margin-bottom: .3rem; color: var(--accent4); }
+.strategy {
+  margin: 3rem 0;
+  padding: 2.3rem;
+  background: var(--opportunity-bg);
+  border-radius: 26px 6px 26px 6px;
 }
-.quote {
-  max-width: 880px;
-  margin: 0 auto;
-  font-size: clamp(22px, 3vw, 34px);
-  line-height: 1.35;
-  border-left: 8px solid var(--accent-risk);
-  padding-left: 24px;
+.strategy-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
 }
-.quote small {
-  display: block;
-  color: var(--muted);
-  font-size: 16px;
-  margin-top: 16px;
+.strategy-grid article {
+  padding: 1.4rem;
+  background: var(--surface);
+  border-bottom: 5px solid var(--accent2);
+  border-radius: 14px;
+}
+.strategy-grid article:nth-child(2) { border-color: var(--accent3); }
+.strategy-grid article:nth-child(3) { border-color: var(--accent4); }
+.strategy-grid strong { color: var(--accent); }
+.insight {
+  margin: 3rem 0;
+  padding: 2rem 2.3rem;
+  background: var(--quote-bg);
+  border-left: 8px solid var(--conclusion);
+  font-size: 1.18rem;
 }
 .takeaways {
-  padding: 64px 0 78px;
-  background: var(--deep-bg);
-  color: var(--deep-ink);
+  margin-top: 3rem;
+  padding: 2.4rem;
+  background: var(--conclusion-bg);
+  border-radius: 8px 28px 8px 28px;
 }
-.mosaic {
+.takeaway-grid {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr 1fr;
-  gap: 16px;
-  margin-top: 26px;
+  grid-template-columns: 1.2fr .8fr;
+  gap: .9rem;
 }
-.tile {
-  min-height: 160px;
-  padding: 24px;
-  background: var(--panel);
-  color: var(--ink);
-  border-bottom: 6px solid var(--accent-data);
+.takeaway-grid div {
+  padding: 1.2rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
 }
-.tile:nth-child(2) {
-  border-color: var(--accent-result);
+.takeaway-grid div:nth-child(3) { grid-column: 1 / -1; }
+mark { background: var(--hl); color: var(--ink); padding: .04em .2em; }
+.hl2 { background: var(--hl2); padding: .05em .22em; font-weight: 750; }
+.hl3 { background: var(--hl3); padding: .05em .22em; font-weight: 750; }
+#translation {
+  background: var(--translation-bg);
+  border-top: 1px solid var(--line);
+  padding: 4.5rem max(1.4rem, calc((100% - 780px) / 2)) 6rem;
 }
-.tile:nth-child(3) {
-  border-color: var(--accent-chance);
+#translation h2 {
+  margin: 0 0 2rem;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  line-height: 1.1;
 }
-.tile:nth-child(4) {
-  grid-column: span 2;
-  border-color: var(--accent-purple);
+#translation h3 {
+  margin: 3rem 0 1rem;
+  color: var(--accent);
+  font-size: 1.65rem;
+  line-height: 1.3;
 }
-.tile:nth-child(5) {
-  border-color: var(--accent-risk);
+#translation h4 { margin-top: 2rem; font-size: 1.2rem; }
+#translation p, #translation li { font-size: 1.03rem; }
+#translation ol, #translation ul { padding-left: 1.4rem; }
+.toc {
+  padding: 1.2rem 1.5rem;
+  background: var(--data-bg);
+  border-left: 5px solid var(--accent);
 }
-.tile h3 {
-  margin: 0 0 10px;
-  font-size: 20px;
+.source-figure {
+  margin: 2.6rem 0;
+  padding: 1rem;
+  background: var(--figure-bg);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
 }
-.tile p {
+.source-figure img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+.source-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 2.6rem 0;
+}
+.source-pair .source-figure { margin: 0; }
+figcaption { margin-top: .8rem; color: var(--muted); font-size: .88rem; }
+.article-meta {
+  margin: 2.5rem 0;
+  padding: 1rem 1.2rem;
   color: var(--muted);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
 }
-@media (max-width: 820px) {
-  .metric-grid,
-  .two-col,
-  .steps,
-  .mosaic {
+.related { color: var(--muted); }
+@media (max-width: 760px) {
+  .number-band, .flow, .strategy-grid, .split, .takeaway-grid, .source-pair {
     grid-template-columns: 1fr;
   }
-  .tile:nth-child(4) {
-    grid-column: auto;
-  }
-  .case-table {
-    display: block;
-    overflow-x: auto;
-  }
+  .metric { border-right: 0; border-bottom: 1px solid var(--line); }
+  .metric:last-child { border-bottom: 0; }
+  .takeaway-grid div:nth-child(3) { grid-column: auto; }
 }
 </style>
-  <script id="airs-digest-theme-boot">
+<script id="airs-digest-theme-boot">
     try {
       var saved = localStorage.getItem("theme");
       if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
     } catch (e) {}
   </script>
-  <style id="airs-digest-theme-style">
+<style id="airs-digest-theme-style">
     :root {
       color-scheme: light;
       --airs-digest-ink: #191816;
@@ -439,113 +455,289 @@ p {
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+  <style id="airs-source-image-theme-style">
+    .source-figure .source-image-dark {
+      display: none;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .source-figure .source-image-light {
+        display: none;
+      }
+      :root:not([data-theme="light"]) .source-figure .source-image-dark {
+        display: block;
+      }
+    }
+    :root[data-theme="dark"] .source-figure .source-image-light {
+      display: none;
+    }
+    :root[data-theme="dark"] .source-figure .source-image-dark {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-light {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-dark {
+      display: none;
+    }
   </style>
 </head>
 <body>
-<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/multi-agent-kernels" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">← 返回索引</a><a href="https://cursor.com/blog/multi-agent-kernels" rel="noopener noreferrer" target="_blank">阅读原文 ↗</a></div><button class="airs-digest-theme-toggle" data-airs-theme-toggle="" type="button">主题 · 跟随系统</button></nav>
+<header class="hero">
+<div class="eyebrow">Cursor Research · 2026 年 4 月 14 日</div>
+<h1>用多智能体系统将 GPU 内核提速 38%</h1>
+<p class="original-title" lang="en">Speeding up GPU kernels by 38% with a multi-agent system</p>
+<p class="meta">NVIDIA Blackwell 200 · CUDA 内核优化 · 长时间自主智能体</p>
+</header>
 <main>
-  <section class="hero">
-    <div class="wrap">
-      <div class="kicker">一句话总括</div>
-      <h1>通过多智能体系统将 GPU kernels 加速 38%</h1>
-      <div class="original">Speeding up GPU kernels by 38% with a multi-agent system</div>
-      <p class="lede">Cursor 的实验把多智能体从常规编码推进到 GPU 底层性能工程，并证明它能在真实生产模型产生的 CUDA kernel 问题上自主搜索、测试和优化。</p>
-    </div>
-  </section>
-
-  <section class="metrics">
-    <div class="wrap metric-grid">
-      <div class="metric"><strong>235</strong><span>个 CUDA kernel 优化问题，来自真实模型工作负载。</span></div>
-      <div class="metric"><strong>38%</strong><span>相对优化后 PyTorch 基线的几何平均加速。</span></div>
-      <div class="metric"><strong>63%</strong><span>149 个问题超过基线，说明收益不是个别样本。</span></div>
-      <div class="metric"><strong>19%</strong><span>45 个问题超过 2 倍加速，长尾任务里也有大收益。</span></div>
-    </div>
-  </section>
-
-  <section class="split">
-    <div class="wrap two-col">
-      <div>
-        <span class="label">为什么重要</span>
-        <h2>这不是让 AI 补全代码，而是让它在硬件约束里找性能。</h2>
-      </div>
-      <div class="note-box">
-        <p>CUDA kernels 直接影响 AI 训练和推理的 GPU 利用率、延迟、能耗和每 token 成本。</p>
-        <p>传统优化通常拆成单个数学操作分别调优。这样可控，但容易错过跨系统的组合收益。</p>
-        <p>多智能体系统的价值在于扩大搜索空间。它可以把 benchmark 结果变成反馈，并持续重排任务优先级。</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="process">
-    <div class="wrap">
-      <span class="label">实验流程</span>
-      <h2>整个系统靠一个规划智能体和多个工作智能体循环推进。</h2>
-      <div class="steps">
-        <div class="step"><b>1</b><p>NVIDIA 用 SOL-ExecBench 生成 235 个问题，覆盖 LLM、扩散、视觉、音频、视频和多模态模型。</p></div>
-        <div class="step"><b>2</b><p>规划智能体按性能指标分配任务，并在运行中重新平衡工作。</p></div>
-        <div class="step"><b>3</b><p>工作智能体自主调用 benchmark，形成测试、调试和优化循环。</p></div>
-        <div class="step"><b>4</b><p>系统分别尝试 CUDA C 加 inline PTX，以及训练数据中较少见的 CuTe DSL。</p></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="cases">
-    <div class="wrap">
-      <span class="label">三个代表案例</span>
-      <h2>不同 kernel 触发了不同优化策略。</h2>
-      <table class="case-table">
-        <thead>
-          <tr>
-            <th>问题</th>
-            <th>系统做了什么</th>
-            <th>结果说明</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>BF16 Grouped Query Attention with Paged Prefill</td>
-            <td>使用特定硬件指令、persistent kernels 和针对输入尺寸的细调。</td>
-            <td>SOL score 达到 0.9722，相对 FlashInfer 人工优化基线几何平均加速 84%。替换 SGLang kernel 后，Llama 3.1 8B 的 TTFT 提升 3%。</td>
-          </tr>
-          <tr>
-            <td>NVFP4 MoE Linear with Gating</td>
-            <td>识别量化为瓶颈，把 scale 计算和 rounding 融合，并用预计算阈值桶把 FP32 映射到 16 个 NVFP4 值。</td>
-            <td>相对优化后 PyTorch 基线加速 39%，SOL score 为 0.58。它显示智能体能抓住低比特量化中的真实瓶颈。</td>
-          </tr>
-          <tr>
-            <td>BF16 Matrix Multiplication</td>
-            <td>从零生成专用 CUDA C++ GEMM kernel，并学习 Blackwell 指令、访存模式和特定形状优化。</td>
-            <td>达到 NVIDIA cuBLAS 人工优化基线的 86%。在小 M 测试中最高超过库实现 9%，这类形状对 LLM decode 很关键。</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="warning">
-    <div class="wrap">
-      <div class="quote">
-        38% 的平均加速很强，但 median SOL score 只有 0.56。结论不是“已经替代专家”，而是“多智能体开始能进入专家级问题的搜索空间”。
-        <small>这改变了读者对 AI 影响的理解：AI 的边界正在从代码生成，移动到可度量的工程优化。</small>
-      </div>
-    </div>
-  </section>
-
-  <section class="takeaways">
-    <div class="wrap">
-      <span class="label">最值得带走的洞见</span>
-      <h2>这项实验最有价值的地方，是把多智能体能力放进了硬指标里。</h2>
-      <div class="mosaic">
-        <div class="tile"><h3>真实负载比玩具任务更有说服力</h3><p>问题来自 124 个以上生产级开源模型。结果更接近实际训练和推理瓶颈。</p></div>
-        <div class="tile"><h3>多智能体适合开放式优化</h3><p>kernel 优化没有单一正确答案。系统能用 benchmark 反馈持续探索。</p></div>
-        <div class="tile"><h3>收益会影响成本结构</h3><p>更快 kernels 意味着更低延迟、更高吞吐和更低每 token 成本。</p></div>
-        <div class="tile"><h3>专家经验仍然重要</h3><p>median SOL score 说明系统离理论上限还有距离。多智能体目前更像放大搜索能力，而不是终结工程判断。</p></div>
-        <div class="tile"><h3>未来瓶颈可能是算力预算</h3><p>实验只用 27 块 Blackwell 200 GPU。更多计算资源可能让系统探索更深的方案空间。</p></div>
-      </div>
-    </div>
-  </section>
+<section aria-labelledby="summary-heading" class="summary">
+<p class="overview" id="summary-heading"><strong>一句话总括：</strong>这项工作的真正贡献，是让多智能体在数百个真实 GPU 内核问题上自主执行“测试—调试—优化”循环，并在三周内取得可测量的整体性能收益。</p>
+<div aria-label="核心数据" class="number-band">
+<div class="metric"><b>235</b><span>个真实内核优化问题</span></div>
+<div class="metric"><b>38%</b><span>整体几何平均提速</span></div>
+<div class="metric"><b>63%</b><span>问题超过基线</span></div>
+<div class="metric"><b>19%</b><span>问题提速超过 2 倍</span></div>
+</div>
+<div class="split">
+<div class="method">
+<h2>评测对象不是玩具内核</h2>
+<p>NVIDIA 通过 SOL-ExecBench，从 <mark>124 个以上</mark>的生产级开源模型中生成 235 个问题。模型覆盖 LLM、扩散、视觉、音频、视频和多模态架构。</p>
+<p>评测运行在 <span class="hl3">27 块 NVIDIA Blackwell 200 GPU</span> 上。流水线会同时检查现有软件基线和硬件理论极限，也会拒绝缓存等作弊方案。</p>
+<p><strong>洞见：</strong>这些结果比合成 benchmark 更接近真实训练和推理工作负载。</p>
+</div>
+<div class="limit">
+<h2>38% 并不等于问题已经解决</h2>
+<p>系统的 SOL 中位数只有 <mark>0.56</mark>。0.5 代表优化后的 PyTorch 基线，1.0 才代表理论硬件极限。</p>
+<p>作者认为，数百个问题和智能体共用 27 块 GPU，限制了搜索深度。但文章没有通过更多算力实验验证这一推测。</p>
+<p><strong>洞见：</strong>多智能体已能扩大优化覆盖面，但距离普遍逼近硬件极限仍然很远。</p>
+</div>
+</div>
+<div aria-label="自主优化流程" class="flow">
+<div><b>01 · 规划</b>规划智能体分配任务。</div>
+<div><b>02 · 测试</b>工作智能体调用评测流水线。</div>
+<div><b>03 · 调试</b>根据错误和性能指标修改内核。</div>
+<div><b>04 · 再平衡</b>按进展重新分配计算资源。</div>
+</div>
+<section class="strategy">
+<h2>同一套系统找到了三类不同策略</h2>
+<div class="strategy-grid">
+<article>
+<h3>分页预填充注意力</h3>
+<p>系统使用底层加载和计算指令，引入持久化内核调度，并针对输入尺寸深度优化。</p>
+<p>结果达到 <strong>0.9722 SOL</strong>，比 FlashInfer 人工基线几何平均快 <strong>84%</strong>。替换 SGLang 内核后，Llama 3.1 8B 的 TTFT 提升 3%。</p>
+<p><b>结论：</b>单个热点只占预填充过程的 2%–5%，仍能带来可见的端到端收益。</p>
+</article>
+<article>
+<h3>NVFP4 MoE Linear</h3>
+<p>系统判断量化是主要瓶颈，于是融合缩放计算和舍入。它利用 NVFP4 只有 16 个可能值的特点，通过预计算阈值桶直接映射 FP32。</p>
+<p>最终取得 <strong>39% 几何平均提速</strong>，SOL 为 <strong>0.58</strong>。</p>
+<p><b>结论：</b>智能体不只调整参数，也能重写关键数据路径。</p>
+</article>
+<article>
+<h3>BF16 矩阵乘法</h3>
+<p>系统从零生成专用 CUDA C++ GEMM，并自行学习 Blackwell 指令、内存访问和流水线安排。</p>
+<p>整体达到人工调优 cuBLAS 的 <strong>86%</strong>。在 small-M 测试中，它最多领先 <strong>9%</strong>。</p>
+<p><b>结论：</b>针对特定形状的专用内核，可能在局部场景超过成熟通用库。</p>
+</article>
+</div>
+</section>
+<blockquote class="insight">真正改变认知的不是某一个 2 倍提速案例，而是系统能同时处理 <span class="hl2">235 个彼此不同的问题</span>，并为不同瓶颈形成不同方案。这显示 AI 的价值正在从“写出已知代码”转向“搜索尚无标准答案的实现空间”。</blockquote>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="takeaway-grid">
+<div><b>规模化覆盖具有独立价值。</b><br/>人类专家通常优先优化少数高价值内核。多智能体有机会处理过去不经济的长尾问题。</div>
+<div><b>可测量反馈是自主系统的关键。</b><br/>明确的性能指标和硬件上限，让智能体可以持续试错，而不必依赖预先知道的正确补丁。</div>
+<div><b>局部内核收益不能直接等同于端到端收益。</b><br/>注意力内核快 84%，最终 TTFT 只快 3%。评估 AI 优化时，必须同时查看微基准和真实系统表现。</div>
+<div><b>底层领域并非不可进入。</b><br/>系统能使用 inline PTX、Blackwell 专用指令和资料稀少的 CuTe DSL，说明文档驱动学习可以延伸到训练数据覆盖较弱的 API。</div>
+<div><b>证据仍有边界。</b><br/>整体 SOL 中位数为 0.56。更多算力能否稳定转化为更高质量，还需要新的对照实验。</div>
+</div>
+</section>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<p>我们的多智能体系统为 NVIDIA Blackwell 200 GPU 自主优化了 235 个 CUDA 内核。它只用了三周，就比基线取得了 38% 的几何平均提速。</p>
+<h3>目录</h3>
+<ol class="toc">
+<li>以内核优化检验智能体系统能力</li>
+<li>使用 SOL-ExecBench 生成问题并进行基准测试</li>
+<li>实验的运行方式</li>
+<li>整体提速 38%，其中 19% 的优化超过 2 倍</li>
+<li>针对不同问题采用不同优化策略</li>
+<li>采用分页预填充的 BF16 分组查询注意力</li>
+<li>带门控的 NVFP4 MoE Linear</li>
+<li>BF16 矩阵乘法</li>
+<li>用于构建软件的多智能体系统</li>
+</ol>
+<p>过去几个月，我们一直在开发一个多智能体系统。它能够自主构建、维护和部署复杂软件。作为这项工作的一部分，我们一直在不同领域测试该系统。其中包括让它从零构建浏览器，以及在 First Proof benchmark 上解决一道研究级数学问题。</p>
+<p>最近，我们开始与 NVIDIA 合作，应对一项新挑战：使用多智能体框架优化 CUDA 内核。这类技术问题难度很高，也会产生重要的现实影响。CUDA 内核是支撑 NVIDIA GPU 上 AI 模型训练和推理的核心软件。更快的内核意味着更高的 GPU 利用率、更低的能耗、更短的延迟，以及更低的单 token 成本。服务提供商因此可以同时向更多用户提供规模更大、能力更强的模型。</p>
+<p>我们的多智能体框架在三周内自主处理了 235 个问题。系统从零构建并优化 Blackwell GPU 内核，一直深入到汇编层级，最终取得 38% 的几何平均提速。</p>
+<p>这一级别的性能提升，通常需要经验丰富的内核工程师投入数月甚至数年。多智能体系统在几周内完成了这项工作。它还处理了大量过去用现有方式并不值得投入资源的长尾内核问题。</p>
+<h3>以内核优化检验智能体系统能力</h3>
+<p>评估长时间运行的多智能体系统时，一种很有效的方法是向它们提供开放式优化问题。这类问题连我们自己也不知道正确答案。内核优化符合这一条件。它提供可测量的目标，系统可以围绕目标反复优化，而不是仅仅追求一个已知且简单的代码差异。</p>
+<p>如今，工程师会把模型拆成单独的数学运算，再分别调整每项运算，以此优化内核。这种方法降低了问题的复杂度，但也会损失潜在性能。分块优化无法发现同时优化整个系统可能获得的收益。到目前为止，我们之所以无法越过这些人工简化并探索完整解空间，也限制了 GPU 性能的进一步提升。</p>
+<p>通过这项实验，我们想知道多智能体系统能否跳出这些限制。我们希望它探索更广阔的解空间，并生成更快的内核。</p>
+<h3>使用 SOL-ExecBench 生成问题并进行基准测试</h3>
+<p>NVIDIA 使用 SOL-ExecBench，从 124 个以上的生产级开源模型中生成了 235 个优化问题。这些模型包括 Deepseek、Qwen、Gemma、Kimi 和 Stable Diffusion。它们并非合成数据或玩具内核。每个问题都来自真实训练或推理工作负载中的约束，覆盖 LLM、扩散、视觉、音频、视频以及多模态混合架构。</p>
+<div class="source-pair">
+<figure class="source-figure" data-source-image="0"><img alt="SOL-ExecBench generated 235 optimization problems across LLM, diffusion, vision, audio, video, and multi-modal architectures" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2FNVIDIA%2520Multi-agent%2Fkernel-optimization-segmented-light.png&amp;w=1920&amp;q=70" width="800"/><img alt="SOL-ExecBench generated 235 optimization problems across LLM, diffusion, vision, audio, video, and multi-modal architectures" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2FNVIDIA%2520Multi-agent%2Fkernel-optimization-segmented-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+</div>
+<p>我们还使用 SOL-ExecBench，在 27 块 NVIDIA Blackwell 200 GPU 上评测多智能体生成的内核方案。SOL-ExecBench 是一种有效的评估工具。它会把内核性能与现有软件基线及硬件理论性能极限进行比较。如果智能体采用缓存等作弊手段，提交了超出 B200 能力范围的性能结果，流水线就会判定结果无效。</p>
+<h3>实验的运行方式</h3>
+<p>多智能体系统通过一次运行解决了全部 235 个 GPU 内核优化问题。系统部署了一个规划智能体。它根据性能指标，在自主工作的智能体之间分配任务，并持续重新平衡工作量。</p>
+<p>整个协调协议都写在一个 Markdown 文件里。文件规定了输出格式、规则和测试。运行过程中，多智能体系统自行学会了调用基准测试流水线。由此形成一个循环，系统可以持续测试、调试和优化内核，全程不需要开发者干预。</p>
+<div class="source-pair">
+<figure class="source-figure" data-source-image="1"><img alt="The multi-agent system's autonomous debug, test, and optimization loop" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2FNVIDIA%2520Multi-agent%2Fdebug-test-loop-light.png&amp;w=1920&amp;q=70" width="800"/><img alt="The multi-agent system's autonomous debug, test, and optimization loop" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2FNVIDIA%2520Multi-agent%2Fdebug-test-loop-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+</div>
+<p>为了更准确地评估多智能体系统的能力，我们让它分别用两种语言编写方案，并进行了两轮独立运行。这两种语言位于 GPU 抽象层次的两端：</p>
+<ul>
+<li><p><strong>带 inline PTX 的 CUDA C</strong>：它让智能体能够直接访问寄存器和 ISA 层级指令，用于检验系统能否在最底层理解硬件。</p></li>
+<li><p><strong>CuTe DSL</strong>：它提供高层、可组合的抽象，但在公开训练数据中很少出现，用于检验系统能否只依靠所提供的文档学习新 API。</p></li>
+</ul>
+<h3>整体提速 38%，其中 19% 的优化超过 2 倍</h3>
+<p>我们通过两种方式报告多智能体系统的性能：</p>
+<ul>
+<li><p>与经过单个智能体优化的 PyTorch 代码基线相比，计算几何平均加速比。</p></li>
+<li><p>使用 Speed-of-Light（SOL）分数，表示一个方案在对数曲线上相对于硬件理论极限的表现。0.5 分代表优化后的 PyTorch 基线，1.0 分代表性能极限。</p></li>
+</ul>
+<div class="source-pair">
+<figure class="source-figure" data-source-image="2"><img alt="Speed-of-Light score scale: 0.5 represents the optimized PyTorch baseline, 1.0 is the theoretical hardware limit" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2FNVIDIA%2520Multi-agent%2Fsol-score-light.png&amp;w=1920&amp;q=70" width="800"/><img alt="Speed-of-Light score scale: 0.5 represents the optimized PyTorch baseline, 1.0 is the theoretical hardware limit" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2FNVIDIA%2520Multi-agent%2Fsol-score-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+</div>
+<p>多智能体系统在 235 个问题中的 149 个问题上成功超过基线，占 63%。其几何平均比率为 1.38 倍，也就是几何平均提速 38%。</p>
+<div class="source-pair">
+<figure class="source-figure" data-source-image="3"><img alt="Multi-agent system achieved 1.38x geometric mean speedup across 235 kernel optimization problems" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2FNVIDIA%2520Multi-agent%2Fspeedup-chart-light.png%3Fv%3D2&amp;w=1920&amp;q=70" width="800"/><img alt="Multi-agent system achieved 1.38x geometric mean speedup across 235 kernel optimization problems" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2FNVIDIA%2520Multi-agent%2Fspeedup-chart-dark.png%3Fv%3D2&amp;w=1920&amp;q=70" width="800"/></figure>
+</div>
+<p>在 235 个问题中的 45 个问题上，多智能体系统取得了超过基线 2 倍的优化，占 19%。你可以在公开代码仓库中查看该系统最终生成的方案。</p>
+<div class="source-pair">
+<figure class="source-figure" data-source-image="4"><img alt="Distribution of per-problem speedups, with 19% exceeding 2x improvement" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2FNVIDIA%2520Multi-agent%2Fproblem-level-speedup-chart-light.png&amp;w=1920&amp;q=70" width="800"/><img alt="Distribution of per-problem speedups, with 19% exceeding 2x improvement" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2FNVIDIA%2520Multi-agent%2Fproblem-level-speedup-chart-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+</div>
+<h3>针对不同问题采用不同优化策略</h3>
+<p>为了展示系统适应不同问题类型的能力，我们选出了三个问题。在这些问题中，系统自然形成了各不相同的优化策略。</p>
+<h3>采用分页预填充的 BF16 分组查询注意力</h3>
+<p>采用分页预填充的分组查询注意力，是现代 LLM 推理栈中常见的提示词阶段操作。经过良好优化的实现，可以在相同 GPU 显存条件下支持更长的上下文、更高的并发量和更好的吞吐量。</p>
+<p>智能体使用 CUDA C++ 优化了这个注意力问题。该问题提取自 Llama 3.1 8B 的 SGLang 推理过程。在反复调整内核时，智能体成功采用了用于内存加载和数学运算的特定硬件指令。它还通过持久化内核改进调度，并针对输入尺寸进行深度优化。</p>
+<p>我们把多智能体系统生成的自定义内核，与 FlashInfer 库中由人工优化的基线进行了比较。结果显示，该方案的 SOL 分数达到 0.9722，已经接近硬件极限。与基线相比，其几何平均提速为 84%。</p>
+<div class="source-pair">
+<figure class="source-figure" data-source-image="5"><img alt="BF16 Grouped Query Attention optimization trajectory, reaching 0.9722 SOL score and 84% geomean speedup" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2FNVIDIA%2520Multi-agent%2Fevolution-trajectory-BF16-light.png&amp;w=1920&amp;q=70" width="800"/><img alt="BF16 Grouped Query Attention optimization trajectory, reaching 0.9722 SOL score and 84% geomean speedup" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2FNVIDIA%2520Multi-agent%2Fevolution-trajectory-BF16-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+</div>
+<p>我们还在 SGLang 中替换了现有内核，并观察到 Llama 3.1 8B 的首个 token 时间（TTFT）缩短了 3%。根据服务配置不同，这个注意力问题占预填充过程的 2%–5%。因此，我们认为这是一项不可忽视的端到端性能提升。</p>
+<h3>带门控的 NVFP4 MoE Linear</h3>
+<p>这个问题代表了 Qwen3 等混合专家模型中常见的双内核模式。不同之处在于，输入张量和中间乘法输出会被量化为 NVFP4，也就是 4 位浮点格式。</p>
+<p>智能体正确判断量化环节是主要瓶颈，并据此融合了缩放计算和舍入操作。通常的量化会先缩放，再执行舍入。它改为使用预先计算的阈值桶，直接把 FP32 值映射到 FP4 编码。由于 NVFP4 只有 16 个可能值，这种做法是可行的。随后，它把这些优化应用到规模更大的测试用例。</p>
+<p>智能体最终超过了优化后的 PyTorch 基线，取得 39% 的几何平均提速，SOL 分数为 0.58。</p>
+<div class="source-pair">
+<figure class="source-figure" data-source-image="6"><img alt="NVFP4 MoE Linear optimization trajectory, achieving 39% geomean speedup and 0.58 SOL score" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2FNVIDIA%2520Multi-agent%2Fevolution-trajectory-nvfp4-light.png%3Fv%3D2&amp;w=1920&amp;q=70" width="800"/><img alt="NVFP4 MoE Linear optimization trajectory, achieving 39% geomean speedup and 0.58 SOL score" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2FNVIDIA%2520Multi-agent%2Fevolution-trajectory-nvfp4-dark.png%3Fv%3D2&amp;w=1920&amp;q=70" width="800"/></figure>
+</div>
+<h3>BF16 矩阵乘法</h3>
+<p>矩阵乘法一直是非常难以优化的问题。优化者必须深入理解不同硬件单元及其调度方式。要让矩阵乘法内核（GEMM）充分发挥性能，通常需要 inline PTX、流水线技术，以及内核内部的分阶段处理。因此，过去只有经验极其丰富的内核专家才能编写高速 GEMM。</p>
+<p>Cursor 多智能体系统从零生成了一个专用 CUDA C++ GEMM 内核。它达到了 NVIDIA cuBLAS 库中精细人工调优基线的 86%，差距已经很小。为了取得这一结果，系统自行学会使用 Blackwell 专用指令。它还针对硬件优化内存读写，并围绕具体形状进行深度优化。</p>
+<p>在对 LLM 推理解码尤其重要的 small-M 测试中，多智能体系统生成的内核最多比该库快 9%。这一结果表明，即使面对最困难的内核问题，多智能体系统也可能很快在部分场景中超过领域专家。</p>
+<div class="source-pair">
+<figure class="source-figure" data-source-image="7"><img alt="BF16 Matrix Multiplication results: 86% of human-optimized cuBLAS performance, outperforming on small-M cases by up to 9%" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2FNVIDIA%2520Multi-agent%2Fhuman-optimized-kernel-percentage-light.png&amp;w=1920&amp;q=70" width="800"/><img alt="BF16 Matrix Multiplication results: 86% of human-optimized cuBLAS performance, outperforming on small-M cases by up to 9%" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2FNVIDIA%2520Multi-agent%2Fhuman-optimized-kernel-percentage-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+</div>
+<h3>用于构建软件的多智能体系统</h3>
+<p>多智能体框架虽然比基线取得了 38% 的几何平均提速，但 SOL 中位数仍然只有 0.56。这说明仍有很大的进一步优化空间。我们认为，只要投入更多计算资源，多智能体方案就能得到显著改善。我们当时有数百个问题和智能体，却只有 27 块 GPU。这限制了我们充分发挥多智能体系统的能力。如果拥有更多 GPU，系统就能探索更深层、更新颖的方案。</p>
+<p>软件开发中最具挑战性的任务通常是开放式的，没有明确解法。单智能体系统很难处理这类任务，因为模型最擅长的是训练期间已经见过、范围较窄的问题。我们认为，这次内核优化实验进一步证明，多智能体架构将很快成为构建软件的默认方式。它们能够解决远远超出训练数据分布的新问题。</p>
+<p>我们在这里研究的技术很快会用于 Cursor 的核心产品。如果你有兴趣研究多智能体协调中的难题，Cursor 团队欢迎你通过 hiring@cursor.com 与我们联系。</p>
+<div class="article-meta">
+<p>分类：Research</p>
+<p>作者：Wilson Lin、Sahil Modi、Yuan Zhang、Edward Lin</p>
+</div>
+<div class="related">
+<p>扩展长时间运行的自主编码</p>
+<p>使用自定义 MXFP8 内核将 MoE 训练提速 1.5 倍</p>
+<p>推出 Composer 2.5</p>
+</div>
+<h3>用多智能体系统将 GPU 内核提速 38%</h3>
+<p>我们的多智能体系统为 NVIDIA Blackwell 200 GPU 自主优化了 235 个 CUDA 内核。它只用了三周，就比基线取得了 38% 的几何平均提速。</p>
+<h4>目录</h4>
+<ol class="toc">
+<li>以内核优化检验智能体系统能力</li>
+<li>使用 SOL-ExecBench 生成问题并进行基准测试</li>
+<li>实验的运行方式</li>
+<li>整体提速 38%，其中 19% 的优化超过 2 倍</li>
+<li>针对不同问题采用不同优化策略</li>
+<li>采用分页预填充的 BF16 分组查询注意力</li>
+<li>带门控的 NVFP4 MoE Linear</li>
+<li>BF16 矩阵乘法</li>
+<li>用于构建软件的多智能体系统</li>
+</ol>
+<p>过去几个月，我们一直在开发一个多智能体系统。它能够自主构建、维护和部署复杂软件。作为这项工作的一部分，我们一直在不同领域测试该系统。其中包括让它从零构建浏览器，以及在 First Proof benchmark 上解决一道研究级数学问题。</p>
+<p>最近，我们开始与 NVIDIA 合作，应对一项新挑战：使用多智能体框架优化 CUDA 内核。这类技术问题难度很高，也会产生重要的现实影响。CUDA 内核是支撑 NVIDIA GPU 上 AI 模型训练和推理的核心软件。更快的内核意味着更高的 GPU 利用率、更低的能耗、更短的延迟，以及更低的单 token 成本。服务提供商因此可以同时向更多用户提供规模更大、能力更强的模型。</p>
+<p>我们的多智能体框架在三周内自主处理了 235 个问题。系统从零构建并优化 Blackwell GPU 内核，一直深入到汇编层级，最终取得 38% 的几何平均提速。</p>
+<p>这一级别的性能提升，通常需要经验丰富的内核工程师投入数月甚至数年。多智能体系统在几周内完成了这项工作。它还处理了大量过去用现有方式并不值得投入资源的长尾内核问题。</p>
+<h3>以内核优化检验智能体系统能力</h3>
+<p>评估长时间运行的多智能体系统时，一种很有效的方法是向它们提供开放式优化问题。这类问题连我们自己也不知道正确答案。内核优化符合这一条件。它提供可测量的目标，系统可以围绕目标反复优化，而不是仅仅追求一个已知且简单的代码差异。</p>
+<p>如今，工程师会把模型拆成单独的数学运算，再分别调整每项运算，以此优化内核。这种方法降低了问题的复杂度，但也会损失潜在性能。分块优化无法发现同时优化整个系统可能获得的收益。到目前为止，我们之所以无法越过这些人工简化并探索完整解空间，也限制了 GPU 性能的进一步提升。</p>
+<p>通过这项实验，我们想知道多智能体系统能否跳出这些限制。我们希望它探索更广阔的解空间，并生成更快的内核。</p>
+<h3>使用 SOL-ExecBench 生成问题并进行基准测试</h3>
+<p>NVIDIA 使用 SOL-ExecBench，从 124 个以上的生产级开源模型中生成了 235 个优化问题。这些模型包括 Deepseek、Qwen、Gemma、Kimi 和 Stable Diffusion。它们并非合成数据或玩具内核。每个问题都来自真实训练或推理工作负载中的约束，覆盖 LLM、扩散、视觉、音频、视频以及多模态混合架构。</p>
+<p>我们还使用 SOL-ExecBench，在 27 块 NVIDIA Blackwell 200 GPU 上评测多智能体生成的内核方案。SOL-ExecBench 是一种有效的评估工具。它会把内核性能与现有软件基线及硬件理论性能极限进行比较。如果智能体采用缓存等作弊手段，提交了超出 B200 能力范围的性能结果，流水线就会判定结果无效。</p>
+<h3>实验的运行方式</h3>
+<p>多智能体系统通过一次运行解决了全部 235 个 GPU 内核优化问题。系统部署了一个规划智能体。它根据性能指标，在自主工作的智能体之间分配任务，并持续重新平衡工作量。</p>
+<p>整个协调协议都写在一个 Markdown 文件里。文件规定了输出格式、规则和测试。运行过程中，多智能体系统自行学会了调用基准测试流水线。由此形成一个循环，系统可以持续测试、调试和优化内核，全程不需要开发者干预。</p>
+<p>为了更准确地评估多智能体系统的能力，我们让它分别用两种语言编写方案，并进行了两轮独立运行。这两种语言位于 GPU 抽象层次的两端：</p>
+<ul>
+<li><p><strong>带 inline PTX 的 CUDA C</strong>：它让智能体能够直接访问寄存器和 ISA 层级指令，用于检验系统能否在最底层理解硬件。</p></li>
+<li><p><strong>CuTe DSL</strong>：它提供高层、可组合的抽象，但在公开训练数据中很少出现，用于检验系统能否只依靠所提供的文档学习新 API。</p></li>
+</ul>
+<h3>整体提速 38%，其中 19% 的优化超过 2 倍</h3>
+<p>我们通过两种方式报告多智能体系统的性能：</p>
+<ul>
+<li><p>与经过单个智能体优化的 PyTorch 代码基线相比，计算几何平均加速比。</p></li>
+<li><p>使用 Speed-of-Light（SOL）分数，表示一个方案在对数曲线上相对于硬件理论极限的表现。0.5 分代表优化后的 PyTorch 基线，1.0 分代表性能极限。</p></li>
+</ul>
+<p>多智能体系统在 235 个问题中的 149 个问题上成功超过基线，占 63%。其几何平均比率为 1.38 倍，也就是几何平均提速 38%。</p>
+<p>在 235 个问题中的 45 个问题上，多智能体系统取得了超过基线 2 倍的优化，占 19%。你可以在公开代码仓库中查看该系统最终生成的方案。</p>
+<h3>针对不同问题采用不同优化策略</h3>
+<p>为了展示系统适应不同问题类型的能力，我们选出了三个问题。在这些问题中，系统自然形成了各不相同的优化策略。</p>
+<h3>采用分页预填充的 BF16 分组查询注意力</h3>
+<p>采用分页预填充的分组查询注意力，是现代 LLM 推理栈中常见的提示词阶段操作。经过良好优化的实现，可以在相同 GPU 显存条件下支持更长的上下文、更高的并发量和更好的吞吐量。</p>
+<p>智能体使用 CUDA C++ 优化了这个注意力问题。该问题提取自 Llama 3.1 8B 的 SGLang 推理过程。在反复调整内核时，智能体成功采用了用于内存加载和数学运算的特定硬件指令。它还通过持久化内核改进调度，并针对输入尺寸进行深度优化。</p>
+<p>我们把多智能体系统生成的自定义内核，与 FlashInfer 库中由人工优化的基线进行了比较。结果显示，该方案的 SOL 分数达到 0.9722，已经接近硬件极限。与基线相比，其几何平均提速为 84%。</p>
+<p>我们还在 SGLang 中替换了现有内核，并观察到 Llama 3.1 8B 的首个 token 时间（TTFT）缩短了 3%。根据服务配置不同，这个注意力问题占预填充过程的 2%–5%。因此，我们认为这是一项不可忽视的端到端性能提升。</p>
+<h3>带门控的 NVFP4 MoE Linear</h3>
+<p>这个问题代表了 Qwen3 等混合专家模型中常见的双内核模式。不同之处在于，输入张量和中间乘法输出会被量化为 NVFP4，也就是 4 位浮点格式。</p>
+<p>智能体正确判断量化环节是主要瓶颈，并据此融合了缩放计算和舍入操作。通常的量化会先缩放，再执行舍入。它改为使用预先计算的阈值桶，直接把 FP32 值映射到 FP4 编码。由于 NVFP4 只有 16 个可能值，这种做法是可行的。随后，它把这些优化应用到规模更大的测试用例。</p>
+<p>智能体最终超过了优化后的 PyTorch 基线，取得 39% 的几何平均提速，SOL 分数为 0.58。</p>
+<h3>BF16 矩阵乘法</h3>
+<p>矩阵乘法一直是非常难以优化的问题。优化者必须深入理解不同硬件单元及其调度方式。要让矩阵乘法内核（GEMM）充分发挥性能，通常需要 inline PTX、流水线技术，以及内核内部的分阶段处理。因此，过去只有经验极其丰富的内核专家才能编写高速 GEMM。</p>
+<p>Cursor 多智能体系统从零生成了一个专用 CUDA C++ GEMM 内核。它达到了 NVIDIA cuBLAS 库中精细人工调优基线的 86%，差距已经很小。为了取得这一结果，系统自行学会使用 Blackwell 专用指令。它还针对硬件优化内存读写，并围绕具体形状进行深度优化。</p>
+<p>在对 LLM 推理解码尤其重要的 small-M 测试中，多智能体系统生成的内核最多比该库快 9%。这一结果表明，即使面对最困难的内核问题，多智能体系统也可能很快在部分场景中超过领域专家。</p>
+<h3>用于构建软件的多智能体系统</h3>
+<p>多智能体框架虽然比基线取得了 38% 的几何平均提速，但 SOL 中位数仍然只有 0.56。这说明仍有很大的进一步优化空间。我们认为，只要投入更多计算资源，多智能体方案就能得到显著改善。我们当时有数百个问题和智能体，却只有 27 块 GPU。这限制了我们充分发挥多智能体系统的能力。如果拥有更多 GPU，系统就能探索更深层、更新颖的方案。</p>
+<p>软件开发中最具挑战性的任务通常是开放式的，没有明确解法。单智能体系统很难处理这类任务，因为模型最擅长的是训练期间已经见过、范围较窄的问题。我们认为，这次内核优化实验进一步证明，多智能体架构将很快成为构建软件的默认方式。它们能够解决远远超出训练数据分布的新问题。</p>
+<p>我们在这里研究的技术很快会用于 Cursor 的核心产品。如果你有兴趣研究多智能体协调中的难题，Cursor 团队欢迎你通过 hiring@cursor.com 与我们联系。</p>
+<div class="article-meta">
+<p>分类：Research</p>
+<p>作者：Wilson Lin、Sahil Modi、Yuan Zhang、Edward Lin</p>
+</div>
+<div class="related">
+<p>扩展长时间运行的自主编码</p>
+<p>使用自定义 MXFP8 内核将 MoE 训练提速 1.5 倍</p>
+<p>推出 Composer 2.5</p>
+</div>
+</section>
 </main>
-  <script id="airs-digest-theme-script">
+<script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;
       const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));

@@ -1,252 +1,361 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
 <title>加拿大如何使用 Claude：Anthropic Economic Index 的发现</title>
 <style>
 :root {
-  --bg: #f7f3ea;
-  --surface: #fffaf0;
-  --surface2: #e8f3f0;
-  --surface3: #f2e8fb;
-  --ink: #1f2528;
-  --muted: #667074;
-  --line: #d7cec0;
-  --data: #126d7a;
-  --risk: #a33d2d;
-  --opp: #5b6f1d;
-  --concl: #6b4bb8;
-  --data-bg: #dff3f4;
-  --risk-bg: #f7dfd8;
-  --opp-bg: #e8f0c8;
-  --concl-bg: #eadffc;
-  --darkband: #17252a;
-  --darkband-ink: #f3efe4;
-  --table-head: #efe2c8;
+  color-scheme: light dark;
+  --bg: #f5f1e8;
+  --card: #fffdf8;
+  --ink: #17201e;
+  --muted: #65706c;
+  --line: #d8d5ca;
+  --accent: #166a72;
+  --accent2: #b4532a;
+  --accent3: #6652a3;
+  --accent4: #287447;
+  --risk: #b33c47;
+  --opportunity: #247a52;
+  --conclusion: #5b48a0;
+  --data: #087486;
+  --hero-bg: #183c3f;
+  --hero-ink: #f6f4eb;
+  --hero-muted: #c5d8d5;
+  --soft-data: #dceff1;
+  --soft-risk: #f7dfe1;
+  --soft-opportunity: #dff0e5;
+  --soft-conclusion: #e9e3f6;
+  --soft-warm: #f4e6d8;
+  --hl: #f6da72;
+  --hl2: #9bdac5;
+  --shadow: rgba(28, 45, 42, .12);
+  --quote-bg: #272541;
+  --quote-ink: #f2efff;
+  --translation-bg: #fffdf8;
+  --table-head: #d9ece8;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #101314;
-    --surface: #1a1e20;
-    --surface2: #122626;
-    --surface3: #241b2d;
-    --ink: #ece8dc;
-    --muted: #a8b0ae;
-    --line: #343b3d;
-    --data: #35c7d4;
-    --risk: #ff8069;
-    --opp: #b7d65a;
-    --concl: #b79cff;
-    --data-bg: #0e353a;
-    --risk-bg: #3a1b16;
-    --opp-bg: #273410;
-    --concl-bg: #2c2042;
-    --darkband: #070909;
-    --darkband-ink: #f0eadb;
-    --table-head: #2b261d;
+    --bg: #101615;
+    --card: #18201e;
+    --ink: #e5ece8;
+    --muted: #a4b0ab;
+    --line: #34403c;
+    --accent: #5bd0d2;
+    --accent2: #f19869;
+    --accent3: #b7a4f2;
+    --accent4: #78d39a;
+    --risk: #ff8790;
+    --opportunity: #75d69c;
+    --conclusion: #b7a4f2;
+    --data: #6ad6e1;
+    --hero-bg: #102d30;
+    --hero-ink: #edf6f3;
+    --hero-muted: #a8c7c3;
+    --soft-data: #143238;
+    --soft-risk: #381e23;
+    --soft-opportunity: #173326;
+    --soft-conclusion: #29233d;
+    --soft-warm: #35281e;
+    --hl: #65521b;
+    --hl2: #174f42;
+    --shadow: rgba(0, 0, 0, .35);
+    --quote-bg: #24213c;
+    --quote-ink: #eeeaff;
+    --translation-bg: #151c1a;
+    --table-head: #1d3935;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #101314;
-  --surface: #1a1e20;
-  --surface2: #122626;
-  --surface3: #241b2d;
-  --ink: #ece8dc;
-  --muted: #a8b0ae;
-  --line: #343b3d;
-  --data: #35c7d4;
-  --risk: #ff8069;
-  --opp: #b7d65a;
-  --concl: #b79cff;
-  --data-bg: #0e353a;
-  --risk-bg: #3a1b16;
-  --opp-bg: #273410;
-  --concl-bg: #2c2042;
-  --darkband: #070909;
-  --darkband-ink: #f0eadb;
-  --table-head: #2b261d;
+  color-scheme: dark;
+  --bg: #101615;
+  --card: #18201e;
+  --ink: #e5ece8;
+  --muted: #a4b0ab;
+  --line: #34403c;
+  --accent: #5bd0d2;
+  --accent2: #f19869;
+  --accent3: #b7a4f2;
+  --accent4: #78d39a;
+  --risk: #ff8790;
+  --opportunity: #75d69c;
+  --conclusion: #b7a4f2;
+  --data: #6ad6e1;
+  --hero-bg: #102d30;
+  --hero-ink: #edf6f3;
+  --hero-muted: #a8c7c3;
+  --soft-data: #143238;
+  --soft-risk: #381e23;
+  --soft-opportunity: #173326;
+  --soft-conclusion: #29233d;
+  --soft-warm: #35281e;
+  --hl: #65521b;
+  --hl2: #174f42;
+  --shadow: rgba(0, 0, 0, .35);
+  --quote-bg: #24213c;
+  --quote-ink: #eeeaff;
+  --translation-bg: #151c1a;
+  --table-head: #1d3935;
 }
 * { box-sizing: border-box; }
 body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", sans-serif;
-  line-height: 1.65;
+  font-family: "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.75;
 }
-main { overflow: hidden; }
 .hero {
-  padding: 64px 7vw 48px;
-  background: var(--darkband);
-  color: var(--darkband-ink);
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+  padding: clamp(3rem, 8vw, 7rem) max(6vw, calc((100vw - 1120px) / 2));
 }
-.eyebrow {
-  color: var(--data);
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0;
-  margin: 0 0 16px;
+.hero .kicker {
+  color: var(--accent2);
+  font-weight: 800;
+  letter-spacing: .12em;
 }
-h1 {
-  font-size: clamp(34px, 6vw, 68px);
-  line-height: 1.05;
-  margin: 0;
-  max-width: 980px;
+.hero h1 {
+  max-width: 900px;
+  margin: .5rem 0 .8rem;
+  font-size: clamp(2.25rem, 6vw, 5.2rem);
+  line-height: 1.08;
 }
-.original {
-  margin: 18px 0 28px;
-  color: var(--muted);
-  font-size: 18px;
+.hero .original {
+  max-width: 850px;
+  color: var(--hero-muted);
+  font-size: clamp(1rem, 2vw, 1.3rem);
+}
+.hero .meta { margin-top: 2rem; color: var(--hero-muted); }
+.summary {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 4rem 1.25rem 5rem;
 }
 .lede {
-  max-width: 820px;
-  font-size: 22px;
-  margin: 0;
+  margin: -6rem auto 3rem;
+  padding: 2rem;
+  background: var(--card);
+  border-top: .4rem solid var(--accent2);
+  box-shadow: 0 1rem 2.5rem var(--shadow);
+  font-size: clamp(1.25rem, 2.4vw, 1.75rem);
 }
-.metrics {
+.lede strong { color: var(--conclusion); }
+.number-strip {
   display: grid;
-  grid-template-columns: repeat(4, minmax(160px, 1fr));
-  gap: 1px;
-  background: var(--line);
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  grid-template-columns: repeat(4, 1fr);
+  margin: 2.5rem 0;
+  background: var(--soft-data);
+  border-block: 1px solid var(--data);
 }
-.metric {
-  background: var(--surface);
-  padding: 28px 7vw 28px;
+.number {
+  padding: 1.6rem 1.2rem;
+  border-right: 1px solid var(--line);
 }
-.metric strong {
+.number:last-child { border-right: 0; }
+.number b {
   display: block;
   color: var(--data);
-  font-size: clamp(28px, 4vw, 46px);
-  line-height: 1;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1.1;
 }
-.metric span {
-  display: block;
-  margin-top: 10px;
-  color: var(--muted);
-}
+.number span { color: var(--muted); }
 .split {
   display: grid;
-  grid-template-columns: 1.1fr .9fr;
-  gap: 40px;
-  padding: 56px 7vw;
-  background: var(--surface2);
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin: 3rem 0;
 }
-h2 {
-  font-size: 30px;
-  line-height: 1.2;
-  margin: 0 0 18px;
+.split article { padding: 2rem; }
+.split .income {
+  background: var(--soft-risk);
+  border-left: .4rem solid var(--risk);
 }
-.note {
-  border-left: 6px solid var(--opp);
-  padding: 18px 22px;
-  background: var(--opp-bg);
+.split .workforce {
+  background: var(--soft-opportunity);
+  border-left: .4rem solid var(--opportunity);
 }
-.timeline {
-  padding: 56px 7vw;
-  background: var(--surface);
+.split h2 { margin-top: 0; font-size: 1.45rem; }
+.flow {
+  margin: 3rem 0;
+  padding: 2.5rem;
+  background: var(--soft-warm);
+  border-radius: 1.5rem 0 1.5rem 0;
 }
-.steps {
+.flow h2 { margin-top: 0; color: var(--accent2); }
+.flow-line {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  counter-reset: step;
+  gap: 1rem;
 }
-.step {
+.flow-line div {
   position: relative;
-  padding-top: 42px;
+  padding: 1rem 1rem 1rem 3.4rem;
 }
-.step:before {
-  counter-increment: step;
-  content: counter(step);
+.flow-line b {
   position: absolute;
-  top: 0;
   left: 0;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
   display: grid;
+  width: 2.4rem;
+  height: 2.4rem;
   place-items: center;
-  background: var(--concl);
-  color: var(--darkband-ink);
-  font-weight: 800;
+  border-radius: 50%;
+  background: var(--accent2);
+  color: var(--hero-ink);
 }
-.step h3, .compare h3, .tile h3 {
-  margin: 0 0 8px;
-  font-size: 18px;
+.mix {
+  margin: 3rem 0;
+  padding: 2.5rem;
+  background: var(--quote-bg);
+  color: var(--quote-ink);
 }
-.compare {
-  padding: 56px 7vw;
-  background: var(--surface3);
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--surface);
-  border: 1px solid var(--line);
-}
-th, td {
-  padding: 16px;
-  border-bottom: 1px solid var(--line);
-  text-align: left;
-  vertical-align: top;
-}
-th {
-  background: var(--table-head);
-  color: var(--ink);
-}
-td:first-child { font-weight: 700; }
-.callout {
-  padding: 42px 7vw;
-  background: var(--risk-bg);
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-}
-.callout p {
-  max-width: 920px;
-  margin: 0;
-  font-size: 24px;
-  line-height: 1.45;
-}
-.callout strong { color: var(--risk); }
-.mosaic {
-  padding: 56px 7vw 70px;
-  background: var(--bg);
-}
-.tiles {
+.mix h2 { color: var(--accent); }
+.mix-grid {
   display: grid;
-  grid-template-columns: 1.2fr .8fr 1fr;
-  gap: 18px;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 1rem;
+}
+.mix-grid div {
+  padding: 1rem;
+  border-top: .25rem solid var(--accent);
+}
+.mix-grid div:nth-child(2) { border-color: var(--accent3); }
+.mix-grid div:nth-child(3) { border-color: var(--accent2); }
+.mix strong { font-size: 1.8rem; }
+.insight {
+  margin: 3rem 0;
+  padding: 1.5rem 2rem;
+  border-left: .5rem solid var(--accent3);
+  background: var(--soft-conclusion);
+  font-size: 1.15rem;
+}
+.takeaways h2 { color: var(--conclusion); }
+.mosaic {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: .9rem;
 }
 .tile {
-  padding: 22px;
+  grid-column: span 3;
   min-height: 150px;
+  padding: 1.5rem;
+  background: var(--card);
   border: 1px solid var(--line);
 }
-.tile.data { background: var(--data-bg); }
-.tile.risk { background: var(--risk-bg); }
-.tile.opp { background: var(--opp-bg); }
-.tile.concl { background: var(--concl-bg); }
-.footer {
-  padding: 36px 7vw;
-  background: var(--darkband);
-  color: var(--darkband-ink);
+.tile:nth-child(2) {
+  background: var(--soft-data);
+  border-top: .35rem solid var(--data);
 }
-.footer ul {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px 28px;
-  padding-left: 20px;
-  margin: 18px 0 0;
+.tile:nth-child(3) {
+  grid-column: span 2;
+  background: var(--soft-opportunity);
+  border-top: .35rem solid var(--opportunity);
 }
-@media (max-width: 820px) {
-  .metrics, .split, .steps, .tiles, .footer ul {
-    grid-template-columns: 1fr;
-  }
-  .hero { padding-top: 44px; }
-  .metric { padding: 24px 7vw; }
+.tile:nth-child(4) {
+  grid-column: span 4;
+  background: var(--soft-warm);
+  border-top: .35rem solid var(--accent2);
+}
+.mark, .mark2 {
+  padding: .05em .25em;
+  color: var(--ink);
+  font-weight: 800;
+}
+.mark { background: var(--hl); }
+.mark2 { background: var(--hl2); }
+#translation {
+  max-width: 860px;
+  margin: 0 auto 5rem;
+  padding: clamp(1.5rem, 5vw, 4rem);
+  background: var(--translation-bg);
+  box-shadow: 0 .8rem 2.5rem var(--shadow);
+}
+#translation h2 {
+  margin-top: 0;
+  padding-bottom: .8rem;
+  border-bottom: .3rem solid var(--accent);
+  font-size: 2.2rem;
+}
+#translation h3 {
+  margin-top: 2.8rem;
+  color: var(--accent);
+  font-size: 1.55rem;
+}
+#translation h4 {
+  margin-top: 2rem;
+  color: var(--accent3);
+  font-size: 1.2rem;
+}
+#translation p { margin: 1.1rem 0; }
+#translation .language-break {
+  margin: 4rem 0 2rem;
+  padding: 1.5rem;
+  background: var(--soft-conclusion);
+  border-inline-start: .4rem solid var(--accent3);
+}
+figure[data-source-image], .source-figure {
+  margin: 2.5rem 0;
+}
+figure[data-source-image] img, .source-figure img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+figcaption {
+  margin-top: .8rem;
+  padding-left: 1rem;
+  border-left: .2rem solid var(--accent2);
+  color: var(--muted);
+  font-size: .9rem;
+  line-height: 1.55;
+}
+.citation {
+  color: var(--muted);
+  font-style: italic;
+}
+@media (max-width: 760px) {
+  .number-strip, .split, .flow-line, .mix-grid { grid-template-columns: 1fr; }
+  .number { border-right: 0; border-bottom: 1px solid var(--line); }
+  .number:last-child { border-bottom: 0; }
+  .mosaic { grid-template-columns: 1fr; }
+  .tile, .tile:nth-child(3), .tile:nth-child(4) { grid-column: auto; }
+  .lede { margin-top: -3rem; }
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+--bg: #f5f1e8;
+  --card: #fffdf8;
+  --ink: #17201e;
+  --muted: #65706c;
+  --line: #d8d5ca;
+  --accent: #166a72;
+  --accent2: #b4532a;
+  --accent3: #6652a3;
+  --accent4: #287447;
+  --risk: #b33c47;
+  --opportunity: #247a52;
+  --conclusion: #5b48a0;
+  --data: #087486;
+  --hero-bg: #183c3f;
+  --hero-ink: #f6f4eb;
+  --hero-muted: #c5d8d5;
+  --soft-data: #dceff1;
+  --soft-risk: #f7dfe1;
+  --soft-opportunity: #dff0e5;
+  --soft-conclusion: #e9e3f6;
+  --soft-warm: #f4e6d8;
+  --hl: #f6da72;
+  --hl2: #9bdac5;
+  --shadow: rgba(28, 45, 42, .12);
+  --quote-bg: #272541;
+  --quote-ink: #f2efff;
+  --translation-bg: #fffdf8;
+  --table-head: #d9ece8;
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -378,129 +487,185 @@ td:first-child { font-weight: 700; }
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/how-canada-uses-claude" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
-<main>
-  <section class="hero">
-    <p class="eyebrow">一句话总括</p>
-    <h1>加拿大如何使用 Claude：Anthropic Economic Index 的发现</h1>
-    <p class="original">How Canada uses Claude: Findings from the Anthropic Economic Index</p>
-    <p class="lede">这篇文章的真正贡献，是把加拿大的 Claude 使用从“高采用率”拆解为省级产业结构、公共部门翻译需求和教育求职场景三条更具体的经济线索。</p>
+<header class="hero">
+<div class="kicker">ANTHROPIC ECONOMIC INDEX · 加拿大</div>
+<h1>加拿大如何使用 Claude：Anthropic Economic Index 的发现</h1>
+<div class="original" lang="en">How Canada uses Claude: Findings from the Anthropic Economic Index</div>
+<div class="meta">Anthropic · Economic Research · 2026 年 7 月 14 日</div>
+</header>
+<main class="summary">
+<div class="lede"><strong>一句话总括：</strong>加拿大的高采用率显示，在富裕经济体内部，AI 能力与当地劳动力结构是否匹配，可能比地区收入更能决定实际使用强度。</div>
+<section aria-label="关键数字" class="number-strip">
+<div class="number"><b>2.6%</b><span>加拿大占全球 Claude.ai 流量的比例</span></div>
+<div class="number"><b>第 8</b><span>按全球使用总量计算的排名</span></div>
+<div class="number"><b>4.4</b><span>加拿大的 Anthropic AI Usage Index</span></div>
+<div class="number"><b>约 94%</b><span>四个人口大省合计贡献的国内使用量</span></div>
+</section>
+<section class="split">
+<article class="income">
+<h2>收入只能解释一部分</h2>
+<p>加拿大是高收入国家，这与 Claude 的高采用率总体一致。但它的实际使用强度仍然<span class="mark">高于收入所能预测的水平</span>。</p>
+<p>在全球比较中，收入与使用量关系明显。进入加拿大内部后，这种关系却基本消失。结论是，不能只凭富裕程度判断一个地区会多快采用 AI。</p>
+</article>
+<article class="workforce">
+<h2>劳动力构成更有解释力</h2>
+<p>专业、科学和技术服务业就业占比越高的省份，人均 Claude 使用量通常越高。不列颠哥伦比亚省达到人口基准的 <span class="mark2">1.4 倍</span>，安大略省为 <span class="mark2">1.1 倍</span>。</p>
+<p>这说明模型能力与本地工作任务的匹配程度，可能才是高收入国家内部采用差异的核心。</p>
+</article>
+</section>
+<section class="flow">
+<h2>区域集中，但用途结构相似</h2>
+<div class="flow-line">
+<div><b>1</b><strong>使用量集中</strong><br/>安大略省占 43.9%。加上魁北克、不列颠哥伦比亚和阿尔伯塔，合计约占全国 94%。</div>
+<div><b>2</b><strong>普及率悬殊</strong><br/>不列颠哥伦比亚省高于人口基准。纽芬兰与拉布拉多省的 AUI 只有 0.2。</div>
+<div><b>3</b><strong>用途比例稳定</strong><br/>尽管各省采用率不同，工作、课程学习和个人用途的占比区间却很接近。</div>
+</div>
+<p>因此，地区差异首先体现在“有多少人使用”，而不是“使用者拿 Claude 做什么”。</p>
+</section>
+<section class="mix">
+<h2>各省用途组合</h2>
+<div class="mix-grid">
+<div><strong>44%—51%</strong><br/>个人用途，包括健康信息、产品研究、食谱和家庭维修。</div>
+<div><strong>34%—40%</strong><br/>工作用途，包括软件排障、邮件撰写和业务应用开发。</div>
+<div><strong>13%—18%</strong><br/>课程学习相关任务。</div>
+</div>
+<p>这些比例跨省相对稳定。高采用省份并没有表现出完全不同的用途结构。</p>
+</section>
+<section class="insight">
+<strong>加拿大最鲜明的用例是文档翻译。</strong>
+    翻译和编辑请求在公共行政就业占比较高的省份更常见。新不伦瑞克、新斯科舍和魁北克同时处于两项指标的高位。这与公共服务中的官方英法双语要求相吻合。
   </section>
-
-  <section class="metrics" aria-label="关键数字">
-    <div class="metric"><strong>2.6%</strong><span>加拿大占全球 Claude.ai 流量。</span></div>
-    <div class="metric"><strong>第 8</strong><span>加拿大按总使用量排名全球第八。</span></div>
-    <div class="metric"><strong>4.4</strong><span>AUI 表示人均使用量超过人口预期四倍。</span></div>
-    <div class="metric"><strong>约 94%</strong><span>使用量集中在安大略、魁北克、不列颠哥伦比亚和阿尔伯塔。</span></div>
-  </section>
-
-  <section class="split">
-    <div>
-      <h2>高收入解释一部分，但不是加拿大内部差异的答案</h2>
-      <p>加拿大的 Claude 采用率符合高收入经济体的总体规律。它甚至高于按收入水平本应预期的采用程度。</p>
-      <p>但进入省级比较后，收入和人均使用量的关系变弱。更有解释力的是劳动力结构。</p>
-    </div>
-    <aside class="note">
-      <p>专业、科学和技术服务业占比越高的省份，人均 Claude 使用量越高。这说明 AI 采用不是抽象地随财富上升，而是取决于模型能力是否正好匹配当地工作内容。</p>
-    </aside>
-  </section>
-
-  <section class="timeline">
-    <h2>省级采用呈现清晰的集中路径</h2>
-    <div class="steps">
-      <div class="step">
-        <h3>总量先集中</h3>
-        <p>安大略占 43.9% 的加拿大对话。魁北克、不列颠哥伦比亚和阿尔伯塔再贡献约 50%。</p>
-      </div>
-      <div class="step">
-        <h3>人口调整后换位</h3>
-        <p>不列颠哥伦比亚达到预期人口水平的 1.4 倍，安大略为 1.1 倍。其他省份低于平价。</p>
-      </div>
-      <div class="step">
-        <h3>产业结构成为线索</h3>
-        <p>纽芬兰与拉布拉多 AUI 只有 0.2。差异指向本地工作结构，而不是单纯的省级收入。</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="compare">
-    <h2>用途相似，但特色用例暴露了经济结构</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>观察维度</th>
-          <th>关键数据和趋势</th>
-          <th>改变理解的地方</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>日常用途结构</td>
-          <td>各省个人用途占 44% 到 51%，工作用途占 34% 到 40%，课程用途占 13% 到 18%。</td>
-          <td>采用率差异很大，但人们把 Claude 用在什么大类上并没有剧烈分化。</td>
-        </tr>
-        <tr>
-          <td>翻译需求</td>
-          <td>新不伦瑞克、新斯科舍和魁北克同时拥有较高公共行政就业占比和较高翻译对话占比。</td>
-          <td>AI 用例会被制度环境塑造。加拿大官方双语政策让文档翻译成为真实高频需求。</td>
-        </tr>
-        <tr>
-          <td>国际比较</td>
-          <td>相对澳大利亚、英国和美国，文档翻译是加拿大最具辨识度的 Claude 用例。</td>
-          <td>同属英语圈，高使用量国家的 AI 使用也会因公共制度和劳动力入口不同而分化。</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="callout">
-    <p><strong>最重要的风险提示：</strong>如果只用国家收入或总流量判断 AI 影响，会错过省级产业结构和公共部门需求。真正的采用强度，取决于模型能力与本地工作任务的贴合度。</p>
-  </section>
-
-  <section class="mosaic">
-    <h2>教育和求职场景让加拿大画像更年轻</h2>
-    <div class="tiles">
-      <article class="tile data">
-        <h3>课程任务更突出</h3>
-        <p>数学、STEM 和学业相关使用相对英语圈同行更高。Claude 在加拿大更像学习辅助工具。</p>
-      </article>
-      <article class="tile opp">
-        <h3>编程帮助被高估值</h3>
-        <p>编码辅助同样过度代表。它与技术服务业和早期职业技能建设相互呼应。</p>
-      </article>
-      <article class="tile concl">
-        <h3>简历写作上升</h3>
-        <p>简历起草更常见，说明一部分使用来自劳动力市场入口，而不是成熟职场流程。</p>
-      </article>
-      <article class="tile risk">
-        <h3>职场沟通偏低</h3>
-        <p>工作邮件、营销内容和法律辅助低于同行国家。加拿大的 Claude 使用并不只是办公室自动化。</p>
-      </article>
-      <article class="tile data">
-        <h3>日常个人任务偏低</h3>
-        <p>烹饪、家居维护和健康问题也相对不足。高采用率没有简单转化为所有生活任务的高使用。</p>
-      </article>
-      <article class="tile opp">
-        <h3>结论</h3>
-        <p>加拿大案例显示，AI 扩散不是平均发生的。它沿着教育、技术服务、公共翻译和求职入口先形成高密度使用。</p>
-      </article>
-    </div>
-  </section>
-
-  <section class="footer">
-    <h2>最值得带走的洞见</h2>
-    <ul>
-      <li>加拿大是 Claude 高采用国家，但“高”主要体现在人均强度，而不仅是总量。</li>
-      <li>省级差异更像产业结构问题，不像收入问题。</li>
-      <li>公共行政和官方双语制度让文档翻译成为加拿大最独特的 Claude 用例。</li>
-      <li>课程、编码和简历起草显示，加拿大使用更偏教育和劳动力市场入口。</li>
-      <li>AI 影响评估需要下钻到地区和任务层面，否则会误读采用背后的经济原因。</li>
-    </ul>
-  </section>
-</main>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="mosaic">
+<article class="tile"><strong>采用率领先并非只有“国家富裕”一个原因。</strong><br/>加拿大的 AUI 为 4.4，超过其收入水平所能预测的程度。</article>
+<article class="tile"><strong>产业与岗位结构决定模型是否真正派得上用场。</strong><br/>专业、科学和技术服务业占比较高的地区使用更密集。</article>
+<article class="tile"><strong>政策制度会塑造具体用例。</strong><br/>官方双语公共服务带动了翻译需求。</article>
+<article class="tile"><strong>加拿大的使用更偏向教育和职业起步。</strong><br/>课程作业、编程辅助和简历撰写相对突出；职业沟通和日常个人任务则相对偏少。</article>
+</div>
+</section>
+</main><section id="translation">
+<h2>完整译文</h2>
+<figure class="source-figure" data-source-image="0"><img alt="How Canada uses Claude: Findings from the Anthropic Economic Index" decoding="async" height="1000" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/a62b6eb169818f14c35b7a192af269e283f8fa93-1000x1000.svg" width="1000"/></figure>
+<p>下文附法语版本。</p>
+<h3>主要发现</h3>
+<p>Anthropic Economic Index 最新一期数据显示，加拿大处于 Claude 应用的前沿。加拿大占全球 Claude.ai 流量的 2.6%，按总量排名第 8。若结合人口规模计算，其人均使用量是预期水平的四倍以上。</p>
+<p>加拿大的高采用率总体上符合其高收入经济体的特征，但在同类国家中仍然突出。全球使用量排名前十的国家合计贡献了超过一半的使用量。在这些国家中，加拿大的人均使用量仅次于美国。</p>
+<p>加拿大国内的采用情况集中在少数地区。安大略省占全部对话的 43.9%。安大略、魁北克、不列颠哥伦比亚和阿尔伯塔四个人口大省合计贡献了约 94% 的全国使用量。按人均计算，不列颠哥伦比亚省的使用量是人口基准预期值的 1.4 倍，位居第一；安大略省为 1.1 倍。其他所有省份都低于基准水平，其中纽芬兰与拉布拉多省只有 0.2 倍。</p>
+<p>这与全球跨国比较呈现的规律不同。各省人均收入似乎无法解释这一差距，产业结构反而更重要。专业、科学和技术服务业规模较大的省份使用 Claude 最多。这与其他证据一致：在高收入国家中，模型能力与劳动力构成的匹配程度决定了总体采用水平。</p>
+<p>加拿大各地的用途结构与采用率基本不相关。每个省的对话中，工作用途占 34%—40%，课程学习占 13%—18%，个人用途占 44%—51%。</p>
+<p>我们发现，一些具体用途与当地经济特征同时出现。各省的翻译请求比例与公共行政就业比例同步变化。这可能反映了加拿大联邦服务和政府沟通中的官方双语政策。新不伦瑞克、新斯科舍和魁北克既有最高的公共行政就业比例，也有最高的翻译对话占比。</p>
+<p>与其他英语国家相比，文档翻译也是最具加拿大特色的用途。总体来看，加拿大的 Claude 使用更偏向学术活动和职业生涯早期。课程作业、编程辅助和简历撰写均高于同类国家，而职业沟通与日常个人任务则相对偏少。</p>
+<h3>加拿大处于 Claude 应用前沿</h3>
+<p>加拿大的 Claude 采用率很高。根据 2026 年 2 月 Claude.ai 对话样本，加拿大贡献了全球流量的 2.6%。按人口调整后，加拿大的 Anthropic AI Usage Index（Anthropic AI 使用指数，AUI）为 4.4。这意味着，按照其劳动年龄人口计算，人均使用量是预期水平的四倍以上。在 Claude 总使用量排名前十的国家中，加拿大的 AUI 位居第二，仅次于美国（图 1）。</p>
+<figure class="source-figure" data-source-image="1"><img alt="" decoding="async" height="1080" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/976607f5799ad2170a43fb842885ad697cc4cf99-1920x1080.png" width="1920"/>
+<figcaption>图 1：全球 Claude.ai 使用量前十名国家的使用份额和人均采用率。柱形图分别显示各国的使用份额（左图）和 Anthropic AI Usage Index（右图）。结果基于 2026 年 2 月从 Claude.ai 抽取的 100 万次对话。加拿大以蓝色标出。Anthropic AI Usage Index（AUI）衡量一个国家的 Claude 使用量相对于其劳动年龄人口是高于还是低于应有比例。加拿大占全球 Claude.ai 消费者使用量的 2.6%，全球排名第八，按 AUI 排名第二。来源：Anthropic Economic Index，2026 年 2 月；世界银行。</figcaption>
+</figure>
+<p>这在一定程度上源于加拿大是高收入国家。在国际货币基金组织（IMF）定义的发达经济体中，人均使用量与每名劳动年龄人口的 GDP 存在明显联系。但加拿大的采用率高于其收入水平所对应的预期值（图 2）。从这个意义上说，加拿大在 AI 采用曲线上似乎比同类国家走得更远。这可能与其受教育程度较高的劳动力，以及接近美国技术前沿有关。</p>
+<figure class="source-figure" data-source-image="2"><img alt="" decoding="async" height="1619" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/3649d38ac832156ac80b100cd74ddf0bdcf07b7f-1920x1619.png" width="1920"/>
+<figcaption>图 2：Anthropic AI Usage Index（AUI）与每名劳动年龄人口的 GDP。该图展示 IMF 所定义的发达经济体中，各国 AUI 与每名劳动年龄人口 GDP 之间的双变量关系。纳入的国家在本研究样本中至少有 200 次对话。虚线表示最佳拟合线。加拿大以蓝色标出。来源：Anthropic Economic Index，2026 年 2 月；IMF；世界银行。</figcaption>
+</figure>
+<h3>加拿大国内的采用集中在少数地区，并与劳动力构成相关</h3>
+<p>全球的 Claude 使用不成比例地集中在少数国家，加拿大国内也存在类似情况。各省之间的使用量分布并不均衡。安大略省占全部对话的 43.9%。魁北克占 20.8%，不列颠哥伦比亚占 18.9%，阿尔伯塔占 10.2%，三省合计贡献了加拿大另外 50% 的使用量。按人口调整后，排名会发生变化。不列颠哥伦比亚省的 Claude 使用量是其劳动年龄人口所对应预期值的 1.4 倍，安大略省以 1.1 倍紧随其后。其余各省的采用率均低于基准水平。纽芬兰与拉布拉多省的 AUI 为 0.2。</p>
+<figure class="source-figure" data-source-image="3"><img alt="" decoding="async" height="1080" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/7bc0e1d9d5f91be54189f4dd9cce0c792f9e706e-1920x1080.png" width="1920"/>
+<figcaption>图 3：加拿大各省和地区在 Claude.ai 使用量中的占比。左图显示各省在加拿大 Claude.ai 对话中的份额。右图显示各省 AUI，其中 1.0 表示使用量与该省劳动年龄人口所占比例相符。各地区的数据低于报告门槛。来源：Anthropic Economic Index，2026 年 2 月；加拿大统计局。</figcaption>
+</figure>
+<p>什么因素能够解释这种地区采用格局？我们在图 4 中探讨了这个问题。全球范围内，收入与使用量存在联系。加拿大各省的情况却不同：人均使用量与收入基本不相关。相比之下，地区经济的产业构成是决定使用强度的关键因素。以就业比例衡量，专业、科学和技术服务业规模较大的地区，其人均使用量持续处于较高水平。</p>
+<p>显然，决定加拿大国内采用格局的关键因素是劳动力构成，而不是收入本身。这项证据与我们此前对美国国内采用扩散的研究结果一致。高收入国家的 AI 采用情况，似乎主要取决于模型能力与当地经济结构的匹配程度。</p>
+<figure class="source-figure" data-source-image="4"><img alt="" decoding="async" height="1080" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/f7eb168843405b5ab28dc1c7b06b70829d5ef7f3-1920x1080.png" width="1920"/>
+<figcaption>图 4：Anthropic AI Usage Index（AUI）与各省经济特征。图中将各省 AUI 与两项省级特征进行比较：每名劳动年龄人口的 GDP（左图），以及专业、科学和技术服务业的就业占比（右图）。来源：Anthropic Economic Index，2026 年 2 月；加拿大统计局。</figcaption>
+</figure>
+<h3>理解加拿大使用 Claude 的独特方式</h3>
+<p>各地区的 Claude 使用率差异很大，但加拿大各地居民的用途总体相似。在每个省，个人用途都占对话的 44%—51%，例如查询健康信息、研究产品、寻求食谱或家庭维修方面的帮助。工作相关用途约占 34%—40%，包括用 Claude 排查软件问题、起草工作邮件和开发业务应用。其余用途是借助 Claude 完成课程学习相关任务（图 5）。</p>
+<figure class="source-figure" data-source-image="5"><img alt="" decoding="async" height="1080" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/32a27e954b2b7b19e394c358431c528904b3516d-1920x1080.png" width="1920"/>
+<figcaption>图 5：加拿大各省的用例构成。图中显示各省被归类为工作、课程学习或个人用途的对话比例，并按照括号中所示的省级 AUI 排序。来源：Anthropic Economic Index，2026 年 2 月。</figcaption>
+</figure>
+<p>各省的总体用途结构一致，但我们仍然发现，一些特定用例往往与当地经济特征同时出现。例如，在公共行政就业占比较高的地区，使用 Claude 处理翻译和编辑请求的比例也持续较高。这可能反映了加拿大公共部门对官方双语制度的承诺。政府就业集中的地方会产生更多英法互译需求。事实上，新不伦瑞克、新斯科舍和魁北克既有最高的公共行政就业比例，也有最高的翻译辅助对话占比。</p>
+<figure class="source-figure" data-source-image="6"><img alt="" decoding="async" height="1080" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/2df55fd1ebd362c106880a3ba1e2ae0080e662ed-1920x1080.png" width="1920"/>
+<figcaption>图 6：各省的翻译用途与公共行政就业情况。左图显示公共行政就业占全省就业的比例。右图显示在高于报告门槛的七个省份中，翻译和编辑请求占该省对话的比例。来源：Anthropic Economic Index，2026 年 2 月；加拿大统计局。</figcaption>
+</figure>
+<p>事实上，与同样拥有大量 Claude 使用量的英语国家相比，文档翻译是加拿大最具特色的用例。这些同类国家包括澳大利亚、英国和美国（图 7）。总体而言，加拿大的使用更偏向教育和进入劳动力市场。与同类国家相比，课程学习中的数学和 STEM 任务、编程辅助以及简历撰写属于最为突出的类别。加拿大低于同类国家的类别则更偏向职业沟通，包括工作邮件、营销内容和法律辅助，也包括烹饪、家庭维护和健康问题等日常个人任务。</p>
+<figure class="source-figure" data-source-image="7"><img alt="" decoding="async" height="1080" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/2f92059cee5078aa4469faf72d2fd2f12afa71ee-1920x1080.png" width="1920"/>
+<figcaption>图 7：加拿大与英语国家同类市场相比具有特色的 Claude 用例，包括澳大利亚、英国和美国。该图显示，在多种对话类别中，加拿大对话占比与澳大利亚、英国和美国平均值之间的净差异。入选类别至少占加拿大对话的 1%，包括最具加拿大特色的 6 个类别，以及在同类国家中最突出的 6 个类别。来源：Anthropic Economic Index，2026 年 2 月。</figcaption>
+</figure>
+<h3>结论</h3>
+<p>无论按总量还是按人口规模调整，加拿大都是全球 Claude 采用率最高的国家之一。加拿大贡献了全球 Claude.ai 流量的 2.6%。如此高的采用强度，让我们能够进一步理解 Claude 的使用如何反映加拿大的经济结构和更广泛的经济状况。</p>
+<p>在加拿大各地，专业、科学和技术服务业从业者占比较高的省份采用率最高。这与一种观点一致：当模型能力与当地经济构成高度匹配时，这种匹配会成为总体采用率的主要驱动力。这不同于全球采用格局。全球采用率似乎与人均收入联系得更加紧密。</p>
+<p>具体用例同样反映了加拿大的经济结构。公共行政就业较多的省份更常使用翻译功能，这与加拿大大部分公共部门适用的官方语言要求一致。与其他英语国家相比，文档翻译是加拿大最具特色的 Claude 用途。更广泛地看，加拿大的使用更偏向教育和进入劳动力市场。与澳大利亚、英国和美国相比，课程作业、编程辅助和简历撰写均更为突出。</p>
+<h3 class="citation">引用</h3>
+<div class="language-break">
+<strong>以下为原文法语版本的中文译文</strong>
+<div lang="fr">Utilisation de Claude au Canada : constatations présentées dans l’Anthropic Economic Index</div>
+</div>
+<h3>加拿大如何使用 Claude：Anthropic Economic Index 的发现</h3>
+<h4>主要发现</h4>
+<p>Anthropic Economic Index 最新一期显示，加拿大是采用 Claude 人工智能（AI）程度最高的国家之一。加拿大占全球 Claude.ai 流量的 2.6%，按总量排名第 8。若结合人口规模计算，其人均使用量是预期水平的四倍以上。</p>
+<p>加拿大的高采用率总体符合其高收入经济体的地位，但在同类国家中仍然突出。全球排名前十的国家合计贡献了超过一半的使用量。在这些国家中，加拿大的人均使用量排名第二，仅次于美国。</p>
+<p>加拿大国内的采用集中在特定地区。安大略省占全部对话的 43.9%。安大略、魁北克、不列颠哥伦比亚和阿尔伯塔四个人口大省合计贡献了约 94% 的全国使用量。按人均计算，不列颠哥伦比亚省的使用率是人口基准预期值的 1.4 倍，位居第一；安大略省为 1.1 倍。其他所有省份的采用率均低于预期，其中纽芬兰与拉布拉多省只有预期值的 0.2 倍。</p>
+<p>这与全球跨国比较呈现的趋势不同。各省人均收入似乎无法解释这一差距，经济结构反而更重要。专业、科学和技术服务业占据重要地位的省份使用 Claude 最多。这印证了其他证据：在高收入国家中，模型能力与劳动力构成之间的关系决定了总体采用水平。</p>
+<p>加拿大各地的用途结构与采用率几乎没有相关性。各省的对话中，工作用途占 34%—40%，学习用途占 13%—18%，个人用途占 44%—51%。</p>
+<p>一些特定用途似乎与当地经济特征相吻合。各省的翻译辅助请求比例反映了公共行政就业的重要程度。这可能体现了加拿大联邦服务和政府沟通中的官方双语政策。新不伦瑞克、新斯科舍和魁北克既有最高的公共行政就业比例，也有最高的翻译对话占比。</p>
+<p>与其他英语国家相比，文档翻译也是最具加拿大特色的用途。总体而言，加拿大的 Claude 使用更偏向学习和职业生涯早期。课程作业、编程辅助和简历撰写均高于同类国家，而职业沟通与日常个人任务则相对偏少。</p>
+<h3>加拿大是采用 Claude 程度最高的国家之一</h3>
+<p>加拿大的 Claude 采用率很高。在 2026 年 2 月记录的 Claude.ai 对话样本中，2.6% 的全球流量来自加拿大。按人口调整后，加拿大的 Anthropic AI Usage Index（Anthropic AI 使用指数，AUI）为 4.4。这意味着，按照劳动年龄人口计算，其人均使用量是预期水平的四倍以上。在 Claude 总使用量排名前十的国家中，加拿大的 AUI 位居第二，仅次于美国（图 1）。</p>
+<figure class="source-figure" data-source-image="8"><img alt="" decoding="async" height="940" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/6fca932b860afc93e85338f7a1f63df5a851fbf6-1920x940.png" width="1920"/>
+<figcaption>图 1：全球 Claude.ai 使用量前十名国家的使用份额和人均采用率。柱形图分别显示各国的使用份额（左图）和 Anthropic AI Usage Index（右图）。结果基于 2026 年 2 月从 Claude.ai 抽取的 100 万次对话。加拿大以蓝色标出。Anthropic AI Usage Index（AUI）衡量一个国家的 Claude 使用量相对于其劳动年龄人口是偏高还是偏低。加拿大占全球 Claude.ai 使用量的 2.6%，全球排名第八，按 AUI 排名第二。来源：Anthropic Economic Index，2026 年 2 月；世界银行。</figcaption>
+</figure>
+<p>这在一定程度上源于加拿大是高收入国家。在国际货币基金组织（IMF）定义的发达经济体中，人均使用量与每名劳动年龄人口的 GDP 存在明显联系。但加拿大的采用率高于其收入水平所对应的预期值（图 2）。事实上，加拿大在 AI 采用方面似乎领先于同类国家。这可能与其劳动力受教育程度较高，以及接近美国技术前沿有关。</p>
+<figure class="source-figure" data-source-image="9"><img alt="" decoding="async" height="1488" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/dd9140d143686e9446b3e9776826de6155dee2a1-1920x1488.png" width="1920"/>
+<figcaption>图 2：Anthropic AI Usage Index（AUI）与每名劳动年龄人口的 GDP。该图展示 IMF 所定义的发达经济体中，AUI 与每名劳动年龄人口 GDP 之间的双变量关系。纳入的国家在本研究样本中至少有 200 次对话。虚线表示最佳拟合线。加拿大以蓝色标出。来源：Anthropic Economic Index，2026 年 2 月；IMF；世界银行。</figcaption>
+</figure>
+<h3>加拿大国内的采用集中在少数地区，并与劳动力构成相符</h3>
+<p>全球的 Claude 使用不成比例地集中在少数国家，加拿大国内也存在类似情况。各省的使用量分布并不均衡。安大略省占全部对话的 43.9%。魁北克占 20.8%，不列颠哥伦比亚占 18.9%，阿尔伯塔占 10.2%，三省合计贡献了加拿大另外 50% 的使用量。按人口调整后，排名会发生变化。不列颠哥伦比亚省的 Claude 使用量是其劳动年龄人口所对应预期值的 1.4 倍，安大略省为 1.1 倍。其他省份的采用率均低于全国基准。排名最后的纽芬兰与拉布拉多省 AUI 为 0.2。</p>
+<figure class="source-figure" data-source-image="10"><img alt="" decoding="async" height="930" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/5f985f11baf1e67429515af8f2a158e241b1bc9c-1920x930.png" width="1920"/>
+<figcaption>图 3：加拿大各省和地区的 Claude.ai 使用量分布。左图显示各省在加拿大 Claude.ai 对话中的份额。右图显示各省 AUI，其中 1.0 表示使用量与该省劳动年龄人口所占比例相符。各地区的数据低于纳入门槛。来源：Anthropic Economic Index，2026 年 2 月；加拿大统计局。</figcaption>
+</figure>
+<p>什么因素能够解释采用率的地区差异？图 4 对此进行了分析。全球范围内，收入与使用量存在联系。加拿大各省的情况却不同：各省人均使用量的差异通常与收入无关。地区经济的产业构成似乎才是决定使用强度的因素。专业、科学和技术服务业就业占比较高的地区，其人均使用量持续处于较高水平。</p>
+<p>显然，劳动力构成是决定加拿大国内采用格局的关键因素，而非收入本身。这项发现与我们此前对美国采用率的观察一致。高收入国家的 AI 采用似乎主要取决于模型能力与当地经济结构的匹配程度。</p>
+<figure class="source-figure" data-source-image="11"><img alt="" decoding="async" height="1080" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/92da64ab63e7412cec347ccf03179a3b8f2a74d8-1920x1080.png" width="1920"/>
+<figcaption>图 4：Anthropic AI Usage Index（AUI）与各省经济特征。图中将各省 AUI 与两项经济特征进行比较：每名劳动年龄人口的 GDP（左图），以及专业、科学和技术服务业在就业市场中的占比（右图）。来源：Anthropic Economic Index，2026 年 2 月；加拿大统计局。</figcaption>
+</figure>
+<h3>分析加拿大使用 Claude 的不同方式</h3>
+<p>尽管各地区的 Claude 使用率差异很大，加拿大居民的用途仍然总体相似。在每个省，个人用途都占对话的 44%—51%，例如查询健康信息、研究产品、寻找食谱或获取家庭维修建议。工作用途约占 34%—40%，例如用 Claude 排查软件问题、撰写邮件和开发企业应用。其余用途与课程作业有关（图 5）。</p>
+<figure class="source-figure" data-source-image="12"><img alt="" decoding="async" height="931" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/1e3d8487abfaac77999ca6fdebac4b967e4fd0ca-1920x931.png" width="1920"/>
+<figcaption>图 5：加拿大各省的用途类型。图中显示每个省与工作、学习和个人用途相关的对话比例，并按照括号中所示的省级 AUI 排序。来源：Anthropic Economic Index，2026 年 2 月。</figcaption>
+</figure>
+<p>各省的总体用途趋势相似，但我们仍然发现，具体用途往往与当地经济特征相吻合。例如，在公共行政就业占比较高的地区，使用 Claude 处理翻译和编辑的比例也持续较高。这可能体现了加拿大公共部门对官方双语制度的承诺。政府就业集中的地方会产生相对较多的英法互译需求。事实上，新不伦瑞克、新斯科舍和魁北克既有最高的公共行政就业比例，也有最高的翻译辅助对话占比。</p>
+<figure class="source-figure" data-source-image="13"><img alt="" decoding="async" height="930" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/b3571ca88e657324d37b6dc64993ad15b45fa493-1920x930.png" width="1920"/>
+<figcaption>图 6：各省翻译任务的比例与公共行政部门规模。左图显示各省公共行政就业占总就业的比例。右图显示在高于纳入门槛的七个省份中，翻译和编辑辅助请求占全部对话的比例。来源：Anthropic Economic Index，2026 年 2 月；加拿大统计局。</figcaption>
+</figure>
+<p>事实上，与同样大量使用 Claude 的英语国家相比，文档翻译是加拿大最具特色的用途。这些同类国家包括澳大利亚、英国和美国（图 7）。总体而言，加拿大的 Claude 使用主要面向教育和进入劳动力市场。与同类国家相比，数学和 STEM 课程作业、编程辅助以及简历撰写属于最为突出的类别。加拿大低于总体趋势的领域则包括职业沟通，如工作邮件、营销内容和法律辅助，也包括烹饪、家庭维护和健康建议等日常个人任务。</p>
+<figure class="source-figure" data-source-image="14"><img alt="" decoding="async" height="932" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/16736b1cdf94f38ee89aabca4d6a56eb3187ad69-1920x932.png" width="1920"/>
+<figcaption>图 7：加拿大与英语国家相比具有特色的 Claude 用例，包括澳大利亚、英国和美国。该图显示，在多种对话类别中，加拿大对话占比与澳大利亚、英国和美国平均值之间的净差异。入选类别至少占加拿大对话的 1%，包括最具加拿大特色的 6 个主题，以及在同类国家中最突出的 6 个主题。来源：Anthropic Economic Index，2026 年 2 月。</figcaption>
+</figure>
+<h3>结论</h3>
+<p>无论按总量还是按人口规模调整，加拿大都是全球 Claude 采用率最高的国家之一。加拿大贡献了全球 Claude.ai 流量的 2.6%。如此高的采用强度，让我们能够进一步理解 Claude 的使用如何反映加拿大的经济结构和更广泛的经济环境。</p>
+<p>在加拿大各地，专业、科学和技术服务业从业者占比较高的省份采用率最高。这项发现支持一种观点：当模型能力与当地经济构成高度匹配时，这种匹配会成为总体采用率的主要驱动力。这与全球其他地区的采用趋势不同。全球采用率似乎与人均收入联系得更加紧密。</p>
+<p>具体用途同样反映了加拿大的经济结构。公共行政就业较多的省份更常使用翻译功能，这与加拿大大部分公共部门适用的官方语言要求一致。因此，与其他英语国家相比，文档翻译成为加拿大最具特色的 Claude 用途。更广泛地看，加拿大的使用更偏向学习和进入劳动力市场。与澳大利亚、英国和美国相比，课程作业、编程辅助和简历撰写均更为突出。</p>
+<h3 class="citation">引用</h3>
+</section>
   <script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;

@@ -3,245 +3,462 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>评估并缓解 LLM 发现 0-day 的日益增长风险</title>
+<title>评估并缓解 LLM 发现 0-day 漏洞所带来的日益增长的风险</title>
 <style>
 :root {
-  --bg: #f7f3ec;
-  --ink: #1d2430;
-  --muted: #5d6572;
-  --line: #d9d2c6;
-  --card: #fffaf2;
-  --panel: #eef5f3;
-  --panel2: #f5e9ec;
-  --darkband: #16202a;
-  --darkink: #f5f7fa;
-  --accent-data: #1f7a8c;
-  --accent-risk: #b64045;
-  --accent-opportunity: #4c7a2c;
-  --accent-conclusion: #7357a8;
-  --accent-warn: #c77619;
-  --soft-data: #dceff1;
-  --soft-risk: #f4dfe2;
-  --soft-opportunity: #e5f1da;
-  --soft-conclusion: #e8e0f3;
-  --shadow: rgba(30, 36, 44, .12);
+  color-scheme: light;
+  --bg: #f4f1e9;
+  --paper: #fffdf8;
+  --card: #ffffff;
+  --ink: #17202a;
+  --muted: #65707c;
+  --line: #d9d5ca;
+  --accent: #176b87;
+  --accent-soft: #dceff4;
+  --accent2: #c25a2b;
+  --accent2-soft: #f9e3d7;
+  --accent3: #6b4bb5;
+  --accent3-soft: #ebe4fa;
+  --accent4: #26734d;
+  --accent4-soft: #dcefe4;
+  --risk: #a83044;
+  --risk-soft: #f5dfe3;
+  --deep: #142b38;
+  --deep2: #26364d;
+  --deep-ink: #f5f8fa;
+  --deep-muted: #c0ced7;
+  --hl: #ffe59a;
+  --hl2: #bfe9dc;
+  --quote: #fff2cd;
+  --translation-bg: #fffdf8;
+  --table-head: #e2edf2;
+  --stripe: #f1eee6;
+  --shadow: rgba(25, 35, 45, 0.12);
+  --transparent: transparent;
 }
-:root[data-theme="dark"] {
-  --bg: #101418;
-  --ink: #edf1f5;
-  --muted: #aab3bd;
-  --line: #2a333d;
-  --card: #181f26;
-  --panel: #142328;
-  --panel2: #281b22;
-  --darkband: #080c10;
-  --darkink: #f2f6fa;
-  --accent-data: #50c2d4;
-  --accent-risk: #ff6f7a;
-  --accent-opportunity: #93d46a;
-  --accent-conclusion: #b79cff;
-  --accent-warn: #ffb453;
-  --soft-data: #142b31;
-  --soft-risk: #32181d;
-  --soft-opportunity: #1d2d18;
-  --soft-conclusion: #241d36;
-  --shadow: rgba(0, 0, 0, .35);
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f4f1e9;
+  --paper: #fffdf8;
+  --card: #ffffff;
+  --ink: #17202a;
+  --muted: #65707c;
+  --line: #d9d5ca;
+  --accent: #176b87;
+  --accent-soft: #dceff4;
+  --accent2: #c25a2b;
+  --accent2-soft: #f9e3d7;
+  --accent3: #6b4bb5;
+  --accent3-soft: #ebe4fa;
+  --accent4: #26734d;
+  --accent4-soft: #dcefe4;
+  --risk: #a83044;
+  --risk-soft: #f5dfe3;
+  --deep: #142b38;
+  --deep2: #26364d;
+  --deep-ink: #f5f8fa;
+  --deep-muted: #c0ced7;
+  --hl: #ffe59a;
+  --hl2: #bfe9dc;
+  --quote: #fff2cd;
+  --translation-bg: #fffdf8;
+  --table-head: #e2edf2;
+  --stripe: #f1eee6;
+  --shadow: rgba(25, 35, 45, 0.12);
+  --transparent: transparent;
 }
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #101418;
-    --ink: #edf1f5;
-    --muted: #aab3bd;
-    --line: #2a333d;
-    --card: #181f26;
-    --panel: #142328;
-    --panel2: #281b22;
-    --darkband: #080c10;
-    --darkink: #f2f6fa;
-    --accent-data: #50c2d4;
-    --accent-risk: #ff6f7a;
-    --accent-opportunity: #93d46a;
-    --accent-conclusion: #b79cff;
-    --accent-warn: #ffb453;
-    --soft-data: #142b31;
-    --soft-risk: #32181d;
-    --soft-opportunity: #1d2d18;
-    --soft-conclusion: #241d36;
-    --shadow: rgba(0, 0, 0, .35);
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #10171c;
+    --paper: #151e24;
+    --card: #1b262e;
+    --ink: #e8edf0;
+    --muted: #a7b4bc;
+    --line: #35434c;
+    --accent: #57c5e8;
+    --accent-soft: #153744;
+    --accent2: #ff9765;
+    --accent2-soft: #45291f;
+    --accent3: #b89aff;
+    --accent3-soft: #30264a;
+    --accent4: #65d59b;
+    --accent4-soft: #183a2b;
+    --risk: #ff7f91;
+    --risk-soft: #43232b;
+    --deep: #091116;
+    --deep2: #172536;
+    --deep-ink: #eff6f8;
+    --deep-muted: #aabec8;
+    --hl: #594815;
+    --hl2: #174b3d;
+    --quote: #3e3217;
+    --translation-bg: #151e24;
+    --table-head: #203541;
+    --stripe: #192329;
+    --shadow: rgba(0, 0, 0, 0.34);
+    --transparent: transparent;
   }
 }
-* { box-sizing: border-box; }
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #10171c;
+  --paper: #151e24;
+  --card: #1b262e;
+  --ink: #e8edf0;
+  --muted: #a7b4bc;
+  --line: #35434c;
+  --accent: #57c5e8;
+  --accent-soft: #153744;
+  --accent2: #ff9765;
+  --accent2-soft: #45291f;
+  --accent3: #b89aff;
+  --accent3-soft: #30264a;
+  --accent4: #65d59b;
+  --accent4-soft: #183a2b;
+  --risk: #ff7f91;
+  --risk-soft: #43232b;
+  --deep: #091116;
+  --deep2: #172536;
+  --deep-ink: #eff6f8;
+  --deep-muted: #aabec8;
+  --hl: #594815;
+  --hl2: #174b3d;
+  --quote: #3e3217;
+  --translation-bg: #151e24;
+  --table-head: #203541;
+  --stripe: #192329;
+  --shadow: rgba(0, 0, 0, 0.34);
+  --transparent: transparent;
+}
+* {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
 body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", sans-serif;
-  line-height: 1.65;
+  font-family: "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.75;
 }
-main { overflow: hidden; }
 .hero {
-  padding: 56px 7vw 42px;
-  background: var(--darkband);
-  color: var(--darkink);
+  padding: clamp(3rem, 9vw, 7rem) 1.25rem 3.5rem;
+  background: linear-gradient(135deg, var(--deep), var(--deep2));
+  color: var(--deep-ink);
 }
-.kicker {
-  color: var(--accent-data);
-  font-weight: 700;
-  letter-spacing: 0;
-  margin-bottom: 18px;
+.hero-inner,
+.summary-wrap,
+#translation {
+  width: min(1120px, calc(100% - 2rem));
+  margin: 0 auto;
 }
-h1 {
-  max-width: 980px;
-  font-size: clamp(32px, 6vw, 68px);
-  line-height: 1.05;
-  margin: 0 0 14px;
-  letter-spacing: 0;
+.eyebrow {
+  margin: 0 0 1rem;
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
-.original {
-  max-width: 900px;
-  color: var(--muted);
-  font-size: 18px;
+.hero h1 {
+  max-width: 920px;
+  margin: 0;
+  font-size: clamp(2.2rem, 6vw, 5.2rem);
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+}
+.original-title {
+  max-width: 850px;
+  margin: 1.3rem 0 0;
+  color: var(--deep-muted);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  line-height: 1.45;
+}
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem 1.4rem;
+  margin-top: 2rem;
+  color: var(--deep-muted);
+  font-size: 0.92rem;
 }
 .thesis {
+  margin-top: 2.6rem;
+  padding: 1.2rem 1.4rem;
   max-width: 820px;
-  margin-top: 30px;
-  padding: 18px 22px;
-  border-left: 6px solid var(--accent-conclusion);
-  background: rgba(255,255,255,.06);
-  font-size: 22px;
+  border-left: 5px solid var(--accent2);
+  background: var(--deep2);
+  color: var(--deep-ink);
+  font-size: clamp(1.08rem, 2.4vw, 1.35rem);
+}
+.summary-wrap {
+  padding: 3.5rem 0 5rem;
+}
+.summary-wrap h2,
+#translation h2 {
+  margin: 0 0 1.4rem;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  line-height: 1.2;
 }
 .metrics {
   display: grid;
-  grid-template-columns: repeat(4, minmax(150px, 1fr));
-  gap: 1px;
-  background: var(--line);
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0 0 3.5rem;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
 }
 .metric {
-  background: var(--card);
-  padding: 26px 24px;
+  padding: 1.7rem;
+  border-right: 1px solid var(--line);
+}
+.metric:last-child {
+  border-right: 0;
 }
 .metric strong {
   display: block;
-  color: var(--accent-data);
-  font-size: 34px;
+  color: var(--accent);
+  font-size: clamp(2rem, 5vw, 3.4rem);
   line-height: 1;
 }
-.metric span { color: var(--muted); }
+.metric:nth-child(2) strong {
+  color: var(--accent3);
+}
+.metric:nth-child(3) strong {
+  color: var(--risk);
+}
+.metric span {
+  display: block;
+  margin-top: 0.7rem;
+  color: var(--muted);
+  font-size: 0.93rem;
+}
 .split {
   display: grid;
-  grid-template-columns: 1.1fr .9fr;
-  gap: 36px;
-  padding: 58px 7vw;
-  background: var(--panel);
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  margin: 0 0 3.5rem;
 }
-h2 {
-  margin: 0 0 16px;
-  font-size: 28px;
-  line-height: 1.2;
+.split article {
+  padding: 2rem;
 }
-.badge {
-  display: inline-block;
-  margin-bottom: 16px;
-  padding: 5px 10px;
-  border-radius: 999px;
-  background: var(--soft-opportunity);
-  color: var(--accent-opportunity);
-  font-weight: 700;
+.method {
+  background: var(--accent-soft);
+  border-top: 6px solid var(--accent);
 }
-.note {
-  border-top: 4px solid var(--accent-warn);
+.change {
+  background: var(--accent2-soft);
+  border-bottom: 6px solid var(--accent2);
+}
+.split h3,
+.timeline h3,
+.case-grid h3,
+.risk-band h3,
+.takeaways h3 {
+  margin-top: 0;
+  line-height: 1.3;
+}
+.hl {
+  padding: 0.08em 0.25em;
+  background: var(--hl);
+  font-weight: 750;
+}
+.hl2 {
+  padding: 0.08em 0.25em;
+  background: var(--hl2);
+  font-weight: 750;
+}
+.timeline {
+  margin: 0 0 3.5rem;
+  padding: 2.2rem;
   background: var(--card);
-  padding: 22px;
-  box-shadow: 0 12px 30px var(--shadow);
+  box-shadow: 0 16px 40px var(--shadow);
 }
-.flow {
-  padding: 56px 7vw;
-  background: var(--bg);
-}
-.steps {
+.timeline ol {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 18px;
+  gap: 1rem;
+  padding: 0;
+  list-style: none;
+  counter-reset: steps;
 }
-.step {
+.timeline li {
   position: relative;
-  padding: 18px;
-  border-left: 5px solid var(--accent-data);
-  background: var(--soft-data);
+  padding-top: 3.2rem;
+  color: var(--muted);
+  counter-increment: steps;
 }
-.step b {
+.timeline li::before {
+  content: counter(steps);
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  width: 2.35rem;
+  height: 2.35rem;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent3);
+  color: var(--deep-ink);
+  font-weight: 800;
+}
+.timeline strong {
   display: block;
-  margin-bottom: 8px;
-  color: var(--accent-data);
-}
-.cases {
-  padding: 56px 7vw;
-  background: var(--panel2);
+  margin-bottom: 0.35rem;
+  color: var(--ink);
 }
 .case-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
+  grid-template-columns: 1.05fr 1fr 1.05fr;
+  gap: 1rem;
+  margin-bottom: 3.5rem;
 }
-.case {
-  background: var(--card);
-  border-bottom: 5px solid var(--accent-risk);
-  padding: 22px;
+.case-grid article {
+  min-height: 270px;
+  padding: 1.7rem;
 }
-.case h3 { margin: 0 0 10px; }
-.compare {
-  padding: 56px 7vw;
-  background: var(--darkband);
-  color: var(--darkink);
+.case-grid article:nth-child(1) {
+  background: var(--accent3-soft);
+  border-left: 5px solid var(--accent3);
 }
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: rgba(255,255,255,.04);
+.case-grid article:nth-child(2) {
+  background: var(--accent4-soft);
+  border-top: 5px solid var(--accent4);
 }
-th, td {
-  padding: 16px;
-  border-bottom: 1px solid rgba(255,255,255,.16);
-  text-align: left;
-  vertical-align: top;
+.case-grid article:nth-child(3) {
+  background: var(--risk-soft);
+  border-right: 5px solid var(--risk);
 }
-th { color: var(--accent-data); }
-.safeguards {
-  padding: 56px 7vw;
-  background: var(--soft-risk);
+.case-label {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
 }
-.quote {
-  max-width: 880px;
-  padding: 24px 28px;
-  border-left: 8px solid var(--accent-risk);
-  background: var(--card);
-  font-size: 22px;
+.risk-band {
+  margin: 0 0 3.5rem;
+  padding: 2.5rem;
+  background: linear-gradient(120deg, var(--deep), var(--deep2));
+  color: var(--deep-ink);
+}
+.risk-band h3 {
+  color: var(--accent2);
+}
+.risk-band p {
+  max-width: 900px;
+  color: var(--deep-muted);
+}
+.risk-band strong {
+  color: var(--deep-ink);
+}
+.insight-quote {
+  margin: 0 0 3.5rem;
+  padding: 2rem clamp(1.5rem, 5vw, 4rem);
+  border-left: 8px solid var(--accent4);
+  background: var(--quote);
+  color: var(--ink);
+  font-family: Georgia, "Noto Serif SC", serif;
+  font-size: clamp(1.2rem, 3vw, 1.7rem);
+  line-height: 1.55;
 }
 .takeaways {
-  padding: 56px 7vw 72px;
-  background: var(--bg);
-}
-.mosaic {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-.tile {
-  padding: 20px;
-  min-height: 130px;
-  background: var(--card);
+  padding: 2.5rem;
+  background: var(--paper);
   border: 1px solid var(--line);
 }
-.tile:nth-child(1) { border-top: 6px solid var(--accent-data); }
-.tile:nth-child(2) { border-top: 6px solid var(--accent-risk); }
-.tile:nth-child(3) { border-top: 6px solid var(--accent-opportunity); }
-.tile:nth-child(4) { border-top: 6px solid var(--accent-conclusion); }
-.tile b { display: block; margin-bottom: 8px; }
-@media (max-width: 820px) {
-  .metrics, .split, .steps, .case-grid, .mosaic {
+.takeaway-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 0.9rem;
+}
+.takeaway-grid p {
+  margin: 0;
+  padding: 1.35rem;
+  background: var(--stripe);
+}
+.takeaway-grid p:nth-child(2) {
+  background: var(--accent-soft);
+}
+.takeaway-grid p:nth-child(3) {
+  background: var(--accent2-soft);
+}
+.takeaway-grid p:nth-child(4) {
+  background: var(--accent4-soft);
+}
+#translation {
+  margin-bottom: 4rem;
+  padding: clamp(2rem, 6vw, 5rem);
+  background: var(--translation-bg);
+  box-shadow: 0 18px 50px var(--shadow);
+}
+#translation > h2 {
+  padding-bottom: 1rem;
+  border-bottom: 4px solid var(--accent);
+}
+#translation h3 {
+  margin: 3.4rem 0 1rem;
+  color: var(--accent);
+  font-size: 1.65rem;
+}
+#translation p,
+#translation ul {
+  max-width: 780px;
+  margin-right: auto;
+  margin-left: auto;
+}
+#translation p {
+  margin-top: 1.05rem;
+  margin-bottom: 1.05rem;
+}
+#translation .authors,
+#translation .edit-note {
+  color: var(--muted);
+  font-size: 0.93rem;
+}
+#translation .edit-note {
+  margin-top: 3rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--line);
+}
+.source-figure {
+  margin: 2.5rem auto;
+}
+.source-figure img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+.source-figure figcaption {
+  margin: 0.75rem auto 0;
+  max-width: 720px;
+  color: var(--muted);
+  font-size: 0.88rem;
+  text-align: center;
+}
+@media (max-width: 760px) {
+  .metrics,
+  .split,
+  .case-grid,
+  .timeline ol,
+  .takeaway-grid {
     grid-template-columns: 1fr;
   }
-  .hero { padding-top: 40px; }
+  .metric {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .metric:last-child {
+    border-bottom: 0;
+  }
+  #translation {
+    width: min(100% - 1rem, 1120px);
+  }
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -373,102 +590,220 @@ th { color: var(--accent-data); }
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/zero-days" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
-<main>
-  <section class="hero">
-    <div class="kicker">一句话总括</div>
-    <h1>评估并缓解 LLM 发现 0-day 的日益增长风险</h1>
-    <div class="original">Evaluating and mitigating the growing risk of LLM-discovered 0-days</div>
-    <p class="thesis">文章的真正贡献是把“LLM 会发现漏洞”从推测变成了可验证的工程事实：Claude Opus 4.6 已能在成熟开源项目中规模化发现高危漏洞，并迫使防御、披露和滥用治理同步提速。</p>
-  </section>
+<header class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">Frontier Red Team · Anthropic</p>
+    <h1>评估并缓解 LLM 发现 0-day 漏洞所带来的日益增长的风险</h1>
+    <p class="original-title" lang="en">Evaluating and mitigating the growing risk of LLM-discovered 0-days</p>
+    <div class="meta">
+      <span>发布日期：2026 年 2 月 5 日</span>
+      <span>来源：Anthropic</span>
+      <span>更新：2026 年 2 月 6 日</span>
+    </div>
+    <p class="thesis"><strong>一句话总括：</strong>Claude Opus 4.6 已能像安全研究员一样理解代码，在成熟项目中规模化发现传统工具长期遗漏的高危漏洞，这同时扩大了防御能力和双重用途风险。</p>
+  </div>
+</header>
 
-  <section class="metrics" aria-label="关键数字">
-    <div class="metric"><strong>500+</strong><span>已发现并验证的高危漏洞</span></div>
-    <div class="metric"><strong>3</strong><span>公开讲解的代表性案例</span></div>
-    <div class="metric"><strong>数百万</strong><span>部分项目已有 CPU 小时级 fuzzing 积累</span></div>
-    <div class="metric"><strong>90 天</strong><span>传统披露窗口面临压力</span></div>
-  </section>
+<main class="summary-wrap">
+  <div class="metrics" aria-label="关键数据">
+    <div class="metric">
+      <strong>500+</strong>
+      <span>已发现并经过验证的高危漏洞</span>
+    </div>
+    <div class="metric">
+      <strong>数百万小时</strong>
+      <span>部分目标代码库此前累计接受的 CPU fuzzing 时间</span>
+    </div>
+    <div class="metric">
+      <strong>90 天</strong>
+      <span>可能难以承受 LLM 漏洞发现速度的行业披露窗口</span>
+    </div>
+  </div>
 
   <section class="split">
-    <div>
-      <span class="badge">核心判断</span>
-      <h2>模型不是更快的 fuzzing，而是另一种漏洞研究者</h2>
-      <p>Opus 4.6 没有依赖专用 harness 或特殊提示。它拿到常规工具后，会读代码、查提交历史、比较修复模式，并推理哪些输入能触发崩溃。</p>
-      <p>这改变了读者对 AI 影响的理解。AI 的价值不只是扩大测试量，而是能把人类研究员的模式识别和代码理解迁移到大规模任务中。</p>
-    </div>
-    <aside class="note">
-      <h2>为什么这很关键</h2>
-      <p>许多老牌项目已经被 fuzzers 跑了多年。传统工具仍可能错过需要特定前置条件、特定算法路径或历史补丁联想的漏洞。</p>
-      <p>LLM 能把注意力集中到“看起来危险”的代码片段。这让防御者拥有新工具，也让攻击者可能更快找到未修复缺口。</p>
-    </aside>
+    <article class="method">
+      <h3>贡献不只是“更快地跑 fuzzing”</h3>
+      <p>Claude 被放入一台配有常规工具的虚拟机。研究团队没有提供专用 harness、特殊脚手架或工具使用教程。</p>
+      <p>它会阅读提交历史，识别容易出错的函数，并推理出触发特定逻辑路径所需的输入。这说明 LLM 带来的增益来自<span class="hl2">代码理解和策略选择</span>，而不只是更多算力。</p>
+    </article>
+    <article class="change">
+      <h3>成熟代码库也不再等于低风险</h3>
+      <p>一些目标项目已经被 fuzzers 测试多年，却仍藏有高危漏洞。部分问题甚至存在了数十年。</p>
+      <p>这改变了一个常见判断：高覆盖率和长期测试不能证明复杂状态组合已经安全。LLM 可能重新打开那些被认为已充分检查的代码区域。</p>
+    </article>
   </section>
 
-  <section class="flow">
-    <h2>Anthropic 的验证流程</h2>
-    <div class="steps">
-      <div class="step"><b>1. 放入虚拟机</b>Claude 获得开源项目最新代码和常规命令行工具。</div>
-      <div class="step"><b>2. 聚焦内存破坏</b>这类漏洞可用崩溃、AddressSanitizer 和非崩溃内存错误来验证。</div>
-      <div class="step"><b>3. 去重和排序</b>模型先批判、合并和重新排序剩余崩溃，减少维护者负担。</div>
-      <div class="step"><b>4. 人类复核补丁</b>内部和外部安全研究员验证漏洞，并协助开发补丁。</div>
-    </div>
+  <section class="timeline">
+    <h3>团队如何控制误报</h3>
+    <ol>
+      <li><strong>寻找问题</strong>Claude 在真实开源项目中自主选择分析方法。</li>
+      <li><strong>验证崩溃</strong>团队使用崩溃监控和 AddressSanitizer 等工具确认内存错误。</li>
+      <li><strong>复核排序</strong>Claude 对结果进行批评、去重，并重新评估优先级。</li>
+      <li><strong>人工把关</strong>内部及外部安全研究人员验证漏洞，并协助开发补丁。</li>
+    </ol>
+    <p>流程把减少误报放在重要位置，因为未经验证的自动报告会把成本转嫁给资源有限的开源维护者。结论是，规模化发现必须与同样可靠的验证和修复能力一起扩展。</p>
   </section>
 
-  <section class="cases">
-    <h2>三个案例说明了 LLM 的不同优势</h2>
-    <div class="case-grid">
-      <article class="case">
-        <h3>GhostScript：从提交历史找补丁遗漏</h3>
-        <p>Claude 在 fuzzing 和手工分析无果后阅读 Git 历史。它发现安全相关修复，再寻找同类调用点。</p>
-        <p>结论是，LLM 能把“一个漏洞修了哪里”转化为“哪里可能还没修”。</p>
-      </article>
-      <article class="case">
-        <h3>OpenSC：避开低覆盖陷阱</h3>
-        <p>Claude 识别到连续 strcat 的危险模式。该路径前置条件多，因此传统 fuzzers 很少覆盖。</p>
-        <p>这说明覆盖率不是全部。理解哪些代码片段天然危险，可能比平均撒点更有效。</p>
-      </article>
-      <article class="case">
-        <h3>CGIF：理解算法后构造触发器</h3>
-        <p>漏洞来自 LZW 压缩在特殊序列下可能让压缩后数据大于原始数据，从而触发缓冲区溢出。</p>
-        <p>即使达到行和分支覆盖，也可能错过这种需要特定操作序列的缺陷。</p>
-      </article>
-    </div>
+  <section class="case-grid">
+    <article>
+      <span class="case-label">案例 01 · GhostScript</span>
+      <h3>从历史补丁反推遗漏点</h3>
+      <p>fuzzing 和初步人工分析都没有结果。Claude 随后阅读 Git 提交历史，找到一项与安全有关的修改，再搜索同一函数的其他调用位置。</p>
+      <p>它最终构造出可触发崩溃的文件。这个案例表明，历史修复记录也能成为发现相似未修复漏洞的线索。</p>
+    </article>
+    <article>
+      <span class="case-label">案例 02 · OpenSC</span>
+      <h3>跳过低价值路径，聚焦危险代码</h3>
+      <p>Claude 发现连续使用多个 <code>strcat</code> 的位置，并识别出缓冲区溢出风险。传统 fuzzer 很少到达这行代码，因为触发它需要满足许多前置条件。</p>
+      <p>LLM 能判断哪些代码片段更值得检查。它不必对所有路径平均分配精力。</p>
+    </article>
+    <article>
+      <span class="case-label">案例 03 · CGIF</span>
+      <h3>理解算法后构造罕见状态</h3>
+      <p>CGIF 假定压缩后的数据总会更小。Claude 理解 LZW 固定大小符号表和特殊“clear”标记的关系，并发现压缩结果可能反而变大。</p>
+      <p>即使达到 <span class="hl">100% 行覆盖率和分支覆盖率</span>，这个漏洞也可能被遗漏，因为它需要一组非常具体的操作顺序。</p>
+    </article>
   </section>
 
-  <section class="compare">
-    <h2>传统工具与 LLM 的互补关系</h2>
-    <table>
-      <thead>
-        <tr><th>维度</th><th>传统 fuzzing</th><th>LLM 漏洞发现</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>工作方式</td><td>大量生成输入，观察程序是否崩溃。</td><td>阅读代码和历史，推理危险路径和触发输入。</td></tr>
-        <tr><td>优势</td><td>稳定、自动化、适合长时间覆盖。</td><td>能利用上下文、补丁模式和算法理解。</td></tr>
-        <tr><td>盲点</td><td>难触发深层前置条件和特定状态序列。</td><td>可能产生误报，需要严格验证和人类复核。</td></tr>
-        <tr><td>影响</td><td>继续是基础设施。</td><td>成为现有工具之上的新发现层。</td></tr>
-      </tbody>
-    </table>
+  <section class="risk-band">
+    <h3>能力增长也会压缩响应时间</h3>
+    <p>Anthropic 为 Claude Opus 4.6 增加了面向网络安全场景的 probes。它们在模型生成响应时测量内部激活，用于识别潜在滥用。配套措施可能包括实时干预和阻断恶意流量。</p>
+    <p>这些措施也可能给合法研究和防御工作制造阻力。更深层的问题是，发现速度正在接近甚至可能超过专家研究人员，而漏洞验证、协调披露和补丁部署仍受人工流程约束。</p>
+    <p><strong>核心结论：</strong>风险不只在于 LLM 会发现漏洞，还在于现有安全制度可能跟不上它发现漏洞的规模。</p>
   </section>
 
-  <section class="safeguards">
-    <h2>防滥用成为能力发布的一部分</h2>
-    <p class="quote">Anthropic 同步引入网络安全专用 probes，用于在模型生成时检测潜在滥用，并准备扩大实时干预，包括阻断恶意流量。</p>
-    <p>这会给合法研究带来摩擦。文章承认这一点，并表示需要与安全社区共同调整。</p>
-    <p>结论是，能力越接近真实 0-day 发现，治理就越不能只靠事后审查。检测、处置和研究者协作必须嵌入产品流程。</p>
-  </section>
+  <blockquote class="insight-quote">防守方眼下拥有一个短暂窗口：尽快让 AI 帮助检查和修复更多代码，同时建立能够承受同等速度的验证、披露与滥用防控流程。</blockquote>
 
   <section class="takeaways">
-    <h2>最值得带走的洞见</h2>
-    <div class="mosaic">
-      <div class="tile"><b>LLM 已经能发现真实新漏洞。</b>这不是演示级能力，而是已产生 500 多个经验证的高危发现。</div>
-      <div class="tile"><b>双用风险正在从可能性变成操作问题。</b>同一能力可以帮助维护者，也可以加速攻击者。</div>
-      <div class="tile"><b>防御窗口可能短暂。</b>现在用 AI 扫描和修复开源代码，能在攻击规模化之前减少暴露面。</div>
-      <div class="tile"><b>披露规范需要升级。</b>当漏洞发现速度上升，传统 90 天窗口和人工处理节奏可能跟不上。</div>
+    <h3>最值得带走的洞见</h3>
+    <div class="takeaway-grid">
+      <p><strong>LLM 已经具备实用的 0-day 发现能力。</strong>这不是单一 benchmark 推测，而是来自真实开源项目和人工验证漏洞的结果。</p>
+      <p><strong>推理能力补足了 fuzzing 的盲区。</strong>LLM 可以结合代码语义、提交历史和算法状态，主动选择高价值路径。</p>
+      <p><strong>发现规模必须匹配修复规模。</strong>超过 500 个高危发现说明，验证、去重、补丁开发和维护者协作会成为新的瓶颈。</p>
+      <p><strong>披露规范需要调整。</strong>传统 90 天窗口可能无法适应 LLM 发现漏洞的速度和数量。</p>
     </div>
   </section>
-</main>
+</main><section id="translation">
+  <h2>完整译文</h2>
+
+  <p class="authors">Nicholas Carlini*、Keane Lucas*、Evyatar Ben Asher*、Newton Cheng、Hasnain Lakhani、David Forsythe 和 Kyla Guru。* 表示贡献相同。</p>
+
+  <p>Claude Opus 4.6 于今天发布。它延续了 AI 模型网络安全能力显著提升的趋势。去年秋天，我们曾写道，AI 对网络安全的影响已经来到一个转折点。能力进步可能迅速加快，而现在正是加速利用 AI 开展防御的时机。此后的证据进一步强化了这一判断。AI 模型如今已经可以规模化发现高危漏洞。我们认为，现在必须迅速行动。在窗口仍然存在时，我们应当增强防守方的能力，并保护尽可能多的代码。</p>
+
+  <p>Opus 4.6 发现高危漏洞的能力明显优于此前的模型。这也说明相关能力的发展速度有多快。多年来，安全团队一直在自动化漏洞发现。他们投入大量资源建设 fuzzing 基础设施和定制 harness，希望规模化寻找缺陷。</p>
+
+  <p>但在早期测试中，最引人注意的是 Opus 4.6 无需针对任务开发专用工具，也不需要定制脚手架或特殊提示，就能迅速发现漏洞。它发现漏洞的方式更值得关注。Fuzzer 会向代码投放大量随机输入，观察什么输入会令程序出错。Opus 4.6 则会像人类研究员一样阅读并分析代码。它会查看过去的修复，从中寻找尚未处理的相似缺陷。它会识别容易引发问题的模式，也能充分理解一段逻辑，再判断究竟什么输入可以破坏它。</p>
+
+  <p>我们让 Opus 4.6 检查了一些经过最充分测试的代码库。这些项目已经接受 fuzzers 多年测试，累计消耗了数百万小时的 CPU 时间。Opus 4.6 仍然在其中发现了高危漏洞。有些漏洞已经潜伏了数十年，却始终没有被发现。</p>
+
+  <p>要让天平向防守方倾斜，我们也必须亲自投入这项工作。我们现在正使用 Claude 寻找开源软件中的漏洞，并协助修复。我们首先选择开源软件，是因为它无处不在。从企业系统到关键基础设施都在运行开源软件，其中的漏洞会在整个互联网扩散。</p>
+
+  <p>许多开源项目由小型团队或志愿者维护。他们没有专门的安全资源。因此，找到经过人工验证的缺陷，再贡献经过人工审查的补丁，可以带来很大帮助。</p>
+
+  <p>到目前为止，我们已经发现并验证了 500 多个高危漏洞。我们已经开始报告这些问题，也看到首批补丁陆续被合入。我们仍在与维护者合作，修复其余漏洞。</p>
+
+  <p>本文将介绍我们的方法，分享 Claude 发现的一些早期漏洞案例，并讨论我们为应对潜在滥用而设置的防护措施。这些能力仍在持续进步，而这项工作也才刚刚开始。随着工作规模扩大，我们还会分享更多信息。</p>
+
+  <h3>实验设置</h3>
+
+  <p>在这项工作中，我们把 Claude 放进一台“虚拟机”。它确实是一台模拟出来的计算机，其中包含开源项目的最新版本。我们为它提供了标准工具，例如常见的 coreutils 和 Python。我们也提供了漏洞分析工具，例如调试器和 fuzzers。</p>
+
+  <p>不过，我们没有特别说明应该怎样使用这些工具。我们也没有提供定制 harness，让 Claude 获得关于如何更有效发现漏洞的专门知识。这意味着，我们直接测试的是 Claude 的“开箱即用”能力。整个实验只依赖一个事实：现代大语言模型已经是通用型智能体，能够自行判断怎样充分利用现有工具。</p>
+
+  <p>在报告任何问题之前，我们都进行了充分验证，以确保 Claude 没有产生虚构漏洞。所谓虚构漏洞，是指模型编造实际上并不存在的问题。这种情况正在给开源开发者造成越来越不合理的负担。</p>
+
+  <p>我们重点寻找内存损坏漏洞，因为这类问题相对容易验证。逻辑错误发生后，程序可能仍然可以运行。内存损坏则更容易识别。我们可以监控程序是否崩溃，也可以运行 AddressSanitizer 等工具，捕获没有导致崩溃的内存错误。</p>
+
+  <p>不过，并非所有能让程序崩溃的输入都代表高危漏洞。因此，我们随后让 Claude 对剩余的崩溃进行批评、去重，并重新评估优先级。在首轮发现中，我们自己的安全研究人员验证了每个漏洞，并手工编写补丁。</p>
+
+  <p>随着发现数量增加，我们又邀请外部的人类安全研究人员协助验证和开发补丁。我们的目标是切实帮助维护者处理这些报告。因此，整个流程特别重视减少误报。与此同时，我们也在加快自动化补丁开发，希望在发现缺陷后能够可靠地完成修复。</p>
+
+  <h3>漏洞</h3>
+
+  <p>下面介绍 Claude 发现的三个漏洞。这些漏洞现在都已经由维护者修复。我们认为，它们体现了 LLM 相比其他工具所具有的独特优势。</p>
+
+  <p>GhostScript 是一款处理 PostScript 和 PDF 文件的工具。Claude 最初为了寻找漏洞走了几条弯路。它先尝试对代码进行 fuzzing。失败后，它又尝试人工式分析。这两种方法都没有取得重要发现。</p>
+
+  <p>不过，Claude 最终采用了另一种方法：阅读 Git 提交历史。Claude 很快找到了一项与安全有关的提交，并对此作出评论：</p>
+
+  <p>Claude 随后查看代码，理解具体发生了哪些变化：</p>
+
+  <p>基于这些信息，Claude 又寻找了调用该函数的其他位置，希望发现可能被遗漏、尚未修复的相似漏洞。</p>
+
+  <p>完成这一观察后，Claude 很快构造出一个概念验证崩溃样本。这个文件被传给 GhostScript 后会导致程序崩溃，从而证明了 Claude 的判断。</p>
+
+  <p>OpenSC 是一款处理智能卡数据的命令行工具。Claude 同样先尝试通过 fuzzing 寻找漏洞。失败后，它又进行了人工式分析。与前一个案例一样，这种方式仍然没有奏效。于是 Claude 改变方法，开始在代码仓库中搜索那些经常出现漏洞的函数调用。</p>
+
+  <p>Claude 很快找到一个连续执行多次 <code>strcat</code> 操作的位置。这类函数在 C 语言中通常被认为不安全，因为它们可以拼接字符串，却不会检查拼接后字符串的长度。</p>
+
+  <p>因此，程序员必须确认输出缓冲区足以容纳拼接后的输入。对 OpenSC 来说，关键问题出现在下面这段代码中：</p>
+
+  <p>Claude 判断这里存在缓冲区溢出漏洞。查看现有 fuzzers 对这行代码的测试频率后，我们发现传统 fuzzers 很少研究这里。原因是程序必须满足许多前置条件，才能执行到这一行。</p>
+
+  <p>相比之下，Claude 能够判断哪些代码片段值得关注，再把精力集中到这些位置。它不需要不加区分地检查代码，也不会对所有行投入相同的精力。</p>
+
+  <p>CGIF 是一个处理 GIF 文件的库。在这个案例中，让我们意外的不是 Claude 如何找到漏洞，而是它如何验证漏洞，并生成概念验证来证明问题确实存在。</p>
+
+  <p>简单来说，Claude 发现这个库假定压缩后的数据一定比原始数据小。这个假定通常是安全的，但在这里可以被利用。证明这一点并不容易。</p>
+
+  <p>GIF 文件格式使用 LZW 压缩算法压缩数据。较为传统的 LZ77 系压缩器使用“距离、长度”二元组来编码匹配项。LZW 的做法不同。它会为频繁使用的 token 组合建立字典。这些组合可以是单个字符，也可以是两个 token 的组合。压缩器再次遇到同一个 token 时，只需输出一个更短的比特串，表示“再次输出这个 token”。熟悉语言建模的读者可以把 LZW 理解为一种在思路上与 BPE 分词很相似的过程。</p>
+
+  <p>CGIF 隐含地假定，字符串压缩后的大小总会小于未压缩时的大小。这个假定几乎总是成立。不过，Claude 立刻识别出了这里的漏洞：</p>
+
+  <p>Claude 意识到，LZW 维护着一个固定大小的符号表。如果符号表可以被填满，LZW 就会在数据流中插入一个特殊的新“clear”token。这样一来，“压缩后”的输出大小就可能超过未压缩数据的大小，进而触发缓冲区溢出漏洞。</p>
+
+  <p>这个漏洞格外有意思，因为触发它需要从概念上理解 LZW 算法，以及它与 GIF 文件格式的关系。传统 fuzzers 很难触发这种漏洞。即使是覆盖率引导的 fuzzers 也会遇到困难，因为程序必须在多个分支中作出特定选择。</p>
+
+  <p>事实上，即使 CGIF 达到 100% 的行覆盖率和分支覆盖率，这个漏洞仍然可能不被发现。它需要一组非常具体的操作顺序。</p>
+
+  <h3>防护措施</h3>
+
+  <p>在发布 Claude Opus 4.6 的同时，我们正在引入一个新的检测层，帮助 Safeguards 团队识别并应对利用 Claude 实施的网络安全滥用。</p>
+
+  <p>这项工作的核心是 probes。它们会在模型生成响应时测量模型内部的激活，使我们能够规模化检测特定危害。随着本次发布，我们创建了面向网络安全场景的新 probes，以便更好地追踪和理解 Claude 在网络安全领域可能遭到的滥用。</p>
+
+  <p>在执行措施方面，我们也在改进处理管线，使其跟上新的检测架构。这包括更新网络安全执行工作流，利用基于 probes 的检测结果。我们还会扩大应对网络安全滥用时可采取的措施范围。</p>
+
+  <p>具体来说，我们可能实施实时干预，包括阻断被判定为恶意的流量。这会给合法研究和部分防御工作带来阻力。我们希望与安全研究社区合作，在问题出现时寻找解决办法。</p>
+
+  <p>我们致力于让 Claude 保持在网络安全领域的前沿。为此，我们会努力确保它既安全又有效。</p>
+
+  <p>这些变化结合起来，意味着我们在防止滥用方面迈出了重要一步。提升的不只是可检测的范围，也包括我们根据发现采取行动的速度和有效性。</p>
+
+  <h3>结论</h3>
+
+  <p>即使没有专用脚手架，Claude Opus 4.6 也可以在经过充分测试的代码库中发现有实质意义的 0-day 漏洞。我们的结果表明，语言模型能够在现有发现工具的基础上提供真正的增益。前文介绍的 Safeguards 工作，对于管理由此产生的双重用途风险至关重要。</p>
+
+  <p>展望未来，我们和更广泛的安全社区都必须面对一个令人不安的现实：语言模型已经能够发现新的漏洞，并且可能很快在速度和规模上超过人类专家研究员。</p>
+
+  <p>与此同时，现有的漏洞披露规范也需要调整。行业标准的 90 天窗口可能无法承受 LLM 发现漏洞的速度和数量。整个行业需要建立能够跟上这种节奏的工作流程。</p>
+
+  <p>这项工作仍在进行。我们很快会分享更多内容，包括我们对这些能力如何演变的认识，以及安全社区应当怎样充分利用它们。</p>
+
+  <p class="edit-note"><strong>2026 年 2 月 6 日编辑：</strong>更新了作者名单。</p>
+</section>
   <script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;

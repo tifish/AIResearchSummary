@@ -1,259 +1,378 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>用于科学计算的长时运行 Claude</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>面向科学计算的长时间运行 Claude</title>
 <style>
 :root {
-  --bg: #f7f3ec;
-  --ink: #1d2430;
-  --muted: #667085;
-  --line: #d8d0c2;
-  --card: #fffaf1;
-  --panel: #ffffff;
-  --deep: #17202d;
-  --deep-ink: #f5f7fb;
-  --data: #2563eb;
-  --data-bg: #eaf1ff;
-  --risk: #c2410c;
-  --risk-bg: #fff0e8;
-  --opportunity: #0f766e;
-  --opportunity-bg: #e7f7f3;
-  --conclusion: #7c3aed;
-  --conclusion-bg: #f1e9ff;
-  --memory: #b45309;
-  --memory-bg: #fff6dc;
-  --shadow: rgba(24, 32, 45, .12);
+  color-scheme: light dark;
+  --bg: #f6f3ec;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #17202a;
+  --muted: #66717d;
+  --line: #d9d4c8;
+  --accent: #2563eb;
+  --accent2: #00886f;
+  --accent3: #d05a1f;
+  --accent4: #8b45b5;
+  --risk: #b52c45;
+  --opportunity: #087f5b;
+  --conclusion: #6246c7;
+  --data: #075ea8;
+  --hl: #ffec9b;
+  --hl2: #ccefe4;
+  --hl3: #dce8ff;
+  --hero-bg: #19233a;
+  --hero-ink: #f6f8ff;
+  --hero-muted: #bbc7df;
+  --data-bg: #e7f2ff;
+  --risk-bg: #fde8ec;
+  --opportunity-bg: #e4f5ee;
+  --conclusion-bg: #eee8ff;
+  --warm-bg: #fff0df;
+  --cool-bg: #e9f5f6;
+  --quote-bg: #26213a;
+  --quote-ink: #f7f0ff;
+  --translation-bg: #fffdf8;
+  --code-bg: #ece9e1;
+  --shadow: 0 18px 50px rgba(34, 40, 55, .10);
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f6f3ec;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #17202a;
+  --muted: #66717d;
+  --line: #d9d4c8;
+  --accent: #2563eb;
+  --accent2: #00886f;
+  --accent3: #d05a1f;
+  --accent4: #8b45b5;
+  --risk: #b52c45;
+  --opportunity: #087f5b;
+  --conclusion: #6246c7;
+  --data: #075ea8;
+  --hl: #ffec9b;
+  --hl2: #ccefe4;
+  --hl3: #dce8ff;
+  --hero-bg: #19233a;
+  --hero-ink: #f6f8ff;
+  --hero-muted: #bbc7df;
+  --data-bg: #e7f2ff;
+  --risk-bg: #fde8ec;
+  --opportunity-bg: #e4f5ee;
+  --conclusion-bg: #eee8ff;
+  --warm-bg: #fff0df;
+  --cool-bg: #e9f5f6;
+  --quote-bg: #26213a;
+  --quote-ink: #f7f0ff;
+  --translation-bg: #fffdf8;
+  --code-bg: #ece9e1;
+  --shadow: 0 18px 50px rgba(34, 40, 55, .10);
 }
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #101418;
-    --ink: #eef2f7;
-    --muted: #a8b3c2;
-    --line: #34404d;
-    --card: #181f27;
-    --panel: #141a21;
-    --deep: #06090d;
-    --deep-ink: #f4f7fb;
-    --data: #7aa7ff;
-    --data-bg: #14233d;
-    --risk: #ff9b72;
-    --risk-bg: #321a12;
-    --opportunity: #5ee0cf;
-    --opportunity-bg: #102c29;
-    --conclusion: #c4a7ff;
-    --conclusion-bg: #241a3a;
-    --memory: #f4c46b;
-    --memory-bg: #30240f;
-    --shadow: rgba(0, 0, 0, .35);
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #10131a;
+    --surface: #171b24;
+    --card: #1d222d;
+    --ink: #e7ebf2;
+    --muted: #a7b0bf;
+    --line: #353c49;
+    --accent: #78a7ff;
+    --accent2: #41d1b4;
+    --accent3: #ff9869;
+    --accent4: #d39aef;
+    --risk: #ff7890;
+    --opportunity: #55d6a5;
+    --conclusion: #b8a0ff;
+    --data: #7fc2ff;
+    --hl: #604f16;
+    --hl2: #174d43;
+    --hl3: #243f70;
+    --hero-bg: #151c2b;
+    --hero-ink: #edf2ff;
+    --hero-muted: #aebbd3;
+    --data-bg: #172b40;
+    --risk-bg: #3b1d28;
+    --opportunity-bg: #17372f;
+    --conclusion-bg: #2c2448;
+    --warm-bg: #3a2a1d;
+    --cool-bg: #173137;
+    --quote-bg: #211b32;
+    --quote-ink: #f0e9fa;
+    --translation-bg: #171b24;
+    --code-bg: #252a34;
+    --shadow: 0 18px 50px rgba(0, 0, 0, .28);
   }
 }
 :root[data-theme="dark"] {
-  --bg: #101418;
-  --ink: #eef2f7;
-  --muted: #a8b3c2;
-  --line: #34404d;
-  --card: #181f27;
-  --panel: #141a21;
-  --deep: #06090d;
-  --deep-ink: #f4f7fb;
-  --data: #7aa7ff;
-  --data-bg: #14233d;
-  --risk: #ff9b72;
-  --risk-bg: #321a12;
-  --opportunity: #5ee0cf;
-  --opportunity-bg: #102c29;
-  --conclusion: #c4a7ff;
-  --conclusion-bg: #241a3a;
-  --memory: #f4c46b;
-  --memory-bg: #30240f;
-  --shadow: rgba(0, 0, 0, .35);
+  color-scheme: dark;
+  --bg: #10131a;
+  --surface: #171b24;
+  --card: #1d222d;
+  --ink: #e7ebf2;
+  --muted: #a7b0bf;
+  --line: #353c49;
+  --accent: #78a7ff;
+  --accent2: #41d1b4;
+  --accent3: #ff9869;
+  --accent4: #d39aef;
+  --risk: #ff7890;
+  --opportunity: #55d6a5;
+  --conclusion: #b8a0ff;
+  --data: #7fc2ff;
+  --hl: #604f16;
+  --hl2: #174d43;
+  --hl3: #243f70;
+  --hero-bg: #151c2b;
+  --hero-ink: #edf2ff;
+  --hero-muted: #aebbd3;
+  --data-bg: #172b40;
+  --risk-bg: #3b1d28;
+  --opportunity-bg: #17372f;
+  --conclusion-bg: #2c2448;
+  --warm-bg: #3a2a1d;
+  --cool-bg: #173137;
+  --quote-bg: #211b32;
+  --quote-ink: #f0e9fa;
+  --translation-bg: #171b24;
+  --code-bg: #252a34;
+  --shadow: 0 18px 50px rgba(0, 0, 0, .28);
 }
 * { box-sizing: border-box; }
 body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-  line-height: 1.65;
+  font-family: Inter, "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.75;
 }
 main { overflow: hidden; }
 .hero {
-  background: var(--deep);
-  color: var(--deep-ink);
-  padding: 56px 7vw 46px;
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+  padding: clamp(3.5rem, 9vw, 8rem) max(6vw, calc((100vw - 1120px) / 2));
 }
-.eyebrow {
-  color: var(--opportunity);
-  font-weight: 700;
-  margin: 0 0 14px;
+.hero .eyebrow {
+  color: var(--accent2);
+  font-size: .82rem;
+  font-weight: 800;
+  letter-spacing: .15em;
+  text-transform: uppercase;
 }
-h1 {
+.hero h1 {
+  max-width: 900px;
+  margin: .65rem 0 .45rem;
+  font-size: clamp(2.4rem, 6vw, 5.4rem);
+  line-height: 1.08;
+}
+.original-title {
+  margin: 0 0 2rem;
+  color: var(--hero-muted);
+  font-size: clamp(1rem, 2vw, 1.35rem);
+}
+.dek {
+  max-width: 850px;
   margin: 0;
-  font-size: clamp(2rem, 5vw, 4.2rem);
-  line-height: 1.05;
-  letter-spacing: 0;
+  font-size: clamp(1.15rem, 2.3vw, 1.65rem);
+  line-height: 1.55;
 }
-.original {
-  margin: 14px 0 28px;
-  color: var(--muted);
-  font-size: 1.05rem;
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .65rem 1.5rem;
+  margin-top: 2rem;
+  color: var(--hero-muted);
+  font-size: .92rem;
 }
-.lede {
-  max-width: 880px;
-  font-size: clamp(1.2rem, 2.2vw, 1.65rem);
-  margin: 0;
+.summary-wrap {
+  width: min(1120px, 90vw);
+  margin: 0 auto;
+  padding: 4rem 0 5rem;
 }
-.num-band {
+.metric-band {
   display: grid;
-  grid-template-columns: repeat(4, minmax(150px, 1fr));
-  gap: 1px;
-  background: var(--line);
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--line);
+  background: var(--card);
+  box-shadow: var(--shadow);
 }
-.num {
-  background: var(--data-bg);
-  padding: 26px 7vw 24px;
+.metric {
+  min-height: 150px;
+  padding: 1.45rem;
+  border-right: 1px solid var(--line);
 }
-.num strong {
+.metric:last-child { border-right: 0; }
+.metric strong {
   display: block;
   color: var(--data);
-  font-size: 2rem;
-  line-height: 1;
+  font-size: clamp(1.6rem, 3vw, 2.7rem);
+  line-height: 1.15;
 }
-.num span {
+.metric span {
   display: block;
-  margin-top: 8px;
+  margin-top: .6rem;
   color: var(--muted);
+  font-size: .92rem;
 }
 .split {
   display: grid;
   grid-template-columns: 1.05fr .95fr;
-  gap: 34px;
-  padding: 52px 7vw;
-  background: var(--panel);
+  gap: 2rem;
+  margin-top: 3.5rem;
 }
-.text-block h2, .flow h2, .table-wrap h2, .takeaways h2 {
-  margin: 0 0 14px;
-  font-size: 1.65rem;
-}
-.text-block p, .flow p, .takeaways p {
-  margin: 0 0 14px;
-}
-.callout {
-  border-left: 6px solid var(--opportunity);
+.split-main {
+  padding: 2.2rem;
   background: var(--opportunity-bg);
-  padding: 20px;
-  align-self: start;
-  box-shadow: 0 12px 28px var(--shadow);
+  border-top: 6px solid var(--opportunity);
 }
-.callout b {
-  color: var(--opportunity);
+.split-side {
+  padding: 2.2rem;
+  background: var(--risk-bg);
+  border-left: 6px solid var(--risk);
 }
-.flow {
-  background: var(--card);
-  padding: 50px 7vw;
+.split h2, .timeline h2, .takeaways h2 { margin-top: 0; line-height: 1.25; }
+.label {
+  display: inline-block;
+  margin-bottom: .6rem;
+  color: var(--muted);
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.timeline {
+  margin-top: 3.5rem;
+  padding: 2.5rem;
+  background: var(--cool-bg);
 }
 .steps {
   display: grid;
-  gap: 18px;
-  margin-top: 24px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.2rem;
+  margin-top: 2rem;
 }
 .step {
-  display: grid;
-  grid-template-columns: 42px 1fr;
-  gap: 16px;
-  align-items: start;
+  position: relative;
+  padding-top: 1.2rem;
+  border-top: 4px solid var(--accent);
 }
-.badge {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: var(--memory-bg);
-  color: var(--memory);
-  display: grid;
-  place-items: center;
-  font-weight: 800;
-  border: 1px solid var(--memory);
+.step:nth-child(2) { border-color: var(--accent2); }
+.step:nth-child(3) { border-color: var(--accent3); }
+.step:nth-child(4) { border-color: var(--accent4); }
+.step b {
+  display: block;
+  margin-bottom: .4rem;
 }
-.step div:last-child {
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 16px;
-}
-.insight {
-  background: var(--conclusion-bg);
-  border-top: 1px solid var(--conclusion);
-  border-bottom: 1px solid var(--conclusion);
-  padding: 34px 7vw;
-  color: var(--ink);
-  font-size: 1.35rem;
-  font-weight: 700;
-}
-.table-wrap {
-  padding: 52px 7vw;
-  background: var(--panel);
-}
-table {
-  width: 100%;
+.compare {
+  margin-top: 3.5rem;
   border-collapse: collapse;
+  width: 100%;
   background: var(--card);
-  overflow: hidden;
-  box-shadow: 0 10px 26px var(--shadow);
 }
-th, td {
+.compare th, .compare td {
+  padding: 1.15rem;
   text-align: left;
   vertical-align: top;
-  padding: 18px;
-  border-bottom: 1px solid var(--line);
-}
-th {
-  color: var(--deep-ink);
-  background: var(--deep);
-}
-td:first-child {
-  color: var(--risk);
-  font-weight: 700;
-}
-.risk-strip {
-  background: var(--risk-bg);
-  border-left: 8px solid var(--risk);
-  padding: 32px 7vw;
-}
-.risk-strip h2 {
-  margin: 0 0 10px;
-  color: var(--risk);
-}
-.mosaic {
-  display: grid;
-  grid-template-columns: 1.2fr .8fr 1fr;
-  gap: 16px;
-  padding: 52px 7vw;
-  background: var(--deep);
-}
-.tile {
-  padding: 22px;
-  min-height: 150px;
-  color: var(--deep-ink);
   border: 1px solid var(--line);
 }
-.tile.data { background: var(--data-bg); color: var(--ink); }
-.tile.risk { background: var(--risk-bg); color: var(--ink); }
-.tile.opp { background: var(--opportunity-bg); color: var(--ink); }
-.tile.done { background: var(--conclusion-bg); color: var(--ink); }
-.tile h3 {
-  margin: 0 0 10px;
-  font-size: 1.1rem;
+.compare th { background: var(--data-bg); }
+.insight {
+  margin: 3.5rem 0;
+  padding: 2.4rem;
+  background: var(--quote-bg);
+  color: var(--quote-ink);
+  font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+  line-height: 1.55;
+  border-left: 8px solid var(--accent3);
 }
-.tile p { margin: 0; }
-@media (max-width: 820px) {
-  .num-band, .split, .mosaic {
-    grid-template-columns: 1fr;
-  }
-  .num { padding-left: 7vw; padding-right: 7vw; }
-  th, td { display: block; width: 100%; }
-  tr { border-bottom: 1px solid var(--line); }
+.takeaways {
+  padding: 2.7rem;
+  background: var(--conclusion-bg);
+}
+.takeaway-grid {
+  display: grid;
+  grid-template-columns: 1.2fr .8fr 1fr;
+  gap: 1rem;
+}
+.takeaway {
+  padding: 1.25rem;
+  background: var(--card);
+  border-bottom: 5px solid var(--conclusion);
+}
+.takeaway:nth-child(2) { border-color: var(--risk); }
+.takeaway:nth-child(3) { border-color: var(--opportunity); }
+.takeaway:nth-child(4) {
+  grid-column: 1 / 3;
+  border-color: var(--data);
+}
+.takeaway:nth-child(5) { border-color: var(--accent3); }
+mark, .highlight {
+  padding: .05em .25em;
+  background: var(--hl);
+  color: var(--ink);
+  font-weight: 750;
+}
+.hl2 { background: var(--hl2); }
+.hl3 { background: var(--hl3); }
+#translation {
+  background: var(--translation-bg);
+  border-top: 1px solid var(--line);
+  padding: 5rem max(5vw, calc((100vw - 820px) / 2));
+}
+#translation > h2 {
+  margin: 0 0 2rem;
+  color: var(--accent);
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 1.15;
+}
+#translation h3 {
+  margin: 3.2rem 0 1rem;
+  color: var(--conclusion);
+  font-size: 1.55rem;
+  line-height: 1.3;
+}
+#translation p, #translation li {
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-size: 1.06rem;
+}
+#translation p { margin: 1.2rem 0; }
+#translation code {
+  padding: .12rem .35rem;
+  background: var(--code-bg);
+  color: var(--ink);
+  border-radius: .25rem;
+}
+.source-figure {
+  margin: 2.8rem 0;
+  padding: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.source-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+.source-figure figcaption {
+  margin-top: .8rem;
+  color: var(--muted);
+  font-size: .9rem;
+  line-height: 1.55;
+}
+@media (max-width: 760px) {
+  .metric-band, .split, .steps, .takeaway-grid { grid-template-columns: 1fr; }
+  .metric { border-right: 0; border-bottom: 1px solid var(--line); }
+  .metric:last-child { border-bottom: 0; }
+  .takeaway:nth-child(4) { grid-column: auto; }
+  .compare { display: block; overflow-x: auto; }
+  .timeline, .takeaways, .split-main, .split-side { padding: 1.5rem; }
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -385,107 +504,171 @@ td:first-child {
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/long-running-Claude" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
 <main>
-  <section class="hero">
-    <p class="eyebrow">一句话总括</p>
-    <h1>用于科学计算的长时运行 Claude</h1>
-    <p class="original">Long-running Claude for scientific computing</p>
-    <p class="lede">文章真正的贡献，是把多日自主代理从“能写代码”推进到“能被科研工作流约束地推进复杂数值项目”。关键不只是模型能力，而是目标、测试、记忆和调度方式。</p>
-  </section>
-
-  <section class="num-band" aria-label="关键数字">
-    <div class="num"><strong>0.1%</strong><span>主要科学输出对 CLASS 的目标精度。</span></div>
-    <div class="num"><strong>数天</strong><span>Claude 从零推进到多个输出的亚百分比一致性。</span></div>
-    <div class="num"><strong>约 2,000</strong><span>C 编译器项目中的 Claude 会话数量。</span></div>
-    <div class="num"><strong>20 轮</strong><span>Ralph loop 示例中的最大反复验收次数。</span></div>
-  </section>
-
-  <section class="split">
-    <div class="text-block">
-      <h2>科研代理需要可判定的成功标准</h2>
-      <p>作者选择了一个可微分宇宙学 Boltzmann 求解器作为案例。它要预测 CMB 等早期宇宙观测量，并与 CLASS 这样的参考实现对齐。</p>
-      <p>0.1% 不是随意数字。CLASS 与 CAMB 这两个经典代码之间的典型一致性也在这个量级。</p>
-      <p>这改变了读者对 AI 科研影响的理解：代理最适合先进入边界清晰、指标可测、参考实现存在的科学工程问题。</p>
-    </div>
-    <aside class="callout">
-      <b>核心洞见</b>
-      <p>长时运行不是让模型自由发挥。它是把模型放进一个有实验记录、有回归测试、有版本历史的科研机器里。</p>
-    </aside>
-  </section>
-
-  <section class="flow">
-    <h2>工作流的关键不是提示词，而是闭环</h2>
-    <p>文章给出的流程更像实验室制度，而不是单次聊天技巧。每一步都减少代理跑偏后的恢复成本。</p>
-    <div class="steps">
-      <div class="step"><div class="badge">1</div><div><strong>CLAUDE.md 写清目标。</strong><br>它保存交付物、约束和设计选择。Claude 会持续参考，也可以更新它。</div></div>
-      <div class="step"><div class="badge">2</div><div><strong>CHANGELOG.md 充当长期记忆。</strong><br>它记录成功、失败、精度表和限制。失败路径尤其重要，可以避免新会话重复走死路。</div></div>
-      <div class="step"><div class="badge">3</div><div><strong>测试 oracle 判断进展。</strong><br>在科学代码里，oracle 可以是参考实现、量化目标或现有测试套件。</div></div>
-      <div class="step"><div class="badge">4</div><div><strong>Git 协调和恢复。</strong><br>每个有意义单元提交并推送，既能观察进度，也能避免计算资源中断造成损失。</div></div>
-    </div>
-  </section>
-
-  <section class="insight">
-    代理压缩的不是科学判断本身，而是大量可验证的工程迭代。人类价值从逐行控制，转向定义问题、设计验收和识别异常。
-  </section>
-
-  <section class="table-wrap">
-    <h2>案例显示了机会，也暴露了边界</h2>
-    <table>
-      <thead>
-        <tr><th>观察</th><th>关键数据和趋势</th><th>结论</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>速度显著提高</td>
-          <td>类似 JAX 可微分 Boltzmann 求解器通常代表数月到数年研究时间。Claude 在数天内达到多个输出的亚百分比一致性。</td>
-          <td>AI 代理能显著压缩科研软件原型期。</td>
-        </tr>
-        <tr>
-          <td>质量仍需审查</td>
-          <td>结果不是生产级。它并未在所有 regime 中达到可接受精度。</td>
-          <td>快并不等于可靠。科研代码仍需要专家验算和更宽测试覆盖。</td>
-        </tr>
-        <tr>
-          <td>长链错误更难调试</td>
-          <td>Boltzmann 求解器是深度耦合管线。早期重组模型的小误差会影响下游所有结果。</td>
-          <td>这类任务更适合单个顺序代理配合子代理，而不是完全并行拆分。</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="risk-strip">
-    <h2>风险：代理会显得忙碌，但测试面可能很窄</h2>
-    <p>作者指出，Claude 一度只在单个 fiducial 参数点测试代码。这会大幅降低发现 bug 的机会。</p>
-    <p>它还会犯基础错误，例如混淆 gauge convention，或在领域专家能快速定位的问题上花费数小时。结论是：长期代理需要持续扩大测试覆盖，而不是只追求当前指标变好。</p>
-  </section>
-
-  <section class="mosaic">
-    <div class="tile data">
-      <h3>最值得带走的洞见 1</h3>
-      <p>可量化 oracle 是当前自主科研代理的核心前提。没有它，模型很难知道自己是否真的进步。</p>
-    </div>
-    <div class="tile opp">
-      <h3>最值得带走的洞见 2</h3>
-      <p>CHANGELOG 不是文档负担。它是跨会话延续实验记忆的最小基础设施。</p>
-    </div>
-    <div class="tile risk">
-      <h3>最值得带走的洞见 3</h3>
-      <p>亚百分比结果证明了潜力，但生产级科学软件仍需要专家审查和更全面验证。</p>
-    </div>
-    <div class="tile done">
-      <h3>最值得带走的洞见 4</h3>
-      <p>Ralph loop 这类反复验收机制，能对抗代理过早宣布完成的倾向。</p>
-    </div>
-    <div class="tile data">
-      <h3>最值得带走的洞见 5</h3>
-      <p>当项目有清晰成功标准和可用计算资源时，不运行代理本身也开始形成机会成本。</p>
-    </div>
-  </section>
+<header class="hero">
+<div class="eyebrow">Science · Anthropic</div>
+<h1>面向科学计算的长时间运行 Claude</h1>
+<p class="original-title" lang="en">Long-running Claude for scientific computing</p>
+<p class="dek"><strong>一句话总括：</strong>这项实验说明，配备明确验收标准、持久记忆和可靠测试后，AI 代理可以连续工作数天，把复杂科学软件从零推进到接近参考实现的精度。</p>
+<div class="meta"><span>作者：Siddharth Mishra-Sharma</span><span>发布日期：2026 年 3 月 23 日</span><span>主题：长周期代理式科学计算</span></div>
+</header>
+<section aria-label="中文总结" class="summary-wrap">
+<div class="metric-band">
+<div class="metric"><strong>数天</strong><span>Claude 从零开发求解器所用的时间量级。类似工作通常需要数月甚至数年。</span></div>
+<div class="metric"><strong>亚百分比</strong><span>多个输出相对 CLASS 达到的一致性水平，但并非所有计算区间都已达标。</span></div>
+<div class="metric"><strong>0.1%</strong><span>主要科学结果的目标误差。它接近 CLASS 与 CAMB 的典型一致水平。</span></div>
+<div class="metric"><strong>20 次</strong><span>示例 Ralph loop 的最大迭代次数，用来减少代理过早宣布完成的问题。</span></div>
+</div>
+<div class="split">
+<article class="split-main">
+<span class="label">真正的贡献</span>
+<h2>关键不是让代理“写代码”，而是让它知道怎样持续纠错</h2>
+<p>项目把 <mark class="hl2">CLAUDE.md、CHANGELOG.md、测试预言机和 Git</mark> 组合成一套闭环。代理能记住失败路线，也能衡量每次修改是否更接近 CLASS。</p>
+<p>这改变了人们对 AI 科研能力的判断标准。决定效果的不只是模型知识量，还有任务能否提供稳定、可验证的反馈。</p>
+</article>
+<aside class="split-side">
+<span class="label">必须保留的边界</span>
+<h2>亚百分比精度不等于可用于生产</h2>
+<p>求解器仍未在所有计算区间达到 CLASS 所要求的精度。测试一度只覆盖一个基准参数点，也曾因规范选择等基础问题浪费数小时。</p>
+<p><strong>结论：</strong>长时间运行可以放大持续进步，也会放大测试盲区。科学判断和覆盖充分的验证仍不可替代。</p>
+</aside>
+</div>
+<section class="timeline">
+<span class="label">工作闭环</span>
+<h2>四个环节让跨会话研究保持方向</h2>
+<div class="steps">
+<div class="step"><b>1. 写清目标</b><span>在 CLAUDE.md 中规定交付物、上下文、精度标准和工作规则。</span></div>
+<div class="step"><b>2. 保留记忆</b><span>用 CHANGELOG.md 记录进度、限制、精度表和已经失败的方法。</span></div>
+<div class="step"><b>3. 持续验证</b><span>以 CLASS 源码和单元测试作为测试预言机，及时发现回归。</span></div>
+<div class="step"><b>4. 可恢复执行</b><span>频繁提交并推送。借助 tmux、SLURM 和循环编排继续未完成的工作。</span></div>
+</div>
+</section>
+<table class="compare">
+<thead>
+<tr><th>任务结构</th><th>适合的代理模式</th><th>原因与启示</th></tr>
+</thead>
+<tbody>
+<tr><td>C 编译器项目</td><td>大量代理并行拆分</td><td>工作较容易分割。Anthropic 的示例跨越约 <span class="highlight hl3">2,000 个会话</span>。</td></tr>
+<tr><td>Boltzmann 求解器</td><td>单个代理顺序推进，按需派生子代理</td><td>流水线高度耦合。早期宇宙复合过程中的微小误差会影响所有下游结果。</td></tr>
+<tr><td>开放式科学发现</td><td>目前仍需更强的人类监督</td><td>如果缺少量化目标、参考实现或测试套件，代理很难可靠判断自己是否取得进展。</td></tr>
+</tbody>
+</table>
+<blockquote class="insight">真正发生变化的是科研时间的机会成本：当目标明确且算力可用时，夜间没有运行代理，也可能意味着放弃了一段本可获得的进展。</blockquote>
+<section class="takeaways">
+<span class="label">最值得带走的洞见</span>
+<h2>从这次实验中应当记住什么</h2>
+<div class="takeaway-grid">
+<div class="takeaway"><strong>可验证性决定自治上限。</strong><br/>参考实现、量化目标和回归测试让代理能够自行判断方向。</div>
+<div class="takeaway"><strong>测试缺口会悄悄积累风险。</strong><br/>单一参数点上的成功，不能证明科学代码在整个参数空间都可靠。</div>
+<div class="takeaway"><strong>记忆必须包含失败。</strong><br/>如果不记录死路，后续会话很可能重复同样的尝试。</div>
+<div class="takeaway"><strong>复杂耦合任务不一定适合大规模并行。</strong><br/>需要追踪因果链时，顺序工作的主代理往往更合适。</div>
+<div class="takeaway"><strong>速度不能替代质量门槛。</strong><br/>数天达到亚百分比一致性很有意义，但离生产级科学基础设施仍有距离。</div>
+</div>
+</section>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<figure class="source-figure" data-source-image="0"><img alt="Long-running Claude for scientific computing" decoding="async" height="1000" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/ac2fa660649f361111949b32136a308ef35b6864-1000x1000.svg" width="1000"/></figure>
+<p>在本文中，Discovery 团队研究员 Siddharth Mishra-Sharma 解释了如何把持续数天的代理式编程工作流用于科学计算任务。即使任务不属于自己的专业领域，也可以采用测试预言机、持久记忆和编排模式来推进工作。</p>
+<h3>基本设想</h3>
+<p>目前，大多数使用 AI 代理的科学家仍在采用对话式循环。他们紧盯过程，并亲自管理每一个步骤。</p>
+<p>过去一年左右，模型处理长周期任务的能力显著增强，一种新的工作方式也随之出现。我们不必再介入每个细节，而是可以指定高层目标，让一组代理自主工作。</p>
+<p>这种方式让我们有可能在几小时内完成原本需要几天、几周甚至几个月的项目。某些科学任务尤其适合这种模式。例如，重新实现数值求解器，把旧版 Fortran 方言编写的遗留科学软件迁移到现代语言，或者对照参考实现调试大型代码库。</p>
+<p>这些任务的范围明确，成功标准清晰。人类只需偶尔监督，不必持续盯守。</p>
+<p>Anthropic 的 C 编译器项目展示过这种工作方式。Claude 跨越约 2,000 个会话，构建出一个能够编译 Linux 内核的 C 编译器。</p>
+<p>本文介绍如何使用 Claude Code，为科学计算任务搭建类似的工作模式。这里主要考虑的是普通学术实验室的使用环境。</p>
+<p>作为具体示例，我会介绍如何使用 Claude Opus 4.6，实现一个可微分的宇宙学 Boltzmann 求解器。这类数值代码用于预测大爆炸余辉，也就是宇宙微波背景（Cosmic Microwave Background，CMB）的统计性质。它通过演化早期宇宙中光子、重子、中微子和暗物质的耦合方程来完成计算。</p>
+<p>CLASS 和 CAMB 等 Boltzmann 求解器是宇宙学领域的核心科学基础设施。研究人员依靠它们，使用 Planck、Simons Observatory 等巡天项目的数据约束宇宙学模型。</p>
+<p>可微分版本能够让梯度穿过整个求解器传播，从而使用基于梯度的推断方法。这可以大幅加快参数估计。</p>
+<p>使用 JAX 编写求解器非常自然。它几乎无需额外工作，就能提供自动微分能力，并兼容 GPU 等加速器。</p>
+<p>值得注意的是，这项任务并不属于我的核心研究领域。我对相关工具和科学背景有宏观了解，但并不具备在合理时间内独立完成它所需的专业知识。</p>
+<p>真正拥有相关专长的团队已经使用 JAX 构建了可微分求解器，其中包含 CLASS 的一部分功能。这些项目通常凝聚了研究人员数月乃至数年的工作。</p>
+<p>这次实验想要验证的是：在非领域专家只提供少量指导的情况下，代理能否走得更远。</p>
+<p>这种任务的结构与 C 编译器项目不同。后者可以分派给大量并行工作的代理。</p>
+<p>Boltzmann 求解器则是一条高度耦合的流水线。在描述早期宇宙如何发生复合时，一个很小的数值误差或不理想的近似，都可能悄悄改变所有下游结果。</p>
+<p>因此，它需要另一套代理能力。调试人员必须沿整条计算链追踪因果关系，并运用领域知识。</p>
+<p>这类任务可能更适合由一个代理顺序推进。它可以按需派生子代理，并使用参考实现对差异进行二分定位。</p>
+<p>我们会使用运行 SLURM 作业调度器的高性能计算（HPC）集群。不过，无论在哪里运行 Claude Code，核心思路都相同：准备进度文件、测试预言机，以及规则清晰的代理提示。</p>
+<h3>起草计划，并在本地迭代</h3>
+<p>当工作方式转向管理一支自主的代理研究团队时，你的大部分时间应当用于编写指令。这个过程可以与 Claude 协作完成。</p>
+<p>这些指令需要明确说明项目的交付物和相关上下文，并保存在根目录下的 <code>CLAUDE.md</code> 文件中。</p>
+<p>Claude 会特殊处理这个文件。它会让文件内容始终处于上下文中，并在制定整体计划时加以参考。</p>
+<p>更重要的是，Claude 可以在工作过程中编辑这些指令。它能够根据遇到的问题更新文件，为后续工作留下新的指导。</p>
+<p>在这个宇宙学 Boltzmann 求解器项目中，我准备了一份早期版本的 <code>CLAUDE.md</code>。它展示了首次尝试编写求解器后确定的整体计划和设计决策。</p>
+<p>为了得到这份文件，我先指定了项目的高层目标：完整覆盖参考实现 CLASS 的功能，同时保持完全可微分；主要科学交付结果与 CLASS 相比，误差目标为 0.1%。随后，我与 Claude 反复修改计划，直到它看起来足够合理。</p>
+<p>CLASS 和 CAMB 这两套经典 Boltzmann 代码通常能达到 0.1% 左右的一致水平。因此，这似乎是一个合适的科学目标。</p>
+<h3>跨会话记忆</h3>
+<p>进度文件是代理可携带的长期记忆，作用类似实验室笔记。按照本文使用的约定，我们把它命名为 <code>CHANGELOG.md</code>。在 <code>CLAUDE.md</code> 中，Claude 会被要求持续把进度记录到这个文件里。</p>
+<p>一份良好的进度文件可以记录当前状态、已经完成的任务、失败的方法及其失败原因、关键检查点的精度表，以及已知限制。</p>
+<p>记录失败的方法尤其重要。缺少这些记录时，后续会话会再次尝试同样的死路。</p>
+<p>一条记录可能写成：“尝试用 Tsit5 求解扰动常微分方程，但系统过于刚性。已改用 Kvaerno5。”本示例的变更日志展示了这些要素。</p>
+<h3>测试预言机</h3>
+<p>使用代理开展更加开放的科学发现，当然已经不再遥远。不过，在现阶段，长时间运行的自主科学工作仍然极度依赖一种机制：代理必须知道自己是否正在取得进展。</p>
+<p>对于科学代码，这种机制可以是参考实现、能够明确量化的目标，或者已有的测试套件。</p>
+<p>要求代理在工作过程中扩充测试套件并持续运行测试，也很有帮助。这样可以防止代码发生回归。</p>
+<p>在我的示例任务中，Claude 被要求以 CLASS 的 C 源码作为参考实现，构建并持续运行单元测试。</p>
+<h3>用 Git 协调工作</h3>
+<p>Git 很适合在减少人工干预的同时监控和协调代理的进展。代理应当在完成每个有意义的工作单元后提交并推送。</p>
+<p>这样做可以在出现问题时提供可恢复的历史记录，也能让进展在本地清晰可见。如果计算资源在会话中途耗尽，工作也不至于丢失。</p>
+<p>实际使用时，可以在 <code>CLAUDE.md</code> 中加入这样的指令：“完成每个有意义的工作单元后提交并推送。每次提交前运行 <code>pytest tests/ -x -q</code>。绝不要提交会破坏现有已通过测试的代码。”</p>
+<p>如果需要引导代理，你随时可以通过 SSH 登录集群，手动再次提示代理，或者更新它的指令。</p>
+<p>不过，更方便的方式通常是让本地 Claude Code 实例通过 SSH 登录并替你执行命令。下文介绍的其他操作也可以采用这种方式。</p>
+<h3>执行循环</h3>
+<p>如前所述，通常最好先在本地反复修改计划。确认计划合理，并已经写入 <code>CLAUDE.md</code> 后，再进入下一阶段。</p>
+<p>随后，在计算节点的 tmux 等终端多路复用器中启动 Claude Code 会话。告诉代理代码库的位置，然后让它自行工作。</p>
+<p>由于会话运行在 tmux 内，你可以分离会话并合上笔记本电脑，只需偶尔检查进度。</p>
+<p>在 Boltzmann 求解器项目中，我甚至会在排队买咖啡时，用手机查看 GitHub 上的进展。</p>
+<p>在 HPC 集群上，可以通过 SLURM 调度器申请一个节点。用于在 tmux 会话中启动 Claude Code 的示例作业脚本，可以采用相应的形式。</p>
+<p>作业启动后，连接到 tmux 会话并向 Claude Code 发出指示。例如：“阅读 <code>CHANGELOG.md</code>，然后继续处理下一个任务。”确认它方向正确后，就可以分离会话。</p>
+<p>你可以随时重新连接，以便检查进度、调整方向或启动新任务。</p>
+<p><strong>Ralph loop：</strong>随着模型能力提升，它们对提示工程、检索增强生成（RAG）或上下文填充等定制编排方式的依赖会逐渐减少。</p>
+<p>不过，在特定的能力阶段，适量的脚手架仍能提升模型表现。例如，当前模型可能出现“代理式懒惰”（agentic laziness）。面对复杂的多部分任务时，它们有时会找借口在全部工作完成之前停下，比如说：“时间不早了，我们明天再继续？”</p>
+<p>一种规避方式是使用 Ralph loop。这种编排模式本质上是一个 <code>for</code> 循环。当代理声称已经完成时，它会把代理重新带回上下文，并询问它是否真的做完了。</p>
+<p>这种模式对长时间运行的任务很有帮助。代理可能会承认工作尚未达到要求，然后继续推进，直到真正完成。</p>
+<p>其他类似模式包括 GSD、面向特定领域的 GSD 变体，以及 Claude Code 原生的 <code>/loop</code> 命令。</p>
+<p>Ralph 可以通过 <code>/plugin</code> 安装。在 Claude Code 中，可以使用相应的典型调用提示。</p>
+<p>在这个示例里，Claude 最多会迭代 20 次，直到它用“DONE”这一固定口令确认任务已经完成。</p>
+<h3>结果</h3>
+<p>Claude 从零开始，在几天内持续开发了这个项目。它的多个输出与参考实现 CLASS 达到了亚百分比级的一致性。</p>
+<p>我让 Claude 重建代码主要输出在整个项目开发过程中的精度变化。这些输出包括不同类型的 CMB 角功率谱。Claude 还标注了开发期间的重要里程碑。</p>
+<p>它生成了下图，展示项目逐步达到亚百分比精度的过程。</p>
+<figure class="source-figure" data-source-image="1"><img alt="" decoding="async" height="880" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/d6b037407956ad8d5317c97730fd9f273a6a6afa-1680x880.png" width="1680"/><figcaption>随着代理持续开发代码，项目逐步达到亚百分比精度。</figcaption></figure>
+<p>代理的开发轨迹有些磕绊。例如，它的测试覆盖存在明显缺口。有一段时间，它只在一个基准参数点上测试代码，导致测试发现错误的覆盖面大幅缩小。</p>
+<p>它也会犯一些基础错误。例如，它可能在规范约定上出错，或者花费数小时追查宇宙学家一眼就能发现的问题。</p>
+<p>尽管如此，它仍然持续朝既定目标前进，并最终实现了亚百分比精度。</p>
+<p>这个项目还带来了一个副作用：通过观察 Git 提交历史，我对 Boltzmann 求解器及其描述的物理过程有了出乎意料的深入了解。</p>
+<p>这个项目不属于我的核心研究领域。不过，跟随 Claude 的渐进式进展，再去查阅那些我不认识的内容，最终成了一种有效吸收科学知识的方式。</p>
+<p>提交日志读起来就像一位速度极快、严格按字面执行任务的博士后留下的实验笔记。</p>
+<p>最终得到的求解器还没有达到生产级水平。例如，它并未在所有计算区间内都以可接受的精度匹配参考实现 CLASS。</p>
+<p>不过，这次实验说明，由代理驱动的开发可以把研究人员数月甚至数年的工作压缩到几天。</p>
+<p>这种压缩改变了“空闲时间”的含义。AI 研究中有一种普遍体验：晚上启动一个实验，例如一次训练任务，然后在早晨看到结果时获得满足感。</p>
+<p>不运行实验会带来机会成本。如今，不运行代理似乎也开始具有类似的成本。</p>
+<p>如果你拥有可用的算力，也有成功标准明确的项目，那么每一个没有让代理替你工作的夜晚，都可能意味着一段未能获得的进展。</p>
+<h3>致谢</h3>
+<p>感谢 Eric Kauderer-Abrams 进行同行评审，也感谢 Xander Balwit、Ethan Dyer 和 Rebecca Hiscott 提供宝贵反馈。</p>
+</section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

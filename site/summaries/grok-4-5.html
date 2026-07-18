@@ -1,377 +1,518 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>介绍 Grok 4.5</title>
 <style>
 :root {
-  --bg: #f6f3ee;
-  --ink: #172026;
-  --muted: #64707a;
-  --line: #d8d1c8;
-  --surface: #fffaf2;
-  --surface-2: #eef7f4;
-  --surface-3: #f4eefb;
-  --surface-4: #fff1e8;
-  --dark-band: #172026;
-  --dark-band-ink: #f7efe4;
-  --accent-data: #1677ff;
-  --accent-risk: #d94f2b;
-  --accent-opportunity: #178a5f;
-  --accent-conclusion: #7b4cc2;
-  --accent-cost: #c78312;
-  --badge-bg: #e7f0ff;
-  --risk-bg: #ffe9df;
-  --opportunity-bg: #e5f6ee;
-  --conclusion-bg: #efe7ff;
-  --cost-bg: #fff0cf;
-  --shadow: 0 18px 50px rgba(23, 32, 38, 0.12);
+  color-scheme: light dark;
+  --bg: #f6f3ec;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #172033;
+  --muted: #667085;
+  --line: #d8dce5;
+  --accent: #2563eb;
+  --accent-soft: #e7efff;
+  --accent2: #07875d;
+  --accent2-soft: #ddf7ec;
+  --accent3: #d97706;
+  --accent3-soft: #fff0cf;
+  --risk: #c43d51;
+  --risk-soft: #fde7ea;
+  --conclusion: #7047c7;
+  --conclusion-soft: #eee7ff;
+  --dark-panel: #17233d;
+  --dark-panel-ink: #f4f7ff;
+  --dark-panel-muted: #bac6dc;
+  --hl: #ffe08a;
+  --hl2: #bcebd8;
+  --shadow: rgba(23, 32, 51, 0.12);
+  --figure-bg: #e9edf4;
+  --quote-bg: #e8f0ff;
+  --translation-bg: #fffdf8;
 }
-
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #111417;
-    --ink: #f2eee7;
-    --muted: #a7b0b8;
-    --line: #323a42;
-    --surface: #1b2025;
-    --surface-2: #13231f;
-    --surface-3: #211a2c;
-    --surface-4: #2a1d18;
-    --dark-band: #080a0c;
-    --dark-band-ink: #f3eadf;
-    --accent-data: #65a7ff;
-    --accent-risk: #ff876a;
-    --accent-opportunity: #4bd08f;
-    --accent-conclusion: #b99aff;
-    --accent-cost: #f3bd4e;
-    --badge-bg: #142844;
-    --risk-bg: #3a1d16;
-    --opportunity-bg: #123327;
-    --conclusion-bg: #2a2040;
-    --cost-bg: #352912;
-    --shadow: 0 18px 50px rgba(0, 0, 0, 0.38);
+    --bg: #0e131d;
+    --surface: #151c28;
+    --card: #1a2331;
+    --ink: #e8edf5;
+    --muted: #a9b3c3;
+    --line: #354154;
+    --accent: #72a2ff;
+    --accent-soft: #182b4e;
+    --accent2: #55d3a3;
+    --accent2-soft: #123a30;
+    --accent3: #f5b85c;
+    --accent3-soft: #432f15;
+    --risk: #ff8291;
+    --risk-soft: #461f28;
+    --conclusion: #b99aff;
+    --conclusion-soft: #30244e;
+    --dark-panel: #080d15;
+    --dark-panel-ink: #eaf0fb;
+    --dark-panel-muted: #9facbf;
+    --hl: #674d0f;
+    --hl2: #164b3b;
+    --shadow: rgba(0, 0, 0, 0.35);
+    --figure-bg: #111824;
+    --quote-bg: #172b4a;
+    --translation-bg: #121924;
   }
 }
-
 :root[data-theme="dark"] {
-  --bg: #111417;
-  --ink: #f2eee7;
-  --muted: #a7b0b8;
-  --line: #323a42;
-  --surface: #1b2025;
-  --surface-2: #13231f;
-  --surface-3: #211a2c;
-  --surface-4: #2a1d18;
-  --dark-band: #080a0c;
-  --dark-band-ink: #f3eadf;
-  --accent-data: #65a7ff;
-  --accent-risk: #ff876a;
-  --accent-opportunity: #4bd08f;
-  --accent-conclusion: #b99aff;
-  --accent-cost: #f3bd4e;
-  --badge-bg: #142844;
-  --risk-bg: #3a1d16;
-  --opportunity-bg: #123327;
-  --conclusion-bg: #2a2040;
-  --cost-bg: #352912;
-  --shadow: 0 18px 50px rgba(0, 0, 0, 0.38);
+  --bg: #0e131d;
+  --surface: #151c28;
+  --card: #1a2331;
+  --ink: #e8edf5;
+  --muted: #a9b3c3;
+  --line: #354154;
+  --accent: #72a2ff;
+  --accent-soft: #182b4e;
+  --accent2: #55d3a3;
+  --accent2-soft: #123a30;
+  --accent3: #f5b85c;
+  --accent3-soft: #432f15;
+  --risk: #ff8291;
+  --risk-soft: #461f28;
+  --conclusion: #b99aff;
+  --conclusion-soft: #30244e;
+  --dark-panel: #080d15;
+  --dark-panel-ink: #eaf0fb;
+  --dark-panel-muted: #9facbf;
+  --hl: #674d0f;
+  --hl2: #164b3b;
+  --shadow: rgba(0, 0, 0, 0.35);
+  --figure-bg: #111824;
+  --quote-bg: #172b4a;
+  --translation-bg: #121924;
 }
-
 * {
   box-sizing: border-box;
 }
-
+html {
+  scroll-behavior: smooth;
+}
 body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-  line-height: 1.7;
+  font-family: Inter, "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.75;
 }
-
 main {
   overflow: hidden;
 }
-
+#summary {
+  padding-bottom: 4rem;
+}
 .hero {
-  min-height: 72vh;
-  display: grid;
-  align-items: end;
-  padding: 8vw;
-  background: var(--dark-band);
-  color: var(--dark-band-ink);
+  padding: clamp(3.5rem, 9vw, 8rem) max(6vw, calc((100vw - 1180px) / 2));
+  background: linear-gradient(135deg, var(--dark-panel), var(--conclusion-soft));
+  color: var(--dark-panel-ink);
 }
-
-.kicker {
-  color: var(--accent-opportunity);
-  font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: 0;
+.eyebrow {
+  margin: 0 0 1rem;
+  color: var(--accent3);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
-
-h1 {
-  margin: 0.4rem 0 0.2rem;
-  font-size: clamp(2.5rem, 8vw, 6.5rem);
-  line-height: 1;
-  letter-spacing: 0;
+.hero h1 {
+  max-width: 900px;
+  margin: 0;
+  font-size: clamp(3rem, 8vw, 6.8rem);
+  line-height: 1.02;
+  letter-spacing: -0.055em;
 }
-
 .original-title {
-  color: var(--muted);
-  font-size: clamp(1rem, 2vw, 1.35rem);
+  margin: 1.25rem 0 0;
+  color: var(--dark-panel-muted);
+  font-size: clamp(1rem, 2.4vw, 1.35rem);
 }
-
-.lede {
-  max-width: 820px;
-  margin-top: 2rem;
-  font-size: clamp(1.25rem, 2.6vw, 2rem);
-  line-height: 1.35;
+.thesis {
+  max-width: 900px;
+  margin: 3rem 0 0;
+  padding-left: 1.25rem;
+  border-left: 5px solid var(--accent2);
+  font-size: clamp(1.25rem, 3vw, 1.85rem);
+  line-height: 1.55;
 }
-
-.metrics {
+.thesis strong {
+  color: var(--accent2);
+}
+.metric-strip {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  border-bottom: 1px solid var(--line);
-  background: var(--surface);
+  max-width: 1180px;
+  margin: -2rem auto 0;
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: 0 18px 50px var(--shadow);
 }
-
 .metric {
-  padding: 2rem;
+  min-height: 160px;
+  padding: 1.5rem;
   border-right: 1px solid var(--line);
 }
-
 .metric:last-child {
   border-right: 0;
 }
-
 .metric b {
   display: block;
-  color: var(--accent-data);
-  font-size: clamp(1.6rem, 4vw, 3rem);
+  margin-bottom: 0.4rem;
+  color: var(--accent);
+  font-size: clamp(1.8rem, 4vw, 3rem);
   line-height: 1.1;
 }
-
+.metric:nth-child(2) b {
+  color: var(--accent2);
+}
+.metric:nth-child(3) b {
+  color: var(--accent3);
+}
+.metric:nth-child(4) b {
+  color: var(--risk);
+}
 .metric span {
   color: var(--muted);
-  font-size: 0.95rem;
 }
-
-.split {
+.summary-wrap {
+  width: min(1120px, calc(100% - 2rem));
+  margin: 4rem auto 0;
+}
+.split-story {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 2rem;
+  align-items: stretch;
 }
-
-.panel {
-  padding: 5vw;
+.split-lead {
+  padding: 2.25rem;
+  background: var(--accent-soft);
+  border-top: 8px solid var(--accent);
 }
-
-.panel.foundation {
-  background: var(--surface-2);
-}
-
-.panel.scope {
-  background: var(--surface-3);
-}
-
-h2 {
-  margin: 0 0 1rem;
-  font-size: clamp(1.6rem, 3vw, 2.6rem);
+.split-lead h2,
+.rl-story h2,
+.risk-panel h2,
+.takeaways h2 {
+  margin-top: 0;
+  font-size: clamp(1.8rem, 4vw, 3rem);
   line-height: 1.15;
-  letter-spacing: 0;
 }
-
-.panel p,
-.timeline p,
-.note p,
-.takeaway p {
-  margin: 0.7rem 0 0;
+.split-detail {
+  padding: 2.25rem 0 2.25rem 2.25rem;
+  border-left: 1px solid var(--line);
 }
-
+.split-detail h3 {
+  color: var(--accent2);
+}
+mark {
+  padding: 0.05em 0.2em;
+  background: var(--hl);
+  color: var(--ink);
+  font-weight: 800;
+}
+mark.alt {
+  background: var(--hl2);
+}
+.rl-story {
+  margin-top: 4rem;
+  padding: clamp(2rem, 5vw, 4rem);
+  background: var(--dark-panel);
+  color: var(--dark-panel-ink);
+}
+.rl-story h2 {
+  color: var(--accent3);
+}
 .process {
-  padding: 5vw 8vw;
-  background: var(--bg);
-}
-
-.timeline {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
   margin-top: 2rem;
-  background: var(--line);
+  counter-reset: step;
 }
-
-.step {
-  background: var(--surface);
+.process article {
+  position: relative;
   padding: 1.5rem;
-  min-height: 210px;
-  border-top: 5px solid var(--accent-opportunity);
+  border-top: 2px solid var(--accent2);
 }
-
-.step:nth-child(2) {
-  border-top-color: var(--accent-data);
-}
-
-.step:nth-child(3) {
-  border-top-color: var(--accent-risk);
-}
-
-.step:nth-child(4) {
-  border-top-color: var(--accent-conclusion);
-}
-
-.step strong {
-  display: inline-grid;
+.process article::before {
+  counter-increment: step;
+  content: counter(step);
+  display: grid;
   place-items: center;
-  width: 2rem;
-  height: 2rem;
-  margin-bottom: 1rem;
-  color: var(--dark-band-ink);
-  background: var(--dark-band);
-  border-radius: 999px;
+  width: 2.1rem;
+  height: 2.1rem;
+  margin-top: -2.65rem;
+  background: var(--accent2);
+  color: var(--dark-panel);
+  border-radius: 50%;
+  font-weight: 900;
 }
-
-.pricing {
-  padding: 5vw 8vw;
-  background: var(--surface-4);
+.process h3 {
+  margin-top: 1.5rem;
 }
-
-table {
+.process p {
+  color: var(--dark-panel-muted);
+}
+.insight-bar {
+  margin: 0;
+  padding: 1.5rem 2rem;
+  background: var(--accent3-soft);
+  border-left: 8px solid var(--accent3);
+  color: var(--ink);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+.commercial-grid {
+  display: grid;
+  grid-template-columns: 1.25fr 0.75fr;
+  gap: 1.25rem;
+  margin-top: 4rem;
+}
+.price-table {
   width: 100%;
   border-collapse: collapse;
-  overflow: hidden;
-  background: var(--surface);
-  box-shadow: var(--shadow);
+  background: var(--card);
 }
-
-th,
-td {
+.price-table caption {
   padding: 1rem;
+  background: var(--accent2);
+  color: var(--dark-panel);
+  font-size: 1.2rem;
+  font-weight: 900;
   text-align: left;
-  border-bottom: 1px solid var(--line);
 }
-
-th {
-  color: var(--accent-cost);
-  font-size: 0.95rem;
-}
-
-td:first-child {
-  font-weight: 700;
-}
-
-.insight {
-  padding: 5vw 8vw;
-  background: var(--dark-band);
-  color: var(--dark-band-ink);
-}
-
-.quote {
-  max-width: 900px;
-  border-left: 8px solid var(--accent-risk);
-  padding-left: 2rem;
-  font-size: clamp(1.35rem, 3vw, 2.5rem);
-  line-height: 1.35;
-}
-
-.caveat {
-  margin-top: 2rem;
-  display: inline-block;
-  padding: 0.8rem 1rem;
-  background: var(--risk-bg);
-  color: var(--ink);
-  border: 1px solid var(--accent-risk);
-}
-
-.grid {
-  padding: 5vw 8vw;
-  background: var(--bg);
-}
-
-.takeaways {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr 1fr;
-  grid-auto-rows: minmax(170px, auto);
-  gap: 1rem;
-  margin-top: 2rem;
-}
-
-.takeaway {
-  padding: 1.4rem;
+.price-table th,
+.price-table td {
+  padding: 1rem;
   border: 1px solid var(--line);
-  background: var(--surface);
+  text-align: left;
 }
-
-.takeaway.big {
-  grid-row: span 2;
-  background: var(--conclusion-bg);
-  border-color: var(--accent-conclusion);
-}
-
-.takeaway.data {
-  background: var(--badge-bg);
-  border-color: var(--accent-data);
-}
-
-.takeaway.risk {
-  background: var(--risk-bg);
-  border-color: var(--accent-risk);
-}
-
-.takeaway.opportunity {
-  background: var(--opportunity-bg);
-  border-color: var(--accent-opportunity);
-}
-
-.takeaway.cost {
-  background: var(--cost-bg);
-  border-color: var(--accent-cost);
-}
-
-.label {
-  display: inline-block;
-  margin-bottom: 0.7rem;
+.price-table th {
   color: var(--muted);
-  font-size: 0.85rem;
-  font-weight: 700;
 }
-
-@media (max-width: 850px) {
-  .metrics,
-  .split,
-  .timeline,
-  .takeaways {
+.availability {
+  padding: 2rem;
+  background: var(--conclusion-soft);
+  border-bottom: 8px solid var(--conclusion);
+}
+.availability h3 {
+  color: var(--conclusion);
+}
+.risk-panel {
+  margin-top: 4rem;
+  padding: clamp(2rem, 5vw, 4rem);
+  background: var(--risk-soft);
+  border: 2px solid var(--risk);
+}
+.risk-panel h2 {
+  color: var(--risk);
+}
+.risk-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+}
+.risk-label {
+  color: var(--risk);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.takeaways {
+  margin-top: 4rem;
+}
+.mosaic {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+}
+.tile {
+  padding: 1.5rem;
+  border: 1px solid var(--line);
+  background: var(--card);
+}
+.tile:nth-child(1) {
+  grid-column: span 3;
+  border-top: 7px solid var(--accent);
+}
+.tile:nth-child(2) {
+  grid-column: span 3;
+  background: var(--accent2-soft);
+  border-top: 7px solid var(--accent2);
+}
+.tile:nth-child(3) {
+  grid-column: span 2;
+  background: var(--accent3-soft);
+  border-top: 7px solid var(--accent3);
+}
+.tile:nth-child(4) {
+  grid-column: span 2;
+  background: var(--risk-soft);
+  border-top: 7px solid var(--risk);
+}
+.tile:nth-child(5) {
+  grid-column: span 2;
+  background: var(--conclusion-soft);
+  border-top: 7px solid var(--conclusion);
+}
+.tile b {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+#translation {
+  padding: 5rem 1rem;
+  background: var(--translation-bg);
+  border-top: 1px solid var(--line);
+}
+.translation-inner {
+  width: min(760px, 100%);
+  margin: 0 auto;
+}
+#translation h2 {
+  margin: 0 0 2rem;
+  font-size: clamp(2.5rem, 7vw, 4.5rem);
+  line-height: 1.1;
+}
+#translation h3 {
+  margin: 3.5rem 0 1rem;
+  padding-top: 1rem;
+  border-top: 3px solid var(--accent);
+  font-size: clamp(1.65rem, 4vw, 2.25rem);
+  line-height: 1.3;
+}
+#translation h4 {
+  margin: 2.5rem 0 0.75rem;
+  color: var(--conclusion);
+  font-size: 1.25rem;
+}
+#translation p,
+#translation li {
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-size: 1.08rem;
+}
+.toc {
+  margin: 1rem 0 2rem;
+  padding: 1.5rem 1.5rem 1.5rem 2.75rem;
+  background: var(--accent-soft);
+  border-left: 5px solid var(--accent);
+}
+.source-figure {
+  margin: 2.75rem 0;
+  padding: 1rem;
+  background: var(--figure-bg);
+  border: 1px solid var(--line);
+}
+.source-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0.3rem;
+}
+.source-figure figcaption {
+  margin-top: 0.8rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+.meta {
+  margin-top: 3rem;
+  padding: 1.25rem;
+  background: var(--quote-bg);
+  border-left: 5px solid var(--conclusion);
+}
+.related {
+  margin: 2rem 0;
+  padding: 1.25rem;
+  border: 1px dashed var(--line);
+}
+.related p {
+  margin: 0.35rem 0;
+  color: var(--muted);
+}
+@media (max-width: 820px) {
+  .metric-strip {
+    grid-template-columns: 1fr 1fr;
+    margin-inline: 1rem;
+  }
+  .metric:nth-child(2) {
+    border-right: 0;
+  }
+  .metric:nth-child(-n+2) {
+    border-bottom: 1px solid var(--line);
+  }
+  .split-story,
+  .commercial-grid,
+  .risk-columns {
     grid-template-columns: 1fr;
   }
-
+  .split-detail {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .process {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .process article::before {
+    margin-top: -2.65rem;
+  }
+  .tile:nth-child(n) {
+    grid-column: span 6;
+  }
+}
+@media (max-width: 520px) {
+  .metric-strip {
+    grid-template-columns: 1fr;
+  }
   .metric {
     border-right: 0;
     border-bottom: 1px solid var(--line);
   }
-
-  .takeaway.big {
-    grid-row: auto;
-  }
-
-  .hero,
-  .panel,
-  .process,
-  .pricing,
-  .insight,
-  .grid {
-    padding: 2rem;
+  .metric:last-child {
+    border-bottom: 0;
   }
 }
+
+:root[data-theme="light"] {
+  color-scheme: light;
+--bg: #f6f3ec;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #172033;
+  --muted: #667085;
+  --line: #d8dce5;
+  --accent: #2563eb;
+  --accent-soft: #e7efff;
+  --accent2: #07875d;
+  --accent2-soft: #ddf7ec;
+  --accent3: #d97706;
+  --accent3-soft: #fff0cf;
+  --risk: #c43d51;
+  --risk-soft: #fde7ea;
+  --conclusion: #7047c7;
+  --conclusion-soft: #eee7ff;
+  --dark-panel: #17233d;
+  --dark-panel-ink: #f4f7ff;
+  --dark-panel-muted: #bac6dc;
+  --hl: #ffe08a;
+  --hl2: #bcebd8;
+  --shadow: rgba(23, 32, 51, 0.12);
+  --figure-bg: #e9edf4;
+  --quote-bg: #e8f0ff;
+  --translation-bg: #fffdf8;
+}
 </style>
-  <script id="airs-digest-theme-boot">
+<script id="airs-digest-theme-boot">
     try {
       var saved = localStorage.getItem("theme");
       if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
     } catch (e) {}
   </script>
-  <style id="airs-digest-theme-style">
+<style id="airs-digest-theme-style">
     :root {
       color-scheme: light;
       --airs-digest-ink: #191816;
@@ -494,151 +635,236 @@ td:first-child {
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+  <style id="airs-source-image-theme-style">
+    .source-figure .source-image-dark {
+      display: none;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .source-figure .source-image-light {
+        display: none;
+      }
+      :root:not([data-theme="light"]) .source-figure .source-image-dark {
+        display: block;
+      }
+    }
+    :root[data-theme="dark"] .source-figure .source-image-light {
+      display: none;
+    }
+    :root[data-theme="dark"] .source-figure .source-image-dark {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-light {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-dark {
+      display: none;
+    }
   </style>
 </head>
 <body>
-<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/grok-4-5" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">← 返回索引</a><a href="https://cursor.com/blog/grok-4-5" rel="noopener noreferrer" target="_blank">阅读原文 ↗</a></div><button class="airs-digest-theme-toggle" data-airs-theme-toggle="" type="button">主题 · 跟随系统</button></nav>
 <main>
-  <section class="hero">
-    <div>
-      <div class="kicker">一句话总括</div>
-      <h1>介绍 Grok 4.5</h1>
-      <div class="original-title">Introducing Grok 4.5</div>
-      <p class="lede">Cursor 把新模型的核心能力放在真实工具环境里的长时任务上，而不是只展示代码生成能力。</p>
-    </div>
-  </section>
-
-  <section class="metrics" aria-label="关键数字">
-    <div class="metric">
-      <b>数万亿</b>
-      <span>Cursor 数据 token 被用于训练，覆盖代码库、工具交互和开发者代理行为。</span>
-    </div>
-    <div class="metric">
-      <b>首周 2 倍</b>
-      <span>个人和团队订阅可获得 Grok 4.5 用量翻倍。</span>
-    </div>
-    <div class="metric">
-      <b>$2 / $6</b>
-      <span>基础版每百万输入 token 2 美元，每百万输出 token 6 美元。</span>
-    </div>
-    <div class="metric">
-      <b>$4 / $18</b>
-      <span>快速版每百万输入 token 4 美元，每百万输出 token 18 美元。</span>
-    </div>
-  </section>
-
-  <section class="split">
-    <div class="panel foundation">
-      <span class="label">模型基础</span>
-      <h2>它不是只为写代码而训练</h2>
-      <p>Grok 4.5 是 Cursor 与 SpaceXAI 联合训练的 MoE 模型。训练数据仍深度包含 Cursor 的代码和工具使用轨迹。</p>
-      <p>变化在于数据配比更宽。文章提到 STEM 任务、研究论文和其他知识工作被纳入训练。读者应把它理解为从编程助手向通用电脑任务代理的扩展。</p>
-    </div>
-    <div class="panel scope">
-      <span class="label">能力边界</span>
-      <h2>重点是持续调查、使用工具和验证</h2>
-      <p>文章强调长时任务，而不是一次性回答。模型需要在软件工程、数据科学、金融和法律等任务中调用工具、修正错误并验证结果。</p>
-      <p>这改变了评估 AI 的角度。真正重要的不是单轮语言能力，而是能否在复杂环境中把工作推进到可检查的结果。</p>
-    </div>
-  </section>
-
-  <section class="process">
-    <span class="label">训练流程</span>
-    <h2>强化学习环境本身成为核心资产</h2>
-    <div class="timeline">
-      <div class="step">
-        <strong>1</strong>
-        <h3>定义问题</h3>
-        <p>工程师先指定任务和验证方式。这样模型训练不只依赖主观偏好，而是围绕可检验结果展开。</p>
-      </div>
-      <div class="step">
-        <strong>2</strong>
-        <h3>代理构建环境</h3>
-        <p>分布式代理系统批量构造、测试和打磨任务环境。文章称部分环境若由人工完成，可能需要数百名工程师数月。</p>
-      </div>
-      <div class="step">
-        <strong>3</strong>
-        <h3>保持难度</h3>
-        <p>任务必须足够难，难到前沿模型也会失败。否则模型进步后，旧任务就不再提供有效学习信号。</p>
-      </div>
-      <div class="step">
-        <strong>4</strong>
-        <h3>训练下一代</h3>
-        <p>Cursor 用上一代模型加速下一代模型的数据环境建设。这说明模型迭代正在进入自我放大的工程循环。</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="pricing">
-    <span class="label">可用性与成本</span>
-    <h2>发布策略把模型直接放进 Cursor 工作流</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>项目</th>
-          <th>文章给出的信息</th>
-          <th>读者应如何理解</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>平台</td>
-          <td>桌面、Web、iOS、CLI 和 SDK 均可使用</td>
-          <td>Cursor 希望它覆盖从编辑器到自动化接口的完整工作链路。</td>
-        </tr>
-        <tr>
-          <td>基础版</td>
-          <td>$2/M 输入 token，$6/M 输出 token</td>
-          <td>更适合常规长任务，成本结构偏向输出用量。</td>
-        </tr>
-        <tr>
-          <td>快速版</td>
-          <td>$4/M 输入 token，$18/M 输出 token</td>
-          <td>速度溢价明显，输出成本是基础版的 3 倍。</td>
-        </tr>
-        <tr>
-          <td>Composer 2.5</td>
-          <td>继续提供，属于不同权重级别</td>
-          <td>Cursor 没有用新模型替代旧模型，而是保留不同规模的选择。</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="insight">
-    <span class="label">评估提醒</span>
-    <div class="quote">文章没有提供可核验的具体 benchmark 分数。它还说明 Grok 4.5 在 CursorBench 上存在训练数据污染优势，因此被排除。</div>
-    <div class="caveat">这点很关键：如果评测集进入训练数据，分数就不再能可靠代表泛化能力。Cursor 把问题公开写出，反而提示读者要更谨慎看待内部评测。</div>
-  </section>
-
-  <section class="grid">
-    <span class="label">最值得带走的洞见</span>
-    <h2>这次发布真正透露的是模型产品化方向</h2>
-    <div class="takeaways">
-      <div class="takeaway big">
-        <h3>模型能力正在从回答问题转向完成工作</h3>
-        <p>Grok 4.5 的叙事核心是长时任务、工具调用、错误恢复和验证。这比单次生成代码更接近真实办公场景。</p>
-      </div>
-      <div class="takeaway data">
-        <h3>Cursor 数据成为训练优势</h3>
-        <p>数万亿 token 的真实工具交互让模型学习开发者和代理如何在环境中行动。这类数据比普通文本更贴近任务执行。</p>
-      </div>
-      <div class="takeaway opportunity">
-        <h3>知识工作边界被重新定义</h3>
-        <p>文章把数据科学、金融和法律放进同一能力框架。AI 影响不再局限于 IDE，而是扩展到所有可由电脑工具完成的复杂工作。</p>
-      </div>
-      <div class="takeaway risk">
-        <h3>评测污染仍是硬问题</h3>
-        <p>CursorBench 被排除说明内部基准很容易被训练数据影响。读者需要区分真实泛化和训练记忆。</p>
-      </div>
-      <div class="takeaway cost">
-        <h3>价格透露使用场景</h3>
-        <p>快速版输出价格明显更高。高价值、时间敏感的任务可能适合它，普通批量任务则需要更谨慎控制成本。</p>
-      </div>
-    </div>
-  </section>
+<section id="summary">
+<header class="hero">
+<p class="eyebrow">Cursor · Research · 2026-07-08</p>
+<h1>介绍 Grok 4.5</h1>
+<p class="original-title" lang="en">Introducing Grok 4.5</p>
+<p class="thesis"><strong>一句话总括：</strong>Cursor 与 SpaceXAI 把编程代理的训练经验扩展到了通用知识工作，并用更难、更真实的任务环境训练模型持续调查、调用工具、纠错和验证。</p>
+</header>
+<div aria-label="关键数据" class="metric-strip">
+<div class="metric"><b>数万亿</b><span>来自 Cursor 的训练 token</span></div>
+<div class="metric"><b>首周 2 倍</b><span>个人及团队方案的模型使用额度</span></div>
+<div class="metric"><b>$2 / $6</b><span>基础版每百万输入／输出 token</span></div>
+<div class="metric"><b>$4 / $18</b><span>快速版每百万输入／输出 token</span></div>
+</div>
+<div class="summary-wrap">
+<div class="split-story">
+<section class="split-lead">
+<h2>从编程专家走向跨领域代理</h2>
+<p>Composer 2.5 的定位是编程专家。Grok 4.5 则扩大了数据配比，加入高质量 STEM 任务、研究论文和其他知识工作。</p>
+<p><strong>结论：</strong>Cursor 想让模型处理的，不只是代码，而是电脑上的长时程复杂工作。</p>
+</section>
+<section class="split-detail">
+<h3>基础仍来自真实的软件工作</h3>
+<p>训练包含<mark>数万亿个 Cursor 数据 token</mark>。这些数据覆盖用户与代码库、软件工具的广泛交互。</p>
+<p>模型既能学习现有软件，也能观察开发者如何工作，以及代理如何与环境互动。</p>
+<h3>为什么这会改变理解</h3>
+<p>通用能力并不是通过放弃编程数据获得的。Cursor 的路线是保留真实工具交互，再扩大知识领域。由此形成的模型更接近跨任务执行代理，而不是单纯的问答系统。</p>
+</section>
+</div>
+<section class="rl-story">
+<h2>难题强化学习训练的是完整执行闭环</h2>
+<p>训练环境横跨软件工程和更广泛的知识工作。任务被刻意设计到连前沿模型也可能失败的程度。</p>
+<div class="process">
+<article>
+<h3>调查问题</h3>
+<p>模型先收集信息并理解真实环境，而不是直接猜答案。</p>
+</article>
+<article>
+<h3>使用工具</h3>
+<p>任务要求模型通过工具采取行动，并持续推进长时程工作。</p>
+</article>
+<article>
+<h3>从错误恢复</h3>
+<p>失败是训练过程的一部分。模型需要识别偏差并调整路径。</p>
+</article>
+<article>
+<h3>验证结果</h3>
+<p>环境定义了验证方式，让训练目标落在可检查的结果上。</p>
+</article>
+</div>
+</section>
+<p class="insight-bar">部分环境若完全由人工建设，需要数百名工程师耗时数月。Cursor 用分布式代理群构建、测试和改进环境，也就是用上一代模型加速下一代模型。</p>
+<div class="commercial-grid">
+<table class="price-table">
+<caption>公开定价</caption>
+<thead>
+<tr>
+<th>版本</th>
+<th>每百万输入 token</th>
+<th>每百万输出 token</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>基础版</td>
+<td><mark>2 美元</mark></td>
+<td><mark>6 美元</mark></td>
+</tr>
+<tr>
+<td>快速版</td>
+<td><mark class="alt">4 美元</mark></td>
+<td><mark class="alt">18 美元</mark></td>
+</tr>
+</tbody>
+</table>
+<section class="availability">
+<h3>发布即覆盖多端</h3>
+<p>Grok 4.5 已进入 Cursor 的桌面端、Web、iOS、CLI 和 SDK。</p>
+<p>个人与团队方案首周享有双倍使用额度。Composer 2.5 仍会继续提供。</p>
+<p><strong>结论：</strong>Cursor 将两种不同参数规模和权重类别的模型并行保留，而不是让新模型直接替代旧模型。</p>
+</section>
+</div>
+<section class="risk-panel">
+<h2>评测披露比排行榜名次更重要</h2>
+<div class="risk-columns">
+<div>
+<p class="risk-label">评测口径</p>
+<p>SWE-Bench Pro 和 Terminal-Bench 中，第三方模型采用自行报告的成绩。SWE-Bench multilingual 的 GPT 5.5 成绩则来自 Cursor 内部运行。</p>
+<p>这些成绩的来源并不完全一致，因此横向比较需要保留谨慎。</p>
+</div>
+<div>
+<p class="risk-label">数据污染</p>
+<p>较早的 Cursor 代码库快照被意外纳入训练，使 Grok 4.5 在 CursorBench 上获得优势。Cursor 表示无法确定具体影响，因此排除了该项结果。</p>
+<p>相关数据已从未来模型的训练集中删除，CursorBench 也在进行更大规模的更新。<strong>这一披露说明，模型评测必须同时检查数据来源和测试集独立性。</strong></p>
+</div>
+</div>
+</section>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="mosaic">
+<article class="tile"><b>01 · 能力边界正在外扩</b>Grok 4.5 以软件工程为基础，但目标已扩展到数据科学、金融、法律及其他电脑工作。</article>
+<article class="tile"><b>02 · 真实交互数据是关键资产</b>数万亿个 Cursor 数据 token 让模型接触到开发者与代理实际使用工具的过程。</article>
+<article class="tile"><b>03 · 难题环境需要持续升级</b>模型进步后，旧任务会失去训练价值。环境本身也必须不断变难。</article>
+<article class="tile"><b>04 · 污染会破坏评测解释力</b>CursorBench 的训练数据重叠意味着高分不能直接等同于更强的泛化能力。</article>
+<article class="tile"><b>05 · 模型组合不会立刻收敛</b>Grok 4.5 与 Composer 2.5 将并行提供，分别服务于不同规模和能力需求。</article>
+</div>
+</section>
+</div>
+</section><section id="translation">
+<div class="translation-inner">
+<h2>完整译文</h2>
+<h3>目录</h3>
+<ol class="toc">
+<li>坚实的基础</li>
+<li>在高难度问题上进行强化学习</li>
+<li>开始使用 Grok 4.5</li>
+</ol>
+<figure class="source-figure" data-source-image="0"><img alt="Grok 4.5 benchmark results" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fevals-blog-light-2.png&amp;w=1920&amp;q=70" width="800"/><img alt="Grok 4.5 benchmark results" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fevals-blog-dark-2.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<p>今天，我们与 SpaceXAI 一同发布 Grok 4.5。这是我们最智能的模型，也是我们打造的第一个不只面向软件工程的模型。</p>
+<p>Grok 4.5 能够处理困难且耗时很长的任务。这些任务需要模型创造性地使用工具解决问题。无论是软件工程、数据科学、金融、法律工作，还是你在电脑上进行的其他工作，它都可以应对。</p>
+<p>Cursor 的个人和团队订阅方案都包含可观的模型用量。发布首周的使用额度还会翻倍。考虑到该模型具备的网络安全能力，我们也增加了新的安全防护措施。</p>
+<h3>坚实的基础</h3>
+<p>Grok 4.5 是一个由我们与 SpaceXAI 联合训练的混合专家模型（mixture-of-experts model）。</p>
+<p>训练使用了数万亿个来自 Cursor 数据的 token。这些数据涵盖用户与代码库及软件工具之间的广泛交互。模型通过这套数据，既能学习现有软件，也能学习开发者与代理之间的互动。它由此掌握开发者如何工作，以及代理如何与各自的环境交互。</p>
+<p>我们把上一代模型 Composer 2.5 训练成了编程专家。到了 Grok 4.5，我们有意让训练数据的构成更加广泛。训练数据包括高质量的 STEM 任务、研究论文和其他知识工作，使模型能够熟练处理多个领域的任务。</p>
+<h3>在高难度问题上进行强化学习</h3>
+<p>我们在贴近现实的环境中，让模型针对高难度问题进行强化学习。这些环境既覆盖软件工程，也涵盖更广泛的知识工作。模型会在其中学习调查问题、使用工具、从错误中恢复，并验证结果。</p>
+<p>许多问题必须足够困难，难到连前沿模型也会失败。随着模型不断进步，现有任务将无法再教给它们新的东西。过去需要大量推理的问题，也会逐渐变成常规任务。</p>
+<p>我们开发了一套分布式代理系统，用于大规模构建这些环境。工程师会指定问题，并说明如何验证解决方案。随后，大批代理负责构建、测试和改进每一个环境。其中一些环境如果由人工完成，需要数百名工程师组成团队，并耗费数月时间。我们正是通过这种方式，利用上一代模型加速下一代模型的进展。</p>
+<h3>开始使用 Grok 4.5</h3>
+<p>Grok 4.5 已于今天在 Cursor 中上线，覆盖桌面端、Web、iOS、CLI 和我们的 SDK。</p>
+<p>个人与团队方案都把可观的模型用量纳入了我们的第一方模型池。发布首周的使用额度会翻倍。基础模型的价格为每百万输入 token 2 美元、每百万输出 token 6 美元。快速版的价格为每百万输入 token 4 美元、每百万输出 token 18 美元。</p>
+<p>Grok 4.5 和 Composer 2.5 属于两种不同的模型权重类别。我们很高兴能够同时支持这两种规模和权重。Composer 2.5 将继续提供。未来，我们还会继续发布同等规模的新模型。</p>
+<p>SWE-Bench Pro 和 Terminal-Bench 展示的是第三方模型自行报告的成绩。在 SWE-Bench multilingual 中，GPT 5.5 的成绩来自我们的内部运行结果。</p>
+<p>Grok 4.5 在 CursorBench 上具有优势，因为 Cursor 代码库的一个早期快照被意外纳入了训练。具体影响目前尚不明确。我们已经从未来模型的训练数据中删除了这些内容。同时，我们正在对 CursorBench 进行一次更大规模的更新。因此，这里没有列出该项成绩。</p>
+<div class="meta">
+<p><strong>归档分类：</strong>研究</p>
+<p><strong>作者：</strong>Cursor Team</p>
+</div>
+<div class="related">
+<h4>相关文章</h4>
+<p>通过 warp decode 改进 MoE 模型推理</p>
+<p>训练 Composer 处理更长时程的任务</p>
+<p>奖励黑客正在淹没模型智能的提升</p>
+</div>
+<h3>介绍 Grok 4.5</h3>
+<h3>目录</h3>
+<ol class="toc">
+<li>坚实的基础</li>
+<li>在高难度问题上进行强化学习</li>
+<li>开始使用 Grok 4.5</li>
+</ol>
+<p>今天，我们与 SpaceXAI 一同发布 Grok 4.5。这是我们最智能的模型，也是我们打造的第一个不只面向软件工程的模型。</p>
+<p>Grok 4.5 能够处理困难且耗时很长的任务。这些任务需要模型创造性地使用工具解决问题。无论是软件工程、数据科学、金融、法律工作，还是你在电脑上进行的其他工作，它都可以应对。</p>
+<p>Cursor 的个人和团队订阅方案都包含可观的模型用量。发布首周的使用额度还会翻倍。考虑到该模型具备的网络安全能力，我们也增加了新的安全防护措施。</p>
+<h3>坚实的基础</h3>
+<p>Grok 4.5 是一个由我们与 SpaceXAI 联合训练的混合专家模型（mixture-of-experts model）。</p>
+<p>训练使用了数万亿个来自 Cursor 数据的 token。这些数据涵盖用户与代码库及软件工具之间的广泛交互。模型通过这套数据，既能学习现有软件，也能学习开发者与代理之间的互动。它由此掌握开发者如何工作，以及代理如何与各自的环境交互。</p>
+<p>我们把上一代模型 Composer 2.5 训练成了编程专家。到了 Grok 4.5，我们有意让训练数据的构成更加广泛。训练数据包括高质量的 STEM 任务、研究论文和其他知识工作，使模型能够熟练处理多个领域的任务。</p>
+<h3>在高难度问题上进行强化学习</h3>
+<p>我们在贴近现实的环境中，让模型针对高难度问题进行强化学习。这些环境既覆盖软件工程，也涵盖更广泛的知识工作。模型会在其中学习调查问题、使用工具、从错误中恢复，并验证结果。</p>
+<p>许多问题必须足够困难，难到连前沿模型也会失败。随着模型不断进步，现有任务将无法再教给它们新的东西。过去需要大量推理的问题，也会逐渐变成常规任务。</p>
+<p>我们开发了一套分布式代理系统，用于大规模构建这些环境。工程师会指定问题，并说明如何验证解决方案。随后，大批代理负责构建、测试和改进每一个环境。其中一些环境如果由人工完成，需要数百名工程师组成团队，并耗费数月时间。我们正是通过这种方式，利用上一代模型加速下一代模型的进展。</p>
+<h3>开始使用 Grok 4.5</h3>
+<p>Grok 4.5 已于今天在 Cursor 中上线，覆盖桌面端、Web、iOS、CLI 和我们的 SDK。</p>
+<p>个人与团队方案都把可观的模型用量纳入了我们的第一方模型池。发布首周的使用额度会翻倍。基础模型的价格为每百万输入 token 2 美元、每百万输出 token 6 美元。快速版的价格为每百万输入 token 4 美元、每百万输出 token 18 美元。</p>
+<p>Grok 4.5 和 Composer 2.5 属于两种不同的模型权重类别。我们很高兴能够同时支持这两种规模和权重。Composer 2.5 将继续提供。未来，我们还会继续发布同等规模的新模型。</p>
+<p>SWE-Bench Pro 和 Terminal-Bench 展示的是第三方模型自行报告的成绩。在 SWE-Bench multilingual 中，GPT 5.5 的成绩来自我们的内部运行结果。</p>
+<p>Grok 4.5 在 CursorBench 上具有优势，因为 Cursor 代码库的一个早期快照被意外纳入了训练。具体影响目前尚不明确。我们已经从未来模型的训练数据中删除了这些内容。同时，我们正在对 CursorBench 进行一次更大规模的更新。因此，这里没有列出该项成绩。</p>
+<div class="meta">
+<p><strong>归档分类：</strong>研究</p>
+<p><strong>作者：</strong>Cursor Team</p>
+</div>
+<div class="related">
+<h4>相关文章</h4>
+<p>通过 warp decode 改进 MoE 模型推理</p>
+<p>训练 Composer 处理更长时程的任务</p>
+<p>奖励黑客正在淹没模型智能的提升</p>
+</div>
+</div>
+</section>
 </main>
-  <script id="airs-digest-theme-script">
+<script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;
       const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));

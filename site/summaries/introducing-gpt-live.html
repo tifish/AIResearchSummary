@@ -1,254 +1,360 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>介绍 GPT-Live</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>推出 GPT-Live</title>
 <style>
 :root{
-  --bg:#f6f4ef;
-  --ink:#17191f;
-  --muted:#5f6572;
-  --line:#d8d2c4;
-  --hero:#17202a;
-  --hero-ink:#f7f2e8;
+  color-scheme:light dark;
+  --bg:#f5f2ea;
+  --surface:#fffdf8;
   --card:#ffffff;
-  --soft:#ece7dc;
-  --data:#2563eb;
-  --data-bg:#e8f0ff;
-  --risk:#c2410c;
-  --risk-bg:#fff0e8;
-  --opportunity:#0f766e;
-  --opportunity-bg:#e4f7f3;
-  --conclusion:#7c3aed;
-  --conclusion-bg:#f1e8ff;
-  --accent:#d97706;
-  --shadow:0 18px 50px rgba(23,25,31,.10);
+  --ink:#17202a;
+  --muted:#66717d;
+  --line:#d9d5ca;
+  --accent:#075f63;
+  --accent-soft:#d7f0ed;
+  --accent2:#a84b16;
+  --accent2-soft:#ffe1ce;
+  --accent3:#5840a3;
+  --accent3-soft:#e8e0ff;
+  --risk:#a1263d;
+  --risk-soft:#fbdde3;
+  --opportunity:#23733b;
+  --opportunity-soft:#dcf3df;
+  --conclusion:#164e86;
+  --conclusion-soft:#dcecff;
+  --data:#8a5900;
+  --data-soft:#ffedbd;
+  --deep:#142b35;
+  --deep-ink:#edf9f8;
+  --deep-muted:#b8cfce;
+  --hl:#ffdfa0;
+  --hl2:#cdebe6;
+  --shadow:0 18px 55px rgba(35,42,48,.12);
 }
-:root[data-theme="dark"]{
-  --bg:#101215;
-  --ink:#f1f3f5;
-  --muted:#aab1bd;
-  --line:#303744;
-  --hero:#080b10;
-  --hero-ink:#f4efe4;
-  --card:#191d24;
-  --soft:#1f242c;
-  --data:#6ea8ff;
-  --data-bg:#172337;
-  --risk:#ff9a6b;
-  --risk-bg:#321c15;
-  --opportunity:#5eead4;
-  --opportunity-bg:#12312e;
-  --conclusion:#c4a1ff;
-  --conclusion-bg:#261a3d;
-  --accent:#fbbf24;
-  --shadow:0 18px 50px rgba(0,0,0,.35);
-}
-@media (prefers-color-scheme: dark){
+@media (prefers-color-scheme:dark){
   :root{
-    --bg:#101215;
-    --ink:#f1f3f5;
-    --muted:#aab1bd;
-    --line:#303744;
-    --hero:#080b10;
-    --hero-ink:#f4efe4;
-    --card:#191d24;
-    --soft:#1f242c;
-    --data:#6ea8ff;
-    --data-bg:#172337;
-    --risk:#ff9a6b;
-    --risk-bg:#321c15;
-    --opportunity:#5eead4;
-    --opportunity-bg:#12312e;
-    --conclusion:#c4a1ff;
-    --conclusion-bg:#261a3d;
-    --accent:#fbbf24;
-    --shadow:0 18px 50px rgba(0,0,0,.35);
+    --bg:#0e1318;
+    --surface:#151c22;
+    --card:#1b242c;
+    --ink:#e5edf3;
+    --muted:#a7b1ba;
+    --line:#34414b;
+    --accent:#57d4cd;
+    --accent-soft:#173c3b;
+    --accent2:#ff9a61;
+    --accent2-soft:#492719;
+    --accent3:#b9a4ff;
+    --accent3-soft:#302653;
+    --risk:#ff8398;
+    --risk-soft:#451e29;
+    --opportunity:#78dc91;
+    --opportunity-soft:#193d25;
+    --conclusion:#79bfff;
+    --conclusion-soft:#193752;
+    --data:#ffc866;
+    --data-soft:#443313;
+    --deep:#091b22;
+    --deep-ink:#e4f6f5;
+    --deep-muted:#9bb8b7;
+    --hl:#594313;
+    --hl2:#16453f;
+    --shadow:0 18px 55px rgba(0,0,0,.34);
   }
 }
+:root[data-theme="dark"]{
+  --bg:#0e1318;
+  --surface:#151c22;
+  --card:#1b242c;
+  --ink:#e5edf3;
+  --muted:#a7b1ba;
+  --line:#34414b;
+  --accent:#57d4cd;
+  --accent-soft:#173c3b;
+  --accent2:#ff9a61;
+  --accent2-soft:#492719;
+  --accent3:#b9a4ff;
+  --accent3-soft:#302653;
+  --risk:#ff8398;
+  --risk-soft:#451e29;
+  --opportunity:#78dc91;
+  --opportunity-soft:#193d25;
+  --conclusion:#79bfff;
+  --conclusion-soft:#193752;
+  --data:#ffc866;
+  --data-soft:#443313;
+  --deep:#091b22;
+  --deep-ink:#e4f6f5;
+  --deep-muted:#9bb8b7;
+  --hl:#594313;
+  --hl2:#16453f;
+  --shadow:0 18px 55px rgba(0,0,0,.34);
+}
 *{box-sizing:border-box}
+html{scroll-behavior:smooth}
 body{
   margin:0;
   background:var(--bg);
   color:var(--ink);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
-  line-height:1.65;
+  font-family:"Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
+  line-height:1.75;
 }
-main{overflow:hidden}
+main{max-width:1180px;margin:auto;padding:28px 20px 80px}
 .hero{
-  background:var(--hero);
-  color:var(--hero-ink);
-  padding:56px 22px 42px;
+  position:relative;
+  overflow:hidden;
+  padding:clamp(34px,7vw,82px);
+  border-radius:32px;
+  color:var(--deep-ink);
+  background:var(--deep);
+  box-shadow:var(--shadow);
 }
-.wrap{max-width:1080px;margin:0 auto}
-.kicker{
+.hero::after{
+  content:"";
+  position:absolute;
+  width:330px;
+  height:330px;
+  right:-90px;
+  top:-110px;
+  border:54px solid var(--accent);
+  border-radius:50%;
+  opacity:.33;
+}
+.eyebrow{
   color:var(--accent);
-  font-size:14px;
-  font-weight:700;
-  letter-spacing:.04em;
+  font-weight:800;
+  letter-spacing:.12em;
+  text-transform:uppercase;
 }
-h1{
-  margin:12px 0 6px;
-  font-size:clamp(34px,6vw,72px);
-  line-height:1.05;
-  letter-spacing:0;
+.hero h1{
+  max-width:800px;
+  margin:.25em 0 .1em;
+  font-size:clamp(3rem,9vw,7rem);
+  line-height:1;
+  letter-spacing:-.055em;
 }
-.original{
-  margin:0 0 28px;
-  color:var(--muted);
-  font-size:18px;
+.original-title{margin:12px 0;color:var(--deep-muted);font-size:1.1rem}
+.deck{max-width:790px;margin:35px 0 0;font-size:clamp(1.25rem,2.4vw,1.9rem);line-height:1.55}
+.meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:34px}
+.meta span{
+  padding:6px 12px;
+  border:1px solid var(--accent);
+  border-radius:999px;
+  color:var(--deep-ink);
 }
-.lead{
-  max-width:760px;
-  font-size:24px;
-  line-height:1.45;
+#summary{padding-top:34px}
+.one-line{
   margin:0;
+  padding:26px 30px;
+  border-left:8px solid var(--conclusion);
+  background:var(--conclusion-soft);
+  font-size:1.18rem;
 }
-.stats{
+.one-line strong{color:var(--conclusion)}
+.metric-strip{
   display:grid;
   grid-template-columns:repeat(4,1fr);
   gap:1px;
+  margin:28px 0;
+  overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:22px;
   background:var(--line);
-  border-top:1px solid var(--line);
-  border-bottom:1px solid var(--line);
 }
-.stat{
-  background:var(--data-bg);
+.metric{
+  min-height:160px;
   padding:24px;
+  background:var(--card);
 }
-.stat strong{
-  display:block;
-  color:var(--data);
-  font-size:30px;
-  line-height:1;
-  margin-bottom:8px;
-}
-.stat span{color:var(--muted);font-size:14px}
+.metric b{display:block;color:var(--data);font-size:2rem;line-height:1.15}
+.metric span{display:block;margin-top:12px;color:var(--muted)}
 .split{
   display:grid;
-  grid-template-columns:1.1fr .9fr;
-  gap:34px;
-  padding:56px 22px;
-  align-items:center;
+  grid-template-columns:1fr 1fr;
+  gap:22px;
+  margin:28px 0;
 }
-.panel{
-  background:var(--card);
-  border:1px solid var(--line);
-  box-shadow:var(--shadow);
-  padding:28px;
-  border-radius:8px;
-}
-h2{font-size:28px;line-height:1.2;margin:0 0 14px}
-p{margin:0 0 14px}
+.split > div{padding:30px;border-radius:24px}
+.architecture{background:var(--accent-soft);border-top:7px solid var(--accent)}
+.delegation{background:var(--accent3-soft);border-top:7px solid var(--accent3)}
+.split h2{margin-top:0;font-size:1.35rem}
+.architecture h2{color:var(--accent)}
+.delegation h2{color:var(--accent3)}
 .flow{
-  background:var(--soft);
-  padding:52px 22px;
+  margin:28px 0;
+  padding:30px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:24px;
 }
-.steps{
+.flow h2{margin-top:0}
+.flow ol{
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:18px;
-  margin-top:24px;
+  margin:0;
+  padding:0;
+  list-style:none;
 }
-.step{
-  border-left:5px solid var(--opportunity);
-  background:var(--opportunity-bg);
-  padding:22px;
+.flow li{position:relative;padding:18px 18px 18px 58px;border-bottom:3px solid var(--accent2)}
+.flow li::before{
+  content:counter(list-item);
+  position:absolute;
+  left:8px;
+  top:15px;
+  width:34px;
+  height:34px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:var(--accent2);
+  color:var(--surface);
+  font-weight:900;
 }
-.step b{display:block;color:var(--opportunity);margin-bottom:8px}
-.compare{
-  padding:56px 22px;
-  background:var(--card);
-}
-table{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:20px;
-  overflow:hidden;
-  border:1px solid var(--line);
-}
-th,td{
-  text-align:left;
-  padding:16px;
-  border-bottom:1px solid var(--line);
-  vertical-align:top;
-}
-th{background:var(--soft)}
-td:first-child{font-weight:700}
 .eval{
-  padding:52px 22px;
-  background:var(--data-bg);
-}
-.eval-grid{
   display:grid;
-  grid-template-columns:1fr 1fr 1fr;
-  gap:16px;
-  margin-top:22px;
+  grid-template-columns:1.25fr .75fr;
+  gap:0;
+  margin:28px 0;
+  overflow:hidden;
+  border-radius:24px;
+  background:var(--deep);
+  color:var(--deep-ink);
 }
-.badge{
-  background:var(--card);
-  border-top:6px solid var(--data);
-  padding:22px;
-  border-radius:8px;
+.eval-main{padding:34px}
+.eval-main h2{color:var(--accent)}
+.eval-main ul{padding-left:1.2em}
+.eval-note{padding:34px;background:var(--risk-soft);color:var(--ink)}
+.eval-note strong{color:var(--risk)}
+.experience{
+  margin:28px 0;
+  padding:32px;
+  border:2px solid var(--opportunity);
+  border-radius:24px;
+  background:var(--opportunity-soft);
 }
+.experience h2{margin-top:0;color:var(--opportunity)}
+.features{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+}
+.feature{padding:18px 0;border-top:4px solid var(--opportunity)}
 .safety{
-  padding:56px 22px;
-  background:var(--risk-bg);
+  margin:28px 0;
+  padding:32px;
+  background:var(--risk-soft);
+  border-radius:4px 28px 4px 28px;
 }
-.safety .quote{
-  border-left:6px solid var(--risk);
-  padding:18px 22px;
-  background:var(--card);
-  font-size:21px;
-  line-height:1.45;
-}
-.avail{
-  padding:48px 22px;
-}
-.timeline{
-  display:grid;
-  grid-template-columns:120px 1fr;
-  gap:18px;
-  margin-top:20px;
-}
-.time{
-  color:var(--conclusion);
-  font-weight:800;
-}
-.item{
-  border-bottom:1px solid var(--line);
-  padding-bottom:18px;
-  margin-bottom:18px;
-}
-.takeaways{
-  background:var(--hero);
-  color:var(--hero-ink);
-  padding:54px 22px;
-}
+.safety h2{margin-top:0;color:var(--risk)}
+.takeaways{margin:28px 0}
+.takeaways h2{font-size:1.8rem}
 .mosaic{
   display:grid;
-  grid-template-columns:1.2fr 1fr 1fr;
+  grid-template-columns:1.2fr .8fr 1fr;
   gap:14px;
-  margin-top:24px;
 }
-.tile{
-  padding:22px;
+.mosaic div{padding:24px;border-radius:20px}
+.mosaic div:nth-child(1){grid-row:span 2;background:var(--accent-soft);border:1px solid var(--accent)}
+.mosaic div:nth-child(2){background:var(--data-soft);border:1px solid var(--data)}
+.mosaic div:nth-child(3){background:var(--risk-soft);border:1px solid var(--risk)}
+.mosaic div:nth-child(4){grid-column:2/4;background:var(--conclusion-soft);border:1px solid var(--conclusion)}
+mark{
+  padding:.06em .24em;
+  color:inherit;
+  background:var(--hl);
+}
+mark.alt{background:var(--hl2)}
+#translation{
+  max-width:840px;
+  margin:70px auto 0;
+  padding:clamp(24px,5vw,56px);
+  border-top:10px solid var(--accent);
+  background:var(--surface);
+  box-shadow:var(--shadow);
+}
+#translation h2{
+  margin:0 0 30px;
+  font-size:clamp(2.2rem,5vw,4rem);
+  line-height:1.15;
+}
+#translation h3{margin:2.4em 0 .75em;color:var(--accent);font-size:1.65rem}
+#translation h4{margin:1.8em 0 .5em;color:var(--accent2);font-size:1.2rem}
+#translation p{margin:1em 0}
+.diagram-label{
+  margin:20px 0;
+  padding:15px 18px;
+  border-left:5px solid var(--accent3);
+  background:var(--accent3-soft);
+}
+.footnotes{
+  margin:30px 0;
+  padding:20px;
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  color:var(--muted);
+  font-size:.94rem;
+}
+.source-figure{
+  margin:34px 0;
+  padding:12px;
   border:1px solid var(--line);
-  background:rgba(255,255,255,.06);
-  min-height:140px;
+  border-radius:18px;
+  background:var(--card);
 }
-.tile:nth-child(1){border-top:6px solid var(--opportunity)}
-.tile:nth-child(2){border-top:6px solid var(--data)}
-.tile:nth-child(3){border-top:6px solid var(--risk)}
-.tile:nth-child(4){border-top:6px solid var(--conclusion)}
-.tile:nth-child(5){border-top:6px solid var(--accent);grid-column:span 2}
-.tile b{display:block;margin-bottom:8px}
-@media (max-width:760px){
-  .stats,.steps,.eval-grid,.split,.mosaic{grid-template-columns:1fr}
-  .timeline{grid-template-columns:1fr}
-  .tile:nth-child(5){grid-column:auto}
-  .lead{font-size:20px}
+.source-figure img{
+  display:block;
+  width:100%;
+  height:auto;
+  border-radius:11px;
+}
+.source-figure figcaption{
+  margin-top:10px;
+  padding:0 5px;
+  color:var(--muted);
+  font-size:.9rem;
+}
+.keep-reading{
+  margin-top:48px;
+  padding-top:22px;
+  border-top:2px solid var(--line);
+}
+@media(max-width:820px){
+  .metric-strip,.split,.flow ol,.features,.mosaic,.eval{grid-template-columns:1fr}
+  .mosaic div:nth-child(1),.mosaic div:nth-child(4){grid-row:auto;grid-column:auto}
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+--bg:#f5f2ea;
+  --surface:#fffdf8;
+  --card:#ffffff;
+  --ink:#17202a;
+  --muted:#66717d;
+  --line:#d9d5ca;
+  --accent:#075f63;
+  --accent-soft:#d7f0ed;
+  --accent2:#a84b16;
+  --accent2-soft:#ffe1ce;
+  --accent3:#5840a3;
+  --accent3-soft:#e8e0ff;
+  --risk:#a1263d;
+  --risk-soft:#fbdde3;
+  --opportunity:#23733b;
+  --opportunity-soft:#dcf3df;
+  --conclusion:#164e86;
+  --conclusion-soft:#dcecff;
+  --data:#8a5900;
+  --data-soft:#ffedbd;
+  --deep:#142b35;
+  --deep-ink:#edf9f8;
+  --deep-muted:#b8cfce;
+  --hl:#ffdfa0;
+  --hl2:#cdebe6;
+  --shadow:0 18px 55px rgba(35,42,48,.12);
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -380,114 +486,208 @@ td:first-child{font-weight:700}
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/introducing-gpt-live" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
 <main>
-  <section class="hero">
-    <div class="wrap">
-      <div class="kicker">Product · OpenAI · 2026-07-08</div>
-      <h1>介绍 GPT-Live</h1>
-      <p class="original">Introducing GPT-Live</p>
-      <p class="lead">一句话总括：GPT-Live 的真正贡献，是把语音 AI 从“等你说完再回答”改造成可连续感知、实时回应，并把复杂任务交给后台模型处理的交互系统。</p>
-    </div>
-  </section>
-
-  <section class="stats">
-    <div class="stat"><strong>全双工</strong><span>同时听和说，不再只按回合切换。</span></div>
-    <div class="stat"><strong>GPT-5.5</strong><span>上线时负责后台搜索、推理和复杂任务。</span></div>
-    <div class="stat"><strong>5-10 分钟</strong><span>人类偏好评估使用匹配时长对话。</span></div>
-    <div class="stat"><strong>1.5 亿+</strong><span>每周使用 ChatGPT Voice 和 Dictation 的人数。</span></div>
-  </section>
-
-  <section class="split wrap">
-    <div>
-      <h2>核心变化不是声音更像人，而是交互节奏变了</h2>
-      <p>旧的级联系统要先转文字，再由语言模型回答，最后转成语音。信息会在模型之间流失，停顿也更明显。</p>
-      <p>Advanced Voice Mode 已经把音频处理放进单一模型，但仍然依赖“用户停止说话”来判断轮次。短暂停顿和环境噪声都可能触发误判。</p>
-      <p>GPT-Live 的全双工架构让模型可以持续处理输入，同时生成输出。它能选择继续听、插话、暂停、回应，或调用工具。</p>
-    </div>
-    <div class="panel">
-      <h2>结论</h2>
-      <p>语音 AI 的瓶颈不只是延迟。更大的问题是它是否理解对话正在发生。</p>
-      <p>GPT-Live 把“轮次识别”变成“连续交互决策”。这会让 AI 更适合陪练、翻译、支持服务和长时间协作。</p>
-    </div>
-  </section>
-
-  <section class="flow">
-    <div class="wrap">
-      <h2>新架构把交流和深度工作拆开</h2>
-      <div class="steps">
-        <div class="step"><b>1. 持续监听</b>模型在你说话时持续接收音频。它可以用“mhmm”或“got it”表示正在跟随，也可以安静等待。</div>
-        <div class="step"><b>2. 实时互动</b>它每秒多次判断是否发声、是否打断、是否暂停。语音体验因此更接近自然对话。</div>
-        <div class="step"><b>3. 后台委托</b>搜索、深度推理和代理型任务交给 GPT-5.5 等模型。前台对话仍然保持流动。</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="compare">
-    <div class="wrap">
-      <h2>三代语音系统的差异</h2>
-      <table>
-        <thead><tr><th>方式</th><th>工作方式</th><th>用户感受</th><th>限制</th></tr></thead>
-        <tbody>
-          <tr><td>级联语音系统</td><td>语音转文字、语言模型、文字转语音依次工作。</td><td>能接入前沿模型，但回答慢。</td><td>跨模型传递会丢信息，停顿显得生硬。</td></tr>
-          <tr><td>回合式语音模型</td><td>单一模型处理和生成音频，但仍按回合运行。</td><td>更顺滑，延迟更低。</td><td>必须等用户停下，容易误判短暂停顿。</td></tr>
-          <tr><td>GPT-Live</td><td>连续处理输入和输出，并可后台委托任务。</td><td>能被打断，能等待，也能边聊边做事。</td><td>视频和屏幕共享上线时暂不支持。</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="eval">
-    <div class="wrap">
-      <h2>评估显示，它不只是更自然，也更能处理复杂任务</h2>
-      <p>OpenAI 新建了面向愉悦度和对话流的人工评估。GPT-Live-1 和 GPT-Live-1 mini 在匹配的 5-10 分钟对话中，相比 Advanced Voice Mode 获得更强偏好。</p>
-      <div class="eval-grid">
-        <div class="badge"><b>GPQA</b><p>GPT-Live-1 在专家级科学推理测试上明显优于 Advanced Voice Mode。语音入口不再意味着推理能力下降。</p></div>
-        <div class="badge"><b>BrowseComp</b><p>它在困难网页搜索任务上有提升。意义在于，用户可以用口头方式发起需要搜索的复杂问题。</p></div>
-        <div class="badge"><b>τ³-Voice Telecom</b><p>内部电信客服任务显示它更适合多轮支持流程。语音代理开始接近真实业务场景。</p></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="safety">
-    <div class="wrap">
-      <h2>声音带来新的安全边界</h2>
-      <p class="quote">当 AI 可以实时说话，安全机制也必须能在它说话时生效。</p>
-      <p>OpenAI 扩展了音频原生安全评估，并针对自伤、精神病性风险、躁狂、情感依赖、暴力和性内容做了合成评估。内部专家也测试了语音特有风险。</p>
-      <p>文章称 GPT-Live 在几乎所有测试领域都达到或优于 Advanced Voice Mode。系统还能在检测到潜在不安全输出时调整回应、显示安全资源，或在高风险情况下结束语音对话。</p>
-      <p>这改变了读者对语音 AI 的理解。语音不是普通文本输出的外壳，而是一个更即时、更情绪化，也更需要实时保护的交互通道。</p>
-    </div>
-  </section>
-
-  <section class="avail">
-    <div class="wrap">
-      <h2>上线范围和现实限制</h2>
-      <div class="timeline">
-        <div class="time">现在</div>
-        <div class="item">GPT-Live 面向全球 ChatGPT 用户在 iOS、Android 和 ChatGPT.com 推出。Go、Plus 和 Pro 用户默认使用 GPT-Live-1，Free 用户默认使用 GPT-Live-1 mini。</div>
-        <div class="time">很快</div>
-        <div class="item">OpenAI 计划把 GPT-Live 带到 API。开发者和企业可以登记通知。</div>
-        <div class="time">仍有限制</div>
-        <div class="item">部分语言可能有非母语口音或流利度缺口。上线时不支持 ChatGPT 中带视频或屏幕共享的语音。</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="takeaways">
-    <div class="wrap">
-      <h2>最值得带走的洞见</h2>
-      <div class="mosaic">
-        <div class="tile"><b>语音 AI 的下一步是连续性</b>真正的突破不是更像真人发音，而是系统能在对话中持续判断时机。</div>
-        <div class="tile"><b>前台互动和后台推理会分工</b>GPT-Live 负责交流流畅度，GPT-5.5 负责更深任务。这可能成为多模态代理的常见架构。</div>
-        <div class="tile"><b>安全必须实时化</b>语音输出不能只靠生成后审查。系统需要在说话过程中干预。</div>
-        <div class="tile"><b>语音会进入更复杂工作流</b>搜索、客服、语言练习和长任务协作都会受影响。</div>
-        <div class="tile"><b>限制同样重要</b>视频、屏幕共享和跨语言流利度仍未完全解决。GPT-Live 是方向明确的发布，不是语音交互的终点。</div>
-      </div>
-    </div>
-  </section>
+<article>
+<header class="hero">
+<div class="eyebrow">OpenAI · Product · 2026</div>
+<h1>推出 GPT-Live</h1>
+<p class="original-title" lang="en">Introducing GPT-Live</p>
+<p class="deck">新一代语音模型让 AI 能够一边听、一边说，也能在后台完成搜索与深度推理。它真正改变的不是声音质量，而是人与 AI 共同交流和工作的节奏。</p>
+<div class="meta">
+<span>2026 年 7 月 8 日</span>
+<span>ChatGPT Voice</span>
+<span>GPT‑Live‑1</span>
+<span>GPT‑Live‑1 mini</span>
+</div>
+</header>
+<section id="summary">
+<p class="one-line"><strong>一句话总括：</strong>GPT‑Live 用全双工交互层维持自然对话，再把复杂任务交给前沿模型处理，使语音 AI 能够同时兼顾交流节奏与深度能力。</p>
+<div aria-label="关键数字" class="metric-strip">
+<div class="metric"><b>1.5 亿+</b><span>每周使用 ChatGPT Voice、听写等语音功能的人数。</span></div>
+<div class="metric"><b>5—10 分钟</b><span>真人配对评测中，每轮匹配对话的时长。</span></div>
+<div class="metric"><b>9 种声音</b><span>ChatGPT 为 GPT‑Live 重新制作的全部预设声音。</span></div>
+<div class="metric"><b>2 个版本</b><span>GPT‑Live‑1 面向付费层，GPT‑Live‑1 mini 面向免费用户。</span></div>
+</div>
+<div class="split">
+<div class="architecture">
+<h2>交互架构：从轮次切换到持续协同</h2>
+<p>传统级联系统依次完成语音转文字、生成回答和文字转语音。信息可能在模型之间损失，响应也更慢。</p>
+<p>Advanced Voice Mode 把音频输入和输出合进一个模型，但仍要等待用户说完。GPT‑Live 则能<mark class="alt">同时监听和发声</mark>，每秒多次决定是否继续听、暂停、打断或调用工具。</p>
+<p>这意味着短暂停顿不再必然被当成一句话的结束。语音交互开始更接近真正的共同对话。</p>
+</div>
+<div class="delegation">
+<h2>能力架构：把自然对话与深度工作解耦</h2>
+<p>GPT‑Live 负责实时交流。搜索、推理和更具智能体特征的任务则可交给 GPT‑5.5 等后台模型。</p>
+<p>后台任务运行时，GPT‑Live 仍可继续交谈并维持上下文。首发时，Instant 版本使用 GPT‑5.5 Instant；Medium 和 High 使用 GPT‑5.5 Thinking。</p>
+<p>关键洞见是：<mark>交流模型不必独自完成所有工作</mark>。交互速度和推理深度可以分别优化。</p>
+</div>
+</div>
+<div class="flow">
+<h2>三代语音系统的演进</h2>
+<ol>
+<li><strong>级联系统</strong><br/>三个模型依次处理。响应慢，语气容易僵硬。</li>
+<li><strong>轮次式模型</strong><br/>单模型处理音频。延迟下降，但仍依赖停顿判断轮次。</li>
+<li><strong>GPT‑Live</strong><br/>持续处理输入并生成输出。复杂任务可在后台并行完成。</li>
+</ol>
+</div>
+<div class="eval">
+<div class="eval-main">
+<h2>评测显示偏好和能力均有提升</h2>
+<p>在匹配的 <mark>5—10 分钟</mark>真人对话中，GPT‑Live‑1 和 GPT‑Live‑1 mini 相比 Advanced Voice Mode 获得明显更高的整体偏好。</p>
+<ul>
+<li><strong>GPQA：</strong>专家级生物、化学和物理推理表现显著提升。</li>
+<li><strong>BrowseComp：</strong>智能体网页搜索和查找隐蔽信息的能力增强。</li>
+<li><strong>τ³‑Voice Telecom：</strong>现实、多轮电信客服任务表现更好。</li>
+</ul>
+<p>这说明新架构不仅改善“听起来是否自然”，也提升了语音入口能够调动的实际任务能力。</p>
+</div>
+<aside class="eval-note">
+<strong>需要保留的限定</strong>
+<p>文章没有披露各项评测的具体分数、胜率或样本量。</p>
+<p>τ³‑Voice Telecom 使用了 OpenAI 的内部变体，并采用由最新推理模型驱动的定制用户模型。因此，读者无法仅凭本文独立复核全部结果。</p>
+</aside>
+</div>
+<div class="experience">
+<h2>产品体验的变化不只体现在“更像真人”</h2>
+<div class="features">
+<div class="feature"><strong>更自然</strong><br/>允许插话、停顿和要求放慢语速，也会用简短回应表示正在倾听。</div>
+<div class="feature"><strong>更聪明</strong><br/>可调用最新前沿模型，并提供 Instant、Medium 和 High 推理级别。</div>
+<div class="feature"><strong>更会听</strong><br/>减少在用户思考时抢话，也能更好地区分人声与交通或交谈噪声。</div>
+<div class="feature"><strong>可视化</strong><br/>交谈期间可展示天气、股票和体育等信息卡，同时保留搜索、记忆、图片及文件能力。</div>
+</div>
+<p>这些变化把语音从一种免手持输入方式，推向了可承载复杂、持续任务的交互界面。</p>
+</div>
+<div class="safety">
+<h2>实时语音带来新的安全边界</h2>
+<p>OpenAI 增加了音频原生和合成音频评测，覆盖自伤、精神病性症状与躁狂、对 AI 的情感依赖、暴力及性内容。内部专家还测试了语音特有风险。</p>
+<p>系统可在模型说话期间检测潜在不安全输出，并转向更安全的回答、提供资源，或在高风险情况下结束通话。青少年还受到年龄适配行为、家长控制和高风险通知机制的额外保护。</p>
+<p>不过，安全工作仍依赖长期监测。尤其是<mark>情感依赖</mark>，必须通过真实使用中的新模式持续修正防护措施。</p>
+</div>
+<div class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="mosaic">
+<div><strong>自然感来自时序，不只是音色。</strong><p>能否在恰当时机听、说、停顿和保持安静，比单纯生成更逼真的声音更重要。</p></div>
+<div><strong>前台互动与后台智能正在分层。</strong><p>这种解耦让新模型和智能体可以持续接入，而无需重做整个语音交互层。</p></div>
+<div><strong>评测方向扩大了。</strong><p>语音模型不再只比延迟和转写准确率，还要衡量轮次、打断、交流流畅度与复杂任务能力。</p></div>
+<div><strong>产品已经落地，但仍有限制。</strong><p>全球用户开始获得新体验，API 也在规划中。不过部分语言仍可能有口音或流利度问题，首发版本也不支持视频和屏幕共享。</p></div>
+</div>
+</div>
+</section><section id="translation">
+<h2>完整译文</h2>
+<p><strong>新一代语音模型带来更自然的人机互动，现已为 ChatGPT Voice 提供支持。</strong></p>
+<p>我们正在推出 GPT‑Live。这是新一代语音模型，能让人与 AI 的交流更像真实对话。</p>
+<p>GPT‑Live 采用全双工架构，因此可以同时听和说。在对话中，它可以用“嗯哼”或“对”等简短回应表示自己正在倾听。它也能快速接话，或者在你需要时间思考时保持安静。由此带来的语音体验自然顺畅，让人更容易开口交流。</p>
+<p>GPT‑Live 也是目前最聪明的 OpenAI 语音模型。遇到需要网页搜索、深度推理或更复杂工作的提问时，它会在后台把任务交给最新的前沿模型，并在结果准备好后带回当前对话。在后台模型工作期间，GPT‑Live 仍能继续与你交谈，保持对话流畅。发布之初，GPT‑Live 将在后台使用 GPT‑5.5。随着新的前沿模型发布，我们会持续更新 GPT‑Live 所使用的模型。</p>
+<p>这些进展带来了全新的 ChatGPT Voice 体验。它更加智能，使用起来也更加自然。长远来看，我们相信这项研究还能让人们通过语音完成日益复杂、耗时更长且更具智能体特征的工作。</p>
+<p>从今天起，我们开始向全球 ChatGPT 用户推出 GPT‑Live 的两个版本：GPT‑Live‑1 和 GPT‑Live‑1 mini。我们也计划很快将它们带到 API。开发者和企业可以通过相关表单登记，以便接收通知。</p>
+<h3>迈入人机互动的新时代</h3>
+<p>我们的愿景是实现真正自然的人机互动。在这样的世界里，与 AI 协作会像与另一个人共事一样流畅、及时。推理和复杂任务则会在后台无缝完成。</p>
+<h3>以往的方法</h3>
+<p>早期语音 AI 系统让我们更接近这一愿景，但也带来了重要的取舍。</p>
+<h4>级联式语音系统</h4>
+<p>级联式语音系统依赖多个模型依次处理每轮对话。最初的 ChatGPT Voice 串联了三个模型：语音转文字模型负责转写用户说的话，大语言模型负责生成回答，文字转语音模型再把回答转换成语音。</p>
+<p>这种方式首次让我们可以通过语音与前沿 AI 模型交谈，但复杂架构也有代价。信息可能在不同模型之间丢失，回答速度较慢，表达也显得僵硬。</p>
+<div class="diagram-label"><strong>级联式语音系统</strong><br/>响应缓慢而僵硬，停顿时间很长。</div>
+<h4>轮次式语音模型</h4>
+<p>ChatGPT Advanced Voice Mode 等轮次式语音模型在单个模型内处理并生成音频。这降低了延迟，也让对话更顺畅，但它们仍按离散轮次运行。</p>
+<p>模型必须等用户停止说话后才能回应，因此双方的来回交流仍然僵硬。此外，轮次检测以静默为依据。哪怕只是短暂停顿或出现背景噪声，也可能被误认为一轮对话已经结束，导致模型在不自然的时机打断用户。</p>
+<div class="diagram-label"><strong>轮次式语音模型</strong><br/>响应稍快，也更流畅，但与模型来回对话的感觉依然僵硬。</div>
+<h3>我们的新方法</h3>
+<p>GPT‑Live 通过两项架构变化解决这些限制。</p>
+<h4>持续互动</h4>
+<p>第一，我们采用全双工架构，为 GPT‑Live 构建了持续互动能力。GPT‑Live 不再逐条处理一系列相互分离的消息，而是在生成输出的同时持续处理输入。</p>
+<p>因此，模型每秒可以多次作出交互决定，包括是否说话、继续倾听、暂停、打断或调用工具。</p>
+<p>这让模型能够进行更自然的来回交流，更准确地把握时间，甚至可以进行实时翻译。</p>
+<div class="diagram-label"><strong>持续互动</strong><br/>响应快速、自然、富有表现力，也会更主动地倾听。</div>
+<h4>委派深度工作</h4>
+<p>第二，我们把负责持续互动的 GPT‑Live 与深度工作解耦。遇到需要搜索、推理或更强智能体能力的问题时，GPT‑Live 可以把任务交给 GPT‑5.5 等其他模型。</p>
+<p>这样一来，即使后台同时处理多个任务，它也能继续进行当前对话。</p>
+<p>这项架构变化还让 GPT‑Live 可以持续使用最新模型和智能体，把前沿智能与自然互动结合起来。</p>
+<div class="diagram-label"><strong>委派深度工作</strong><br/>GPT‑Live 提供快速、自然的回应，GPT‑5.5 则在后台处理搜索。</div>
+<h3>评测</h3>
+<p>我们建立了新的人类评测，用来衡量对话是否令人愉快，以及交流是否流畅。在这些面对面的比较中，GPT‑Live‑1 和 GPT‑Live‑1 mini 均明显优于 Advanced Voice Mode。</p>
+<p>评测使用彼此匹配的 5—10 分钟对话，衡量整体偏好、轮次衔接、打断情况、对话流畅度，以及每次互动给人的自然程度。</p>
+<p><strong>GPQA：</strong>在 GPQA 上，GPT‑Live‑1 明显优于 Advanced Voice Mode。该 benchmark 测试生物学、化学和物理学领域的专家级科学推理能力。</p>
+<p><strong>BrowseComp：</strong>在 BrowseComp 上，GPT‑Live‑1 相比 Advanced Voice Mode 取得显著提升。该 benchmark 测试智能体网页搜索，以及寻找难以定位的信息的能力。</p>
+<p><strong>τ³‑Voice Telecom（内部变体）**：</strong>在 τ³‑Voice Telecom 上，GPT‑Live‑1 优于 Advanced Voice Mode。该 benchmark 通过真实、多轮的电信支持任务测试语音智能体。</p>
+<div class="footnotes">
+<p>* GPT‑Live‑1（Instant）和 GPT‑Live‑1 mini 在后台使用 GPT‑5.5 Instant 模型。GPT‑Live‑1 Medium 和 GPT‑Live‑1 High 使用 GPT‑5.5 Thinking 模型，并分别采用中等和高等推理强度。</p>
+<p>** 在这项评测中，我们使用了由最新推理模型驱动的定制用户模型。</p>
+</div>
+<h3>全新的 ChatGPT Voice 体验</h3>
+<p>每周有超过 1.5 亿人通过 Voice、听写等功能与 ChatGPT 交谈。他们用它免手操作地处理日常事务、练习语言、讲睡前故事，或者在通勤途中随意聊天。</p>
+<p>从今天起，点击 Voice 按钮与 ChatGPT 交谈时，你将获得由 GPT‑Live 驱动的改进体验。对话会更加自然，回答更加聪明，倾听能力也更好，同时还能显示可视化回答。</p>
+<h4>更自然的对话</h4>
+<p>现在，与 ChatGPT 交谈应该更像真实对话。你可以插话提问，可以停下来整理思路，也可以让 ChatGPT 放慢语速。</p>
+<p>它会自然地用“嗯哼”或“明白了”等短语回应，让你知道它一直在听。我们还针对 GPT‑Live 重新制作了 ChatGPT 中九种各具特色的声音。</p>
+<h4>更聪明的回答</h4>
+<p>ChatGPT Voice 现在可以调用我们最新的前沿模型，在需要时给出更聪明的回答。</p>
+<p>你也可以选择符合自身需求的推理级别。Instant 适合快速响应。Medium 和 High 则适合希望 ChatGPT 花更多时间思考的情况。</p>
+<h4>更好的倾听能力</h4>
+<p>如果你需要片刻时间思考，ChatGPT Voice 现在会等待，不会突然插话。如果你要求它保持安静并倾听，它也会照做。</p>
+<p>遇到驶过的车辆或附近交谈等背景噪声时，ChatGPT 也能更好地专注于你的声音，不容易受到干扰。</p>
+<h4>一眼看懂的可视化回答</h4>
+<p>有些回答在看得见时更有用。交谈期间，ChatGPT 现在可以针对天气、股票、体育等主题显示内容丰富的可视化卡片。Voice 也会继续支持搜索、记忆、图片和文件上传。</p>
+<figure class="source-figure" data-source-image="0"><img alt="ChatGPT Voice displaying a weather forecast for Denver, Colorado." decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/38TRAE6B8AS3hNkoQuKSOl/729b7c415ed4c1b62027449799cead86/gpt-live-visual-answer-weather.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="1"><img alt="ChatGPT Voice displaying upcoming international football matches." decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/7IWfPZwH8SaJVikq4PScQP/f327d0d73d35b3989b8d504d5e9fa782/gpt-live-visual-answer-sports.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="2"><img alt="ChatGPT Voice displaying a map with nearby soccer pubs." decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/GLkTfEhJSFJZ77FHnN1f6/b1ab29d652268636a226246f5b1766cc/gpt-live-visual-answer-maps.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<p>最终呈现的是一种更自然、更强大，也更适合日常生活的 ChatGPT Voice 体验。</p>
+<h3>为语音场景设计的安全机制</h3>
+<p>GPT‑Live 从一开始就以默认安全为设计目标。它继承了最新模型的安全进展，同时针对关键风险领域接受专门的安全训练，并加入了专为语音设计的新防护措施。</p>
+<h4>扩展安全测试</h4>
+<p>为了更准确地反映人们在现实环境中使用语音的方式，我们首先扩展了安全测试，加入新的音频原生评测。</p>
+<p>我们还根据从 Advanced Voice Mode 中获得的经验，创建了使用生成音频的合成评测，以便更集中地测试关键安全领域。这些领域包括自伤、精神病性症状与躁狂、对 AI 的情感依赖、暴力和性内容。</p>
+<p>内部专家也对模型进行了红队测试，重点寻找语音所特有的风险。</p>
+<p>在测试中，GPT‑Live 在几乎所有受评领域的表现都与 Advanced Voice Mode 相当或更好。有关测试和防护措施的更多信息，可参阅 GPT‑Live system card。</p>
+<h4>内置防护措施</h4>
+<p>语音对话实时展开，因此我们还构建了能在模型说话期间采取行动的防护措施。</p>
+<p>当系统检测到可能不安全的输出时，可以引导模型给出更安全的回答，也可以显示额外的安全提示或资源。在风险较高的情况下，系统还可以结束语音对话。</p>
+<p>对于涉及自伤的对话，我们调整了 ChatGPT 的支持流程，使其适用于语音场景，其中包括提供经过专家审核的危机求助热线支持。</p>
+<p>我们还设计了额外保护措施来支持青少年用户，并直接在模型中训练符合相应年龄的行为，以降低不当回答的风险。</p>
+<p>家长可以通过 Parental Controls 决定青少年能否使用 ChatGPT Voice。如果系统发现可能存在自伤或自杀意图的迹象，在风险较高的情况下，与账号关联的家长可能会收到通知。</p>
+<h4>从真实使用中学习</h4>
+<p>我们还在推出更长期的衡量机制和发布后监测，重点关注情感依赖，以便继续加深理解并完善防护措施。</p>
+<p>这项工作建立在我们此前对情感型使用和情绪健康的研究之上。它将帮助我们识别新出现的模式，并改善系统在情绪敏感互动中的回应方式。</p>
+<p>最后，GPT‑Live 是为对话而设计的，不是用来模仿他人声音的。它在 ChatGPT 中使用一组预设声音，并配有防止模仿真人声音的保护机制。</p>
+<p>我们致力于维护安全与福祉。随着从真实使用中不断学习，我们也会继续加强这些保护措施。</p>
+<h3>可用范围与限制</h3>
+<p>GPT‑Live 现正通过 iOS、Android 和 ChatGPT.com 向全球 ChatGPT 用户推出。</p>
+<p>GPT‑Live‑1 将成为 Go、Plus 和 Pro 用户使用 ChatGPT Voice 时的默认模型。GPT‑Live‑1 mini 将成为 Free 用户的默认模型。更多可用范围信息可在 Help Center 中查看。</p>
+<p>我们已经针对 ChatGPT 中一些最常用的语言优化 GPT‑Live。对于某些语言，模型可能带有非母语口音，流利程度也可能存在不足。我们正在积极改进不同语言下的体验。</p>
+<p>发布之初，GPT‑Live 不支持在 ChatGPT 中同时使用语音、视频或屏幕共享，但我们正在努力尽快加入这些能力。</p>
+<p>你仍然可以使用旧版 ChatGPT Voice，包括支持这些功能的 Standard 和 Advanced Voice Mode。</p>
+<p>2026</p>
+<p>ChatGPT</p>
+<p>作者</p>
+<div class="keep-reading">
+<h3>继续阅读</h3>
+<figure class="source-figure" data-source-image="3"><img alt="GPT-5.6 is now the preferred model in Microsoft 365 Copilot &gt; Cover image" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/3MPipvFMxS8m3kTyCtwFgj/015747dcd34cb667a221688cfca64e0f/Frame.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="4"><img alt="GPT 5-6 &gt; Card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/1a9IPPV5nXWydTBosgmgYI/8e03f28ca04f26edc8bc81cdba387df1/5-6.jpg?w=3840&amp;q=90&amp;fm=webp"/></figure>
+</div>
+</section>
+</article>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

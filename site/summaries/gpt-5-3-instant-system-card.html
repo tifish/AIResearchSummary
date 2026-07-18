@@ -1,365 +1,306 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>GPT-5.3 Instant 系统卡</title>
 <style>
-:root {
-  --bg: #f7f8fb;
-  --ink: #17202a;
-  --muted: #617184;
-  --line: #d8e0ea;
-  --card: #ffffff;
-  --hero: #132238;
-  --hero-ink: #f4f8ff;
-  --hero-muted: #bfd0e6;
-  --data: #2563eb;
-  --data-bg: #e9f1ff;
-  --risk: #c2410c;
-  --risk-bg: #fff0e8;
-  --opportunity: #0f766e;
-  --opportunity-bg: #e6f7f4;
-  --conclusion: #7c3aed;
-  --conclusion-bg: #f1ebff;
-  --note: #b45309;
-  --note-bg: #fff6d8;
-  --soft: #eef3f8;
-  --shadow: 0 18px 45px rgba(30, 48, 80, .12);
+:root,
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f5f3ed;
+  --surface: #ffffff;
+  --ink: #17211d;
+  --muted: #65706a;
+  --line: #d9ddd7;
+  --accent: #176b52;
+  --accent2: #2864a5;
+  --accent3: #a04967;
+  --accent4: #a66516;
+  --hero: #153c32;
+  --hero-ink: #f6fff9;
+  --hero-muted: #c3ddd3;
+  --data-bg: #e1f0ff;
+  --risk-bg: #f8e5eb;
+  --opportunity-bg: #e2f4e9;
+  --conclusion-bg: #fff0d7;
+  --card: #fbfcfa;
+  --translation-bg: #ffffff;
+  --hl: #ffe09e;
+  --hl2: #bfe6d0;
+  --shadow: rgba(20, 42, 34, 0.12);
 }
-
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0d1118;
-    --ink: #e8edf5;
-    --muted: #a6b3c4;
-    --line: #283244;
-    --card: #151c27;
-    --hero: #08101d;
-    --hero-ink: #eef5ff;
-    --hero-muted: #9fb3d3;
-    --data: #74a7ff;
-    --data-bg: #13243d;
-    --risk: #ff9b72;
-    --risk-bg: #321b13;
-    --opportunity: #5eead4;
-    --opportunity-bg: #102b29;
-    --conclusion: #c4a6ff;
-    --conclusion-bg: #241a3a;
-    --note: #ffd166;
-    --note-bg: #2d260f;
-    --soft: #121a25;
-    --shadow: 0 18px 45px rgba(0, 0, 0, .35);
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0e1513;
+    --surface: #17201d;
+    --ink: #e5eee9;
+    --muted: #9daea6;
+    --line: #33423c;
+    --accent: #58d2a6;
+    --accent2: #70b2ff;
+    --accent3: #f08daf;
+    --accent4: #f1b85c;
+    --hero: #102d26;
+    --hero-ink: #effff7;
+    --hero-muted: #9cc7b7;
+    --data-bg: #12273c;
+    --risk-bg: #351b27;
+    --opportunity-bg: #153126;
+    --conclusion-bg: #352916;
+    --card: #18221e;
+    --translation-bg: #121a17;
+    --hl: #6f5017;
+    --hl2: #18583f;
+    --shadow: rgba(0, 0, 0, 0.3);
   }
 }
-
 :root[data-theme="dark"] {
-  --bg: #0d1118;
-  --ink: #e8edf5;
-  --muted: #a6b3c4;
-  --line: #283244;
-  --card: #151c27;
-  --hero: #08101d;
-  --hero-ink: #eef5ff;
-  --hero-muted: #9fb3d3;
-  --data: #74a7ff;
-  --data-bg: #13243d;
-  --risk: #ff9b72;
-  --risk-bg: #321b13;
-  --opportunity: #5eead4;
-  --opportunity-bg: #102b29;
-  --conclusion: #c4a6ff;
-  --conclusion-bg: #241a3a;
-  --note: #ffd166;
-  --note-bg: #2d260f;
-  --soft: #121a25;
-  --shadow: 0 18px 45px rgba(0, 0, 0, .35);
+  color-scheme: dark;
+  --bg: #0e1513;
+  --surface: #17201d;
+  --ink: #e5eee9;
+  --muted: #9daea6;
+  --line: #33423c;
+  --accent: #58d2a6;
+  --accent2: #70b2ff;
+  --accent3: #f08daf;
+  --accent4: #f1b85c;
+  --hero: #102d26;
+  --hero-ink: #effff7;
+  --hero-muted: #9cc7b7;
+  --data-bg: #12273c;
+  --risk-bg: #351b27;
+  --opportunity-bg: #153126;
+  --conclusion-bg: #352916;
+  --card: #18221e;
+  --translation-bg: #121a17;
+  --hl: #6f5017;
+  --hl2: #18583f;
+  --shadow: rgba(0, 0, 0, 0.3);
 }
-
 * {
   box-sizing: border-box;
 }
-
+html {
+  scroll-behavior: smooth;
+}
 body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  line-height: 1.65;
+  font-family: "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.75;
 }
-
-main {
-  width: min(1120px, calc(100% - 32px));
-  margin: 0 auto;
-}
-
 .hero {
-  margin: 24px auto 28px;
-  padding: 42px;
-  border-radius: 8px;
+  padding: clamp(3rem, 8vw, 7rem) max(6vw, calc((100vw - 1120px) / 2));
   background: var(--hero);
   color: var(--hero-ink);
-  box-shadow: var(--shadow);
 }
-
-.kicker {
-  margin: 0 0 12px;
-  color: var(--data);
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0;
+.eyebrow {
+  margin: 0 0 1rem;
+  color: var(--accent4);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
-
-h1 {
+.hero h1 {
+  max-width: 850px;
   margin: 0;
-  font-size: clamp(34px, 6vw, 64px);
-  line-height: 1.05;
-  letter-spacing: 0;
+  font-size: clamp(2.5rem, 7vw, 5.7rem);
+  line-height: 1.06;
+  letter-spacing: -0.045em;
 }
-
-.original {
-  margin: 12px 0 28px;
+.original-title {
+  margin: 1rem 0 0;
   color: var(--hero-muted);
-  font-size: 18px;
+  font-size: clamp(1rem, 2vw, 1.3rem);
 }
-
-.thesis {
-  margin: 0;
+.hero-summary {
   max-width: 760px;
-  font-size: 22px;
-  color: var(--hero-ink);
+  margin: 2.5rem 0 0;
+  padding-left: 1.2rem;
+  border-left: 5px solid var(--accent4);
+  font-size: clamp(1.15rem, 2.4vw, 1.55rem);
+  font-weight: 650;
 }
-
-.stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--line);
+main {
+  width: min(1120px, 88vw);
+  margin: 0 auto;
 }
-
-.stat {
-  padding: 22px;
-  background: var(--card);
-}
-
-.stat b {
-  display: block;
-  color: var(--data);
-  font-size: 26px;
-  line-height: 1.1;
-}
-
-.stat span {
-  color: var(--muted);
-  font-size: 14px;
-}
-
-.split {
-  display: grid;
-  grid-template-columns: 1.1fr .9fr;
-  gap: 28px;
-  align-items: stretch;
-  margin: 34px 0;
-}
-
-.panel {
-  padding: 28px;
-  border-radius: 8px;
-  background: var(--card);
-  border: 1px solid var(--line);
-}
-
-.panel.alt {
-  background: var(--opportunity-bg);
-  border-color: var(--opportunity);
-}
-
-h2 {
-  margin: 0 0 14px;
-  font-size: 24px;
-  line-height: 1.25;
-}
-
-p {
-  margin: 0 0 12px;
-}
-
-.badge {
-  display: inline-block;
-  margin-bottom: 12px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  color: var(--opportunity);
-  background: var(--card);
-  border: 1px solid var(--opportunity);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.flow {
-  margin: 34px 0;
-  padding: 30px;
-  border-radius: 8px;
-  background: var(--soft);
-  border: 1px solid var(--line);
-}
-
-.steps {
+.fact-strip {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-  margin-top: 18px;
-}
-
-.step {
-  position: relative;
-  padding: 18px 18px 18px 22px;
-  border-left: 5px solid var(--data);
-  background: var(--card);
-  border-radius: 8px;
-}
-
-.step:nth-child(2) {
-  border-left-color: var(--opportunity);
-}
-
-.step:nth-child(3) {
-  border-left-color: var(--conclusion);
-}
-
-.step strong {
-  display: block;
-  margin-bottom: 6px;
-}
-
-.table-wrap {
-  margin: 34px 0;
+  margin: -2rem 0 4rem;
   overflow: hidden;
-  border-radius: 8px;
   border: 1px solid var(--line);
-  background: var(--card);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: 0 16px 40px var(--shadow);
 }
-
-table {
-  width: 100%;
-  border-collapse: collapse;
+.fact {
+  min-height: 150px;
+  padding: 1.5rem;
+  border-right: 1px solid var(--line);
 }
-
-th, td {
-  padding: 16px;
-  border-bottom: 1px solid var(--line);
-  text-align: left;
-  vertical-align: top;
+.fact:last-child {
+  border-right: 0;
 }
-
-th {
-  background: var(--data-bg);
-  color: var(--data);
-  font-size: 14px;
-}
-
-tr:last-child td {
-  border-bottom: 0;
-}
-
-.insight {
-  margin: 34px 0;
-  padding: 28px;
-  border-left: 8px solid var(--risk);
-  background: var(--risk-bg);
-  border-radius: 8px;
-}
-
-.insight h2 {
-  color: var(--risk);
-}
-
-.note-band {
-  margin: 34px 0;
-  padding: 24px;
-  background: var(--note-bg);
-  border: 1px solid var(--note);
-  border-radius: 8px;
-}
-
-.note-band strong {
-  color: var(--note);
-}
-
-.takeaways {
-  margin: 34px 0 50px;
-}
-
-.mosaic {
-  display: grid;
-  grid-template-columns: 1.1fr .9fr 1fr;
-  gap: 14px;
-  margin-top: 16px;
-}
-
-.tile {
-  min-height: 132px;
-  padding: 20px;
-  border-radius: 8px;
-  background: var(--card);
-  border: 1px solid var(--line);
-}
-
-.tile.data {
-  background: var(--data-bg);
-  border-color: var(--data);
-}
-
-.tile.risk {
-  background: var(--risk-bg);
-  border-color: var(--risk);
-}
-
-.tile.opportunity {
-  background: var(--opportunity-bg);
-  border-color: var(--opportunity);
-}
-
-.tile.conclusion {
-  grid-column: span 3;
-  background: var(--conclusion-bg);
-  border-color: var(--conclusion);
-}
-
-.tile strong {
+.fact strong {
   display: block;
-  margin-bottom: 8px;
+  color: var(--accent2);
+  font-size: 1.75rem;
+  line-height: 1.2;
 }
-
+.fact span {
+  display: block;
+  margin-top: 0.7rem;
+  color: var(--muted);
+}
+.split {
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  gap: 2rem;
+  margin: 4rem 0;
+  align-items: stretch;
+}
+.split-intro {
+  padding: 2.4rem;
+  border-radius: 22px;
+  background: var(--opportunity-bg);
+  border-top: 7px solid var(--accent);
+}
+.split-detail {
+  padding: 2.4rem;
+  border: 1px solid var(--line);
+  border-radius: 22px 4px 22px 4px;
+  background: var(--surface);
+}
+.split h2,
+.safety h2,
+.takeaways h2 {
+  margin-top: 0;
+  font-size: clamp(1.6rem, 3vw, 2.5rem);
+  line-height: 1.25;
+}
+.kicker {
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+mark {
+  padding: 0.06em 0.22em;
+  background: var(--hl);
+  color: var(--ink);
+}
+mark.alt {
+  background: var(--hl2);
+}
+.safety {
+  margin: 4rem 0;
+  padding: clamp(2rem, 5vw, 4rem);
+  color: var(--ink);
+  background: var(--risk-bg);
+  border-left: 9px solid var(--accent3);
+}
+.safety-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+.limit-note {
+  padding: 1.4rem;
+  background: var(--conclusion-bg);
+  border-bottom: 5px solid var(--accent4);
+  font-weight: 650;
+}
+.takeaways {
+  margin: 4rem 0 5rem;
+}
+.takeaway-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr 1fr;
+  gap: 1rem;
+}
+.takeaway {
+  padding: 1.5rem;
+  border: 1px solid var(--line);
+  background: var(--card);
+}
+.takeaway:nth-child(1) {
+  border-top: 6px solid var(--accent);
+}
+.takeaway:nth-child(2) {
+  background: var(--data-bg);
+  border-top: 6px solid var(--accent2);
+}
+.takeaway:nth-child(3) {
+  background: var(--conclusion-bg);
+  border-top: 6px solid var(--accent4);
+}
+.takeaway strong {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-size: 1.1rem;
+}
+#translation {
+  width: min(780px, 88vw);
+  margin: 0 auto 6rem;
+  padding: clamp(2rem, 5vw, 4rem);
+  border-top: 8px solid var(--accent2);
+  background: var(--translation-bg);
+  box-shadow: 0 18px 50px var(--shadow);
+}
+#translation h2 {
+  margin: 0 0 2rem;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  line-height: 1.15;
+}
+#translation h3 {
+  margin-top: 2.5rem;
+  color: var(--accent);
+  font-size: 1.5rem;
+}
+#translation p {
+  margin: 1.15rem 0;
+}
+.meta-list {
+  margin: 2rem 0;
+  padding: 1rem 1.3rem;
+  border-left: 5px solid var(--accent4);
+  background: var(--conclusion-bg);
+}
+.source-figure {
+  margin: 2.8rem 0;
+}
+.source-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+.source-figure figcaption {
+  margin-top: 0.75rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
 @media (max-width: 760px) {
-  main {
-    width: min(100% - 22px, 1120px);
-  }
-
-  .hero {
-    padding: 28px 22px;
-  }
-
-  .stats,
+  .fact-strip,
   .split,
-  .steps,
-  .mosaic {
+  .safety-grid,
+  .takeaway-grid {
     grid-template-columns: 1fr;
   }
-
-  .tile.conclusion {
-    grid-column: auto;
+  .fact {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
   }
-
-  h1 {
-    font-size: 36px;
-  }
-
-  .thesis {
-    font-size: 19px;
+  .fact:last-child {
+    border-bottom: 0;
   }
 }
 </style>
@@ -492,130 +433,109 @@ tr:last-child td {
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/gpt-5-3-instant-system-card" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<header class="hero">
+<p class="eyebrow">OpenAI · Publication · 2026</p>
+<h1>GPT-5.3 Instant 系统卡</h1>
+<p class="original-title" lang="en">GPT-5.3 Instant System Card</p>
+<p class="hero-summary">一句话总括：这份简短系统卡明确了 GPT-5.3 Instant 的体验改进方向，并说明其综合安全缓解方案主要沿用 GPT-5.2 Instant 的设计。</p>
+</header>
 <main>
-  <header class="hero">
-    <p class="kicker">一句话总括</p>
-    <h1>GPT-5.3 Instant 系统卡</h1>
-    <p class="original">GPT-5.3 Instant System Card</p>
-    <p class="thesis">这份系统卡的真正贡献，是把 GPT-5.3 Instant 的定位说清楚：它主要提升交互速度、联网回答质量和对话流畅度，安全框架则大体延续 GPT-5.2 Instant。</p>
-  </header>
-
-  <section class="stats" aria-label="关键数字">
-    <div class="stat">
-      <b>2026-03-03</b>
-      <span>发布日期</span>
-    </div>
-    <div class="stat">
-      <b>GPT-5</b>
-      <span>所属模型系列</span>
-    </div>
-    <div class="stat">
-      <b>5.3</b>
-      <span>Instant 新增版本</span>
-    </div>
-    <div class="stat">
-      <b>5.2</b>
-      <span>安全缓解方法的主要参照</span>
-    </div>
-  </section>
-
-  <section class="split">
-    <article class="panel">
-      <h2>核心变化是体验层面的</h2>
-      <p>OpenAI 说 GPT-5.3 Instant 响应更快，联网搜索回答更丰富，也能更好贴合上下文。</p>
-      <p>这改变了读者对模型升级的理解。这里的重点不是新能力边界，而是日常对话中更少卡顿、更少跑偏。</p>
-    </article>
-    <aside class="panel alt">
-      <span class="badge">机会</span>
-      <h2>更顺的回答会影响使用习惯</h2>
-      <p>文章特别提到减少不必要的死胡同、警告和过度断言。</p>
-      <p>这说明产品正在优化对话节奏。用户可能更容易把模型当成连续协作工具，而不是一次性问答框。</p>
-    </aside>
-  </section>
-
-  <section class="flow">
-    <h2>这份卡片实际讲了三件事</h2>
-    <div class="steps">
-      <div class="step">
-        <strong>先定位模型</strong>
-        <p>GPT-5.3 Instant 是 GPT-5 系列的新成员，也被称为 gpt-5.3-instant。</p>
+<section aria-label="关键信息" class="fact-strip">
+<div class="fact">
+<strong>2026-03-03</strong>
+<span>OpenAI 发布这份系统卡的日期。</span>
+</div>
+<div class="fact">
+<strong>更快响应</strong>
+<span>产品改进首先落在对话速度上。</span>
+</div>
+<div class="fact">
+<strong>安全方案延续</strong>
+<span>综合安全缓解方法与 GPT-5.2 Instant 基本相同。</span>
+</div>
+</section>
+<section class="split">
+<div class="split-intro">
+<p class="kicker">核心变化</p>
+<h2>改进重点是回答体验</h2>
+<p>GPT-5.3 Instant 是 GPT-5 系列的新成员。原文强调它能提供<mark class="alt">更快的响应</mark>。</p>
+<p>这意味着本次更新首先改善的是用户与模型直接交互时的流畅度。</p>
+</div>
+<div class="split-detail">
+<h2>联网回答更丰富，也更贴合语境</h2>
+<p>模型在搜索网页时，会给出内容更丰富、上下文处理更好的回答。</p>
+<p>它还会减少无意义的绕行、过多的限定语，以及打断对话节奏的武断表达。</p>
+<p><mark>结论：</mark>改进不只涉及速度，也涉及信息组织方式和措辞质量。</p>
+</div>
+</section>
+<section class="safety">
+<p class="kicker">安全与边界</p>
+<h2>安全框架没有被描述为一次全面重做</h2>
+<div class="safety-grid">
+<div>
+<p>GPT-5.3 Instant 的综合安全缓解方案，<strong>大体沿用 GPT-5.2 Instant</strong> 系统卡中介绍的方法。</p>
+<p>这表明新模型的产品体验发生了变化，但公开文本强调的是安全方法的连续性。</p>
+</div>
+<div class="limit-note">
+        正文没有给出 benchmark 成绩、样本量、比例或量化安全评测。因此，不能仅凭这段文字判断改进幅度，也不能推断安全表现提升了多少。
       </div>
-      <div class="step">
-        <strong>再说明体验改进</strong>
-        <p>改进集中在速度、联网搜索回答质量和对话流畅度。</p>
+</div>
+</section>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="takeaway-grid">
+<div class="takeaway">
+<strong>体验改进是公开重点</strong>
+        速度、联网回答质量和对话流畅度，是正文明确列出的变化。
       </div>
-      <div class="step">
-        <strong>最后交代安全延续</strong>
-        <p>综合安全缓解方法大体沿用 GPT-5.2 Instant 系统卡中的做法。</p>
+<div class="takeaway">
+<strong>联网搜索不仅追求更多内容</strong>
+        OpenAI 同时强调了回答的上下文质量，说明信息如何组织也很重要。
       </div>
-    </div>
-  </section>
-
-  <section class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>读者可能期待</th>
-          <th>文章实际提供</th>
-          <th>应如何理解</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>新的 benchmark 分数</td>
-          <td>正文没有列出分数、样本量或评测表。</td>
-          <td>这不是一份以量化评测为主的发布说明。</td>
-        </tr>
-        <tr>
-          <td>新的安全机制细节</td>
-          <td>文章说安全缓解方法大体与 GPT-5.2 Instant 相同。</td>
-          <td>安全变化可能不是本次版本说明的重点。</td>
-        </tr>
-        <tr>
-          <td>模型升级带来的实际影响</td>
-          <td>文章强调更快、更连贯、更少不必要阻断。</td>
-          <td>影响主要体现在交互质量，而不是单项能力展示。</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section class="insight">
-    <h2>风险在于披露粒度有限</h2>
-    <p>文章没有给出独立安全测试结果，也没有展开 GPT-5.3 Instant 与 GPT-5.2 Instant 的差异清单。</p>
-    <p>这会限制外部读者判断风险变化的能力。读者需要回到 GPT-5.2 系统卡，才能理解安全缓解框架的上下文。</p>
-  </section>
-
-  <section class="note-band">
-    <p><strong>关键洞见：</strong>如果只看这份文本，GPT-5.3 Instant 更像一次面向响应体验的增量发布。它把模型体验推向更自然的协作，但没有用公开数据证明能力或安全边界发生了大幅变化。</p>
-  </section>
-
-  <section class="takeaways">
-    <h2>最值得带走的洞见</h2>
-    <div class="mosaic">
-      <div class="tile data">
-        <strong>数据很少，本身就是信号</strong>
-        <p>正文没有 benchmark。读者应把它当作系统卡入口，而不是完整评测报告。</p>
+<div class="takeaway">
+<strong>安全方法保持连续</strong>
+        GPT-5.3 Instant 的综合缓解方案主要承接 GPT-5.2 Instant，而不是另起一套框架。
       </div>
-      <div class="tile opportunity">
-        <strong>体验优化是主线</strong>
-        <p>更快、更贴合上下文、更少无效停顿，可能比单个新功能更影响高频使用。</p>
-      </div>
-      <div class="tile risk">
-        <strong>安全叙述依赖旧卡</strong>
-        <p>安全方法沿用 GPT-5.2 Instant。理解风险需要同时阅读前一版系统卡。</p>
-      </div>
-      <div class="tile conclusion">
-        <strong>结论</strong>
-        <p>GPT-5.3 Instant 的公开说明更强调对话质量的细修，而不是宣布新的能力跃迁。它值得读，是因为它展示了前沿模型迭代正在从“能做什么”转向“怎样更顺地帮你做”。</p>
-      </div>
-    </div>
-  </section>
+</div>
+</section>
 </main>
+<section id="translation">
+<h2>完整译文</h2>
+<h3>引言</h3>
+<p>GPT-5.3 Instant 是 GPT-5 系列的最新成员。正如我们的博客所述，GPT-5.3 Instant 的响应速度更快。它在搜索网页时，能够提供内容更丰富、上下文处理更好的回答。它还减少了不必要的无效绕行、限定说明，以及可能打断对话节奏的过于武断的表达。该模型采用的综合安全缓解方案，与《GPT-5.2 系统卡》中介绍的 GPT-5.2 Instant 安全方案基本相同。</p>
+<p>在这份系统卡中，我们也将 GPT-5.3 Instant 称为 gpt-5.3-instant。</p>
+<div class="meta-list">
+<p>2026</p>
+<p>系统卡</p>
+<p>作者</p>
+<p>继续阅读</p>
+</div>
+<figure class="source-figure" data-source-image="0"><img alt="5.3 Instant Art Card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/72xhlkMHldxPfwGsZttoiI/3ada2b7e0cdb129d0779fbc8b700a7af/5.3_Instant_Art_Card__1_.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="1"><img alt="System Card Art" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/3kfYeisRWae4jKIMSphLhU/0e06a3ac9f3a42b91d6cc7bba01c2e8c/System_Card_Art.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="2"><img alt="GPT-5.2-Codex systemcard 1x1" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/6UXk5SoEm1RQDLwLxKMS51/3669f90372feb0d02b95b9b6ef87ecdc/GPT-5.2-Codex_systemcard_1x1.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+</section>
   <script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;

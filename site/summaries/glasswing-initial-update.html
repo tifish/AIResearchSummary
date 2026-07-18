@@ -1,312 +1,206 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Project Glasswing：初步更新</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Project Glasswing：初步进展</title>
 <style>
-:root {
+:root{
+  color-scheme:light dark;
+  --bg:#f4f1ea;
+  --paper:#fffdf8;
+  --ink:#17202a;
+  --muted:#637080;
+  --line:#d8d2c7;
+  --accent:#1565c0;
+  --accent2:#00897b;
+  --accent3:#d45b24;
+  --accent4:#7b4bb7;
+  --danger:#b3261e;
+  --success:#157347;
+  --deep:#15253c;
+  --deep-ink:#f5f7fb;
+  --soft-data:#e7f1ff;
+  --soft-risk:#fde9e5;
+  --soft-opportunity:#e4f5ef;
+  --soft-conclusion:#eee7fa;
+  --hl:#ffe28a;
+  --hl2:#a7ead7;
+  --shadow:rgba(23,32,42,.12);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#101419;
+    --paper:#181e25;
+    --ink:#e7edf4;
+    --muted:#a9b4c0;
+    --line:#35404b;
+    --accent:#69aef8;
+    --accent2:#48cfbb;
+    --accent3:#ff8a58;
+    --accent4:#bd91ed;
+    --danger:#ff7b72;
+    --success:#62d39a;
+    --deep:#0a1522;
+    --deep-ink:#eaf2ff;
+    --soft-data:#172b42;
+    --soft-risk:#3a2021;
+    --soft-opportunity:#16342e;
+    --soft-conclusion:#2c213d;
+    --hl:#795d12;
+    --hl2:#135e52;
+    --shadow:rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101419;
+  --paper:#181e25;
+  --ink:#e7edf4;
+  --muted:#a9b4c0;
+  --line:#35404b;
+  --accent:#69aef8;
+  --accent2:#48cfbb;
+  --accent3:#ff8a58;
+  --accent4:#bd91ed;
+  --danger:#ff7b72;
+  --success:#62d39a;
+  --deep:#0a1522;
+  --deep-ink:#eaf2ff;
+  --soft-data:#172b42;
+  --soft-risk:#3a2021;
+  --soft-opportunity:#16342e;
+  --soft-conclusion:#2c213d;
+  --hl:#795d12;
+  --hl2:#135e52;
+  --shadow:rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
+  line-height:1.78;
+}
+main{max-width:1120px;margin:auto;padding:32px 20px 80px}
+.hero{
+  padding:clamp(34px,7vw,76px);
+  border-radius:28px;
+  background:var(--deep);
+  color:var(--deep-ink);
+  box-shadow:0 20px 50px var(--shadow);
+}
+.eyebrow{
+  color:var(--accent2);
+  font-size:.82rem;
+  font-weight:800;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+}
+h1{max-width:850px;margin:.25em 0 .15em;font-size:clamp(2.4rem,7vw,5.5rem);line-height:1.05}
+.original{margin:0;color:var(--muted);font-size:clamp(1rem,2vw,1.35rem)}
+.hero .original{color:var(--deep-ink);opacity:.67}
+.lede{max-width:800px;margin:28px 0 0;font-size:clamp(1.15rem,2.3vw,1.6rem);line-height:1.55}
+.hl{background:var(--hl);color:var(--ink);padding:.06em .25em;border-radius:.25em}
+.hl2{background:var(--hl2);color:var(--ink);padding:.06em .25em;border-radius:.25em}
+.metric-strip{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  margin:26px 0;
+  overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:20px;
+  background:var(--paper);
+}
+.metric{padding:25px 18px;border-right:1px solid var(--line)}
+.metric:last-child{border-right:0}
+.metric strong{display:block;color:var(--accent);font-size:clamp(1.55rem,3vw,2.5rem);line-height:1.15}
+.metric span{color:var(--muted);font-size:.9rem}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin:28px 0}
+.panel{padding:28px;border-radius:18px}
+.panel.data{background:var(--soft-data);border-top:5px solid var(--accent)}
+.panel.risk{background:var(--soft-risk);border-top:5px solid var(--danger)}
+.panel h2,.panel h3{margin-top:0}
+.flow{
+  margin:30px 0;
+  padding:30px;
+  border-left:8px solid var(--accent3);
+  background:var(--paper);
+  box-shadow:0 10px 30px var(--shadow);
+}
+.flow-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.step{padding:18px 0;border-top:3px solid var(--accent3)}
+.step b{color:var(--accent3)}
+.contrast{
+  margin:30px 0;
+  padding:32px;
+  border-radius:8px 32px 8px 32px;
+  background:var(--soft-opportunity);
+}
+.contrast h2{color:var(--success)}
+.quote{
+  margin:32px 0;
+  padding:28px 34px;
+  border-left:7px solid var(--accent4);
+  background:var(--soft-conclusion);
+  font-size:1.2rem;
+  font-weight:650;
+}
+.takeaways{margin:36px 0}
+.mosaic{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.tile{padding:22px;border:1px solid var(--line);background:var(--paper);border-radius:16px}
+.tile:nth-child(1){border-left:6px solid var(--accent)}
+.tile:nth-child(2){border-left:6px solid var(--danger)}
+.tile:nth-child(3){border-left:6px solid var(--accent2)}
+.tile:nth-child(4){border-left:6px solid var(--accent4)}
+.tile strong{display:block;margin-bottom:6px}
+#translation{
+  max-width:820px;
+  margin:70px auto 0;
+  padding:clamp(24px,5vw,54px);
+  border-radius:22px;
+  background:var(--paper);
+  box-shadow:0 14px 40px var(--shadow);
+}
+#translation h2{font-size:2.2rem;border-bottom:4px solid var(--accent);padding-bottom:12px}
+#translation h3{margin-top:2.4em;color:var(--accent)}
+#translation h4{margin-top:2em;color:var(--accent3)}
+#translation p,#translation li{font-family:"Noto Serif SC","Songti SC",serif}
+#translation li{margin:.65em 0}
+.source-figure{margin:38px 0;color:var(--muted)}
+.source-figure img{display:block;max-width:100%;height:auto;border-radius:14px;box-shadow:0 10px 28px var(--shadow)}
+.source-figure figcaption{margin-top:12px;padding-left:14px;border-left:3px solid var(--accent4);font-size:.9rem}
+.note{color:var(--muted);font-size:.92rem}
+@media(max-width:760px){
+  .metric-strip,.split,.flow-grid,.mosaic{grid-template-columns:1fr}
+  .metric{border-right:0;border-bottom:1px solid var(--line)}
+  .metric:last-child{border-bottom:0}
+  main{padding-inline:14px}
+}
+
+:root[data-theme="light"] {
   color-scheme: light;
-  --bg: #f7f4ee;
-  --surface: #fffdf8;
-  --surface-2: #eef6f2;
-  --surface-3: #f3edf8;
-  --surface-4: #eef1fb;
-  --ink: #182027;
-  --muted: #62707c;
-  --line: #d8d1c6;
-  --data: #2364aa;
-  --risk: #b23a48;
-  --opportunity: #198754;
-  --conclusion: #6f42c1;
-  --warn: #c47f00;
-  --dark-band: #172033;
-  --dark-band-ink: #f8fafc;
-  --badge-ink: #ffffff;
-  --shadow: #d8d1c6;
-  --table-head: #e7edf8;
-  --quote-bg: #fff0e2;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --bg: #101418;
-    --surface: #171d23;
-    --surface-2: #10241d;
-    --surface-3: #211a29;
-    --surface-4: #151d2b;
-    --ink: #e8edf2;
-    --muted: #a9b4bf;
-    --line: #2e3944;
-    --data: #6aa9ff;
-    --risk: #ff7b8a;
-    --opportunity: #62d493;
-    --conclusion: #b999ff;
-    --warn: #ffbf52;
-    --dark-band: #090d14;
-    --dark-band-ink: #f5f7fb;
-    --badge-ink: #081018;
-    --shadow: #07090c;
-    --table-head: #18253a;
-    --quote-bg: #2a1d12;
-  }
-}
-:root[data-theme="dark"] {
-  color-scheme: dark;
-  --bg: #101418;
-  --surface: #171d23;
-  --surface-2: #10241d;
-  --surface-3: #211a29;
-  --surface-4: #151d2b;
-  --ink: #e8edf2;
-  --muted: #a9b4bf;
-  --line: #2e3944;
-  --data: #6aa9ff;
-  --risk: #ff7b8a;
-  --opportunity: #62d493;
-  --conclusion: #b999ff;
-  --warn: #ffbf52;
-  --dark-band: #090d14;
-  --dark-band-ink: #f5f7fb;
-  --badge-ink: #081018;
-  --shadow: #07090c;
-  --table-head: #18253a;
-  --quote-bg: #2a1d12;
-}
-* {
-  box-sizing: border-box;
-}
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-  line-height: 1.65;
-}
-main {
-  max-width: 1120px;
-  margin: 0 auto;
-}
-.hero {
-  padding: 56px 24px 42px;
-}
-.kicker {
-  color: var(--data);
-  font-weight: 700;
-  letter-spacing: 0;
-}
-h1 {
-  margin: 10px 0 8px;
-  font-size: clamp(32px, 6vw, 64px);
-  line-height: 1.05;
-}
-.original-title {
-  color: var(--muted);
-  font-size: 18px;
-}
-.lede {
-  max-width: 820px;
-  margin-top: 28px;
-  padding-left: 18px;
-  border-left: 6px solid var(--conclusion);
-  font-size: 24px;
-  line-height: 1.45;
-}
-.metrics {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  margin: 10px 24px 0;
-  background: var(--line);
-  border: 1px solid var(--line);
-}
-.metric {
-  background: var(--dark-band);
-  color: var(--dark-band-ink);
-  padding: 24px;
-}
-.metric strong {
-  display: block;
-  font-size: 34px;
-  line-height: 1;
-  color: var(--warn);
-}
-.metric span {
-  display: block;
-  margin-top: 10px;
-  color: var(--dark-band-ink);
-}
-.split {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 28px;
-  padding: 48px 24px;
-}
-.panel {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  padding: 28px;
-  box-shadow: 0 18px 40px var(--shadow);
-}
-.panel.alt {
-  background: var(--surface-2);
-  border-top: 8px solid var(--opportunity);
-}
-h2 {
-  margin: 0 0 14px;
-  font-size: 28px;
-  line-height: 1.2;
-}
-h3 {
-  margin: 0 0 8px;
-  font-size: 19px;
-}
-.label {
-  display: inline-block;
-  margin-bottom: 12px;
-  color: var(--badge-ink);
-  background: var(--data);
-  padding: 4px 10px;
-  font-weight: 700;
-  font-size: 13px;
-}
-.label.risk {
-  background: var(--risk);
-}
-.flow {
-  padding: 44px 24px;
-  background: var(--surface-4);
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-}
-.timeline {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-top: 22px;
-}
-.step {
-  position: relative;
-  padding: 20px;
-  background: var(--surface);
-  border-left: 6px solid var(--data);
-}
-.step:nth-child(2) {
-  border-left-color: var(--risk);
-}
-.step:nth-child(3) {
-  border-left-color: var(--warn);
-}
-.step:nth-child(4) {
-  border-left-color: var(--opportunity);
-}
-.step b {
-  color: var(--conclusion);
-}
-.table-zone {
-  padding: 48px 24px;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--surface);
-  border: 1px solid var(--line);
-}
-th, td {
-  padding: 15px 16px;
-  border-bottom: 1px solid var(--line);
-  text-align: left;
-  vertical-align: top;
-}
-th {
-  background: var(--table-head);
-  color: var(--ink);
-}
-td:first-child {
-  font-weight: 700;
-  color: var(--data);
-}
-.insight-band {
-  margin: 0 24px 48px;
-  padding: 30px;
-  background: var(--quote-bg);
-  border-left: 10px solid var(--warn);
-  font-size: 22px;
-  line-height: 1.45;
-}
-.tools {
-  display: grid;
-  grid-template-columns: 1.2fr .8fr;
-  gap: 22px;
-  padding: 0 24px 52px;
-}
-.tools-main {
-  background: var(--surface-3);
-  padding: 28px;
-  border: 1px solid var(--line);
-}
-.tools-side {
-  background: var(--dark-band);
-  color: var(--dark-band-ink);
-  padding: 28px;
-}
-.tools-side h2 {
-  color: var(--dark-band-ink);
-}
-.pill-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 18px;
-}
-.pill {
-  border: 1px solid var(--line);
-  background: var(--surface);
-  color: var(--ink);
-  padding: 8px 12px;
-  font-weight: 700;
-}
-.takeaways {
-  padding: 46px 24px 64px;
-}
-.mosaic {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-.tile {
-  min-height: 150px;
-  padding: 24px;
-  color: var(--ink);
-  background: var(--surface);
-  border: 1px solid var(--line);
-}
-.tile.data {
-  border-top: 8px solid var(--data);
-}
-.tile.risk {
-  border-top: 8px solid var(--risk);
-}
-.tile.opp {
-  border-top: 8px solid var(--opportunity);
-}
-.tile.final {
-  border-top: 8px solid var(--conclusion);
-}
-@media (max-width: 760px) {
-  .metrics,
-  .split,
-  .timeline,
-  .tools,
-  .mosaic {
-    grid-template-columns: 1fr;
-  }
-  .hero {
-    padding-top: 34px;
-  }
-  .lede {
-    font-size: 20px;
-  }
+--bg:#f4f1ea;
+  --paper:#fffdf8;
+  --ink:#17202a;
+  --muted:#637080;
+  --line:#d8d2c7;
+  --accent:#1565c0;
+  --accent2:#00897b;
+  --accent3:#d45b24;
+  --accent4:#7b4bb7;
+  --danger:#b3261e;
+  --success:#157347;
+  --deep:#15253c;
+  --deep-ink:#f5f7fb;
+  --soft-data:#e7f1ff;
+  --soft-risk:#fde9e5;
+  --soft-opportunity:#e4f5ef;
+  --soft-conclusion:#eee7fa;
+  --hl:#ffe28a;
+  --hl2:#a7ead7;
+  --shadow:rgba(23,32,42,.12);
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -438,119 +332,143 @@ td:first-child {
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/glasswing-initial-update" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
 <main>
-  <header class="hero">
-    <div class="kicker">Anthropic · Announcements · May 22, 2026</div>
-    <h1>Project Glasswing：初步更新</h1>
-    <div class="original-title">Project Glasswing: An initial update</div>
-    <p class="lede">一句话总括：Project Glasswing 的真正贡献，是把前沿 AI 在漏洞发现上的速度优势转化为一组可观察的安全事实，并迫使行业承认新的瓶颈已经转移到验证、披露、修补和部署。</p>
-  </header>
-
-  <section class="metrics" aria-label="关键数字">
-    <div class="metric"><strong>50</strong><span>约 50 个合作伙伴参与早期防御工作。</span></div>
-    <div class="metric"><strong>10,000+</strong><span>合作伙伴共发现超过一万个高危或严重漏洞。</span></div>
-    <div class="metric"><strong>1,000+</strong><span>Anthropic 用 Mythos Preview 扫描超过一千个开源项目。</span></div>
-    <div class="metric"><strong>90.6%</strong><span>已评估候选漏洞中的真实阳性比例。</span></div>
-  </section>
-
-  <section class="split">
-    <article class="panel">
-      <span class="label">核心变化</span>
-      <h2>漏洞发现不再是最慢环节</h2>
-      <p>文章最重要的判断是，AI 已经把发现漏洞的成本和时间大幅压低。过去，安全进展常受限于能否找到足够多的新漏洞。</p>
-      <p>现在，Mythos Preview 一次性制造了新的压力。人类团队需要复现问题、判断严重性、联系维护者、写报告，并等待补丁被部署。结论是，安全系统的瓶颈已经从“找不到”变成“修不完”。</p>
-    </article>
-    <article class="panel alt">
-      <span class="label risk">现实风险</span>
-      <h2>披露延迟让能力增长变得危险</h2>
-      <p>行业通常会在发现漏洞后约 90 天披露。若补丁更早完成，披露可能在补丁可用后约 45 天发生。这是为了给用户升级留出时间。</p>
-      <p>但这也意味着公开漏洞只是滞后指标。模型能力越强，攻击者潜在利用这些时间差的风险越高。读者应把 AI 安全能力理解为部署节奏问题，而不只是模型性能问题。</p>
-    </article>
-  </section>
-
-  <section class="flow">
-    <h2>开源扫描显示了“发现多、消化慢”的结构性矛盾</h2>
-    <p>Anthropic 扫描的开源项目支撑了大量互联网基础设施。Mythos Preview 估计发现 23,019 个漏洞，其中 6,202 个是高危或严重。</p>
-    <div class="timeline">
-      <div class="step"><h3>发现</h3><p><b>6,202</b> 个候选被估计为高危或严重。AI 让初始发现变得密集。</p></div>
-      <div class="step"><h3>验证</h3><p><b>1,752</b> 个候选经过独立安全团队或 Anthropic 评估。验证需要大量人工工作。</p></div>
-      <div class="step"><h3>确认</h3><p><b>1,094</b> 个被确认达到高危或严重级别。候选结果需要重新定级。</p></div>
-      <div class="step"><h3>修补</h3><p><b>75</b> 个已报告高危或严重漏洞完成修补。补丁速度明显落后于发现速度。</p></div>
-    </div>
-  </section>
-
-  <section class="table-zone">
-    <h2>外部证据让结果不只停留在 Anthropic 自述</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>来源</th>
-          <th>关键数据或评价</th>
-          <th>改变理解的地方</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Cloudflare</td>
-          <td>在关键路径系统中发现 2,000 个漏洞，其中 400 个为高危或严重。</td>
-          <td>AI 不只是能找玩具样例，也能进入真实生产系统的安全工作流。</td>
-        </tr>
-        <tr>
-          <td>Mozilla</td>
-          <td>测试 Mythos Preview 时在 Firefox 150 中发现并修复 271 个漏洞，比 Firefox 148 中使用 Claude Opus 4.6 的结果多十倍以上。</td>
-          <td>模型迭代带来的不是线性改进，而可能是安全团队产能的跃迁。</td>
-        </tr>
-        <tr>
-          <td>UK AI Security Institute</td>
-          <td>报告称 Mythos Preview 是第一个端到端解决其两个 cyber ranges 的模型。</td>
-          <td>多步骤攻击模拟的完成能力，说明模型已接近实际攻击链推理。</td>
-        </tr>
-        <tr>
-          <td>XBOW 与学术 benchmark</td>
-          <td>XBOW 称其在 Web exploit benchmark 上显著领先；ExploitBench 和 ExploitGym 也显示 Mythos Preview 表现最强。</td>
-          <td>评估重点正在从“能否写代码”转向“能否开发可用 exploit”。</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <aside class="insight-band">
-    最关键的洞见不是“AI 会发现很多漏洞”，而是“AI 会让未修补漏洞的窗口期更值钱”。当发现和利用更便宜时，补丁测试、部署和默认防护就变成更重要的防线。
-  </aside>
-
-  <section class="tools">
-    <div class="tools-main">
-      <h2>防御方需要缩短从补丁到部署的距离</h2>
-      <p>文章给开发者和网络防御者的建议都很基础，但紧迫性提高了。开发者应缩短补丁周期，让用户更容易更新。网络防御者应压缩补丁测试和部署时间。</p>
-      <p>同时，默认加固、多因素认证和完整日志变得更重要。它们不依赖某一个补丁及时落地，可以降低窗口期中的系统性风险。</p>
-      <div class="pill-list">
-        <span class="pill">更短补丁周期</span>
-        <span class="pill">更快部署</span>
-        <span class="pill">默认配置加固</span>
-        <span class="pill">多因素认证</span>
-        <span class="pill">完整日志</span>
-      </div>
-    </div>
-    <div class="tools-side">
-      <h2>工具正在外溢</h2>
-      <p>Anthropic 已推出 Claude Security 公测。Claude Opus 4.7 在三周内被用于修补超过 2,100 个漏洞。</p>
-      <p>这说明更广泛可用的模型已经能帮助防御方处理普通漏洞。Mythos 级模型暂不公开，是因为防滥用保护还不够强。</p>
-    </div>
-  </section>
-
-  <section class="takeaways">
-    <h2>最值得带走的洞见</h2>
-    <div class="mosaic">
-      <div class="tile data"><h3>发现能力已经越过拐点</h3><p>一万个以上高危或严重发现，说明 AI 已能显著改变漏洞研究的产能曲线。</p></div>
-      <div class="tile risk"><h3>风险集中在过渡期</h3><p>当漏洞被快速发现但缓慢修补时，攻击者和防御者都在争夺同一段窗口期。</p></div>
-      <div class="tile opp"><h3>防御优势来自流程</h3><p>真正能扩大防御收益的不是单个模型，而是 triage、披露、补丁和部署流程的升级。</p></div>
-      <div class="tile final"><h3>公开发布需要更强护栏</h3><p>Anthropic 的立场是，Mythos 级模型有防御价值，但在防滥用措施成熟前不应一般发布。</p></div>
-    </div>
-  </section>
+<header class="hero">
+<div class="eyebrow">Anthropic · 2026 年 5 月 22 日 · Announcements</div>
+<h1>Project Glasswing：初步进展</h1>
+<p class="original">Project Glasswing: An initial update</p>
+<p class="lede"><strong>一句话总括：</strong>Claude Mythos Preview 已把大规模漏洞发现变成现实，但验证、披露和修补仍依赖有限的人力，网络安全因此进入了一个<span class="hl">发现飞快、修复偏慢</span>的高风险过渡期。</p>
+</header>
+<section aria-label="关键数字" class="metric-strip">
+<div class="metric"><strong>约 50 家</strong><span>Project Glasswing 合作伙伴</span></div>
+<div class="metric"><strong>超过 10,000</strong><span>合作伙伴发现的高危或严重漏洞</span></div>
+<div class="metric"><strong>1,000+</strong><span>已扫描的开源项目</span></div>
+<div class="metric"><strong>90.6%</strong><span>人工核验样本中的真实漏洞比例</span></div>
+</section>
+<section class="split">
+<article class="panel data">
+<h2>能力跃升已有外部证据</h2>
+<p>多数合作伙伴在一个月内各自发现了数百个高危或严重漏洞。Cloudflare 找到 <strong>2,000</strong> 个漏洞，其中 <strong>400</strong> 个达到高危或严重级别。</p>
+<p>Mozilla 在 Firefox 150 中发现并修复 <strong>271</strong> 个漏洞。数量超过使用 Claude Opus 4.6 测试 Firefox 148 时的十倍。英国 AI Security Institute 还报告，Mythos Preview 首次完整攻克了其两套网络攻击模拟环境。</p>
+<p><strong>结论：</strong>这不只是实验室 benchmark 的提升。模型已经在真实、关键的软件系统中显著提高漏洞发现产量。</p>
+</article>
+<article class="panel risk">
+<h2>瓶颈已经转移</h2>
+<p>Anthropic 在开源项目中发现了 <strong>23,019</strong> 个疑似漏洞，其中 <strong>6,202</strong> 个被初评为高危或严重。</p>
+<p>但目前仅约 <strong>530</strong> 个高危或严重漏洞已向维护者披露，其中 <strong>75</strong> 个完成修补。高危或严重漏洞平均需要两周才能修复。</p>
+<p><strong>结论：</strong>稀缺资源不再只是漏洞研究能力，而是人工复现、评级、协调披露和部署补丁的容量。</p>
+</article>
+</section>
+<section class="flow">
+<h2>从模型发现到用户安全，中间仍有漫长的人工作业</h2>
+<div class="flow-grid">
+<div class="step"><b>01 · 发现</b><p>AI 可以低成本扫描大量代码，并生成可复现的攻击路径。</p></div>
+<div class="step"><b>02 · 核验与披露</b><p>安全团队必须复现问题、重评严重程度、检查现有修复，再向维护者提交高质量报告。</p></div>
+<div class="step"><b>03 · 修补与部署</b><p>维护者设计补丁后，仍需等待软件发布、测试和最终用户安装。</p></div>
+</div>
+<p><strong>关键洞见：</strong>Mythos 级模型同时缩短了发现和利用漏洞的时间，却没有自动消除后续流程中的延迟。这会扩大攻击者可利用的窗口。</p>
+</section>
+<section class="contrast">
+<h2>短期是风险，长期则可能重塑软件工程</h2>
+<p>在过渡期内，漏洞会被迅速发现，却只能缓慢修补。软件开发者应缩短补丁周期，并降低用户安装更新的难度。网络防御者也需要加快补丁测试和部署，同时强化多因素认证、默认配置和日志记录。</p>
+<p>长期来看，同类模型可以在代码部署前发现缺陷。若工具、流程和维护者容量同步提升，AI 有机会让重要软件比今天安全得多。</p>
+</section>
+<aside class="quote">真正改变网络安全格局的，不只是 AI 能找到多少漏洞，而是整个软件生态能否以相近速度完成核验、修补和部署。</aside>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="mosaic">
+<div class="tile"><strong>漏洞发现已跨过规模化门槛</strong>约 50 家合作伙伴一个月内发现超过 1 万个高危或严重漏洞，说明能力提升已进入实际生产环境。</div>
+<div class="tile"><strong>高精度并未解决容量问题</strong>已核验样本的真实漏洞比例达到 90.6%，但人工复现、评级和协调披露仍然昂贵而缓慢。</div>
+<div class="tile"><strong>防御者需要压缩全部补丁链路</strong>只加快漏洞发现并不够。补丁制作、测试、发布和安装的每个环节都要提速。</div>
+<div class="tile"><strong>开放发布仍受安全保障限制</strong>Anthropic 认为现有防护还不足以防止严重滥用，因此暂未公开发布 Mythos 级模型。</div>
+</div>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<figure class="source-figure" data-source-image="0"><img alt="Project Glasswing: An initial update" decoding="async" height="1080" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/9f76163fe710723283a55b9f60d5caca6697dffd-1920x1080.jpg" width="1920"/></figure>
+<p>上个月，我们启动了 Project Glasswing。这是一项协作计划，目标是在能力越来越强的 AI 模型被用于攻击之前，保护全球最关键的软件。</p>
+<p>此后，我们与约 50 家合作伙伴使用 Claude Mythos Preview，在全球最具系统重要性的软件中发现了超过 1 万个高危或严重漏洞。过去，软件安全进展受限于发现新漏洞的速度。现在，限制因素已经变成核验、披露和修补 AI 所发现的大量漏洞的速度。</p>
+<p>本文将介绍 Project Glasswing 启动最初几周以来，我们对这一关键网络安全挑战的认识。内容重点包括 Mythos Preview 性能的早期公开证据，以及扫描数千个开源软件项目的初步结果。我们还会讨论这些进展对当今网络防御者的意义、Project Glasswing 接下来的安排，以及未来发布 Mythos 级模型时的考虑。</p>
+<h3>早期结果</h3>
+<h4>我们如何介绍 Mythos Preview 的发现</h4>
+<p>软件行业长期以来的惯例，是在新漏洞被发现 90 天后将其公开。如果补丁在 90 天期限届满前完成，则通常会在补丁可用约 45 天后公开。这种安排让最终用户有时间更新软件，避免攻击者在此之前利用漏洞。我们自己的协调漏洞披露政策也采用了这种方式。</p>
+<p>但这也意味着，已经公开的漏洞只能滞后地反映 AI 模型网络能力边界的快速提升。现在，我们还不能详细披露合作伙伴通过 Mythos Preview 发现的全部问题，否则可能让最终用户面临风险。因此，我们会提供能够说明模型性能的示例，以及截至目前的总体进展数据。等 Mythos Preview 所发现漏洞的补丁得到广泛部署后，我们会更详细地分享相关发现。</p>
+<h4>合作伙伴和外部测试者提供的证据</h4>
+<p>Project Glasswing 的首批合作伙伴负责开发和维护互联网及其他关键基础设施赖以运行的基础软件。修复这些代码中的缺陷，可以降低众多依赖组织的风险，进而减少数十亿最终用户面临的风险。</p>
+<p>一个月后，多数合作伙伴都在各自的软件中发现了数百个高危或严重漏洞。总数超过 1 万个。多家合作伙伴告诉我们，其漏洞发现速度提高了十倍以上。例如，Cloudflare 在关键路径系统中发现了 2,000 个漏洞，其中 400 个为高危或严重漏洞。Cloudflare 团队认为，其误报率优于人工测试人员。</p>
+<p>这些结果与外部测试者使用 Mythos Preview 的体验一致，也与近期对该模型开展的其他评估相符：</p>
+<ul>
+<li>英国 AI Security Institute 报告称，Mythos Preview 是第一个能够从头到尾完成其两套网络靶场的模型。这些靶场模拟了多步骤网络攻击。</li>
+<li>Mozilla 在测试 Mythos Preview 时，于 Firefox 150 中发现并修复了 271 个漏洞。这个数字是使用 Claude Opus 4.6 在 Firefox 148 中发现数量的十倍以上。</li>
+<li>独立安全平台 XBOW 表示，在其 Web 漏洞利用 benchmark 上，Mythos Preview 相比所有现有模型都有“显著提升”。按相同 token 用量比较，它展现出了“前所未有的精度”。</li>
+<li>ExploitBench 和 ExploitGym 是两个近期发布的学术 benchmark，用于衡量模型开发漏洞利用程序的能力。两项结果都显示 Mythos Preview 表现最强。我们在 Frontier Red Team 博客中更详细地讨论了这些 benchmark 所揭示的模型能力。</li>
+</ul>
+<p>总体而言，我们还看到，经过修补的软件正以更快的速度发布。Palo Alto Networks 最新版本包含的补丁数量超过平时的五倍。Microsoft 表示，他们发布的新补丁数量将在一段时间内“继续增加”。Oracle 发现并修复旗下产品及云服务漏洞的速度，也比过去快了数倍。</p>
+<p>Mythos Preview 还证明了自己可以用于其他类型的安全工作。例如，Project Glasswing 的一家银行合作伙伴曾遇到威胁行为者入侵客户电子邮箱并伪造电话的事件。Mythos Preview 协助发现并阻止了一笔 150 万美元的欺诈电汇。</p>
+<h3>开源软件</h3>
+<p>过去几个月里，Anthropic 使用 Mythos Preview 扫描了超过 1,000 个开源项目。这些项目共同支撑着互联网的大量基础设施，也支撑着我们自己的许多基础设施。</p>
+<p>截至目前，Mythos Preview 在这些项目中发现了 23,019 个疑似漏洞。其中 6,202 个被模型评估为高危或严重漏洞，其余包括模型评估为中危或低危的漏洞。</p>
+<p>在这些被评为高危或严重的漏洞中，已有 1,752 个由六家独立安全研究公司之一进行仔细评估，少数则由我们自己评估。其中，90.6%，即 1,587 个，被证明是真实有效的漏洞；62.4%，即 1,094 个，被确认属于高危或严重漏洞。这意味着，即使 Mythos Preview 不再发现任何新漏洞，按照当前人工筛选后的真实漏洞比例计算，它预计也将从开源代码中找出近 3,900 个高危或严重漏洞。这还不包括它为 Project Glasswing 合作伙伴发现的漏洞。需要说明的是，我们打算继续扫描开源代码，因此预计这个数字还会增加。</p>
+<p>Mythos Preview 检测到的一个开源漏洞位于 wolfSSL。wolfSSL 是一个以安全性著称的开源密码学库，全球数十亿台设备都在使用它。Mythos Preview 构造了一种漏洞利用方法，攻击者可以借此伪造证书。例如，攻击者可以搭建一个冒充银行或电子邮件服务商的网站。对最终用户来说，这个网站看起来完全合法，实际上却由攻击者控制。该漏洞现已修复，编号为 CVE-2026-5194。我们将在未来几周发布完整的技术分析。</p>
+<p>正如前文所述，修复此类漏洞的瓶颈，是人类筛选、报告以及设计和部署补丁的能力。相比之下，使用 Mythos Preview 发现漏洞已经容易得多。我们建立了一个开源漏洞扫描看板，展示漏洞披露流程中的不同阶段，并持续跟踪进展。看板包含各种严重级别的漏洞，并不局限于 Mythos Preview 最初评估为高危或严重的子集。可以看到，进入每个后续阶段的漏洞数量都会急剧下降。这反映出核验和修复每个漏洞所需的大量人力。</p>
+<figure class="source-figure" data-source-image="1"><img alt="" decoding="async" height="1008" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/7af1880d305b982764cfefc7dce87c677f1b0254-1634x1008.png" width="1634"/>
+<figcaption>我们的开源漏洞看板展示了所有严重级别的漏洞，而不只是 Mythos Preview 评估为高危或严重的漏洞。</figcaption>
+</figure>
+<p>我们的漏洞筛选流程非常严格。首先，我们或合作的外部安全公司会复现 Mythos 发现的问题，并重新评估其严重程度。确认漏洞真实存在后，我们会检查是否已有修复措施，再为软件维护者撰写详细报告。我们在这里非常谨慎。开源软件维护本就面临许多常规挑战，而维护者现在还要应对大量低质量的 AI 生成漏洞报告。事实上，多位维护者告诉我们，他们目前面临严重的容量限制。有些人甚至要求我们放慢披露速度，因为他们需要更多时间设计补丁。Mythos Preview 发现的高危或严重漏洞，平均需要两周才能修复。</p>
+<p>应维护者要求，我们有时会直接披露漏洞，不再开展进一步评估。目前，我们已经报告了 1,129 个未经核验的漏洞。其中，Mythos Preview 估计有 175 个属于高危或严重漏洞。</p>
+<p>据估计，我们目前已向维护者披露 530 个高危或严重漏洞。对于直接披露的问题，该估计采用 Claude 给出的严重程度评估；如果维护者或安全合作伙伴提供了评估，则以他们的判断为依据。此外，还有 827 个已经确认的漏洞等待尽快披露。按照相同方法估计，这些漏洞也属于高危或严重级别。</p>
+<p>在已经报告的 530 个高危或严重漏洞中，75 个现已修复，其中 65 个已经发布公开安全公告。补丁数量仍然较少，原因有三点。第一，我们仍处在协调漏洞披露政策规定的 90 天期限早期，预计很快会有更多补丁完成。第二，我们可能低估了补丁数量，因为有些漏洞修复后不会发布公开安全公告。遇到这种情况，我们只能使用 Claude 自行扫描和识别补丁。第三，补丁数量较少也反映了一个真实问题：即使我们的披露速度相对缓慢，Mythos Preview 仍在给早已超负荷运转的安全生态增加压力。</p>
+<p>与修复漏洞相比，发现漏洞已经变得容易得多。这种反差构成了网络安全领域的一项重大挑战。如果能够成功应对，我们的软件会比过去安全得多。下面将讨论网络防御者可以采取的一些调整措施。</p>
+<h3>适应网络安全的新阶段</h3>
+<p>具备与 Mythos Preview 相近网络安全能力的模型，很快会得到更广泛的使用。软件行业显然需要采取更大规模的行动，以处理这些模型将产生的大量发现。</p>
+<p>目前，从漏洞被发现，到补丁完成，再到最终用户广泛部署补丁，往往存在很长的延迟。这为攻击者利用关键软件留下了显著的时间窗口。Mythos 级模型大幅减少了发现和利用漏洞所需的时间与成本，因此也放大了这些延迟带来的风险。最终，Mythos 级模型将帮助开发者在软件部署前发现缺陷，从而构建安全性高得多的软件。但在这个过渡期内，漏洞被快速发现，修补速度却仍然缓慢，这会带来新的风险。</p>
+<p>软件开发者和用户现在就应采取行动，减少自身面临的风险。下面的建议并不新颖。许多研究人员，包括 Anthropic 的研究人员，正在研究更好、更持久的解决方案。在此期间，首先要把基础工作做好：</p>
+<ul>
+<li>软件开发者应缩短补丁周期，并尽快提供安全修复。合理使用公开可用的 AI 模型可以提供帮助。我们也在开发工具并分享研究成果，以支持这项工作，详情见下文。开发者还应尽可能降低用户保持软件更新的难度。对于仍在运行已知存在漏洞的软件的用户，在可行范围内应更主动地督促其更新。</li>
+<li>网络防御者应缩短补丁测试和部署周期。National Institute of Standards and Technology、英国 National Cyber Security Centre 等机构提出的关键控制措施，如今变得更加重要，因为它们不依赖任何一个补丁能否及时发布，也能改善安全状况。这些措施包括强化网络默认配置、强制使用多因素认证，以及保留完整日志以支持检测和响应。</li>
+</ul>
+<h3>使用公开 AI 模型开展网络防御的工具</h3>
+<p>许多普遍可用的模型已经能够发现大量软件漏洞。它们可能还无法发现最复杂的漏洞，也不能像 Claude Mythos Preview 那样有效地利用漏洞。即便如此，Project Glasswing 已推动许多其他组织使用这些普遍可用的模型检查自己的代码库。我们正在努力让这项工作变得更容易。</p>
+<p>首先，我们已经面向 Claude Enterprise 客户公开测试 Claude Security。该工具可以帮助团队扫描代码库中的漏洞，并生成建议的修复方案。上线三周以来，Claude Opus 4.7 已被用于修补超过 2,100 个漏洞。这个速度高于前文介绍的开源漏洞修补速度，主要原因是企业可以直接修复自己的代码，而开源软件的修复通常需要志愿维护者通过协调披露流程处理。</p>
+<p>我们还启动了 Cyber Verification Program。该计划允许安全专业人员使用我们的模型开展合法的网络安全工作，例如漏洞研究、渗透测试和红队测试，同时不受部分用于防止网络滥用的安全限制影响。</p>
+<p>现在，我们还将自己和合作伙伴配合 Mythos Preview 使用的工具，按请求提供给符合条件的客户安全团队。我们的目标是减少复杂配置，让用户更容易发挥高能力公开模型的最佳性能。本次发布包括：</p>
+<ul>
+<li>我们与合作伙伴共同构建和分享的 skills，也就是用于重复性工作的自定义指令；</li>
+<li>一套 harness，可以帮助 Claude 理解代码库、启动扫描 subagents、筛选发现并撰写报告；</li>
+<li>一个威胁模型构建器，用于分析代码库、识别潜在攻击目标，并据此确定模型工作的优先级。</li>
+</ul>
+<p>Project Glasswing 的合作伙伴 Cisco 最近还将 Foundry Security Spec 开源，帮助其他防御者建立与 Cisco 自用系统类似的评估体系。</p>
+<h3>支持整个生态</h3>
+<p>我们已经与 Open Source Security Foundation 的 Alpha-Omega 项目建立合作关系。这将支持该基金会帮助维护者处理和筛选漏洞报告。我们也会继续发布研究成果，探索如何让前沿模型的能力更好地服务于网络防御者。</p>
+<p>我们还支持开发了 ExploitBench 和 ExploitGym。这两个新 benchmark 让研究人员能够持续跟踪前沿 AI 模型开发漏洞利用程序的能力。我们在相关内容中进行了进一步讨论。通过 External Researcher Access Program，我们也在支持其他高质量定量 benchmark 的开发。最后，Claude for Open Source 会为维护者和贡献者提供支持。我们还承诺，未来只要 Anthropic 采用某个开源软件包，就会对其进行扫描。</p>
+<h3>Project Glasswing 的下一步</h3>
+<p>AI 进步的速度意味着，许多不同的 AI 公司很快都会开发出能力与 Mythos Preview 相当的模型。目前，没有任何公司，包括 Anthropic，已经建立足够强大的安全保障，可以防止这类模型遭到滥用并可能造成严重伤害。这正是我们尚未向公众发布 Mythos 级模型的原因。但这也是我们启动 Project Glasswing 的原因：如果能力相近的模型在缺少此类安全保障的情况下发布，那么世界上几乎任何人利用有缺陷软件的成本和难度，很快都会大幅下降。</p>
+<p>Glasswing 可以让最具系统重要性的网络防御者获得不对称优势。不过，现在迫切需要尽可能多的组织加强网络防御。我们希望，普遍可用的模型，以及配套提供的新工具、资源和研究成果，能够帮助这些组织改善自身的网络安全状况。</p>
+<p>接下来，我们将与关键合作伙伴合作，包括美国及其盟国政府，把 Project Glasswing 扩展到更多合作伙伴。我们也期待在不久的将来，当所需的、更强大的安全保障开发完成后，通过面向公众的常规发布提供 Mythos 级模型。</p>
+<p>越过这些风险之后，一个令人鼓舞的未来正在等待我们：重要代码的安全加固程度将远胜今天，黑客攻击也会少得多。前方仍有许多障碍，但我们依然相信，Project Glasswing 能够帮助我们抵达这样的未来。</p>
+</section>
 </main>
   <script id="airs-digest-theme-script">
     (() => {

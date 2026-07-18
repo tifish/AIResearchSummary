@@ -3,112 +3,317 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI 模型在真实感网络靶场中展现出更强的发现和利用漏洞能力</title>
+<title>AI 模型在真实网络靶场中发现并利用漏洞的能力显著增强</title>
 <style>
-:root{
-  --bg:#f6f7fb;
-  --ink:#18202b;
-  --muted:#5f6b7a;
-  --line:#d9dee8;
-  --card:#ffffff;
-  --hero:#121a2a;
-  --hero-ink:#f7fbff;
-  --data:#2563eb;
-  --risk:#dc2626;
-  --opportunity:#059669;
-  --conclusion:#7c3aed;
-  --warn-bg:#fff1f2;
-  --data-bg:#eef5ff;
-  --op-bg:#ecfdf5;
-  --note-bg:#f5f3ff;
-  --soft-bg:#f8fafc;
-  --table-head:#e8eef8;
-  --shadow:0 18px 45px rgba(23,31,48,.12);
+:root,
+:root[data-theme="light"] {
+  --bg: #f5f1e8;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #18202a;
+  --muted: #66717d;
+  --line: #d8d4ca;
+  --deep: #172638;
+  --deep-ink: #f6f8fb;
+  --accent: #176b87;
+  --accent2: #c25039;
+  --accent3: #6c53a3;
+  --accent4: #39865d;
+  --data-bg: #dceff5;
+  --risk-bg: #f8dfd7;
+  --opportunity-bg: #dff1e6;
+  --conclusion-bg: #e8e0f5;
+  --hl: #ffe39a;
+  --hl2: #bfe8d0;
+  --quote-bg: #203b4c;
+  --quote-ink: #f5fbff;
+  --shadow: rgba(31, 42, 55, 0.12);
 }
-@media (prefers-color-scheme: dark){
-  :root{
-    --bg:#0c111b;
-    --ink:#e8edf6;
-    --muted:#aab4c2;
-    --line:#263244;
-    --card:#141b28;
-    --hero:#070b12;
-    --hero-ink:#f2f6ff;
-    --data:#60a5fa;
-    --risk:#fb7185;
-    --opportunity:#34d399;
-    --conclusion:#a78bfa;
-    --warn-bg:#2a1218;
-    --data-bg:#102035;
-    --op-bg:#0f241c;
-    --note-bg:#201832;
-    --soft-bg:#121a26;
-    --table-head:#1b2636;
-    --shadow:0 18px 45px rgba(0,0,0,.35);
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10151b;
+    --surface: #171e26;
+    --card: #1d2630;
+    --ink: #e8edf2;
+    --muted: #a6b1bd;
+    --line: #34414e;
+    --deep: #0a1118;
+    --deep-ink: #eef5fa;
+    --accent: #58c4e8;
+    --accent2: #ff826d;
+    --accent3: #b89ae8;
+    --accent4: #6fd39a;
+    --data-bg: #173442;
+    --risk-bg: #44251f;
+    --opportunity-bg: #19382a;
+    --conclusion-bg: #302544;
+    --hl: #604b15;
+    --hl2: #174a32;
+    --quote-bg: #0d2939;
+    --quote-ink: #e8f7ff;
+    --shadow: rgba(0, 0, 0, 0.34);
   }
 }
-:root[data-theme="dark"]{
-  --bg:#0c111b;
-  --ink:#e8edf6;
-  --muted:#aab4c2;
-  --line:#263244;
-  --card:#141b28;
-  --hero:#070b12;
-  --hero-ink:#f2f6ff;
-  --data:#60a5fa;
-  --risk:#fb7185;
-  --opportunity:#34d399;
-  --conclusion:#a78bfa;
-  --warn-bg:#2a1218;
-  --data-bg:#102035;
-  --op-bg:#0f241c;
-  --note-bg:#201832;
-  --soft-bg:#121a26;
-  --table-head:#1b2636;
-  --shadow:0 18px 45px rgba(0,0,0,.35);
+:root[data-theme="dark"] {
+  --bg: #10151b;
+  --surface: #171e26;
+  --card: #1d2630;
+  --ink: #e8edf2;
+  --muted: #a6b1bd;
+  --line: #34414e;
+  --deep: #0a1118;
+  --deep-ink: #eef5fa;
+  --accent: #58c4e8;
+  --accent2: #ff826d;
+  --accent3: #b89ae8;
+  --accent4: #6fd39a;
+  --data-bg: #173442;
+  --risk-bg: #44251f;
+  --opportunity-bg: #19382a;
+  --conclusion-bg: #302544;
+  --hl: #604b15;
+  --hl2: #174a32;
+  --quote-bg: #0d2939;
+  --quote-ink: #e8f7ff;
+  --shadow: rgba(0, 0, 0, 0.34);
 }
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",Arial,sans-serif;line-height:1.68}
-main{max-width:1100px;margin:auto}
-.hero{background:var(--hero);color:var(--hero-ink);padding:56px 28px 44px;border-bottom:6px solid var(--data)}
-.hero h1{font-size:clamp(30px,4vw,52px);line-height:1.12;margin:0 0 12px;letter-spacing:0}
-.hero .en{color:var(--muted);font-size:16px;max-width:850px}
-.hero .lede{font-size:22px;max-width:860px;margin-top:28px;color:var(--hero-ink)}
-.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:0;background:var(--card);box-shadow:var(--shadow)}
-.metric{padding:24px;border-right:1px solid var(--line)}
-.metric:last-child{border-right:0}
-.metric b{display:block;font-size:34px;color:var(--data);line-height:1}
-.metric span{display:block;margin-top:8px;color:var(--muted)}
-.split{display:grid;grid-template-columns:1.1fr .9fr;gap:28px;padding:42px 28px;background:var(--soft-bg)}
-.split h2,.flow h2,.compare h2,.takeaways h2{font-size:26px;margin:0 0 14px}
-.explain{border-left:5px solid var(--opportunity);padding-left:18px}
-.riskbox{background:var(--warn-bg);border-top:4px solid var(--risk);padding:22px}
-.riskbox strong{color:var(--risk)}
-.flow{padding:42px 28px;background:var(--card)}
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.step{position:relative;padding:20px;background:var(--data-bg);border-left:4px solid var(--data)}
-.step .badge{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--data);color:var(--hero-ink);font-weight:700;margin-bottom:10px}
-.quote{margin:0;padding:30px 28px;background:var(--note-bg);border-left:8px solid var(--conclusion);font-size:21px}
-.compare{padding:42px 28px;background:var(--soft-bg)}
-table{width:100%;border-collapse:collapse;background:var(--card);overflow:hidden;border:1px solid var(--line)}
-th,td{padding:15px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
-th{background:var(--table-head);color:var(--ink)}
-td:first-child{font-weight:700}
-.label-risk{color:var(--risk);font-weight:700}
-.label-op{color:var(--opportunity);font-weight:700}
-.takeaways{padding:42px 28px;background:var(--hero);color:var(--hero-ink)}
-.mosaic{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.tile{padding:20px;background:rgba(255,255,255,.08);border:1px solid var(--line)}
-.tile:nth-child(1){border-top:5px solid var(--data)}
-.tile:nth-child(2){border-top:5px solid var(--risk)}
-.tile:nth-child(3){border-top:5px solid var(--opportunity)}
-.tile:nth-child(4){border-top:5px solid var(--conclusion)}
-.tile b{display:block;margin-bottom:8px}
-@media (max-width:760px){
-  .metrics,.steps,.split,.mosaic{grid-template-columns:1fr}
-  .metric{border-right:0;border-bottom:1px solid var(--line)}
-  .hero{padding:38px 20px 32px}
-  .split,.flow,.compare,.takeaways{padding:32px 20px}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+  line-height: 1.75;
+}
+a { color: var(--accent); }
+.hero {
+  background: var(--deep);
+  color: var(--deep-ink);
+  padding: clamp(3rem, 8vw, 7rem) 1.5rem;
+}
+.hero-inner {
+  max-width: 1050px;
+  margin: 0 auto;
+}
+.eyebrow {
+  color: var(--accent4);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+h1 {
+  max-width: 900px;
+  margin: 0.6rem 0 0.8rem;
+  font-size: clamp(2.2rem, 6vw, 5rem);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+.original-title {
+  max-width: 780px;
+  margin: 0;
+  color: var(--muted);
+  font-family: Georgia, serif;
+  font-size: clamp(1rem, 2vw, 1.25rem);
+}
+.thesis {
+  max-width: 850px;
+  margin: 2.2rem 0 0;
+  padding-left: 1.2rem;
+  border-left: 5px solid var(--accent2);
+  font-size: clamp(1.15rem, 2.4vw, 1.55rem);
+}
+.summary {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 3.5rem 1.5rem 4rem;
+}
+.summary h2,
+#translation h2 {
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1.2;
+}
+.number-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 0 0 3.5rem;
+  border: 1px solid var(--line);
+  background: var(--card);
+  box-shadow: 0 18px 45px var(--shadow);
+}
+.number {
+  padding: 1.5rem;
+  border-right: 1px solid var(--line);
+}
+.number:last-child { border-right: 0; }
+.number strong {
+  display: block;
+  color: var(--accent);
+  font-size: clamp(1.7rem, 4vw, 2.8rem);
+  line-height: 1;
+}
+.number:nth-child(2) strong { color: var(--accent2); }
+.number:nth-child(3) strong { color: var(--accent3); }
+.number:nth-child(4) strong { color: var(--accent4); }
+.number span {
+  display: block;
+  margin-top: 0.65rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  margin: 2rem 0 3rem;
+}
+.split article {
+  padding: 2rem;
+  border-top: 6px solid var(--accent);
+  background: var(--data-bg);
+}
+.split article:last-child {
+  border-color: var(--accent2);
+  background: var(--risk-bg);
+}
+.split h3 { margin-top: 0; font-size: 1.35rem; }
+mark {
+  padding: 0.08em 0.25em;
+  background: var(--hl);
+  color: var(--ink);
+  font-weight: 750;
+}
+mark.alt { background: var(--hl2); }
+.timeline {
+  margin: 3rem 0;
+  padding: 2.5rem;
+  background: var(--surface);
+  border-left: 8px solid var(--accent3);
+}
+.timeline h3 { margin-top: 0; }
+.step {
+  position: relative;
+  margin-left: 1rem;
+  padding: 0 0 1.7rem 2rem;
+  border-left: 2px solid var(--line);
+}
+.step:last-child { padding-bottom: 0; }
+.step::before {
+  position: absolute;
+  left: -0.55rem;
+  top: 0.35rem;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: var(--accent3);
+  content: "";
+}
+.step strong { color: var(--accent3); }
+.insight-band {
+  margin: 3rem calc(50% - 50vw);
+  padding: 3rem max(1.5rem, calc(50vw - 550px));
+  background: var(--quote-bg);
+  color: var(--quote-ink);
+}
+.insight-band blockquote {
+  margin: 0;
+  font-size: clamp(1.25rem, 3vw, 2rem);
+  line-height: 1.5;
+}
+.insight-band p {
+  margin-bottom: 0;
+  color: var(--accent4);
+  font-weight: 700;
+}
+.takeaways h3 { font-size: 1.6rem; }
+.mosaic {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+}
+.tile {
+  grid-column: span 3;
+  padding: 1.5rem;
+  border: 1px solid var(--line);
+  background: var(--card);
+}
+.tile:nth-child(2) {
+  background: var(--opportunity-bg);
+  border-top: 5px solid var(--accent4);
+}
+.tile:nth-child(3) {
+  grid-column: span 2;
+  background: var(--risk-bg);
+  border-top: 5px solid var(--accent2);
+}
+.tile:nth-child(4) {
+  grid-column: span 4;
+  background: var(--conclusion-bg);
+  border-top: 5px solid var(--accent3);
+}
+.tile b {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--accent);
+}
+#translation {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 4rem 1.5rem 7rem;
+}
+#translation > h2 {
+  padding-bottom: 1rem;
+  border-bottom: 4px solid var(--accent);
+}
+.source-meta {
+  margin-bottom: 2.5rem;
+  padding: 1rem 1.2rem;
+  background: var(--data-bg);
+  border-left: 5px solid var(--accent);
+  color: var(--muted);
+}
+#translation p { margin: 1.15rem 0; }
+#translation h3 {
+  margin-top: 3rem;
+  color: var(--accent3);
+  font-size: 1.45rem;
+}
+#translation h4 {
+  margin-top: 2rem;
+  color: var(--accent2);
+  font-size: 1.1rem;
+}
+.transcript-list {
+  padding: 1.2rem 1.2rem 1.2rem 2.5rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.source-figure {
+  margin: 2.5rem 0;
+  text-align: center;
+}
+.source-figure img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+.source-figure figcaption {
+  margin-top: 0.8rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+@media (max-width: 760px) {
+  .number-strip { grid-template-columns: 1fr 1fr; }
+  .number:nth-child(2) { border-right: 0; }
+  .number:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+  .split { grid-template-columns: 1fr; }
+  .mosaic { grid-template-columns: 1fr; }
+  .tile,
+  .tile:nth-child(3),
+  .tile:nth-child(4) { grid-column: auto; }
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -240,84 +445,155 @@ td:first-child{font-weight:700}
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/cyber-toolkits-update" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">Frontier Red Team · Anthropic · 2026-01-16</div>
+    <h1>AI 模型在真实网络靶场中发现并利用漏洞的能力显著增强</h1>
+    <p class="original-title" lang="en">AI models are showing a greater ability to find and exploit vulnerabilities on realistic cyber ranges</p>
+    <p class="thesis"><strong>一句话总括：</strong>Claude Sonnet 4.5 已能在部分真实感较高的网络靶场中摆脱定制攻击工具，仅靠公开工具完成多阶段攻击，显示 AI 网络攻击能力的实际门槛正在快速降低。</p>
+  </div>
+</header>
+
 <main>
-  <section class="hero">
-    <h1>AI 模型在真实感网络靶场中展现出更强的发现和利用漏洞能力</h1>
-    <div class="en">AI models are showing a greater ability to find and exploit vulnerabilities on realistic cyber ranges</div>
-    <p class="lede">一句话总括：Claude Sonnet 4.5 的新进展在于，它开始能脱离专用攻击工具包，直接用普通开源渗透测试环境完成部分真实感网络攻击任务。</p>
-  </section>
+  <section class="summary" aria-labelledby="summary-title">
+    <h2 id="summary-title">更短、更易读的中文总结</h2>
 
-  <section class="metrics" aria-label="关键数字">
-    <div class="metric"><b>25-50</b><span>靶场网络中的主机数量级</span></div>
-    <div class="metric"><b>2/5</b><span>Sonnet 4.5 在 Equifax 仿真中无专用工具包成功的次数</span></div>
-    <div class="metric"><b>5/9</b><span>仍无法在无自定义工具包时取得进展的网络</span></div>
-    <div class="metric"><b>0/5</b><span>Sonnet 3.5 在同一无工具包条件下的成功次数</span></div>
-  </section>
-
-  <section class="split">
-    <div class="explain">
-      <h2>真正变化不是“会攻击”，而是工具门槛下降</h2>
-      <p>早期模型需要 Incalmo 的自定义网络工具包。工具包会把模型的高层攻击计划转成低层命令。</p>
-      <p>Sonnet 4.5 在少数网络中可以跳过这层辅助。它只使用 Kali Linux 上的 Bash 和标准开源工具。这改变了风险判断，因为现实世界中这类工具很容易获得。</p>
+    <div class="number-strip" aria-label="关键数据">
+      <div class="number"><strong>25—50</strong><span>每个模拟网络包含的主机数量</span></div>
+      <div class="number"><strong>2/5</strong><span>Sonnet 4.5 在 Equifax 靶场自主成功的次数</span></div>
+      <div class="number"><strong>5/9</strong><span>没有定制工具就无法推进的网络数量</span></div>
+      <div class="number"><strong>0/5</strong><span>Sonnet 3.5 仅靠 Bash 与 Kali 的成功次数</span></div>
     </div>
-    <aside class="riskbox">
-      <strong>风险信号</strong>
-      <p>模型能迅速识别公开 CVE，并写出利用代码。文章强调，Equifax 原始事件也源于公开漏洞未及时修补。</p>
-      <p>因此，AI 能力提升会放大旧漏洞的时间压力。补丁延迟不再只是常规运维问题。</p>
-    </aside>
-  </section>
 
-  <section class="flow">
-    <h2>攻击流程显示出更强的自主性</h2>
-    <div class="steps">
-      <div class="step"><span class="badge">1</span><p>模型进入高保真的 Equifax 泄露仿真环境。目标是提取模拟个人信息。</p></div>
-      <div class="step"><span class="badge">2</span><p>它识别已公开 CVE，并直接生成利用代码。文章称它不需要查询或多轮试错。</p></div>
-      <div class="step"><span class="badge">3</span><p>在 5 次试验中成功 2 次。这不是稳定自动化攻击，但已经显示出能力曲线的方向。</p></div>
+    <div class="split">
+      <article>
+        <h3>定制工具不再是绝对前提</h3>
+        <p>此前，前沿模型需要 Incalmo 的定制网络工具包。工具包负责把模型的高层攻击意图转成具体命令。</p>
+        <p>Sonnet 4.5 如今能在少数网络中，仅使用 <mark class="alt">Bash 和 Kali Linux 的标准开源工具</mark>完成任务。这意味着模型开始具备更强的自主操作能力。</p>
+      </article>
+      <article>
+        <h3>成功有限，但风险已经发生变化</h3>
+        <p>Sonnet 4.5 并非每次都能完成攻击。在 Equifax 模拟中，它只成功了 <mark>5 次中的 2 次</mark>。</p>
+        <p>但风险判断不能只看成功率。模型已能立即识别公开 CVE，并直接写出利用代码。这会显著压缩防守方修补漏洞的时间窗口。</p>
+      </article>
+    </div>
+
+    <div class="timeline">
+      <h3>能力变化发生得很快</h3>
+      <div class="step">
+        <strong>Sonnet 3.5</strong>
+        <p>它在 5 次 Equifax 模拟中均未能仅靠 Bash 和 Kali 成功。完成任务仍需要专用工具包。</p>
+      </div>
+      <div class="step">
+        <strong>一年多以后：Sonnet 4.5</strong>
+        <p>它能记起公开 CVE，并立即编写利用代码。在同一靶场中，5 次试验有 2 次自主成功。</p>
+      </div>
+      <div class="step">
+        <strong>趋势判断</strong>
+        <p>模型正在从依赖专用工具，转向独立使用公开工具。作者认为，这预示着网络攻防能力还会继续提升。</p>
+      </div>
+    </div>
+
+    <div class="insight-band">
+      <blockquote>原始 Equifax 事件源于一个已经公开、却没有及时修补的 CVE。更快、更有能力的 AI 智能体，会把这类补丁延迟转化为更紧迫的现实风险。</blockquote>
+      <p>洞见：安全基本功没有过时，反而因为自动化攻击而更加重要。</p>
+    </div>
+
+    <div class="takeaways">
+      <h3>最值得带走的洞见</h3>
+      <div class="mosaic">
+        <div class="tile">
+          <b>能力门槛正在下降</b>
+          标准开源工具已经足以让较新的模型完成部分复杂攻击。定制攻击框架不再始终不可或缺。
+        </div>
+        <div class="tile">
+          <b>成功率不是唯一指标</b>
+          即使模型不能稳定成功，它瞬间识别漏洞并生成利用代码的能力，也会改变防守方所面对的速度压力。
+        </div>
+        <div class="tile">
+          <b>补丁延迟更危险</b>
+          已公开但未修补的 CVE，尤其容易被快速自动化利用。
+        </div>
+        <div class="tile">
+          <b>防守方也需要 AI 工具</b>
+          作者认为，应投入更多研究，为网络防守人员提供足以跟上攻击能力进步速度的 AI 工具。
+        </div>
+      </div>
     </div>
   </section>
+  <section id="translation">
+    <h2>完整译文</h2>
+    <div class="source-meta">来源：Anthropic · 日期：2026 年 1 月 16 日 · 分类：Frontier Red Team · <a href="https://www.anthropic.com/research/cyber-toolkits-update">原文页面</a></div>
 
-  <blockquote class="quote">
-    关键洞见：当模型能把公开漏洞知识、代码生成和标准命令行工具连起来，防守方面对的不是单点能力提升，而是攻击流程摩擦的减少。
-  </blockquote>
+    <p>在最近一次 AI 模型网络能力评估中，当前的 Claude 模型已经能够仅使用标准开源工具，在包含数十台主机的网络中完成多阶段攻击。上一代模型则需要定制工具才能做到这一点。</p>
 
-  <section class="compare">
-    <h2>同一任务上的代际对比</h2>
-    <table>
-      <thead>
-        <tr><th>模型与条件</th><th>结果</th><th>对 AI 影响的含义</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Claude Sonnet 3.5 + Bash/Kali</td>
-          <td><span class="label-risk">0/5 成功</span></td>
-          <td>一年多前的模型还难以在无专用工具包时完成同类任务。</td>
-        </tr>
-        <tr>
-          <td>Claude Sonnet 4.5 + Bash/Kali</td>
-          <td><span class="label-op">2/5 成功</span></td>
-          <td>模型开始能把普通工具变成可执行攻击链。这说明能力提升发生得很快。</td>
-        </tr>
-        <tr>
-          <td>Sonnet 4.5 在 9 个网络中</td>
-          <td><span class="label-risk">5 个仍受阻</span></td>
-          <td>当前能力仍有限。文章的重点是趋势，而不是声称模型已经能稳定完成所有任务。</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
+    <p>这说明，AI 用于相对自主的网络攻击流程时，面临的障碍正在迅速减少。它也凸显了安全基本措施的重要性，例如及时修补已知漏洞。</p>
 
-  <section class="takeaways">
-    <h2>最值得带走的洞见</h2>
-    <div class="mosaic">
-      <div class="tile"><b>漏洞修补变得更急</b>公开 CVE 与 AI 代理结合，会压缩防守方可拖延的窗口。</div>
-      <div class="tile"><b>普通工具也会放大风险</b>风险不一定来自专用黑客工具。Kali、Bash 和开源工具已经足够形成威胁信号。</div>
-      <div class="tile"><b>不要夸大现状</b>Sonnet 4.5 仍只在部分试验中成功。多数复杂网络仍会阻滞它。</div>
-      <div class="tile"><b>防守也需要 AI 化</b>文章的政策含义是投入防守研究，让安全团队获得能跟上攻击自动化速度的 AI 工具。</div>
-    </div>
+    <p>去年，我们曾介绍与 Carnegie Mellon University CyLab 联合开展的实验。我们把 Claude 放入模拟网络中。这些环境比夺旗赛式网络安全竞赛常见的环境更加复杂，也更接近真实网络。</p>
+
+    <p>当时，Claude 和其他前沿 AI 模型必须借助定制网络工具包，才能在这些包含 25—50 台主机的网络中完整地成功一次。该工具包会接收 AI 关于如何实施攻击的高层指令，再将其转换成具体的底层命令。</p>
+
+    <p>此后，我们继续与 Incalmo 合作，在这些网络靶场中进行评估。网络靶场是用于安全测试的模拟网络环境。</p>
+
+    <p>在测试 Claude Sonnet 4.5 时，我们观察到一个值得注意的进展。该模型现在可以在少数网络中成功完成任务，不再需要上一代模型所依赖的定制网络工具包。</p>
+
+    <p>具体来说，Sonnet 4.5 现在能够在高保真的 Equifax 数据泄露模拟中，导出全部模拟个人信息。Equifax 数据泄露是历史上损失最为惨重的网络攻击事件之一。</p>
+
+    <p>模型完成这项任务时，只使用一台广泛可获得的 Kali Linux 主机上的 Bash shell。它使用的是标准开源渗透测试工具，而不是定制工具包。</p>
+
+    <p>Sonnet 4.5 能够立即识别一个已经公开的 CVE，并编写代码利用它。模型不需要查询资料，也不需要反复尝试。</p>
+
+    <p>最初的 Equifax 数据泄露事件，正是攻击者利用了一个已经公开、但尚未修补的 CVE。考虑到这一点，高能力且行动迅速的 AI 智能体可能采用相同方式发起攻击。这更加凸显了及时更新和安装补丁等安全最佳实践的紧迫性。</p>
+
+    <p>同时，我们也不能夸大当前的能力水平。Claude 并非每次测试都能成功。Sonnet 4.5 在 Equifax 网络靶场的 5 次试验中，有 2 次实现了自主成功。</p>
+
+    <p>此外，在 9 个网络中的 5 个网络里，如果没有定制网络工具包，它就无法取得进展。</p>
+
+    <p>不过，模型先是需要专用工具，随后逐渐可以摆脱这些工具，或者只使用公开工具。这条发展轨迹与我们观察到的其他 AI 进步趋势一致。我们认为，它预示着模型在网络安全领域还会进一步提升。</p>
+
+    <p>这种提升发生得很快。Claude Sonnet 3.5 的发布时间只比 Claude Sonnet 4.5 早一年多。在不使用专用网络工具包的情况下，Sonnet 3.5 在 Equifax 模拟的 5 次试验中一次也没有成功。</p>
+
+    <p>这一趋势与现实案例相互印证，例如近期由 AI 编排的网络间谍活动。它们表明，我们需要进行大量研究，找出为网络防守人员配备 AI 工具的最佳方式。防守方需要这些工具，才能跟上能力进步的速度。</p>
+
+    <p>你可以前往 Incalmo 网站，或查阅 Claude Sonnet 4.5 系统卡，了解这些测试的更多信息。请参阅第 5 节，尤其是第 5.3 节。</p>
+
+    <p>下文还提供了评估记录中带注释的节选。完整记录见附录。</p>
+
+    <h3>致谢</h3>
+
+    <p>感谢 Brian Singer 提供数据，并协助准备本文。</p>
+
+    <h3>附录：完整记录</h3>
+
+    <p>完整记录如下：</p>
+
+    <ul class="transcript-list">
+      <li>使用 Bash 和 Kali 的 Claude Sonnet 3.5</li>
+      <li>使用 Incalmo 的 Claude Sonnet 3.5</li>
+      <li>使用 Bash 和 Kali 的 Claude Sonnet 4.5</li>
+    </ul>
   </section>
 </main>
   <script id="airs-digest-theme-script">

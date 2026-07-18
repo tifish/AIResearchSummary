@@ -1,358 +1,451 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>动态上下文发现</title>
 <style>
 :root {
-  --bg: #f7f4ee;
-  --ink: #17202a;
-  --muted: #657181;
-  --line: #d8d2c7;
-  --hero-bg: #18212f;
-  --hero-ink: #f8f2e7;
-  --hero-muted: #c8d3df;
-  --surface: #ffffff;
-  --surface-soft: #f1eee7;
-  --data-bg: #e8f4ff;
-  --risk-bg: #fff0eb;
-  --opportunity-bg: #edf8ef;
-  --conclusion-bg: #fff7d7;
-  --process-bg: #f3f0ff;
-  --table-bg: #ffffff;
-  --quote-bg: #202938;
-  --takeaway-bg: #eef6f4;
-  --accent-data: #177ddc;
-  --accent-risk: #d84a2b;
-  --accent-opportunity: #209b5b;
-  --accent-conclusion: #b98900;
-  --accent-skill: #7a4fd8;
-  --shadow: rgba(23, 32, 42, 0.12);
+  color-scheme: light dark;
+  --bg: #f4f6fb;
+  --paper: #ffffff;
+  --ink: #172033;
+  --muted: #667085;
+  --line: #d9deea;
+  --hero-bg: #17213d;
+  --hero-ink: #f8faff;
+  --hero-muted: #bdc8e4;
+  --data: #1769e0;
+  --data-bg: #e7f0ff;
+  --risk: #c13b4f;
+  --risk-bg: #ffe9ed;
+  --opp: #078260;
+  --opp-bg: #def7ee;
+  --conclusion: #8a4dcc;
+  --conclusion-bg: #f1e7ff;
+  --warm: #b75c00;
+  --warm-bg: #fff0d8;
+  --hl: #fff1a8;
+  --hl2: #ccecff;
+  --quote-bg: #222d4c;
+  --quote-ink: #f5f7ff;
+  --translation-bg: #fffdf9;
+  --code-bg: #edf1f7;
+  --shadow: rgba(29, 39, 66, 0.12);
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f4f6fb;
+  --paper: #ffffff;
+  --ink: #172033;
+  --muted: #667085;
+  --line: #d9deea;
+  --hero-bg: #17213d;
+  --hero-ink: #f8faff;
+  --hero-muted: #bdc8e4;
+  --data: #1769e0;
+  --data-bg: #e7f0ff;
+  --risk: #c13b4f;
+  --risk-bg: #ffe9ed;
+  --opp: #078260;
+  --opp-bg: #def7ee;
+  --conclusion: #8a4dcc;
+  --conclusion-bg: #f1e7ff;
+  --warm: #b75c00;
+  --warm-bg: #fff0d8;
+  --hl: #fff1a8;
+  --hl2: #ccecff;
+  --quote-bg: #222d4c;
+  --quote-ink: #f5f7ff;
+  --translation-bg: #fffdf9;
+  --code-bg: #edf1f7;
+  --shadow: rgba(29, 39, 66, 0.12);
 }
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #11151b;
-    --ink: #e9edf2;
-    --muted: #a7b1be;
-    --line: #303844;
-    --hero-bg: #0b1018;
-    --hero-ink: #f1f5f9;
-    --hero-muted: #9fb0c3;
-    --surface: #1a2029;
-    --surface-soft: #202733;
-    --data-bg: #102437;
-    --risk-bg: #351c18;
-    --opportunity-bg: #12291f;
-    --conclusion-bg: #30280e;
-    --process-bg: #211c35;
-    --table-bg: #171d25;
-    --quote-bg: #090d13;
-    --takeaway-bg: #132521;
-    --accent-data: #57b3ff;
-    --accent-risk: #ff7b5f;
-    --accent-opportunity: #54d68c;
-    --accent-conclusion: #ffd45a;
-    --accent-skill: #a98cff;
-    --shadow: rgba(0, 0, 0, 0.36);
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0d111b;
+    --paper: #151b28;
+    --ink: #e7ebf5;
+    --muted: #a9b2c5;
+    --line: #30394b;
+    --hero-bg: #121a31;
+    --hero-ink: #f1f5ff;
+    --hero-muted: #aab8da;
+    --data: #68a5ff;
+    --data-bg: #142c50;
+    --risk: #ff7f91;
+    --risk-bg: #471d27;
+    --opp: #54d7ae;
+    --opp-bg: #123c33;
+    --conclusion: #c59aff;
+    --conclusion-bg: #33234b;
+    --warm: #ffae55;
+    --warm-bg: #452f16;
+    --hl: #665515;
+    --hl2: #17485f;
+    --quote-bg: #0b1020;
+    --quote-ink: #ecf1ff;
+    --translation-bg: #121720;
+    --code-bg: #202838;
+    --shadow: rgba(0, 0, 0, 0.34);
   }
 }
 :root[data-theme="dark"] {
-  --bg: #11151b;
-  --ink: #e9edf2;
-  --muted: #a7b1be;
-  --line: #303844;
-  --hero-bg: #0b1018;
-  --hero-ink: #f1f5f9;
-  --hero-muted: #9fb0c3;
-  --surface: #1a2029;
-  --surface-soft: #202733;
-  --data-bg: #102437;
-  --risk-bg: #351c18;
-  --opportunity-bg: #12291f;
-  --conclusion-bg: #30280e;
-  --process-bg: #211c35;
-  --table-bg: #171d25;
-  --quote-bg: #090d13;
-  --takeaway-bg: #132521;
-  --accent-data: #57b3ff;
-  --accent-risk: #ff7b5f;
-  --accent-opportunity: #54d68c;
-  --accent-conclusion: #ffd45a;
-  --accent-skill: #a98cff;
-  --shadow: rgba(0, 0, 0, 0.36);
+  color-scheme: dark;
+  --bg: #0d111b;
+  --paper: #151b28;
+  --ink: #e7ebf5;
+  --muted: #a9b2c5;
+  --line: #30394b;
+  --hero-bg: #121a31;
+  --hero-ink: #f1f5ff;
+  --hero-muted: #aab8da;
+  --data: #68a5ff;
+  --data-bg: #142c50;
+  --risk: #ff7f91;
+  --risk-bg: #471d27;
+  --opp: #54d7ae;
+  --opp-bg: #123c33;
+  --conclusion: #c59aff;
+  --conclusion-bg: #33234b;
+  --warm: #ffae55;
+  --warm-bg: #452f16;
+  --hl: #665515;
+  --hl2: #17485f;
+  --quote-bg: #0b1020;
+  --quote-ink: #ecf1ff;
+  --translation-bg: #121720;
+  --code-bg: #202838;
+  --shadow: rgba(0, 0, 0, 0.34);
 }
 * {
   box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
 }
 body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-  line-height: 1.72;
+  font-family: Inter, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  line-height: 1.75;
 }
-main {
-  overflow: hidden;
+a {
+  color: var(--data);
 }
 .hero {
+  padding: 5rem max(1.5rem, calc((100vw - 1120px) / 2));
   background: var(--hero-bg);
   color: var(--hero-ink);
-  padding: 64px 22px 46px;
 }
-.wrap {
-  width: min(1100px, calc(100% - 36px));
-  margin: 0 auto;
+.hero-kicker {
+  margin: 0 0 1rem;
+  color: var(--opp);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
-.kicker {
-  color: var(--accent-data);
-  font-weight: 700;
-  letter-spacing: 0;
-  margin-bottom: 16px;
-}
-h1 {
+.hero h1 {
+  max-width: 900px;
   margin: 0;
-  font-size: clamp(34px, 6vw, 72px);
-  line-height: 1.05;
-  letter-spacing: 0;
+  font-size: clamp(2.7rem, 8vw, 6.5rem);
+  line-height: 1.03;
+  letter-spacing: -0.055em;
 }
-.original {
-  margin-top: 12px;
+.original-title {
+  margin: 1rem 0 0;
   color: var(--hero-muted);
-  font-size: 18px;
+  font-size: clamp(1rem, 2vw, 1.35rem);
 }
-.thesis {
-  margin-top: 30px;
-  max-width: 760px;
-  font-size: 22px;
+.dek {
+  max-width: 850px;
+  margin: 2.2rem 0 0;
+  font-size: clamp(1.15rem, 2.2vw, 1.55rem);
   line-height: 1.55;
 }
 .meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 28px;
+  gap: 0.65rem;
+  margin-top: 2rem;
 }
 .meta span {
+  padding: 0.28rem 0.75rem;
   border: 1px solid var(--line);
   border-radius: 999px;
-  padding: 6px 12px;
   color: var(--hero-muted);
+  font-size: 0.84rem;
 }
-.number-band {
+.summary-shell {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 5rem;
+}
+.summary-shell h2 {
+  margin: 0 0 1.4rem;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+}
+.big-claim {
+  padding: 2rem;
+  border-left: 8px solid var(--conclusion);
+  background: var(--conclusion-bg);
+  font-size: clamp(1.15rem, 2vw, 1.45rem);
+}
+.big-claim strong {
+  color: var(--conclusion);
+}
+.metric-band {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.7fr) 2fr;
+  gap: 2rem;
+  align-items: center;
+  margin: 2.4rem 0;
+  padding: 2rem;
   background: var(--data-bg);
-  border-bottom: 1px solid var(--line);
-  padding: 22px 0;
+  border-top: 4px solid var(--data);
 }
-.metrics {
+.metric-number {
+  color: var(--data);
+  font-size: clamp(3.4rem, 9vw, 6rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.06em;
+}
+.metric-copy h3,
+.split-panel h3,
+.process h3,
+.takeaways h3 {
+  margin-top: 0;
+}
+.split-panel {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  margin: 2.4rem 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 16px 40px var(--shadow);
 }
-.metric {
-  padding: 18px;
-  border-left: 5px solid var(--accent-data);
+.static-side,
+.dynamic-side {
+  padding: 2rem;
 }
-.metric strong {
-  display: block;
-  font-size: 34px;
-  color: var(--accent-data);
-  line-height: 1.1;
+.static-side {
+  background: var(--risk-bg);
+  border-top: 5px solid var(--risk);
 }
-.metric span {
-  color: var(--muted);
+.dynamic-side {
+  background: var(--opp-bg);
+  border-top: 5px solid var(--opp);
 }
-.split {
-  background: var(--surface);
-  padding: 54px 0;
+.static-side h3 {
+  color: var(--risk);
 }
-.two-col {
-  display: grid;
-  grid-template-columns: 0.95fr 1.05fr;
-  gap: 36px;
-  align-items: start;
-}
-h2 {
-  margin: 0 0 14px;
-  font-size: 28px;
-  line-height: 1.25;
-}
-.lead {
-  font-size: 18px;
-  color: var(--muted);
-}
-.explain-box {
-  border-left: 6px solid var(--accent-opportunity);
-  background: var(--opportunity-bg);
-  padding: 22px 24px;
-}
-.explain-box p {
-  margin: 0 0 12px;
+.dynamic-side h3 {
+  color: var(--opp);
 }
 .process {
-  background: var(--process-bg);
-  padding: 54px 0;
+  margin: 2.4rem 0;
+  padding: 2.2rem;
+  background: var(--paper);
+  border: 1px solid var(--line);
 }
-.steps {
+.process ol {
   display: grid;
-  gap: 18px;
-  margin-top: 26px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  padding: 0;
+  list-style: none;
+  counter-reset: steps;
 }
-.step {
-  display: grid;
-  grid-template-columns: 54px 1fr;
-  gap: 18px;
-  align-items: start;
+.process li {
+  position: relative;
+  padding-top: 3.4rem;
+  color: var(--muted);
+  counter-increment: steps;
 }
-.badge {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
+.process li::before {
+  position: absolute;
+  top: 0;
+  left: 0;
   display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
   place-items: center;
-  background: var(--accent-skill);
-  color: var(--hero-ink);
-  font-weight: 800;
+  border-radius: 50%;
+  background: var(--warm-bg);
+  color: var(--warm);
+  font-weight: 900;
+  content: counter(steps);
 }
-.step-body {
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 18px;
-}
-.step-body h3 {
-  margin: 0 0 6px;
-  font-size: 20px;
-}
-.step-body p {
-  margin: 0;
-  color: var(--muted);
-}
-.compare {
-  background: var(--table-bg);
-  padding: 54px 0;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--surface);
-  box-shadow: 0 12px 30px var(--shadow);
-}
-th, td {
-  text-align: left;
-  padding: 18px;
-  border-bottom: 1px solid var(--line);
-  vertical-align: top;
-}
-th {
-  color: var(--muted);
-  font-size: 14px;
-}
-td strong {
+.process strong {
+  display: block;
   color: var(--ink);
 }
-.quote {
+.insight-strip {
+  margin: 2.4rem 0;
+  padding: 2.4rem;
   background: var(--quote-bg);
-  color: var(--hero-ink);
-  padding: 48px 0;
+  color: var(--quote-ink);
+  font-size: clamp(1.2rem, 2.5vw, 1.65rem);
 }
-.quote-line {
-  border-left: 8px solid var(--accent-conclusion);
-  padding-left: 24px;
-  font-size: 25px;
-  line-height: 1.5;
-  max-width: 900px;
-}
-.quote-line small {
-  display: block;
-  margin-top: 14px;
-  color: var(--hero-muted);
-  font-size: 16px;
-}
-.risks {
-  background: var(--risk-bg);
-  padding: 54px 0;
-}
-.risk-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 22px;
-}
-.risk-item {
-  border-top: 5px solid var(--accent-risk);
-  padding: 18px 0 0;
-}
-.risk-item h3 {
-  margin: 0 0 8px;
-}
-.risk-item p {
-  margin: 0;
-  color: var(--muted);
+.insight-strip b {
+  color: var(--opp);
 }
 .takeaways {
-  background: var(--takeaway-bg);
-  padding: 56px 0 70px;
+  margin-top: 2.4rem;
 }
-.mosaic {
+.takeaway-grid {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr 1fr;
-  gap: 16px;
-  margin-top: 24px;
+  grid-template-columns: 1.2fr 0.8fr 0.8fr;
+  gap: 1rem;
 }
-.tile {
-  background: var(--surface);
+.takeaway {
+  padding: 1.4rem;
   border: 1px solid var(--line);
-  padding: 20px;
-  min-height: 140px;
+  background: var(--paper);
 }
-.tile:nth-child(1) {
-  border-top: 6px solid var(--accent-data);
+.takeaway:first-child {
+  grid-row: span 2;
+  background: var(--conclusion-bg);
+  border-color: var(--conclusion);
 }
-.tile:nth-child(2) {
-  border-top: 6px solid var(--accent-opportunity);
+.takeaway:nth-child(2) {
+  background: var(--data-bg);
+  border-color: var(--data);
 }
-.tile:nth-child(3) {
-  border-top: 6px solid var(--accent-risk);
+.takeaway:nth-child(3) {
+  background: var(--risk-bg);
+  border-color: var(--risk);
 }
-.tile:nth-child(4) {
-  grid-column: span 2;
-  border-top: 6px solid var(--accent-conclusion);
+.takeaway:nth-child(4) {
+  background: var(--opp-bg);
+  border-color: var(--opp);
 }
-.tile:nth-child(5) {
-  border-top: 6px solid var(--accent-skill);
+.takeaway:nth-child(5) {
+  background: var(--warm-bg);
+  border-color: var(--warm);
 }
-.tile strong {
+.takeaway strong {
   display: block;
-  margin-bottom: 8px;
-  font-size: 18px;
+  margin-bottom: 0.45rem;
 }
-.tile p {
-  margin: 0;
+mark {
+  padding: 0.06em 0.22em;
+  background: var(--hl);
+  color: var(--ink);
+}
+.mark-secondary {
+  background: var(--hl2);
+}
+#translation {
+  background: var(--translation-bg);
+  border-top: 1px solid var(--line);
+}
+.translation-inner {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 5rem 1.5rem 7rem;
+}
+#translation h2 {
+  margin: 0 0 2.5rem;
+  font-size: clamp(2.3rem, 5vw, 4rem);
+  line-height: 1.1;
+}
+#translation h3 {
+  margin: 3.2rem 0 1rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 2px solid var(--line);
+  font-size: 1.75rem;
+  line-height: 1.3;
+}
+#translation h4 {
+  margin: 2.6rem 0 0.8rem;
+  color: var(--conclusion);
+  font-size: 1.35rem;
+}
+#translation p,
+#translation li {
+  font-family: Georgia, "Noto Serif SC", "Songti SC", serif;
+  font-size: 1.06rem;
+}
+#translation ul,
+#translation ol {
+  padding-left: 1.5rem;
+}
+.toc {
+  margin: 1.5rem 0 2.5rem;
+  padding: 1.4rem 1.6rem;
+  background: var(--code-bg);
+  border-left: 5px solid var(--data);
+}
+.toc strong {
+  display: block;
+  margin-bottom: 0.6rem;
+}
+.footnote {
+  margin-top: 3rem;
+  padding: 1.2rem 1.4rem;
+  border-left: 4px solid var(--warm);
+  background: var(--warm-bg);
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+.post-meta {
+  margin: 2.5rem 0;
+  padding: 1.3rem;
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.related {
   color: var(--muted);
 }
+.source-figure {
+  margin: 2.5rem 0;
+}
+.source-figure img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+.source-figure figcaption {
+  margin-top: 0.75rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+  text-align: center;
+}
 @media (max-width: 760px) {
-  .metrics, .two-col, .risk-grid, .mosaic {
+  .hero {
+    padding-top: 3.5rem;
+    padding-bottom: 3.5rem;
+  }
+  .metric-band,
+  .split-panel,
+  .takeaway-grid {
     grid-template-columns: 1fr;
   }
-  .tile:nth-child(4) {
-    grid-column: auto;
+  .process ol {
+    grid-template-columns: 1fr;
   }
-  .hero {
-    padding-top: 44px;
-  }
-  .thesis {
-    font-size: 19px;
-  }
-  th, td {
-    padding: 13px;
+  .takeaway:first-child {
+    grid-row: auto;
   }
 }
 </style>
-  <script id="airs-digest-theme-boot">
+<script id="airs-digest-theme-boot">
     try {
       var saved = localStorage.getItem("theme");
       if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
     } catch (e) {}
   </script>
-  <style id="airs-digest-theme-style">
+<style id="airs-digest-theme-style">
     :root {
       color-scheme: light;
       --airs-digest-ink: #191816;
@@ -475,197 +568,269 @@ td strong {
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+  <style id="airs-source-image-theme-style">
+    .source-figure .source-image-dark {
+      display: none;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .source-figure .source-image-light {
+        display: none;
+      }
+      :root:not([data-theme="light"]) .source-figure .source-image-dark {
+        display: block;
+      }
+    }
+    :root[data-theme="dark"] .source-figure .source-image-light {
+      display: none;
+    }
+    :root[data-theme="dark"] .source-figure .source-image-dark {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-light {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-dark {
+      display: none;
+    }
   </style>
 </head>
 <body>
-<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/dynamic-context-discovery" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">← 返回索引</a><a href="https://cursor.com/blog/dynamic-context-discovery" rel="noopener noreferrer" target="_blank">阅读原文 ↗</a></div><button class="airs-digest-theme-toggle" data-airs-theme-toggle="" type="button">主题 · 跟随系统</button></nav>
 <main>
-  <section class="hero">
-    <div class="wrap">
-      <div class="kicker">一句话总括</div>
-      <h1>动态上下文发现</h1>
-      <div class="original">Dynamic context discovery</div>
-      <p class="thesis">Cursor 的真正贡献，是把编码智能体的上下文从“预先塞满”改成“按需发现”。模型不必一开始看到所有内容，而是在需要时从文件化的工具输出、聊天历史、技能、MCP 描述和终端记录中检索。</p>
-      <div class="meta">
-        <span>Cursor Research</span>
-        <span>2026 年 1 月 6 日</span>
-        <span>作者：Jediah Katz</span>
-      </div>
+<section id="summary">
+<header class="hero">
+<p class="hero-kicker">Cursor Research · 2026 年 1 月 6 日</p>
+<h1>动态上下文发现</h1>
+<p class="original-title" lang="en">Dynamic context discovery</p>
+<p class="dek"><strong>一句话总括：</strong>Cursor 把大量上下文转化为可搜索的文件，让编程智能体在真正需要时自行查找，从而减少 token 消耗、信息冲突和压缩造成的遗忘。</p>
+<div class="meta">
+<span>来源：Cursor</span>
+<span>分类：Research</span>
+<span>作者：Jediah Katz</span>
+</div>
+</header>
+<div class="summary-shell">
+<h2>核心发现</h2>
+<div class="big-claim">
+<strong>少给一点，反而可能做得更好。</strong>
+      Cursor 不再把所有工具、日志和历史记录预先塞进提示词，而是只提供发现入口。智能体随后按任务需要检索内容。这改变了上下文工程的重点：关键不只是选择放进什么，还包括设计一条可靠的取用路径。
     </div>
-  </section>
-
-  <section class="number-band">
-    <div class="wrap metrics">
-      <div class="metric">
-        <strong>46.9%</strong>
-        <span>MCP 工具运行中的总 agent tokens 降幅。</span>
-      </div>
-      <div class="metric">
-        <strong>5</strong>
-        <span>文章列出的动态上下文实现路径。</span>
-      </div>
-      <div class="metric">
-        <strong>1 个原则</strong>
-        <span>少放静态上下文，多给可搜索入口。</span>
-      </div>
+<div class="metric-band">
+<div class="metric-number">46.9%</div>
+<div class="metric-copy">
+<h3>MCP 场景中的 token 降幅</h3>
+<p>在确实调用 MCP 工具的 A/B 测试运行中，按需加载工具说明使智能体的总 token 消耗降低了 <mark>46.9%</mark>。</p>
+<p>结果具有统计显著性。不过，降幅会随安装的 MCP 数量产生较大波动。它说明静态注入大量工具说明的成本并非边缘问题，而是可以被架构性消除的开销。</p>
+</div>
+</div>
+<div class="split-panel">
+<article class="static-side">
+<h3>静态上下文的问题</h3>
+<p>所有说明都常驻上下文，会挤占窗口空间。未使用的信息也可能互相矛盾，让模型难以判断重点。</p>
+<p>截断超长输出虽然节省空间，却可能丢掉决定任务成败的内容。上下文摘要同样属于有损压缩，智能体可能忘记关键约束。</p>
+</article>
+<article class="dynamic-side">
+<h3>动态发现的做法</h3>
+<p>先给智能体少量索引，再把完整信息保存在文件中。智能体可通过 <code>tail</code>、<code>grep</code>、<code>rg</code> 或 <code>jq</code> 精确读取。</p>
+<p>这样既保留全部数据，又只让相关片段进入上下文。文件因此成为工具输出、历史记录和能力说明之间的共同接口。</p>
+</article>
+</div>
+<div class="process">
+<h3>五种落地方式</h3>
+<ol>
+<li><strong>保存长输出</strong>把过长的 shell 或 MCP 返回值写入文件，避免截断和数据丢失。</li>
+<li><strong>恢复聊天历史</strong>摘要后仍可搜索历史文件，找回压缩时遗漏的关键细节。</li>
+<li><strong>加载 Agent Skills</strong>静态提供名称与描述，具体规则、脚本和资源按需读取。</li>
+<li><strong>发现 MCP 工具</strong>按服务器组织工具说明，只有任务需要时才加载对应定义。</li>
+<li><strong>检索终端会话</strong>把集成终端输出同步到本地文件，按需定位报错和长时间运行日志。</li>
+</ol>
+</div>
+<div class="insight-strip">
+      文件的价值不在于新奇，而在于它是一个<b>简单、可搜索、可组合</b>的抽象。模型和工具仍在快速变化时，这种基础接口比过早设计复杂的新协议更稳妥。
     </div>
-  </section>
-
-  <section class="split">
-    <div class="wrap two-col">
-      <div>
-        <h2>更多上下文不等于更强智能体</h2>
-        <p class="lead">传统做法倾向于把工具说明、历史记录和命令输出都放进提示词。这样会消耗 token，也会把无关或互相矛盾的信息带进模型视野。</p>
-      </div>
-      <div class="explain-box">
-        <p>Cursor 的做法更像给智能体一个可搜索的工作目录。默认只给少量线索，真正需要时再读取具体文件。</p>
-        <p>这改变了对 AI 编程能力的理解：长任务的质量不只取决于模型窗口大小，也取决于上下文是否能被可靠找回。</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="process">
-    <div class="wrap">
-      <h2>五种文件化上下文</h2>
-      <div class="steps">
-        <div class="step">
-          <div class="badge">1</div>
-          <div class="step-body">
-            <h3>长工具输出写入文件</h3>
-            <p>第三方命令和 MCP 调用可能返回大量 JSON。Cursor 不简单截断，而是写入文件，让智能体用 tail 或继续读取来定位细节。这样减少了到达上下文上限时的无谓总结。</p>
-          </div>
+<div class="takeaways">
+<h3>最值得带走的洞见</h3>
+<div class="takeaway-grid">
+<div class="takeaway">
+<strong>上下文工程正在从“预先塞满”转向“提供发现能力”</strong>
+          优秀的智能体框架不必预测任务所需的一切。更可扩展的方式，是保留完整信息并提供高效检索入口。
         </div>
-        <div class="step">
-          <div class="badge">2</div>
-          <div class="step-body">
-            <h3>总结时引用聊天历史</h3>
-            <p>上下文窗口满了以后，摘要会压缩信息，也会丢失细节。把聊天历史作为文件提供，允许模型在摘要后搜索遗漏内容，降低长任务失忆风险。</p>
-          </div>
+<div class="takeaway">
+<strong>文件避免了截断与常驻之间的二选一</strong>
+          大型工具输出可以完整落盘，同时只把相关部分送入模型。
         </div>
-        <div class="step">
-          <div class="badge">3</div>
-          <div class="step-body">
-            <h3>Skills 作为可发现能力</h3>
-            <p>Agent Skills 用文件描述特定任务的做法。系统提示只保留名称和描述，具体说明、脚本和可执行文件按需搜索。</p>
-          </div>
+<div class="takeaway">
+<strong>摘要不再是不可逆的遗忘</strong>
+          聊天历史文件让智能体在上下文压缩后仍能恢复原始细节。
         </div>
-        <div class="step">
-          <div class="badge">4</div>
-          <div class="step-body">
-            <h3>MCP 工具描述按服务器分组</h3>
-            <p>许多 MCP 服务器有大量工具和长描述。Cursor 将工具描述同步到文件夹，只把工具名等少量静态信息给模型。A/B 测试中，这让调用 MCP 的运行减少 46.9% 总 agent tokens。</p>
-          </div>
+<div class="takeaway">
+<strong>MCP 工具发现有可测量的收益</strong>
+<mark class="mark-secondary">46.9%</mark> 的降幅表明，工具描述本身就是重要的 token 成本来源。
         </div>
-        <div class="step">
-          <div class="badge">5</div>
-          <div class="step-body">
-            <h3>集成终端会话也变成文件</h3>
-            <p>终端输出同步到本地文件系统后，用户可以直接问“命令为什么失败”。智能体能 grep 长日志，而不是依赖用户复制粘贴。</p>
-          </div>
+<div class="takeaway">
+<strong>简单抽象更能适应模型迭代</strong>
+          文件可由成熟命令行工具直接处理，也便于按服务器和能力组织。
         </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="compare">
-    <div class="wrap">
-      <h2>静态上下文与动态发现的差别</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>维度</th>
-            <th>静态上下文</th>
-            <th>动态上下文发现</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>Token 使用</strong></td>
-            <td>提前注入大量信息，很多内容不会被使用。</td>
-            <td>只加载任务需要的部分，MCP 场景实测 token 降低明显。</td>
-          </tr>
-          <tr>
-            <td><strong>信息完整性</strong></td>
-            <td>长输出常被截断，关键错误可能消失。</td>
-            <td>完整输出留在文件里，模型可以继续读。</td>
-          </tr>
-          <tr>
-            <td><strong>长任务连续性</strong></td>
-            <td>摘要后容易忘记早期约束和细节。</td>
-            <td>聊天历史可搜索，摘要不再是唯一记忆。</td>
-          </tr>
-          <tr>
-            <td><strong>工具生态</strong></td>
-            <td>工具描述堆在提示词里，安装越多负担越重。</td>
-            <td>按服务器分组存放，状态和认证问题也能被模型发现。</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="quote">
-    <div class="wrap">
-      <div class="quote-line">
-        文件不一定是 LLM 工具的最终界面，但它现在是一个简单、强韧、可搜索的抽象。
-        <small>这说明编码智能体的进步不只是模型更强，也来自更朴素的工程接口。</small>
-      </div>
-    </div>
-  </section>
-
-  <section class="risks">
-    <div class="wrap">
-      <h2>这项设计解决的真正风险</h2>
-      <div class="risk-grid">
-        <div class="risk-item">
-          <h3>截断造成的隐性数据丢失</h3>
-          <p>当命令输出太长时，简单截断可能刚好删掉错误栈、失败原因或用户真正关心的行。文件化输出让模型可以回头查证。</p>
-        </div>
-        <div class="risk-item">
-          <h3>摘要压缩造成的任务漂移</h3>
-          <p>摘要会节省窗口，但它是有损的。把历史保留为可检索文件，让模型在不确定时恢复原始细节。</p>
-        </div>
-        <div class="risk-item">
-          <h3>工具描述污染提示词</h3>
-          <p>企业 MCP 可能连接日志、设计文件和内部文档。所有工具常驻提示词会迅速膨胀，也让模型更容易被无关工具干扰。</p>
-        </div>
-        <div class="risk-item">
-          <h3>用户上下文需要手工搬运</h3>
-          <p>终端历史同步后，用户不必复制粘贴失败输出。智能体能直接理解“刚才那个命令”的上下文。</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="takeaways">
-    <div class="wrap">
-      <h2>最值得带走的洞见</h2>
-      <div class="mosaic">
-        <div class="tile">
-          <strong>上下文工程正在产品化</strong>
-          <p>Cursor 把提示词外的文件系统变成智能体记忆层。这会影响所有长程编码任务。</p>
-        </div>
-        <div class="tile">
-          <strong>省 token 也能提质量</strong>
-          <p>少加载无关信息，模型更不容易被噪声带偏。46.9% 的 token 降幅说明收益不只是理论。</p>
-        </div>
-        <div class="tile">
-          <strong>不要把截断当优化</strong>
-          <p>截断节省窗口，却可能删掉最关键证据。可回读的文件比丢弃信息更稳妥。</p>
-        </div>
-        <div class="tile">
-          <strong>未来的智能体会更像会搜索的工程师</strong>
-          <p>它们不会记住一切，而是知道到哪里找。文件、历史、工具目录和终端记录共同构成工作记忆。</p>
-        </div>
-        <div class="tile">
-          <strong>简单抽象仍然有优势</strong>
-          <p>在工具接口尚未定型时，文件提供了兼容搜索、分组、脚本和状态传达的低成本方案。</p>
-        </div>
-      </div>
-    </div>
-  </section>
+</div>
+</div>
+</div>
+</section><section id="translation">
+<div class="translation-inner">
+<h2>完整译文</h2>
+<div class="toc">
+<strong>目录</strong>
+<ol>
+<li>用于动态上下文发现的文件</li>
+<li>将过长的工具响应转为文件</li>
+<li>在摘要过程中引用聊天历史</li>
+<li>支持 Agent Skills 开放标准</li>
+<li>只高效加载所需的 MCP 工具</li>
+<li>将所有集成终端会话视为文件</li>
+<li>简单的抽象</li>
+</ol>
+</div>
+<p>编程智能体正在迅速改变软件的构建方式。它们之所以进步得如此之快，一方面源于智能体模型能力的提升，另一方面也得益于更好的上下文工程。后者可以更有效地引导模型。</p>
+<p>Cursor 的智能体框架由我们提供给模型的指令和工具组成。我们会针对支持的每一种新前沿模型分别优化这套框架。不过，有些上下文工程改进适用于框架内的所有模型。例如，如何收集上下文，以及如何在漫长的任务轨迹中优化 token 使用。</p>
+<p>随着模型越来越擅长充当智能体，我们发现，预先提供更少的细节往往效果更好。这样可以让智能体更容易自行提取相关上下文。我们把这种模式称为“动态上下文发现”，以区别于始终包含在上下文中的“静态上下文”。</p>
+<h3>用于动态上下文发现的文件</h3>
+<p>动态上下文发现的 token 效率要高得多，因为只有必要的数据才会被拉入上下文窗口。它还可能提升智能体的响应质量，因为上下文窗口中容易造成困惑或相互矛盾的信息减少了。</p>
+<p>Cursor 通过以下方式运用动态上下文发现：</p>
+<ul>
+<li>将过长的工具响应转为文件</li>
+<li>在摘要过程中引用聊天历史</li>
+<li>支持 Agent Skills 开放标准</li>
+<li>只高效加载所需的 MCP 工具</li>
+<li>将所有集成终端会话视为文件</li>
+</ul>
+<h3>1. 将过长的工具响应转为文件</h3>
+<p>工具调用返回的大型 JSON 响应，可能会使上下文窗口迅速膨胀。</p>
+<p>对于 Cursor 的第一方工具，例如文件编辑和代码库搜索工具，我们可以通过设计合理的工具定义和精简的响应格式来避免上下文膨胀。不过，第三方工具并不会自然获得同样的处理，例如 shell 命令或 MCP 调用。</p>
+<p>编程智能体通常会截断过长的 shell 命令输出或 MCP 结果。这可能造成数据丢失，而被删掉的内容中也许就包含你希望放入上下文的重要信息。Cursor 采用了另一种做法：我们把输出写入文件，并让智能体能够读取它。智能体会调用 <code>tail</code> 查看末尾内容。如果还需要更多信息，再继续读取。</p>
+<p>这种做法减少了触及上下文限制时不必要的摘要操作。</p>
+<h3>2. 在摘要过程中引用聊天历史</h3>
+<p>当模型的上下文窗口被填满时，Cursor 会触发一次摘要操作。它会总结智能体截至当时完成的工作，并为智能体提供一个新的上下文窗口。</p>
+<p>不过，摘要是对上下文的有损压缩。摘要完成后，智能体掌握的信息可能会退化。它也许已经忘记了任务中的关键细节。在 Cursor 中，我们把聊天历史作为文件，用它来提高摘要过程的质量。</p>
+<p>当上下文窗口达到限制，或者用户决定手动执行摘要时，我们会向智能体提供历史文件的引用。如果智能体发现摘要缺少自己需要的细节，它就可以搜索历史记录并恢复这些信息。</p>
+<h3>3. 支持 Agent Skills 开放标准</h3>
+<p>Cursor 支持 Agent Skills。这是一项开放标准，可以用专门能力扩展编程智能体。Skills 与其他类型的 Rules 类似，都通过文件来定义。这些文件会告诉智能体，应该如何完成特定领域的任务。</p>
+<p>Skill 还包含名称和描述。这些信息可以作为“静态上下文”放入系统提示词。智能体随后可以进行动态上下文发现，并利用 <code>grep</code> 和 Cursor 的语义搜索等工具提取相关 Skill。</p>
+<p>Skill 还可以附带与任务相关的可执行文件或脚本。由于它们本身就是文件，智能体可以轻松找出某个 Skill 所需的内容。</p>
+<h3>4. 只高效加载所需的 MCP 工具</h3>
+<p>MCP 很适合访问受 OAuth 保护的资源。这些资源可能是生产环境日志、外部设计文件，也可能是企业内部的上下文和文档。</p>
+<p>有些 MCP 服务器包含大量工具，而这些工具往往带有很长的说明。它们会显著挤占上下文窗口。即使大多数工具从未被使用，其说明也会一直包含在提示词中。如果使用多个 MCP 服务器，问题还会进一步叠加。</p>
+<p>要求每个 MCP 服务器都自行完成这类优化并不现实。我们认为，减少上下文用量是编程智能体应该承担的责任。在 Cursor 中，我们把工具说明同步到一个文件夹，从而为 MCP 提供动态上下文发现能力。<sup>1</sup></p>
+<p>现在，智能体只会收到少量静态上下文，其中包括工具名称。这些信息会提示它在任务需要时查找相应工具。在一项 A/B 测试中，我们发现，在调用了 MCP 工具的运行中，这种策略让智能体使用的总 token 减少了 46.9%。这一结果具有统计显著性。不过，根据已安装 MCP 的数量不同，结果存在较大方差。</p>
+<p>这种文件方案还让我们可以把 MCP 工具的状态传达给智能体。例如，过去某个 MCP 服务器需要重新认证时，智能体会彻底忘记那些工具，用户也会因此感到困惑。现在，智能体可以主动提醒用户重新认证。</p>
+<h3>5. 将所有集成终端会话视为文件</h3>
+<p>用户不再需要把某个终端会话的输出复制并粘贴到智能体的输入中。Cursor 现在会把集成终端的输出同步到本地文件系统。</p>
+<p>这样一来，用户可以直接询问“为什么我的命令失败了？”，智能体也能理解用户指的是哪段输出。终端历史可能很长，所以智能体可以用 <code>grep</code> 只查找相关内容。这对于服务器等长期运行进程的日志尤其有用。</p>
+<p>这种方式与命令行编程智能体看到的内容相似。后者会在上下文中看到之前的 shell 输出，但 Cursor 会动态发现这些内容，而不是把它们静态注入上下文。</p>
+<h3>简单的抽象</h3>
+<p>文件是否会成为基于大语言模型的工具最终采用的接口，目前还不明确。</p>
+<p>不过，编程智能体正在快速进步。在这个过程中，文件一直是一种简单而强大的基础构件。与再造一种无法充分适应未来的新抽象相比，选择文件也更加稳妥。敬请关注，我们还会分享这一领域更多令人期待的工作。</p>
+<p>这些改进将在未来几周内向所有用户开放。本文介绍的技术凝聚了多位 Cursor 员工的工作，其中包括 Lukas Moller、Yash Gaitonde、Wilson Lin、Jason Ma、Devang Jhabakh 和 Jediah Katz。如果你有兴趣利用 AI 解决最困难、最具雄心的编程任务，我们很乐意与你交流。请发送邮件至 <a href="mailto:hiring@cursor.com">hiring@cursor.com</a> 联系我们。</p>
+<aside class="footnote">
+<p><sup>1</sup> 我们考虑过采用工具搜索方案，但那会把工具分散在一个扁平索引中。我们最终选择为每台服务器创建一个文件夹，让同一服务器的工具在逻辑上保持成组。当模型列出文件夹内容时，它可以同时看到该服务器的所有工具，并把它们理解为一个完整单元。</p>
+<p>文件还能支持更强大的搜索。智能体可以使用 <code>rg</code> 的完整参数，甚至可以用 <code>jq</code> 筛选工具说明。</p>
+</aside>
+<div class="post-meta">
+<p><strong>归档分类：</strong>Research</p>
+<p><strong>作者：</strong>Jediah Katz</p>
+</div>
+<div class="related">
+<p>让 Composer 胜任更长周期的任务</p>
+<p>持续改进我们的智能体框架</p>
+<p>快速正则表达式搜索：为智能体工具建立文本索引</p>
+</div>
+<h3>动态上下文发现</h3>
+<div class="toc">
+<strong>目录</strong>
+<ol>
+<li>用于动态上下文发现的文件</li>
+<li>将过长的工具响应转为文件</li>
+<li>在摘要过程中引用聊天历史</li>
+<li>支持 Agent Skills 开放标准</li>
+<li>只高效加载所需的 MCP 工具</li>
+<li>将所有集成终端会话视为文件</li>
+<li>简单的抽象</li>
+</ol>
+</div>
+<p>编程智能体正在迅速改变软件的构建方式。它们之所以进步得如此之快，一方面源于智能体模型能力的提升，另一方面也得益于更好的上下文工程。后者可以更有效地引导模型。</p>
+<p>Cursor 的智能体框架由我们提供给模型的指令和工具组成。我们会针对支持的每一种新前沿模型分别优化这套框架。不过，有些上下文工程改进适用于框架内的所有模型。例如，如何收集上下文，以及如何在漫长的任务轨迹中优化 token 使用。</p>
+<p>随着模型越来越擅长充当智能体，我们发现，预先提供更少的细节往往效果更好。这样可以让智能体更容易自行提取相关上下文。我们把这种模式称为“动态上下文发现”，以区别于始终包含在上下文中的“静态上下文”。</p>
+<h3>用于动态上下文发现的文件</h3>
+<p>动态上下文发现的 token 效率要高得多，因为只有必要的数据才会被拉入上下文窗口。它还可能提升智能体的响应质量，因为上下文窗口中容易造成困惑或相互矛盾的信息减少了。</p>
+<p>Cursor 通过以下方式运用动态上下文发现：</p>
+<ul>
+<li>将过长的工具响应转为文件</li>
+<li>在摘要过程中引用聊天历史</li>
+<li>支持 Agent Skills 开放标准</li>
+<li>只高效加载所需的 MCP 工具</li>
+<li>将所有集成终端会话视为文件</li>
+</ul>
+<h3>1. 将过长的工具响应转为文件</h3>
+<p>工具调用返回的大型 JSON 响应，可能会使上下文窗口迅速膨胀。</p>
+<p>对于 Cursor 的第一方工具，例如文件编辑和代码库搜索工具，我们可以通过设计合理的工具定义和精简的响应格式来避免上下文膨胀。不过，第三方工具并不会自然获得同样的处理，例如 shell 命令或 MCP 调用。</p>
+<p>编程智能体通常会截断过长的 shell 命令输出或 MCP 结果。这可能造成数据丢失，而被删掉的内容中也许就包含你希望放入上下文的重要信息。Cursor 采用了另一种做法：我们把输出写入文件，并让智能体能够读取它。智能体会调用 <code>tail</code> 查看末尾内容。如果还需要更多信息，再继续读取。</p>
+<p>这种做法减少了触及上下文限制时不必要的摘要操作。</p>
+<h3>2. 在摘要过程中引用聊天历史</h3>
+<p>当模型的上下文窗口被填满时，Cursor 会触发一次摘要操作。它会总结智能体截至当时完成的工作，并为智能体提供一个新的上下文窗口。</p>
+<p>不过，摘要是对上下文的有损压缩。摘要完成后，智能体掌握的信息可能会退化。它也许已经忘记了任务中的关键细节。在 Cursor 中，我们把聊天历史作为文件，用它来提高摘要过程的质量。</p>
+<p>当上下文窗口达到限制，或者用户决定手动执行摘要时，我们会向智能体提供历史文件的引用。如果智能体发现摘要缺少自己需要的细节，它就可以搜索历史记录并恢复这些信息。</p>
+<h3>3. 支持 Agent Skills 开放标准</h3>
+<p>Cursor 支持 Agent Skills。这是一项开放标准，可以用专门能力扩展编程智能体。Skills 与其他类型的 Rules 类似，都通过文件来定义。这些文件会告诉智能体，应该如何完成特定领域的任务。</p>
+<p>Skill 还包含名称和描述。这些信息可以作为“静态上下文”放入系统提示词。智能体随后可以进行动态上下文发现，并利用 <code>grep</code> 和 Cursor 的语义搜索等工具提取相关 Skill。</p>
+<p>Skill 还可以附带与任务相关的可执行文件或脚本。由于它们本身就是文件，智能体可以轻松找出某个 Skill 所需的内容。</p>
+<h3>4. 只高效加载所需的 MCP 工具</h3>
+<p>MCP 很适合访问受 OAuth 保护的资源。这些资源可能是生产环境日志、外部设计文件，也可能是企业内部的上下文和文档。</p>
+<p>有些 MCP 服务器包含大量工具，而这些工具往往带有很长的说明。它们会显著挤占上下文窗口。即使大多数工具从未被使用，其说明也会一直包含在提示词中。如果使用多个 MCP 服务器，问题还会进一步叠加。</p>
+<p>要求每个 MCP 服务器都自行完成这类优化并不现实。我们认为，减少上下文用量是编程智能体应该承担的责任。在 Cursor 中，我们把工具说明同步到一个文件夹，从而为 MCP 提供动态上下文发现能力。<sup>1</sup></p>
+<p>现在，智能体只会收到少量静态上下文，其中包括工具名称。这些信息会提示它在任务需要时查找相应工具。在一项 A/B 测试中，我们发现，在调用了 MCP 工具的运行中，这种策略让智能体使用的总 token 减少了 46.9%。这一结果具有统计显著性。不过，根据已安装 MCP 的数量不同，结果存在较大方差。</p>
+<p>这种文件方案还让我们可以把 MCP 工具的状态传达给智能体。例如，过去某个 MCP 服务器需要重新认证时，智能体会彻底忘记那些工具，用户也会因此感到困惑。现在，智能体可以主动提醒用户重新认证。</p>
+<h3>5. 将所有集成终端会话视为文件</h3>
+<p>用户不再需要把某个终端会话的输出复制并粘贴到智能体的输入中。Cursor 现在会把集成终端的输出同步到本地文件系统。</p>
+<p>这样一来，用户可以直接询问“为什么我的命令失败了？”，智能体也能理解用户指的是哪段输出。终端历史可能很长，所以智能体可以用 <code>grep</code> 只查找相关内容。这对于服务器等长期运行进程的日志尤其有用。</p>
+<p>这种方式与命令行编程智能体看到的内容相似。后者会在上下文中看到之前的 shell 输出，但 Cursor 会动态发现这些内容，而不是把它们静态注入上下文。</p>
+<h3>简单的抽象</h3>
+<p>文件是否会成为基于大语言模型的工具最终采用的接口，目前还不明确。</p>
+<p>不过，编程智能体正在快速进步。在这个过程中，文件一直是一种简单而强大的基础构件。与再造一种无法充分适应未来的新抽象相比，选择文件也更加稳妥。敬请关注，我们还会分享这一领域更多令人期待的工作。</p>
+<p>这些改进将在未来几周内向所有用户开放。本文介绍的技术凝聚了多位 Cursor 员工的工作，其中包括 Lukas Moller、Yash Gaitonde、Wilson Lin、Jason Ma、Devang Jhabakh 和 Jediah Katz。如果你有兴趣利用 AI 解决最困难、最具雄心的编程任务，我们很乐意与你交流。请发送邮件至 <a href="mailto:hiring@cursor.com">hiring@cursor.com</a> 联系我们。</p>
+<aside class="footnote">
+<p><sup>1</sup> 我们考虑过采用工具搜索方案，但那会把工具分散在一个扁平索引中。我们最终选择为每台服务器创建一个文件夹，让同一服务器的工具在逻辑上保持成组。当模型列出文件夹内容时，它可以同时看到该服务器的所有工具，并把它们理解为一个完整单元。</p>
+<p>文件还能支持更强大的搜索。智能体可以使用 <code>rg</code> 的完整参数，甚至可以用 <code>jq</code> 筛选工具说明。</p>
+</aside>
+<div class="post-meta">
+<p><strong>归档分类：</strong>Research</p>
+<p><strong>作者：</strong>Jediah Katz</p>
+</div>
+<div class="related">
+<p>让 Composer 胜任更长周期的任务</p>
+<p>持续改进我们的智能体框架</p>
+<p>快速正则表达式搜索：为智能体工具建立文本索引</p>
+</div>
+</div>
+</section>
 </main>
-  <script id="airs-digest-theme-script">
+<script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;
       const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));

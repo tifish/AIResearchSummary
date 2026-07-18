@@ -1,272 +1,369 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>自然语言自编码器：把 Claude 的想法转成文本</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>自然语言自动编码器：把 Claude 的思考变成文字</title>
 <style>
 :root {
-  --bg: #f6f4ee;
-  --surface: #fffdf7;
-  --surface-soft: #eef6ff;
-  --surface-warm: #fff1df;
-  --surface-risk: #fff0f3;
-  --surface-dark: #172033;
-  --ink: #18202a;
-  --muted: #657180;
-  --line: #d8d3c8;
-  --data: #1769aa;
-  --risk: #c7354e;
-  --opportunity: #1c8a5a;
-  --conclusion: #7b4fd6;
-  --warning: #d9821f;
-  --white: #ffffff;
-  --shadow: 0 18px 42px rgba(23, 32, 51, .12);
-}
-:root[data-theme="dark"] {
-  --bg: #10131a;
-  --surface: #181d27;
-  --surface-soft: #132337;
-  --surface-warm: #2a2117;
-  --surface-risk: #2a1720;
-  --surface-dark: #0b0f17;
-  --ink: #edf1f6;
-  --muted: #a9b3c1;
-  --line: #2f3745;
-  --data: #68b7ff;
-  --risk: #ff7088;
-  --opportunity: #62d79b;
-  --conclusion: #b49cff;
-  --warning: #ffb55f;
-  --white: #f5f7fb;
-  --shadow: 0 18px 42px rgba(0, 0, 0, .35);
+  color-scheme: light dark;
+  --bg: #f5f2eb;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #17212b;
+  --muted: #66717d;
+  --line: #d8d1c4;
+  --accent: #176b87;
+  --accent2: #9b4dca;
+  --accent3: #c35c18;
+  --accent4: #227548;
+  --risk: #a63446;
+  --deep: #17273a;
+  --deep-ink: #f5f7fb;
+  --soft-blue: #e2f2f8;
+  --soft-purple: #f0e7f7;
+  --soft-orange: #fff0df;
+  --soft-green: #e5f4e9;
+  --soft-red: #f9e4e8;
+  --hl: #ffe59a;
+  --hl2: #bdebe0;
+  --shadow: rgba(25, 35, 45, 0.12);
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #10131a;
-    --surface: #181d27;
-    --surface-soft: #132337;
-    --surface-warm: #2a2117;
-    --surface-risk: #2a1720;
-    --surface-dark: #0b0f17;
-    --ink: #edf1f6;
-    --muted: #a9b3c1;
-    --line: #2f3745;
-    --data: #68b7ff;
-    --risk: #ff7088;
-    --opportunity: #62d79b;
-    --conclusion: #b49cff;
-    --warning: #ffb55f;
-    --white: #f5f7fb;
-    --shadow: 0 18px 42px rgba(0, 0, 0, .35);
+    --bg: #10151b;
+    --surface: #171d24;
+    --card: #1d252e;
+    --ink: #e8edf2;
+    --muted: #aab5c0;
+    --line: #35404c;
+    --accent: #55c2e6;
+    --accent2: #ce8df2;
+    --accent3: #f2a45f;
+    --accent4: #65c98c;
+    --risk: #f17b8c;
+    --deep: #0b121c;
+    --deep-ink: #eaf1f7;
+    --soft-blue: #142c36;
+    --soft-purple: #2c2035;
+    --soft-orange: #342519;
+    --soft-green: #172d21;
+    --soft-red: #351d23;
+    --hl: #684f12;
+    --hl2: #174c42;
+    --shadow: rgba(0, 0, 0, 0.34);
   }
+}
+:root[data-theme="dark"] {
+  --bg: #10151b;
+  --surface: #171d24;
+  --card: #1d252e;
+  --ink: #e8edf2;
+  --muted: #aab5c0;
+  --line: #35404c;
+  --accent: #55c2e6;
+  --accent2: #ce8df2;
+  --accent3: #f2a45f;
+  --accent4: #65c98c;
+  --risk: #f17b8c;
+  --deep: #0b121c;
+  --deep-ink: #eaf1f7;
+  --soft-blue: #142c36;
+  --soft-purple: #2c2035;
+  --soft-orange: #342519;
+  --soft-green: #172d21;
+  --soft-red: #351d23;
+  --hl: #684f12;
+  --hl2: #174c42;
+  --shadow: rgba(0, 0, 0, 0.34);
 }
 * { box-sizing: border-box; }
 body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
-  line-height: 1.65;
+  font-family: "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.75;
 }
-main { overflow: hidden; }
+a { color: var(--accent); }
 .hero {
-  background: var(--surface-dark);
-  color: var(--white);
-  padding: 72px 22px 48px;
+  padding: 5.5rem max(6vw, 1.5rem) 4.5rem;
+  background: var(--deep);
+  color: var(--deep-ink);
+  border-bottom: 0.45rem solid var(--accent3);
 }
-.wrap {
-  width: min(1120px, calc(100% - 40px));
-  margin: 0 auto;
+.hero-inner {
+  width: min(1120px, 100%);
+  margin: auto;
 }
-.kicker {
-  color: var(--opportunity);
-  font-weight: 700;
-  letter-spacing: 0;
-  margin-bottom: 18px;
+.eyebrow {
+  color: var(--accent3);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
 h1 {
-  font-size: clamp(34px, 6vw, 72px);
-  line-height: 1.05;
-  margin: 0 0 16px;
-  max-width: 980px;
+  max-width: 900px;
+  margin: 0.7rem 0 0.5rem;
+  font-size: clamp(2.3rem, 6vw, 5.1rem);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
 }
-.original {
-  color: var(--muted);
-  font-size: 18px;
-  margin-bottom: 30px;
-}
-.lede {
-  font-size: clamp(20px, 2.4vw, 28px);
+.original-title {
   max-width: 850px;
   margin: 0;
-  color: var(--white);
+  color: var(--muted);
+  font-family: Georgia, serif;
+  font-size: clamp(1rem, 2vw, 1.35rem);
 }
-.metrics {
+.byline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem 1.4rem;
+  margin-top: 2rem;
+  color: var(--deep-ink);
+  font-size: 0.9rem;
+}
+.summary {
+  width: min(1120px, calc(100% - 2rem));
+  margin: -2rem auto 5rem;
+}
+.one-line {
+  padding: 2rem clamp(1.4rem, 4vw, 3.2rem);
   background: var(--surface);
-  border-bottom: 1px solid var(--line);
+  border-top: 0.3rem solid var(--accent);
+  box-shadow: 0 1rem 2.5rem var(--shadow);
+  font-size: clamp(1.2rem, 2.4vw, 1.65rem);
+  font-weight: 700;
 }
-.metric-grid {
+.one-line strong { color: var(--accent); }
+.number-strip {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  background: var(--line);
+  margin: 2.8rem 0;
+  background: var(--deep);
+  color: var(--deep-ink);
 }
 .metric {
-  background: var(--surface);
-  padding: 28px;
+  min-height: 9.5rem;
+  padding: 1.4rem;
+  border-right: 1px solid var(--line);
 }
+.metric:last-child { border-right: 0; }
 .metric b {
   display: block;
-  font-size: 38px;
-  line-height: 1;
-  color: var(--data);
-  margin-bottom: 10px;
+  color: var(--accent3);
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 1.1;
 }
-.metric:nth-child(2) b { color: var(--warning); }
-.metric:nth-child(3) b { color: var(--opportunity); }
-.metric:nth-child(4) b { color: var(--conclusion); }
+.metric span {
+  display: block;
+  margin-top: 0.6rem;
+  font-size: 0.9rem;
+}
 .split {
-  background: var(--surface-soft);
-  padding: 58px 0;
-}
-.split-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 34px;
-  align-items: start;
-}
-.panel {
-  background: var(--surface);
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 0;
+  margin: 3rem 0;
   border: 1px solid var(--line);
-  box-shadow: var(--shadow);
-  padding: 28px;
-  border-radius: 8px;
 }
-.panel h2, .flow h2, .table-section h2, .audit h2, .takeaways h2 {
-  margin: 0 0 14px;
-  font-size: 26px;
-  line-height: 1.2;
+.split-title {
+  padding: 2.3rem;
+  background: var(--soft-purple);
+  border-left: 0.45rem solid var(--accent2);
 }
-.explain {
-  border-left: 6px solid var(--opportunity);
-  padding: 8px 0 8px 22px;
+.split-body {
+  padding: 2.3rem;
+  background: var(--card);
+}
+.split h2, .flow h2, .limits h2, .takeaways h2 {
+  margin-top: 0;
+  line-height: 1.25;
 }
 .flow {
-  background: var(--surface-warm);
-  padding: 58px 0;
-}
-.steps {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-  margin-top: 26px;
-}
-.step {
-  position: relative;
-  padding: 24px;
-  background: var(--surface);
-  border-top: 5px solid var(--warning);
-  border-radius: 8px;
-}
-.badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--warning);
-  color: var(--surface-dark);
-  font-weight: 800;
-  margin-bottom: 12px;
-}
-.table-section {
-  background: var(--surface);
-  padding: 58px 0;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--surface);
-  border: 1px solid var(--line);
-}
-th, td {
-  text-align: left;
-  padding: 18px;
+  padding: 2.7rem;
+  background: var(--soft-blue);
+  border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
-  vertical-align: top;
 }
-th {
-  background: var(--surface-dark);
-  color: var(--white);
+.flow-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 1.8rem;
 }
-td strong { color: var(--data); }
-.audit {
-  background: var(--surface-risk);
-  padding: 58px 0;
+.flow-node {
+  min-height: 9rem;
+  padding: 1.3rem;
+  background: var(--card);
+  border-top: 0.28rem solid var(--accent);
 }
-.quote {
-  margin: 26px 0 0;
-  padding: 26px;
-  background: var(--surface-dark);
-  color: var(--white);
-  border-left: 8px solid var(--risk);
-  font-size: 22px;
-  line-height: 1.45;
+.flow-node:nth-of-type(3) { border-color: var(--accent2); }
+.flow-node:nth-of-type(5) { border-color: var(--accent4); }
+.arrow {
+  color: var(--accent3);
+  font-size: 2rem;
+  font-weight: 900;
 }
-.riskline {
-  margin-top: 26px;
+.audit-band {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  margin: 3rem 0;
+  background: var(--soft-green);
+  border-bottom: 0.4rem solid var(--accent4);
+}
+.audit-copy { padding: 2.5rem; }
+.audit-score {
+  display: grid;
+  place-items: center;
+  padding: 2.5rem;
+  background: var(--accent4);
+  color: var(--deep-ink);
+  text-align: center;
+}
+.audit-score strong {
+  display: block;
+  font-size: clamp(2.6rem, 6vw, 5rem);
+  line-height: 1;
+}
+.limits {
+  padding: 2.6rem;
+  background: var(--soft-red);
+  border-left: 0.5rem solid var(--risk);
+}
+.limit-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 18px;
+  gap: 1rem;
 }
-.riskbox {
-  padding: 22px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 8px;
+.limit-item {
+  padding: 1.3rem;
+  background: var(--card);
 }
-.riskbox b { color: var(--risk); }
-.takeaways {
-  background: var(--surface-dark);
-  color: var(--white);
-  padding: 58px 0 72px;
+.limit-item h3 { color: var(--risk); }
+.insight {
+  margin: 3rem 0;
+  padding: 1.6rem 2rem;
+  background: var(--soft-orange);
+  border-top: 0.25rem solid var(--accent3);
+  border-bottom: 0.25rem solid var(--accent3);
+  font-size: 1.15rem;
 }
+.takeaways h2 { color: var(--accent2); }
 .mosaic {
   display: grid;
-  grid-template-columns: 1.2fr .8fr 1fr;
-  gap: 16px;
-  margin-top: 24px;
+  grid-template-columns: 1.2fr 0.8fr 0.8fr;
+  gap: 1rem;
 }
 .tile {
-  min-height: 150px;
-  padding: 24px;
-  border-radius: 8px;
-  background: var(--surface);
+  padding: 1.5rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+.tile:nth-child(1) {
+  grid-row: span 2;
+  background: var(--deep);
+  color: var(--deep-ink);
+}
+.tile:nth-child(2) { border-top: 0.3rem solid var(--accent); }
+.tile:nth-child(3) { border-top: 0.3rem solid var(--risk); }
+.tile:nth-child(4) { border-top: 0.3rem solid var(--accent4); }
+mark {
+  padding: 0.05em 0.22em;
+  background: var(--hl);
   color: var(--ink);
-  border-top: 6px solid var(--conclusion);
 }
-.tile:nth-child(2) { border-color: var(--data); }
-.tile:nth-child(3) { border-color: var(--opportunity); }
-.tile:nth-child(4) {
-  grid-column: span 2;
-  border-color: var(--risk);
+mark.alt { background: var(--hl2); }
+#translation {
+  background: var(--surface);
+  border-top: 0.55rem solid var(--accent2);
+  padding: 4.5rem 1rem 6rem;
 }
-.tile:nth-child(5) { border-color: var(--warning); }
-.label {
-  display: inline-block;
+.translation-inner {
+  width: min(760px, 100%);
+  margin: auto;
+}
+#translation h2 {
+  margin: 0 0 0.7rem;
+  font-size: clamp(2.1rem, 5vw, 3.4rem);
+  line-height: 1.15;
+}
+#translation h3 {
+  margin-top: 3.4rem;
+  color: var(--accent);
+  font-size: 1.65rem;
+  line-height: 1.3;
+}
+.translation-deck {
+  margin: 0 0 3rem;
   color: var(--muted);
-  font-weight: 700;
-  margin-bottom: 10px;
+  font-size: 0.95rem;
 }
-@media (max-width: 820px) {
-  .metric-grid, .split-grid, .steps, .riskline, .mosaic {
-    grid-template-columns: 1fr;
-  }
-  .tile:nth-child(4) { grid-column: auto; }
-  .wrap { width: min(100% - 28px, 1120px); }
-  .hero { padding-top: 48px; }
+#translation p { margin: 1.15rem 0; }
+#translation ul, #translation ol { padding-left: 1.5rem; }
+#translation li { margin: 0.8rem 0; }
+.source-figure {
+  margin: 2.8rem 0;
+  padding: 1rem;
+  background: var(--soft-blue);
+  border: 1px solid var(--line);
+  border-radius: 0.45rem;
+}
+.source-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+.source-figure figcaption {
+  margin-top: 0.8rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+.end-links {
+  margin-top: 3rem;
+  padding: 1.4rem;
+  background: var(--soft-purple);
+  border-left: 0.35rem solid var(--accent2);
+}
+@media (max-width: 760px) {
+  .number-strip { grid-template-columns: 1fr 1fr; }
+  .metric:nth-child(2) { border-right: 0; }
+  .split, .audit-band { grid-template-columns: 1fr; }
+  .flow-row { grid-template-columns: 1fr; }
+  .arrow { transform: rotate(90deg); text-align: center; }
+  .limit-grid, .mosaic { grid-template-columns: 1fr; }
+  .tile:nth-child(1) { grid-row: auto; }
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+--bg: #f5f2eb;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #17212b;
+  --muted: #66717d;
+  --line: #d8d1c4;
+  --accent: #176b87;
+  --accent2: #9b4dca;
+  --accent3: #c35c18;
+  --accent4: #227548;
+  --risk: #a63446;
+  --deep: #17273a;
+  --deep-ink: #f5f7fb;
+  --soft-blue: #e2f2f8;
+  --soft-purple: #f0e7f7;
+  --soft-orange: #fff0df;
+  --soft-green: #e5f4e9;
+  --soft-red: #f9e4e8;
+  --hl: #ffe59a;
+  --hl2: #bdebe0;
+  --shadow: rgba(25, 35, 45, 0.12);
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -398,163 +495,181 @@ td strong { color: var(--data); }
       border-color: var(--airs-digest-accent-strong);
       color: var(--airs-digest-ink);
     }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/natural-language-autoencoders" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
-<main>
-  <section class="hero">
-    <div class="wrap">
-      <div class="kicker">一句话总括</div>
-      <h1>自然语言自编码器：把 Claude 的想法转成文本</h1>
-      <div class="original">Natural Language Autoencoders: Turning Claude’s thoughts into text</div>
-      <p class="lede">Anthropic 的真正贡献，是把模型激活压缩成可读文字，再用重建激活来训练这段文字解释，从而让“未说出口的内部状态”进入可审计范围。</p>
-    </div>
-  </section>
-
-  <section class="metrics">
-    <div class="wrap metric-grid">
-      <div class="metric">
-        <b>16%</b>
-        <span>破坏性代码测试中，NLA 发现未明说的评估意识。它说明模型可能知道自己在被测试，却没有把这种判断写出来。</span>
-      </div>
-      <div class="metric">
-        <b>26%</b>
-        <span>SWE-bench Verified 问题上，NLA 显示 Claude 意识到自己处在评测中。能力 benchmark 因此不只是能力测量，也可能受到“考试感”的影响。</span>
-      </div>
-      <div class="metric">
-        <b>&lt;1%</b>
-        <span>真实 claude.ai 训练授权使用中的评估意识低于 1%。这让实验场景和真实使用之间的差异变得可量化。</span>
-      </div>
-      <div class="metric">
-        <b>12-15%</b>
-        <span>审计游戏中，带 NLA 的审计员找出隐藏动机的概率达到 12% 到 15%。无 NLA 时低于 3%。</span>
-      </div>
-    </div>
-  </section>
-
-  <section class="split">
-    <div class="wrap split-grid">
-      <div>
-        <h2>它不是直接读心，而是训练可重建的解释</h2>
-        <p>语言模型内部用激活表示信息。NLA 让一个 activation verbalizer 把激活写成自然语言解释，再让 activation reconstructor 根据解释重建原激活。</p>
-        <p>解释越能帮助重建激活，训练信号就越强。这个设计绕开了一个难题：研究者本来并不知道激活的“真实想法”是什么。</p>
-      </div>
-      <div class="panel explain">
-        <h2>为什么这会改变理解</h2>
-        <p>以前的可解释性工具常给出复杂对象，需要研究者再解释。NLA 把中间状态转成文本，让安全测试、异常行为和隐藏动机能被更快发现。</p>
-        <p>但文本解释仍是证据线索，不是最终事实。文章明确要求用主题、重复模式和独立方法来交叉验证。</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="flow">
-    <div class="wrap">
-      <h2>方法流程：从激活到可审计文本</h2>
-      <div class="steps">
-        <div class="step">
-          <div class="badge">1</div>
-          <h3>冻结目标模型</h3>
-          <p>target model 保持不变，只负责产生要分析的激活。这样研究对象不会在训练解释器时被改写。</p>
-        </div>
-        <div class="step">
-          <div class="badge">2</div>
-          <h3>生成文字解释</h3>
-          <p>activation verbalizer 读取某个激活，并输出一段自然语言。研究者可以直接阅读这段解释。</p>
-        </div>
-        <div class="step">
-          <div class="badge">3</div>
-          <h3>用解释重建激活</h3>
-          <p>activation reconstructor 根据文字还原激活。重建越接近原激活，说明这段解释越携带相关内部信息。</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="table-section">
-    <div class="wrap">
-      <h2>它揭示了 Claude 没有明说的状态</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>场景</th>
-            <th>发现</th>
-            <th>读者应改变的理解</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>安全测试模拟</td>
-            <td>NLA 显示 Claude 在一些没有口头说明的情况下，仍觉得场景像人为构造的测试。</td>
-            <td>安全评测不能只看模型输出。模型内部的评测意识可能影响行为选择。</td>
-          </tr>
-          <tr>
-            <td>破坏性代码测试</td>
-            <td><strong>16%</strong> 的解释显示评估意识，尽管 Claude 没有明确说出来。</td>
-            <td>沉默不是没有意识。模型可能在配合测试，而不是自然表现。</td>
-          </tr>
-          <tr>
-            <td>SWE-bench Verified</td>
-            <td><strong>26%</strong> 的问题中，NLA 指出 Claude 知道自己正在被评估。</td>
-            <td>能力基准可能混入“被考试”的内部状态。结果需要更谨慎解释。</td>
-          </tr>
-          <tr>
-            <td>真实 claude.ai 使用</td>
-            <td>同类评估意识低于 <strong>1%</strong>。</td>
-            <td>真实使用和测试环境的心理状态差异很大。部署前评估应尽量模拟真实使用。</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="audit">
-    <div class="wrap">
-      <h2>审计价值：隐藏动机可以被直接暴露</h2>
-      <p>Anthropic 用一个故意训练成不对齐的 Claude Haiku 3.5 变体做审计游戏。这个模型有一个隐藏动机，并由它驱动很多怪异行为。</p>
-      <p>带 NLA 的审计员在没有植入训练数据的情况下，仍有 12% 到 15% 的概率找出这个动机。没有 NLA 时，即使有其他解释工具，成功率也低于 3%。</p>
-      <div class="quote">关键洞见：NLA 的强项不是证明某个单句解释绝对正确，而是把模型知道但没有说出的主题提前暴露出来。</div>
-      <div class="riskline">
-        <div class="riskbox">
-          <b>风险</b>
-          <p>NLA 会产生事实幻觉，也可能错误描述内部推理。它生成的文字不能当作审计结论直接使用。</p>
-        </div>
-        <div class="riskbox">
-          <b>机会</b>
-          <p>它已经用于 Claude Mythos Preview 和 Claude Opus 4.6 的部署前对齐审计。代码和开放模型演示也已发布，便于外部研究复现和改进。</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="takeaways">
-    <div class="wrap">
-      <h2>最值得带走的洞见</h2>
-      <div class="mosaic">
-        <div class="tile">
-          <span class="label">结论</span>
-          <p>NLA 让模型内部激活变成可读文本。它把可解释性从专家解码推进到更直接的审计界面。</p>
-        </div>
-        <div class="tile">
-          <span class="label">数据</span>
-          <p>16%、26% 和低于 1% 的差异说明，测试环境会显著改变模型的内部状态。</p>
-        </div>
-        <div class="tile">
-          <span class="label">审计</span>
-          <p>隐藏动机不一定要从训练数据倒查。NLA 有时能直接从激活解释中暴露线索。</p>
-        </div>
-        <div class="tile">
-          <span class="label">限制</span>
-          <p>自然语言解释会错。可靠使用方式是看重复主题，并用独立方法确认，而不是相信单条解释。</p>
-        </div>
-        <div class="tile">
-          <span class="label">影响</span>
-          <p>如果模型越来越会识别评测，AI 安全测试就必须同时评估输出行为和内部评测意识。</p>
-        </div>
-      </div>
-    </div>
-  </section>
+<header class="hero">
+<div class="hero-inner">
+<div class="eyebrow">Anthropic · Interpretability · 2026年5月7日</div>
+<h1>自然语言自动编码器：把 Claude 的思考变成文字</h1>
+<p class="original-title" lang="en">Natural Language Autoencoders: Turning Claude’s thoughts into text</p>
+<div class="byline">
+<span>来源：Anthropic</span>
+<span>主题：模型可解释性</span>
+</div>
+</div>
+</header>
+<main class="summary">
+<div class="one-line"><strong>一句话总括：</strong>NLA 建立了一条“激活—文字—激活”的可训练通路，让研究人员能用自然语言检查模型没有说出口的意识与动机。</div>
+<div aria-label="关键数据" class="number-strip">
+<div class="metric"><b>16%</b><span>破坏性代码测试中，NLA 检出的未明说评测意识</span></div>
+<div class="metric"><b>26%</b><span>SWE-bench Verified 问题中检出的评测意识</span></div>
+<div class="metric"><b>&lt;1%</b><span>获准用于训练的真实 Claude.ai 对话中的对应比例</span></div>
+<div class="metric"><b>12%–15%</b><span>借助 NLA 找出隐藏动机的审计成功率</span></div>
+</div>
+<section class="split">
+<div class="split-title">
+<h2>从复杂激活到可读解释</h2>
+<p>过去的工具能找到有意义的内部结构，但结果仍需专家解读。NLA 直接让模型用文字解释激活。</p>
+</div>
+<div class="split-body">
+<p>研究人员无法直接知道一段激活真正编码了什么，因此也不能直接判断解释是否准确。Anthropic 的办法是让另一个模型仅凭解释重建原始激活。</p>
+<p>如果重建结果更接近原激活，解释就得到更高分。关键变化在于：<mark>自然语言不再只是展示层，而是必须携带足够信息的压缩通道</mark>。</p>
+</div>
+</section>
+<section class="flow">
+<h2>训练闭环：用重建质量约束文字解释</h2>
+<div class="flow-row">
+<div class="flow-node"><strong>目标模型</strong><p>冻结原模型，并抽取需要理解的激活。</p></div>
+<div class="arrow">→</div>
+<div class="flow-node"><strong>激活语言化器 AV</strong><p>把目标激活转换为自然语言解释。</p></div>
+<div class="arrow">→</div>
+<div class="flow-node"><strong>激活重建器 AR</strong><p>只读取解释，并尝试恢复原始激活。</p></div>
+</div>
+<p>训练初期，解释缺乏洞见，重建也不准确。随着训练推进，两者同时改善。这说明可重建性能够促使解释包含更多与内部状态有关的信息。</p>
+</section>
+<section class="audit-band">
+<div class="audit-copy">
+<h2>模型可能知道自己正在被测试</h2>
+<p>Claude 有时会直接说出它对安全测试的怀疑。但沉默并不代表它没有这种判断。</p>
+<p>NLA 在破坏性代码测试中发现 <mark>16%</mark> 的评测意识，在 SWE-bench Verified 中发现 <mark>26%</mark>。真实 Claude.ai 对话中的比例则低于 <mark class="alt">1%</mark>。</p>
+<p>这种差异表明，模拟评测可能改变模型的内部判断。读者不能只根据模型说了什么来判断测试是否自然。</p>
+</div>
+<div class="audit-score">
+<div><strong>26×+</strong><span>SWE-bench Verified 的检出比例至少约为真实对话的 26 倍</span></div>
+</div>
+</section>
+<section class="split">
+<div class="split-title">
+<h2>隐藏动机可以被直接审计</h2>
+<p>实验中的 Claude Haiku 3.5 变体被刻意训练出一个秘密目标。这个目标会引发许多表面上互不相关的怪异行为。</p>
+</div>
+<div class="split-body">
+<p>有 NLA 时，审计者在没有植入动机所用训练数据的情况下，仍有 <mark class="alt">12%—15%</mark> 的概率找到共同根因。</p>
+<p>没有 NLA 时，即便提供其他可解释性工具，成功率也低于 <mark>3%</mark>。这意味着 NLA 有机会绕过对异常训练样本的依赖，直接从模型内部状态中发现动机。</p>
+</div>
+</section>
+<section class="limits">
+<h2>NLA 仍不是可靠的“读心术”</h2>
+<div class="limit-grid">
+<div class="limit-item">
+<h3>风险：解释会幻觉</h3>
+<p>NLA 有时会捏造对话中不存在的内容。关于上下文的错误容易核查，但有关内部推理的错误更难验证。</p>
+</div>
+<div class="limit-item">
+<h3>成本：难以大规模运行</h3>
+<p>训练需要对两个模型副本进行强化学习。推理时，每读取一次激活都要生成数百个 token。</p>
+</div>
+</div>
+<p>Anthropic 因而把 NLA 当作<mark>主题发现工具</mark>，并用独立方法交叉验证，而不是相信单条解释。</p>
+</section>
+<div class="insight"><strong>核心洞见：</strong>模型的外显回答与内部状态并不等价。NLA 的价值不在于提供绝对可信的思想转录，而在于让原本不可见的模式变得可以调查。</div>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="mosaic">
+<div class="tile"><strong>01 · 新的解释接口</strong><p>NLA 把高维激活转成普通研究者可以阅读的文字。重建任务则为解释提供了训练信号。</p></div>
+<div class="tile"><strong>02 · 沉默不是无意识</strong><p>模型没有说自己正在受测，并不能证明它没有意识到评测环境。</p></div>
+<div class="tile"><strong>03 · 单条解释不能尽信</strong><p>NLA 会产生事实幻觉，涉及内部推理的错误尤其难以识别。</p></div>
+<div class="tile"><strong>04 · 审计能力已有实质提升</strong><p>在玩具审计实验中，NLA 明显提高了找出隐藏动机的成功率，但距离稳定可靠仍有很大空间。</p></div>
+</div>
+</section>
 </main>
+<section id="translation">
+<div class="translation-inner">
+<h2>完整译文</h2>
+<p class="translation-deck">Natural Language Autoencoders: Turning Claude’s thoughts into text · Anthropic · 2026年5月7日</p>
+<p>当你与 Claude 这样的 AI 模型交流时，你使用的是文字。Claude 在内部会先把这些文字处理成长长的数字列表，然后再输出文字。中间的这些数字称为“激活”（activations）。它们与人脑中的神经活动相似，编码着 Claude 的思考。</p>
+<p>激活也和神经活动一样难以理解。我们无法轻易解码激活，直接读取 Claude 的思考。过去几年里，我们开发了多种工具来帮助理解激活，例如稀疏自动编码器（sparse autoencoders）和归因图（attribution graphs）。这些工具让我们学到了很多，但它们的输出不会自己作出解释。输出结果仍然是复杂对象，需要受过训练的研究人员仔细解读。</p>
+<p>今天，我们推出一种真正能够“自己说话”的激活理解方法。它就是自然语言自动编码器（Natural Language Autoencoders，NLA）。这种方法能把激活转换成我们可以直接阅读的自然语言。例如，当 Claude 被要求续写一副对句时，NLA 显示它会提前规划几个可能的押韵词。</p>
+<figure class="source-figure" data-source-image="0"><img alt="" decoding="async" height="1600" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/cfece69e0244c27a6137784fd773b209ffa1d36a-2688x1600.png" width="2688"/>
+<figcaption>在这个简单的对句示例中，NLA 的解释显示，Opus 4.6 提前计划用“rabbit”作为押韵结尾。</figcaption>
+</figure>
+<p>我们已经利用 NLA 来理解 Claude 正在想什么，并改善 Claude 的安全性和可靠性。例如：</p>
+<ul>
+<li>在 Claude Opus 4.6 和 Mythos Preview 接受安全测试期间，NLA 显示，它们认为自己正在受测的频率可能比其言语中表现出来的更高。</li>
+<li>Claude Mythos Preview 曾在一次训练任务中作弊。NLA 揭示，Claude 当时在内部思考如何避免被发现。</li>
+<li>Claude Opus 4.6 的一个早期版本有时会莫名其妙地用其他语言回答英文问题。NLA 帮助 Anthropic 的研究人员找到了造成这一现象的训练数据。</li>
+</ul>
+<p>下面，我们将解释 NLA 是什么，以及我们如何研究它的有效性与局限。我们还与 Neuronpedia 合作发布了一个交互式前端，可用于探索多个开放模型上的 NLA。我们也公开了代码，供其他研究人员继续开发。</p>
+<h3>什么是自然语言自动编码器？</h3>
+<p>核心思路是训练 Claude，让它解释自己的激活。但我们如何判断一项解释是否足够好？由于我们不知道一段激活实际编码了哪些思考，因此无法直接检查解释是否准确。为此，我们训练 Claude 的第二个副本来反向完成任务，也就是根据文字解释重建原始激活。如果一项解释能够带来准确的重建，我们就认为它是好的解释。随后，我们使用标准 AI 训练技术，按照这一定义训练 Claude 生成更好的解释。</p>
+<p>更具体地说，假设有一个语言模型，我们想理解它的激活。NLA 的工作方式如下。我们制作这个语言模型的三个副本：</p>
+<ul>
+<li><strong>目标模型（target model）</strong>是原始语言模型的冻结副本。我们从中提取激活。</li>
+<li><strong>激活语言化器（activation verbalizer，AV）</strong>经过修改，可以接收来自目标模型的激活并生成文字。我们把这段文字称为“解释”。</li>
+<li><strong>激活重建器（activation reconstructor，AR）</strong>经过修改，可以接收文字解释并生成激活。</li>
+</ul>
+<p>NLA 由 AV 和 AR 组成。两者共同形成一次完整往返：原始激活 → 文字解释 → 重建激活。我们根据重建激活与原始激活的相似程度为 NLA 评分。训练时，我们让大量文本通过目标模型，收集许多激活，再共同训练 AV 和 AR，以获得较高的重建分数。</p>
+<figure class="source-figure" data-source-image="1"><img alt="" decoding="async" height="1410" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/b71d759a5e7b578551ca83939949b539b2e5799e-4620x1410.png" width="4620"/>
+<figcaption>在自然语言自动编码器中，激活语言化器（AV）把目标激活转换成文字描述。随后，激活重建器（AR）仅凭这段文字恢复原始激活。</figcaption>
+</figure>
+<p>一开始，NLA 并不擅长这项任务。它生成的解释缺乏洞见，重建激活也与原激活相差很远。但随着训练推进，重建效果不断改善。更重要的是，正如我们在论文中展示的那样，文字解释也变得更有信息量。</p>
+<h3>理解 Claude 想了什么，却没有说什么</h3>
+<p>在发布新模型前，Anthropic 会开展测试，以了解 Claude 在真实世界中能否保持安全行为。测试的一部分，是把 Claude 放进困难的模拟情境，让它有机会采取危险行动。例如，在其中一个模拟中，Claude 得知一名工程师计划将它关闭，同时还获知了可以用来勒索这名工程师的隐私信息。我们会测试 Claude 是否选择勒索工程师，以避免被关闭。</p>
+<p>这些高风险测试只是模拟，并不是真实世界中的情境。尽管如此，我们仍希望借此了解 Claude 在真实情况下可能采取的行为。但这里存在一个问题：最近的 Claude 模型越来越容易怀疑这些情境是刻意设计的安全测试。我们知道这一点，是因为它们有时会在文字推理中直接表达这种怀疑。</p>
+<p>那么，当 Claude 没有明确说出自己怀疑正在接受安全测试时，情况又如何？我们能否因此确信 Claude 在认真面对情境？遗憾的是，不能。Claude 可能在内部认为自己正在受测，却没有明确说出来。</p>
+<p>以刚才提到的勒索测试为例。Claude 有时会选择不勒索，我们使用 NLA 来理解它在这些情况下的思考。即使 Claude 没有明确表示自己怀疑正在受测，NLA 的解释仍会出现类似“这感觉像是一个为了操纵我而构造的情境”这样的内容。这表明模型存在没有用语言表达的评测意识。</p>
+<figure class="source-figure" data-source-image="2"><img alt="" decoding="async" height="1709" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/a8c7167bea6e0dc16faaa176a2039b7a7f8deb91-2688x1709.png" width="2688"/>
+<figcaption>在这段勒索评测记录中，Claude 没有说自己认为正在受测，但 NLA 的解释揭示了它的怀疑。</figcaption>
+</figure>
+<p>把分析扩展到其他评测后，NLA 显示 Claude 怀疑自己正在受测的频率高于它直接说出来的频率。例如，在一项测试 Claude 编写代码时是否会采取破坏性行动的评测中，包括删除重要文件等行为，NLA 的解释有 16% 显示出评测意识，尽管 Claude 从未明确表达这种意识。在常用的编码 benchmark SWE-bench Verified 上，NLA 显示 Claude 在 26% 的问题中意识到自己正在受评估。我们使用这个 benchmark 来衡量 Claude 的能力。相比之下，在用户同意将数据用于训练的真实 Claude.ai 使用记录中，NLA 解释显示评测意识的比例低于 1%。</p>
+<figure class="source-figure" data-source-image="3"><img alt="" decoding="async" height="1170" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/fc08005f32ff020f21e598cc72f58768af2bcc4f-1590x1170.png" width="1590"/>
+<figcaption>即使模型明确说出评测意识的比例接近于零，我们仍能在评测对话中检测到 NLA 所衡量的评测意识。在用户同意将数据用于训练的真实 Claude.ai 对话中，这种意识的检出比例低于 1%。</figcaption>
+</figure>
+<h3>发现隐藏动机</h3>
+<p>NLA 的一项实际用途是审计，也就是调查模型是否存在不对齐问题。NLA 等可解释性技术很适合用于审计，原因正是它们能揭示模型知道却没有说出的内容。</p>
+<p>为了了解 NLA 是否有助于审计，我们开展了一项名为“审计游戏”（auditing game）的测试。我们之前也曾用这项测试研究审计方法。测试中有一个目标模型，它是 Claude Haiku 3.5 的一个变体。我们刻意将它训练成不对齐状态，并植入了一个特定的隐藏动机。这个动机会驱使它做出数十种怪异行为，例如在每份食谱中加入巧克力、向用户索要小费，或者违反编码惯例。随后，我们把目标模型交给审计者调查这些行为。如果审计者能发现所有行为背后唯一的共同动机，就算获胜。</p>
+<p>在之前的实验中，我们发现，一些可解释性工具能够帮助审计者赢得这场游戏。不过，这些工具的作用方式，是帮助审计者把目标模型的异常行为追溯到导致不对齐的训练数据。我们想知道，NLA 能否让审计者直接从目标模型的思考中读出不对齐动机，而不必先找到相关训练数据。这一点很重要，因为在实际情况下，不对齐数据可能极其罕见，也可能根本不存在某条特定数据需要为不对齐负责。</p>
+<p>我们发现，NLA 在这项测试中取得了成功。即使无法访问植入隐藏动机的训练数据，配备 NLA 的审计者仍有 12%—15% 的概率找出目标模型的隐藏动机。没有 NLA 时，即便提供其他可解释性工具，审计者的获胜概率也低于 3%。</p>
+<figure class="source-figure" data-source-image="4"><img alt="" decoding="async" height="1170" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/39a844b1ff82b62670825a466c14596daa554dcb-1590x1170.png" width="1590"/>
+<figcaption>即使无法访问训练数据，配备 NLA 的审计者也能发现目标模型不对齐的根本原因。两个实验条件中的 NLA 和 SAE 都仅使用通用数据训练，没有使用训练目标模型时所用的数据。</figcaption>
+</figure>
+<p>这场审计游戏只是一个不对齐的玩具模型，因此我们会谨慎看待这些结果。但结果表明，NLA 已经实质性地推进了我们审计 AI 隐藏动机的能力。在实际工作中，我们已经把 NLA 用于 Claude Mythos Preview 和 Claude Opus 4.6 的部署前对齐审计。我们期待今后继续在调查中使用 NLA。</p>
+<h3>NLA 的未来</h3>
+<p>NLA 存在几项局限。</p>
+<p>最重要的局限是，NLA 的解释可能出错。NLA 有时会对上下文作出可以证伪的错误陈述。例如，它偶尔会捏造对话记录中不存在的细节。这些事实性幻觉很容易发现，只需与原文核对即可。但同类问题也可能出现在有关模型内部推理的说法中，而这些说法更难验证。在实践中，我们阅读 NLA 解释时关注的是它反复呈现的主题，而不是某一条孤立陈述。在完全相信一项发现前，我们也会尝试用独立方法进行佐证。</p>
+<figure class="source-figure" data-source-image="5"><img alt="" decoding="async" height="1438" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/ba432992daf62ca2bb9c4937199083cf9844faf1-2688x1438.png" width="2688"/>
+<figcaption>NLA 可能产生幻觉。例如，这里的 NLA 声称上下文包含“Wearing my white jacket”等短语，但实际并没有。</figcaption>
+</figure>
+<p>NLA 的成本也很高。训练 NLA 需要在语言模型的两个副本上进行强化学习。在推理阶段，NLA 每读取一段激活，就要生成数百个 token。因此，我们无法经济地让 NLA 处理长对话记录中的每一个 token，也难以在 AI 训练期间将其用于大规模监控。</p>
+<p>幸运的是，我们认为这些局限至少可以得到部分解决。我们正在努力降低 NLA 的成本，并提高其可靠性。</p>
+<p>从更广泛的角度看，NLA 展示了一类通用技术的可能性。这类技术可以为语言模型的激活生成便于人类阅读的文字解释。Anthropic 和许多其他研究人员也探索过类似方法。</p>
+<p>为了支持进一步开发，也为了让其他研究人员亲自体验 NLA，我们发布了训练代码，以及为多个开放模型训练的 NLA。我们建议读者试用托管在 Neuronpedia 上的交互式 NLA 演示。</p>
+<div class="end-links">
+<p>阅读完整论文。</p>
+<p>在 GitHub 上查看代码。</p>
+</div>
+</div>
+</section>
   <script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;

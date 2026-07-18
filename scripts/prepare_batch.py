@@ -72,7 +72,12 @@ def main() -> int:
         if not extracted.get("article_text"):
             print(f"  no text, skip {art['url']}", file=sys.stderr)
             continue
-        record = {**art, "article_text": extracted["article_text"], "source_hash": extracted["source_hash"]}
+        record = {
+            **art,
+            "article_text": extracted["article_text"],
+            "article_images": extracted.get("article_images", []),
+            "source_hash": extracted["source_hash"],
+        }
         slug = summary_slug(art["url"])
         input_path = batch_dir / f"{i:03d}.json"
         input_path.write_text(json.dumps(record, ensure_ascii=False), encoding="utf-8")
