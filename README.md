@@ -2,7 +2,7 @@
 
 [直接查看索引网页](https://tifish.github.io/AIResearchSummary/)
 
-这个仓库包含一组 Python 脚本和一个 Python 刷新入口（`refresh.py`），以及一个已经生成好的静态网页，用来跟踪 Anthropic、OpenAI、Cursor 的 AI 研究更新。刷新流程支持三种 Agent 后端，并复用你已有的本机登录：Codex SDK（`codex`，走 Codex CLI 登录）、Claude Agent SDK（`claude`，走 Claude Code 登录）和 Grok Build CLI（`grok`，走 Grok Build 登录）。
+这个仓库包含一组 Python 脚本和一个 Python 刷新入口（`refresh.py`），以及一个已经生成好的静态网页，用来跟踪 Anthropic、OpenAI、Cursor 的 AI 研究更新。刷新流程支持三种 Agent 后端，全部直接以 headless 方式调用本机 CLI（不依赖 SDK 包），并复用你已有的本机登录：Codex CLI（`codex`）、Claude Code CLI（`claude`）和 Grok Build CLI（`grok`）。
 
 ## 依赖
 
@@ -57,21 +57,22 @@ python -m pip install -r requirements.txt
 在仓库根目录运行下面任一入口：
 
 ```bat
-Refresh-Codex.cmd       :: 使用 Codex SDK + 本机 Codex CLI（默认 gpt-5.6-sol / high）
-Refresh-Claude.cmd      :: 使用 Claude Agent SDK（默认 claude-fable-5 / high）
+Refresh-Codex.cmd       :: 使用本机 Codex CLI（默认 gpt-5.6-sol / high）
+Refresh-Claude.cmd      :: 使用本机 Claude Code CLI（默认 claude-fable-5 / high）
 Refresh-Grok.cmd        :: 使用 Grok Build CLI（默认 grok-4.5 / high）
 ```
 
 它们都调用 `refresh.py`，也可以直接运行并传参：
 
 ```bat
-python refresh.py --agent codex        :: 走 Codex SDK；需先 pip install openai-codex 且已登录 Codex CLI
+python refresh.py --agent codex        :: 走 Codex CLI（codex exec）；需已安装 codex 且运行过 codex login
                                        :: 可选：set AIRS_CODEX_MODEL=... 指定模型（默认用账号默认模型）
                                        :: 可选：set AIRS_CODEX_REASONING_EFFORT=... 指定推理强度
-                                       :: 可选：set AIRS_CODEX_BIN=... 指定 Codex CLI；默认优先使用 PATH 中的 codex
-python refresh.py --agent claude       :: 走 Claude Agent SDK；需先 pip install claude-agent-sdk 且已登录 Claude Code
+                                       :: 可选：set AIRS_CODEX_BIN=... 指定 Codex CLI；默认用 PATH 中的 codex
+python refresh.py --agent claude       :: 走 Claude Code CLI（claude -p）；需已安装 claude 且登录过 Claude Code
                                        :: 可选：set AIRS_CLAUDE_MODEL=sonnet 指定模型（默认用账号默认模型）
                                        :: 可选：set AIRS_CLAUDE_EFFORT=... 指定 effort
+                                       :: 可选：set AIRS_CLAUDE_BIN=... 指定 Claude CLI；默认用 PATH 中的 claude
 python refresh.py --agent grok         :: 走 Grok Build headless CLI；需已安装 grok 且运行过 grok login
                                        :: 可选：set AIRS_GROK_MODEL=... 指定模型（默认用 Grok Build 的默认模型）
                                        :: 可选：set AIRS_GROK_REASONING_EFFORT=... 指定推理强度

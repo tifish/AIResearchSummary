@@ -1,13 +1,15 @@
 """Drive the configured agent for a single generation step.
 
-Three backends, all reusing an existing local login:
-  - codex   : OpenAI Codex SDK (`openai-codex`) over the Codex CLI login.
+Three backends, all headless CLI subprocesses reusing an existing local login
+(no per-backend SDK dependency — the CLIs get new models/flags first):
+  - codex   : Codex CLI (`codex exec`).
               AIRS_CODEX_MODEL picks a model (default = account default).
               AIRS_CODEX_REASONING_EFFORT picks its reasoning effort.
               AIRS_CODEX_BIN can override the Codex CLI executable.
-  - claude  : Claude Agent SDK (`claude-agent-sdk`) over the Claude Code login.
+  - claude  : Claude Code CLI (`claude -p`).
               AIRS_CLAUDE_MODEL picks a model (default = account default).
               AIRS_CLAUDE_EFFORT picks its effort level.
+              AIRS_CLAUDE_BIN can override the Claude Code executable.
   - grok    : Grok Build CLI in supported headless JSON mode.
               AIRS_GROK_MODEL picks a model (default = account default).
               AIRS_GROK_REASONING_EFFORT picks its reasoning effort.
@@ -19,11 +21,9 @@ these helpers to produce one article's summary/digest the same way Refresh does.
 
 from __future__ import annotations
 
-import asyncio
 import json
 import os
 import re
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -48,104 +48,142 @@ def load_prompt(name: str) -> str:
 _TRANSIENT_RE = re.compile(
     r"rate.?limit|overloaded|too many requests|\b429\b|\b500\b|\b502\b|\b503\b|\b529\b|"
     r"internal server error|bad gateway|service unavailable|timeout|timed out|temporarily|"
-    r"maximum number of turns|"   # claude (SDK): occasional long output doesn't finish in one turn — retry
-    r"ServerBusyError|RetryLimitExceededError|server busy",  # codex (SDK) transient error types
+    r"maximum number of turns|"   # claude: occasional long output doesn't finish in one turn — retry
+    r"ServerBusyError|RetryLimitExceededError|server busy|"
+    r"exceeded retry limit|stream disconnected",  # codex transient errors
     re.I,
 )
 
 
-def _run_claude_sdk(prompt: str) -> str:
-    """One Claude Agent SDK call over the user's Claude Code subscription login.
+def _run_claude_cli(prompt: str) -> str:
+    """One headless Claude Code CLI call over the user's subscription login.
 
-    Pure text generation: all tools disabled, single turn, no user/project
-    CLAUDE.md or settings loaded — so the model is driven only by `prompt` and the
-    output is reproducible. Returns the assistant's full text (same contract as the
-    CLI path). Raises RuntimeError on failure; the caller decides if it's transient.
+    Pure text generation: all built-in tools and MCP servers disabled, no
+    user/project CLAUDE.md or settings loaded, no session files written — so the
+    model is driven only by `prompt` and the output is reproducible. The prompt
+    goes in over stdin (no Windows command-line length limit); `--output-format
+    json` gives a stable `result` field for the final text. Raises RuntimeError
+    on failure; the caller decides if it's transient.
     """
+    command = [
+        os.environ.get("AIRS_CLAUDE_BIN") or "claude",
+        "-p",
+        "--output-format", "json",
+        "--tools", "",               # pure LLM call: no filesystem/tool access
+        "--strict-mcp-config",       # with no --mcp-config: no MCP servers
+        "--permission-mode", "dontAsk",  # headless: never block on a prompt
+        "--setting-sources", "",     # ignore user/project CLAUDE.md & settings
+        "--no-session-persistence",
+    ]
+    model = os.environ.get("AIRS_CLAUDE_MODEL")
+    if model:
+        command.extend(["--model", model])
+    effort = os.environ.get("AIRS_CLAUDE_EFFORT")
+    if effort:
+        command.extend(["--effort", effort])
+
     try:
-        from claude_agent_sdk import (
-            AssistantMessage,
-            ClaudeAgentOptions,
-            CLINotFoundError,
-            ResultMessage,
-            TextBlock,
-            query,
+        result = subprocess.run(
+            command,
+            input=prompt,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            check=False,
         )
-    except ImportError as exc:
+    except FileNotFoundError as exc:
         raise RuntimeError(
-            "claude-agent-sdk not installed. Run: python -m pip install claude-agent-sdk"
+            "Claude Code CLI not found — install it and run `claude` once to log in."
         ) from exc
 
-    options = ClaudeAgentOptions(
-        model=os.environ.get("AIRS_CLAUDE_MODEL") or None,  # None -> account default
-        effort=os.environ.get("AIRS_CLAUDE_EFFORT") or None,
-        allowed_tools=[],            # pure LLM call: no filesystem/tool access
-        permission_mode="dontAsk",   # headless: never block on a permission prompt
-        max_turns=1,                 # single shot
-        setting_sources=[],          # ignore user/project CLAUDE.md & settings
-    )
-
-    async def _collect() -> str:
-        parts: list[str] = []
-        result_text, error_detail = None, None
-        async for msg in query(prompt=prompt, options=options):
-            if isinstance(msg, AssistantMessage):
-                parts.extend(b.text for b in msg.content if isinstance(b, TextBlock))
-            elif isinstance(msg, ResultMessage):
-                result_text = msg.result
-                if msg.is_error:
-                    error_detail = msg.result or msg.api_error_status or msg.subtype
-        if error_detail:
-            raise RuntimeError(f"result error: {error_detail}")
-        text = "".join(parts).strip() or (result_text or "").strip()
-        if not text:
-            raise RuntimeError("returned no text")
-        return text
-
+    payload = None
     try:
-        return asyncio.run(_collect())
-    except CLINotFoundError as exc:
+        payload = json.loads(extract_json(result.stdout))
+    except ValueError:
+        pass
+
+    if result.returncode != 0 or (payload is not None and payload.get("is_error")):
+        detail = ""
+        if payload is not None:
+            detail = str(payload.get("result") or payload.get("subtype") or "")
+        detail = detail or (result.stderr or result.stdout).strip()
         raise RuntimeError(
-            "Claude Code CLI not found / not logged in — run `claude` once to log in."
-        ) from exc
+            f"Claude Code exited with code {result.returncode}: {detail[:800]}"
+        )
+    if payload is None:
+        raise RuntimeError(f"Claude Code returned invalid JSON: {result.stdout[:800]}")
 
-
-def _run_codex_sdk(prompt: str) -> str:
-    """One Codex SDK call over the user's Codex CLI login.
-
-    Pure text generation: read-only sandbox + deny-all approvals so it never writes
-    files or blocks on an approval prompt (the prompt is self-contained). Returns
-    the turn's final text. Raises RuntimeError on failure; the caller decides if
-    it's transient.
-    """
-    try:
-        from openai_codex import ApprovalMode, Codex, CodexConfig, CodexError, Sandbox
-    except ImportError as exc:
-        raise RuntimeError(
-            "openai-codex not installed. Run: python -m pip install openai-codex"
-        ) from exc
-
-    model = os.environ.get("AIRS_CODEX_MODEL") or None  # None -> account default
-    effort = os.environ.get("AIRS_CODEX_REASONING_EFFORT") or None
-    codex_bin = os.environ.get("AIRS_CODEX_BIN") or shutil.which("codex")
-    codex_config = CodexConfig(codex_bin=codex_bin) if codex_bin else CodexConfig()
-    try:
-        with Codex(codex_config) as codex:
-            thread = codex.thread_start(
-                sandbox=Sandbox.read_only,
-                approval_mode=ApprovalMode.deny_all,
-                model=model,
-            )
-            result = thread.run(prompt, effort=effort)
-    except CodexError as exc:
-        raise RuntimeError(f"codex error ({type(exc).__name__}): {exc}") from exc
-
-    if getattr(result, "error", None):
-        raise RuntimeError(f"codex result error: {result.error}")
-    text = (result.final_response or "").strip()
+    text = str(payload.get("result") or "").replace("\r\n", "\n").replace("\r", "\n").strip()
     if not text:
-        raise RuntimeError(f"codex returned no text (status={getattr(result, 'status', None)})")
+        raise RuntimeError(
+            f"Claude Code returned no text (subtype={payload.get('subtype')})"
+        )
     return text
+
+
+def _run_codex_cli(prompt: str) -> str:
+    """One headless Codex CLI call (`codex exec`) over the user's login.
+
+    Pure text generation: read-only sandbox, ephemeral session (no session files
+    on disk), non-interactive so it never blocks on an approval prompt. The
+    prompt goes in over stdin (no Windows command-line length limit) and the
+    final text comes back through --output-last-message, so noisy progress
+    output on stdout never reaches the parser. Raises RuntimeError on failure;
+    the caller decides if it's transient.
+    """
+    out_path: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(suffix=".txt", delete=False) as out_file:
+            out_path = Path(out_file.name)
+
+        command = [
+            os.environ.get("AIRS_CODEX_BIN") or "codex",
+            "exec",
+            "--sandbox", "read-only",
+            "--skip-git-repo-check",
+            "--ephemeral",
+            "--color", "never",
+            "--output-last-message", str(out_path),
+        ]
+        model = os.environ.get("AIRS_CODEX_MODEL")
+        if model:
+            command.extend(["--model", model])
+        effort = os.environ.get("AIRS_CODEX_REASONING_EFFORT")
+        if effort:
+            command.extend(["-c", f'model_reasoning_effort="{effort}"'])
+        command.append("-")  # read the prompt from stdin
+
+        try:
+            result = subprocess.run(
+                command,
+                input=prompt,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                check=False,
+            )
+        except FileNotFoundError as exc:
+            raise RuntimeError(
+                "Codex CLI not found. Install it and run `codex login` once."
+            ) from exc
+
+        if result.returncode != 0:
+            detail = (result.stderr or result.stdout).strip()
+            raise RuntimeError(
+                f"codex exited with code {result.returncode}: {detail[:800]}"
+            )
+
+        text = out_path.read_text(encoding="utf-8", errors="replace")
+        text = text.replace("\r\n", "\n").replace("\r", "\n").strip()
+        if not text:
+            detail = (result.stderr or result.stdout).strip()
+            raise RuntimeError(f"codex returned no text: {detail[-400:]}")
+        return text
+    finally:
+        if out_path is not None:
+            out_path.unlink(missing_ok=True)
 
 
 def _run_grok_cli(prompt: str) -> str:
@@ -235,9 +273,9 @@ def run_agent(prompt: str, agent: str = "codex", retries: int = 3) -> str:
     momentary API hiccup. Non-transient errors (e.g. auth) fail immediately.
     """
     if agent == "codex":
-        attempt_fn = _run_codex_sdk
+        attempt_fn = _run_codex_cli
     elif agent == "claude":
-        attempt_fn = _run_claude_sdk
+        attempt_fn = _run_claude_cli
     elif agent == "grok":
         attempt_fn = _run_grok_cli
     else:
