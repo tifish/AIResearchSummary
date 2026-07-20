@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>智能体集群与新的模型经济学</title>
+<style>
+:root{
+  --bg:#f5f3ed;--paper:#fffdf8;--ink:#18202b;--muted:#66707d;--line:#d8d5cb;
+  --accent:#3157d5;--accent2:#008a72;--accent3:#d05a32;--accent4:#8150b8;
+  --hl:#fff0a8;--hl2:#cceee6;--risk-bg:#fff0ec;--data-bg:#e9efff;
+  --opportunity-bg:#e5f6ef;--conclusion-bg:#eee7f8;--dark-panel:#18233b;
+  --dark-panel-ink:#f5f7ff;--quote-bg:#fff8dc;--stripe:#ebe7dd;
+  --shadow:0 16px 44px rgba(30,38,52,.10);
+}
+:root[data-theme="light"]{
+  --bg:#f5f3ed;--paper:#fffdf8;--ink:#18202b;--muted:#66707d;--line:#d8d5cb;
+  --accent:#3157d5;--accent2:#008a72;--accent3:#d05a32;--accent4:#8150b8;
+  --hl:#fff0a8;--hl2:#cceee6;--risk-bg:#fff0ec;--data-bg:#e9efff;
+  --opportunity-bg:#e5f6ef;--conclusion-bg:#eee7f8;--dark-panel:#18233b;
+  --dark-panel-ink:#f5f7ff;--quote-bg:#fff8dc;--stripe:#ebe7dd;
+  --shadow:0 16px 44px rgba(30,38,52,.10);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1118;--paper:#171c25;--ink:#e7eaf0;--muted:#a8b0bd;--line:#343c49;
+    --accent:#83a2ff;--accent2:#48d4b4;--accent3:#ff8a65;--accent4:#c59af2;
+    --hl:#5b4b12;--hl2:#134d43;--risk-bg:#3b211f;--data-bg:#1c2b4d;
+    --opportunity-bg:#17372f;--conclusion-bg:#302342;--dark-panel:#080d17;
+    --dark-panel-ink:#e9efff;--quote-bg:#352e18;--stripe:#242a34;
+    --shadow:0 16px 44px rgba(0,0,0,.32);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1118;--paper:#171c25;--ink:#e7eaf0;--muted:#a8b0bd;--line:#343c49;
+  --accent:#83a2ff;--accent2:#48d4b4;--accent3:#ff8a65;--accent4:#c59af2;
+  --hl:#5b4b12;--hl2:#134d43;--risk-bg:#3b211f;--data-bg:#1c2b4d;
+  --opportunity-bg:#17372f;--conclusion-bg:#302342;--dark-panel:#080d17;
+  --dark-panel-ink:#e9efff;--quote-bg:#352e18;--stripe:#242a34;
+  --shadow:0 16px 44px rgba(0,0,0,.32);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"Noto Sans SC","Microsoft YaHei",sans-serif;line-height:1.78}
+main{max-width:1120px;margin:auto}
+.hero{padding:72px 6vw 54px;background:var(--dark-panel);color:var(--dark-panel-ink);border-radius:0 0 36px 36px}
+.eyebrow{color:var(--accent2);font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+h1{max-width:850px;margin:.2em 0;font-size:clamp(2.5rem,7vw,5.5rem);line-height:1.04;letter-spacing:-.045em}
+.original{font:500 1.1rem/1.5 Georgia,serif;opacity:.72}
+.lede{max-width:780px;margin:34px 0 0;font-size:1.35rem;line-height:1.65}
+.summary-wrap{padding:42px 24px 70px}
+.number-band{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);box-shadow:var(--shadow)}
+.metric{background:var(--paper);padding:26px 22px}
+.metric strong{display:block;color:var(--accent);font-size:2rem;line-height:1.2}
+.metric:nth-child(2) strong{color:var(--accent2)}
+.metric:nth-child(3) strong{color:var(--accent3)}
+.metric:nth-child(4) strong{color:var(--accent4)}
+.metric span{color:var(--muted);font-size:.92rem}
+.split{display:grid;grid-template-columns:.9fr 1.1fr;gap:38px;margin:54px 0;align-items:start}
+.split h2{font-size:2.1rem;line-height:1.2;margin-top:0}
+.flow{border-left:4px solid var(--accent2);padding-left:26px}
+.flow article{padding:4px 0 22px}
+.flow b{color:var(--accent2)}
+.risk{margin:48px 0;background:var(--risk-bg);border-top:7px solid var(--accent3);padding:34px}
+.risk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.risk h2{margin-top:0}
+.cost-panel{margin:48px 0;padding:42px;background:var(--dark-panel);color:var(--dark-panel-ink);border-radius:28px}
+.cost-panel h2{font-size:2rem;margin-top:0}
+.cost-bars{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.cost-bars div{padding:22px;border:1px solid var(--accent);border-radius:16px}
+.cost-bars div:last-child{border-color:var(--accent2)}
+.cost-bars strong{display:block;font-size:2rem}
+.insight{margin:48px 0;padding:30px 34px;background:var(--quote-bg);border-left:8px solid var(--accent4);font-size:1.2rem}
+.takeaways{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-top:48px}
+.takeaways h2{grid-column:1/-1}
+.tile{padding:24px;border-radius:18px;background:var(--data-bg)}
+.tile:nth-of-type(2){grid-column:span 3;background:var(--opportunity-bg)}
+.tile:nth-of-type(3){grid-column:span 3;background:var(--risk-bg)}
+.tile:nth-of-type(4){grid-column:span 2;background:var(--conclusion-bg)}
+.tile:nth-of-type(5){grid-column:span 4;background:var(--data-bg)}
+mark{background:var(--hl);color:var(--ink);padding:.05em .25em}
+.hl2{background:var(--hl2);color:var(--ink);padding:.05em .25em;font-weight:750}
+#translation{max-width:820px;margin:0 auto;padding:64px 24px 100px;background:var(--paper)}
+#translation h2{font-size:2.5rem;border-bottom:3px solid var(--accent);padding-bottom:12px}
+#translation h3{margin-top:2.5em;font-size:1.65rem;color:var(--accent)}
+#translation h4{margin-top:2em;font-size:1.2rem;color:var(--accent3)}
+#translation p,#translation li{font-family:"Noto Serif SC","Songti SC",serif}
+#translation nav{background:var(--stripe);padding:20px 26px;border-radius:12px}
+#translation a{color:var(--accent)}
+.source-figure{margin:36px 0}
+.source-figure img{display:block;max-width:100%;height:auto;margin:auto}
+.source-figure figcaption{margin-top:10px;color:var(--muted);font-size:.9rem;text-align:center}
+.note{color:var(--muted);font-size:.94rem;border-top:1px solid var(--line);padding-top:14px}
+@media(max-width:760px){
+  .number-band,.risk-grid,.split,.cost-bars{grid-template-columns:1fr}
+  .takeaways{display:block}.tile{margin:12px 0}
+  .hero{padding-top:48px}.summary-wrap{padding-inline:16px}
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+  <style id="airs-source-image-theme-style">
+    .source-figure .source-image-dark {
+      display: none;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .source-figure .source-image-light {
+        display: none;
+      }
+      :root:not([data-theme="light"]) .source-figure .source-image-dark {
+        display: block;
+      }
+    }
+    :root[data-theme="dark"] .source-figure .source-image-light {
+      display: none;
+    }
+    :root[data-theme="dark"] .source-figure .source-image-dark {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-light {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-dark {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/agent-swarm-model-economics" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header class="hero">
+<div class="eyebrow">Cursor Research · 2026 年 7 月 8 日</div>
+<h1>智能体集群与新的模型经济学</h1>
+<div class="original">Agent swarms and the new model economics</div>
+<p class="lede"><strong>一句话总括：</strong>Cursor 的实验表明，扩大智能体系统的关键不是制造更多并发，而是用分层规划、共享记忆和冲突治理，把昂贵的判断与廉价的大规模执行分开。</p>
+</header>
+<div class="summary-wrap">
+<section aria-label="关键数字" class="number-band">
+<div class="metric"><strong>835 页</strong><span>唯一可用的 SQLite 实现资料</span></div>
+<div class="metric"><strong>73%–85%</strong><span>新集群四小时得分区间</span></div>
+<div class="metric"><strong>&lt;1,000</strong><span>新 Grok 4.5 全程合并冲突</span></div>
+<div class="metric"><strong>$1,339</strong><span>最便宜的正式混合配置</span></div>
+</section>
+<section class="split">
+<div>
+<div class="eyebrow">核心机制</div>
+<h2>任务树首先解决的是记忆问题</h2>
+<p>规划者只负责拆解目标和作出设计决定。执行者只处理一个狭窄任务。</p>
+<p>这种分工让两类智能体不必在同一个上下文里同时保留全局目标和实现细节。Cursor 因而认为，集群扩展能力更多来自<mark>上下文效率</mark>，而不只是并行。</p>
+</div>
+<div class="flow">
+<article><b>01 · 规格</b><br/>自然语言目标成为任务树的根。</article>
+<article><b>02 · 规划</b><br/>高能力模型消除歧义，并把工作切成互不重叠的子树。</article>
+<article><b>03 · 执行</b><br/>速度快、价格低的模型完成大量明确任务。</article>
+<article><b>04 · 校验</b><br/>编译器、协调者和多种审查视角不断纠偏。</article>
+</div>
+</section>
+<section class="risk">
+<h2>吞吐量不是生产力：旧系统陷入了协作风暴</h2>
+<div class="risk-grid">
+<div><strong>68,000 次提交</strong><p>旧 Grok 4.5 在前两小时的提交速度约为新系统的 70 倍。但多数活动是反复改动和争用。</p></div>
+<div><strong>超过 70,000 次冲突</strong><p>冲突不但没有收敛，反而持续加速。新系统四小时内的冲突不到 1,000 次。</p></div>
+<div><strong>7,771 对 47</strong><p>旧系统最热门文件出现 7,771 次冲突。新系统最受争抢的文件只有 47 次。</p></div>
+</div>
+<p><strong>结论：</strong>在大规模智能体系统中，提交次数可能衡量的是混乱，而不是有效进展。真正有意义的指标是可验证结果、架构稳定性和返工量。</p>
+</section>
+<section class="cost-panel">
+<h2>模型组合带来一个新的成本杠杆</h2>
+<p>所有组合都取得了相近质量，但总成本相差近八倍。执行者至少消耗 <span class="hl2">69%</span> 的 token，多数配置甚至超过 90%。</p>
+<div class="cost-bars">
+<div><strong>$9,373</strong>GPT-5.5 同时规划和执行时，仅执行者产生的成本。</div>
+<div><strong>$411</strong>Opus 4.8 规划、Composer 2.5 执行时，整个执行者集群的成本。</div>
+</div>
+<p>少数时刻需要前沿模型作出高价值判断。歧义一旦被压缩成明确指令，大量工作便可交给便宜模型。模型选择因此不再只是“谁最强”，而是“哪类能力应该放在哪一层”。</p>
+</section>
+<aside class="insight">Fable 5 规划者使用的规划 token 更少，尽管单价约为 Opus 4.8 的两倍，规划账单仍略低。但它带来的执行 token 多出数倍，最终总成本反而更高。<strong>局部省钱不等于系统省钱。</strong></aside>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="tile"><strong>组织设计会放大模型能力。</strong><br/>同一批模型换用新协作框架后，在每种配置中都胜过旧框架。</div>
+<div class="tile"><strong>共享环境就是集体记忆。</strong><br/>设计文档、Field Guide 和代码引用，让后来的智能体可以继承已经获得的知识。</div>
+<div class="tile"><strong>高并发需要机器速度的治理。</strong><br/>第三方冲突处理、巨型文件拆分和自动传播设计变更，取代了人类节奏的合并流程。</div>
+<div class="tile"><strong>审查要追求差异，而非单一完美视角。</strong><br/>互不相关的审查视角叠加后，能在错误固化前捕捉更多问题。</div>
+<div class="tile"><strong>规格正在成为新的编程单位。</strong><br/>工程师最稀缺的产物可能不再是代码，而是能被概率式“编译器”可靠下放的意图描述。</div>
+</section>
+</div>
+<section id="translation">
+<h2>完整译文</h2>
+<nav>
+<strong>目录</strong>
+<ul>
+<li>树与叶</li>
+<li>任务树如何帮助记忆</li>
+<li>为智能体打造版本控制系统</li>
+<li>每秒 1,000 次提交时的故障模式</li>
+<li>审查视角</li>
+<li>让智能体塑造环境</li>
+<li>SQLite 实验</li>
+<li>不同模型组合的结果</li>
+<li>深入分析各次运行</li>
+<li>模型经济学</li>
+<li>把规格当作提示词</li>
+</ul>
+</nav>
+<p>今年早些时候，我们开展了一系列实验，测试让大量智能体协作完成同一目标时的扩展极限。我们的假设是，这种方式可以处理规模更大、复杂度更高的任务。</p>
+<p>其中的旗舰项目，是让一个长时间运行的智能体集群从零构建网页浏览器。它成功验证了概念，但距离成熟的软件还很远。</p>
+<p>那项工作有意采用经验探索的方式。我们从空白开始，不断试错，逐步逼近稳定而有效的系统。此后，我们希望更深入地理解智能体集群，以便有意识地设计它。</p>
+<p>为了检验进展，我们重新挑战了一项旧集群表现不佳的任务：只依据 SQLite 文档，用 Rust 从零实现 SQLite。</p>
+<p>初步结果令人振奋。我们让新旧集群使用相同的模型和时间预算处理同一项任务，然后测量它们能通过多少未公开的 SQL 测试。</p>
+<p>在每一种模型配置中，新集群的表现都更好。使用 Grok 4.5 时，新集群在四小时内达到 80%。旧集群则陷入失控循环，不到两小时就不得不暂停。</p>
+<p>我们还调整了不同模型承担的工作。有些运行由同一个模型包办全部任务。另一些运行则由前沿模型负责规划，再由快速、便宜的模型执行。所有组合的质量都很接近，但成本差异巨大。<sup><a href="#note-1">1</a></sup></p>
+<figure class="source-figure" data-source-image="0"><img alt="Cost to rebuild SQLite by model mix under old and new agent swarms" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fcost-to-rebuild-sqlite-by-model-mix-light-2.png&amp;w=1920&amp;q=70" width="800"/><img alt="Cost to rebuild SQLite by model mix under old and new agent swarms" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fcost-to-rebuild-sqlite-by-model-mix-dark-2.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<h3>树与叶</h3>
+<p>大型任务的描述天然呈树状。总体目标位于根部，再递归拆分为基本工作单元。我们的集群包含两种角色。它们都围绕同一套树状分解组织：</p>
+<ul>
+<li><strong>规划智能体</strong>由能力最强的模型驱动，负责拆分目标并委派任务。</li>
+<li><strong>执行智能体</strong>通常由速度更快、价格更低的模型驱动，负责完成这些任务。</li>
+</ul>
+<figure class="source-figure" data-source-image="1"><img alt="Diagram of decomposing work across planner and worker agents in a task tree" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fdecomposing-work-light.png&amp;w=1920&amp;q=70" width="800"/><img alt="Diagram of decomposing work across planner and worker agents in a task tree" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fdecomposing-work-dark-2.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<p>这种设计包含了更严格的编排系统所能实现的能力。我们不会强行为问题套上固定的拓扑结构。集群会顺着问题的轮廓生长，算力和上下文也会随任务复杂度扩展。</p>
+<p>我们认为，这正是该设计能够泛化到不同任务的原因。这些任务包括构建浏览器、解决数学问题和优化 GPU 内核。我们还在内部用它寻找并修复开源软件漏洞、提升自身代码库的测试覆盖率，以及生成数十亿 token 的合成训练数据。</p>
+<h3>任务树如何帮助记忆</h3>
+<p>单个智能体承担完整任务时，必须独自遍历整棵树。它需要深入每一片叶子，同时始终在上下文中保存祖先节点、当前位置和更大的目标。</p>
+<p>我们认为，这解释了长时间运行的单智能体为何会逐渐偏离目标。它可以专注眼前工作，却可能忘记全局。它也可以持续保留全局图景，但会降低局部任务的完成质量。</p>
+<p>在集群中，规划者从不实现代码，因此上下文不会塞满底层细节。执行者从不负责规划，所以能把全部上下文用于一个狭窄任务。</p>
+<p>我们怀疑，智能体集群之所以能够扩展，主要依靠这种上下文效率，而非并行本身。这种效率存在于各种规模的集群中。因此，即使任务规模只是中等，任务分解也能改善智能体表现。</p>
+<p>其他领域也能看到类似结构。经济学家 Ronald Coase 曾追问企业为何存在。他认为，协调成本的增长速度快于工作本身。因此，组织会形成由边界清晰的单元组成的层级，而不是让所有人与所有人直接沟通。</p>
+<h3>为智能体打造版本控制系统</h3>
+<p>我们在此前介绍集群的文章中提到，Git 和 Cargo 等工具依赖粗粒度锁来控制并发。这对一名开发者没有问题，却无法承受数百个智能体同时产生的工作量。</p>
+<p>今年早些时候，浏览器集群在 Git 上的峰值约为每小时 1,000 次提交。新系统的峰值则达到每秒约 1,000 次。</p>
+<p>为了支持这种活动速率，我们从零构建了新的版本控制系统（VCS）。吞吐量并不是自行掌控这一层的唯一原因。系统中的每项变更都会经过 VCS，因此碰撞会首先在这里显现。下一节介绍的几种协调机制也直接实现于这一层。</p>
+<h3>每秒 1,000 次提交时的故障模式</h3>
+<p>人类工程团队有代码审查、所有权、站会和合并队列等标准协调机制。它们适合人类的工作节奏。但当集群达到这种提交速度时，我们会遇到人类团队很少遭遇的故障模式。</p>
+<h4>设计上的“脑裂”</h4>
+<p>两个互不知情的规划者，会在代码库的不同位置用不同方式实现同一个概念。</p>
+<p>我们通过提示词解决了这个问题。规划者必须亲自作出设计决定，不能把决定交给下级。我们还要求它们确保不同的委派子树不会重复决定同一个问题。</p>
+<h4>规划者之间的争用</h4>
+<p>更难处理的一种争用，是两个规划者知道彼此存在，却通过反复修改同一批文件相互拉扯。</p>
+<p>问题的本质是双方持有两套现实图景。合并工具无法解决意见分歧。为此，我们让智能体把决定记录在共享设计文档中。依赖某项决定的代码会带上一个由编译器检查的引用，指回对应文档。规划者无意间相互矛盾时，协调智能体会合并文档，而这些引用会把解决结果向下游传播。</p>
+<h4>合并冲突</h4>
+<p>集群中的智能体不断在同一批文件上碰撞。要解决碰撞，它们必须停下当前工作，吸收另一个智能体的上下文，再围绕对方的改动完成合并。执行智能体不擅长这样做。实践中，它们往往会覆盖对方的修改，或者放弃自己的工作。</p>
+<p>为了解决这个问题，我们建立了一套机制。发生合并冲突时，一个中立的第三方智能体会介入，代表各方处理冲突。它唯一的目标是保持公正和高效，类似工程团队使用的合并队列。</p>
+<h4>巨型文件</h4>
+<p>有些文件特别容易成为智能体集中修改的地方。每个智能体可能只增加少量代码，但没有任何一个智能体负责控制文件规模。</p>
+<p>这些“巨型文件”会堵塞整个系统。传输、比较和合并它们的成本很高，它们也会成为持续碰撞的地点。</p>
+<p>为此，我们允许执行智能体标记过度膨胀的文件。文件被标记后，系统会阻止新的提交，再由外部智能体把它拆成更小的模块。</p>
+<h4>僵化</h4>
+<p>智能体在有人类参与的既有代码库中学会了避免触碰核心代码，即使核心代码确实需要修改也是如此。</p>
+<p>我们的解决办法是允许有意破坏。某个智能体如果认为核心改动值得做，可以在自身任务范围之外提交一个聚焦的补丁，并留言解释原因。</p>
+<p>编译器会把这项变更传遍整个系统。所有依赖旧设计的部分都会构建失败。智能体遇到相应错误后，会找到留言，阅读理由，再更新自己的工作以适应新设计。</p>
+<h3>审查视角</h3>
+<p>在长期运行的多智能体系统中，错误会不断积累。集群需要在小错误成为基础性问题之前纠正自身。</p>
+<p>我们尝试了多种审查视角。例如，把执行者的完整记录交给审查智能体；只提供执行结果；或者只让它查看代码库。我们也让不同模型担任审查者。这些模型拥有不同的训练方式和“性格”。</p>
+<p>没有任何单一视角能发现所有问题。但互不相关的视角可以叠加。这类似自动驾驶系统：不需要任何一个组件完美，也能组合出超越人类的可靠性。用于审查的算力回报很高，因为审查远比被审查的工作便宜。我们怀疑，这种叠加式审查是多次运行能够持续保持质量的重要原因。</p>
+<h3>让智能体塑造环境</h3>
+<p>“迹象协调”（Stigmergy）是蚂蚁、白蚁等群居生物无需直接交流便能协作的机制。它们改变环境，而环境又影响下一个个体。</p>
+<p>我们在早期运行中加入了“保留笔记”和“记录决定”等规则，因为这些做法显然有益。事后看来，这些规则是在帮助智能体为未来的自己和队友建立制度化知识。</p>
+<p>我们进一步开展了一个实验，让智能体自行编写和共享上下文。我们将其称为 Field Guide。它是一个完全由智能体管理的文件夹。每个智能体启动时，系统都会自动注入其中的 index.md。智能体负责决定指南应包含什么内容，唯一约束是总行数预算。</p>
+<p>这份指南背后的逻辑是：模型权重已经冻结，因此最值得记录的恰恰是意外遭遇。下一个智能体了解这些意外后，就能缩短探索路径。</p>
+<p>Field Guide 仍是一项早期实验，但结果很有希望。对于智能体不能完全掌控的代码库，我们预计它会带来更大收益。训练模型为后继者写作也是一个有趣的后续研究方向。在这种训练中，知识捕捉得越好，获得的奖励就越高。</p>
+<h3>SQLite 实验</h3>
+<p>我们要求采用上述全部改进的新集群，用 Rust 实现 835 页 SQLite 手册描述的全部功能。我们不向它提供源代码、测试套件、SQLite 二进制文件或互联网访问权限。</p>
+<p>为了衡量进展，我们使用 SQLite 项目的 sqllogictest 评分。这套测试用于检查不同数据库引擎执行相同查询时能否返回相同结果。它包含数百万条已知正确答案的查询。集群数据库答对的比例就是得分。运行过程中不断上升的曲线反映了进展。</p>
+<p>集群从未被告知这套测试的存在。每次运行结束后，我们都会人工审查代码和运行过程，检查是否存在作弊或走捷径的行为。我们还会确认系统的各个部分是否均衡构建，而不是只实现测试容易覆盖的部分。</p>
+<p>阅读曲线时，请记住智能体会自行选择策略。有些集群先构建宽广的基础，得分会连续数小时保持低位，之后突然上升。另一些集群会深入一个领域，早期得分较高，随后在补齐其他部分时进入平台期。整体趋势比某个准确时刻的具体得分更重要。</p>
+<h3>不同模型组合的结果</h3>
+<p>我们测试了四种能力和成本不同的配置：</p>
+<ul>
+<li><strong>GPT-5.5 同时担任规划者和执行者。</strong>全部工作都使用能力强大的前沿模型。<sup><a href="#note-2">2</a></sup></li>
+<li><strong>Grok 4.5 同时担任规划者和执行者。</strong>它是我们用于比较的高性价比前沿模型。</li>
+<li><strong>Opus 4.8 担任规划者，Composer 2.5 担任执行者。</strong>把前沿判断能力与高效执行结合起来。</li>
+<li><strong>Fable 5 担任规划者，Composer 2.5 担任执行者。</strong>用于观察次一级规划模型会提升还是削弱混合配置的价值。</li>
+</ul>
+<p>在每种组合中，新框架都胜过旧框架。</p>
+<p>Fable 5 混合配置在第一个小时内就通过了约三分之二的测试。到四小时截止时，新系统各次运行的得分介于 73% 到 85%，旧系统则介于 11% 到 77%。</p>
+<p>旧版 Grok 4.5 运行在两小时前就被暂停，原因将在下文说明。所有新配置后来都通过了 100% 的测试。</p>
+<p>未来，我们希望测试规划者与执行者组合的完整 N×N 矩阵。本轮最重要的是比较两个框架版本。事实证明，不同行为之间的差异远大于分数差异所呈现的程度。</p>
+<figure class="source-figure" data-source-image="2"><img alt="SQLite test suite grade over time for GPT-5.5 under old and new swarms" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fsqlite-grade-over-time-gpt-5-5-light.png&amp;w=1920&amp;q=70" width="800"/><img alt="SQLite test suite grade over time for GPT-5.5 under old and new swarms" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fsqlite-grade-over-time-gpt-5-5-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<figure class="source-figure" data-source-image="3"><img alt="SQLite test suite grade over time for Grok 4.5 under old and new swarms" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fsqlite-grade-over-time-grok-4-5-light.png&amp;w=1920&amp;q=70" width="800"/><img alt="SQLite test suite grade over time for Grok 4.5 under old and new swarms" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fsqlite-grade-over-time-grok-4-5-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<figure class="source-figure" data-source-image="4"><img alt="SQLite test suite grade over time for Opus 4.8 planner with Composer 2.5 worker" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fsqlite-grade-over-time-opus-4-8-composer-2-5-light.png&amp;w=1920&amp;q=70" width="800"/><img alt="SQLite test suite grade over time for Opus 4.8 planner with Composer 2.5 worker" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fsqlite-grade-over-time-opus-4-8-composer-2-5-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<figure class="source-figure" data-source-image="5"><img alt="SQLite test suite grade over time for Fable 5 planner with Composer 2.5 worker" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fsqlite-grade-over-time-fable-5-composer-2-5-light.png&amp;w=1920&amp;q=70" width="800"/><img alt="SQLite test suite grade over time for Fable 5 planner with Composer 2.5 worker" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fsqlite-grade-over-time-fable-5-composer-2-5-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<h3>深入分析各次运行</h3>
+<p>先看最简单的活动指标。使用旧框架和新框架时，Grok 4.5 的提交速率差异很大。旧系统在最初两小时产生了 68,000 次提交，速度约为新系统的 70 倍。</p>
+<figure class="source-figure" data-source-image="6"><img alt="Grok 4.5 cumulative commits over active minutes, old harness versus new" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fgrok-4-5-cumulative-commits-over-active-minutes-light.png&amp;w=1920&amp;q=70" width="800"/><img alt="Grok 4.5 cumulative commits over active minutes, old harness versus new" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fgrok-4-5-cumulative-commits-over-active-minutes-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<p>一种解释是，它的生产力更高。另一种解释是，大多数提交都是无效活动，例如反复震荡、争用和修改。</p>
+<p>合并冲突数据支持后一种解释。旧系统在被暂停前积累了超过 70,000 次冲突。冲突速度不但没有趋稳，反而继续上升。新系统在完整四小时内记录的冲突不到 1,000 次。</p>
+<figure class="source-figure" data-source-image="7"><img alt="Grok 4.5 cumulative merge conflicts over time, old harness versus new" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fgrok-4-5-cumulative-merge-conflicts-over-time-light.png&amp;w=1920&amp;q=70" width="800"/><img alt="Grok 4.5 cumulative merge conflicts over time, old harness versus new" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fgrok-4-5-cumulative-merge-conflicts-over-time-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<p>冲突主要集中在体积最大的文件上。旧系统中，最大的文件在整个运行期间持续增长。最热门的一个文件积累了 7,771 次冲突，共有 1,173 个不同智能体修改过它。新系统整个代码库中争用最严重的文件只发生了 47 次冲突。</p>
+<figure class="source-figure" data-source-image="8"><img alt="Grok 4.5 hottest file size in lines of code over run progress, old harness versus new" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fgrok-4-5-file-size-loc-over-run-progress-light.png&amp;w=1920&amp;q=70" width="800"/><img alt="Grok 4.5 hottest file size in lines of code over run progress, old harness versus new" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fgrok-4-5-file-size-loc-over-run-progress-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<p>旧集群最大的协调失败是“脑裂”，也就是规划者重复彼此的工作。这一点反映在软件包结构上。Rust 代码被组织成称为 crate 的软件包。在这种项目中，每个 crate 大致对应一个主要组件。</p>
+<p>旧系统膨胀到 54 个 crate，其中包括三个不同的 SQL 软件包。新系统很早就稳定在九个 crate，此后再也没有增加。</p>
+<figure class="source-figure" data-source-image="9"><img alt="Distinct Rust crates over time in Grok 4.5 SQLite runs, old harness versus new" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fgrok-4-5-distinct-crates-light.png&amp;w=1920&amp;q=70" width="800"/><img alt="Distinct Rust crates over time in Grok 4.5 SQLite runs, old harness versus new" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fgrok-4-5-distinct-crates-dark.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<p>这些差异最终都体现在代码库中。使用 Fable 5 组合时，新旧集群最终都通过了完整测试。但旧系统需要 64,305 行引擎代码，新系统只用了 9,908 行。Opus 组合也呈现相同趋势：旧框架以 19,013 行代码取得 97% 的得分，新框架则以 4,645 行代码取得 100%。</p>
+<figure class="source-figure" data-source-image="10"><img alt="Lines of engine code needed to complete the SQLite experiment, old harness versus new" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fin-our-new-agent-swarm-the-same-models-needed-far-fewer-lines-of-code-to-complete-the-sqlite-experiment-light-2.png&amp;w=1920&amp;q=70" width="800"/><img alt="Lines of engine code needed to complete the SQLite experiment, old harness versus new" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fin-our-new-agent-swarm-the-same-models-needed-far-fewer-lines-of-code-to-complete-the-sqlite-experiment-dark-2.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<h3>模型经济学</h3>
+<p>文章开头提到，各种模型组合产生了相近的质量，但成本差异巨大。Opus 4.8 混合组合的成本为 1,339 美元，而单独使用 GPT-5.5 的成本为 10,565 美元。Token 数据说明了差异从何而来。</p>
+<p>每次运行的支出结构都很一致。执行者至少消耗 69% 的 token，在大多数运行中超过 90%。</p>
+<p>但由于规划 token 更贵，美元成本的分配与 token 数量不同。在 Opus 4.8 与 Composer 2.5 的组合中，担任规划者的 Opus 只产生了很少一部分 token，却占总成本的约三分之二。担任执行者的 Composer 处理了绝大多数 token，成本却只占余下的三分之一。</p>
+<figure class="source-figure" data-source-image="11"><img alt="Token usage by model role, planner versus worker, across SQLite swarm configurations" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Ftokens-by-model-planner-vs-worker-light-2.png&amp;w=1920&amp;q=70" width="800"/><img alt="Token usage by model role, planner versus worker, across SQLite swarm configurations" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Ftokens-by-model-planner-vs-worker-dark-2.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<p>大型任务中，真正需要前沿智能的时刻并不多，例如最初的任务分解、设计决定和部分权衡。当前沿规划者把歧义压缩成详细而明确的指令后，便宜的模型只需照着执行。这可能带来巨大的成本节省。在规划和执行都使用 GPT-5.5 的运行中，仅执行者就花费了 9,373 美元。在 Opus 4.8 规划、Composer 2.5 执行的运行中，整个执行者集群只花费了 411 美元。</p>
+<p>比较两个混合配置还能发现一个值得注意的细节。尽管 Fable 5 的每 token 价格约为 Opus 4.8 的两倍，但它使用的规划 token 少得多，因此规划费用还略低一些。然而，Fable 运行中的执行者消耗了多出数倍的 token，最终整个运行的成本高出不少。</p>
+<h3>把规格当作提示词</h3>
+<p>AI 能力的每次跃升，都提高了工程师可以操作的抽象层级。</p>
+<p>自动补全让工程师一次处理一行代码。早期模型把单位提升到一个代码块，智能体又把它提升到一个文件或一项功能。</p>
+<p>到了智能体集群，工作的单位变成了规格。</p>
+<p>要让这种方式奏效，集群必须真正遵循规格。这也是本文大部分内容所要解决的问题。我们向集群提供了 835 页文字，它交回了一个数据库。在这次实验中，真正稀缺的是对意图的正确描述。我们预计，这也会成为未来软件工程中的稀缺资源。</p>
+<p>从这个角度看，集群开始像一个编译器。编译器通过一系列中间步骤，把源代码转换成机器代码。集群对意图执行了类似过程。规划者把目标解析成任务树，再逐层下放成可执行工作。区别在于，编译器会在每一步保留原意，而集群的每一步都具有概率性。本文描述的一切机制，都是为了缩小这一差距。</p>
+<p>我们邀请大家探索集群产出的成果。由 Opus 4.8 单独运行产生的代码库已经公开，地址是 <a href="https://github.com/cursor/minisqlite">github.com/cursor/minisqlite</a>。根据初步查看，它似乎做得很好，但我们尚未进行更深入的人工分析。欢迎亲自查看，并告诉我们你的发现。</p>
+<p class="note" id="note-1"><sup>1</sup> 为了了解单独使用前沿模型的成本，我们还让 Opus 4.8 和 Fable 5 各自独立运行。我们只对这些运行进行了非正式评分，因此不据此判断质量。不过，根据经验，我们预计两个模型都会有良好表现。图表中的斜线柱表示它们的成本。</p>
+<p class="note" id="note-2"><sup>2</sup> 我们原本希望使用 GPT-5.6 Sol 作为前沿模型配置。这个新模型似乎比其他受测模型更容易受到字面措辞和强调语气影响。我们遇到了其他模型从未出现过的失控循环。它发布不久，我们没有时间专门调整提示词。只针对一个模型调优、其余模型保持不变，又会使比较失真，因此最终改用 GPT-5.5。</p>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

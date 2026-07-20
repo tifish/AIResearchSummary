@@ -53,10 +53,21 @@ KNOWN_CATEGORY_WORDS = {
     "Security",
     "Societal Impacts",
 }
+ARTICLE_END_MARKERS = {
+    "related content",
+    "more from anthropic",
+    "share",
+    "copy link",
+}
 
 
 def clean_text(value: str) -> str:
     return re.sub(r"\s+", " ", html.unescape(value)).strip()
+
+
+def is_article_end_marker(value: str) -> bool:
+    normalized = clean_text(value).casefold()
+    return normalized in ARTICLE_END_MARKERS or normalized.startswith("filed under:")
 
 
 def normalize_url(value: str) -> str:
@@ -231,7 +242,7 @@ class ArticleParser(HTMLParser):
             self.seen_title = True
             return
 
-        if text.lower() in {"related content", "more from anthropic"}:
+        if is_article_end_marker(text):
             self.stop_collecting = True
             return
 
@@ -343,7 +354,7 @@ def extract_article_images(url: str, container: Any, title: str, date_text: str,
     for node in container.find_all([*content_tags, "img"]):
         if node.name in content_tags:
             text = clean_text(node.get_text(" ", strip=True))
-            if text.lower() in {"related content", "more from anthropic", "share", "copy link"}:
+            if is_article_end_marker(text):
                 break
             if text and text not in ignored_text and len(text) >= 3:
                 block_index += 1
@@ -457,7 +468,7 @@ def extract_with_bs4(url: str, markup: str) -> dict[str, Any]:
             text = clean_text(node.get_text(" ", strip=True))
             if not text or text in {title, date_text, category}:
                 continue
-            if text.lower() in {"related content", "more from anthropic", "share", "copy link"}:
+            if is_article_end_marker(text):
                 break
             if len(text) < 3:
                 continue
