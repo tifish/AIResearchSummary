@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Grok 4.5 模型卡</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #f4f1e9;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #17211d;
+  --muted: #657069;
+  --line: #d8ddd7;
+  --accent: #176b5b;
+  --accent2: #2266a5;
+  --accent3: #a34c21;
+  --accent4: #7550a8;
+  --data: #176b5b;
+  --risk: #a33d35;
+  --opportunity: #2266a5;
+  --conclusion: #7550a8;
+  --hl: #ccefe2;
+  --hl2: #d8e9ff;
+  --hl3: #ffe0ce;
+  --hl4: #e9dcff;
+  --hero-bg: #172a25;
+  --hero-ink: #f6fff9;
+  --hero-muted: #b8cec5;
+  --data-bg: #e3f3ed;
+  --notice-bg: #fff0e7;
+  --insight-bg: #eee7f8;
+  --translation-bg: #fffdf8;
+  --shadow: 0 18px 50px rgba(31, 49, 41, 0.12);
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f4f1e9;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #17211d;
+  --muted: #657069;
+  --line: #d8ddd7;
+  --accent: #176b5b;
+  --accent2: #2266a5;
+  --accent3: #a34c21;
+  --accent4: #7550a8;
+  --data: #176b5b;
+  --risk: #a33d35;
+  --opportunity: #2266a5;
+  --conclusion: #7550a8;
+  --hl: #ccefe2;
+  --hl2: #d8e9ff;
+  --hl3: #ffe0ce;
+  --hl4: #e9dcff;
+  --hero-bg: #172a25;
+  --hero-ink: #f6fff9;
+  --hero-muted: #b8cec5;
+  --data-bg: #e3f3ed;
+  --notice-bg: #fff0e7;
+  --insight-bg: #eee7f8;
+  --translation-bg: #fffdf8;
+  --shadow: 0 18px 50px rgba(31, 49, 41, 0.12);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0f1513;
+    --surface: #151d1a;
+    --card: #19231f;
+    --ink: #e5eee9;
+    --muted: #9aaba3;
+    --line: #304039;
+    --accent: #52c7a7;
+    --accent2: #69aee8;
+    --accent3: #ef9365;
+    --accent4: #bb91ec;
+    --data: #52c7a7;
+    --risk: #f07b72;
+    --opportunity: #69aee8;
+    --conclusion: #bb91ec;
+    --hl: #164c3d;
+    --hl2: #173f61;
+    --hl3: #5a321f;
+    --hl4: #493466;
+    --hero-bg: #0b211b;
+    --hero-ink: #e9fff5;
+    --hero-muted: #9bbcaf;
+    --data-bg: #162e27;
+    --notice-bg: #38241c;
+    --insight-bg: #29203a;
+    --translation-bg: #121916;
+    --shadow: 0 18px 50px rgba(0, 0, 0, 0.32);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0f1513;
+  --surface: #151d1a;
+  --card: #19231f;
+  --ink: #e5eee9;
+  --muted: #9aaba3;
+  --line: #304039;
+  --accent: #52c7a7;
+  --accent2: #69aee8;
+  --accent3: #ef9365;
+  --accent4: #bb91ec;
+  --data: #52c7a7;
+  --risk: #f07b72;
+  --opportunity: #69aee8;
+  --conclusion: #bb91ec;
+  --hl: #164c3d;
+  --hl2: #173f61;
+  --hl3: #5a321f;
+  --hl4: #493466;
+  --hero-bg: #0b211b;
+  --hero-ink: #e9fff5;
+  --hero-muted: #9bbcaf;
+  --data-bg: #162e27;
+  --notice-bg: #38241c;
+  --insight-bg: #29203a;
+  --translation-bg: #121916;
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.32);
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Inter, "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  line-height: 1.75;
+}
+a {
+  color: var(--accent2);
+}
+.hero {
+  padding: clamp(3.5rem, 9vw, 7.5rem) max(1.25rem, calc((100vw - 1120px) / 2));
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+  border-bottom: 6px solid var(--accent);
+}
+.eyebrow {
+  margin: 0 0 1rem;
+  color: var(--hero-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.hero h1 {
+  max-width: 850px;
+  margin: 0;
+  font-size: clamp(2.8rem, 8vw, 6.4rem);
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+.original-title {
+  margin: 1.25rem 0 0;
+  color: var(--hero-muted);
+  font-size: clamp(1rem, 2vw, 1.25rem);
+}
+.deck {
+  max-width: 780px;
+  margin: 2.5rem 0 0;
+  padding-left: 1.15rem;
+  border-left: 4px solid var(--accent3);
+  font-size: clamp(1.15rem, 2.4vw, 1.55rem);
+  line-height: 1.55;
+}
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1.4rem;
+  margin-top: 2rem;
+  color: var(--hero-muted);
+  font-size: 0.9rem;
+}
+.summary {
+  width: min(1120px, calc(100% - 2.5rem));
+  margin: 0 auto;
+  padding: 4rem 0 5rem;
+}
+.summary h2,
+.translation-inner h2 {
+  margin: 0 0 1.6rem;
+  font-size: clamp(2rem, 4.5vw, 3.3rem);
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+}
+.data-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  overflow: hidden;
+  margin: -1.25rem 0 3.5rem;
+  background: var(--data-bg);
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  box-shadow: var(--shadow);
+}
+.stat {
+  min-height: 150px;
+  padding: 1.4rem;
+  border-right: 1px solid var(--line);
+}
+.stat:last-child {
+  border-right: 0;
+}
+.stat strong {
+  display: block;
+  color: var(--data);
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  line-height: 1;
+}
+.stat span {
+  display: block;
+  margin-top: 0.75rem;
+  color: var(--muted);
+}
+.split {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 2rem;
+  align-items: start;
+  margin: 3.5rem 0;
+}
+.split h3 {
+  margin: 0;
+  color: var(--opportunity);
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  line-height: 1.15;
+}
+.explanation {
+  padding: 1.5rem 1.75rem;
+  background: var(--surface);
+  border-top: 5px solid var(--accent2);
+  box-shadow: var(--shadow);
+}
+.explanation p:first-child {
+  margin-top: 0;
+}
+.explanation p:last-child {
+  margin-bottom: 0;
+}
+.caution {
+  margin: 3.5rem 0;
+  padding: 2rem clamp(1.4rem, 4vw, 3rem);
+  background: var(--notice-bg);
+  border-left: 7px solid var(--risk);
+}
+.caution h3 {
+  margin: 0 0 0.6rem;
+  color: var(--risk);
+  font-size: 1.45rem;
+}
+.caution p {
+  margin: 0;
+  font-size: 1.08rem;
+}
+.takeaway-wrap {
+  margin-top: 3.5rem;
+}
+.takeaway-wrap h3 {
+  margin-bottom: 1.25rem;
+  font-size: 1.6rem;
+}
+.takeaways {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 1fr;
+  gap: 1rem;
+}
+.takeaway {
+  min-height: 170px;
+  padding: 1.4rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+.takeaway:nth-child(1) {
+  border-top: 5px solid var(--conclusion);
+}
+.takeaway:nth-child(2) {
+  background: var(--insight-bg);
+  border-top: 5px solid var(--opportunity);
+}
+.takeaway:nth-child(3) {
+  border-top: 5px solid var(--risk);
+}
+.takeaway b {
+  display: inline-block;
+  margin-bottom: 0.45rem;
+  color: var(--conclusion);
+}
+.mark-data,
+.mark-opportunity,
+.mark-risk,
+.mark-conclusion {
+  padding: 0.08em 0.28em;
+  border-radius: 0.22em;
+  font-weight: 750;
+}
+.mark-data {
+  background: var(--hl);
+  color: var(--data);
+}
+.mark-opportunity {
+  background: var(--hl2);
+  color: var(--opportunity);
+}
+.mark-risk {
+  background: var(--hl3);
+  color: var(--risk);
+}
+.mark-conclusion {
+  background: var(--hl4);
+  color: var(--conclusion);
+}
+#translation {
+  padding: 5rem 1.25rem;
+  background: var(--translation-bg);
+  border-top: 1px solid var(--line);
+}
+.translation-inner {
+  width: min(760px, 100%);
+  margin: 0 auto;
+}
+.translation-kicker {
+  margin-bottom: 0.6rem;
+  color: var(--accent3);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.translation-body {
+  font-family: "Noto Serif SC", "Songti SC", SimSun, serif;
+  font-size: clamp(1.05rem, 2vw, 1.18rem);
+  line-height: 1.95;
+}
+.translation-body p {
+  margin: 0 0 1.4em;
+}
+.source-figure {
+  margin: 2.75rem 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+.source-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0.75rem;
+}
+.source-figure figcaption {
+  margin-top: 0.75rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+.footer-note {
+  width: min(760px, calc(100% - 2.5rem));
+  margin: 0 auto;
+  padding: 1.5rem 0 3rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+@media (max-width: 760px) {
+  .data-strip,
+  .split,
+  .takeaways {
+    grid-template-columns: 1fr;
+  }
+  .stat {
+    min-height: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .stat:last-child {
+    border-bottom: 0;
+  }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/grok-4-5-model-card" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<header class="hero">
+<p class="eyebrow">Cursor · Research · 2026</p>
+<h1>Grok 4.5 模型卡</h1>
+<p class="original-title" lang="en">Grok 4.5 Model Card</p>
+<p class="deck">一句话总括：这则公告确认了 Grok 4.5 官方模型卡的发布及其评估范围，但没有披露任何具体分数或安全结果。</p>
+<div class="meta">
+<span>来源：Cursor</span>
+<span>日期：2026 年 7 月 14 日</span>
+<span>分类：Research</span>
+</div>
+</header>
+<main>
+<article class="summary">
+<div aria-label="文章关键信息" class="data-strip">
+<div class="stat">
+<strong>2</strong>
+<span>正文段落。内容是发布说明，不是完整评估报告。</span>
+</div>
+<div class="stat">
+<strong>2 类</strong>
+<span>明确提到的评估范围：能力 benchmark 与安全评估。</span>
+</div>
+<div class="stat">
+<strong>0</strong>
+<span>正文披露的具体分数、样本量和模型对比结果。</span>
+</div>
+</div>
+<h2>更短、更易读的总结</h2>
+<div class="split">
+<h3>发布的是评估入口，而不是评估结果</h3>
+<div class="explanation">
+<p>Cursor 宣布发布 <span class="mark-conclusion">Grok 4.5 官方模型卡</span>。文章说明，模型卡记录了能力 benchmark 和安全评估。</p>
+<p>这让读者知道官方评估覆盖哪些方面。但正文没有给出报告内容，因此这则公告本身无法证明模型更强或更安全。</p>
+</div>
+</div>
+<aside class="caution">
+<h3>数据缺口决定了解读边界</h3>
+<p>正文没有提供 <span class="mark-risk">benchmark 分数、测试样本量、对比模型、风险比例或评估方法</span>。读者可以确认模型卡已经发布，却不能据此判断 Grok 4.5 的实际表现。</p>
+</aside>
+<div class="split">
+<h3>关注点同时覆盖能力与安全</h3>
+<div class="explanation">
+<p>公告明确列出 <span class="mark-data">能力基准测试</span> 和 <span class="mark-opportunity">安全评估</span> 两个方向。</p>
+<p>这说明评价模型不应只看任务成绩。安全表现也属于官方披露框架的一部分。</p>
+</div>
+</div>
+<section class="takeaway-wrap">
+<h3>最值得带走的洞见</h3>
+<div class="takeaways">
+<div class="takeaway">
+<b>官方披露</b>
+<div>Cursor 确认发布的是 Grok 4.5 的官方模型卡。</div>
+</div>
+<div class="takeaway">
+<b>双重评估</b>
+<div>披露范围同时涉及模型能力与安全，而不是只看 benchmark。</div>
+</div>
+<div class="takeaway">
+<b>不要过度推断</b>
+<div>公告没有展示评估数据。任何性能或安全结论都需要查阅模型卡的具体内容。</div>
+</div>
+</div>
+</section>
+</article>
+<section id="translation">
+<div class="translation-inner">
+<p class="translation-kicker">Original text · 全文翻译</p>
+<h2>完整译文</h2>
+<div class="translation-body">
+<p>我们正式发布 Grok 4.5 的官方模型卡。</p>
+<p>其中记录了该模型的能力基准测试结果和安全评估。</p>
+<figure class="source-figure" data-source-image="0"><img alt="Grok 4.5 Model Card" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Ffeatures%2Fgrok-4-5-model-card-WAzOsvw1TON80GwCenFUtQ8VJ3Ihln.png&amp;w=1920&amp;q=70" width="800"/></figure>
+</div>
+</div>
+</section>
+</main>
+<footer class="footer-note">
+  原文：Cursor，2026 年 7 月 14 日
+</footer>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
