@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>智能体 AI 时代的科学计算</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #f5f2eb;
+  --paper: #fffdf8;
+  --ink: #172028;
+  --muted: #637078;
+  --line: #d8d4ca;
+  --accent: #176b87;
+  --accent2: #c55238;
+  --accent3: #6b55a4;
+  --accent4: #23835b;
+  --data-bg: #dceff5;
+  --risk-bg: #f9dfd7;
+  --opportunity-bg: #dff1e7;
+  --conclusion-bg: #e8e1f4;
+  --hero-bg: #102b38;
+  --hero-ink: #f3fbff;
+  --hero-muted: #b8d7e2;
+  --strip-bg: #172028;
+  --strip-ink: #f7f4ec;
+  --quote-bg: #f1e8d1;
+  --translation-bg: #fffdf8;
+  --hl: #ffe29a;
+  --hl2: #bde8d1;
+  --shadow: 0 18px 50px rgba(27, 39, 48, .10);
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f5f2eb;
+  --paper: #fffdf8;
+  --ink: #172028;
+  --muted: #637078;
+  --line: #d8d4ca;
+  --accent: #176b87;
+  --accent2: #c55238;
+  --accent3: #6b55a4;
+  --accent4: #23835b;
+  --data-bg: #dceff5;
+  --risk-bg: #f9dfd7;
+  --opportunity-bg: #dff1e7;
+  --conclusion-bg: #e8e1f4;
+  --hero-bg: #102b38;
+  --hero-ink: #f3fbff;
+  --hero-muted: #b8d7e2;
+  --strip-bg: #172028;
+  --strip-ink: #f7f4ec;
+  --quote-bg: #f1e8d1;
+  --translation-bg: #fffdf8;
+  --hl: #ffe29a;
+  --hl2: #bde8d1;
+  --shadow: 0 18px 50px rgba(27, 39, 48, .10);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0d1318;
+    --paper: #151e24;
+    --ink: #e6edf0;
+    --muted: #a2b0b8;
+    --line: #34434c;
+    --accent: #55c2e6;
+    --accent2: #ff856e;
+    --accent3: #b69bf1;
+    --accent4: #62d59d;
+    --data-bg: #123442;
+    --risk-bg: #3b211f;
+    --opportunity-bg: #17372b;
+    --conclusion-bg: #2d2544;
+    --hero-bg: #081e29;
+    --hero-ink: #edfaff;
+    --hero-muted: #9ec9d9;
+    --strip-bg: #202b32;
+    --strip-ink: #eef2f3;
+    --quote-bg: #322d20;
+    --translation-bg: #151e24;
+    --hl: #805b00;
+    --hl2: #145c3c;
+    --shadow: 0 18px 50px rgba(0, 0, 0, .34);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0d1318;
+  --paper: #151e24;
+  --ink: #e6edf0;
+  --muted: #a2b0b8;
+  --line: #34434c;
+  --accent: #55c2e6;
+  --accent2: #ff856e;
+  --accent3: #b69bf1;
+  --accent4: #62d59d;
+  --data-bg: #123442;
+  --risk-bg: #3b211f;
+  --opportunity-bg: #17372b;
+  --conclusion-bg: #2d2544;
+  --hero-bg: #081e29;
+  --hero-ink: #edfaff;
+  --hero-muted: #9ec9d9;
+  --strip-bg: #202b32;
+  --strip-ink: #eef2f3;
+  --quote-bg: #322d20;
+  --translation-bg: #151e24;
+  --hl: #805b00;
+  --hl2: #145c3c;
+  --shadow: 0 18px 50px rgba(0, 0, 0, .34);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.75;
+}
+main { overflow: hidden; }
+.hero {
+  padding: clamp(3rem, 8vw, 7rem) max(1.5rem, calc((100vw - 1120px) / 2));
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+}
+.eyebrow {
+  margin: 0 0 1rem;
+  color: var(--accent);
+  font-size: .82rem;
+  font-weight: 800;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+}
+.hero h1 {
+  max-width: 900px;
+  margin: 0;
+  font-size: clamp(2.5rem, 7vw, 5.8rem);
+  line-height: 1.05;
+  letter-spacing: -.045em;
+}
+.original-title {
+  max-width: 760px;
+  margin: 1rem 0 0;
+  color: var(--hero-muted);
+  font-family: Georgia, serif;
+  font-size: clamp(1rem, 2vw, 1.3rem);
+}
+.dek {
+  max-width: 800px;
+  margin: 2.2rem 0 0;
+  border-left: 5px solid var(--accent4);
+  padding-left: 1.2rem;
+  font-size: clamp(1.18rem, 2.3vw, 1.55rem);
+  font-weight: 650;
+}
+.number-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--strip-bg);
+  color: var(--strip-ink);
+}
+.stat {
+  min-height: 160px;
+  padding: 1.6rem;
+  border-right: 1px solid var(--line);
+}
+.stat:last-child { border-right: 0; }
+.stat strong {
+  display: block;
+  color: var(--accent);
+  font-size: clamp(2rem, 5vw, 3.8rem);
+  line-height: 1;
+}
+.stat:nth-child(2) strong { color: var(--accent4); }
+.stat:nth-child(3) strong { color: var(--accent3); }
+.stat:nth-child(4) strong { color: var(--accent2); }
+.stat span {
+  display: block;
+  margin-top: .7rem;
+  color: var(--muted);
+  font-size: .95rem;
+}
+.summary-wrap {
+  width: min(1120px, calc(100% - 3rem));
+  margin: 4rem auto 6rem;
+}
+.summary-wrap h2 {
+  margin: 0 0 2rem;
+  font-size: clamp(2rem, 4vw, 3.3rem);
+}
+.split {
+  display: grid;
+  grid-template-columns: 1.1fr .9fr;
+  gap: 1.5rem;
+}
+.split article {
+  padding: 2rem;
+  border-top: 7px solid var(--accent);
+  background: var(--data-bg);
+}
+.split aside {
+  padding: 2rem;
+  border: 1px solid var(--line);
+  border-left: 7px solid var(--accent2);
+  background: var(--risk-bg);
+}
+.split h3, .process h3, .stewardship h3 { margin-top: 0; }
+mark {
+  padding: .08em .25em;
+  background: var(--hl);
+  color: var(--ink);
+}
+mark.alt { background: var(--hl2); }
+.process {
+  margin: 2.5rem 0;
+  padding: 2.2rem;
+  background: var(--opportunity-bg);
+}
+.flow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: 1.5rem;
+}
+.flow div {
+  position: relative;
+  padding: 1rem 1.2rem 1rem 2.7rem;
+  border-top: 3px solid var(--accent4);
+}
+.flow div::before {
+  position: absolute;
+  top: -.75rem;
+  left: 0;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 50%;
+  background: var(--accent4);
+  color: var(--paper);
+  content: attr(data-step);
+  font-size: .75rem;
+  line-height: 1.35rem;
+  text-align: center;
+}
+.insight-band {
+  margin: 0 calc(50% - 50vw);
+  padding: 3rem max(1.5rem, calc((100vw - 960px) / 2));
+  background: var(--conclusion-bg);
+  text-align: center;
+}
+.insight-band p {
+  margin: 0;
+  color: var(--accent3);
+  font-family: Georgia, "Noto Serif SC", serif;
+  font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.45;
+}
+.stewardship {
+  margin: 2.5rem 0;
+  padding: 2rem 2.2rem;
+  border: 1px solid var(--line);
+  border-left: 9px solid var(--accent2);
+  background: var(--paper);
+  box-shadow: var(--shadow);
+}
+.takeaways h3 { font-size: 1.8rem; }
+.mosaic {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+}
+.tile {
+  grid-column: span 3;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background: var(--data-bg);
+}
+.tile:nth-child(2) {
+  grid-column: span 3;
+  background: var(--risk-bg);
+}
+.tile:nth-child(3) {
+  grid-column: span 2;
+  background: var(--opportunity-bg);
+}
+.tile:nth-child(4) {
+  grid-column: span 4;
+  background: var(--conclusion-bg);
+}
+.tile strong {
+  display: block;
+  margin-bottom: .4rem;
+  color: var(--accent);
+}
+.tile:nth-child(2) strong { color: var(--accent2); }
+.tile:nth-child(3) strong { color: var(--accent4); }
+.tile:nth-child(4) strong { color: var(--accent3); }
+#translation {
+  width: min(780px, calc(100% - 3rem));
+  margin: 0 auto;
+  padding: 5rem 0 7rem;
+  background: var(--translation-bg);
+}
+#translation::before {
+  display: block;
+  width: 72px;
+  height: 7px;
+  margin-bottom: 1.5rem;
+  background: var(--accent);
+  content: "";
+}
+#translation h2 {
+  margin: 0 0 2.5rem;
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+}
+#translation h3 {
+  margin: 3.2rem 0 1rem;
+  color: var(--accent);
+  font-size: 1.75rem;
+  line-height: 1.3;
+}
+#translation p { margin: 0 0 1.35rem; }
+.lead {
+  color: var(--muted);
+  font-size: 1.15rem;
+}
+blockquote {
+  margin: 2.5rem 0;
+  padding: 1.6rem 2rem;
+  border-left: 6px solid var(--accent3);
+  background: var(--quote-bg);
+  font-family: Georgia, "Noto Serif SC", serif;
+  font-size: 1.18rem;
+}
+blockquote footer {
+  margin-top: .8rem;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: .9rem;
+}
+.source-figure {
+  margin: 2.8rem 0;
+  text-align: center;
+}
+.source-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: .7rem;
+}
+.source-figure figcaption {
+  margin-top: .75rem;
+  color: var(--muted);
+  font-size: .88rem;
+}
+.meta {
+  margin-top: 4rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+}
+@media (max-width: 760px) {
+  .number-strip { grid-template-columns: repeat(2, 1fr); }
+  .stat:nth-child(2) { border-right: 0; }
+  .split { grid-template-columns: 1fr; }
+  .flow { grid-template-columns: 1fr; gap: 1rem; }
+  .mosaic { grid-template-columns: 1fr; }
+  .tile, .tile:nth-child(2), .tile:nth-child(3), .tile:nth-child(4) { grid-column: auto; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/scientific-computing-agentic-ai" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header class="hero">
+<p class="eyebrow">OpenAI · Publication · 2026</p>
+<h1>智能体 AI 时代的科学计算</h1>
+<p class="original-title" lang="en">Scientific computing in the age of agentic AI</p>
+<p class="dek">一句话总括：编程智能体正在把科学家的工作重心从代码实现推向目标定义、科学验证与长期治理，从而扩大小型研究团队能够承担的软件工程规模。</p>
+</header>
+<section aria-label="关键数字" class="number-strip">
+<div class="stat"><strong>8</strong><span>个智能体辅助的科学计算项目</span></div>
+<div class="stat"><strong>5</strong><span>个项目仅使用 Codex</span></div>
+<div class="stat"><strong>3</strong><span>个项目结合 Codex 与 Claude Code</span></div>
+<div class="stat"><strong>4 类</strong><span>维护、优化、语言迁移与 GPU 原生重构</span></div>
+</section>
+<section aria-labelledby="summary-title" class="summary-wrap">
+<h2 id="summary-title">更短、更易读的中文总结</h2>
+<div class="split">
+<article>
+<h3>工程能力不再是唯一瓶颈</h3>
+<p>报告研究了 <mark>8 个真实项目</mark>。它们以生命科学为主，工作范围从日常维护一直延伸到 GPU 原生重构。</p>
+<p>智能体能快速完成边界清晰的工程任务。这让小团队有机会推进过去需要更多时间或专业工程人员才能承担的项目。</p>
+<p><strong>洞见：</strong>AI 扩大的不只是编码速度，也扩大了研究团队可以设想和尝试的工程范围。</p>
+</article>
+<aside>
+<h3>瓶颈转移到了科学验证</h3>
+<p>智能体无法稳定判断结果是否符合科学规律。即使代码存在明显错误，它也可能表现得很有信心。</p>
+<p>最可靠的验收方法依赖外部参照。例如精确输出一致、与现有工具等价、统计行为合理，或用模拟数据预先确定正确答案。</p>
+<p><strong>结论：</strong><mark>人工判断仍是质量上限</mark>。生成速度不能替代科学有效性。</p>
+</aside>
+</div>
+<section class="process">
+<h3>有效工作方式是分阶段迭代</h3>
+<p>这些项目通常没有采用一次性交付。研究人员把大目标拆成小改动，再用测试和 benchmark 持续反馈。</p>
+<div aria-label="智能体辅助开发流程" class="flow">
+<div data-step="1"><strong>定义目标</strong><br/>明确要解决的科学和工程问题。</div>
+<div data-step="2"><strong>拆分任务</strong><br/>把宽泛目标变成边界清楚的改动。</div>
+<div data-step="3"><strong>测量结果</strong><br/>用基准、测试和外部参照检查正确性。</div>
+<div data-step="4"><strong>处理最后一公里</strong><br/>修复边界情况与细微数值差异。</div>
+</div>
+<p><strong>洞见：</strong>智能体通常能很快给出初版，但<mark class="alt">边界情况和细微数值差异</mark>会消耗更多时间。最后一公里往往最费力。</p>
+</section>
+<div class="insight-band">
+<p>研究人员的角色正在从“亲自实现”转向“验证与编排”。人仍然决定科学方向，也仍然掌握发布标准。</p>
+</div>
+<section class="stewardship">
+<h3>代码生成得更便宜，长期治理反而更重要</h3>
+<p>低成本重写可能产生许多相似工具。这会分散用户，也会稀释维持可靠性所需的专家精力。</p>
+<p>MHCflurry 和 cyvcf2 的改动进入了原有上游项目。原项目已经废弃的 rustar-aligner 则转由新社区维护。</p>
+<p><strong>结论：</strong>成熟软件包含未写入文档的约定、兼容要求和用户信任。仅仅翻译或重写源代码，无法复制这些资产。新实现必须有明确负责人和可信的维护计划。</p>
+</section>
+<section class="takeaways">
+<h3>最值得带走的洞见</h3>
+<div class="mosaic">
+<div class="tile"><strong>实现成本显著下降</strong>智能体已经能加速维护、迁移、优化和新实现，尤其适合边界清楚的任务。</div>
+<div class="tile"><strong>可信度不会自动随速度提高</strong>智能体可能自信地交付错误结果，因此必须预先设计可测量的验收标准。</div>
+<div class="tile"><strong>迭代优于一次性交付</strong>拆分目标、运行 benchmark、收集反馈，再逐步修正，是案例中反复出现的有效模式。</div>
+<div class="tile"><strong>长期价值取决于人</strong>真正决定科学影响的，是研究人员选择做什么、如何验证，以及由谁持续维护。更多软件不等于更可靠的科学基础设施。</div>
+</div>
+</section>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<p class="lead">一份实地报告展示了科学家如何使用编程智能体，对基因组学及其他数据密集型领域的科学软件进行现代化改造。</p>
+<h3>案例研究</h3>
+<h3>反复出现的主题</h3>
+<h3>长期维护仍不可或缺</h3>
+<h3>迈向更持久的科学软件</h3>
+<h3>案例研究</h3>
+<figure class="source-figure" data-source-image="0"><img alt="Diagram mapping agent-assisted scientific software projects across a spectrum from maintenance to workflow redesign." decoding="async" height="276" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/1l4AGq9PGmoCMR6wqKwTBY/2f21781b97f5fab792d74e44907feb69/diagram1-desktop-light.svg?w=3840&amp;q=90" width="802"/></figure>
+<h3>反复出现的主题</h3>
+<h3>长期维护仍不可或缺</h3>
+<h3>迈向更持久的科学软件</h3>
+<p>科学计算是现代学术研究和产业研发的核心支柱。然而，分析科学信息所需的软件一直难以跟上数据快速增长的步伐。</p>
+<p>许多广泛使用的研究工具最初只是研究论文的配套代码。它们通常由小型学术团队开发。团队的工程经验有限，也几乎没有时间处理软件打包、测试、优化或长期支持。</p>
+<p>结果是，科学基础设施经常依赖缓慢而脆弱的工作流程，还需要持续维护。这些限制拖慢了科学发现的速度。</p>
+<p>AI 智能体正在开始改变这种局面。它们降低了工程工作的成本，也能接手烦琐的实现任务。因此，研究人员可以更快地验证想法，推进过去不切实际的项目，也能更轻松地长期维护软件。</p>
+<p>由此产生的科学软件效率更高，维护也更完善。研究人员因此能把更多时间投入科学发现。</p>
+<p>我们在此分享一份探索性实地报告。报告涵盖 8 个由智能体协助的科学计算项目，主要来自生命科学领域。其中 5 个仅使用 Codex，另外 3 个同时使用 Codex 和 Claude Code。</p>
+<p>报告汇集了各项目团队撰写的案例研究，并归纳出反复出现的主题。这些项目覆盖日常维护、定向优化、大规模编程语言迁移和 GPU 原生重构。</p>
+<p>参与者表示，智能体显著加快了软件开发和维护。在一些项目中，小团队借助智能体完成了原本需要更多时间或专业工程支持的工作。</p>
+<p>不过，他们也强调了一个持续存在的难题：必须为这些工具建立清晰且长期的责任归属与维护机制。</p>
+<p>参与者反复提到，研究人员的角色正从具体实现转向验证和编排。他们需要说明要构建什么，定义如何衡量正确性，并判断项目何时可以发布。</p>
+<p>在这种新模式中，研究人员仍然掌握科学方向和质量标准。智能体提供的协助则提高了推进速度。</p>
+<h3>案例研究</h3>
+<h3>对广泛使用的基因组数据解析库进行现代化改造</h3>
+<p>cyvcf2 是一个用于读写基因组变异文件的 Python 库。GPT‑5.5 用现代化的统一流程替换了该库原有的构建和打包系统，使其更容易安装、测试和发布。</p>
+<blockquote>
+    有了编程智能体，快速推进相当容易。但至少在现阶段，科学研究若想走得更远，仍然需要专家的指导、理解、品位与严谨态度。
+    <footer>——Brent Pedersen</footer>
+</blockquote>
+<h3>反复出现的主题</h3>
+<p>尽管这些项目的范围差异很大，它们共同表明：在科学计算中，工程人力和专业能力正在变得不那么稀缺。新的瓶颈是验证 AI 智能体的输出，而这仍然依赖人的判断。</p>
+<p>在各个案例中，智能体能有效处理具体且范围明确的请求。但它们无法可靠判断自己的工作在科学上是否有效，也不能稳定判断成果是否达到预期。</p>
+<p>事实上，即使工作中存在明显错误，智能体也经常表现得很有信心。因此，人工审查者必须寻找可靠的方法来验证结果。</p>
+<p>最有效的方法会采用外部参照或可测量的验收目标。例如要求输出完全一致，与现有工具保持等价，呈现合理的统计行为，或使用模拟数据预先确定正确答案。</p>
+<p>另一个反复出现的主题是，这些项目通常采用由反馈驱动的分阶段迭代，而不是试图一次性完成。</p>
+<p>参与者把宽泛的目标拆成较小的改动，再使用中间 benchmark 和测试系统评估智能体的工作，并据此继续改进。</p>
+<p>智能体往往能快速完成初步实现。然而，解决边界情况和细微的数值差异需要更长时间。实现工作的“最后一公里”通常最为费力。</p>
+<p>总体来看，这些案例表明，智能体正在帮助研究人员减少花在具体实现上的时间，把更多精力用于引导科学工作。</p>
+<p>人负责定义目标，把复杂项目拆成可管理的部分，并判断结果在科学上是否有效。</p>
+<p>智能体缓解了长期存在的工程限制。这扩大了研究人员能够构建的项目范围，也让他们可以专注于最重要的科学问题和决策。</p>
+<h3>长期维护仍不可或缺</h3>
+<p>研究软件长期存在维护缺口。这不仅拖慢了迭代，也限制了研究的可复现性和可靠性。</p>
+<p>针对“研究代码”和组学工具的已发表研究发现，公开发布的软件经常无法在全新的计算环境中正确安装，也不能按照文档说明运行。研究人员因此不得不花费大量时间进行配置和调试。</p>
+<p>即使只是常规改进，也能节省研究人员的时间并降低计算需求。以性能为目标的重构和重写则可能带来更大的收益。</p>
+<p>但是，实现成本下降也会让人们更容易制作大量相似的重写版本。这会分散用户，也会摊薄维持任何一款工具可靠运行所需的专家精力。</p>
+<p>因此，长期维护和贡献归属至关重要。成熟的科学软件包含许多未写入文档的约定、兼容性要求和用户信任。仅仅转换源代码无法复制这些要素。</p>
+<p>这些案例展示了几条可能的前进路径。MHCflurry 和 cyvcf2 的改动被合并进原有上游项目。由于原项目已被放弃，rustar-aligner 则转由新的社区负责维护。</p>
+<p>如果能够与现有维护者协调，就应尽早开始合作。如果确实需要独立实现，就必须明确负责人，并制定可信的维护计划。</p>
+<p>否则，今天的现代化重写版本可能成为明天无人维护的代码，而不是可靠的科学基础设施。</p>
+<h3>迈向更持久的科学软件</h3>
+<p>这份实地报告采用回顾性和探索性视角。不过，案例研究显示，科学软件的开发方式正在发生一种务实的转变。</p>
+<p>Codex 等编程智能体可以显著降低维护、迁移、优化和全新实现的成本。</p>
+<p>但它们能否产生长期科学价值，仍然取决于人的决定。人需要判断应该构建什么、如何验证，以及由谁负责维护。</p>
+<p>更深层的变化并不只是研究人员可以生产更多软件，而是他们能把更多精力用于定义、验证和维护这些工具。</p>
+<p>这些案例表明，智能体现在已经能够加快科学计算的迭代速度。</p>
+<p>随着编程智能体不断进步，研究人员可以减少维持分析流程运转的时间，把更多时间用于推动各自领域的发展。</p>
+<div class="meta">
+<p>2026</p>
+<p>软件与工程</p>
+<p>作者</p>
+<h3>继续阅读</h3>
+</div>
+<figure class="source-figure" data-source-image="1"><img alt="GPT-Red art card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/6q32m87ClqE8Ovn6vD424h/05ced72e47bbe42711fbac6a082cbff2/Art_Card.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="2"><img alt="Separating signal from noise &gt; Art Card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/7j6M3prKIsTmV6cbMaHjhZ/e66f7cdd98c66c99546853cbc22cfe84/Seperating-signal-from-noise-card.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="3"><img alt="Introducing GeneBench-Pro &gt; Cover image" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/7sbJaKBi5qLXAqbewh72aK/93197556e903eac9df6f077eb12b7581/GenebenchPro_Blog_ArtCard.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
