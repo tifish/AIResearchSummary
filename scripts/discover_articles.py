@@ -195,6 +195,10 @@ def title_from_openai_text(text: str, category: str, date_text: str) -> tuple[st
     if not text:
         return "", ""
 
+    taxonomy_labels = ("Company", *OPENAI_CATEGORIES)
+    taxonomy_pattern = "|".join(re.escape(label) for label in taxonomy_labels)
+    text = re.sub(rf"\s+-\s+(?:{taxonomy_pattern})\s+-\s*$", "", text, flags=re.IGNORECASE)
+
     aria_suffix = f" - {category} - {date_text}"
     if category and date_text and text.endswith(aria_suffix):
         return clean_text(text[: -len(aria_suffix)]), ""
