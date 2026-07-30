@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>我们如何搭建云端智能体环境</title>
+<style>
+:root {
+  --bg: #f5f7fb;
+  --surface: #ffffff;
+  --card: #eef3fa;
+  --ink: #172033;
+  --muted: #667085;
+  --line: #d8dfeb;
+  --accent: #087ea4;
+  --accent2: #b85c18;
+  --accent3: #16784a;
+  --accent4: #7552b8;
+  --accent-ink: #ffffff;
+  --data-bg: #dff4fb;
+  --risk-bg: #fff0df;
+  --opportunity-bg: #e3f6eb;
+  --conclusion-bg: #eee8fb;
+  --deep-bg: #17243a;
+  --deep-ink: #f4f7fc;
+  --deep-muted: #bdc9da;
+  --hl: #c9f0fb;
+  --hl2: #ffe0bb;
+  --quote-bg: #f0eafb;
+  --translation-bg: #ffffff;
+  --figure-bg: #e8edf5;
+  --shadow: 0 18px 50px rgba(23, 32, 51, 0.10);
+}
+:root[data-theme="light"] {
+  --bg: #f5f7fb;
+  --surface: #ffffff;
+  --card: #eef3fa;
+  --ink: #172033;
+  --muted: #667085;
+  --line: #d8dfeb;
+  --accent: #087ea4;
+  --accent2: #b85c18;
+  --accent3: #16784a;
+  --accent4: #7552b8;
+  --accent-ink: #ffffff;
+  --data-bg: #dff4fb;
+  --risk-bg: #fff0df;
+  --opportunity-bg: #e3f6eb;
+  --conclusion-bg: #eee8fb;
+  --deep-bg: #17243a;
+  --deep-ink: #f4f7fc;
+  --deep-muted: #bdc9da;
+  --hl: #c9f0fb;
+  --hl2: #ffe0bb;
+  --quote-bg: #f0eafb;
+  --translation-bg: #ffffff;
+  --figure-bg: #e8edf5;
+  --shadow: 0 18px 50px rgba(23, 32, 51, 0.10);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d121c;
+    --surface: #151c29;
+    --card: #1b2535;
+    --ink: #e7edf7;
+    --muted: #a5b0c1;
+    --line: #334055;
+    --accent: #55c8ec;
+    --accent2: #f2a35d;
+    --accent3: #59ce91;
+    --accent4: #b89aed;
+    --accent-ink: #081018;
+    --data-bg: #102f3b;
+    --risk-bg: #382718;
+    --opportunity-bg: #153426;
+    --conclusion-bg: #2b2341;
+    --deep-bg: #080d15;
+    --deep-ink: #edf3fc;
+    --deep-muted: #a9b7ca;
+    --hl: #164558;
+    --hl2: #55381d;
+    --quote-bg: #28213b;
+    --translation-bg: #111823;
+    --figure-bg: #1a2433;
+    --shadow: 0 18px 50px rgba(0, 0, 0, 0.34);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d121c;
+  --surface: #151c29;
+  --card: #1b2535;
+  --ink: #e7edf7;
+  --muted: #a5b0c1;
+  --line: #334055;
+  --accent: #55c8ec;
+  --accent2: #f2a35d;
+  --accent3: #59ce91;
+  --accent4: #b89aed;
+  --accent-ink: #081018;
+  --data-bg: #102f3b;
+  --risk-bg: #382718;
+  --opportunity-bg: #153426;
+  --conclusion-bg: #2b2341;
+  --deep-bg: #080d15;
+  --deep-ink: #edf3fc;
+  --deep-muted: #a9b7ca;
+  --hl: #164558;
+  --hl2: #55381d;
+  --quote-bg: #28213b;
+  --translation-bg: #111823;
+  --figure-bg: #1a2433;
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.34);
+}
+* {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.75;
+}
+main {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+}
+.hero {
+  margin: 28px 0 0;
+  padding: clamp(34px, 7vw, 84px);
+  border-radius: 30px 30px 8px 8px;
+  background: var(--deep-bg);
+  color: var(--deep-ink);
+  box-shadow: var(--shadow);
+}
+.eyebrow {
+  margin: 0 0 18px;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.hero h1 {
+  max-width: 840px;
+  margin: 0;
+  font-size: clamp(2.3rem, 6vw, 5.4rem);
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+}
+.original-title {
+  max-width: 760px;
+  margin: 18px 0 0;
+  color: var(--deep-muted);
+  font-size: clamp(1rem, 2vw, 1.25rem);
+}
+.one-line {
+  max-width: 850px;
+  margin: 40px 0 0;
+  padding-left: 18px;
+  border-left: 4px solid var(--accent3);
+  font-size: clamp(1.18rem, 2.4vw, 1.65rem);
+  font-weight: 650;
+}
+.metric-strip {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: stretch;
+  margin: 0;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+.metric {
+  padding: 38px clamp(22px, 5vw, 58px);
+}
+.metric strong {
+  display: block;
+  color: var(--accent);
+  font-size: clamp(2.4rem, 7vw, 5.2rem);
+  line-height: 1;
+}
+.metric:last-child strong {
+  color: var(--accent3);
+}
+.metric span {
+  display: block;
+  margin-top: 12px;
+  color: var(--muted);
+}
+.metric-arrow {
+  align-self: center;
+  color: var(--accent2);
+  font-size: 2.4rem;
+  font-weight: 800;
+}
+.summary-grid {
+  display: grid;
+  grid-template-columns: 0.92fr 1.08fr;
+  gap: 20px;
+  padding: 54px 0 20px;
+}
+.summary-grid > article {
+  padding: 34px;
+  border: 1px solid var(--line);
+}
+.problem {
+  background: var(--risk-bg);
+  border-radius: 26px 6px 26px 6px;
+  border-left: 6px solid var(--accent2) !important;
+}
+.solution {
+  background: var(--opportunity-bg);
+  border-radius: 6px 26px 6px 26px;
+  border-top: 6px solid var(--accent3) !important;
+}
+.summary-grid h2,
+.flow h2,
+.takeaways h2 {
+  margin-top: 0;
+  line-height: 1.25;
+}
+.summary-grid p:last-child {
+  margin-bottom: 0;
+}
+.flow {
+  margin: 28px 0;
+  padding: 42px;
+  background: var(--surface);
+  border-top: 5px solid var(--accent);
+  border-bottom: 5px solid var(--accent4);
+}
+.flow-line {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-top: 28px;
+}
+.flow-step {
+  position: relative;
+  min-height: 170px;
+  padding: 24px 20px;
+  background: var(--card);
+  border-radius: 16px;
+}
+.flow-step b {
+  display: inline-grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent4);
+  color: var(--accent-ink);
+}
+.flow-step h3 {
+  margin: 16px 0 8px;
+}
+.flow-step p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+.insight-band {
+  margin: 36px 0;
+  padding: 48px clamp(26px, 6vw, 72px);
+  background: var(--conclusion-bg);
+  border-left: 9px solid var(--accent4);
+}
+.insight-band blockquote {
+  margin: 0;
+  font-size: clamp(1.3rem, 3vw, 2.15rem);
+  font-weight: 720;
+  line-height: 1.45;
+}
+.insight-band p {
+  max-width: 800px;
+  margin: 18px 0 0;
+  color: var(--muted);
+}
+.takeaways {
+  margin: 28px 0 70px;
+}
+.takeaway-mosaic {
+  display: grid;
+  grid-template-columns: 1.25fr 0.75fr;
+  gap: 16px;
+}
+.takeaway {
+  padding: 25px 28px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+.takeaway:nth-child(1) {
+  grid-row: span 2;
+  background: var(--data-bg);
+  border-top: 6px solid var(--accent);
+}
+.takeaway:nth-child(2) {
+  border-right: 6px solid var(--accent2);
+}
+.takeaway:nth-child(3) {
+  background: var(--opportunity-bg);
+  border-bottom: 6px solid var(--accent3);
+}
+.takeaway:nth-child(4) {
+  grid-column: 1 / -1;
+  background: var(--quote-bg);
+  border-left: 6px solid var(--accent4);
+}
+.takeaway strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 1.08rem;
+}
+.hl {
+  padding: 0.08em 0.28em;
+  background: var(--hl);
+  color: var(--ink);
+  font-weight: 760;
+}
+.hl2 {
+  padding: 0.08em 0.28em;
+  background: var(--hl2);
+  color: var(--ink);
+  font-weight: 760;
+}
+#translation {
+  width: min(800px, 100%);
+  margin: 0 auto 80px;
+  padding: clamp(28px, 6vw, 64px);
+  background: var(--translation-bg);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+#translation h2 {
+  margin: 0 0 36px;
+  padding-bottom: 18px;
+  border-bottom: 4px solid var(--accent);
+  font-size: clamp(1.9rem, 4vw, 2.8rem);
+  line-height: 1.2;
+}
+#translation h3 {
+  margin: 54px 0 20px;
+  color: var(--accent4);
+  font-size: 1.55rem;
+  line-height: 1.3;
+}
+#translation p,
+#translation li {
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-size: 1.06rem;
+}
+#translation nav {
+  margin: 0 0 38px;
+  padding: 24px 28px;
+  background: var(--card);
+  border-left: 5px solid var(--accent2);
+}
+#translation nav h3 {
+  margin: 0 0 12px;
+  color: var(--ink);
+  font-size: 1.1rem;
+}
+#translation nav ol {
+  margin: 0;
+  padding-left: 1.35rem;
+}
+.chart-label {
+  margin: 24px 0 40px;
+  padding: 14px 18px;
+  background: var(--data-bg);
+  border-left: 4px solid var(--accent);
+  color: var(--muted);
+  font-size: 0.94rem !important;
+  font-weight: 700;
+}
+.source-figure {
+  margin: 38px 0 44px;
+  padding: 14px;
+  background: var(--figure-bg);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+.source-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+.source-figure figcaption {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-align: center;
+}
+.questions {
+  margin: 24px 0;
+  padding: 24px 30px;
+  background: var(--opportunity-bg);
+  border-left: 5px solid var(--accent3);
+}
+.questions li + li {
+  margin-top: 12px;
+}
+@media (max-width: 760px) {
+  main {
+    width: min(100% - 20px, 1120px);
+  }
+  .hero {
+    margin-top: 10px;
+    border-radius: 20px 20px 6px 6px;
+  }
+  .metric-strip,
+  .summary-grid,
+  .flow-line,
+  .takeaway-mosaic {
+    grid-template-columns: 1fr;
+  }
+  .metric-arrow {
+    justify-self: center;
+    transform: rotate(90deg);
+  }
+  .summary-grid {
+    padding-top: 28px;
+  }
+  .takeaway:nth-child(1),
+  .takeaway:nth-child(4) {
+    grid-row: auto;
+    grid-column: auto;
+  }
+  .flow {
+    padding: 28px 18px;
+  }
+  #translation {
+    padding: 28px 20px;
+  }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+  <style id="airs-source-image-theme-style">
+    .source-figure .source-image-dark {
+      display: none;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .source-figure .source-image-light {
+        display: none;
+      }
+      :root:not([data-theme="light"]) .source-figure .source-image-dark {
+        display: block;
+      }
+    }
+    :root[data-theme="dark"] .source-figure .source-image-light {
+      display: none;
+    }
+    :root[data-theme="dark"] .source-figure .source-image-dark {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-light {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-dark {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/cloud-agent-environment" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<section class="hero">
+<p class="eyebrow">Cursor · Research · 2026 年 7 月 30 日</p>
+<h1>我们如何搭建云端智能体环境</h1>
+<p class="original-title" lang="en">How we set up our cloud agent environment</p>
+<p class="one-line">一句话总括：Cursor 把开发环境当作面向智能体的产品，通过统一接口、端到端验证和自动修复，让云端智能体从辅助工具变成了主要代码贡献者。</p>
+</section>
+<section aria-label="关键数据" class="metric-strip">
+<div class="metric">
+<strong>约 10%</strong>
+<span>去年 12 月，云端智能体编写的已合并 PR 占比</span>
+</div>
+<div aria-hidden="true" class="metric-arrow">→</div>
+<div class="metric">
+<strong>&gt; 50%</strong>
+<span>如今由云端智能体编写的代码占比</span>
+</div>
+</section>
+<section class="summary-grid">
+<article class="problem">
+<h2>真正的瓶颈是环境</h2>
+<p>Cursor 的开发者主要使用 Mac，本地工具链却要在 Linux 云端 VM 中运行。构建命令、参数和脚本也很零散。</p>
+<p>仅靠技能文档无法消除这些复杂性。命令本身仍然容易出错，智能体还要照看长期运行的进程。</p>
+<p><span class="hl2">智能体表现不稳定，不一定代表模型能力不足。</span>它也可能只是被不一致、难以理解的环境拖住了。</p>
+</article>
+<article class="solution">
+<h2>把环境做成智能体可用的产品</h2>
+<p>团队先让云端环境与本地开发保持一致，并把关键依赖放进统一的 Dockerfile。</p>
+<p>随后，他们用 <strong>anydev</strong> 收拢服务启动和常用工具。监督进程会自动监控并重启长期构建任务。</p>
+<p>最后，<strong>Cursor Cloud MCP</strong> 和 <strong>Cloud Doctor</strong> 负责发现配置故障、分析根因，并在高置信度时提交修复 PR。</p>
+<p><span class="hl">环境开始自愈后，智能体才能稳定完成端到端测试。</span>开发者也更愿意直接合并和部署它们的代码。</p>
+</article>
+</section>
+<section class="flow">
+<h2>能力提升形成了一条闭环</h2>
+<div class="flow-line">
+<article class="flow-step">
+<b>1</b>
+<h3>匹配本地环境</h3>
+<p>让 Ubuntu VM 获得开发者日常使用的依赖、数据和安全访问能力。</p>
+</article>
+<article class="flow-step">
+<b>2</b>
+<h3>简化操作接口</h3>
+<p>用 anydev 统一启动服务、调用工具，并管理长期运行的任务。</p>
+</article>
+<article class="flow-step">
+<b>3</b>
+<h3>自主测试证明</h3>
+<p>智能体运行端到端流程，录制演示，并向用户证明改动正确。</p>
+</article>
+<article class="flow-step">
+<b>4</b>
+<h3>诊断并持续修复</h3>
+<p>Cloud Doctor 从失败轨迹中发现系统性问题，再修正技能、命令或环境。</p>
+</article>
+</div>
+</section>
+<aside class="insight-band">
+<blockquote>模型需要的并不只是更多操作说明，而是一条更短、更稳定、能够自行恢复的成功路径。</blockquote>
+<p>这改变了理解 AI 编码能力的方式。衡量模型时，不能把环境质量视为固定背景。环境本身会决定智能体能否运行代码、验证结果，并获得开发者信任。</p>
+</aside>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="takeaway-mosaic">
+<article class="takeaway">
+<strong>开发环境也是产品</strong>
+        它的用户不再只有人类开发者。仓库结构、工具接口和错误信息都要让智能体能够自行理解和操作。
+      </article>
+<article class="takeaway">
+<strong>文档不能替代简单接口</strong>
+        技能可以说明正确命令，但无法修复命令本身的复杂性和隐藏陷阱。
+      </article>
+<article class="takeaway">
+<strong>验证能力带来信任</strong>
+        当智能体可以完成端到端测试并提交录屏证明时，工程师不必在本地再次检出分支。
+      </article>
+<article class="takeaway">
+<strong>自愈机制会放大采用规模</strong>
+        环境越可靠，团队越敢把重要任务交给智能体。Cursor 的数据从<span class="hl2">约十分之一</span>增长到<span class="hl">超过一半</span>，正体现了这种反馈循环。
+      </article>
+</div>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<nav aria-label="目录">
+<h3>目录</h3>
+<ol>
+<li>让云端开发与本地开发保持一致</li>
+<li>为智能体提供更简单的接口</li>
+<li>打造可自愈的环境</li>
+<li>改善智能体的开发体验</li>
+<li>让你的开发环境为云端智能体做好准备</li>
+</ol>
+</nav>
+<p>当我们决定给云端智能体配备计算机，让它们能够测试自己的改动时，第一步就是确保它们能在我们自己的代码库中做好测试。</p>
+<p>在让 monorepo 适配云端智能体的过程中，我们意识到，开发环境本身就是一种产品，只不过它的用户是智能体。你需要让云端环境与本地开发保持一致，让仓库足够易懂，使智能体不依赖团队内部的口口相传也能运行和测试代码。随着代码库不断变化，你还要持续维护这个环境的健康状态。</p>
+<p>这个环境的建设改变了我们的工作方式。去年 12 月，云端智能体编写的代码约占 Cursor monorepo 已合并 PR 的十分之一。如今，它们编写的代码已经超过一半。</p>
+<p class="chart-label">云端智能体所编写的已合并 PR 占比，按 7 天滚动计算</p>
+<figure class="source-figure" data-source-image="0"><img alt="Cloud agents running securely in their environment" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fcloud-agents-light-87YVZRZvWMWUkZ2ztCc6hIcohupUY9.png&amp;w=1920&amp;q=70" width="800"/><img alt="Cloud agents running securely in their environment" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fcloud-agents-dark-ES43zfdrxU43nOLCVEUVDfXAbFSBWn.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<h3>让云端开发与本地开发保持一致</h3>
+<p>要让云端智能体在我们的仓库中顺利工作，第一步是确保仓库能在云端 VM 中正常运行。任何首次配置远程开发环境的工程师，都会熟悉这个阶段。</p>
+<p>大多数 Cursor 开发者都在本地 Mac 设备上工作，但我们的云端 VM 运行 Linux。因此，我们需要改造各种开发工具和设置脚本，使其不再依赖特定操作系统，并能在 Ubuntu VM 上运行。我们还把关键开发依赖加入 Cursor 定义的 Dockerfile。这个 Dockerfile 会作为云端智能体的初始镜像。</p>
+<p>我们还与安全团队合作，为云端智能体产品增加了多项安全功能。这样，用户就能放心地把必要的密钥注入智能体环境。这些功能包括限制网络出站访问、提供限定范围并经过代理的 Git 远程访问、扫描提交内容和提交信息中的密钥，以及在工具返回结果中遮盖密钥。即使智能体尝试读取密钥值，最后一项措施也能阻止它得逞。</p>
+<h3>为智能体提供更简单的接口</h3>
+<p>即使开发环境已经能在 Ubuntu VM 上运行，智能体仍然不擅长运行我们的代码。这并不意外。我们的开发体验比较混乱，开发者需要学习并记住大量构建命令、构建参数和工具脚本。</p>
+<p>我们为系统中的许多部分编写了构建和运行技能，但效果有限。技能可以记录正确的命令，可这些命令本身仍然十分复杂，其中还藏着许多容易踩中的陷阱。</p>
+<p>为了降低复杂度，我们开发了一个名为 <strong>anydev</strong> 的 CLI。智能体可以用它启动所有服务。我们也通过 anydev 调用常用工具脚本，并为它配置了多个 <code>--help</code> 菜单，用来解释各个子命令的用法。anydev 还带有一个监督进程。它会监控并重启长期运行的构建命令，让模型完全不必承担这项工作。</p>
+<p>anydev 把开发体验简化到了足够清晰的程度，使智能体能够可靠地运行代码。技能仍会说明如何使用它，但更重要的变化是，智能体不再需要同时处理冷门的多步骤构建命令，不必躲避隐藏的陷阱，也不用持续照看长期运行的进程。</p>
+<p>从这个阶段开始，每个都拥有独立计算机的云端智能体，相比本地智能体真正体现出了额外价值。借助计算机操作能力、<code>recordScreen</code> 工具和可用的开发环境，智能体现在可以对改动进行端到端测试，并向用户证明工作成果是正确的。</p>
+<p>智能体修复错误报告后，还可以在 Slack 中分享由自己录制的演示。它们开启 PR 时也能附上这类演示。面对许多任务，工程师现在可以放心地合并和部署云端智能体编写的代码，全程无须在本地检出对应分支。</p>
+<h3>打造可自愈的环境</h3>
+<p>智能体周围的环境一直在变化。要让它保持可用，就必须持续更新环境的运行方式，以及智能体能够访问的资源。</p>
+<p>为了在环境出现故障时诊断问题并恢复运行，我们开发了 <strong>Cursor Cloud MCP</strong>。我们选择 MCP，是因为它可以提供动态发现的工具。即使工具接口发生变化，我们也不必重新构建智能体循环。云端智能体可以借助它检查自己的环境，查找设置失败、出站访问策略、已变更密钥等问题。这样，它们就能在问题出现时进行诊断和修复，让不健康的环境更快恢复。</p>
+<p>部署 Cursor Cloud MCP 后，我们又建立了一套名为 <strong>Cloud Doctor</strong> 的自动化机制。它会定期检查故障，记录哪些错误可能只是暂时性问题，哪些错误值得关注。它还会分析根本原因，并在有较高把握时开启 PR 来修复问题。</p>
+<figure class="source-figure" data-source-image="1"><img alt="Cloud Doctor opens a PR to fix an unhealthy environment" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fcloud-heal-light-yMlLRraMEnhKaeOHfHV1D2imkVt13g.png&amp;w=1920&amp;q=70" width="800"/><img alt="Cloud Doctor opens a PR to fix an unhealthy environment" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fcloud-heal-dark-PvfCh7vICeb0SxCVwLB0jLH4rtlcFt.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<h3>改善智能体的开发体验</h3>
+<p>即使环境处于健康状态，智能体有时仍会采用耗时或绕远的方式验证改动。它们可能选错技能，在 VM 中遇到本可避免的问题，或者采用不必要的漫长工作流程。</p>
+<p>在这里，我们同样会使用 Cursor Cloud MCP。Cloud Doctor 智能体会检查运行轨迹，找出另一个智能体在哪一步出了问题，哪些技能或命令容易造成误导，以及哪些工作流程总是异常缓慢。Cloud Doctor 会根据这些发现修复技能、简化操作路径，或者修改环境，让下一个智能体能更轻松地完成工作。</p>
+<p>这个循环会持续改善智能体自己的开发体验。当环境健康并具备自愈能力时，智能体的运行会更加可靠，开发者也会愿意把更重要的工作交给云端智能体。</p>
+<p>正因如此，我们才能在内部扩大云端智能体的使用规模。如今，我们发布的大部分代码都由它们编写。</p>
+<h3>让你的开发环境为云端智能体做好准备</h3>
+<p>对我们而言，云端智能体能否高效工作，主要取决于环境。要判断你的代码库是否已经准备就绪，可以先回答三个问题：</p>
+<ul class="questions">
+<li>智能体能否访问开发者会使用的同一套工具和数据？</li>
+<li>智能体能否找到准确记录开发者实际工作方式的技能？</li>
+<li>智能体能否测试并验证核心工作流程？</li>
+</ul>
+<p>如果你希望获得帮助，让自己的开发环境为云端智能体做好准备，请联系我们。</p>
+<p>如果想进一步了解，也可以阅读 Faire 如何借助云端智能体，让每周 PR 产出翻倍。</p>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

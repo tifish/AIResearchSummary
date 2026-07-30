@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>启用两项设置，如何让我们的 ARC-AGI-3 得分增至三倍</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #f4f1ea;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #17201d;
+  --muted: #66706b;
+  --line: #d9ddd7;
+  --accent: #156b5d;
+  --accent-soft: #dcefe9;
+  --accent2: #2459a6;
+  --accent2-soft: #e2ebfa;
+  --accent3: #a64b20;
+  --accent3-soft: #f8e5d9;
+  --accent4: #7952a8;
+  --accent4-soft: #eee5f8;
+  --risk: #a23545;
+  --risk-soft: #f7e1e5;
+  --opportunity: #387a32;
+  --opportunity-soft: #e2f1df;
+  --conclusion: #c27a08;
+  --conclusion-soft: #f8ebcb;
+  --deep: #132d2a;
+  --deep-ink: #f2faf7;
+  --deep-muted: #b9d0c9;
+  --hl: #ffe59a;
+  --hl2: #ccebdc;
+  --quote: #e8e2f2;
+  --shadow: rgba(21, 40, 34, 0.12);
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f4f1ea;
+  --surface: #fffdf8;
+  --card: #ffffff;
+  --ink: #17201d;
+  --muted: #66706b;
+  --line: #d9ddd7;
+  --accent: #156b5d;
+  --accent-soft: #dcefe9;
+  --accent2: #2459a6;
+  --accent2-soft: #e2ebfa;
+  --accent3: #a64b20;
+  --accent3-soft: #f8e5d9;
+  --accent4: #7952a8;
+  --accent4-soft: #eee5f8;
+  --risk: #a23545;
+  --risk-soft: #f7e1e5;
+  --opportunity: #387a32;
+  --opportunity-soft: #e2f1df;
+  --conclusion: #c27a08;
+  --conclusion-soft: #f8ebcb;
+  --deep: #132d2a;
+  --deep-ink: #f2faf7;
+  --deep-muted: #b9d0c9;
+  --hl: #ffe59a;
+  --hl2: #ccebdc;
+  --quote: #e8e2f2;
+  --shadow: rgba(21, 40, 34, 0.12);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0e1514;
+    --surface: #141d1b;
+    --card: #192421;
+    --ink: #e4ece8;
+    --muted: #a2b0aa;
+    --line: #34423e;
+    --accent: #5bd0b5;
+    --accent-soft: #173c34;
+    --accent2: #78a9f5;
+    --accent2-soft: #182f50;
+    --accent3: #f29a6d;
+    --accent3-soft: #48291d;
+    --accent4: #c49aee;
+    --accent4-soft: #352449;
+    --risk: #ff8999;
+    --risk-soft: #461f27;
+    --opportunity: #8ed786;
+    --opportunity-soft: #203e20;
+    --conclusion: #f2ba55;
+    --conclusion-soft: #493817;
+    --deep: #071f1b;
+    --deep-ink: #edf9f5;
+    --deep-muted: #a7c9bf;
+    --hl: #594410;
+    --hl2: #174d3e;
+    --quote: #30243d;
+    --shadow: rgba(0, 0, 0, 0.34);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0e1514;
+  --surface: #141d1b;
+  --card: #192421;
+  --ink: #e4ece8;
+  --muted: #a2b0aa;
+  --line: #34423e;
+  --accent: #5bd0b5;
+  --accent-soft: #173c34;
+  --accent2: #78a9f5;
+  --accent2-soft: #182f50;
+  --accent3: #f29a6d;
+  --accent3-soft: #48291d;
+  --accent4: #c49aee;
+  --accent4-soft: #352449;
+  --risk: #ff8999;
+  --risk-soft: #461f27;
+  --opportunity: #8ed786;
+  --opportunity-soft: #203e20;
+  --conclusion: #f2ba55;
+  --conclusion-soft: #493817;
+  --deep: #071f1b;
+  --deep-ink: #edf9f5;
+  --deep-muted: #a7c9bf;
+  --hl: #594410;
+  --hl2: #174d3e;
+  --quote: #30243d;
+  --shadow: rgba(0, 0, 0, 0.34);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.75;
+}
+main { overflow: hidden; }
+.hero {
+  padding: clamp(3rem, 8vw, 7rem) max(1.25rem, calc((100vw - 1120px) / 2));
+  background: var(--deep);
+  color: var(--deep-ink);
+}
+.eyebrow {
+  margin: 0 0 1rem;
+  color: var(--accent);
+  font-size: .82rem;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.hero h1 {
+  max-width: 900px;
+  margin: 0;
+  font-size: clamp(2.3rem, 6vw, 5.4rem);
+  line-height: 1.08;
+  letter-spacing: -.04em;
+}
+.original-title {
+  max-width: 800px;
+  margin: 1.1rem 0 0;
+  color: var(--deep-muted);
+  font-size: clamp(1rem, 2vw, 1.25rem);
+}
+.hero-lead {
+  max-width: 850px;
+  margin: 2.5rem 0 0;
+  padding-left: 1.2rem;
+  border-left: .3rem solid var(--conclusion);
+  font-size: clamp(1.15rem, 2.5vw, 1.55rem);
+}
+.wrap {
+  width: min(1120px, calc(100% - 2.5rem));
+  margin: 0 auto;
+}
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: -1.7rem;
+  border: 1px solid var(--line);
+  box-shadow: 0 1rem 3rem var(--shadow);
+}
+.stat {
+  padding: 1.5rem;
+  background: var(--card);
+}
+.stat + .stat { border-left: 1px solid var(--line); }
+.stat:nth-child(1) { border-top: .35rem solid var(--accent2); }
+.stat:nth-child(2) { border-top: .35rem solid var(--opportunity); }
+.stat:nth-child(3) { border-top: .35rem solid var(--accent3); }
+.stat:nth-child(4) { border-top: .35rem solid var(--conclusion); }
+.stat strong {
+  display: block;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1.1;
+}
+.stat span { color: var(--muted); font-size: .92rem; }
+.summary-section { padding: 5rem 0; }
+.summary-section h2 {
+  margin: 0 0 1rem;
+  font-size: clamp(1.7rem, 4vw, 2.7rem);
+  line-height: 1.2;
+}
+.split {
+  display: grid;
+  grid-template-columns: .9fr 1.1fr;
+  gap: 3rem;
+  align-items: start;
+}
+.problem {
+  padding: 2rem;
+  background: var(--risk-soft);
+  border-left: .45rem solid var(--risk);
+}
+.problem h2 { color: var(--risk); }
+.explanation {
+  padding: 1rem 0 1rem 2rem;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.explanation h3 { color: var(--accent2); }
+.timeline-band {
+  padding: 5rem 0;
+  background: var(--accent2-soft);
+}
+.timeline {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+}
+.step {
+  position: relative;
+  padding: 2rem;
+  background: var(--surface);
+  border-top: .35rem solid var(--accent2);
+}
+.step:nth-child(2) {
+  background: var(--accent4-soft);
+  border-color: var(--accent4);
+}
+.step:nth-child(3) {
+  background: var(--opportunity-soft);
+  border-color: var(--opportunity);
+}
+.step + .step { border-left: 1px solid var(--line); }
+.step-number {
+  display: inline-grid;
+  width: 2.2rem;
+  height: 2.2rem;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--deep);
+  color: var(--deep-ink);
+  font-weight: 800;
+}
+.insight-band {
+  padding: 4.5rem 0;
+  background: var(--deep);
+  color: var(--deep-ink);
+}
+.insight-band blockquote {
+  max-width: 930px;
+  margin: 0;
+  font-size: clamp(1.45rem, 3.4vw, 2.7rem);
+  line-height: 1.35;
+}
+.insight-band p { color: var(--deep-muted); }
+.takeaways { padding: 5rem 0 6rem; }
+.takeaway-grid {
+  display: grid;
+  grid-template-columns: 1.35fr .65fr 1fr;
+  gap: 1rem;
+}
+.takeaway {
+  min-height: 170px;
+  padding: 1.5rem;
+  border: 1px solid var(--line);
+}
+.takeaway:nth-child(1) { background: var(--accent-soft); }
+.takeaway:nth-child(2) { background: var(--conclusion-soft); }
+.takeaway:nth-child(3) { background: var(--accent3-soft); }
+.takeaway:nth-child(4) {
+  grid-column: span 2;
+  background: var(--accent4-soft);
+}
+.takeaway:nth-child(5) { background: var(--opportunity-soft); }
+.takeaway h3 { margin-top: 0; }
+mark, .hl {
+  padding: .05em .25em;
+  background: var(--hl);
+  color: var(--ink);
+  font-weight: 750;
+}
+.hl2 {
+  padding: .05em .25em;
+  background: var(--hl2);
+  color: var(--ink);
+  font-weight: 750;
+}
+#translation {
+  padding: 5rem 0 7rem;
+  background: var(--surface);
+  border-top: .55rem solid var(--accent);
+}
+.translation-inner {
+  width: min(760px, calc(100% - 2.5rem));
+  margin: 0 auto;
+}
+#translation h2 {
+  margin: 0 0 2rem;
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  line-height: 1.1;
+}
+#translation h3 {
+  margin: 3.5rem 0 1rem;
+  padding-top: 1rem;
+  border-top: 2px solid var(--line);
+  font-size: 1.8rem;
+}
+#translation p { margin: 1.15rem 0; }
+#translation ul { padding-left: 1.4rem; }
+#translation li { margin: .7rem 0; }
+.meta {
+  color: var(--muted);
+  font-size: .92rem;
+}
+.video-note {
+  margin: 1.8rem 0;
+  padding: 1.25rem 1.5rem;
+  background: var(--accent2-soft);
+  border-left: .3rem solid var(--accent2);
+}
+.timecode {
+  display: inline-block;
+  padding: .2rem .65rem;
+  border-radius: 999px;
+  background: var(--deep);
+  color: var(--deep-ink);
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+}
+.recommendations {
+  margin: 2rem 0;
+  padding: 1.5rem 1.8rem;
+  background: var(--opportunity-soft);
+  border-left: .35rem solid var(--opportunity);
+}
+.source-figure {
+  width: min(100%, 960px);
+  margin: 2.8rem auto;
+  padding: 1rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: 0 .8rem 2.5rem var(--shadow);
+}
+.source-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+.source-figure figcaption {
+  margin-top: .85rem;
+  color: var(--muted);
+  font-size: .9rem;
+  line-height: 1.55;
+}
+.end-matter {
+  margin-top: 4rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+}
+a { color: var(--accent2); text-underline-offset: .18em; }
+@media (max-width: 820px) {
+  .stats, .timeline { grid-template-columns: 1fr 1fr; }
+  .stat + .stat, .step + .step { border-left: 0; }
+  .split { grid-template-columns: 1fr; gap: 1.5rem; }
+  .takeaway-grid { grid-template-columns: 1fr 1fr; }
+  .takeaway:nth-child(4) { grid-column: span 1; }
+}
+@media (max-width: 560px) {
+  .stats, .timeline, .takeaway-grid { grid-template-columns: 1fr; }
+  .hero { padding-top: 3.5rem; padding-bottom: 4rem; }
+  .stat, .step, .takeaway { min-height: auto; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/how-two-settings-tripled-our-arc-agi-3-scores" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header class="hero">
+<p class="eyebrow">OpenAI Research · 2026 年 7 月 29 日</p>
+<h1>启用两项设置，如何让我们的 ARC-AGI-3 得分增至三倍</h1>
+<p class="original-title" lang="en">How enabling two settings tripled our scores on the ARC-AGI-3 benchmark</p>
+<p class="hero-lead"><strong>一句话总括：</strong>这项实验表明，智能体能否保留此前的推理和经历，会显著影响评测结果；改进上下文管理后，同一模型的得分约增至三倍，输出 token 则降至约六分之一。</p>
+</header>
+<div class="wrap">
+<section aria-label="关键数据" class="stats">
+<div class="stat"><strong>13.3%</strong><span>GPT‑5.6 Sol 使用官方框架时的公开集得分</span></div>
+<div class="stat"><strong>38.3%</strong><span>保留推理并启用压缩后的公开集得分</span></div>
+<div class="stat"><strong>约 3×</strong><span>同一模型在改进框架下的得分倍数</span></div>
+<div class="stat"><strong>少 6×</strong><span>完成任务所需的输出 token 变化</span></div>
+</section>
+<section class="summary-section split">
+<div class="problem">
+<h2>低分首先暴露的是“失忆”</h2>
+<p>官方框架会在每次游戏操作后丢弃模型的私有推理。GPT‑5.6 Sol 虽然看得到历史动作和简短备注，却看不到产生这些动作的计划与洞见。</p>
+<p>历史变长后，滚动截断还会删除较早的动作。模型不仅忘记自己怎样思考，也会逐渐忘记自己做过什么。</p>
+<p><strong>洞见：</strong>看起来像推理能力不足的行为，可能部分来自评测框架切断了学习过程。</p>
+</div>
+<div class="explanation">
+<h3>为什么这会改变对 AI 能力的理解</h3>
+<p>ARC-AGI-3 要求智能体在没有明确规则的情况下探索陌生游戏。成功依赖持续积累观察，而不是只解决一个孤立回合。</p>
+<p>若每轮都清除推理，模型就要反复从头理解游戏。即使底层模型具备规划能力，外部表现也会变得迟缓而混乱。</p>
+<p>因此，benchmark 测到的不只是模型。它还测到了 <span class="hl2">API 设置、运行框架和提示方式</span>的组合效果。</p>
+</div>
+</section>
+</div>
+<section class="timeline-band">
+<div class="wrap">
+<h2>两项设置怎样改变长任务</h2>
+<div class="timeline">
+<article class="step">
+<span class="step-number">1</span>
+<h3>保留推理</h3>
+<p>通过 Responses API 传入上一次响应的 ID，GPT‑5.6 可以跨工具调用和多个回合保留推理。</p>
+<p>它不必在每次操作前重新解释游戏，因此思考时间缩短，策略也更连贯。</p>
+</article>
+<article class="step">
+<span class="step-number">2</span>
+<h3>用压缩取代截断</h3>
+<p>官方框架在上下文超过 175,000 个字符后删除最早的消息。压缩则概括旧内容，并让任务继续进行。</p>
+<p>模型得以保存已学到的游戏规律，也不必长期在接近满载的上下文中工作。</p>
+</article>
+<article class="step">
+<span class="step-number">3</span>
+<h3>得分更高，输出更少</h3>
+<p>两项设置一起启用后，公开集得分从 <mark>13.3%</mark> 升至 <mark>38.3%</mark>。</p>
+<p>输出 token 同时减少约 6 倍。这说明更好的记忆不仅提高效果，也提高了效率。</p>
+</article>
+</div>
+</div>
+</section>
+<section class="insight-band">
+<div class="wrap">
+<blockquote>“公平”不一定意味着所有模型都使用最简陋的通用框架。若框架偏离模型的训练和实际部署方式，比较结果也可能偏离真实使用表现。</blockquote>
+<p>OpenAI 因此建议 API 开发者使用 Responses API、保留推理并启用压缩；模型比较也应优先采用这些更接近 ChatGPT 和 Codex 实际部署的设置。</p>
+</div>
+</section>
+<section class="takeaways">
+<div class="wrap">
+<h2>最值得带走的洞见</h2>
+<div class="takeaway-grid">
+<article class="takeaway">
+<h3>评测是一个完整系统</h3>
+<p>分数由模型与运行框架共同产生。API 参数、上下文策略和提示设计都可能改变结论。</p>
+</article>
+<article class="takeaway">
+<h3>记忆决定学习</h3>
+<p>长任务需要保存此前的计划、发现和动作。清除这些信息会让智能体不断从零开始。</p>
+</article>
+<article class="takeaway">
+<h3>效率与效果可以同时提升</h3>
+<p><strong>约 3 倍得分</strong>与<strong>少 6 倍输出 token</strong>同时出现。更长的有效记忆并不等于更多冗余输出。</p>
+</article>
+<article class="takeaway">
+<h3>公开榜单需要解释运行条件</h3>
+<p>若不同框架是否保留推理、怎样处理上下文都不透明，读者很难判断分数究竟代表模型限制，还是评测配置限制。</p>
+</article>
+<article class="takeaway">
+<h3>人类仍然领先</h3>
+<p>改进后的模型达到 <strong>38.3%</strong>，而人类测试者平均约为 <strong>48%</strong>。框架修正缩小了差距，但没有消除差距。</p>
+</article>
+</div>
+</div>
+</section>
+<section id="translation">
+<div class="translation-inner">
+<h2>完整译文</h2>
+<p class="meta">ARC-AGI-3</p>
+<p class="meta">智能体在记得自己做过什么时表现最好</p>
+<p class="meta">结论与建议</p>
+<p class="meta">ARC-AGI-3</p>
+<p class="meta">智能体在记得自己做过什么时表现最好</p>
+<p class="meta">结论与建议</p>
+<p><span class="timecode">00:00</span></p>
+<div class="video-note">
+<p>这段加速视频展示了 GPT‑5.6 Sol 尝试解决 ARC-AGI-3 benchmark 谜题的过程。左侧使用官方框架，右侧使用我们的 Responses API 框架。后者会保留推理并启用压缩。</p>
+<p>在这个游戏的排行榜上，没有任何前沿模型能够解开第一关之后的关卡。使用我们的框架后，GPT‑5.6 Sol 解开了全部六关。</p>
+</div>
+<p>我们第一次看到 GPT‑5.6 Sol 在 ARC-AGI-3 benchmark 上的低分时，感到很困惑。</p>
+<p>GPT‑5.6 Sol 已经解决了循环双覆盖猜想等长期未解的数学问题，也战胜过 Pokémon FireRed 这样的游戏。但在由二维解谜游戏构成的 ARC-AGI-3 中，GPT‑5.6 Sol 只得到 7.8%。GPT‑5.5 几乎连游戏都玩不了，得分低至 0.4%。</p>
+<p>二维解谜游戏对我们的模型来说格外困难吗？还是另有原因？</p>
+<p>Benchmark 很少只衡量 AI 模型本身。它也会衡量一些不太显眼的选择，例如 API 设置、运行框架设计和提示方式。</p>
+<p>在 ARC-AGI-3 中，我们发现，只要启用 ChatGPT 和 Codex 采用的两项 API 设置，也就是保留推理和压缩，模型在公开任务集上的得分就会增至三倍，输出 token 则减少约 6 倍。</p>
+<p>使用官方框架时，GPT‑5.6 Sol 在 ARC-AGI-3 公开集上的得分是 13.3%。保留推理并启用压缩后，得分达到 38.3%。</p>
+<p>这里的分数衡量的是相对人类行动效率（Relative Human Action Efficiency，RHAE）。这一指标会把模型表现与人类基线进行比较。</p>
+<p>根据官方游戏日志，我们估计人类测试者的平均得分为 48%。模型不知道评分方式，在游戏过程中也看不到自己的分数。每次操作只会返回当前画面的文本表示，以及模型所在的关卡。</p>
+<h3>ARC-AGI-3</h3>
+<p>ARC-AGI-3 是一个衡量 AI 智能体学习和推理能力的 benchmark。智能体需要探索陌生的二维游戏，并在没有明确说明的情况下推断游戏规则。你可以在 <a href="https://arcprize.org/tasks">arcprize.org/tasks</a> 体验 25 个演示游戏。</p>
+<p>ARC-AGI-3 特意使用了一个通用框架，不提供工具或特殊功能。ARC 认为，简单的框架能更清楚地暴露模型的不足，也能让模型之间的比较更加公平。商业开发者则会针对每个模型的功能和特点优化运行框架。</p>
+<p>在游戏方面，GPT‑5.6 Sol 曾经只依靠视觉框架战胜 Pokémon FireRed。GPT_Plays_Pokemon 对这个过程进行了直播。它还使用 Codex computer use 战胜了 Slay the Spire，EpochAI 对此进行了直播。Piotr Migdał 和 Piotr Grabowski 也分享过它通过 Baba Is You 最初几个关卡的过程。</p>
+<p>ARC-AGI-3 究竟有什么不同？</p>
+<p>Ethan Mollick 展示了 GPT‑5.6 Sol 在 Codex 中完成 Slay the Spire 2 随机每日挑战的过程。这款游戏发布于 GPT‑5.6 Sol 的知识截止日期之后。</p>
+<figure class="source-figure" data-source-image="0"><img alt="GPT-5.6 Sol in Codex completing a randomized daily challenge in Slay the Spire 2." decoding="async" height="2160" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/AET0YzpXrzZVTN2i7GvZA/25cca071d556d3201a562d7a8ca2e92c/Tweet.png?w=3840&amp;q=90&amp;fm=webp" width="3840"/></figure>
+<p>受到 ARC 对 GPT‑5.5 缺陷分析的启发，我们检查了 GPT‑5.6 Sol 的一些尝试。与 ARC 的观察一样，我们看到的模型似乎并不聪明。它会在每次操作上停留很长时间，而且很难取得进展。</p>
+<p>但在深入检查后，我们发现，模型表现出的许多困惑并非模型本身固有的问题，而是运行框架设置造成的。</p>
+<p>首先，我们注意到，每次游戏操作结束后，所有私有推理都会被丢弃。这意味着 GPT‑5.6 Sol 每执行一次操作，都要重新理解游戏。它无法记住自己此前的思考。</p>
+<p>模型仍然能看到过去的操作记录和随附的简短备注。但它看不到促成这些操作的计划、洞见或想法。</p>
+<p>其次，我们发现，该框架使用了滚动截断窗口。随着历史记录不断增长，较早的操作会变得不可见。因此，GPT‑5.6 Sol 不仅无法记住过去的思考，也在逐渐失去对过去操作的记忆。</p>
+<p>框架的这两个特点共同导致了问题：一是丢弃推理，二是滚动截断。它们解释了 GPT‑5.6 Sol 为什么难以随着时间推移逐步学会游戏。</p>
+<h3>智能体在记得自己做过什么时表现最好</h3>
+<p>我们的模型经过训练，会先通过私有推理消息进行思考，再输出回复或工具调用。这些私有思考消息会作为对话历史的一部分保留下来。如果对话变得太长，我们会对其进行概括，然后继续。</p>
+<figure class="source-figure" data-source-image="1"><img alt="Diagram showing how model reasoning, tool calls, conversation history, and context compaction work together across a long-running task." decoding="async" height="467" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/29SPddA3v6qjLHWpw8RiSB/151b57e5d5bfc371f145c7437632c96b/How_GPT-5.6_Sol_reasons_over_long_tasks_desktop_light.svg?w=3840&amp;q=90" width="596"/></figure>
+<p>这既是我们训练模型的方式，也是我们在 ChatGPT 和 Codex 中部署模型的方式。为了更贴近生产环境，我们使用 Responses API 实现了 ARC-AGI-3 运行框架。</p>
+<p>我们的 API 可以轻松管理上下文。对于 GPT‑5.6，只要传入上一次响应的 ID，就能在多次工具调用和多个回合之间自动保留推理。</p>
+<p>保留推理后，我们注意到两项显著变化。第一，GPT‑5.6 Sol 在每次操作前花费的思考时间变少了，因为它不再需要每回合都从头解释游戏。</p>
+<p>第二，当 GPT‑5.6 Sol 能够记住此前的想法时，它就更擅长随着时间推移不断学习，也能采用连贯的策略。</p>
+<p>下一项改进是用压缩取代滚动截断。压缩是 Responses API 中的另一项设置。</p>
+<p>ARC-AGI-3 运行框架通过滚动截断来应对上下文限制。当对话上下文超过 175,000 个字符时，最早的消息就会被丢弃。</p>
+<p>滚动截断有两个缺点。第一，模型会失去早期的观察和操作。第二，模型会在任务的大部分时间里使用接近满载的上下文窗口，这可能会轻微影响表现。</p>
+<p>在 ARC-AGI-3 中启用压缩后，GPT‑5.6 Sol 能在更长的运行过程中更好地保存自己对每款游戏的认识。它以更少的输出 token 获得了更高的分数。</p>
+<p>为了展示保留推理和启用压缩的效果，下面的动画呈现了 GPT‑5.6 Sol 分别使用两种框架解决一系列 ARC-AGI-3 谜题时，如何使用其 175K 上下文窗口。</p>
+<p><span class="timecode">00:00</span></p>
+<div class="video-note">
+<p>中间两列展示了两种运行框架使用模型上下文窗口的不同方式。GPT‑5.6 Sol 能更好地记住过去后，每次操作所需的思考就会减少，推进速度也会快得多。</p>
+<p>请注意，我们的实现使用 175,000 个 token 作为限制，而不是 175,000 个字符。不过，两者最终非常接近。绝大部分文本都是操作网格，我们的 tokenizer 会以接近 1:1 的比例对其进行 token 化。</p>
+</div>
+<p>总体来看，保留推理和启用压缩让 GPT‑5.6 Sol（max）以少 6 倍的输出 token，取得了大约 3 倍的得分。</p>
+<h3>结论与建议</h3>
+<p>我们希望这些实验能提醒大家，评测很少只衡量模型本身。它们也会衡量一整套不太显眼的选择，包括 API 设置、运行框架设计和提示方式。</p>
+<p>这不是我们第一次对公开 benchmark 上的低分感到惊讶，随后又发现评测运行器使用了会丢弃推理消息的通用框架。</p>
+<p>如果你是希望尽可能提高性能的 API 开发者，我们建议采用与自家产品部署相同的设置：</p>
+<div class="recommendations">
+<ul>
+<li>使用 Responses API，不要使用旧版 Chat Completions API。</li>
+<li>保留推理。</li>
+<li>使用压缩。</li>
+</ul>
+</div>
+<p>如果你正在比较模型，我们建议采用启用了上述设置的评测。这些设置最接近 ChatGPT 和 Codex 中的真实使用方式。</p>
+<p>我们感谢 ARC 多年来在 AGI 评估方面开展的创造性工作，也感谢他们的分析。正是这些分析促使我们在这里进行更深入的检查。</p>
+<p>如果你想亲自与前沿模型一较高下，可以前往 <a href="https://arcprize.org/tasks">arcprize.org/tasks</a> 体验公开游戏。</p>
+<div class="end-matter">
+<p>2026</p>
+<p>作者</p>
+<p>继续阅读</p>
+</div>
+<figure class="source-figure" data-source-image="2"><img alt="oai Science Academic Research Academic Research 1x1" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/59kTmFmujYzNh0VgSvCgwe/e9334dd9944b5309f8ca2d44fdc71b6f/academic-research-card.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="3"><img alt="Scientific computing agentic AI card image (1x1)" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/5opqp3rNWM7eax6GUc6MAl/1c710a4aba8c5c1e0b7d1c1c7c8b32db/1x1__1_.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="4"><img alt="GPT-Red art card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/6q32m87ClqE8Ovn6vD424h/05ced72e47bbe42711fbac6a082cbff2/Art_Card.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+</div>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
