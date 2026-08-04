@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Mixture-of-Kittens：面向 NVL72 的开源 MoE 巨型内核</title>
+<style>
+:root {
+  --bg:#f5f4ef;
+  --surface:#ffffff;
+  --surface2:#eaf2ff;
+  --surface3:#fff2dc;
+  --surface4:#e8f7ef;
+  --surface5:#f7eafa;
+  --ink:#18202a;
+  --muted:#657080;
+  --line:#d8dce2;
+  --accent:#2767d8;
+  --accent2:#008a72;
+  --accent3:#d06a16;
+  --accent4:#9b3ca6;
+  --risk:#c13d50;
+  --deep:#17243a;
+  --deep-ink:#f4f7ff;
+  --hl:#ffe19a;
+  --hl2:#aee8d2;
+  --shadow:rgba(27,39,58,.12);
+}
+:root[data-theme="light"] {
+  --bg:#f5f4ef;
+  --surface:#ffffff;
+  --surface2:#eaf2ff;
+  --surface3:#fff2dc;
+  --surface4:#e8f7ef;
+  --surface5:#f7eafa;
+  --ink:#18202a;
+  --muted:#657080;
+  --line:#d8dce2;
+  --accent:#2767d8;
+  --accent2:#008a72;
+  --accent3:#d06a16;
+  --accent4:#9b3ca6;
+  --risk:#c13d50;
+  --deep:#17243a;
+  --deep-ink:#f4f7ff;
+  --hl:#ffe19a;
+  --hl2:#aee8d2;
+  --shadow:rgba(27,39,58,.12);
+}
+:root[data-theme="dark"] {
+  --bg:#0f141d;
+  --surface:#171e29;
+  --surface2:#15243a;
+  --surface3:#352617;
+  --surface4:#132d27;
+  --surface5:#2d1b31;
+  --ink:#e6eaf1;
+  --muted:#a7b0bf;
+  --line:#354050;
+  --accent:#6da0ff;
+  --accent2:#43d1b5;
+  --accent3:#ff9a4d;
+  --accent4:#dc7ae4;
+  --risk:#ff7183;
+  --deep:#09101c;
+  --deep-ink:#edf3ff;
+  --hl:#6b5013;
+  --hl2:#165e50;
+  --shadow:rgba(0,0,0,.3);
+}
+@media (prefers-color-scheme:dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#0f141d;
+    --surface:#171e29;
+    --surface2:#15243a;
+    --surface3:#352617;
+    --surface4:#132d27;
+    --surface5:#2d1b31;
+    --ink:#e6eaf1;
+    --muted:#a7b0bf;
+    --line:#354050;
+    --accent:#6da0ff;
+    --accent2:#43d1b5;
+    --accent3:#ff9a4d;
+    --accent4:#dc7ae4;
+    --risk:#ff7183;
+    --deep:#09101c;
+    --deep-ink:#edf3ff;
+    --hl:#6b5013;
+    --hl2:#165e50;
+    --shadow:rgba(0,0,0,.3);
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.78}
+a{color:var(--accent)}
+.hero{padding:5rem max(6vw,1.5rem) 4rem;background:var(--deep);color:var(--deep-ink)}
+.hero-inner{max-width:1100px;margin:auto}
+.eyebrow{color:var(--accent2);font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+h1{font-size:clamp(2.3rem,6vw,5.4rem);line-height:1.06;margin:.5rem 0 1rem;max-width:1000px}
+.original{color:var(--muted);font-size:1.05rem}
+.lead{font-size:clamp(1.15rem,2vw,1.55rem);max-width:820px;margin-top:2.5rem;padding-left:1.2rem;border-left:5px solid var(--accent3)}
+.summary-shell{max-width:1120px;margin:auto;padding:3.5rem 1.4rem}
+.metric-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:3.5rem}
+.metric{background:var(--surface);padding:1.5rem}
+.metric strong{display:block;color:var(--accent);font-size:2.2rem;line-height:1.1}
+.metric:nth-child(2) strong{color:var(--accent2)}
+.metric:nth-child(3) strong{color:var(--accent3)}
+.metric:nth-child(4) strong{color:var(--accent4)}
+.metric span{color:var(--muted);font-size:.9rem}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:3rem 0}
+.panel{padding:2rem;border-top:6px solid var(--accent);background:var(--surface2)}
+.panel.opportunity{background:var(--surface4);border-color:var(--accent2)}
+.panel.risk{background:var(--surface3);border-color:var(--risk)}
+.panel h2,.panel h3{margin-top:0}
+.flow{margin:3rem 0;padding:2rem;background:var(--deep);color:var(--deep-ink)}
+.flow-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.flow-item{padding:1rem;border:1px solid var(--accent);border-radius:.6rem}
+.flow-item b{display:block;color:var(--accent2);margin-bottom:.4rem}
+.insight-bar{margin:3rem 0;padding:1.5rem 2rem;background:var(--surface5);border-left:8px solid var(--accent4);font-size:1.15rem}
+.compare{width:100%;border-collapse:collapse;background:var(--surface);margin:1.5rem 0 3rem}
+.compare th,.compare td{padding:1rem;border-bottom:1px solid var(--line);text-align:left}
+.compare th{color:var(--accent3)}
+.takeaways{display:grid;grid-template-columns:repeat(6,1fr);gap:1rem;margin-top:3rem}
+.takeaway{padding:1.4rem;background:var(--surface);box-shadow:0 .5rem 1.5rem var(--shadow)}
+.takeaway:nth-child(1){grid-column:span 3;border-top:5px solid var(--accent)}
+.takeaway:nth-child(2){grid-column:span 3;border-top:5px solid var(--accent2)}
+.takeaway:nth-child(3){grid-column:span 2;border-top:5px solid var(--accent3)}
+.takeaway:nth-child(4){grid-column:span 2;border-top:5px solid var(--accent4)}
+.takeaway:nth-child(5){grid-column:span 2;border-top:5px solid var(--risk)}
+mark{background:var(--hl);color:var(--ink);padding:.08em .25em}
+mark.alt{background:var(--hl2)}
+#translation{max-width:820px;margin:4rem auto;padding:0 1.4rem 6rem}
+#translation>h2{font-size:2.5rem;padding-top:2rem;border-top:8px solid var(--accent)}
+#translation h3{font-size:1.7rem;margin-top:3.5rem;line-height:1.3}
+#translation h4{font-size:1.3rem;margin-top:2.4rem;color:var(--accent)}
+#translation p,#translation li{font-size:1.04rem}
+#translation blockquote{margin:2rem 0;padding:1rem 1.5rem;background:var(--surface3);border-left:5px solid var(--accent3)}
+#translation table{width:100%;border-collapse:collapse;margin:1.5rem 0;display:block;overflow-x:auto}
+#translation th,#translation td{border:1px solid var(--line);padding:.7rem;white-space:nowrap}
+.formula{padding:1rem;background:var(--surface2);border-left:4px solid var(--accent);font-family:Consolas,monospace;overflow-x:auto}
+.source-figure{margin:2.8rem 0;min-height:10rem;border:1px solid var(--line);background:var(--surface);border-radius:.7rem;overflow:hidden}
+.source-figure img{display:block;width:100%;height:auto}
+.source-figure figcaption{padding:.8rem 1rem;color:var(--muted);font-size:.9rem;border-top:1px solid var(--line)}
+.meta{color:var(--muted);margin-bottom:2.5rem}
+.toc{padding:1.5rem 2rem;background:var(--surface2);border-left:5px solid var(--accent)}
+.chart-text{padding:1.2rem;background:var(--surface4);border-left:4px solid var(--accent2);margin:1.5rem 0}
+.footnote{font-size:.92rem;color:var(--muted);border-top:1px solid var(--line);padding-top:1rem}
+@media(max-width:760px){
+  .metric-strip,.split,.flow-grid{grid-template-columns:1fr}
+  .takeaways{grid-template-columns:1fr}
+  .takeaway:nth-child(n){grid-column:span 1}
+  .hero{padding-top:3rem}
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+  <style id="airs-source-image-theme-style">
+    .source-figure .source-image-dark {
+      display: none;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .source-figure .source-image-light {
+        display: none;
+      }
+      :root:not([data-theme="light"]) .source-figure .source-image-dark {
+        display: block;
+      }
+    }
+    :root[data-theme="dark"] .source-figure .source-image-light {
+      display: none;
+    }
+    :root[data-theme="dark"] .source-figure .source-image-dark {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-light {
+      display: block;
+    }
+    :root[data-theme="light"] .source-figure .source-image-dark {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/mixture-of-kittens" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<header class="hero">
+<div class="hero-inner">
+<div class="eyebrow">Cursor Research · 2026 年 8 月 4 日</div>
+<h1>Mixture-of-Kittens：面向 NVL72 的开源 MoE 巨型内核</h1>
+<div class="original">Mixture-of-Kittens: our open-source MoE megakernel for NVL72s</div>
+<p class="lead"><strong>一句话总括：</strong>MoK 通过统一设计通信方向、计算流水和设备端缓冲区，把分布式 MoE 的主要瓶颈从一串割裂操作变成了一个确定性巨型内核。</p>
+</div>
+</header>
+<main>
+<div class="summary-shell">
+<div class="metric-strip">
+<div class="metric"><strong>2.37×</strong><span>MXFP8 前向最高加速</span></div>
+<div class="metric"><strong>29%</strong><span>拉取式 dispatch 的带宽利用率优势</span></div>
+<div class="metric"><strong>5.8×</strong><span>推送式 dispatch 的信令延迟倍数</span></div>
+<div class="metric"><strong>41%</strong><span>生产训练 token/s 提升</span></div>
+</div>
+<section class="split">
+<div class="panel">
+<h2>瓶颈不只在矩阵乘法</h2>
+<p>在部分 Composer 训练配置中，MoE 层会占用<strong>超过一半</strong>的端到端训练时间。此前的 MXFP8、NVFP4 和 warp decode 优化主要改善计算，却把跨 GPU 通信留在内核之外。</p>
+<p>MoK 的关键变化是把 dispatch、专家 FFN 和 combine 一起设计。性能问题由此不再被误解为单个算子的效率问题。</p>
+</div>
+<div class="panel opportunity">
+<h2>NVL72 改变了优化边界</h2>
+<p>一个 NVL72 机架把 <mark class="alt">72 块 GPU</mark> 放进同一 NVLink 域。这使细粒度的通信与计算重叠成为可能。</p>
+<p>但 GB300 的 Grace CPU 相对 GPU 较慢。GPU 很容易追上 CPU 侧任务，因此设计必须尽量消除 CPU 工作和 CPU-GPU 同步。</p>
+</div>
+</section>
+<section class="flow">
+<h2>通信方向不是统一答案</h2>
+<div class="flow-grid">
+<div class="flow-item"><b>前向 dispatch</b>拉取式</div>
+<div class="flow-item"><b>前向 combine</b>推送式</div>
+<div class="flow-item"><b>反向 reverse-combine</b>拉取式</div>
+<div class="flow-item"><b>反向 reverse-dispatch</b>推送式</div>
+</div>
+<p>这组方向允许四次通信复用同一份只有数 MB 的调度表。它还消除了跨 GPU 的多通道完成信令。选择通信方向时，调度成本、双向链路利用率和信令延迟比“推送通常更快”的经验判断更重要。</p>
+</section>
+<section class="split">
+<div class="panel risk">
+<h3>过细和过粗都浪费硬件</h3>
+<p>通信粒度过细时，Tensor Core 会频繁等待。粒度过粗时，首批 token 到达太晚，最后一批输出也拖长流水尾部。</p>
+<p>MoK 把每轮传输的 token 集合称为 minibatch，并开放调参。经验目标是让每个专家 grouped GEMM 至少拥有<strong>两个完整 wave</strong>。</p>
+</div>
+<div class="panel">
+<h3>SM 被明确分工</h3>
+<p>一部分 SM 执行专家 FFN，另一部分负责 dispatch 和 combine。两组通过本地计数器互相通知。</p>
+<p>TMA load/store 只需不到三分之一的 SM 就能跑满 NVLink，因此通信与计算可以在不同 SM 上同时推进。</p>
+</div>
+</section>
+<div class="insight-bar">
+<strong>真正消除 CPU-GPU 同步的部件是环形 token 缓冲区。</strong>
+    MoK 用数百 MB 的固定 ring buffer 代替按实际 token 数动态分配的大缓冲区。dispatch 和 combine 跨 macrobatch 边界交错运行，槽位一被清空就立即复用。
+  </div>
+<table class="compare">
+<thead>
+<tr><th>测试项目</th><th>相对最快公开基线</th><th>理解上的变化</th></tr>
+</thead>
+<tbody>
+<tr><td>MXFP8 前向</td><td><strong>最高 2.37×</strong></td><td>通信融合能产生远大于单算子微调的收益</td></tr>
+<tr><td>MXFP8 反向</td><td><strong>最高 1.78×</strong></td><td>重放与梯度调度仍能保持明显优势</td></tr>
+<tr><td>BF16 前向</td><td><strong>最高 1.92×</strong></td><td>优势并不依赖低精度格式</td></tr>
+<tr><td>BF16 反向</td><td><strong>最高 1.58×</strong></td><td>完整训练路径都能受益</td></tr>
+<tr><td>512 GPU 生产训练</td><td><strong>token/s 约 +41%</strong></td><td>单层 benchmark 的收益能传递到端到端训练</td></tr>
+</tbody>
+</table>
+<section class="panel opportunity">
+<h2>确定性、精度与机架间通信没有被牺牲</h2>
+<p>MoK 固定浮点运算顺序。相同输入会得到逐位一致的输出。它支持 BF16 和 MXFP8，并在 MXFP8 模式下让共享专家继续使用 BF16，以保持训练稳定。</p>
+<p>其任务通过 Blackwell 的 Cluster Launch Control 调度。高优先级流上的 FSDP all-gather 等机架间通信可以取得 SM，不必等整个巨型内核结束。</p>
+</section>
+<h2>最值得带走的洞见</h2>
+<div class="takeaways">
+<div class="takeaway"><strong>1.</strong> 分布式 MoE 的主要限制可能是通信和信令，而不是 GEMM 本身。</div>
+<div class="takeaway"><strong>2.</strong> push 与 pull 应按操作选择。单一通信范式会错过调度和链路利用率优势。</div>
+<div class="takeaway"><strong>3.</strong> 最佳重叠粒度位于两个极端之间，并应随模型形状和硬件调整。</div>
+<div class="takeaway"><strong>4.</strong> 环形缓冲区能在不丢 token 的前提下移除动态分配所需的 CPU 同步。</div>
+<div class="takeaway"><strong>5.</strong> 巨型内核已从少数手工专家才能驾驭的技术，变成可由小团队借助 AI agent 推进的系统工程。</div>
+</div>
+</div>
+<section id="translation">
+<h2>完整译文</h2>
+<p class="meta">来源：Cursor　日期：2026 年 8 月 4 日　分类：Research　原文：<a href="https://cursor.com/blog/mixture-of-kittens">cursor.com/blog/mixture-of-kittens</a></p>
+<p>我们将 Mixture-of-Kittens 开源了。这是一个面向 NVL72 的确定性 MoE 训练巨型内核。它把通信和计算融合进同一个内核。</p>
+<nav class="toc">
+<strong>目录</strong>
+<ul>
+<li>在 MoE 中重叠计算与通信</li>
+<li>选择正确的通信方向</li>
+<li>合理组织计算与通信的重叠</li>
+<li>用环形 token 缓冲区彻底消除 CPU-GPU 同步</li>
+<li>其他功能与实现细节</li>
+<li>加速效果</li>
+<li>面向 agent 时代的巨型内核</li>
+<li>引用</li>
+</ul>
+</nav>
+<p>今天，我们正式开源 Mixture-of-Kittens（MoK）。这是我们用于生产环境的 NVL72 MoE 训练巨型内核。</p>
+<p>随着我们扩大 agent 编程模型 Composer 的训练和推理规模，混合专家层一直是主要瓶颈。根据负载和训练配置的不同，它可能占用端到端训练时间的一半以上。</p>
+<p>MoK 把所有 MoE 通信和计算融合进一个完全确定性的内核，以解决这个瓶颈。目前，它已支撑 Composer 在数万块 GPU 上的训练。</p>
+<p>你可以在 <a href="https://github.com/cursor/mixture-of-kittens">GitHub</a> 上试用 MoK 并研究代码。我们期待收到反馈和社区贡献。</p>
+<p>MoK 源于我们此前多次加速 MoE 层的尝试。过去一年里，我们编写了自己的 MXFP8 和 NVFP4 训练内核，还为 MoE 推理开发了“warp decode”方法。</p>
+<p>不过，这些技术只优化了该层的计算部分，并假设 GPU 间通信会由其他组件处理。在生产负载中，通信已经成为限制因素。因此，我们从基本原理出发，重新设计了整个 MoE 层，并把通信直接放进内核。</p>
+<p>此外，转向 GB300 NVL72 后，问题在两个方面发生了变化。第一，一个 NVL72 是位于同一 NVLink 域内的多节点机架。这让全部 72 块 GPU 可以快速、细粒度地重叠计算与通信。</p>
+<p>第二，集成式 Grace CPU，也就是 GB300 名称中的“G”，与 GPU 相比往往较慢。我们发现 GPU stream 很容易追上 CPU 侧任务。此时 GPU 会完全空闲。因此，我们必须尽可能减少 CPU 工作和 CPU-GPU 同步。</p>
+<p>我们针对这些挑战提出了 Mixture-of-Kittens（MoK）。这是一个从基本原理出发、专为 NVL72 高度优化的 MoE 训练巨型内核。MoK 把所有 MoE 通信和计算融合进单个内核。它完全确定，并且相对于公开实现达到了当前最佳性能。</p>
+<div class="chart-text">
+<p><strong>Mixture-of-Kittens 在 GB300 NVL72 上的 MXFP8 前向吞吐量最高达到最快公开基线的 2.37 倍</strong></p>
+<p>NCCL + PyTorch</p><p>DeepEP + PyTorch</p><p>DeepEP + TransformerEngine</p><p>HybridEP + Megatron</p><p>Mixture-of-Kittens</p>
+</div>
+<div class="chart-text">
+<p><strong>Mixture-of-Kittens 在 GB300 NVL72 上的 MXFP8 前向吞吐量最高达到最快公开基线的 2.37 倍</strong></p>
+<p>NCCL + PyTorch</p><p>DeepEP + PyTorch</p><p>DeepEP + TransformerEngine</p><p>HybridEP + Megatron</p><p>Mixture-of-Kittens</p>
+</div>
+<div class="chart-text">
+<p><strong>Mixture-of-Kittens 在 GB300 NVL72 上的 MXFP8 前向吞吐量最高达到最快公开基线的 2.37 倍</strong></p>
+<p>NCCL + PyTorch</p><p>DeepEP + PyTorch</p><p>DeepEP + TransformerEngine</p><p>HybridEP + Megatron</p><p>Mixture-of-Kittens</p>
+</div>
+<p>在跨越多个 NVL72 机架的生产训练栈中，MoK 将端到端每秒 token 数提高到原来的 1.41 倍。</p>
+<p>本文余下部分会介绍 MoK 背后的关键思路。内容包括如何选择正确的通信方向，如何组织计算与通信的重叠，以及如何通过环形 token 缓冲区消除 CPU-GPU 同步。我们还会介绍巨型内核设计、确定性、MXFP8 支持及其他实现细节。</p>
+<h3>在 MoE 中重叠计算与通信</h3>
+<p>MoK 面向 DeepSeek-V3（DSV3）风格的 MoE 层。这种结构广泛用于 GLM、Qwen、Kimi（截至 K2.7）和 DSV 等开放权重模型。此类 MoE 层把一个共享专家与大量路由专家组合起来。路由专家通常多达数百个。</p>
+<p>每个 token 进入 MoE 层后，路由投影会选出 top-k 路由专家，并为每个专家分配一个路由权重。每个被选中的专家随后执行标准前馈网络计算，包括 up 投影、gate 投影、SwiGLU 激活和 down 投影。该层最后使用路由权重，合并共享专家和路由专家的输出。</p>
+<p>本文使用以下记号：</p>
+<ul>
+<li><strong>D</strong>：模型维度</li>
+<li><strong>I</strong>：专家中间维度</li>
+<li><strong>E</strong>：路由选中的 top-k 专家集合</li>
+<li>输入 token：<strong>x ∈ R<sup>D</sup></strong></li>
+<li>路由权重：<strong>s ∈ R<sup>|E|</sup></strong></li>
+<li>专家权重：<strong>W<sub>up</sub> ∈ R<sup>I×D</sup></strong>、<strong>W<sub>gate</sub> ∈ R<sup>I×D</sup></strong>、<strong>W<sub>down</sub> ∈ R<sup>D×I</sup></strong></li>
+</ul>
+<p>MoE 层随后执行相应计算，其中各项定义如上。原文此处的公式未包含在所提供的正文文本中。</p>
+<p>在专家并行（EP）中，我们把路由专家分片，将其权重分布在多块 GPU，也就是多个 rank 上。共同持有全部专家权重的 rank 数量称为 EP degree。例如，有 256 个路由专家且 EP degree 为 64 时，每个 rank 持有 4 个路由专家，外加共享专家。因此，在进入和离开 MoE 层时，token 必须按照路由投影结果在 GPU 之间传输。</p>
+<p>分布式 MoE 最直接的实现方式如下：先把每个 token 发送给持有其目标专家的 rank，这一步是 dispatch all-to-all；然后执行 FFN；接着把结果送回 token 原来的 rank，这一步是 combine all-to-all；最后对专家输出做加权求和。但通信耗时可能与计算本身相当。顺序执行两者效率很低。</p>
+<p>标准解决办法是使用流水线，让 dispatch/combine<sup>1</sup> 通信与各专家的 FFN 重叠。系统先传输一批 token，然后在计算这批 token 的 FFN 时传输下一批，如此重复。MoK 是这种方案的一种实现。它加入了一组针对目标硬件的新技术，因此比现有基线更快。</p>
+<figure class="source-figure" data-source-image="0"><img alt="Overlapping the computation and communication of MoE forward" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fmoe-forward-light-8oB4P86jYdEv7akurQxupC2x6VJCut.png&amp;w=1920&amp;q=70" width="800"/><img alt="Overlapping the computation and communication of MoE forward" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fmoe-forward-dark-L2SnHJbCNRXuOSyUPPWpwcuCibwY7v.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<h3>选择正确的通信方向</h3>
+<p>在 GPU 间发送 token 时，可以选择基于 push 的机制。此时，持有 token 的 GPU 主动把数据写入远程目标 GPU。也可以选择基于 pull 的机制。此时，需要 token 的 GPU 从远程源 GPU 读取数据。现有方法在 GPU 间分散和收集 token 时，通常依赖 push 通信，例如 DeepEP。</p>
+<p>一种常见看法是，push 所需的协议通信较少，因此更容易跑满 GPU 间链路，通常也就成为默认选择。不过，我们观察到两种机制各有取舍。要让性能最大化，必须为每个通信操作选择正确的方向。原因有三个。</p>
+<h4>调度</h4>
+<p>为了尽快完成 token 的 dispatch 和 combine，需要满足以下条件：</p>
+<ul>
+<li>连接机架内 72 块 GPU 的所有 NVLink 通道都必须保持饱和。不能长时间只让 token 经过部分“源端 → 目标端”通道。因此，在任意时刻，每个源 rank 发送的 token 都要均匀分布到所有目标 rank。</li>
+<li>发送给某个 rank 的 token 应按该 rank 的本地专家排列。如果到达顺序杂乱，按专家分组的 GEMM 就要等待更久，直到凑齐一个完整 token tile，Tensor Core 才能开始矩阵乘法。</li>
+<li>本地复制次数应为零。属于同一专家的 token 应直接落入连续内存。这样 grouped GEMM 无需本地重排即可开始。</li>
+<li>满足以上三个条件的额外开销必须尽可能小。绝大多数时间应花在实际发送 token 上，而不是调度或搜索待发送 token。</li>
+</ul>
+<p>使用 push dispatch 时，需要生成一张包含 <code>{src_index, dst_rank, dst_index}</code> 三列的调度表。<code>src_index</code> 是本地输入激活缓冲区的索引。<code>dst_index</code> 是 token 在目标 rank 内存中的落点。表格的行序决定 token 通过 NVLink 发送的顺序。我们希望各行以 round-robin 方式轮换 <code>dst_rank</code>，让每条已连接通道都保持忙碌。</p>
+<p>在目标为同一 <code>dst_rank</code> 的行中，<code>dst_index</code> 必须在所有源 GPU 之间均匀交错。它们还必须遵循目标 rank 上本地专家递增的顺序。构建这张表需要多次排序。每个 rank 的调度还必须考虑其他所有 rank，因为两个源 rank 不能写入同一个 <code>dst_index</code>。</p>
+<p><strong>Push 调度：</strong>连续条目必须交错选择目标 rank，才能让整个网络保持饱和。</p>
+<p><strong>Pull 调度：</strong>连续条目必须交错选择源 rank，才能让整个网络保持饱和。</p>
+<figure class="source-figure" data-source-image="1"><img alt="Push vs pull based dispatch" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fpvp-dispatch-light-neEuNH9Bsl5cwfAh8KHsvvbxSd96Rt.png&amp;w=1920&amp;q=70" width="800"/><img alt="Push vs pull based dispatch" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fpvp-dispatch-dark-0NPIr5Of3L37JXHKa0lOuh8bKrX21C.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<p>使用 pull dispatch 时，调度表可以简化为两列：<code>{src_rank, src_index}</code>。表格的行索引直接对应本地目标缓冲区中的 token 索引。</p>
+<p>理论上，调度表的行数应与目标缓冲区的行数一致。这会要求分配大量内存，后文会继续讨论。这里不需要排序。我们遍历路由投影结果。每当发现一个 token 应落到当前 rank，就把它的源 rank 和索引写入调度表。算法按此方式运行。</p>
+<p>实际测试中，实现该算法的调度内核只占 MoE 总运行时间的不到 3%。它完全运行在设备端，不需要任何 CPU-GPU 通信。</p>
+<p>如果为 combine 选择 push 方式，还可以原样复用这张调度表。只需把 <code>{src_rank, src_index}</code> 当作 <code>{dst_rank, dst_index}</code> 读取即可。事实上，我们只需构建一次调度表，就能在前向和反向过程中复用到全部四个通信操作：</p>
+<ul>
+<li>拉取式前向 dispatch</li>
+<li>推送式前向 combine</li>
+<li>拉取式反向 reverse-combine</li>
+<li>推送式反向 reverse-dispatch</li>
+</ul>
+<p>最坏情况下，这张调度表也只有几 MB。长期保留不会形成内存压力。另一个好处是，它可以彻底消除 GPU 间的多通道信令。下文会进一步解释。</p>
+<h4>NVLink 带宽利用率</h4>
+<p>与所有网络系统一样，通过 NVLink 传输用户数据时，除了有效负载，还会附带协议元数据。元数据包含来源、目标和确认信息等内容，具体取决于网络协议。NVLink 通信协议的细节并未公开，但我们可以观察链路上传输的数据，并据此谨慎分析。</p>
+<p>我们发现，push NVLink 通信传输的总字节数更少。这里的总量包括协议元数据和有效负载。它还会把几乎所有内容都沿同一方向发送。因此，当所有通道都处于繁忙状态时，它能取得更高的带宽利用率。</p>
+<p>pull 传输的总字节数更多，但协议元数据会更均匀地分布到链路的两个方向。拉取方先向一个方向发送元数据，再从另一个方向接收更多元数据和有效负载。</p>
+<p>我们可以编写一个简单的跨 GPU 传输内核，再用 NCU 分析它，以验证这一点。例如，在微基准中通过 NVLink 发送一个 256×256 BF16 tile，也就是 131,072B 时，我们得到了相应观察结果。</p>
+<p>原文表格中的 RX 表示接收方向，TX 表示发送方向。可以看到，push 的总传输量大约少 12.4 KB。理想情况下，它应能带来更好的 NVLink 整体饱和度。不过，NVLink 在两个方向上使用独立通道。要达到 NVLink 规格标称的带宽，也就是 GB300 上第五代 NVLink 的 1.8 TB/s，流量必须在两个方向上充分流动。对于 MoE dispatch/combine 这类负载，每次传输通常只有几 KB，而且流量并不均衡，因此链路执行中会出现空泡。</p>
+<p>实际结果显示，在专家负载不均时执行 token dispatch，pull 通信的 NVLink 带宽利用率最高比 push 高 29%。因此，pull 是更好的选择。</p>
+<h4>信令</h4>
+<p>GPU 必须知道 dispatch/combine 通信何时完成，所以信令不可缺少。GPU 只有收到完成信号后，才能开始处理接收到的 token。降低信令开销十分重要，而通信方向会对其产生明显影响。</p>
+<p>使用 push dispatch 或 pull combine 时，完成信号必须跨 GPU 传播。在按专家分组的 GEMM 开始前，一个 rank 最多需要等待 71 个对等方发来信号。它还要发出 memory fence，在整个机架范围刷新内存。另外，信号仍在传输时，数据其实已经位于目标端，只是暂时不能使用。</p>
+<p>使用 pull dispatch 和 push combine 时，跨 GPU 信令会消失。每个 rank 发起一次 load，等待数据到达，随后便能立即使用。不需要多节点同步。此外，只有单个实体负责信令，所以开销不会随专家并行规模增长。</p>
+<p>我们发现，这部分信令开销相当大。在多节点微基准中，push dispatch 的信令延迟约为 pull dispatch 的 5.8 倍，分别为 103 微秒和 18 微秒。在巨型内核中，这些成本会快速累积。</p>
+<p>基于上述结果，MoK 使用拉取式前向 dispatch、推送式前向 combine、拉取式反向 reverse-combine，以及推送式反向 reverse-dispatch。</p>
+<h3>合理组织计算与通信的重叠</h3>
+<h4>计算与通信的粒度</h4>
+<p>计算与通信的粒度，是两类任务互相发送完成信号时所采用的工作粒度。这里存在一个值得注意的取舍。</p>
+<p>在一个极端，通信可以非常细。例如，只发送刚好足以让 Tensor Core 启动一条完整矩阵乘加指令的 token。在 Blackwell 上，这个数量可以是 256。随后，让每次传输持续与矩阵乘法重叠。Comet 是这种方法的典型例子。</p>
+<p>在另一个极端，通信可以很粗。系统一次发送数千或数万个 token，并等待整批数据全部到达，之后才启动 Tensor Core 操作。DeepEP 是这类方法的典型例子。</p>
+<p>我们的观察是，这两个极端都不是正确选择。最优点位于两者之间，并且取决于实际负载。</p>
+<p>如果通信粒度过细，Tensor Core 永远无法完全饱和。Nvidia Tensor Core 是高度流水化、面向带宽优化的加速器。我们应该持续向它们供给工作，而不是每隔几条 MMA 指令就遇到一次 barrier wait。</p>
+<p>如果通信粒度过粗，Tensor Core 会长时间等待第一轮 token 到达，也会等待最后一轮输出完成 combine。</p>
+<figure class="source-figure" data-source-image="2"><img alt="Fine-grained vs coarse-grained computation-communication overlap" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Ffine-coarse-light-48pUffAHZCSN3oRNYJ3dlnVg9jMAGg.png&amp;w=1920&amp;q=70" width="800"/><img alt="Fine-grained vs coarse-grained computation-communication overlap" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Ffine-coarse-dark-WAWoXuzvuMXQRR7n8GEdubCftkGOPv.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<p>我们把每一轮发送的 token 集合称为一个 <strong>minibatch</strong>。MoK 把 minibatch 大小设为可调参数，因此在运行负载前可以方便地扫描候选配置。</p>
+<p>选择最佳 minibatch 大小时，可以采用一个粗略的启发式方法：考虑每个算子需要多少个 wave，例如按专家分组的 GEMM。</p>
+<p>一个 wave 是 GPU 上所有 SM 同时执行一轮任务。如果工作量太小，例如专家 grouped GEMM 收到的 token 过少，就会出现不完整 wave。此时部分 SM 会闲置。也可能出现尾部效应，也就是最后一个 wave 只使用部分 SM。</p>
+<p>我们发现，让 FFN 中的每个专家 grouped GEMM 至少拥有两个完整 wave，是一种有效的 minibatch 大小选择方式。原因有两个。第一，一个完整 wave 已足以完全跑满 Tensor Core。第二，有两个 wave 时，第二个 wave 的 MMA 可以与第一个 wave 的 epilogue 及其依赖算子重叠，例如 SwiGLU 激活或下一个 grouped GEMM，从而摊薄尾部效应。</p>
+<p>具体来说，在 Blackwell GPU 上，要充分利用 Tensor Core 执行 M×N×K GEMM，其中 K 是归约维度，每个 SM 都需要处理一个 128×256 的输出 tile。无论使用 1-SM 还是 2-SM MMA，都是如此。</p>
+<p>设：</p>
+<ul>
+<li><strong>T</strong>：每次传输的 token 数，也就是 minibatch 大小</li>
+<li><strong>H</strong>：隐藏维度</li>
+<li><strong>I</strong>：专家中间维度</li>
+<li><strong>C</strong>：SM 数量</li>
+</ul>
+<p>我们希望每个 GEMM 产生足以填满至少两个 wave 的任务，同时把通信粒度保持在尽可能小的水平，以获得最大重叠。对于 up 和 gate 投影，两者不存在依赖，可以同时运行，因此需要满足相应条件。</p>
+<p>对于不能与其他算子并行执行的 down 投影，则需要满足另一项相应条件。</p>
+<p>综合两者，便可得到所需约束。原文提供的正文文本没有包含这些公式的具体表达式。</p>
+<p>以 Kimi 2.5 为例。它是 Composer 2.5 的基础模型，其参数为 H=7168、I=2048。Blackwell GPU 的 C=148。代入这些值后可以得到相应结果。原文提供的正文文本没有包含该计算式。</p>
+<p>在针对 Kimi 2.5 形状运行 MoK 前向的微基准中，我们观察到了与这一启发式方法大致一致的结果。</p>
+<h4>安排重叠任务</h4>
+<p>确定通信粒度后，下一个问题是如何在 GPU 上安排 dispatch、combine 和 FFN，让它们高效重叠。为此，我们采用 inter-SM overlapping 技术。一部分 SM 分配给专家 FFN，称为 comp SM；另一部分分配给 dispatch/combine，称为 comms SM。两组 SM 通过一个本地计数器互相发送信号。由于 TMA load/store 只需不到三分之一的 SM 就能完全跑满 NVLink 带宽，这种分工是可行的。</p>
+<p>我们把 inter-SM overlapping 作为基础策略。在 MoE 前向过程中，comms SM 首先执行拉取式 dispatch all-to-all。每当一个完整 minibatch 的 token 到达并可以计算时，它们就通知 comp SM。comp SM 随后对这些 token 原子式地执行 MLP-SwiGLU。所有操作完成 down 投影后，comp SM 再通知 comms SM，表示 token 已可进行 combine。</p>
+<p>comms SM 会先处理全部 dispatch 任务，再处理 combine all-to-all。因此，当 dispatch 完成时，comp SM 通常已经发来了许多完成信号。随后，comms SM 开始执行推送式 combine，同时 comp SM 继续完成最后到达的 token 所对应的 FFN。此外，在 comp SM 等待第一次 dispatch 完成时，还可以插入共享专家 FFN。</p>
+<figure class="source-figure" data-source-image="3"><img alt="Minibatch-only MoK forward schedule" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fminibatch-light-rpB7k0EeXrBjPyO5DNDtH44ki6cPB5.png&amp;w=1920&amp;q=70" width="800"/><img alt="Minibatch-only MoK forward schedule" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fminibatch-dark-Oy2SjizfH8J0QyfpdXzHQKP3169t1Q.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<p>反向过程与此类似，但加入前向重放后会稍微复杂。后文会详细介绍。comms SM 执行 reverse-combine，并通知 comp SM 运行不含权重梯度的 FFN backward，也就是三个 dgrad 专家 grouped GEMM 和 SwiGLU 激活反向。FFN 完成后，comp SM 通知 comms SM，说明 token 已可进行 reverse-dispatch。</p>
+<figure class="source-figure" data-source-image="4"><img alt="Minibatch-only MoK backward schedule" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fminibatch-2-light-7PsFKWZYeq5ckiMU3WfpOT00ZgsMfn.png&amp;w=1920&amp;q=70" width="800"/><img alt="Minibatch-only MoK backward schedule" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fminibatch-2-dark-8TsLpdu0188op7l65z3vTQJIcCfrKZ.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<p>全部 minibatch 的 dgrad 完成后，我们再计算剩余的三个 wgrad。推迟 wgrad 有两个原因。第一，reverse-dispatch 不依赖 wgrad，因此 wgrad 可以与最后几次 reverse-dispatch 重叠。第二，对 wgrad 而言，token 轴是归约维度。一次性沿完整 token 轴进行累加，可以尽量降低数值不稳定性。与前向过程相同，我们让完整的共享专家反向与第一轮 reverse-combine 重叠。</p>
+<h3>用环形 token 缓冲区彻底消除 CPU-GPU 同步</h3>
+<p>最后一个缺失环节是处理 MoE 的动态性。我们无法提前知道会有多少 token 到达某个目标 rank。</p>
+<p>现有方案有两种。第一种是丢弃 token。超出固定缓冲区容量的 token 会被直接忽略，永远不会进入专家 FFN。第二种是 CPU-GPU 同步。系统把根据路由结果算出的各 rank token 数发送到 CPU，再由 CPU 分配大小刚好匹配的缓冲区。</p>
+<p>两种方案都有明显缺点。我们不愿为了训练质量而丢弃 token。CPU-GPU 同步也会阻止 GPU stream 跑在 CPU thread 前面。</p>
+<p>CPU-GPU 同步在 GB300 NVL72 上尤其昂贵，因为集成式 Grace CPU 很慢。在我们的 trace 中，GPU kernel 经常受到 CPU 任务限制，例如日志记录或把训练指标推送到远程服务器。同一套训练栈在使用 Intel CPU 的 DGX 机器上并没有这些问题。因此，我们希望尽量减少 CPU-GPU 同步。</p>
+<p>MoK 使用一种环形 token 缓冲区来解决问题。我们将其称为 <strong>macrobatch</strong>。我们不再分配一个很大但大部分空间闲置的目标缓冲区，而是创建一个只有数百 MB 的固定环形缓冲区，并以 minibatch 为粒度循环使用。</p>
+<p>高效实现 macrobatching，需要谨慎重叠计算与通信。两者都不应因为某个缓冲区槽位仍在使用，或槽位数据尚未到达而停顿。理想情况下，重叠应跨越环形边界。系统一边计算缓冲区尾部的数据，一边向缓冲区开头执行 dispatch。</p>
+<p>关键思路是在性能允许时尽早排空每个槽位，使其尽快被复用。在前向过程中，dispatch 填充槽位，combine 排空槽位，再将其释放给下一次 dispatch。</p>
+<p>不过，如果像上一节的调度一样，先完成所有 dispatch，再完成所有 combine，下一个 macrobatch 就必须等到全部 combine 结束才能启动。计算与通信也要等到下一 macrobatch 的第一次 dispatch 完成后，才能重新开始重叠。</p>
+<p>为避免这个问题，我们在前向过程中交错执行 dispatch 和 combine。系统把前一个 macrobatch 某个 minibatch 的 combine，与下一个 macrobatch 对应 minibatch 的 dispatch 交错起来。两者使用环形缓冲区的同一区域。这样，缓冲区一被清空就会立即重新填充。第一个 macrobatch 的 dispatch 和最后一个 macrobatch 的 combine 没有对应任务，因此不会交错。</p>
+<figure class="source-figure" data-source-image="5"><img alt="MoK forward schedule at a macrobatch boundary" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fminibatch-3-light-6sCFZaei9WotkdFUDJewSnWO1BuMvG.png&amp;w=1920&amp;q=70" width="800"/><img alt="MoK forward schedule at a macrobatch boundary" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fminibatch-3-dark-tlhWhNcxFQX3Ohofubq8GmUBjX1595.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<h4>使用反向环，减少反向过程中的前向重放</h4>
+<p>反向过程稍微复杂，因为反向巨型内核必须支持前向激活重放。macrobatch 缓冲区是环形结构。如果存在多个 macrobatch，前向过程中保存的部分激活会被覆盖，因此必须重新计算。重放只需运行到 SwiGLU 激活为止，因为反向过程只需要 down 投影的输入激活和输出梯度，不需要它的前向输出。</p>
+<p>这里的一项关键优化是反向环。如果按 macrobatch 升序处理 token，最后一个 macrobatch 会让环形缓冲区只填充一部分，反向过程最终需要重放更多激活。因此，MoK 在前向过程中按 macrobatch 的逆序遍历 token。这样，保存下来的环形缓冲区要么完全填满，要么包含全部 token，从而最大限度减少反向过程中的前向重放。</p>
+<h3>其他功能与实现细节</h3>
+<h4>巨型内核</h4>
+<p>我们使用 megakernel 技术构建 MoK。指令在 SM 任务层面重叠，而不是被内核启动边界分隔。巨型内核通常适合融合完整的前向或反向步骤。我们发现它对 MoK 也很有用，原因有两个。</p>
+<p>第一，如果不使用巨型内核融合，实现 minibatching 和 macrobatching 会需要多次启动内核，从而增加启动边界的开销。第二，在 inter-SM overlapping 中，我们发现使用多个 stream 和 green context 无法可靠地按预期精确划分 SM。软件划分则能提供精确的分配保证。</p>
+<h4>确定性</h4>
+<p>为了支持内部消融实验和 on-policy RL 后训练，我们把 MoK 设计为完全确定。浮点运算的顺序是固定的。因此，无论硬件怎样调度和发射指令，相同输入都会产生逐位一致的输出。</p>
+<h4>使用 Cluster Launch Control 重叠 RDMA</h4>
+<p>MoK 巨型内核通过 Cluster Launch Control（CLC）调度任务，以支持 RDMA 重叠。CLC 是 Blackwell 引入的一项硬件原生 work-stealing 功能，也是实现 persistent grid kernel 的一种新方式。</p>
+<p>基于 CLC 的内核可以自然地把执行资源让给更高优先级 stream 上的内核，不必等待当前内核完全结束。这一点很重要。训练期间，我们经常需要让机架内通信和计算与机架间 InfiniBand/RoCE 通信重叠，例如 FSDP all-gather。这些通信本身也需要使用 SM。如果没有 CLC，机架间通信就会排在巨型内核之后串行执行，造成明显的性能下降。</p>
+<h4>MXFP8 支持</h4>
+<p>MoK 同时支持 BF16 和 MXFP8 精度模式。我们使用 MXFP8 模式训练，因为它速度更快，也没有引发数值问题。在 MXFP8 模式下，共享专家仍使用 BF16。我们发现，这样做会影响训练稳定性。</p>
+<p>MXFP8 的一项额外成本是，张量送入 Tensor Core 前必须量化。为降低这部分开销，我们做了两项工作。第一，提供优化后的 MXFP8 量化内核，用于预先量化权重。第二，把激活量化融合进 dispatch all-to-all、专家 grouped GEMM 和 SwiGLU。</p>
+<h4>路由权重梯度计算</h4>
+<p>MoK 的反向过程还会使用类似 SonicMoE 的计算方式，求出路由权重梯度。它不会保存完整的 down 投影输出，而是通过 SwiGLU 激活与 down 投影 dgrad 的内积进行计算。这项计算被融合进 SwiGLU backward，以避免额外的内存流量。</p>
+<h4>计算与通信 SM 调优</h4>
+<p>comp SM 和 comms SM 的最佳比例取决于工作负载。本地 token 数、模型形状、硬件算力和网络带宽，都会改变 dispatch/combine 相对于专家 FFN 的耗时。即使负载相同，前向和反向过程的最佳比例也不一样。因此，MoK 提供了可调参数，可以分别设置前向和反向使用的 comms SM 数量。</p>
+<h3>加速效果</h3>
+<p>我们用两类 benchmark 评估 MoK。第一类是单个 MoE 层的 benchmark，我们公开了全部测试代码。第二类是在内部生产训练栈上跨多个 NVL72 机架执行的端到端 benchmark。</p>
+<h4>MoE 层 benchmark</h4>
+<p>我们测试了单个 MoE 层的完整执行，包括全局 token 调度、token dispatch all-to-all、专家 FFN、token combine all-to-all，以及最后的加权求和。前向和反向过程分别测试，并覆盖 BF16 与 MXFP8 两种模式。所有测试都在单个 NVL72 机架内运行，EP degree 为 64，每块 GPU 在路由前拥有 2,048 个 token。</p>
+<p>我们选择的基线需要满足两个条件。第一，同时支持 MoE 前向和反向过程。第二，可以在 NVL72 上运行。基线包括：</p>
+<ul>
+<li>NCCL + PyTorch</li>
+<li>DeepEP + PyTorch</li>
+<li>DeepEP + TransformerEngine</li>
+<li>HybridEP + Megatron。对于 NVL72，这是 Nvidia 推荐使用的方案，优先级高于 DeepEP + Megatron。</li>
+</ul>
+<p>我们测试了多个常用开放权重模型的形状：</p>
+<ul>
+<li>Kimi K2.7 Code：E=384、H=7168、I=2048、top-k=8</li>
+<li>GLM-5.2：E=256、H=6144、I=2048、top-k=8</li>
+<li>Qwen3.5-397B-A17B：E=512、H=4096、I=1024、top-k=10</li>
+<li>DeepSeek-V4-Pro：E=384、H=7168、I=3072、top-k=6</li>
+</ul>
+<p>下面的图表给出了四种形状在所有基线上的测试结果：</p>
+<div class="chart-text">
+<p><strong>Mixture-of-Kittens 在 GB300 NVL72 上的 MXFP8 前向吞吐量最高达到最快公开基线的 2.37 倍</strong></p>
+<p>NCCL + PyTorch</p><p>DeepEP + PyTorch</p><p>DeepEP + TransformerEngine</p><p>HybridEP + Megatron</p><p>Mixture-of-Kittens</p>
+</div>
+<div class="chart-text">
+<p><strong>Mixture-of-Kittens 在 GB300 NVL72 上的 MXFP8 前向吞吐量最高达到最快公开基线的 2.37 倍</strong></p>
+<p>NCCL + PyTorch</p><p>DeepEP + PyTorch</p><p>DeepEP + TransformerEngine</p><p>HybridEP + Megatron</p><p>Mixture-of-Kittens</p>
+</div>
+<div class="chart-text">
+<p><strong>Mixture-of-Kittens 在 GB300 NVL72 上的 MXFP8 前向吞吐量最高达到最快公开基线的 2.37 倍</strong></p>
+<p>NCCL + PyTorch</p><p>DeepEP + PyTorch</p><p>DeepEP + TransformerEngine</p><p>HybridEP + Megatron</p><p>Mixture-of-Kittens</p>
+</div>
+<div class="chart-text">
+<p><strong>专家并行 MoE 吞吐量：MXFP8 反向（GB300 NVL72）</strong></p>
+<p>NCCL + PyTorch</p><p>DeepEP + PyTorch</p><p>DeepEP + TransformerEngine</p><p>HybridEP + Megatron</p><p>Mixture-of-Kittens</p>
+</div>
+<div class="chart-text">
+<p><strong>专家并行 MoE 吞吐量：MXFP8 反向（GB300 NVL72）</strong></p>
+<p>NCCL + PyTorch</p><p>DeepEP + PyTorch</p><p>DeepEP + TransformerEngine</p><p>HybridEP + Megatron</p><p>Mixture-of-Kittens</p>
+</div>
+<div class="chart-text">
+<p><strong>专家并行 MoE 吞吐量：MXFP8 反向（GB300 NVL72）</strong></p>
+<p>NCCL + PyTorch</p><p>DeepEP + PyTorch</p><p>DeepEP + TransformerEngine</p><p>HybridEP + Megatron</p><p>Mixture-of-Kittens</p>
+</div>
+<div class="chart-text">
+<p><strong>专家并行 MoE 吞吐量：BF16 前向（GB300 NVL72）</strong></p>
+<p>NCCL + PyTorch</p><p>DeepEP + PyTorch</p><p>DeepEP + TransformerEngine</p><p>HybridEP + Megatron</p><p>Mixture-of-Kittens</p>
+</div>
+<div class="chart-text">
+<p><strong>专家并行 MoE 吞吐量：BF16 前向（GB300 NVL72）</strong></p>
+<p>NCCL + PyTorch</p><p>DeepEP + PyTorch</p><p>DeepEP + TransformerEngine</p><p>HybridEP + Megatron</p><p>Mixture-of-Kittens</p>
+</div>
+<div class="chart-text">
+<p><strong>专家并行 MoE 吞吐量：BF16 前向（GB300 NVL72）</strong></p>
+<p>NCCL + PyTorch</p><p>DeepEP + PyTorch</p><p>DeepEP + TransformerEngine</p><p>HybridEP + Megatron</p><p>Mixture-of-Kittens</p>
+</div>
+<div class="chart-text">
+<p><strong>专家并行 MoE 吞吐量：BF16 反向（GB300 NVL72）</strong></p>
+<p>NCCL + PyTorch</p><p>DeepEP + PyTorch</p><p>DeepEP + TransformerEngine</p><p>HybridEP + Megatron</p><p>Mixture-of-Kittens</p>
+</div>
+<div class="chart-text">
+<p><strong>专家并行 MoE 吞吐量：BF16 反向（GB300 NVL72）</strong></p>
+<p>NCCL + PyTorch</p><p>DeepEP + PyTorch</p><p>DeepEP + TransformerEngine</p><p>HybridEP + Megatron</p><p>Mixture-of-Kittens</p>
+</div>
+<div class="chart-text">
+<p><strong>专家并行 MoE 吞吐量：BF16 反向（GB300 NVL72）</strong></p>
+<p>NCCL + PyTorch</p><p>DeepEP + PyTorch</p><p>DeepEP + TransformerEngine</p><p>HybridEP + Megatron</p><p>Mixture-of-Kittens</p>
+</div>
+<p>总体而言，与最快基线相比，MoK 在 MXFP8 前向上最高快 2.37 倍，在 MXFP8 反向上最高快 1.78 倍，在 BF16 前向上最高快 1.92 倍，在 BF16 反向上最高快 1.58 倍。</p>
+<h4>端到端 benchmark</h4>
+<p>除了与公开实现进行 benchmark，我们还报告了内部生产训练栈的加速结果。此前，我们的训练栈使用基于 DeepEP 的专家并行实现，并为 MoE 计算配备自定义 MXFP8 内核。我们通过切换 MoE 层实现，也就是在 DeepEP 和 MoK 之间切换，比较端到端每秒 token 数。测试使用 512 块 GPU，跨越多个 GB300 NVL72 机架。</p>
+<div class="chart-text">
+<p><strong>端到端训练吞吐量对比（GB300 NVL72）</strong></p>
+<p>基于 DeepEP</p><p>Mixture-of-Kittens</p>
+</div>
+<div class="chart-text">
+<p><strong>端到端训练吞吐量对比（GB300 NVL72）</strong></p>
+<p>基于 DeepEP</p><p>Mixture-of-Kittens</p>
+</div>
+<div class="chart-text">
+<p><strong>端到端训练吞吐量对比（GB300 NVL72）</strong></p>
+<p>基于 DeepEP</p><p>Mixture-of-Kittens</p>
+</div>
+<p>总体而言，与此前基于 DeepEP 的生产配置相比，MoK 让每秒 token 数提高了约 41%。这使我们可以更高效地利用 GB300 NVL72 基础设施训练模型。</p>
+<h3>面向 agent 时代的巨型内核</h3>
+<p>Mixture-of-Kittens 从今天起完全开源。我们计划持续维护它，也欢迎社区提供反馈和贡献。我们希望它能降低 AI 研究门槛，让更多研究者和实验室高效训练模型。</p>
+<p>MoK 也以灵活性为目标。我们投入了大量精力，让它易于修改。借助 agent，你可以迅速把它适配到我们当前使用范围之外的平台。</p>
+<p>顺带一提，随着 AI 模型具备编写高性能内核的能力，内核优化领域变得有趣得多。过去需要手工编写的单算子内核，如今几乎可以完全交给 AI。只要给出正确的设计方向，例如如何让 warp 专门化，以及使用哪些 PTX 指令，agent 就能一次生成达到当前最佳水平的内核。</p>
+<p>更有意思的是，它为我们带来了新的能力。去年，编写巨型内核需要先创建一层简化抽象。今年，我们不再需要框架。我们移除了额外的抽象层，并借助 agent，从零开始直接处理复杂问题。</p>
+<p>agent 自动完成了较简单的任务，例如单算子内核。它们也帮助我们更快解决困难任务，例如编写分布式 MoE 巨型内核。整个项目只需要一支很小的团队。</p>
+<p>不过，要优化运行在数十万块 GPU 上的高风险机器学习负载，我们还有大量工作要做。如果你对本文及这类工作感兴趣，我们很希望听到你的声音。请通过 <a href="mailto:hiring@cursor.com">hiring@cursor.com</a> 联系我们。</p>
+<h3>引用</h3>
+<p>如果你使用了这项工作，请引用：</p>
+<blockquote>
+Stuart H. Sul、Nash Brown、Henry Wildermuth、William Lin 和 Federico Cassano。《Mixture-of-Kittens: MoE Megakernel for NVL72s》。Cursor Research，2026 年 8 月。<a href="https://github.com/cursor/mixture-of-kittens">https://github.com/cursor/mixture-of-kittens</a>
+</blockquote>
+<p>也可以使用 BibTeX。原文提供的正文文本没有包含具体 BibTeX 条目。</p>
+<p>特别感谢 Chris Ré、Sasha Rush、Less Wright、Chen Lu 和 Nathan Wang 阅读本文并提出宝贵意见。</p>
+<p class="footnote"><sup>1</sup> 本文中的 dispatch 指 dispatch all-to-all 通信，combine 指 combine all-to-all 通信。通常被包含在“combine”中的加权归约，在本文中单独称为加权求和。</p>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
