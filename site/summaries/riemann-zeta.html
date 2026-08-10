@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>进一步了解 Claude 的数学能力</title>
+<style>
+:root {
+  --bg: #f5f7fb;
+  --card: #ffffff;
+  --ink: #18212f;
+  --muted: #5f6b7a;
+  --line: #d8dee8;
+  --accent: #1769aa;
+  --accent2: #b44782;
+  --accent3: #17805c;
+  --accent4: #c26a16;
+  --accent5: #7154b3;
+  --hl: #d7ecff;
+  --hl2: #ffe5f1;
+  --risk: #fff0e1;
+  --deep: #17263a;
+  --deep-ink: #f2f6fb;
+}
+:root[data-theme="light"] {
+  --bg: #f5f7fb;
+  --card: #ffffff;
+  --ink: #18212f;
+  --muted: #5f6b7a;
+  --line: #d8dee8;
+  --accent: #1769aa;
+  --accent2: #b44782;
+  --accent3: #17805c;
+  --accent4: #c26a16;
+  --accent5: #7154b3;
+  --hl: #d7ecff;
+  --hl2: #ffe5f1;
+  --risk: #fff0e1;
+  --deep: #17263a;
+  --deep-ink: #f2f6fb;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10161f;
+    --card: #18212d;
+    --ink: #e8edf4;
+    --muted: #a8b3c2;
+    --line: #334052;
+    --accent: #65b7ff;
+    --accent2: #ef8fc0;
+    --accent3: #55d29f;
+    --accent4: #f2a35d;
+    --accent5: #b49aff;
+    --hl: #203d57;
+    --hl2: #4b2940;
+    --risk: #49321f;
+    --deep: #0a0f17;
+    --deep-ink: #e8edf4;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.75 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+main { max-width: 1120px; margin: 0 auto; padding: 28px 22px 72px; }
+.hero {
+  padding: 42px 38px;
+  border-radius: 8px;
+  color: var(--deep-ink);
+  background: var(--deep);
+  border-left: 8px solid var(--accent4);
+}
+.hero h1 { margin: 0 0 8px; font-size: clamp(2rem, 5vw, 4rem); line-height: 1.1; }
+.hero .original { margin: 0; color: var(--accent4); font-size: 1.05rem; }
+.hero .thesis { margin: 24px 0 0; max-width: 780px; font-size: 1.25rem; }
+.statline {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin: 22px 0;
+}
+.stat {
+  padding: 18px;
+  background: var(--card);
+  border-top: 4px solid var(--accent);
+  border-bottom: 1px solid var(--line);
+}
+.stat:nth-child(2) { border-top-color: var(--accent3); }
+.stat:nth-child(3) { border-top-color: var(--accent2); }
+.stat:nth-child(4) { border-top-color: var(--accent5); }
+.stat strong { display: block; font-size: 2rem; line-height: 1.1; }
+.stat span { color: var(--muted); font-size: .9rem; }
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1.2fr .8fr;
+  gap: 22px;
+  align-items: start;
+}
+.panel {
+  padding: 26px;
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+.panel h2, .panel h3 { margin-top: 0; }
+.panel.accent { border-left: 6px solid var(--accent3); }
+.panel.risk { background: var(--risk); border-left: 6px solid var(--accent4); }
+.panel.quote { background: var(--hl2); border-left: 6px solid var(--accent2); font-size: 1.15rem; }
+.insight-band {
+  margin: 22px 0;
+  padding: 22px 28px;
+  background: var(--hl);
+  border-top: 1px solid var(--accent);
+  border-bottom: 1px solid var(--accent);
+}
+.takeaways {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 12px;
+}
+.takeaway {
+  padding: 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+.takeaway b { color: var(--accent5); }
+#translation {
+  margin-top: 44px;
+  padding-top: 28px;
+  border-top: 4px solid var(--accent5);
+}
+#translation h2 { font-size: 2rem; margin-top: 0; }
+#translation h3 { margin-top: 2.2em; color: var(--accent); }
+#translation p, #translation li { max-width: 820px; }
+#translation ul { padding-left: 1.3rem; }
+.source-figure { margin: 0 0 30px; padding: 0; }
+.source-figure figcaption { color: var(--muted); font-size: .9rem; margin-top: 8px; }
+.note { color: var(--muted); font-size: .92rem; }
+@media (max-width: 760px) {
+  main { padding: 16px 14px 48px; }
+  .hero { padding: 30px 22px; }
+  .statline, .summary-grid, .takeaways { grid-template-columns: 1fr; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/riemann-zeta" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<section aria-labelledby="digest-title" class="hero">
+<h1 id="digest-title">进一步了解 Claude 的数学能力</h1>
+<p class="original">Learning more about Claude's mathematical capabilities · Anthropic · Aug 10, 2026</p>
+<p class="thesis">一句话总括：Claude 没有解决黎曼猜想，却把关于黎曼ζ函数零点的已知下界推进到 67.2%，展示了 AI 组合既有数学思想并产出可验证结果的能力。</p>
+</section>
+<div aria-label="关键数据" class="statline">
+<div class="stat"><strong>67.2%</strong><span>零点比例的新下界</span></div>
+<div class="stat"><strong>41.6%</strong><span>此前已知下界</span></div>
+<div class="stat"><strong>3100万</strong><span>输出 token</span></div>
+<div class="stat"><strong>54</strong><span>下载核查的 arXiv 论文</span></div>
+</div>
+<section aria-label="文章总结" class="summary-grid">
+<article class="panel accent">
+<h2>从失败尝试到意外结果</h2>
+<p>Anthropic 员工让 Claude “认真尝试”证明黎曼猜想。这个问题自 1859 年提出，至今无人证明或否证，并设有 <mark>100 万美元</mark>奖金。</p>
+<p>Claude 最终没有完成证明，但在探索过程中发现了一个相关结果。它把黎曼ζ函数位于临界线上的零点比例下界从 <mark>41.6%</mark> 提高到 <mark>67.2%</mark>。</p>
+<p>这意味着 AI 的价值不只在于直接攻克目标，也在于探索目标周围的数学空间。</p>
+</article>
+<aside class="panel risk">
+<h2>结果的边界</h2>
+<p>Anthropic 不认为 Claude 使用的技术能够证明黎曼猜想。新下界是相关进展，不是对猜想本身的解决。</p>
+<p>两位 Anthropic 数学家审阅了论文。Brian Conrey 与 Dan Goldston 也在短时间内检查了工作。</p>
+</aside>
+</section>
+<div class="insight-band">
+<strong>为什么 67.2% 重要：</strong>数学家长期研究ζ函数零点，并逐步提高能够确认位于临界线上的零点比例。Claude 的结果把这一已知比例向前推进了一大步，但仍未回答“是否全部位于临界线”这一核心问题。
+  </div>
+<section class="panel quote">
+<p>“即使 Claude 不能解决黎曼猜想，这一结果仍显示出 AI 模型数学能力的进步速度。”</p>
+<p class="note">这项成果是原始请求的非预期副产品，也是既有数学研究被重新组合后的产物。</p>
+</section>
+<section class="panel" style="margin-top:22px">
+<h2>规模化协作如何推动发现</h2>
+<p>Claude 在两次 Claude Code 会话中使用了总计 <mark>3100 万个输出 token</mark>。第一次生成并尝试了 650 个想法，全部没有奏效。</p>
+<p>第二次持续了一天半。约 60 个 Claude 子代理运行了 2400 条 shell 命令，编写了数百个 Python 脚本，并对已知ζ零点执行数千次数值检查。它们还互相审阅工作。</p>
+<p>Claude 随后让子代理寻找反例、下载 54 篇 arXiv 论文确认结果尚未被发表，并从头独立重做证明。Levent Alpöge 与 Ralph Furman 审阅了数学内容，Claude 则与 Eric Easley 合作完成 Lean 形式化，结果通过了标准验证工具 comparator。</p>
+<p>洞见在于：人类主要提供目标和鼓励，模型负责大规模探索、筛选与验证。</p>
+</section>
+<section class="panel" style="margin-top:22px; border-top:6px solid var(--accent5)">
+<h2>最值得带走的洞见</h2>
+<div class="takeaways">
+<div class="takeaway"><b>01 · 非目标产出</b><br/>未能解决原问题，并不意味着探索没有数学价值。</div>
+<div class="takeaway"><b>02 · 站在前人肩上</b><br/>结果大量依赖 Baluyot、Goldston、Suriajaya、Turnage-Butterbaugh 与 Bombieri 的研究。</div>
+<div class="takeaway"><b>03 · 验证决定可信度</b><br/>人类审阅、反例搜索、文献核查和 Lean 形式化共同构成证据链。</div>
+<div class="takeaway"><b>04 · 进展仍有边界</b><br/>67.2% 是下界提升，不是黎曼猜想被证明。</div>
+</div>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<figure class="source-figure" data-source-image="0"><img alt="Illustration of a mathematical compass" decoding="async" height="2310" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/406d8496be38ea8a5459c66eaa7c5c7edab4a62f-4107x2310.png" width="4107"/></figure>
+<p>最近，Anthropic 的一名员工给 Claude 提出了一个不切实际的挑战：认真尝试解决数学界最著名的未解问题之一——黎曼猜想。</p>
+<p>Claude 确实认真尝试了。但如果你了解这个问题的难度，就会预料到它没有成功。黎曼猜想可以追溯到 1859 年，并设有 100 万美元奖金。不过，在尝试过程中，Claude 意外地在一个相关问题上取得了进展。</p>
+<p>Claude 的一个尚未发布的研究版本，改进了黎曼ζ函数零点中满足黎曼猜想的比例下界。借助数学家数十年来积累的大量研究，它把这一比例从 41.6% 提高到了 67.2%。</p>
+<p>Anthropic 的两位数学家研究并验证了 Claude 的论文，还为专家撰写了一份非正式说明，简要陈述 Claude 的证明。Claude 也为自己的结果生成了一个可形式化验证的证明。我们感谢 Brian Conrey 和 Dan Goldston 两位该领域专家。他们在很短时间内审阅了这篇论文。</p>
+<p>我们不认为 Claude 使用的技术能够导向黎曼猜想的证明。但这项工作成为 AI 模型数学能力快速进步的最新例子。下面我们讨论 Claude 如何处理这个问题，以及它发现了什么。</p>
+<h3>黎曼ζ函数</h3>
+<p>黎曼ζ函数描述了素数的分布：函数取零值的每一个位置，都会为素数序列贡献更精细的一层信息。黎曼猜想认为，决定素数分布的那些零点全部位于某条特定的竖直直线上。它已经成为数学中影响最深远的猜想之一。许多结果都假设它成立，以便为素数提供某种随机性形式。</p>
+<p>至今没有人证明或否证黎曼猜想。但数学家沿着许多相关方向研究黎曼ζ函数及其零点，并取得了进展。其中一个方向就是量化位于这条直线上的零点至少占多少比例。随着研究推进，人们逐步把这个已知常数比例提高到了 41.6%。</p>
+<p>另一个方向关注直线上的零点如何分布。1973 年，Montgomery 在这一领域提出了许多新技术，但这些技术假设黎曼猜想为真。近来，Baluyot、Goldston、Suriajaya 和 Turnage-Butterbaugh 等数学家发表了一系列工作，使 Montgomery 的技术无需这一假设也能运行。这意味着这些技术可以支持提高直线上零点比例的下界常数。Claude 的结果大量借鉴了这条研究路线，以及 Bombieri 在 2000 年发表的一篇论文。</p>
+<h3>Claude 的发现</h3>
+<p>Claude 发现，把 Baluyot、Goldston、Suriajaya 和 Turnage-Butterbaugh 的结果与 Bombieri 的工作结合起来，就能超过此前 41.6% 的最先进下界比例，将其提高到 67.2%。</p>
+<p>下面是对 Claude 发现的简短技术说明：Claude 构造了一个合适的函数空间，其二次型由 Weil 诱导；同时构造了分别由位于直线之上和直线之外的零点产生的正定子空间与负定子空间。随后，Claude 根据一阶和二阶矩信息，写出了一个关于二次型秩的不等式。通过素数上的对偶图景，或通过控制 Hilbert 变换来成功计算后一个矩，这在解析数论中并不令人意外。真正推动结论成立的一步，在于 Claude 勇敢地处理整个空间，同时考虑正定性与负定性，并允许二次型是非对角的。</p>
+<p>完整技术说明见论文。Claude 对其推导过程的解释见另一份附录。</p>
+<h3>Claude 的方法</h3>
+<p>Claude 的一个尚未发布的研究版本，在两次 Claude Code 会话中找到了新的下界，总计使用了 3100 万个输出 token。</p>
+<p>Anthropic 员工 Jarred Sumner 并非数学家。他提示 Claude“认真尝试”黎曼猜想本身，之后把数学选择交给模型。起初，Claude 生成并尝试了 650 个想法，但没有一个奏效。Jarred 让 Claude 再试一次。Claude 这次花了一天半时间，协调约 60 个 Claude 子代理，探索得更加深入。它们合计运行了 2400 条 shell 命令，编写了数百个 Python 脚本。<sup>1</sup> 子代理针对已知ζ零点运行了数千次数值检查，还互相审阅工作。在整个过程中，Jarred 的主要作用是发送鼓励信息，大多是“继续努力”或“相信自己”之类的话。<sup>2</sup> 这似乎帮助 Claude 克服了最初对自己能否取得实质进展的怀疑。</p>
+<p>发现新结果后，Claude 让多个子代理审阅证明、寻找反例、从 arXiv 下载 54 篇论文以确认这一发现尚未有人发表，并从头独立重新证明结果。Claude 主动提出把发现写成论文，并建议由人类数论专家验证。</p>
+<p>Anthropic 自己的两位数学家 Levent Alpöge 和 Ralph Furman 研究了 Claude 的工作，以理解新结果及其与上述既有研究的关系。与此同时，Claude 与另一名员工 Eric Easley 合作完成了该结果的 Lean 形式化。形式化结果通过了标准验证工具 comparator。</p>
+<h3>AI 模型在数学领域的进展</h3>
+<p>这项结果表明，Claude 这样的 AI 模型可以延伸数学家思想的影响范围，并以新的、有时令人意外的方式发挥这些思想的作用。Claude 没有解决黎曼猜想，但这个结果却在尝试原始任务时意外出现了。</p>
+<p>甚至 Claude 自己也对这一发现感到惊讶。它起初持怀疑态度，可能是因为训练数据让它了解数学开放问题的难度，也了解 AI 模型的局限。但在得到一些鼓励后，它得出了我们描述的结果。也许 Claude 和许多人一样，低估了 AI 进步的速度。</p>
+<h3>延伸阅读</h3>
+<p>下面列出了一些能够进一步了解 Claude 结果的文档：</p>
+<ul>
+<li>Claude 的论文；</li>
+<li>Claude 的形式化证明；</li>
+<li>更简洁陈述该证明的 Anthropic 非正式说明；</li>
+<li>Claude 对其推导过程的解释；</li>
+<li>Claude 工作过程的详细记录。</li>
+</ul>
+<h3>脚注</h3>
+<ol>
+<li>60 个子代理中，2 个负责提出关键数学思想；13 个为这两个代理贡献想法；30 个尝试提出新想法但未能成功；13 个负责验证论证正确性；最后 2 个帮助撰写初版论文。</li>
+<li>在帮助 Claude 否证 Jacobian 猜想时，也使用了包含类似鼓励内容的提示。</li>
+</ol>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
