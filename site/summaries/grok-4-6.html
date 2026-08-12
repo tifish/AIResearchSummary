@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>发布 Grok 4.6</title>
+<style>
+:root {
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --ink: #17202a;
+  --muted: #66717d;
+  --line: #d9dfe5;
+  --accent: #126e82;
+  --accent2: #8f3f71;
+  --accent3: #a64b18;
+  --accent4: #4c6e24;
+  --hero-bg: #17202a;
+  --hero-ink: #f8fafc;
+  --hero-muted: #c8d2dc;
+  --data-bg: #e4f4f6;
+  --risk-bg: #f8eaf2;
+  --opportunity-bg: #fff0e5;
+  --conclusion-bg: #edf4df;
+  --soft-bg: #eef1f4;
+  --translation-bg: #ffffff;
+  --hl: #d4f0f3;
+  --hl2: #f8dce9;
+  --shadow: rgba(23, 32, 42, 0.09);
+}
+:root[data-theme="light"] {
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --ink: #17202a;
+  --muted: #66717d;
+  --line: #d9dfe5;
+  --accent: #126e82;
+  --accent2: #8f3f71;
+  --accent3: #a64b18;
+  --accent4: #4c6e24;
+  --hero-bg: #17202a;
+  --hero-ink: #f8fafc;
+  --hero-muted: #c8d2dc;
+  --data-bg: #e4f4f6;
+  --risk-bg: #f8eaf2;
+  --opportunity-bg: #fff0e5;
+  --conclusion-bg: #edf4df;
+  --soft-bg: #eef1f4;
+  --translation-bg: #ffffff;
+  --hl: #d4f0f3;
+  --hl2: #f8dce9;
+  --shadow: rgba(23, 32, 42, 0.09);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11161b;
+    --surface: #1a2128;
+    --ink: #e7edf2;
+    --muted: #a8b4be;
+    --line: #34404a;
+    --accent: #55c7d5;
+    --accent2: #ec87ba;
+    --accent3: #f39a62;
+    --accent4: #a9d66f;
+    --hero-bg: #080c10;
+    --hero-ink: #f1f5f8;
+    --hero-muted: #aebbc5;
+    --data-bg: #17333a;
+    --risk-bg: #392331;
+    --opportunity-bg: #3b291f;
+    --conclusion-bg: #26351f;
+    --soft-bg: #202830;
+    --translation-bg: #161c22;
+    --hl: #17434a;
+    --hl2: #49283a;
+    --shadow: rgba(0, 0, 0, 0.28);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11161b;
+  --surface: #1a2128;
+  --ink: #e7edf2;
+  --muted: #a8b4be;
+  --line: #34404a;
+  --accent: #55c7d5;
+  --accent2: #ec87ba;
+  --accent3: #f39a62;
+  --accent4: #a9d66f;
+  --hero-bg: #080c10;
+  --hero-ink: #f1f5f8;
+  --hero-muted: #aebbc5;
+  --data-bg: #17333a;
+  --risk-bg: #392331;
+  --opportunity-bg: #3b291f;
+  --conclusion-bg: #26351f;
+  --soft-bg: #202830;
+  --translation-bg: #161c22;
+  --hl: #17434a;
+  --hl2: #49283a;
+  --shadow: rgba(0, 0, 0, 0.28);
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+  line-height: 1.75;
+  letter-spacing: 0;
+}
+.hero {
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+  padding: clamp(3rem, 8vw, 7rem) 1.5rem;
+}
+.hero-inner,
+.summary-wrap,
+#translation {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+}
+.kicker {
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+.hero h1 {
+  max-width: 850px;
+  margin: 0.35rem 0 0;
+  font-size: clamp(2.6rem, 7vw, 5.5rem);
+  line-height: 1.08;
+  letter-spacing: 0;
+}
+.original-title {
+  margin: 0.8rem 0 2.2rem;
+  color: var(--hero-muted);
+  font-size: 1.05rem;
+}
+.lede {
+  max-width: 800px;
+  margin: 0;
+  font-size: clamp(1.25rem, 2.6vw, 1.8rem);
+  line-height: 1.55;
+}
+.summary-wrap {
+  padding: 3rem 1.5rem 4rem;
+}
+.metric-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0 0 3rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: 0 12px 28px var(--shadow);
+}
+.metric {
+  min-width: 0;
+  padding: 1.5rem;
+  border-right: 1px solid var(--line);
+}
+.metric:last-child {
+  border-right: 0;
+}
+.metric strong {
+  display: block;
+  color: var(--accent);
+  font-size: 1.85rem;
+  line-height: 1.2;
+}
+.metric span {
+  display: block;
+  margin-top: 0.45rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 2rem;
+  align-items: stretch;
+  margin: 0 0 3rem;
+}
+.split-copy {
+  padding: 0.5rem 0;
+}
+.split-copy h2,
+.training h2,
+.safety h2,
+.takeaways h2 {
+  margin-top: 0;
+  line-height: 1.25;
+}
+.split-copy h2 {
+  color: var(--accent2);
+}
+.opportunity-panel {
+  padding: 2rem;
+  background: var(--opportunity-bg);
+  border-left: 6px solid var(--accent3);
+}
+.opportunity-panel strong {
+  color: var(--accent3);
+}
+.training {
+  margin: 0 0 3rem;
+  padding: 2.5rem;
+  background: var(--data-bg);
+}
+.training h2 {
+  color: var(--accent);
+}
+.timeline {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.4rem;
+  margin-top: 1.8rem;
+}
+.step {
+  position: relative;
+  padding-top: 1.2rem;
+  border-top: 4px solid var(--accent);
+}
+.step:nth-child(2) {
+  border-color: var(--accent2);
+}
+.step:nth-child(3) {
+  border-color: var(--accent4);
+}
+.step b {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+.safety {
+  margin: 0 0 3rem;
+  padding: 2.5rem;
+  color: var(--hero-ink);
+  background: var(--hero-bg);
+  border-left: 8px solid var(--accent2);
+}
+.safety h2 {
+  color: var(--accent2);
+}
+.safety p {
+  color: var(--hero-muted);
+}
+.hl {
+  padding: 0.08em 0.24em;
+  background: var(--hl);
+  color: var(--ink);
+  font-weight: 700;
+}
+.hl2 {
+  padding: 0.08em 0.24em;
+  background: var(--hl2);
+  color: var(--ink);
+  font-weight: 700;
+}
+.takeaways {
+  margin-bottom: 1rem;
+}
+.takeaway-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 0.8fr;
+  gap: 1rem;
+}
+.takeaway {
+  padding: 1.5rem;
+  background: var(--surface);
+  border-top: 5px solid var(--accent);
+  box-shadow: 0 8px 20px var(--shadow);
+}
+.takeaway:nth-child(2) {
+  background: var(--risk-bg);
+  border-color: var(--accent2);
+}
+.takeaway:nth-child(3) {
+  background: var(--conclusion-bg);
+  border-color: var(--accent4);
+}
+.takeaway:nth-child(4) {
+  grid-column: 1 / 3;
+  background: var(--opportunity-bg);
+  border-color: var(--accent3);
+}
+.takeaway:nth-child(5) {
+  background: var(--data-bg);
+  border-color: var(--accent);
+}
+.takeaway h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+}
+.takeaway p {
+  margin: 0;
+}
+#translation {
+  margin-bottom: 4rem;
+  padding: clamp(2rem, 5vw, 4.5rem);
+  background: var(--translation-bg);
+  box-shadow: 0 16px 36px var(--shadow);
+}
+#translation h2 {
+  margin: 0 0 2rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 3px solid var(--accent);
+  font-size: 2rem;
+}
+#translation h3 {
+  margin: 3rem 0 1rem;
+  color: var(--accent2);
+  font-size: 1.55rem;
+}
+#translation p,
+#translation ul {
+  max-width: 760px;
+}
+.toc {
+  max-width: 760px;
+  margin-bottom: 2.5rem;
+  padding: 1.5rem 1.8rem;
+  background: var(--soft-bg);
+  border-left: 5px solid var(--accent);
+}
+.toc h3 {
+  margin: 0 0 0.8rem !important;
+  color: var(--ink) !important;
+  font-size: 1.1rem !important;
+}
+.toc ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+.source-figure {
+  width: min(900px, 100%);
+  margin: 2.5rem auto;
+  padding: 1rem;
+  background: var(--soft-bg);
+  border: 1px solid var(--line);
+}
+.source-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.source-figure figcaption {
+  margin-top: 0.8rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-align: center;
+}
+@media (max-width: 760px) {
+  .metric-strip,
+  .timeline,
+  .takeaway-grid,
+  .split {
+    grid-template-columns: 1fr;
+  }
+  .metric {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .metric:last-child {
+    border-bottom: 0;
+  }
+  .takeaway:nth-child(4) {
+    grid-column: auto;
+  }
+  .hero,
+  .summary-wrap {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  #translation {
+    margin-bottom: 0;
+    padding: 2rem 1.25rem;
+  }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/grok-4-6" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<header class="hero">
+<div class="hero-inner">
+<div class="kicker">Cursor × SpaceXAI · 2026 年 8 月 12 日</div>
+<h1>发布 Grok 4.6</h1>
+<p class="original-title" lang="en">Introducing Grok 4.6</p>
+<p class="lede">一句话总括：Grok 4.6 把提升重点放在长时间运行的智能体上，让模型更有能力把宽泛构想持续推进为可用的交互产品。</p>
+</div>
+</header>
+<main>
+<div class="summary-wrap">
+<section aria-label="关键数据" class="metric-strip">
+<div class="metric">
+<strong>9 项</strong>
+<span>Artificial Analysis Intelligence Index 所包含的基准数量</span>
+</div>
+<div class="metric">
+<strong>追平</strong>
+<span>该综合指数上的 GPT-5.6 Sol</span>
+</div>
+<div class="metric">
+<strong>$2 / $6</strong>
+<span>每百万输入 / 输出 token 的起始价格</span>
+</div>
+<div class="metric">
+<strong>2×</strong>
+<span>Cursor 与 Grok Build 首周使用额度</span>
+</div>
+</section>
+<section class="split">
+<div class="split-copy">
+<h2>从回答问题走向持续完成项目</h2>
+<p>Grok 4.6 面向研究、信息分析和跨代码库开发等多步骤任务。测试中，它尤其擅长把宽泛的产品想法变成可运行的第一版。</p>
+<p>模型还能研究陌生领域，搭建应用结构，并实现核心交互。较长的执行轨迹中也出现了更多<span class="hl">自测与验证</span>。</p>
+<p>这意味着衡量模型时，不能只看单轮答案。它能否在长流程中维持方向并检查成果，也变得更加重要。</p>
+</div>
+<aside class="opportunity-panel">
+<strong>视觉与交互能力</strong>
+<p>相较 Grok 4.5，新模型生成的视觉和交互项目初稿更强。面对明确的产品构想，它可以一次建立应用结构和视觉语言。</p>
+<p>真正的机会在于迭代起点发生了变化。团队可以先获得较完整的原型，再围绕实际成果继续调整。</p>
+</aside>
+</section>
+<section class="training">
+<h2>更长的训练流程支撑更长的执行轨迹</h2>
+<div class="timeline">
+<div class="step">
+<b>补充训练</b>
+<p>训练时间长于 Grok 4.5，并加入精选的模型生成数据、高质量工程数据，以及改进后的优化器与训练方案。</p>
+</div>
+<div class="step">
+<b>SFT 轨迹再生成</b>
+<p>团队使用 Grok 4.5 重新生成不同推理强度、智能体框架和专业领域的轨迹，再通过模型检查过滤问题样本。</p>
+</div>
+<div class="step">
+<b>智能体强化学习</b>
+<p>任务覆盖知识工作、通用编程、内核优化、Web 开发和计算机辅助设计等环境。</p>
+</div>
+</div>
+<p>这些步骤共同强化了模型处理技术任务的基础。文章将长任务能力的改善与更广泛、更有针对性的训练直接联系起来。</p>
+</section>
+<section class="safety">
+<h2>能力扩展也带来更宽的安全评估</h2>
+<p>Cursor 表示，Grok 4.6 的防护措施已经按照模型能力重新改进和校准。目标是在漏洞修补、工程设计和 AI 研究等合法场景中兼顾效用与安全。</p>
+<p>该模型接受了团队<span class="hl2">迄今范围最广的部署前测试</span>，部署后还有第三方测试。不过，文章没有披露具体测试结果或失效率。</p>
+<p>因此，这部分说明了安全投入的范围，却不足以让读者独立比较其风险水平。</p>
+</section>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="takeaway-grid">
+<article class="takeaway">
+<h3>长任务是核心定位</h3>
+<p>Grok 4.6 的主要变化不是单点能力，而是跨越多个步骤持续工作的能力。</p>
+</article>
+<article class="takeaway">
+<h3>初稿质量更重要</h3>
+<p>更完整的第一版，可以让团队更早进入真实反馈循环。</p>
+</article>
+<article class="takeaway">
+<h3>基准信息仍有限</h3>
+<p>文章称其综合指数追平 GPT-5.6 Sol，但没有给出各项分数。</p>
+</article>
+<article class="takeaway">
+<h3>训练覆盖真实工作环境</h3>
+<p>从通用编程到内核优化和 CAD，强化学习任务开始贴近更专业的工程流程。</p>
+</article>
+<article class="takeaway">
+<h3>成本分层明确</h3>
+<p>标准版从输入 2 美元、输出 6 美元起。快速版本的价格是其两倍。</p>
+</article>
+</div>
+</section>
+</div>
+<section id="translation">
+<h2>完整译文</h2>
+<nav aria-label="目录" class="toc">
+<h3>目录</h3>
+<ul>
+<li>Grok 4.6 的训练</li>
+<li>把大胆构想变成可运行的项目</li>
+<li>安全与能力</li>
+<li>开始使用 Grok 4.6</li>
+</ul>
+</nav>
+<p>今天，我们与 SpaceXAI 共同发布 Grok 4.6。</p>
+<p>Grok 4.6 以 Grok 4.5 为基础，尤其关注长时间运行的智能体，以及更具挑战性的交互和视觉工作。无论是研究某个主题、分析信息、跨代码库工作，还是把一个想法变成完善的应用或工作成果，它都能持续处理包含许多步骤的复杂任务。</p>
+<p>Grok 4.6 在多项智能体编程和知识工作基准中达到前沿水平。在由九项基准组成的 Artificial Analysis Intelligence Index 综合指数上，它追平了 GPT-5.6 Sol。</p>
+<figure class="source-figure" data-source-image="0"><img alt="Grok 4.6 benchmark results across coding and knowledge work evaluations" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fevals-4.6-space-x-03-light-RfPXLdwnvrX89InlepuJovKbmJkQB1.png&amp;w=1920&amp;q=70" width="800"/></figure>
+<p>Grok 4.6 现已在 Cursor 和 Grok Build 中提供。第一周内，我们将在 Cursor 和 Grok Build 中提供 2 倍的使用额度。</p>
+<h3>Grok 4.6 的训练</h3>
+<p>与 Grok 4.5 相比，Grok 4.6 接受了时间更长的补充训练。训练内容包括为推理和高级技术概念精选的模型生成数据，以及高质量工程数据。团队还改进了优化器和训练方案。这些工作为随后的监督微调（SFT）和强化学习（RL）阶段奠定了更强的基础。</p>
+<p>随后，我们使用 Grok 4.5 重新生成了 SFT 轨迹。这些轨迹覆盖不同的推理强度、智能体框架和专业领域，包括 STEM、软件工程和知识工作。我们通过基于模型的检查过滤了存在问题的轨迹。最终得到的 SFT 检查点展现出强劲的性能，行为表现也有所改善。</p>
+<p>Grok 4.6 接受了广泛的智能体强化学习任务训练。其中包括知识工作和通用编程，也包括面向内核优化、Web 开发和计算机辅助设计等领域的专用环境。</p>
+<h3>把大胆构想变成可运行的项目</h3>
+<p>我们使用一组专门设计的项目测试 Grok 4.6。这些项目旨在拓展模型的能力范围，并检验它能否在许多步骤中持续工作。我们发现，这个模型尤其擅长把宽泛的产品构想变成可运行的第一版。它可以研究陌生领域，组织应用结构，实现核心交互，并根据多轮反馈继续完善结果。</p>
+<p>在较长的执行轨迹中，我们也开始看到更多自我测试和验证行为。模型会先检查自己的工作，再继续下一步。</p>
+<p>与 Grok 4.5 的典型表现相比，Grok 4.6 在视觉和交互项目上能产出更好的第一版。得到一个具体的产品构想后，它可以一次性建立应用的结构和视觉语言。因此，当获得良好结果的最快方式是先做出较完整的成果，再在反馈循环中持续迭代时，它会特别有用。</p>
+<h3>安全与能力</h3>
+<p>我们已经改进 Grok 4.6 的防护措施，并根据模型能力对其进行了校准。</p>
+<p>我们的安全体系旨在让模型在合法使用场景中兼顾实用性与安全性。这让 Grok 4.6 能够安全地协助漏洞修补，加快工程设计周期，并增强 AI 研究能力。</p>
+<p>针对 Grok 4.6 扩展后的能力，我们也相应调整了安全评估工作。模型接受了我们迄今范围最广的部署前能力测试和防护校准。部署后，我们还开展了广泛的第三方测试。</p>
+<h3>开始使用 Grok 4.6</h3>
+<p>Grok 4.6 现已在 Cursor 和 Grok Build 中提供。它也已登陆 SpaceXAI API，并通过 OpenRouter、Vercel 和 Cloudflare 等合作伙伴提供。</p>
+<p>定价从每百万输入 token 2 美元、每百万输出 token 6 美元起。另有快速版本可供选择，价格是标准版本的两倍。</p>
+<p>第一周内，我们将在 Cursor 和 Grok Build 中提供 2 倍的使用额度。</p>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
