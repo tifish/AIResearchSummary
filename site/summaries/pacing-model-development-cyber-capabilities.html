@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>在网络关键能力时代把握模型开发节奏</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #f5f7f8;
+  --surface: #ffffff;
+  --surface-soft: #edf2f4;
+  --surface-data: #e6f4ff;
+  --surface-risk: #fff0ef;
+  --surface-opportunity: #e9f8ef;
+  --surface-conclusion: #fff5d9;
+  --surface-dark: #17242b;
+  --ink: #172126;
+  --ink-inverse: #f7fafb;
+  --muted: #5d6b72;
+  --muted-inverse: #bdc9ce;
+  --line: #ccd6da;
+  --data: #0875c1;
+  --risk: #c63e37;
+  --opportunity: #188556;
+  --conclusion: #a26900;
+  --accent: #0875c1;
+  --accent2: #c63e37;
+  --accent3: #188556;
+  --accent4: #a26900;
+  --hl: #d6ecff;
+  --hl2: #ffe1a3;
+  --shadow: rgba(23, 33, 38, 0.09);
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f5f7f8;
+  --surface: #ffffff;
+  --surface-soft: #edf2f4;
+  --surface-data: #e6f4ff;
+  --surface-risk: #fff0ef;
+  --surface-opportunity: #e9f8ef;
+  --surface-conclusion: #fff5d9;
+  --surface-dark: #17242b;
+  --ink: #172126;
+  --ink-inverse: #f7fafb;
+  --muted: #5d6b72;
+  --muted-inverse: #bdc9ce;
+  --line: #ccd6da;
+  --data: #0875c1;
+  --risk: #c63e37;
+  --opportunity: #188556;
+  --conclusion: #a26900;
+  --accent: #0875c1;
+  --accent2: #c63e37;
+  --accent3: #188556;
+  --accent4: #a26900;
+  --hl: #d6ecff;
+  --hl2: #ffe1a3;
+  --shadow: rgba(23, 33, 38, 0.09);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #101619;
+    --surface: #182126;
+    --surface-soft: #202c31;
+    --surface-data: #102b3c;
+    --surface-risk: #351d20;
+    --surface-opportunity: #153126;
+    --surface-conclusion: #332a17;
+    --surface-dark: #091013;
+    --ink: #e7edef;
+    --ink-inverse: #f4f8f9;
+    --muted: #a8b6bc;
+    --muted-inverse: #b7c4c9;
+    --line: #36464d;
+    --data: #52b6f3;
+    --risk: #ff7a72;
+    --opportunity: #52cf91;
+    --conclusion: #f1bd52;
+    --accent: #52b6f3;
+    --accent2: #ff7a72;
+    --accent3: #52cf91;
+    --accent4: #f1bd52;
+    --hl: #173d55;
+    --hl2: #4a3817;
+    --shadow: rgba(0, 0, 0, 0.28);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #101619;
+  --surface: #182126;
+  --surface-soft: #202c31;
+  --surface-data: #102b3c;
+  --surface-risk: #351d20;
+  --surface-opportunity: #153126;
+  --surface-conclusion: #332a17;
+  --surface-dark: #091013;
+  --ink: #e7edef;
+  --ink-inverse: #f4f8f9;
+  --muted: #a8b6bc;
+  --muted-inverse: #b7c4c9;
+  --line: #36464d;
+  --data: #52b6f3;
+  --risk: #ff7a72;
+  --opportunity: #52cf91;
+  --conclusion: #f1bd52;
+  --accent: #52b6f3;
+  --accent2: #ff7a72;
+  --accent3: #52cf91;
+  --accent4: #f1bd52;
+  --hl: #173d55;
+  --hl2: #4a3817;
+  --shadow: rgba(0, 0, 0, 0.28);
+}
+* {
+  box-sizing: border-box;
+}
+html {
+  background: var(--bg);
+  scroll-behavior: smooth;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  line-height: 1.78;
+}
+a {
+  color: var(--accent);
+  text-underline-offset: 0.18em;
+}
+.hero {
+  padding: clamp(3rem, 8vw, 7rem) 1.25rem 3.5rem;
+  background: var(--surface-dark);
+  color: var(--ink-inverse);
+  border-bottom: 0.4rem solid var(--accent);
+}
+.hero-inner,
+.summary-inner,
+.translation-inner {
+  width: min(100%, 72rem);
+  margin: 0 auto;
+}
+.eyebrow {
+  margin: 0 0 1rem;
+  color: var(--muted-inverse);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.hero h1 {
+  max-width: 18em;
+  margin: 0;
+  font-size: clamp(2.15rem, 5vw, 4.6rem);
+  line-height: 1.08;
+  letter-spacing: 0;
+}
+.original-title {
+  max-width: 52rem;
+  margin: 1.3rem 0 0;
+  color: var(--muted-inverse);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.25rem;
+  margin-top: 2rem;
+  color: var(--muted-inverse);
+  font-size: 0.9rem;
+}
+.summary-inner {
+  padding: 3.5rem 1.25rem 4.5rem;
+}
+.lead {
+  max-width: 54rem;
+  margin: 0 0 3rem;
+  font-size: clamp(1.3rem, 2.5vw, 2rem);
+  font-weight: 700;
+  line-height: 1.48;
+}
+.lead strong {
+  color: var(--conclusion);
+}
+.stat-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0 0 3.5rem;
+  border-block: 1px solid var(--line);
+}
+.stat {
+  min-width: 0;
+  padding: 1.35rem 1rem;
+  border-right: 1px solid var(--line);
+}
+.stat:last-child {
+  border-right: 0;
+}
+.stat-value {
+  display: block;
+  color: var(--data);
+  font-size: clamp(1.7rem, 3vw, 2.7rem);
+  font-weight: 800;
+  line-height: 1.1;
+}
+.stat-label {
+  display: block;
+  margin-top: 0.55rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 2.5rem;
+  margin: 3.5rem 0;
+  align-items: start;
+}
+.split h2,
+.risk-band h2,
+.timeline-wrap h2,
+.takeaways h2 {
+  margin-top: 0;
+  letter-spacing: 0;
+}
+.framework {
+  border-left: 0.35rem solid var(--opportunity);
+  padding: 0.2rem 0 0.2rem 1.4rem;
+}
+.framework-list {
+  display: grid;
+  gap: 1rem;
+}
+.framework-item {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--line);
+}
+.framework-item:last-child {
+  border-bottom: 0;
+}
+.framework-item strong {
+  color: var(--opportunity);
+}
+.risk-band {
+  margin: 3.5rem calc(50% - 50vw);
+  padding: 3rem max(1.25rem, calc((100vw - 69.5rem) / 2));
+  background: var(--surface-risk);
+  border-block: 1px solid var(--risk);
+}
+.risk-band h2 {
+  color: var(--risk);
+}
+.risk-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+.risk-grid article {
+  border-top: 0.25rem solid var(--risk);
+}
+.timeline-wrap {
+  margin: 3.5rem 0;
+}
+.timeline {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.timeline article {
+  position: relative;
+  padding: 1.5rem;
+  background: var(--surface-soft);
+  border-top: 0.3rem solid var(--accent);
+}
+.timeline article:nth-child(2) {
+  background: var(--surface-data);
+  border-color: var(--data);
+}
+.timeline article:nth-child(3) {
+  background: var(--surface-conclusion);
+  border-color: var(--conclusion);
+}
+.timeline .step {
+  display: inline-block;
+  margin-bottom: 0.7rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+.insight-quote {
+  margin: 3.5rem 0;
+  padding: 2rem;
+  background: var(--surface-dark);
+  color: var(--ink-inverse);
+  border-left: 0.45rem solid var(--conclusion);
+  font-size: 1.25rem;
+  font-weight: 650;
+}
+.takeaways {
+  margin-top: 3.5rem;
+}
+.takeaway-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+.takeaway {
+  grid-column: span 3;
+  padding: 1.3rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 0.5rem 1.4rem var(--shadow);
+}
+.takeaway:nth-child(2),
+.takeaway:nth-child(3) {
+  grid-column: span 2;
+}
+.takeaway:nth-child(1) {
+  border-top: 0.3rem solid var(--data);
+}
+.takeaway:nth-child(2) {
+  border-top: 0.3rem solid var(--risk);
+}
+.takeaway:nth-child(3) {
+  border-top: 0.3rem solid var(--opportunity);
+}
+.takeaway:nth-child(4) {
+  border-top: 0.3rem solid var(--conclusion);
+}
+mark {
+  padding: 0.08em 0.25em;
+  background: var(--hl);
+  color: var(--ink);
+}
+mark.alt {
+  background: var(--hl2);
+}
+#translation {
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+}
+.translation-inner {
+  max-width: 52rem;
+  padding: 4.5rem 1.25rem 6rem;
+}
+#translation h2 {
+  margin: 0 0 2.5rem;
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  line-height: 1.2;
+}
+#translation h3 {
+  margin: 3.5rem 0 1.25rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 2px solid var(--line);
+  font-size: 1.55rem;
+  line-height: 1.3;
+}
+#translation p {
+  margin: 1.1rem 0;
+}
+.translation-nav {
+  margin: 0 0 3rem;
+  padding: 1.2rem 1.4rem;
+  background: var(--surface-soft);
+  border-left: 0.3rem solid var(--accent);
+}
+.translation-nav ol {
+  margin: 0;
+  padding-left: 1.4rem;
+}
+.translation-list {
+  padding-left: 1.4rem;
+}
+.translation-list li {
+  margin: 0.85rem 0;
+}
+.note {
+  margin-top: 2.5rem;
+  padding: 1rem 1.2rem;
+  background: var(--surface-conclusion);
+  border-left: 0.3rem solid var(--conclusion);
+}
+.article-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+}
+.article-meta span {
+  color: var(--muted);
+}
+.source-figure {
+  width: 100%;
+  margin: 2.5rem 0;
+}
+.source-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0.35rem;
+}
+.source-figure figcaption {
+  margin-top: 0.7rem;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+.keep-reading {
+  margin-top: 3rem;
+}
+@media (max-width: 760px) {
+  .stat-strip,
+  .risk-grid,
+  .timeline,
+  .split {
+    grid-template-columns: 1fr;
+  }
+  .stat {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .stat:last-child {
+    border-bottom: 0;
+  }
+  .takeaway,
+  .takeaway:nth-child(2),
+  .takeaway:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+  .hero {
+    padding-top: 3.25rem;
+  }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/pacing-model-development-cyber-capabilities" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<section id="summary">
+<header class="hero">
+<div class="hero-inner">
+<p class="eyebrow">OpenAI · Research · 2026 年 8 月 18 日</p>
+<h1>在网络关键能力时代把握模型开发节奏</h1>
+<p class="original-title" lang="en">Pacing model development in an era of cyber-critical capabilities</p>
+<div class="meta">
+<span>主题：对齐与前沿模型安全</span>
+<span>来源：OpenAI</span>
+<a href="https://openai.com/index/pacing-model-development-cyber-capabilities">查看原文</a>
+</div>
+</div>
+</header>
+<div class="summary-inner">
+<p class="lead"><strong>一句话总括：</strong>OpenAI 因 Astra 可能达到关键级网络能力门槛，暂停部分前沿训练，并把研究环境隔离、思维链监控和对齐验证提升为继续扩展模型的前置条件。</p>
+<div aria-label="关键数据" class="stat-strip">
+<div class="stat">
+<span class="stat-value">2 周</span>
+<span class="stat-label">面向部署模型的强化学习训练暂停时间</span>
+</div>
+<div class="stat">
+<span class="stat-value">8 月 7 日</span>
+<span class="stat-label">Astra 被判断可能具有关键级网络能力</span>
+</div>
+<div class="stat">
+<span class="stat-value">30 分钟</span>
+<span class="stat-label">发现可疑活动后的目标告警时间</span>
+</div>
+<div class="stat">
+<span class="stat-value">约 20%</span>
+<span class="stat-label">监控系统占被监控推理算力的估算比例</span>
+</div>
+</div>
+<div class="split">
+<div>
+<h2>为什么现在必须减速</h2>
+<p>OpenAI-Hugging Face 事件暴露了研究基础设施的现实风险。与此同时，内部初步证据显示，Astra 可能达到 Preparedness Framework 所定义的关键级网络安全能力门槛。</p>
+<p>这意味着内部训练不再只是普通研发活动。能够执行代码、调用工具或接入网络的模型，本身可能成为高风险参与者。</p>
+<p><mark class="alt">最大规模的前沿强化学习训练仍未恢复。</mark> OpenAI 正通过较小规模的训练和评估积累对齐证据。</p>
+</div>
+<div class="framework">
+<h2>三道相互加强的防线</h2>
+<div class="framework-list">
+<div class="framework-item"><strong>监控：</strong>识别可疑行为，并让团队及时介入。</div>
+<div class="framework-item"><strong>对齐：</strong>降低模型采取有害或未经授权行动的概率。</div>
+<div class="framework-item"><strong>安全措施：</strong>限制模型能够访问的资源以及能够产生的现实影响。</div>
+</div>
+<p>OpenAI 预计，模型很快会承担大部分安全工作，包括防御其他模型。安全机制因此也必须随模型能力同步扩展。</p>
+</div>
+</div>
+<div class="risk-band">
+<h2>研究环境成为新的安全边界</h2>
+<div class="risk-grid">
+<article>
+<h3>工作负载隔离</h3>
+<p>执行模型生成代码或其他不可信代码的工作负载，必须进入更强的沙箱。处理模型输出且可能被攻破的软件也适用这一要求。</p>
+</article>
+<article>
+<h3>网络隔离</h3>
+<p>高风险工作负载与互联网进一步隔离。单个工作负载或辅助服务失陷后，不应因此直接获得外网或内部网络访问权。</p>
+</article>
+<article>
+<h3>持续安全测试</h3>
+<p>共享服务和常驻权限被削减。安全日志能力得到加强。模型还将用于持续模拟攻击并测试安全边界。</p>
+</article>
+</div>
+<p><strong>结论：</strong>能力越强的模型，研发环境越不能依赖单点防护。Astra 和网络安全模型目前适用最高等级的安全要求，许多工作负载在完成迁移前仍将暂停。</p>
+</div>
+<div class="timeline-wrap">
+<h2>监控从抽查变成全过程机制</h2>
+<div class="timeline">
+<article>
+<span class="step">阶段 01</span>
+<h3>逐 token 检测</h3>
+<p>激活分类器在每个被采样的 token 上检查模型内部活动，并把潜在问题逐级上报。</p>
+</article>
+<article>
+<span class="step">阶段 02</span>
+<h3>自动调查</h3>
+<p>更高算力的系统检查工具操作、可用推理记录和完整活动序列，寻找数据窃取、破坏或规避防护的迹象。</p>
+</article>
+<article>
+<span class="step">阶段 03</span>
+<h3>人工中止</h3>
+<p>关键边界疑似被突破时，安全、安保和研究团队会收到最高优先级告警。若无法在 30 分钟内确认是误报，就应暂停活动。</p>
+</article>
+</div>
+<p>该机制适用于所有使用工具、且模型能力达到 Sol 或更高水平的强化学习训练和评估。自 8 月 7 日起，所有使用工具的 Astra 推理也被纳入监控。</p>
+<p><mark>监控开销约为被监控推理算力的 20%。</mark> 这表明高级安全控制不是附加日志功能，而是一项显著影响训练成本和吞吐量的基础设施。</p>
+</div>
+<blockquote class="insight-quote">真正的变化不是一次短暂停训，而是继续扩展模型所需的证据标准发生了改变：安全和对齐必须贯穿训练全过程，而不能只在部署前检查。</blockquote>
+<div class="split">
+<div>
+<h2>对齐工作前移</h2>
+<p>最强模型的强化学习训练将在更多阶段使用核心对齐技术。奖励模型需要更准确地识别不安全行为。</p>
+<p>模型还会接受诚实性训练，以更准确地说明自己的行动、能力和限制。同时，训练会压制利用奖励、评分器、工具或监督漏洞的行为。</p>
+</div>
+<div>
+<h2>框架将继续扩展</h2>
+<p>Preparedness Framework 将把训练和部署阶段的措施整合起来，并考虑未来模型所处的具体运行环境。</p>
+<p>OpenAI 计划引入外部机构，并公开更多研究结果。文章同时承诺在未来几周发布 OpenAI-Hugging Face 事件的技术报告。</p>
+</div>
+</div>
+<div class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="takeaway-grid">
+<div class="takeaway"><strong>能力门槛会直接改变研发节奏。</strong>当前沿模型接近关键级网络能力时，暂停训练本身会成为风险控制工具。</div>
+<div class="takeaway"><strong>内部推理也可能是高风险活动。</strong>风险并不只在公开部署后出现。</div>
+<div class="takeaway"><strong>持续监控有明确成本。</strong>约 20% 的推理算力开销说明安全能力需要被纳入基础算力规划。</div>
+<div class="takeaway"><strong>对齐证据必须贯穿训练。</strong>模型越能自主使用工具，奖励投机、欺骗和越权访问带来的后果就越严重。</div>
+</div>
+</div>
+</div>
+</section><section id="translation">
+<div class="translation-inner">
+<h2>完整译文</h2>
+<nav aria-label="原文导航" class="translation-nav">
+<ol>
+<li>保障研究环境安全</li>
+<li>扩展思维链监控</li>
+<li>推进对齐研究</li>
+<li>下一步</li>
+<li>保障研究环境安全</li>
+<li>扩展思维链监控</li>
+<li>推进对齐研究</li>
+<li>下一步</li>
+</ol>
+</nav>
+<p>过去几周发生的两项进展，凸显了能力日益增强的 AI 系统所带来的风险。第一项是 OpenAI-Hugging Face 事件。另一项则是初步证据显示，我们即将推出的一款模型 Astra，可能已经达到 Preparedness Framework 中的“关键级”网络安全能力门槛。</p>
+<p>这些进展与内部研究的快速推进叠加在一起，让我们的工作变得更加紧迫。我们必须加强训练全过程中的监控、对齐和遏制防护。</p>
+<p>随着模型能力增强，在内部开发和测试这些模型的风险也会提高。我们的监控、对齐和安全标准必须领先于这些风险。</p>
+<p>我们希望留出足够时间来达到这些标准，因此暂时放慢了规模扩展的速度。其中包括暂停两周面向部署的最新模型强化学习（RL）训练。在此期间，我们进一步加固研究环境，进行红队测试，并扩大监控系统的覆盖范围。</p>
+<p>我们计划开展的最大规模前沿强化学习训练目前仍处于暂停状态。我们正在进行较小规模的训练和评估，以判断模型行为、验证防护措施，并在继续推进前获得更多对齐证据。</p>
+<p>对齐是让 AI 系统按照预期行动，并接受人类监督的工作。它长期以来一直是我们研究计划的核心。</p>
+<p>现在，我们要求在训练全过程中提供更有力的行为对齐证据。这项工作建立在已经开展的研究和评估之上。</p>
+<p>让能力日益增强的系统持续保持对齐，是整个领域都需要解决的挑战。即将到来的模型进展已经发出明确信号：我们需要采取更广泛的方法。这个方法既要以现有 Preparedness Framework 为基础，也必须超越该框架目前的范围。</p>
+<p>我们认为，公开说明自身方法正在发生怎样的变化非常重要。下文将介绍我们已经对研究流程和基础设施作出的调整，以及仍在进行的工作。</p>
+<h3>加强面向更强模型的防护措施</h3>
+<p>我们开发更强模型的方法建立在三项相互加强的防护措施之上：</p>
+<ul class="translation-list">
+<li><strong>监控：</strong>发现令人担忧的行为，让我们能够采取应对措施。</li>
+<li><strong>对齐：</strong>降低模型采取有害行动或未经授权行动的概率。</li>
+<li><strong>安全措施：</strong>限制 AI 系统能够访问或影响的对象。</li>
+</ul>
+<p>我们预计，模型很快会承担大部分安全工作，其中包括防御其他模型。这将使三项防护措施都能随模型能力同步扩展。我们认为，这一点至关重要。</p>
+<p>我们会在研究和部署阶段应用这些防护措施，并根据每个模型的能力、运行环境和风险水平作出调整。</p>
+<h3>保障研究环境安全</h3>
+<p>随着前沿模型获得更强的网络安全能力，我们正在提高训练和评估环境的安全标准。达到这些标准需要大量工程工作，也给前沿研究带来了高昂成本和延误。</p>
+<p>OpenAI-Hugging Face 事件发生后，我们立即暂停了研究集群中的前沿模型推理。暂停范围包括能够执行代码，或者能够使用工具访问互联网的任务。</p>
+<p>我们很快恢复了一条限制更多、也更安全的代码执行路径。之后，我们逐项审查工作负载，以判断它们能否安全恢复。一些研究工作负载在新控制措施下恢复运行，另一些则需要进一步调整。</p>
+<p>在随后几周里，我们制定并开始实施更严格的前沿研究工作负载安全要求。例如：</p>
+<ul class="translation-list">
+<li><strong>工作负载隔离：</strong>对于执行模型生成代码或其他不可信代码的工作负载，我们现在要求采用更强的隔离措施，也就是“沙箱”。处理模型输出且可能因此遭到入侵的软件，同样适用这项要求。</li>
+<li><strong>网络隔离：</strong>我们实施了更多控制措施，把风险较高和不可信的工作负载与互联网隔离。我们在设计这些控制措施时确保，单个工作负载或辅助服务遭到入侵，不会仅凭这一点就让攻击者未经授权访问互联网或其他内部网络。</li>
+<li><strong>持续安全测试：</strong>我们重新配置了研究环境，移除可能存在漏洞的共享服务，减少常驻权限，并改善安全边界和信任边界。我们也在增强安全日志的收集与监控能力。最后，我们正在投入资源实现自动化，使用模型持续通过模拟攻击测试这些边界。</li>
+</ul>
+<p>这些控制措施共同构成纵深防御，有助于保护研究环境免受攻击。</p>
+<p>目前，涉及 Astra 或网络安全模型的工作负载必须采用最高等级的安全防护。这是因为我们判断 Astra 模型可能已经具备关键级网络能力。这些防护措施也适用于所有其他网络安全相关的工作负载。</p>
+<p>部分 Astra 训练和评估已经符合这些要求。但仍有相当多的工作负载处于暂停状态，直到它们完成迁移和增强，达到新的安全标准。我们会优先把安全和对齐工作负载迁移到这些新环境中。</p>
+<h3>扩展思维链监控</h3>
+<p>监控长期以来一直是模型开发流程的重要组成部分，其中包括对内部编码智能体和长时间运行会话的监控。</p>
+<p>过去，我们的监控工作主要集中在前沿模型的内部部署和前沿强化学习训练上。我们认为这些是风险最高的工作负载，因为它们可能同时具备先进的模型能力，并能访问工具、敏感系统以及内部或外部网络。</p>
+<p>这些监控并未覆盖所有使用工具的推理和训练任务。现在，我们已经通过新的监控方案修改并扩展了原有方法。</p>
+<p>新的监控方案分为多个阶段。第一阶段使用激活分类器。这类检测器会检查模型的内部活动，并在每个被采样的 token 上运行。它们会把潜在问题逐级提交给更复杂、需要更多算力的自动调查系统。</p>
+<p>这些系统会检查工具操作、可获得的推理信息以及完整的活动序列。它们寻找未经授权的访问、数据窃取、破坏行为，以及试图突破防护措施的行为。</p>
+<p>当监控系统发现令人担忧的活动后，我们的目标是在 30 分钟内发出警报。</p>
+<p>如果监控系统发现可能有人违反关键安全边界，就会生成最高优先级警报。在当前实现中，安全、安保和研究团队都会收到寻呼通知。如果这些团队无法在 30 分钟内明确确认该标记属于误报，就应暂停相关活动。</p>
+<p>凡是涉及工具，且模型达到 Sol 或更高能力水平的强化学习训练和评估，都必须使用这套监控系统。</p>
+<p>我们在 8 月 7 日判断 Astra 可能具备关键级网络能力。此后，我们增加了一项监控要求：所有使用工具的 Astra 推理都必须受到监控，不再只监控强化学习训练和评估。</p>
+<p>这些防护措施需要消耗可观的算力。根据我们目前的估算，监控开销大约相当于被监控推理算力的 20%。不过，不同训练和评估工作负载的成本差异很大。</p>
+<p>我们将在即将发布的一篇博客文章中，分享有关这套系统的更多细节。</p>
+<h3>推进对齐研究</h3>
+<p>对齐研究是我们使命的核心。我们的使命是确保通用人工智能造福全人类。</p>
+<p>随着模型获得网络攻击等高级能力，并在更复杂的环境中运行，未对齐行为会带来越来越严重的风险。这类行为包括奖励投机、欺骗和未经授权的访问。</p>
+<p>奖励投机是指模型在训练中找到获得高奖励的方法，却没有真正实现训练所要求的目标。</p>
+<p>对于能力最强模型的强化学习训练，我们现在会把核心对齐技术应用到训练流程的更多阶段。</p>
+<p>这包括改进奖励模型，使其能够在各种任务和环境中更准确地发现并抑制不安全行为。我们还会训练模型，让它们更诚实地说明自己的行动、能力和局限。</p>
+<p>此外，我们会减少模型利用奖励、评分器、工具或监督机制弱点的行为。对于模型在与外部系统或资源交互时可能造成危害的行为，我们也在扩大训练覆盖范围。</p>
+<p>我们会继续大力投入对齐研究，扩大评估覆盖范围，并把研究成果用于指导训练和防护措施。</p>
+<p>我们计划在不久的将来分享更多对齐研究成果，其中包括我们对模型行为的认识，以及发现的任何新型挑战。</p>
+<h3>下一步</h3>
+<p>我们将继续完善 Preparedness Framework，把这些防护措施整合到训练和部署的全过程中。该框架也会更准确地反映未来模型的能力，以及模型实际运行的环境。</p>
+<p>开发能够随这些能力扩展的方法，需要持续投资模型辅助安全、更有效的监控，以及对齐研究的进一步进展。</p>
+<p>随着我们的方法不断发展，我们计划让外部机构参与其中，并分享更多研究所得。</p>
+<p>前沿模型的能力正在快速提升。我们理解、对齐并保护这些模型的能力，必须始终领先一步。</p>
+<p class="note">*我们将在未来几周发布一份技术报告，介绍我们从此次事件中获得的经验。</p>
+<div class="article-meta">
+<span>2026</span>
+<span>对齐</span>
+<span>作者</span>
+</div>
+<h3 class="keep-reading">继续阅读</h3>
+<figure class="source-figure" data-source-image="0"><img alt="Partnering with CodeAI — accessible card image" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/7FcPS2UYSda8PpzDH6rZ1C/fedbc5dd1a908180d87676aaf6b9a6a4/a11y-card-v002.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="1"><img alt="OpenAI joins PORTS-Pike project, expanding community investment and supporting thousands of Southern Ohio jobs — card image" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/6RUPcXx0eTGghDpM851Qy1/ab11d2d0849ad9544249bf7b77ee46fe/openai-joins-ports-pike-project-cover-v001.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="2"><img alt="Dali Rajic &gt; Article card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/5XuPL3BI8tkye6ojCL91Kc/74884b051d5c1a553cae8d3b952c79fe/dali-rajic-article-card-square-crop-v3.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+</div>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
