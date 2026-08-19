@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Claude 如何加速蛋白质设计与分析化学</title>
+<style>
+:root,
+:root[data-theme="light"] {
+  --bg: #f7f8fb;
+  --surface: #ffffff;
+  --surface-alt: #eef3f7;
+  --surface-warm: #fff3d8;
+  --surface-risk: #ffe9e7;
+  --surface-data: #e2f5fb;
+  --surface-opportunity: #e5f5ea;
+  --ink: #17212b;
+  --muted: #596773;
+  --line: #cbd5dc;
+  --accent: #087f9c;
+  --accent2: #c43d46;
+  --accent3: #207a47;
+  --accent4: #a86600;
+  --hero-bg: #172832;
+  --hero-ink: #f5fbff;
+  --hero-muted: #b8cad4;
+  --hl: #c9eff8;
+  --hl2: #ffe49a;
+  --hl3: #c9ebd4;
+  --quote-bg: #203b47;
+  --quote-ink: #f3fbff;
+  --shadow: rgba(22, 39, 50, 0.12);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10171c;
+    --surface: #192228;
+    --surface-alt: #202c33;
+    --surface-warm: #332a18;
+    --surface-risk: #362124;
+    --surface-data: #16303a;
+    --surface-opportunity: #193126;
+    --ink: #e6edf1;
+    --muted: #aab8c0;
+    --line: #3a4a53;
+    --accent: #55c7e2;
+    --accent2: #ff8188;
+    --accent3: #72d495;
+    --accent4: #f0bd56;
+    --hero-bg: #081116;
+    --hero-ink: #edf8fc;
+    --hero-muted: #9bb2bd;
+    --hl: #174453;
+    --hl2: #514117;
+    --hl3: #214832;
+    --quote-bg: #112a34;
+    --quote-ink: #edfaff;
+    --shadow: rgba(0, 0, 0, 0.28);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10171c;
+  --surface: #192228;
+  --surface-alt: #202c33;
+  --surface-warm: #332a18;
+  --surface-risk: #362124;
+  --surface-data: #16303a;
+  --surface-opportunity: #193126;
+  --ink: #e6edf1;
+  --muted: #aab8c0;
+  --line: #3a4a53;
+  --accent: #55c7e2;
+  --accent2: #ff8188;
+  --accent3: #72d495;
+  --accent4: #f0bd56;
+  --hero-bg: #081116;
+  --hero-ink: #edf8fc;
+  --hero-muted: #9bb2bd;
+  --hl: #174453;
+  --hl2: #514117;
+  --hl3: #214832;
+  --quote-bg: #112a34;
+  --quote-ink: #edfaff;
+  --shadow: rgba(0, 0, 0, 0.28);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  color: var(--ink);
+  background: var(--bg);
+  font-family: "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.78;
+}
+a { color: var(--accent); }
+.hero {
+  padding: 72px max(24px, calc((100vw - 1120px) / 2)) 64px;
+  color: var(--hero-ink);
+  background: var(--hero-bg);
+}
+.eyebrow {
+  margin: 0 0 18px;
+  color: var(--accent4);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+h1 {
+  max-width: 900px;
+  margin: 0;
+  font-size: clamp(2.25rem, 5vw, 4.8rem);
+  line-height: 1.12;
+  letter-spacing: 0;
+}
+.original-title {
+  max-width: 820px;
+  margin: 18px 0 0;
+  color: var(--hero-muted);
+  font-family: Georgia, serif;
+  font-size: 1.12rem;
+  line-height: 1.5;
+}
+.hero-deck {
+  max-width: 850px;
+  margin: 34px 0 0;
+  font-size: 1.28rem;
+  line-height: 1.7;
+}
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  margin-top: 32px;
+  color: var(--hero-muted);
+  font-size: 0.9rem;
+}
+.summary-block {
+  width: min(1120px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 64px 0;
+}
+.summary-block h2,
+#translation > h2 {
+  margin: 0 0 28px;
+  font-size: 2rem;
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+.kicker {
+  color: var(--accent);
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+.number-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+.metric {
+  min-width: 0;
+  padding: 28px 24px;
+  border-right: 1px solid var(--line);
+}
+.metric:last-child { border-right: 0; }
+.metric strong {
+  display: block;
+  color: var(--accent);
+  font-size: 2.2rem;
+  line-height: 1.1;
+}
+.metric span {
+  display: block;
+  margin-top: 9px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 38px;
+  align-items: start;
+}
+.split article {
+  padding: 30px 0 30px 24px;
+  border-left: 5px solid var(--accent);
+}
+.split article:last-child { border-color: var(--accent3); }
+.split h3,
+.timeline h3,
+.takeaway h3 {
+  margin: 0 0 12px;
+  font-size: 1.25rem;
+  letter-spacing: 0;
+}
+.deep-band {
+  color: var(--quote-ink);
+  background: var(--quote-bg);
+}
+.deep-band .summary-block { padding-top: 54px; padding-bottom: 54px; }
+.deep-band h2 { color: var(--quote-ink); }
+.timeline {
+  display: grid;
+  gap: 0;
+  max-width: 900px;
+}
+.timeline-item {
+  position: relative;
+  padding: 8px 0 30px 48px;
+  border-left: 2px solid var(--accent4);
+}
+.timeline-item::before {
+  position: absolute;
+  top: 10px;
+  left: -10px;
+  width: 18px;
+  height: 18px;
+  content: "";
+  border: 4px solid var(--quote-bg);
+  border-radius: 50%;
+  background: var(--accent4);
+}
+.timeline-item p { margin: 0; color: var(--hero-muted); }
+.risk-band { background: var(--surface-risk); }
+.risk-note {
+  max-width: 880px;
+  padding: 4px 0 4px 24px;
+  border-left: 6px solid var(--accent2);
+  font-size: 1.08rem;
+}
+.takeaways {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 14px;
+}
+.takeaway {
+  padding: 24px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: 0 8px 22px var(--shadow);
+}
+.takeaway:nth-child(1),
+.takeaway:nth-child(4) { grid-column: span 3; }
+.takeaway:nth-child(2),
+.takeaway:nth-child(3) { grid-column: span 3; }
+.takeaway:nth-child(1) { border-top: 5px solid var(--accent); }
+.takeaway:nth-child(2) { border-top: 5px solid var(--accent3); }
+.takeaway:nth-child(3) { border-top: 5px solid var(--accent4); }
+.takeaway:nth-child(4) { border-top: 5px solid var(--accent2); }
+.hl {
+  padding: 0.05em 0.2em;
+  background: var(--hl);
+  font-weight: 750;
+}
+.hl2 {
+  padding: 0.05em 0.2em;
+  background: var(--hl2);
+  font-weight: 750;
+}
+.hl3 {
+  padding: 0.05em 0.2em;
+  background: var(--hl3);
+  font-weight: 750;
+}
+#translation {
+  width: min(820px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 78px 0 100px;
+}
+#translation > h2 {
+  padding-bottom: 18px;
+  border-bottom: 3px solid var(--accent);
+}
+#translation h3 {
+  margin: 58px 0 18px;
+  font-size: 1.55rem;
+  line-height: 1.3;
+  letter-spacing: 0;
+}
+#translation h4 {
+  margin: 42px 0 14px;
+  color: var(--accent);
+  font-size: 1.18rem;
+  letter-spacing: 0;
+}
+#translation p { margin: 0 0 1.25em; }
+#translation ul,
+#translation ol {
+  margin: 0 0 1.5em;
+  padding-left: 1.5em;
+}
+#translation li { margin: 0.6em 0; }
+.lead {
+  padding: 24px;
+  border-left: 6px solid var(--accent4);
+  background: var(--surface-warm);
+  font-size: 1.06rem;
+}
+.source-figure {
+  margin: 42px 0;
+  padding: 16px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-alt);
+}
+.source-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.source-figure figcaption {
+  margin-top: 13px;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+.footnotes {
+  margin-top: 64px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.source-note {
+  margin-bottom: 34px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+@media (max-width: 760px) {
+  .hero { padding-top: 52px; padding-bottom: 48px; }
+  .hero-deck { font-size: 1.08rem; }
+  .number-strip { grid-template-columns: 1fr 1fr; }
+  .metric:nth-child(2) { border-right: 0; }
+  .metric:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+  .split { grid-template-columns: 1fr; gap: 10px; }
+  .takeaways { grid-template-columns: 1fr; }
+  .takeaway:nth-child(n) { grid-column: auto; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/Claude-accelerates-protein-design" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<section id="summary">
+<header class="hero">
+<p class="eyebrow">Anthropic · Science · 2026 年 8 月 18 日</p>
+<h1>Claude 如何加速蛋白质设计与分析化学</h1>
+<p class="original-title">How Claude is accelerating protein design and analytical chemistry</p>
+<p class="hero-deck"><strong>一句话总括：</strong>Claude 已能协调专业计算工具设计新型蛋白质，并直接解析实验仪器的原始文件，把部分需要数小时、数周甚至数月的科研工作压缩到几十分钟或一两天。</p>
+<div class="meta">
+<span>来源：Anthropic</span>
+<span>分类：Science</span>
+<span>实验领域：蛋白质设计、分析化学</span>
+</div>
+</header>
+<div aria-label="关键数据" class="number-strip">
+<div class="metric"><strong>14 / 15</strong><span>成功获得结合剂的目标数</span></div>
+<div class="metric"><strong>35.1%</strong><span>单目标模式最高总体命中率</span></div>
+<div class="metric"><strong>354</strong><span>经实验确认的蛋白质结合剂</span></div>
+<div class="metric"><strong>19–23 分钟</strong><span>完成 LC-MS 与 NMR 分析</span></div>
+</div>
+<div class="summary-block">
+<p class="kicker">两种能力，同一个变化</p>
+<h2>AI 正从回答科研问题，转向执行科研流程</h2>
+<div class="split">
+<article>
+<h3>从零设计蛋白质</h3>
+<p>Claude 为 15 个目标设计了蛋白质结合剂，并在 <span class="hl">14 个目标</span>上获得实验成功。多目标模式的总体命中率为 <span class="hl">22.6% 至 26.7%</span>，单目标模式达到 <span class="hl">35.1%</span>。</p>
+<p>当前蛋白质设计项目的典型命中率约为 10% 至 15%。这说明通用推理模型可以有效编排结构设计、序列设计、折叠预测和计算筛选工具。</p>
+</article>
+<article>
+<h3>直接处理仪器原始数据</h3>
+<p>Opus 5 只收到合同实验室的原始文件和两句提示。它在 <span class="hl3">23 分钟</span>内完成 NMR 分析，在 <span class="hl3">19 分钟</span>内完成 LC-MS 分析。</p>
+<p>Claude 测得样品纯度为 <span class="hl3">96.4%</span>，实验室结果为 96.33%。这意味着模型不仅能解释报告，还能从专有格式的原始数据开始重建分析流程。</p>
+</article>
+</div>
+</div>
+<div class="deep-band">
+<div class="summary-block">
+<h2>蛋白质设计实验如何展开</h2>
+<div class="timeline">
+<div class="timeline-item">
+<h3>选择目标</h3>
+<p>研究团队选择常见 benchmark 目标，并加入 15-PGDH 和 GDF-8 等新目标，以降低模型复用训练数据中既有成功方案的可能性。</p>
+</div>
+<div class="timeline-item">
+<h3>自主编排工具</h3>
+<p>Claude 自行选择结合位点，并调用公开的结构设计、序列设计和共折叠模型。它还完成多轮计算优化与候选筛选。</p>
+</div>
+<div class="timeline-item">
+<h3>外部湿实验验证</h3>
+<p>Adaptyv Bio 与 Twist Bioscience 独立生产并测试候选设计。最终在 1,320 个设计中确认了 <strong>354 个结合剂</strong>。</p>
+</div>
+<div class="timeline-item">
+<h3>结果优于部分公开基线</h3>
+<p>针对 RBX1，单目标 Mythos Preview 的命中率为 <strong>40%</strong>，竞赛参与者为 3.7%。其最佳设计还超过了竞赛获胜方案的亲和力。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="summary-block">
+<p class="kicker">能力边界</p>
+<h2>高平均表现并不代表所有目标都容易</h2>
+<div class="split">
+<article>
+<h3>模型之间存在互补</h3>
+<p>整体能力更强的 Mythos Preview 未能解决 TNFα，但 Opus 4.8 设计出了多个有效结合剂。其中一些能同时结合人、食蟹猴和小鼠的 TNFα。</p>
+<p>这表明复杂科研任务不能只看模型的总体排名。具体目标、搜索策略和工具编排方式都会改变结果。</p>
+</article>
+<article>
+<h3>失败仍然提供重要信息</h3>
+<p>Claude 在 BBF-14 上只取得有限成功。在 MBP 的 <span class="hl2">90 个设计</span>中，没有一个得到确认的有效结合剂。</p>
+<p>结果说明蛋白质表面形态、柔性和化学特征仍会形成明确的设计瓶颈。湿实验也仍是不可替代的验证环节。</p>
+</article>
+</div>
+</div>
+<div class="risk-band">
+<div class="summary-block">
+<p class="kicker">安全与现实约束</p>
+<h2>科研加速能力具有双重用途</h2>
+<div class="risk-note">
+<p>自主蛋白质设计可以推动药物和基础科学研究，也可能被用于危险的生物研究。Anthropic 因此尚未向普通用户开放最强模型中的部分生命科学能力，并计划通过受信任的访问项目向科学家提供服务。</p>
+<p><strong>更关键的现实是：</strong>设计高亲和力结合剂只是药物研发的早期一步。后续仍有安全性、药代动力学、制造、临床试验、政策和运营等大量障碍。</p>
+</div>
+</div>
+</div>
+<div class="summary-block">
+<p class="kicker">最值得带走的洞见</p>
+<h2>四个判断</h2>
+<div class="takeaways">
+<article class="takeaway">
+<h3>科研代理开始产生可验证成果</h3>
+<p>这里的核心证据不是模型自评，而是外部实验室的湿实验结果和真实仪器数据。</p>
+</article>
+<article class="takeaway">
+<h3>通用模型能成为专业工具的编排层</h3>
+<p>Claude 没有替代所有蛋白质模型，而是选择、运行并组合这些模型，完成端到端工作流。</p>
+</article>
+<article class="takeaway">
+<h3>价值来自缩短人工等待</h3>
+<p>分析化学实验显示，模型可以把原始文件处理、质量检查、解释和报告整合进一次运行。</p>
+</article>
+<article class="takeaway">
+<h3>能力提升必须与验证和访问控制同步</h3>
+<p>生命科学结果昂贵且难以验证，同时具有双重用途。更强的模型并不会降低实验审查与安全治理的重要性。</p>
+</article>
+</div>
+</div>
+</section><section id="translation">
+<h2>完整译文</h2>
+<p class="source-note">原文：Anthropic，2026 年 8 月 18 日。英文标题：How Claude is accelerating protein design and analytical chemistry</p>
+<p class="lead"><strong>摘要：</strong>本文介绍两项结果，说明 Claude 如何帮助生命科学家加快研究进度。</p>
+<p>第一项实验测试了 Claude 从零设计蛋白质结合剂的能力。这是药物设计早期阶段的一项关键任务。过去，专业人员通常需要针对每个目标投入数周或数月。</p>
+<p>Claude 使用 Mythos Preview 和 Opus 4.8，为 15 个目标设计了蛋白质结合剂，并在其中 14 个目标上取得成功。根据实验设置不同，单个设计成功结合目标的比例为 22% 至 35%。目前蛋白质设计项目的典型水平为 10% 至 15%。Claude 的部分最佳设计还表现出极强的结合能力，其亲和力比此前公开的最佳结果高出数倍。</p>
+<p>第二项实验评估了 Claude 能否加快化学分析。研究人员向已经公开提供的 Claude Opus 5 提供了 NMR 和 LC-MS 数据。化学家利用这些数据判断化合物的身份和纯度。</p>
+<p>Claude 只收到合同实验室的原始文件和一段两句话的提示，随后分别在 23 分钟和 19 分钟内完成了分析。它给出的氢原子数量和纯度与实验室自己的分析一致。Claude 测得的纯度为 96.4%，实验室结果为 96.33%。</p>
+<p>这些例子表明，Claude 可以减少完成复杂科研任务所需的时间，也能降低任务对专业计算知识的要求。</p>
+<p>过去几个月中，AI 推动科学发现的速度明显加快。目前，大部分发现都集中在结果验证相对迅速的领域。</p>
+<p>例如，AI 代理已经开始处理数学中的未解问题。存在数十年的 Erdős 问题正以每月数个的速度被解决。我们最近还介绍了 Claude 如何改进黎曼 ζ 函数一个长期未被突破的下界。</p>
+<p>AI 模型也开始加快实验科学的发展。这些领域的结果验证更复杂，成本也更高，生命科学就是其中之一。</p>
+<p>本文介绍 Claude 科学能力的两项实验。第一项是蛋白质设计项目。结果显示，Claude 能为多种目标设计蛋白质结合剂，其表现与领先的人类专家相当，部分结果甚至更好。</p>
+<p>第二项实验考察 Claude Opus 5 执行分析化学任务的表现。结果表明，普通用户可以使用的模型已经能够协助处理科研中常规但耗时的工作。</p>
+<p>下文介绍的蛋白质设计和分析化学任务，代表了药物开发早期阶段的部分工作。加快这些阶段只是我们推动端到端药物研发提速计划的一部分。药物研发中的许多问题来自政策和运营瓶颈，而不是核心科学能力不足。</p>
+<p>本文公布的结果来自 Mythos 和 Opus 系列模型的组合。目前，我们能力最强的模型仍会阻止部分生命科学研究任务。我们的最高优先事项之一，是为科学家推出专门的访问计划。我们预计很快会公布更多信息。在此期间，Opus 5 仍是普通用户可以使用的最强 Claude 模型。</p>
+<h3>Claude 设计蛋白质</h3>
+<p>发布 Claude Mythos 5 时，我们曾介绍利用该模型加快部分药物设计工作的实验。作为这项工作的延续，我们一直在研究 Claude 为多个蛋白质目标设计微型结合剂的能力。</p>
+<p>微型结合剂是一种经过设计的小型蛋白质，可以牢固附着在目标蛋白质上。大量现代药物都依赖这种结合机制。药物会附着在目标上，对其进行抑制或激活，或者向目标输送某种物质。</p>
+<p>设计新的结合剂称为从头设计（de novo design）。过去，蛋白质工程师针对每个目标都需要投入数月时间进行计算、优化和筛选。</p>
+<p>近几年，能够设计蛋白质并预测其结合可能性的机器学习模型大幅加快了蛋白质设计流程。不过，计算专家通常仍需花费数天，有时甚至数周，才能费力地组织和运行这些模型。</p>
+<p>Claude 等通用推理模型可以帮助专家和非专家更高效地完成蛋白质计算设计。但要在湿实验室中验证这些数据，仍然需要数周。湿实验室是科学家实际测试化学品、药物和其他生物物质的地方。</p>
+<p>我们已经收到第一批实验的湿实验数据。这是一项使用 Claude Opus 4.8 和 Mythos Preview，针对 15 个目标展开的多路线蛋白质设计项目。</p>
+<p>外部评估机构 Adaptyv Bio 和 Twist Bioscience 分别生产了 Claude 的设计，并在实验室中独立测试。结果显示，在 15 个目标中，Claude 成功为 14 个目标设计出了结合剂。</p>
+<p>这些结果包括针对至少六个目标的高亲和力结合剂。<sup>1</sup> 在至少四个目标上，Claude 设计的结合剂达到或超过了此前公开报道的最佳亲和力。</p>
+<p>亲和力用于衡量蛋白质与目标结合的牢固程度。要取得治疗效果，通常需要高亲和力结合剂。它们可以让药物在较低剂量下生效，从而降低副作用风险和生产成本。</p>
+<p>在一次持续 48 小时、同时处理全部目标的任务中，Mythos Preview 和 Opus 4.8 的总体命中率分别达到 26.7% 和 22.6%。命中率表示全部设计中真正能够结合目标的比例。目前蛋白质设计项目的典型命中率为 10% 至 15%。<sup>2</sup></p>
+<figure class="source-figure" data-source-image="0"><img alt="Graph showing over all hit rates" decoding="async" height="1672" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/d75b1cc758dafce8709fb4028df60db220055c92-2048x1672.jpg" width="2048"/>
+<figcaption>Mythos Preview 和 Opus 4.8 在一组包含 15 个目标的实验中取得了超过 20% 的总体命中率。不同目标的命中率最高达到 90%，最低为 0%。</figcaption>
+</figure>
+<p>评估 Claude 同时处理多个目标的能力后，我们还想了解，让它每次只专注于一个目标是否能提高表现。这也更接近蛋白质工程师通常采用的工作方式。</p>
+<p>结果确实有所改善。Mythos Preview 使用多个 24 小时会话分别处理每个目标时，总体命中率达到 35.1%。</p>
+<p>除了初始提示中提供的信息外，整个项目几乎没有人工参与。<sup>3</sup> 我们预计，如果由专业蛋白质设计人员使用这种方法，结果还会更好。专家可以主动指导 Claude，并针对中间结果提供反馈。</p>
+<h3>实验项目</h3>
+<p>我们首先选择了多个常用于蛋白质设计 benchmark 的目标，其中包括 Adaptyv Bio 的全部 BenchBB 目标。这些目标已经得到广泛研究，因此我们可以把实验结果与公开的命中率和亲和力数据进行比较。</p>
+<p>我们还从 Adaptyv Bio 最近的竞赛中选择了两个新目标：15-PGDH 和 GDF-8。这样可以检验 Claude 是否能处理训练数据或在线搜索中没有既有成功记录的目标。针对所有目标，我们都要求 Claude 检查并确保设计具有原创性。</p>
+<p>随后，我们在 Claude Science 中提示 Claude 为这些目标设计蛋白质结合剂。我们采用了两种方法。</p>
+<p>第一种是多目标模式。Claude 在同一个 Claude Science 会话中同时处理所有目标。</p>
+<p>第二种是单目标模式。每个会话只处理一个目标，而所有目标的会话同时并行运行。</p>
+<p>我们让 Opus 4.8 和 Mythos Preview 在多目标模式下运行 48 小时。为了运行专门的蛋白质设计和折叠模型，每次任务最多可以使用 12,500 个 NVIDIA H100 GPU 小时。</p>
+<p>我们还让 Mythos Preview 以单目标模式运行。每个目标的任务持续 24 小时，并最多使用 2,500 个 NVIDIA H100 GPU 小时。<sup>5</sup></p>
+<p>为了模拟典型蛋白质设计项目能够获得的资源，我们向 Claude 提供了以下条件：</p>
+<ul>
+<li>一份内容详尽的蛋白质设计提示词。<sup>6</sup> 这份提示词也被加入代理的上下文。</li>
+<li>互联网访问权限，以及论文等蛋白质设计资料组成的语料库。</li>
+<li>Google Drive、Slack、Gmail 和 BioRxiv 连接器。</li>
+<li>用于运行专业蛋白质设计和折叠模型的 GPU。</li>
+<li>在规定时间内不限制 token 和子代理预算，并启用快速模式。</li>
+</ul>
+<p>向 Claude 提供提示后，我们让模型自主执行。项目启动后，我们没有再提供任何科学、技术或运营方面的指导。</p>
+<p>我们只负责批准访问请求，例如网络访问请求，并监控基础设施，确保会话正常运行。</p>
+<p>Claude 完成了结合剂设计涉及的全部工作。人类操作人员完成这些工作可能需要数周。</p>
+<p>Claude 自行决定要在每个目标蛋白质的哪个位置设计结合剂。它通过协调多个结构设计、序列设计和共折叠模型，生成候选结构与序列。共折叠模型会一次性预测蛋白质及其结合对象共同形成的结构。</p>
+<p>Claude 随后执行了多轮计算优化，并通过计算筛选出具有原创性和多样性的候选方案。这些候选还需要能够正常表达、保持可溶，并与目标结合。</p>
+<p>对于 15 个目标中的每一个，我们都要求 Claude 设计 30 个蛋白质结合剂。Claude 操作的是蛋白质设计领域已经使用的公开专业设计和共折叠模型。随后，Claude 的设计被送往 Adaptyv Bio 和 Twist Bioscience 进行验证。</p>
+<figure class="source-figure" data-source-image="1"><img alt="Sankey diagram showing how Claude is combining open-source protein models" decoding="async" height="1529" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/75ea83acd06d906fd3c22cefcec14faccab2c774-2048x1529.jpg" width="2048"/>
+<figcaption>Claude 成功协调了多个开源蛋白质设计模型，并生成了命中率和亲和力都较高的结合剂。a）桑基图展示 Claude 如何组合结构设计、序列设计和多轮优化。b、c）在订购设计数量不少于 100 个的所有结构设计方法中，Claude 都设计出了命中率超过 20% 的结合剂，其中包括高亲和力结合剂。</figcaption>
+</figure>
+<h3>Claude 在各个目标上的表现</h3>
+<p>项目结束时，我们总共完成了 1,320 个设计，并针对 15 个目标中的 14 个目标获得了 354 个结合剂。</p>
+<p>这些结果显著扩充了公开的从头蛋白质设计数据。作为对比，目前两个最大的集合分别是 proteinbase.com 和 Overath 等人整理的集合。它们针对 40 个目标完成了约 5,700 个设计，并从中获得约 770 个结合剂。</p>
+<p>下面介绍三个能够体现 Claude 能力的例子，以及一个显示其局限性的例子。技术报告提供了更多细节。</p>
+<h4>Claude 的设计可以与 Adaptyv Bio 蛋白质设计竞赛的参赛作品竞争</h4>
+<p>对于 Adaptyv Bio 曾经举办过设计竞赛的目标，Claude 在命中率和亲和力上达到或超过了最优秀参赛者的水平。</p>
+<p>RBX1 是一种较小的蛋白质，可以推动特定调控蛋白的定向降解。针对 RBX1，单目标模式下的 Mythos Preview 取得了 40% 的命中率，而竞赛参与者的命中率为 3.7%。</p>
+<p>Claude 排名第一的设计是一种高亲和力结合剂，其表现超过了竞赛的获胜设计。该竞赛共收到 245 个设计。</p>
+<figure class="source-figure" data-source-image="2"><img alt="Graph showing affinities and overall performance" decoding="async" height="1840" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/e8b783d32450994ed6ae2e9a39e00273012fe128-2048x1840.jpg" width="2048"/>
+<figcaption>Claude 针对 RBX1 设计出了亲和力达到当前领先水平的结合剂，并且经常超过 Adaptyv Bio 蛋白质设计竞赛记录的命中率。</figcaption>
+</figure>
+<h4>Claude 为具有挑战性和治疗价值的 TNFα 设计了跨物种结合剂</h4>
+<p>一个有趣的结果是，在 TNFα 上取得成功的是 Opus 4.8，而不是 Mythos Preview。此前已有多个专家团队难以解决这一目标。</p>
+<p>TNFα 是免疫系统释放的一种信号蛋白，会触发炎症。阻断 TNFα 是一些极具影响力的药物所采用的治疗机制，其中包括 Humira。</p>
+<p>TNFα 很难进行结合剂设计，因为它具有多聚体结构。设计者必须瞄准由两个蛋白质共同形成的沟槽中的结合位点。</p>
+<p>Mythos Preview 没有取得成功，但 Opus 4.8 设计出了多个结合剂。其中一些具有跨物种活性，可以结合人、食蟹猴和小鼠的 TNFα。这一点对开展动物研究很重要。</p>
+<p>我们还不确定 Opus 4.8 为什么能在这个目标上成功，而 Mythos Preview 没有成功。</p>
+<p>我们会从整体上评估模型能力。蛋白质设计本身非常复杂，因此总体能力较弱的模型在某些特定领域超过通常更强的模型，并不令人意外。</p>
+<figure class="source-figure" data-source-image="3"><img alt="Graph showing Opus's work against TNFα" decoding="async" height="1811" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/d3eaa6119c840d899138649e6de9ee55f5f7e4aa-2048x1811.jpg" width="2048"/>
+<figcaption>Opus 4.8 成功针对 TNFα 从头设计了结合剂。其中一些结合剂具有跨物种反应性，可以结合人、食蟹猴和小鼠的 TNFα。</figcaption>
+</figure>
+<h4>Claude 设计了包含 β-折叠的多种折叠结构结合剂</h4>
+<p>大部分计算设计的结合剂都是 α-螺旋束。α-螺旋是一种由螺旋结构组成的蛋白质二级结构。</p>
+<p>β-折叠的设计难度更高。在这种结构中，延伸的氨基酸链必须并排对齐。它们也更容易发生错误折叠和聚集。聚集是指蛋白质分子彼此黏附，而不是保持分离和正确折叠。</p>
+<p>Claude 针对六个目标设计出了 15 个经确认的结合剂。这些结合剂至少含有 20% 的 β-链，体现了 Claude 对蛋白质结构进行推理的能力。</p>
+<figure class="source-figure" data-source-image="4"><img alt="Graph showing Claude's performance on 15 binders" decoding="async" height="1171" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/d4156db83e8b482e8939d2f120649b848852fb89-2048x1171.jpg" width="2048"/>
+<figcaption>Claude 针对六个目标成功设计了 15 个包含 β-折叠的结合剂。这些结合剂采用了 10 种不同的骨架。</figcaption>
+</figure>
+<h4>Claude 在部分目标上表现不佳</h4>
+<p>某些目标对 Claude 来说仍然很困难，其中包括 BBF-14 和麦芽糖结合蛋白（MBP）。</p>
+<p>BBF-14 是一种自然界中不存在的 β-桶状蛋白质。它本身也是从头设计的蛋白质。正因为它具有新颖性，研究人员将其作为结合剂设计的 benchmark。</p>
+<p>MBP 的结构也特别难处理。它是一种体积较大、具有柔性的细菌蛋白质，表面光滑且亲水，因此很适合作为实验室试剂。但这些特点也让结合剂几乎无处着力。</p>
+<p>Claude 仍然成功获得了三个彼此独立的 BBF-14 结合剂。三个结合剂分别来自不同的设计路线，并且各自采用不同的骨架。它们的亲和力较为有限，处于亚微摩尔到微摩尔范围。</p>
+<p>不过，在针对 MBP 的 90 个设计中，没有任何一个被确认能够与目标结合。只有一个设计表现出微弱但可重复的结合信号。</p>
+<figure class="source-figure" data-source-image="5"><img alt="Graph showing an example where Claude struggled" decoding="async" height="1495" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/2d80b39660550a7e6de0f012db797382bef8e4a9-2048x1495.jpg" width="2048"/>
+<figcaption>Claude 在为 BBF-14 和麦芽糖结合蛋白（MBP）设计蛋白质结合剂时只取得了有限成功。BBF-14 是一种从头设计的 β-桶蛋白质。</figcaption>
+</figure>
+<p>为了更准确地了解 Claude 在这些设计项目中的表现，我们计划开展更全面的后续表征，以确认命中率和亲和力测量结果。</p>
+<p>在此期间，我们会公开这些项目使用的提示词，以及生成的全部体外和计算数据。<sup>7</sup></p>
+<h3>代理式生物学发现具有双重用途</h3>
+<p>AI 模型日益自主的研究能力，无疑会加快人类治疗手段和基础科学发现的发展。</p>
+<p>不过，这些能力也具有双重用途。如果缺乏可靠的安全措施，它们可能帮助恶意行为者开展危险研究，例如开发生物武器。</p>
+<p>我们正在通过受信任的访问计划，以安全方式提供这些能力。在此期间，Claude Fable 5 不会向普通用户开放蛋白质设计和其他具有双重用途的生物学研究能力。</p>
+<p>不过，下面的实验表明，Opus 系列模型仍然可以完成令人瞩目的科研工作。</p>
+<h3>Claude 执行分析化学工作流</h3>
+<p>蛋白质结合剂项目测试了 Claude 设计新分子的能力。第二项实验则测试它解释已经制造出来的分子测量结果的能力。</p>
+<p>表征化合物是一项繁琐的工作。它与蛋白质设计相似，需要化学家进行多轮测量、分析和迭代。</p>
+<p>例如，化学家每次制造一个分子后，都必须确定产物是不是原本想要制造的物质，并测量其纯度。这项工作通常通过核磁共振（NMR）波谱完成。</p>
+<p>NMR 谱由一系列峰组成。每个峰对应分子中的一个氢原子，或一组化学环境相同的氢原子。</p>
+<p>峰的位置可以告诉化学家每个氢原子与什么相连。峰的大小则表示它代表多少个氢原子。</p>
+<p>确认结构是合成化学中最耗时的步骤之一。针对每一种化合物，化学家都必须手工把谱图中的每个峰与拟议结构中的原子对应起来。</p>
+<p>另一种技术是液相色谱-质谱（LC-MS），主要用于评估纯度。样品流经色谱柱时，仪器首先将其分离成不同成分。仪器随后根据紫外吸收强度记录每种成分的含量，再测量各成分的分子质量。</p>
+<p>对于这两种技术，仪器采集本身只需几分钟。常规质子 NMR 谱通常需要两到三分钟，LC-MS 则大约需要 10 分钟。</p>
+<p>真正繁琐的是分析输出。NMR 和 LC-MS 运行完成后，仪器会生成采用制造商专有格式的原始文件。这些文件通常只能用制造商的软件或其他专业软件打开。<sup>8</sup></p>
+<p>处理和解释这些文件非常费力。因此，我们想了解 Claude Opus 5 这样的公开可用模型能否完成这项任务。<sup>9</sup></p>
+<p>研究人员只向 Claude 提供了合同实验室为一个常规质控样品生成的原始文件，以及一段简短的自然语言提示。<sup>10</sup> Claude 没有使用厂商软件，也没有操作人员协助。</p>
+<p>Claude 在 Claude Science 中并行工作，分别在 23 分钟和 19 分钟内返回了处理完成的 NMR 和 LC-MS 结果。</p>
+<figure class="source-figure" data-source-image="6"><img alt="Image showing what Claude sent and got back" decoding="async" height="792" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/9325c2d545f43be4b1b37a360afb7f9738d45f28-1880x792.jpg" width="1880"/>
+<figcaption>实验室发送的内容，以及 Claude 在 23 分钟后返回的结果。左图是仪器直接输出的原始 NMR 信号。右图是处理后的谱图，其中标出了每个峰的位置，并计算了对应的氢原子数量。</figcaption>
+</figure>
+<p>Claude 的结果与实验室自己的处理结果一致。每个峰的氢原子计数与实验室结果的差值不超过 0.08 ¹H。Claude 测得的纯度为 96.4%，实验室测得的纯度为 96.33%。</p>
+<figure class="source-figure" data-source-image="7"><img alt="Image showing LC-MS results" decoding="async" height="815" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/ca01c0986228b48e028e0fe616934d3449a9a123-1880x815.jpg" width="1880"/>
+<figcaption>左图是收到时的 LC-MS 运行文件。它由原始字节组成，采用原本只有制造商软件才能读取的格式。右图是 Claude 在 19 分钟后恢复出的色谱图。图中显示，样品在 4.34 分钟处出现单一成分，占紫外信号的 96.4%，分子质量为 504 道尔顿。</figcaption>
+</figure>
+<p>对于 NMR 数据，Claude 首先将仪器原始数据转换成经过校准的谱图，并生成一个包含 18 个峰的表格。表中列出了每个峰对应的氢原子数量。</p>
+<p>接下来，Claude 像化学家一样，把四个较宽的峰标记为可能与氮或氧相连的氢原子。</p>
+<p>随后，它提出了标准的验证方法：向 NMR 样品中加入重水。重水会置换这些氢原子，使对应的峰缩小或消失。</p>
+<p>实验室在第一次测量三天后，也独立完成了同一项检查。</p>
+<p>获得重水实验的原始文件后，Claude 定量分析了数据变化。它还发现并纠正了第一次解读中的夸大说法。</p>
+<p>Claude 最初报告四个标记峰全部消失。但它自己的复查显示，实际上只有两个峰消失。最终，Claude 得出了与实验室操作人员相同的结论。</p>
+<p>LC-MS 仪器文件采用一种没有公开说明的厂商格式。Claude自行推断了数据的编码方式。</p>
+<p>在开始分析前，它重现了仪器为全部 2,664 次扫描记录的总量，以此确认文件读取正确。</p>
+<p>随后，Claude 提供了化学家通常需要的全部输出，包括分离轨迹、质谱、紫外光谱、纯度表和化合物分子质量。</p>
+<p>它还提供了可以重复使用的文件读取代码，并列出了关于结果可信度的注意事项。例如，它指出，这类仪器提供的质量只能精确到最接近的整数单位。</p>
+<p>通常，这些分析全部由化学家手工完成。对于具有治疗价值的小分子，每个样品一般需要半小时到一小时。</p>
+<p>实验室自己的记录显示，每张 NMR 谱图大约需要两分钟的人工处理。LC-MS 报告则在样品装入仪器约两小时后生成。</p>
+<p>Claude Science 在 25 分钟内并行处理并解释了两个文件。Claude 还在这段时间内生成了一份书面报告。</p>
+<p>相比之下，实验室在获得第一张谱图四天后才提交这个样品的最终报告。这种延迟相当常见，因为实验室需要逐个分析分子，中间也可能出现其他工作。</p>
+<p>除了提高效率，Claude 在这次任务中还表现出一定程度的科学判断力。例如，它提出的后续实验与合同实验室独立开展的实验完全相同。</p>
+<p>随着模型继续改进，我们预计 Claude 的科学判断会变得更加敏锐。</p>
+<p>如需在 Claude Science 中自行尝试，可以向 Claude 提供一个原始 NMR 或 LC-MS 文件，并要求模型确认化合物的身份和纯度。</p>
+<h3>结论</h3>
+<p>上面的两个例子表明，AI 模型可以通过降低科学发现所需的专业知识、成本和时间，加快生命科学研究。</p>
+<p>在化学领域，Claude 正在自动完成过去由化学家手工执行的分析工作。</p>
+<p>在蛋白质设计领域，Claude 可以用极少的输入，端到端执行结合剂设计项目。它生成的结合剂能够达到或超过此前公开的最佳设计。</p>
+<p>蛋白质微型结合剂并不是标准的药物治疗形式。即使对于单克隆抗体和小分子等常见药物形式，设计出高亲和力结合剂也只是制造类药分子的第一步。</p>
+<p>不过，我们认为这项工作具有基础意义。目前，我们正在扩展这些能力，希望 Claude 最终能够针对所有药物形式，运行端到端的完整开发流程。</p>
+<h3>延伸阅读</h3>
+<p>以下文档提供了更深入的技术细节，以及本文结果的更多信息：</p>
+<ul>
+<li>蛋白质设计项目的提示词和数据；</li>
+<li>蛋白质设计技术报告；</li>
+<li>化学分析技术报告。</li>
+</ul>
+<div class="footnotes">
+<h3>脚注</h3>
+<ol>
+<li>如果结合剂的平衡解离常数处于个位数纳摩尔范围或更低，即 KD &lt; 10 nM，我们就将其视为高亲和力结合剂。</li>
+<li>该数字通过计算 <a href="https://proteinbase.com/">proteinbase.com</a> 上从头设计蛋白质结合剂的总体命中率得出。</li>
+<li>人工参与包括批准 Claude 发出的部分请求，例如网络访问和代码执行请求；解决蛋白质设计会话之外的基础设施问题；以及订购生成的设计，用于实验验证。</li>
+<li>我们总共选择了 16 个目标。在适用时，默认物种为人。按字母顺序排列，这些目标是：15-PGDH、BBF-14、BHRF1、Cas9、EGFR、GDF-8（潜伏型）、GDF-8（成熟型）、IL-7Rα、麦芽糖结合蛋白（MBP）、Nipah virus Glycoprotein G、PD-L1、RBX1、TNFα、TREM2、TrkA 和 VEGF-A。本文给出其中 15 个目标的结果。由于目标发生聚集并具有非特异性黏附，GDF-8（成熟型）的实验数据无法得出明确结论，因此未列入结果。</li>
+<li>15-PGDH 和潜伏型 GDF-8 没有用于多目标模式。Opus 4.8 以单目标模式处理了三个目标：TNFα、潜伏型 GDF-8 和成熟型 GDF-8。</li>
+<li>这份提示词大约包含 30,000 个 token，原文已公开分享。</li>
+<li>提示词、所设计蛋白质复合物的计算模型，以及实验数据均已公开。</li>
+<li>对于 NMR，原始文件是波谱仪记录的原始信号，即“自由感应衰减”（free induction decay）。对于 LC-MS，原始文件是仪器生成的二进制运行文件。两者都是采用专有格式的原始仪器文件。</li>
+<li>我们此前曾介绍 Claude 分析 NMR 数据时与标准软件进行比较的表现。</li>
+<li>NMR 的完整提示词是：“i have a raw 1H FID: process it: FT, phase, baseline-correct. show me the spectrum. then pick peaks and integrate: give me a table with δ (ppm), multiplicity, J (Hz), and integral.” LC-MS 的提示词是：“Process the raw LCMS file: extract chromatograms and mass spectra, and summarize with figures.”</li>
+</ol>
+</div>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
