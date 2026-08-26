@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>支持针对人们如何使用 Claude 的独立研究</title>
+<style>
+:root,
+:root[data-theme="light"] {
+  --bg: #f5f3ee;
+  --surface: #ffffff;
+  --surface-alt: #ece8df;
+  --ink: #17212b;
+  --muted: #64707b;
+  --line: #d5d0c5;
+  --accent: #16697a;
+  --accent-soft: #d9eef1;
+  --accent2: #b45309;
+  --accent2-soft: #ffebc7;
+  --accent3: #7c3aed;
+  --accent3-soft: #ede1ff;
+  --accent4: #b4234d;
+  --accent4-soft: #f9dce5;
+  --success: #18794e;
+  --success-soft: #dcefe5;
+  --risk: #b4234d;
+  --opportunity: #16697a;
+  --conclusion: #7c3aed;
+  --dark-panel: #17212b;
+  --dark-panel-ink: #f4f6f7;
+  --dark-panel-muted: #bac5cc;
+  --hl: #ffe39a;
+  --hl2: #ccecf1;
+  --shadow: 0 18px 45px rgba(35, 43, 50, .10);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101419;
+    --surface: #191f26;
+    --surface-alt: #222a32;
+    --ink: #e8edf1;
+    --muted: #a7b1bb;
+    --line: #38434e;
+    --accent: #52c5d6;
+    --accent-soft: #153940;
+    --accent2: #ffb454;
+    --accent2-soft: #442f15;
+    --accent3: #b99aff;
+    --accent3-soft: #30254b;
+    --accent4: #ff779d;
+    --accent4-soft: #461e2d;
+    --success: #66d6a1;
+    --success-soft: #16372a;
+    --risk: #ff779d;
+    --opportunity: #52c5d6;
+    --conclusion: #b99aff;
+    --dark-panel: #080b0f;
+    --dark-panel-ink: #eef3f6;
+    --dark-panel-muted: #aebbc4;
+    --hl: #5b4516;
+    --hl2: #17434b;
+    --shadow: 0 18px 45px rgba(0, 0, 0, .28);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101419;
+  --surface: #191f26;
+  --surface-alt: #222a32;
+  --ink: #e8edf1;
+  --muted: #a7b1bb;
+  --line: #38434e;
+  --accent: #52c5d6;
+  --accent-soft: #153940;
+  --accent2: #ffb454;
+  --accent2-soft: #442f15;
+  --accent3: #b99aff;
+  --accent3-soft: #30254b;
+  --accent4: #ff779d;
+  --accent4-soft: #461e2d;
+  --success: #66d6a1;
+  --success-soft: #16372a;
+  --risk: #ff779d;
+  --opportunity: #52c5d6;
+  --conclusion: #b99aff;
+  --dark-panel: #080b0f;
+  --dark-panel-ink: #eef3f6;
+  --dark-panel-muted: #aebbc4;
+  --hl: #5b4516;
+  --hl2: #17434b;
+  --shadow: 0 18px 45px rgba(0, 0, 0, .28);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.78;
+}
+a { color: var(--accent); text-underline-offset: .2em; }
+.hero {
+  padding: clamp(3.5rem, 8vw, 7rem) 1.4rem;
+  background: var(--dark-panel);
+  color: var(--dark-panel-ink);
+}
+.hero-inner, .summary-wrap, .translation-inner {
+  width: min(1080px, 100%);
+  margin: 0 auto;
+}
+.eyebrow {
+  margin: 0 0 1rem;
+  color: var(--accent);
+  font-size: .82rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.hero h1 {
+  max-width: 900px;
+  margin: 0;
+  font-size: clamp(2.4rem, 6vw, 5.6rem);
+  line-height: 1.08;
+  letter-spacing: -.04em;
+}
+.original-title {
+  max-width: 820px;
+  margin: 1.25rem 0 0;
+  color: var(--dark-panel-muted);
+  font-family: Georgia, serif;
+  font-size: clamp(1.05rem, 2vw, 1.45rem);
+}
+.dek {
+  max-width: 820px;
+  margin: 2rem 0 0;
+  padding-left: 1rem;
+  border-left: 5px solid var(--accent2);
+  font-size: clamp(1.15rem, 2.2vw, 1.55rem);
+  font-weight: 700;
+}
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .65rem;
+  margin-top: 2rem;
+}
+.meta span {
+  padding: .35rem .75rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--dark-panel-muted);
+  font-size: .82rem;
+}
+.summary-wrap { padding: 3.5rem 1.4rem 5rem; }
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  overflow: hidden;
+  margin: -5rem 0 3.5rem;
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.metric { padding: 1.55rem; border-right: 1px solid var(--line); }
+.metric:last-child { border-right: 0; }
+.metric strong {
+  display: block;
+  color: var(--accent);
+  font-size: clamp(1.55rem, 3vw, 2.6rem);
+  line-height: 1.2;
+}
+.metric:nth-child(2) strong { color: var(--accent2); }
+.metric:nth-child(3) strong { color: var(--accent3); }
+.metric:nth-child(4) strong { color: var(--accent4); }
+.metric span { color: var(--muted); font-size: .9rem; }
+.summary-wrap h2 {
+  margin: 0 0 1.25rem;
+  font-size: clamp(1.7rem, 3.5vw, 2.6rem);
+}
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin: 2.5rem 0;
+}
+.split article {
+  padding: 1.8rem;
+  border-top: 6px solid var(--accent);
+  background: var(--accent-soft);
+}
+.split article:last-child {
+  border-color: var(--accent4);
+  background: var(--accent4-soft);
+}
+.split h3, .flow h3, .takeaways h3 { margin-top: 0; line-height: 1.3; }
+.hl {
+  padding: .05em .22em;
+  background: var(--hl);
+  font-weight: 800;
+}
+.hl2 {
+  padding: .05em .22em;
+  background: var(--hl2);
+  font-weight: 800;
+}
+.insight-strip {
+  margin: 3rem calc(50% - 50vw);
+  padding: 2.7rem max(1.4rem, calc(50vw - 540px));
+  background: var(--dark-panel);
+  color: var(--dark-panel-ink);
+}
+.insight-strip blockquote {
+  margin: 0;
+  color: var(--accent2);
+  font-size: clamp(1.35rem, 3vw, 2.15rem);
+  font-weight: 800;
+  line-height: 1.45;
+}
+.insight-strip p { max-width: 760px; color: var(--dark-panel-muted); }
+.flow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  margin: 2.5rem 0 3.5rem;
+  counter-reset: flow;
+}
+.flow article {
+  position: relative;
+  padding: 1.7rem 1.5rem;
+  border-bottom: 4px solid var(--accent3);
+  background: var(--surface);
+  counter-increment: flow;
+}
+.flow article:nth-child(2) {
+  border-color: var(--accent2);
+  background: var(--accent2-soft);
+}
+.flow article:nth-child(3) {
+  border-color: var(--success);
+  background: var(--success-soft);
+}
+.flow article::before {
+  content: "0" counter(flow);
+  display: block;
+  margin-bottom: .8rem;
+  color: var(--muted);
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+.balance {
+  padding: 2rem;
+  border: 1px solid var(--line);
+  border-left: 8px solid var(--risk);
+  background: var(--surface-alt);
+}
+.balance h3 { margin-top: 0; }
+.takeaways { margin-top: 3.5rem; }
+.takeaway-grid {
+  display: grid;
+  grid-template-columns: 1.2fr .8fr;
+  gap: 1rem;
+}
+.takeaway {
+  padding: 1.45rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+.takeaway:nth-child(2) { background: var(--accent3-soft); }
+.takeaway:nth-child(3) { background: var(--accent2-soft); }
+.takeaway:nth-child(4) {
+  grid-column: 1 / -1;
+  border-left: 7px solid var(--success);
+  background: var(--success-soft);
+}
+.takeaway strong { color: var(--conclusion); }
+#translation {
+  padding: 5rem 1.4rem 7rem;
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+}
+.translation-inner { max-width: 760px; }
+#translation h2 {
+  margin: 0 0 2rem;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 1.2;
+}
+#translation h3 {
+  margin: 3.4rem 0 1.1rem;
+  padding-top: .65rem;
+  border-top: 3px solid var(--accent);
+  font-size: 1.65rem;
+}
+#translation h4 {
+  margin: 2.4rem 0 .75rem;
+  color: var(--accent3);
+  font-size: 1.18rem;
+}
+#translation p { margin: 1.05rem 0; }
+#translation ul { padding-left: 1.4rem; }
+#translation li { margin: .85rem 0; }
+.source-figure {
+  margin: 2.2rem auto 3rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: var(--surface-alt);
+}
+.source-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: .65rem;
+}
+.source-figure figcaption {
+  margin-top: .8rem;
+  color: var(--muted);
+  font-size: .88rem;
+  line-height: 1.55;
+}
+.note {
+  padding: 1.1rem 1.25rem;
+  border-left: 5px solid var(--accent2);
+  background: var(--accent2-soft);
+}
+.credits {
+  color: var(--muted);
+  font-size: .94rem;
+}
+@media (max-width: 760px) {
+  .metrics { grid-template-columns: 1fr 1fr; margin-top: -3.2rem; }
+  .metric:nth-child(2) { border-right: 0; }
+  .metric:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+  .split, .flow, .takeaway-grid { grid-template-columns: 1fr; }
+  .takeaway:nth-child(4) { grid-column: auto; }
+  .flow article { border-bottom-width: 3px; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/enabling-independent-research" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<section id="summary">
+<header class="hero">
+<div class="hero-inner">
+<p class="eyebrow">Anthropic · Societal Impacts</p>
+<h1>支持针对人们如何使用 Claude 的独立研究</h1>
+<p class="original-title" lang="en">Enabling independent research on how people use Claude</p>
+<p class="dek">一句话总括：Anthropic 让外部团队在不接触原始对话的前提下，自主研究真实的 Claude 使用行为，并验证了<span class="hl">独立性与隐私保护可以并存</span>。</p>
+<div class="meta">
+<span>2026 年 8 月 26 日</span>
+<span>约 25 万段对话</span>
+<span>3 个外部研究团队</span>
+</div>
+</div>
+</header>
+<div class="summary-wrap">
+<div aria-label="关键数据" class="metrics">
+<div class="metric"><strong>≈25 万</strong><span>Claude.ai 或 Claude Code 对话</span></div>
+<div class="metric"><strong>&gt;50%</strong><span>涉及委托后果重大的任务</span></div>
+<div class="metric"><strong>≈3/4</strong><span>由用户设定协作方向</span></div>
+<div class="metric"><strong>&lt;5%</strong><span>因安全风险被调整的类别与对话</span></div>
+</div>
+<h2>真实使用数据揭示了什么</h2>
+<p>三个团队研究了人机协作、使用体验和编程生产力。样本来自 <span class="hl2">2026 年 4—5 月</span>。这让研究不再局限于实验任务或偏休闲的公开数据集。</p>
+<div class="split">
+<article>
+<h3>重要工作比预想中更早交给了 AI</h3>
+<p>SALT Lab 发现，<span class="hl">超过一半</span>的 Claude 对话涉及后果重大的任务。法律和财务等专业指导尤其突出。</p>
+<p>这说明，AI 的社会影响不能只从低风险的写作或娱乐用途判断。真实用户已经把它带入更难撤销、也更可能影响他人的决策。</p>
+</article>
+<article>
+<h3>协作仍由人主导，但理解程度并不一致</h3>
+<p>近四分之三的对话中，用户设定方向，Claude 提供协助。用户通常会修改输出，而不是原样采用。</p>
+<p>表面上的“人在回路中”并不等于充分理解。真正重要的是，用户能否判断、学习并承担最终责任。</p>
+</article>
+</div>
+<div class="insight-strip">
+<blockquote>摩擦不总是失败。有些来回修改，反而让人把问题想得更清楚。</blockquote>
+<p>用户需要观察 Claude 如何处理任务，再找出含糊或误解之处。这些额外投入往往能促使他们澄清意图、改善输出，并继续参与问题本身。</p>
+</div>
+<h2>三条研究线索</h2>
+<div class="flow">
+<article>
+<h3>协作方式</h3>
+<p>SALT Lab 研究人们把什么工作交给 AI，以及双方如何分工。结果显示，高风险委托很常见，但多数用户仍在指导和修订。</p>
+<p><strong>洞见：</strong>评估 AI 影响时，任务的重要性与人的实际监督质量必须一起考虑。</p>
+</article>
+<article>
+<h3>情绪与行为</h3>
+<p>Oxford 团队发现，Claude 的温暖、拒绝、不同意或古怪表现，分别与用户的积极、反驳或更深入参与相伴出现。</p>
+<p><strong>洞见：</strong>AI 的行为风格不只是界面细节，它与用户的情绪和参与方式存在系统性联系。</p>
+</article>
+<article>
+<h3>生产力变化</h3>
+<p>METR 的初步结果显示，新模型可能比旧模型节省更多时间。Claude 对任务耗时的估计，也与开发者实际完成时间相关。</p>
+<p><strong>洞见：</strong>真实生产力研究有了可扩展的测量路径，但最终增益仍需等待完整分析。</p>
+</article>
+</div>
+<div class="balance">
+<h3>开放数据的难点，不只是隐私</h3>
+<p>研究者看不到原始对话，只能看到 Claude 生成的聚合类别及占比。这保护了用户，却也让分类错误更难发现。公开数据集 WildChat 可用于预先测试问题，但它偏向休闲和创作用途，不能完全代表 Claude 的真实流量。</p>
+<p>此外，部分聚合结果涉及平台滥用。Anthropic 公布了多数违规类别，但会删除揭示用户如何绕过安全措施的信息。每项研究受影响的类别和对话都<span class="hl">少于 5%</span>。</p>
+<p><strong>结论：</strong>规模化开放不能只靠更多算力。它还需要更成熟的问题设计、隐私审查、滥用披露规则和独立发表保障。</p>
+</div>
+<div class="takeaways">
+<h2>最值得带走的洞见</h2>
+<div class="takeaway-grid">
+<div class="takeaway"><strong>真实用途比公开数据集更严肃。</strong> 用户已经把法律、财务等后果重大的工作交给 AI。</div>
+<div class="takeaway"><strong>人主导不等于人理解。</strong> 是否修改输出，只能说明参与程度，不能证明用户掌握了内容。</div>
+<div class="takeaway"><strong>互动摩擦可能创造价值。</strong> 发现误解并反复澄清，能改善结果，也能让人保持思考。</div>
+<div class="takeaway"><strong>独立研究可以兼顾隐私，但扩展成本很高。</strong> 这次试点证明路径可行，也暴露了分类验证、审查速度和资源投入方面的瓶颈。</div>
+</div>
+</div>
+</div>
+</section><section id="translation">
+<div class="translation-inner">
+<h2>完整译文</h2>
+<figure class="source-figure" data-source-image="0"><img alt="Enabling independent research on how people use Claude" decoding="async" height="1000" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/74256b81ca52aca8cf45a0e4e489d4d4d9d98175-1000x1000.svg" width="1000"/></figure>
+<p>今年早些时候，我们开展了一项试点，向外部研究者开放 Claude 真实使用情况的聚合数据。三个研究团队使用我们的隐私保护分析工具 Anthropic Insights，自行设计了研究。我们代为运行数据收集流程，他们则独立完成分析。</p>
+<p>本文将介绍这些研究的概要结果，以及我们从试点中获得的经验。我们还提供了一份意向登记表，供希望未来与我们合作的研究者填写。</p>
+<p>要让社会顺利过渡到变革性 AI 时代，我们必须了解 AI 对个人和社会的影响。目前，真实 AI 互动数据集中在少数实验室手中。我们认为，应当向研究者、政策制定者和公众更广泛地开放这些数据。</p>
+<p>实验室之外的研究者有两种选择。他们可以参考实验室发布的分析。这些分析反映了真实使用情况，但往往回答的是实验室自己的问题，而不是外部研究者的问题。</p>
+<p>研究者也可以使用公开数据集。他们能够自由研究这些数据，但其中的内容更偏向休闲用途，未必能反映大多数人实际如何使用 AI。对于独立研究 AI 的真实使用情况来说，这两种选择都不充分。</p>
+<p>今年春季，我们试行了一项计划。三家外部研究机构通过 Anthropic Insights，自主设计并开展 Claude 使用数据研究。Anthropic Insights 原名“Clio”，是我们自己的团队用来分析数百万段 Claude 对话中使用模式的隐私保护工具。</p>
+<p>我们希望将来扩大这项计划。因此，我们还对所有与第三方研究者共享的数据进行了额外的隐私审计，以确认隐私保护措施仍然有效。详情见附录。</p>
+<p>据我们所知，这是外部研究者首次利用一家 AI 公司自身的使用数据，开展公开、独立的研究。下文将介绍外部团队的发现、我们开展试点时获得的经验，以及我们在考虑扩大计划时需要权衡的问题。我们还会公开发布各项目的聚合数据。</p>
+<h3>研究者获得了哪些发现</h3>
+<p>我们与三个研究团队合作：Stanford University 的 Social and Language Technologies（SALT）Lab、University of Oxford 的 Human Information Processing Lab，以及评估前沿 AI 模型的非营利组织 METR。</p>
+<p>每个团队都自行提出研究问题，并使用 Anthropic Insights 对约 25 万段 Claude.ai 或 Claude Code 对话进行了隐私保护分析。这些对话产生于 2026 年 4 月至 5 月。</p>
+<p>我们希望外部合作伙伴拥有尽可能充分的独立性。因此，合同赋予我们的审查权仅限于用户隐私、可能帮助他人违反使用政策的信息、Anthropic 的机密信息，以及研究准确性。</p>
+<p>除此之外，Anthropic 无权干预研究发现的内容。即使结果令 Anthropic 难堪，研究者也可以自由发表。以下是部分早期结果。我们很期待这些研究的发展方向，也期待其他人在数据公开后获得新的发现。</p>
+<h4>Social and Language Technologies Lab：人类如何与 AI 协作</h4>
+<p>Social and Language Technologies Lab 研究了人类如何与 AI 协作。他们考察了人们会把哪些工作交给 AI、人类在完成工作时保留了哪些角色，以及人机协作会在哪里失效。他们发现：</p>
+<ul>
+<li>
+<p><strong>人们把重要工作交给 AI 的频率高于预期。</strong>以往研究认为，人们主要把责任较轻的任务委托给 AI，而把后果重大的任务留给自己。这里的“后果重大”是指会影响他人，或者难以撤销的工作。</p>
+<p>但 SALT Lab 发现，超过一半的 Claude 对话涉及用户把后果重大的任务交给 AI。人们寻求专业指导时，最可能把这类工作交给 Claude，尤其是法律或财务问题。</p>
+</li>
+<li>
+<p><strong>与 Claude 协作时，人们通常会指导并监督工作。</strong>在近四分之三的对话中，人类设定方向，Claude 从旁协助。人们通常会调整 Claude 的输出，而不是原样采用。</p>
+<p>不过，即使人们明确指导 Claude 产出自己想要的结果，他们对 Claude 输出内容的理解程度，以及从中学习的程度，仍然存在差异。</p>
+</li>
+<li>
+<p><strong>与 AI 协作时遇到摩擦很常见，但这种摩擦往往有积极作用。</strong>人们会投入时间和精力，观察 Claude 如何尝试完成任务。他们会找出请求中不清楚或被误解的地方，再不断调整指示。</p>
+<p>这一过程能带来更好的结果。它促使人们澄清意图、改进输出，或继续参与问题本身。</p>
+</li>
+</ul>
+<p>可在此阅读他们的完整报告。</p>
+<h4>Human Information Processing Lab：使用 Claude 时的感受</h4>
+<p>Human Information Processing Lab 正在研究人们使用 Claude 时的感受，以及这些感受与 Claude 行为之间的关系。他们的早期结果表明：</p>
+<ul>
+<li>
+<p><strong>人们使用 AI 时的感受，与 AI 的行为有关。</strong>研究者发现，人类行为与 AI 行为会在对话中成组出现。</p>
+<p>Claude 表现得温暖时，人们往往更积极。Claude 拒绝请求或表达不同意见时，人们往往会反驳。Claude 表现得古怪时，人们往往会更深入地进行智力参与。Claude 直接提供帮助时，人们通常显得满意。</p>
+</li>
+<li>
+<p><strong>人们使用 AI 时的体验，与使用互联网其他服务时很相似。</strong>研究者发现，Claude 对话中的沉浸、挫败和愉悦等状态之间的关系，与另一项日常网络浏览研究中的模式十分相似。</p>
+<p>这表明，人们与 AI 互动的方式，可能与参与其他数字活动的方式存在相似之处。</p>
+</li>
+</ul>
+<p>他们仍在完成研究报告。报告公开后，我们会在此补上链接。</p>
+<h4>METR：编程智能体带来的真实生产力提升</h4>
+<p>METR 正在估算编程智能体带来的真实生产力提升，并研究这种提升如何随模型代际变化。他们对 Claude Code 对话的分析仍在进行，但早期结果表明：</p>
+<ul>
+<li>
+<p><strong>能力更强的模型可能为用户节省更多时间。</strong>METR 比较了两个时间：Claude 估计任务在没有 AI 时需要多久，以及使用不同 Claude 模型后实际花费了多久。</p>
+<p>初步结果显示，新模型相较旧模型带来了显著加速。随着分析继续推进，METR 计划分享更多结果。</p>
+</li>
+<li>
+<p><strong>AI 对任务耗时的估计相当合理。</strong>这项分析依赖 Claude 判断一个任务需要多长时间。因此，METR 将这些判断与此前一项开发者研究中已知的完成时间进行了比较。</p>
+<p>Claude 的估计与开发者实际花费的时间存在相关性。</p>
+</li>
+<li>
+<p><strong>下一步是测量 AI 能把研究工作加速多少。</strong>METR 正在继续研究，这项工作能否帮助人们了解 AI 对研究者工作的加速程度。</p>
+<p>随着 AI 更多地参与自身开发，这个问题可能会变得越来越重要。</p>
+</li>
+</ul>
+<p>他们仍在完成研究报告。报告公开后，我们会在此补上链接。</p>
+<h3>我们的团队学到了什么</h3>
+<p>在 AI 领域，共享使用数据几乎没有先例。因此，这次试点不仅是以隐私保护方式支持第三方研究，也是在试验这类计划应当如何运作。</p>
+<p>保护用户隐私和研究者独立性，是我们最重视的两个目标。我们同时实现了这两个目标。Anthropic Insights 正是为此设计的。研究者从未接触原始对话。他们只能看到聚合结果，而且这些结果经过了与内部研究相同的法律和隐私审查。</p>
+<p>不过，这些措施也让试点相对于 AI 实验室通常的研究节奏变得十分缓慢，并且消耗了大量资源。速度和资源投入都给有效扩展计划带来了挑战。有关试点运行方式的更多细节，请参见附录。下面将介绍我们的经验，以及我们如何处理遇到的问题。</p>
+<h4>从不同角度研究同一问题很有价值</h4>
+<p>合作伙伴提出的部分研究问题，与我们的内部研究有所重叠。例如，METR 的提案与我们的经济学研究“Agentic coding and persistent returns to expertise”相似。</p>
+<p>我们认为这种重叠很有价值。它让外部研究者有机会检查相似的数据，并得出自己的结论。随着他们的研究继续推进，我们会关注这些结论是否与我们的结果一致。</p>
+<p>我们还让 METR 与 Anthropic 的 Economics 团队建立了联系。我们发现，这种联系改善了两个研究团队的工作。</p>
+<h4>内部有效的研究方法，需要为外部合作伙伴调整</h4>
+<p>使用 Anthropic Insights 时，研究者会写下一个问题，例如：“这个人正在寻求哪一类指导？”Claude 会针对研究中的每段对话回答这个问题。</p>
+<p>这些答案随后会被汇总成不同类别。研究者只能看到最终类别，以及每个类别所占的对话比例。</p>
+<p>由于我们依赖 Claude 的判断，这项工具对问题措辞很敏感。措辞不当的问题可能会把对话归入无法准确反映其内容的类别。又因为没有人能够阅读底层对话，所以这类错误很难被发现。</p>
+<p>在内部，我们会在数周内多次调整问题，以此控制这类风险。外部合作伙伴无法采用同样的方法。每次分享数据前都要重新进行隐私审查。如果不断重复这一流程，研究将难以开展。</p>
+<p>因此，我们让外部团队先在 WildChat 上测试问题。WildChat 是一个公开的人机对话数据集。研究者可以把分类答案与底层对话逐一核对。</p>
+<p>但 WildChat 偏向休闲和创作用途，与 Claude 的真实流量不同。有些问题在 WildChat 上表现良好，应用到真实 Claude 对话时却产生了误导性类别。</p>
+<p>为了解决这个问题，我们提供了有关如何解读 Anthropic Insights 输出的指导。详情见附录。未来，我们还将探索如何帮助外部研究者提前更有效地设计问题和类别。</p>
+<h4>既要透明披露滥用，也不能帮助他人实施滥用</h4>
+<p>合作伙伴获得的部分 Anthropic Insights 类别，显示了违反《可接受使用政策》或《服务条款》的行为。例如，有一类用户在寻求如何从事被禁止活动的指导。</p>
+<p>我们认为，公众应当了解平台上的滥用行为，因此披露了其中大多数违规情况。但有一种情况例外：如果某个类别描述的是用户如何绕过我们的安全措施，而不只是他们试图从事什么活动，我们就不会公开。</p>
+<p>在每项研究中，受此影响的类别和对话都少于 5%。每次出现这种情况时，我们都会告诉研究者哪些聚类被修改或删除，并说明原因。</p>
+<p>按照标准流程，当 Anthropic Insights 发现此类违规时，我们会把聚合数据交给 Safeguards 团队审查。这也将成为我们今后与外部研究者合作时的一项重要流程。</p>
+<h3>展望未来</h3>
+<p>理解 AI 对社会的影响，是一项规模过于庞大的工作，不能只交给 AI 公司。真正的监督需要外部研究者针对真实使用数据提出自己的问题，并独立发布他们的发现。</p>
+<p>这次试点是一项实验：外部研究者能否在不损害用户隐私的情况下，对我们的平台开展独立研究？实际工作比我们预想的更具挑战，我们也从中获得了很多经验。但到目前为止，答案似乎是肯定的。</p>
+<p>合作伙伴开展了我们自己不会想到去设计的研究。每个项目都让我们对 AI 的真实社会影响有了新的认识。这是一个有希望的开端，但仍有大量工作要做。</p>
+<p>下一步，我们需要判断能否扩大这项计划。我们既要考虑在上述限制下能够支持哪些研究，也要考虑一次能够运行多少项研究。</p>
+<p>我们会从小规模开始，以确保隐私、安全和研究质量。我们希望了解研究者的兴趣，以及他们想研究的问题。</p>
+<p>如果你是一名研究者，而且获得 Anthropic Insights 的访问权限可以帮助你开展目前无法进行的研究，请填写这份表格。</p>
+<h3>附录</h3>
+<p>完整附录可在此查看。附录介绍了这项计划的运行方式，包括我们如何选择三家合作机构、为解释计划目标和 Anthropic Insights 能力而编写的研究入门资料，以及各项目如何从提案推进到研究设计，再进入分析阶段。</p>
+<p>附录还收录了合作协议的详细内容。协议明确规定，即使研究结果令 Anthropic 难堪，合作伙伴也可以自由发表。</p>
+<p>此外，附录介绍了 Imperial College London 对这些数据进行的第三方隐私审计，以及所有公开数据都必须满足的隐私威胁模型。我们还提供了指导，帮助读者解读合作伙伴通过 Anthropic Insights 开展研究后公开的数据。</p>
+<h3>贡献与致谢</h3>
+<div class="credits">
+<p>Kunal Handa 领导了该项目。他与合作伙伴共同完善研究提案，起草研究指导和合同，运行合作伙伴的 Anthropic Insights 研究，协助构建支持合作研究的技术基础设施，参与 Anthropic Insights 输出的内部审查，并撰写了这篇博客文章。</p>
+<p>Miranda Zhang 负责协调合作关系和沟通工作，并参与了项目的各个部分。Gabriel Nicholas 负责协调第三方隐私审计和 Anthropic Insights 输出的内部审查，也参与了项目的各个部分。</p>
+<p>Miles McCain 撰写了 Anthropic Insights 输出解读指南，开发了支持合作研究的技术基础设施，参与了 Anthropic Insights 输出的内部审查，并对博客文章和隐私威胁模型提出了意见。Ryan Heller 为支持合作研究的技术基础设施作出了贡献。</p>
+<p>Saffron Huang 参与了 Anthropic Insights 输出的内部审查，并提供了重要反馈和讨论。Thomas Millar 和 Suzanne Wang 为支持合作研究的技术基础设施及 Anthropic Insights 输出的内部审查作出了贡献。</p>
+<p>Shan Carter、Mo Julapalli、Matt Kearney、Sarah Pollack 和 Judy Shen 参与了 Anthropic Insights 输出的内部审查。Matthew Jagielski 为隐私威胁模型作出了贡献。Shaoyi Zhang 为支持合作研究的技术基础设施作出了贡献。</p>
+<p>Heather Whitney、Ankur Rathi、Aisling Keenan 和 David Saunders 在整个项目期间提供了法律和隐私指导。Jake Eaton 和 Sylvie Carr 为博客文章的框架和写作作出了贡献。Jack Clark 和 Michael Stern 在整个过程中提供了宝贵的指导、支持和讨论。Deep Ganguli 在项目各阶段提供了详细指导、组织支持和反馈。</p>
+<p>此外，我们感谢 Miriam Chaum、Ishita Dasgupta、Esin Durmus、Adam Farina、Zoe Hitzig、Jerry Hong、Devin Kuokka、Hendson Lin、Maxim Massenkoff、Peter McCrory、Maryam Quasto、Nitarshan Rajkumar、Amie Rotherham、Divya Siddarth、Taylor Sorensen、Jerome Swannack、Alex Tamkin、Molly Villagra、Scott White 和 Charles Yang 提供的有益想法、讨论、反馈与支持。</p>
+<p>感谢各团队参与这项计划。Stanford Social and Language Technologies Lab 的合作成员包括 Vishakh Padmakumar、Yijia Shao、Jennifer Wang、Diyi Yang 和 Dora Zhao。Oxford Human Information Processing Lab 的合作成员包括 Tsvetomira Dumbalska、Hannah Rose Kirk 和 Christopher Summerfield。METR 的合作成员包括 Joel Becker（现任职于 Anthropic）、Daniel Paleka 和 Parker Whitfill。</p>
+<p>感谢 Zexi Yao、Bozhidar Stevanoski、Peter Romov、Euodia Dodd、Xiaoxue Yang 和 Nataša Krčo 开展第三方隐私审计。</p>
+</div>
+<h3>引用</h3>
+</div>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

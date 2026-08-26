@@ -55,6 +55,7 @@ OPENAI_CATEGORIES = (
     "Milestone",
     "Conclusion",
     "Research",
+    "Security",
 )
 ANTHROPIC_CATEGORY_PREFIXES = (
     "Economic Research",
