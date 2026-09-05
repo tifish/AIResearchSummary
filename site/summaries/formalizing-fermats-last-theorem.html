@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>形式化费马大定理｜Formalizing Fermat's Last Theorem</title>
+<style>
+:root{
+  --bg:#f5f7fb;--card:#ffffff;--card2:#eef3ff;--ink:#172033;--muted:#5d687b;--line:#d9e0ec;
+  --accent:#315efb;--accent2:#0d9488;--accent3:#d97706;--accent4:#c026d3;
+  --risk:#be123c;--hl:#dbeafe;--hl2:#fef3c7;--deep:#172554;--quote:#ecfeff;
+}
+:root[data-theme="light"]{
+  --bg:#f5f7fb;--card:#ffffff;--card2:#eef3ff;--ink:#172033;--muted:#5d687b;--line:#d9e0ec;
+  --accent:#315efb;--accent2:#0d9488;--accent3:#d97706;--accent4:#c026d3;--risk:#be123c;--hl:#dbeafe;--hl2:#fef3c7;--deep:#172554;--quote:#ecfeff;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0c1220;--card:#131d30;--card2:#17233b;--ink:#e8edf7;--muted:#aab6ca;--line:#2a3955;
+    --accent:#82a5ff;--accent2:#2dd4bf;--accent3:#f5b84b;--accent4:#e879f9;--risk:#fb7185;--hl:#1d365e;--hl2:#4a3814;--deep:#0b1533;--quote:#102d35;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0c1220;--card:#131d30;--card2:#17233b;--ink:#e8edf7;--muted:#aab6ca;--line:#2a3955;
+  --accent:#82a5ff;--accent2:#2dd4bf;--accent3:#f5b84b;--accent4:#e879f9;--risk:#fb7185;--hl:#1d365e;--hl2:#4a3814;--deep:#0b1533;--quote:#102d35;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Noto Sans SC",sans-serif;line-height:1.78}
+main{max-width:1060px;margin:auto;padding:28px 22px 80px}
+.hero{background:linear-gradient(135deg,var(--deep),#253e78);color:#fff;border-radius:24px;padding:42px 44px;margin-bottom:24px}
+.hero h1{font-size:clamp(2rem,5vw,3.7rem);line-height:1.16;margin:12px 0}
+.hero .en{opacity:.72;font-size:1.08rem;letter-spacing:.02em}
+.kicker{color:#b8c8ff;font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:.78rem}
+.lead{font-size:1.18rem;max-width:800px;margin:18px 0 0}
+.band{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:22px 0}
+.metric{padding:18px;border:1px solid var(--line);border-top:4px solid var(--accent);background:var(--card);border-radius:14px}
+.metric:nth-child(2){border-top-color:var(--accent2)}.metric:nth-child(3){border-top-color:var(--accent3)}.metric:nth-child(4){border-top-color:var(--accent4)}
+.metric b{display:block;font-size:1.6rem}.metric span{color:var(--muted);font-size:.9rem}
+.summary-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px;margin:22px 0}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px}
+.panel h2,.panel h3{margin-top:0}
+.panel.conclusion{border-left:7px solid var(--accent2)}
+.panel.impact{background:var(--card2);border-right:7px solid var(--accent3)}
+.insight{margin:22px 0;padding:22px 26px;background:var(--quote);border-left:6px solid var(--accent4);font-size:1.1rem}
+.takeaways{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:18px 0 40px}
+.takeaways div{padding:16px;background:var(--card);border:1px solid var(--line);border-radius:12px}
+.takeaways strong{color:var(--accent)}
+#translation{max-width:850px;margin:0 auto}
+#translation h2{font-size:2rem;border-bottom:3px solid var(--accent);padding-bottom:8px}
+#translation h3{font-size:1.45rem;margin-top:2.1em;color:var(--accent)}
+#translation h4{color:var(--accent2);margin-top:1.7em}
+#translation p{margin:1em 0}
+#translation ul{padding-left:1.5em}
+#translation li{margin:.5em 0}
+blockquote{margin:1.4em 0;padding:16px 22px;background:var(--quote);border-left:5px solid var(--accent2);font-size:1.04rem}
+a{color:var(--accent);text-decoration-thickness:1px}
+figure.source-figure,[data-source-image]{margin:28px 0;padding:0}
+figcaption{color:var(--muted);font-size:.92rem;border-left:3px solid var(--accent3);padding:8px 14px}
+.note{font-size:.92rem;color:var(--muted)}
+@media(max-width:760px){main{padding:16px 14px 50px}.hero{padding:28px 24px}.band{grid-template-columns:repeat(2,1fr)}.summary-grid{grid-template-columns:1fr}.takeaways{grid-template-columns:1fr 1fr}}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/formalizing-fermats-last-theorem" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<section class="hero">
+<div class="kicker">Science · Anthropic · 2026年9月4日</div>
+<h1>形式化费马大定理</h1>
+<div class="en">Formalizing Fermat's Last Theorem</div>
+<p class="lead">一句话总括：这项工作把一个曾经需要多年人工核验的数学证明，变成了 Lean 可以逐步检查的计算对象，显示 AI 正在改变数学成果的验证方式。</p>
+</section>
+<section aria-label="关键数据" class="band">
+<div class="metric"><b>11天</b><span>Claude 基本自主完成证明</span></div>
+<div class="metric"><b>1300万行</b><span>Lean 代码规模</span></div>
+<div class="metric"><b>30,300</b><span>沿途完成的定理数</span></div>
+<div class="metric"><b>约60亿</b><span>输出 token 消耗</span></div>
+</section>
+<section class="summary-grid">
+<article class="panel conclusion">
+<h2>贡献：验证成为核心突破</h2>
+<p>Claude 在 11 天内完成了费马大定理的端到端形式化证明。最终证明使用 Lean 的三个标准公理，并与 Mathlib 中的定理陈述完成比对。</p>
+<p>新意不在于提出新的数学定理，而在于让计算机逐步核验一个极其复杂的既有证明。这种核验可以把“接近 100% 确信”变成可重复执行的检查。</p>
+</article>
+<article class="panel impact">
+<h2>影响：降低审查和复核成本</h2>
+<p>Wiles 的证明发表于 1995 年，共 129 页。它曾在密集核验两个月后被发现关键缺口，修复又花了一年。</p>
+<p>形式化证明能帮助审稿人更快定位错误，也能为 LLM 生成的数学成果提供机器可检查的证据。</p>
+</article>
+</section>
+<div class="insight"><strong>关键洞见：</strong>当 AI 生成数学证明的速度超过人工复核能力时，形式化证明可能成为数学共同体维持可信度的基础设施。</div>
+<section class="panel">
+<h2>规模：协作脚手架决定成败</h2>
+<p>Claude 早期尝试曾因代理失去项目状态而失败。转向 Prove2Me 后，定理依赖图、并行协作和可复用的自然语言描述改善了工作流。最终证明的规模超过 Mathlib 的 5 倍。</p>
+<p>同一方法在三个个人 Claude Max 账号上完成了 Vinogradov 三素数定理的形式化，只用了 3 天。这表明合适的工具脚手架可以让消费者订阅参与大型数学形式化。</p>
+</section>
+<h2>最值得带走的洞见</h2>
+<section class="takeaways">
+<div><strong>01</strong><br/>复杂证明可以被拆成机器可检查的定理图。</div>
+<div><strong>02</strong><br/>验证能力是这项工作的主要新意。</div>
+<div><strong>03</strong><br/>形式化不会取代面向人的数学解释。</div>
+<div><strong>04</strong><br/>AI 可能同时发现新错误并减轻审稿负担。</div>
+<div><strong>05</strong><br/>开放平台和 Lean 生态是规模化的关键。</div>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<figure class="source-figure" data-source-image="0"><img alt="Formalizing Fermat's Last Theorem" decoding="async" height="630" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/578f91575c42231f0994e341014614255149af80-1200x630.jpg" width="1200"/></figure>
+<p>我们正在分享首个由计算机完整核验的费马大定理证明。Claude 基本自主运行了 11 天，用 Lean 编程语言写出了这份证明。下面我们介绍形式化过程，并分享一些思考，讨论这项工作可能对研究数学意味着什么。</p>
+<p>大约在 1637 年，皮埃尔·德·费马在自己的《算术》（<i>Arithmetica</i>）一书上留下了一条边注。这条边注后来成为历史上最著名的数学猜想之一：对于任意 <i>n</i> &gt; 2，不存在满足 <i>aⁿ + bⁿ = cⁿ</i> 的正整数 <i>a</i>、<i>b</i>、<i>c</i>。这个猜想后来被称为费马大定理（Fermat’s Last Theorem，FLT），证明它却异常困难。1995 年，安德鲁·怀尔斯爵士给出了第一份证明，共 129 页，并花费数月艰苦核验。</p>
+<p>十年后，荷兰计算机科学家 Jan Bergstra 提议将 Wiles 的证明“形式化”：把数学推理转换成计算机可以自动检查的形式。从那以后，数学家一直在发展编码这类复杂证明所需的方法。2024 年，伦敦帝国理工学院的 Kevin Buzzard 发起了一项持续多年的社区项目，使用 Lean proof assistant 完成形式化。</p>
+<p>最近，Anthropic 研究员 Tianyi Peng 开始测试 Claude 是否能在 FLT 形式化方面取得进展。<sup>1</sup> Peng 的团队位于哥伦比亚大学，致力于构建 AI 形式化工具。结果超出了他的预期。Claude 基本自主工作了 11 天，完成了首个端到端、经过计算机核验的 FLT 证明。在此过程中，它写出了 1300 万行 Lean 代码，并证明了 29,500 个中间定理。</p>
+<p>我们把最终证明分享给了 Kevin Buzzard。他说：</p>
+<blockquote>这项非凡的自动形式化成果，据 Anthropic 研究人员介绍只用了 11 天，就在不依赖数学公理之外任何额外假设的情况下证明了费马大定理。在此过程中，我们看到了代数、调和分析、几何和数论的自动形式化，也了解到 AI 自动形式化产物已经足够稳健，可以继续在其上构建。这个证明是分层的。</blockquote>
+<p>自动形式化如此复杂的证明，是迈向“所有数学都可以随时检查”的未来的重要一步。随着 AI 产生越来越多证明，轻松形式化成果可以减轻评估新结果的负担，而评估过程有时需要数年。我们希望，人们能够更容易而不是更困难地信任数学赖以建立的知识体系。</p>
+<h3>验证数学证明的挑战</h3>
+<p>与近期由 AI 驱动的黎曼猜想研究不同，后者产生了新的数学成果；这里真正新颖的是验证。也就是像用计算器检查数学计算一样，检查一份数学证明。证明数学定理需要组装复杂的逻辑链条。如果其中一个环节断裂，后续所有内容都可能是错误的。要深入理解一项新结果，并对其正确性建立信心，可能需要数月甚至数年。</p>
+<p>费马大定理就是一个典型例子。<sup>2</sup> 费马把定理写在书的页边，还留下了一句诱人的话：</p>
+<blockquote>我发现了一个真正奇妙的证明，但这条边栏太窄，写不下。</blockquote>
+<p>350 多年来，一代又一代数学家一直在寻找 FLT 的证明，不论它是否“奇妙”。1908 年，有人宣布悬赏 100,000 德国金马克，奖励任何能给出正确证明的人。仅第一年就出现了 621 份错误尝试。</p>
+<p>1993 年 6 月，Wiles 在连续三天的讲座中展示了他认为是首个正确的 FLT 证明。几位数学家随后展开密集核验。两个月后，一位审查者提出的问题暴露出一个关键缺口。Wiles 花了一年修补证明。起初他独自工作，后来与自己的前学生 Richard Taylor 合作。当他几乎准备放弃时，终于意识到自己早先放弃的一条思路可以修复证明。Wiles 于 1995 年 5 月发表了首个正确的 FLT 证明。它依赖现代数学技术，而这些技术远远超出了 1637 年费马所能掌握的知识。几个世纪以来，人们始终没有找到初等证明。因此，数学界如今认为费马本人所谓的“奇妙证明”并不正确。</p>
+<h3>形式化费马大定理</h3>
+<p>检查证明正确性的一种方法，是让计算机来完成检查。Lean 等证明助手会用算法验证证明的逻辑，从而以近乎绝对的确定性展示其正确性。对人类而言，难点在于重写证明，让 Lean 能够理解。面向人类读者的证明会跳过许多显而易见的步骤，而 Lean 必须看到每一步，即使那一步极其琐碎。人类数学证明还会建立在数百年已发表的工作之上，而形式化只能从目前已经形式化的那一小部分数学开始。</p>
+<p>当时，人们预计 FLT 的形式化需要数年。数学社区用来描述项目初始阶段的蓝图就有 86 页。</p>
+<p>Claude 在 11 天内完成了证明，并在过程中生成了 30,300 个可由计算机核验的定理，其中 29,500 个被用于最终证明。数十个 Claude 代理协作定义概念、证明中间定理，并利用这些定理去证明越来越困难的命题。Claude 的证明包含 1300 万行 Lean 代码，规模超过 Mathlib——这一定理所依赖的主要数学证明社区库——的 5 倍。<sup>3</sup></p>
+<p>Claude 的证明采用了 Darmon、Diamond 和 Taylor 对 Wiles 证明的简化版本。人类提供的数学输入很少，主要是 Tianyi 偶尔给出的高层指令，例如“Jacobian 作为 scheme 似乎优先级很高”“尽快完成 Mazur theorem”。你可以在这里看到 Claude 思考过程的节选。</p>
+<p class="note">以下是 Claude 意识到自己刚刚完成这项工作时的思考节选。</p>
+<p>Claude 最初有多次尝试失败。代理虽然早期取得了一些成功，却很快失去对项目状态的追踪，无法继续有效协作。这些失败尝试贡献了最终证明中约 7% 的非模板代码行。</p>
+<p>项目在转向 Prove2Me 后取得成功。Prove2Me 是由 Tianyi Peng 及其哥伦比亚大学合作者设计的开放协作数学形式化平台。Prove2Me 的帮助包括：</p>
+<ul>
+<li>维护一个定理陈述的有向无环图（DAG），代理据此决定下一步要尝试哪些证明。这对缓解记忆退化、支持多个代理并行工作尤其有帮助。</li>
+<li>通过把定理陈述和证明分到不同文件中，并独立维护二者之间的链接，加快 Lean 编译并减少资源消耗。</li>
+<li>为每个定理陈述维护自然语言描述，以便搜索和复用，从而得到更简单的证明路径。</li>
+</ul>
+<figure class="source-figure" data-source-image="1"><img alt="DAG showing Claude formalizing sub-theorems on the way to FLT" decoding="async" height="3264" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/afd8e238255ec2654f2322f3d3630dcf1e8ea4ca-6800x3264.png" width="6800"/><figcaption>Prove2Me 计划中的关键里程碑。Claude 依照这一计划形式化费马大定理。三个彩色区域对应 Claude 在抵达最终目标前必须证明的三个核心子定理。这张图与 Wiles 的原始证明高度一致。</figcaption></figure>
+<p>借助 Prove2Me 和基于 Claude Code 的多代理框架，一个代理团队在不到两周内完成了证明，消耗了约 60 亿个输出 token。这些 token 来自一个通用型内部研究模型。该模型大致相当于 Claude Fable 5.1。最终证明经过 Lean 检查，只使用 Lean 的三个标准公理。一个比较器还确认，这一定理的陈述与 Mathlib 自己的 FLT 陈述一致。</p>
+<h3>降低形式验证的负担</h3>
+<p>我们能够如此快速地产生这份证明，说明形式化大范围数学内容已经成为可能。这既可以帮助发现数学共同体知识体系中的错误，也可以减轻新工作的审稿负担。Kevin Buzzard 审阅 Claude 的 Lean 证明后告诉我们：</p>
+<blockquote>如果自动形式化 FLT 现在已经成为可能，那么我们就朝着自动形式化现代数学文献迈出了一大步。这些自动形式化技术将带来新的工具，找出当前数学知识体系中的错误，并减轻审稿人的负担。这些技术还将让我们能够严格检查 LLM 生成的数学内容，而这目前通常需要付出极其高昂的人力成本。</blockquote>
+<p>形式化也是人类建立对 AI 生成数学成果信心的重要因素。随着 AI 和 AI 辅助数学家比以往产生更多所谓的证明，AI 辅助形式化可以分担人类审查者的部分工作。我们预计，今后在为人类读者撰写的说明之外，同时提供形式化证明会变得普遍。我们并不认为形式化证明应该取代人类可以理解的讲解，但它可能是数学共同体跟上 AI 生成成果的唯一可行方式。</p>
+<p>编写 Lean 似乎也能帮助 Claude 证明新的结果。我们近期许多由 Claude 撰写的成果，都在证明过程中同步完成了形式化。Claude 似乎会利用这些部分证明，独立检查自己的假设。这有点像它编写数值模拟来确认方向是否正确。</p>
+<p>形式化 FLT 是一个极度消耗 token 的项目，但它也是迄今构建的最大 Lean 证明。Anthropic 研究人员进行了一项小实验，使用三个个人 Claude Max 计划来形式化 Hardy–Littlewood Circle Method 的应用。代理完全通过 Prove2Me 协作，只用了 3 天就共同完成了 Vinogradov’s Three Primes Theorem 的形式化。我们认为，只要有合适的脚手架，使用消费者 AI 订阅协作形式化重大成果是可行的。</p>
+<p>为此，Anthropic 以及其他实验室最近扩大了对外部研究人员的支持。支持对象包括从事纯数学和形式化工作的数学家。支持形式包括免费和折扣订阅，以及研究额度。我们也为更大型的科学项目提供专项资助。这些项目可以包括形式化其他重大定理，或改进 Lean、Mathlib。</p>
+<p>随着 AI 快速改变数学研究的面貌，Anthropic 和其他地方的数学家都在思考这对自身工作意味着什么。<sup>3</sup> 不过，在形式化领域，我们对 AI 所扮演的角色感到明确的积极。随着形式化成为更常见的工具，我们希望它能帮助维护人们对数学共同知识体系的信任。</p>
+<h3>致谢</h3>
+<p>我们的形式化工作只是费马定理悠久历史和形式数学发展史中的一小部分。Andrew Wiles 与 Richard Taylor 给出的首个完整证明，是三百多年数学发展的结晶。它整合了 Gerhard Frey、Jean-Pierre Serre、Ken Ribet、Barry Mazur、Robert Langlands、Jerrold Tunnell、Yutaka Taniyama、Goro Shimura、André Weil 等人的思想。Claude 的证明采用了 Henri Darmon、Fred Diamond 和 Richard Taylor 的讲解。</p>
+<p>我们的证明借用了伦敦帝国理工学院 Kevin Buzzard 领导的 FLT 项目，以及 flt-regular 项目中的部分成果。Lean 和 Mathlib 也都是许多人的心血结晶，数百位数学家为它们贡献了工作，其中许多人通过 Lean FRO 参与。我们感谢 Kevin Buzzard 审阅证明并提出意见。</p>
+<h3>了解更多</h3>
+<p>完整证明以及书面讲解可在 <a href="https://github.com/" rel="noopener">GitHub</a> 上获取。</p>
+<h3>推荐阅读</h3>
+<ul>
+<li><i>The Proof in the Code</i> 是一本介绍 Lean theorem prover 历史和数学形式化的近期著作。</li>
+<li>1996 年的《Fermat’s Last Theorem》BBC 纪录片采访了 Wiles 和其他参与证明的数学家。一些本文作者很喜欢这部纪录片。</li>
+<li>对于有数学背景的读者，可以阅读 Philip Wadler 的 <i>Propositions as Types</i>。这本书介绍了 propositions-as-types 的技术史。它是 Lean、Rocq 和 Agda 等证明助手背后的基础学科。</li>
+<li>Chen, S., Marwaha, K., Lu, X., Yuen, H., &amp; Peng, T. (2026). Prove2Me: An open collaborative platform for scaling math formalization. <i>arXiv</i>. <a href="https://doi.org/10.48550/arXiv.2608.28433" rel="noopener">https://doi.org/10.48550/arXiv.2608.28433</a></li>
+<li><i>Automating Math</i>，Adam Marblestone，发表于 <i>Asterisk Magazine</i>。</li>
+</ul>
+<h3>脚注</h3>
+<ol>
+<li>Peng 本科期间，他的研究导师想把 Peng 论文中的成果写进一篇 <i>Nature</i> 文章。导师问 Peng 是否确定证明正确。Peng 诚实地回答：“我有 99% 的把握，但这么长的证明很难做到 100% 确定。” Peng 因此错过了在 <i>Nature</i> 发表成果的机会。</li>
+<li>数学界还有许多努力核验证明的故事。其中最著名的包括 Thomas Hales 于 1998 年给出的 Kepler conjecture 证明。该证明经过四年评审，最终由 12 名审稿人组成的小组接受为“99% 确信”。后来，Hales 领导了一个 20 人项目 Flyspeck，将这份证明形式化。Grigori Perelman 于 2002 年给出的 Poincaré conjecture 证明，则花了数学界大约四年时间，并经过三份各 300 页的讲解，才被接受。Harald Helfgott 于 2013 年给出的 weak Goldbach conjecture 证明，至今仍在评审。有时，后来证明错误的结果会被接受多年，其他数学家还会在这些错误基础上建立理论。</li>
+<li>部分原因在于 Mathlib 简洁且经过充分审查，而我们的证明很可能远比必要长度更长。</li>
+</ol>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
