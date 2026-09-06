@@ -3,62 +3,13 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>形式化费马大定理｜Formalizing Fermat's Last Theorem</title>
+<title>费马大定理的形式化证明</title>
 <style>
-:root{
-  --bg:#f5f7fb;--card:#ffffff;--card2:#eef3ff;--ink:#172033;--muted:#5d687b;--line:#d9e0ec;
-  --accent:#315efb;--accent2:#0d9488;--accent3:#d97706;--accent4:#c026d3;
-  --risk:#be123c;--hl:#dbeafe;--hl2:#fef3c7;--deep:#172554;--quote:#ecfeff;
-}
-:root[data-theme="light"]{
-  --bg:#f5f7fb;--card:#ffffff;--card2:#eef3ff;--ink:#172033;--muted:#5d687b;--line:#d9e0ec;
-  --accent:#315efb;--accent2:#0d9488;--accent3:#d97706;--accent4:#c026d3;--risk:#be123c;--hl:#dbeafe;--hl2:#fef3c7;--deep:#172554;--quote:#ecfeff;
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#0c1220;--card:#131d30;--card2:#17233b;--ink:#e8edf7;--muted:#aab6ca;--line:#2a3955;
-    --accent:#82a5ff;--accent2:#2dd4bf;--accent3:#f5b84b;--accent4:#e879f9;--risk:#fb7185;--hl:#1d365e;--hl2:#4a3814;--deep:#0b1533;--quote:#102d35;
-  }
-}
-:root[data-theme="dark"]{
-  --bg:#0c1220;--card:#131d30;--card2:#17233b;--ink:#e8edf7;--muted:#aab6ca;--line:#2a3955;
-  --accent:#82a5ff;--accent2:#2dd4bf;--accent3:#f5b84b;--accent4:#e879f9;--risk:#fb7185;--hl:#1d365e;--hl2:#4a3814;--deep:#0b1533;--quote:#102d35;
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Noto Sans SC",sans-serif;line-height:1.78}
-main{max-width:1060px;margin:auto;padding:28px 22px 80px}
-.hero{background:linear-gradient(135deg,var(--deep),#253e78);color:#fff;border-radius:24px;padding:42px 44px;margin-bottom:24px}
-.hero h1{font-size:clamp(2rem,5vw,3.7rem);line-height:1.16;margin:12px 0}
-.hero .en{opacity:.72;font-size:1.08rem;letter-spacing:.02em}
-.kicker{color:#b8c8ff;font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:.78rem}
-.lead{font-size:1.18rem;max-width:800px;margin:18px 0 0}
-.band{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:22px 0}
-.metric{padding:18px;border:1px solid var(--line);border-top:4px solid var(--accent);background:var(--card);border-radius:14px}
-.metric:nth-child(2){border-top-color:var(--accent2)}.metric:nth-child(3){border-top-color:var(--accent3)}.metric:nth-child(4){border-top-color:var(--accent4)}
-.metric b{display:block;font-size:1.6rem}.metric span{color:var(--muted);font-size:.9rem}
-.summary-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px;margin:22px 0}
-.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px}
-.panel h2,.panel h3{margin-top:0}
-.panel.conclusion{border-left:7px solid var(--accent2)}
-.panel.impact{background:var(--card2);border-right:7px solid var(--accent3)}
-.insight{margin:22px 0;padding:22px 26px;background:var(--quote);border-left:6px solid var(--accent4);font-size:1.1rem}
-.takeaways{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:18px 0 40px}
-.takeaways div{padding:16px;background:var(--card);border:1px solid var(--line);border-radius:12px}
-.takeaways strong{color:var(--accent)}
-#translation{max-width:850px;margin:0 auto}
-#translation h2{font-size:2rem;border-bottom:3px solid var(--accent);padding-bottom:8px}
-#translation h3{font-size:1.45rem;margin-top:2.1em;color:var(--accent)}
-#translation h4{color:var(--accent2);margin-top:1.7em}
-#translation p{margin:1em 0}
-#translation ul{padding-left:1.5em}
-#translation li{margin:.5em 0}
-blockquote{margin:1.4em 0;padding:16px 22px;background:var(--quote);border-left:5px solid var(--accent2);font-size:1.04rem}
-a{color:var(--accent);text-decoration-thickness:1px}
-figure.source-figure,[data-source-image]{margin:28px 0;padding:0}
-figcaption{color:var(--muted);font-size:.92rem;border-left:3px solid var(--accent3);padding:8px 14px}
-.note{font-size:.92rem;color:var(--muted)}
-@media(max-width:760px){main{padding:16px 14px 50px}.hero{padding:28px 24px}.band{grid-template-columns:repeat(2,1fr)}.summary-grid{grid-template-columns:1fr}.takeaways{grid-template-columns:1fr 1fr}}
+:root{--bg:#f5f7fb;--card:#fff;--ink:#172033;--muted:#5d6b82;--line:#d9e0ec;--accent:#315efb;--accent2:#11a683;--accent3:#e56b2f;--accent4:#9b51e0;--hl:#fff0c2;--hl2:#dff7ef}
+:root[data-theme="light"]{--bg:#f5f7fb;--card:#fff;--ink:#172033;--muted:#5d6b82;--line:#d9e0ec;--accent:#315efb;--accent2:#11a683;--accent3:#e56b2f;--accent4:#9b51e0;--hl:#fff0c2;--hl2:#dff7ef}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101522;--card:#182033;--ink:#edf2ff;--muted:#aeb9ce;--line:#303b52;--accent:#89a5ff;--accent2:#53d5af;--accent3:#ff9a68;--accent4:#c99af7;--hl:#4a4025;--hl2:#173d34}}
+:root[data-theme="dark"]{--bg:#101522;--card:#182033;--ink:#edf2ff;--muted:#aeb9ce;--line:#303b52;--accent:#89a5ff;--accent2:#53d5af;--accent3:#ff9a68;--accent4:#c99af7;--hl:#4a4025;--hl2:#173d34}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.75 system-ui,-apple-system,"Segoe UI",sans-serif}main{max-width:980px;margin:auto;padding:32px 20px}.hero{padding:34px;border-radius:24px;background:linear-gradient(135deg,var(--accent),var(--accent4));color:#fff}.hero h1{font-size:clamp(30px,5vw,54px);line-height:1.15;margin:0 0 8px}.en{opacity:.8;font-size:15px}.lead{font-size:20px;margin-top:24px}.band{display:flex;gap:14px;flex-wrap:wrap;margin:22px 0}.metric{flex:1;min-width:150px;background:var(--card);border:1px solid var(--line);border-top:5px solid var(--accent2);padding:16px;border-radius:14px}.metric b{display:block;font-size:30px;color:var(--accent)}section.block{padding:26px;margin:22px 0;border-radius:18px;background:var(--card);border-left:7px solid var(--accent3)}section.alt{border-left-color:var(--accent4);background:var(--hl2)}h2{margin-top:0}h3{color:var(--accent)}table{width:100%;border-collapse:collapse;background:var(--card)}th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left}th{color:var(--accent)}.takeaways{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}.takeaways div{padding:16px;border-radius:12px;background:var(--hl);border:1px solid var(--line)}#translation{margin-top:42px;max-width:820px}#translation p{margin:0 0 18px}figure{margin:28px 0;padding:14px;background:var(--card);border-radius:14px;border:1px solid var(--line)}figcaption{font-size:14px;color:var(--muted);margin-top:8px}
 </style>
   <script id="airs-digest-theme-boot">
     try {
@@ -210,107 +161,59 @@ figcaption{color:var(--muted);font-size:.92rem;border-left:3px solid var(--accen
   </style>
 </head>
 <body>
-<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/formalizing-fermats-last-theorem" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
-<main>
-<section class="hero">
-<div class="kicker">Science · Anthropic · 2026年9月4日</div>
-<h1>形式化费马大定理</h1>
-<div class="en">Formalizing Fermat's Last Theorem</div>
-<p class="lead">一句话总括：这项工作把一个曾经需要多年人工核验的数学证明，变成了 Lean 可以逐步检查的计算对象，显示 AI 正在改变数学成果的验证方式。</p>
-</section>
-<section aria-label="关键数据" class="band">
-<div class="metric"><b>11天</b><span>Claude 基本自主完成证明</span></div>
-<div class="metric"><b>1300万行</b><span>Lean 代码规模</span></div>
-<div class="metric"><b>30,300</b><span>沿途完成的定理数</span></div>
-<div class="metric"><b>约60亿</b><span>输出 token 消耗</span></div>
-</section>
-<section class="summary-grid">
-<article class="panel conclusion">
-<h2>贡献：验证成为核心突破</h2>
-<p>Claude 在 11 天内完成了费马大定理的端到端形式化证明。最终证明使用 Lean 的三个标准公理，并与 Mathlib 中的定理陈述完成比对。</p>
-<p>新意不在于提出新的数学定理，而在于让计算机逐步核验一个极其复杂的既有证明。这种核验可以把“接近 100% 确信”变成可重复执行的检查。</p>
-</article>
-<article class="panel impact">
-<h2>影响：降低审查和复核成本</h2>
-<p>Wiles 的证明发表于 1995 年，共 129 页。它曾在密集核验两个月后被发现关键缺口，修复又花了一年。</p>
-<p>形式化证明能帮助审稿人更快定位错误，也能为 LLM 生成的数学成果提供机器可检查的证据。</p>
-</article>
-</section>
-<div class="insight"><strong>关键洞见：</strong>当 AI 生成数学证明的速度超过人工复核能力时，形式化证明可能成为数学共同体维持可信度的基础设施。</div>
-<section class="panel">
-<h2>规模：协作脚手架决定成败</h2>
-<p>Claude 早期尝试曾因代理失去项目状态而失败。转向 Prove2Me 后，定理依赖图、并行协作和可复用的自然语言描述改善了工作流。最终证明的规模超过 Mathlib 的 5 倍。</p>
-<p>同一方法在三个个人 Claude Max 账号上完成了 Vinogradov 三素数定理的形式化，只用了 3 天。这表明合适的工具脚手架可以让消费者订阅参与大型数学形式化。</p>
-</section>
-<h2>最值得带走的洞见</h2>
-<section class="takeaways">
-<div><strong>01</strong><br/>复杂证明可以被拆成机器可检查的定理图。</div>
-<div><strong>02</strong><br/>验证能力是这项工作的主要新意。</div>
-<div><strong>03</strong><br/>形式化不会取代面向人的数学解释。</div>
-<div><strong>04</strong><br/>AI 可能同时发现新错误并减轻审稿负担。</div>
-<div><strong>05</strong><br/>开放平台和 Lean 生态是规模化的关键。</div>
-</section>
-<section id="translation">
-<h2>完整译文</h2>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/formalizing-fermats-last-theorem" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav><main>
+<header class="hero"><h1>费马大定理的形式化证明</h1><div class="en">Formalizing Fermat's Last Theorem · Anthropic · Sep 4, 2026</div><p class="lead"><b>一句话总括：</b>Claude 把一个历经数百年、长期依赖人工复核的数学证明，转化成了 Lean 可以逐步检查的完整形式化证明。</p></header>
+<div class="band"><div class="metric"><b>11 天</b>基本自主完成</div><div class="metric"><b>1300 万</b>行 Lean 代码</div><div class="metric"><b>30,300</b>个定理被证明</div><div class="metric"><b>60 亿</b>输出 token</div></div>
+<section class="block"><h2>验证成为主要贡献</h2><p>这项工作的创新点是验证，而不是提出新的数学定理。证明助手会算法化检查每一步逻辑。它能把“几乎确信正确”的长证明，变成可重复运行的确定性检查。</p><table><tr><th>里程碑</th><th>数据</th><th>含义</th></tr><tr><td>Wiles 证明（1995）</td><td>129 页</td><td>人工核验耗时长，且曾发现关键漏洞</td></tr><tr><td>Claude 最终证明</td><td>29,500 个定理</td><td>所有步骤由 Lean 检查</td></tr><tr><td>代码规模</td><td>超过 Mathlib 5 倍</td><td>显示形式化大型数学的工程成本</td></tr></table><p>因此，AI 生成数学成果的可信度可以部分交给机器核验，审稿人则能把时间用于理解结果和判断意义。</p></section>
+<section class="alt block"><h2>协作框架改变了结果</h2><p>早期 Claude 代理很快丢失项目状态，协作失败的代码约占最终非模板代码的 7%。转向 Prove2Me 后，代理通过定理依赖的有向无环图并行工作。平台还把定理陈述与证明分离，以加快 Lean 编译，并为每个定理保存自然语言描述，方便搜索和复用。</p><p>数十个代理在 Claude Code 多代理框架中协作。项目不到两周完成，最终证明只使用 Lean 的三个标准公理，并与 Mathlib 中的费马大定理陈述保持一致。</p></section>
+<section class="block"><h2>对数学研究的影响</h2><p>形式化可能减少检查现有数学文献和审阅新论文的负担。Anthropic 认为，未来面向人类读者的论文可能会同时附上形式化证明。形式化文本不会取代易读的数学解释，但可能成为数学界跟上 AI 产出的必要工具。</p><p>一次小型实验显示，三个个人 Claude Max 账户通过 Prove2Me，在 3 天内完成了 Vinogradov 三素数定理的形式化。这表明合适的协作脚手架可以让消费级 AI 参与重大数学结果的形式化。</p></section>
+<section class="block"><h2>最值得带走的洞见</h2><div class="takeaways"><div>形式化把证明正确性从人工信任转为机器可复核证据。</div><div>大型数学形式化首先是协作、状态管理和编译效率问题。</div><div>AI 可能同时增加数学产出与审查压力，形式化能缓解后者。</div><div>Lean 与 Mathlib 等开放工具将成为 AI 数学研究的重要基础设施。</div></div></section>
+<section id="translation"><h2>完整译文</h2>
 <figure class="source-figure" data-source-image="0"><img alt="Formalizing Fermat's Last Theorem" decoding="async" height="630" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/578f91575c42231f0994e341014614255149af80-1200x630.jpg" width="1200"/></figure>
-<p>我们正在分享首个由计算机完整核验的费马大定理证明。Claude 基本自主运行了 11 天，用 Lean 编程语言写出了这份证明。下面我们介绍形式化过程，并分享一些思考，讨论这项工作可能对研究数学意味着什么。</p>
-<p>大约在 1637 年，皮埃尔·德·费马在自己的《算术》（<i>Arithmetica</i>）一书上留下了一条边注。这条边注后来成为历史上最著名的数学猜想之一：对于任意 <i>n</i> &gt; 2，不存在满足 <i>aⁿ + bⁿ = cⁿ</i> 的正整数 <i>a</i>、<i>b</i>、<i>c</i>。这个猜想后来被称为费马大定理（Fermat’s Last Theorem，FLT），证明它却异常困难。1995 年，安德鲁·怀尔斯爵士给出了第一份证明，共 129 页，并花费数月艰苦核验。</p>
-<p>十年后，荷兰计算机科学家 Jan Bergstra 提议将 Wiles 的证明“形式化”：把数学推理转换成计算机可以自动检查的形式。从那以后，数学家一直在发展编码这类复杂证明所需的方法。2024 年，伦敦帝国理工学院的 Kevin Buzzard 发起了一项持续多年的社区项目，使用 Lean proof assistant 完成形式化。</p>
-<p>最近，Anthropic 研究员 Tianyi Peng 开始测试 Claude 是否能在 FLT 形式化方面取得进展。<sup>1</sup> Peng 的团队位于哥伦比亚大学，致力于构建 AI 形式化工具。结果超出了他的预期。Claude 基本自主工作了 11 天，完成了首个端到端、经过计算机核验的 FLT 证明。在此过程中，它写出了 1300 万行 Lean 代码，并证明了 29,500 个中间定理。</p>
-<p>我们把最终证明分享给了 Kevin Buzzard。他说：</p>
-<blockquote>这项非凡的自动形式化成果，据 Anthropic 研究人员介绍只用了 11 天，就在不依赖数学公理之外任何额外假设的情况下证明了费马大定理。在此过程中，我们看到了代数、调和分析、几何和数论的自动形式化，也了解到 AI 自动形式化产物已经足够稳健，可以继续在其上构建。这个证明是分层的。</blockquote>
-<p>自动形式化如此复杂的证明，是迈向“所有数学都可以随时检查”的未来的重要一步。随着 AI 产生越来越多证明，轻松形式化成果可以减轻评估新结果的负担，而评估过程有时需要数年。我们希望，人们能够更容易而不是更困难地信任数学赖以建立的知识体系。</p>
-<h3>验证数学证明的挑战</h3>
-<p>与近期由 AI 驱动的黎曼猜想研究不同，后者产生了新的数学成果；这里真正新颖的是验证。也就是像用计算器检查数学计算一样，检查一份数学证明。证明数学定理需要组装复杂的逻辑链条。如果其中一个环节断裂，后续所有内容都可能是错误的。要深入理解一项新结果，并对其正确性建立信心，可能需要数月甚至数年。</p>
-<p>费马大定理就是一个典型例子。<sup>2</sup> 费马把定理写在书的页边，还留下了一句诱人的话：</p>
-<blockquote>我发现了一个真正奇妙的证明，但这条边栏太窄，写不下。</blockquote>
-<p>350 多年来，一代又一代数学家一直在寻找 FLT 的证明，不论它是否“奇妙”。1908 年，有人宣布悬赏 100,000 德国金马克，奖励任何能给出正确证明的人。仅第一年就出现了 621 份错误尝试。</p>
-<p>1993 年 6 月，Wiles 在连续三天的讲座中展示了他认为是首个正确的 FLT 证明。几位数学家随后展开密集核验。两个月后，一位审查者提出的问题暴露出一个关键缺口。Wiles 花了一年修补证明。起初他独自工作，后来与自己的前学生 Richard Taylor 合作。当他几乎准备放弃时，终于意识到自己早先放弃的一条思路可以修复证明。Wiles 于 1995 年 5 月发表了首个正确的 FLT 证明。它依赖现代数学技术，而这些技术远远超出了 1637 年费马所能掌握的知识。几个世纪以来，人们始终没有找到初等证明。因此，数学界如今认为费马本人所谓的“奇妙证明”并不正确。</p>
+<p>我们分享首个经过计算机完整核验的费马大定理证明。Claude 基本自主运行了 11 天，用 Lean 编程语言写出证明。下文介绍形式化过程，并讨论这项工作对研究数学可能意味着什么。</p>
+<p>约在 1637 年，皮埃尔·德·费马在自己的丢番图《算术》书页边写下一个断言：对于任何 n&gt;2，不存在满足 aⁿ+bⁿ=cⁿ 的正整数 a、b、c。这个断言后来成为最著名的数学猜想之一。费马大定理极难证明。安德鲁·怀尔斯爵士在 1995 年给出了首个证明，全文 129 页，人工核验耗费数月。</p>
+<p>十年后，荷兰计算机科学家 Jan Bergstra 提议将 Wiles 的证明“形式化”，也就是把数学推理转换成计算机可以自动检查的形式。此后，数学家持续开发编码复杂证明所需的方法。2024 年，帝国理工学院的 Kevin Buzzard 发起多年社区项目，使用 Lean 证明助手完成形式化。</p>
+<p>Anthropic 研究员 Tianyi Peng 最近测试 Claude 能否推进这项工作。结果超出预期。Claude 在 11 天内基本自主完成了首个端到端、经计算机核验的费马大定理证明。过程中，它写下 1300 万行 Lean 代码，并证明了 29,500 个中间定理。</p>
+<p>Kevin Buzzard 说，这是一项非凡的自动形式化成就。证明只使用数学公理。过程中涵盖代数、调和分析、几何和数论的自动形式化。结果表明，AI 形式化产物已经足够稳健，可以继续在其上构建多层证明。</p>
+<p>自动形式化如此复杂的证明，是迈向“所有数学都能方便检查”的重要一步。随着 AI 产生更多证明，形式化可以减轻评估新结果的负担。这个过程过去可能需要数年。我们希望数学知识体系会因此更容易获得信任。</p>
+<h3>核验数学证明的挑战</h3>
+<p>近期 AI 关于黎曼猜想的工作产生了新数学。这里的新意则在于验证。它像用计算器检查数学计算一样，检查数学证明。定理证明需要组合复杂的逻辑链条。只要一个环节断裂，后续内容都可能失效。要深入理解新结果并确认其正确性，往往需要数月甚至数年。</p>
+<p>费马大定理就是典型例子。费马在书页边写道：“我发现了一个真正绝妙的证明，但这页边太窄，写不下。”</p>
+<p>350 多年来，数学家一代代寻找这个证明。1908 年，有人悬赏 100,000 德国金币，约相当于今天的 100 万至 200 万美元。仅第一年就出现 621 个错误尝试。</p>
+<p>1993 年 6 月，Wiles 在连续三天的讲座中展示了他认为正确的证明。几位数学家进行了两个月的密集核验，发现了一个关键漏洞。Wiles 花了一年修补。他一度准备放弃，最终发现早先放弃的方法可以修复证明。1995 年 5 月，他发表了首个正确证明。这个证明使用了 1637 年费马不可能知道的现代数学技术。由于数百年来始终没有找到初等证明，数学界现在认为费马本人所谓的“绝妙证明”并不正确。</p>
 <h3>形式化费马大定理</h3>
-<p>检查证明正确性的一种方法，是让计算机来完成检查。Lean 等证明助手会用算法验证证明的逻辑，从而以近乎绝对的确定性展示其正确性。对人类而言，难点在于重写证明，让 Lean 能够理解。面向人类读者的证明会跳过许多显而易见的步骤，而 Lean 必须看到每一步，即使那一步极其琐碎。人类数学证明还会建立在数百年已发表的工作之上，而形式化只能从目前已经形式化的那一小部分数学开始。</p>
-<p>当时，人们预计 FLT 的形式化需要数年。数学社区用来描述项目初始阶段的蓝图就有 86 页。</p>
-<p>Claude 在 11 天内完成了证明，并在过程中生成了 30,300 个可由计算机核验的定理，其中 29,500 个被用于最终证明。数十个 Claude 代理协作定义概念、证明中间定理，并利用这些定理去证明越来越困难的命题。Claude 的证明包含 1300 万行 Lean 代码，规模超过 Mathlib——这一定理所依赖的主要数学证明社区库——的 5 倍。<sup>3</sup></p>
-<p>Claude 的证明采用了 Darmon、Diamond 和 Taylor 对 Wiles 证明的简化版本。人类提供的数学输入很少，主要是 Tianyi 偶尔给出的高层指令，例如“Jacobian 作为 scheme 似乎优先级很高”“尽快完成 Mazur theorem”。你可以在这里看到 Claude 思考过程的节选。</p>
-<p class="note">以下是 Claude 意识到自己刚刚完成这项工作时的思考节选。</p>
-<p>Claude 最初有多次尝试失败。代理虽然早期取得了一些成功，却很快失去对项目状态的追踪，无法继续有效协作。这些失败尝试贡献了最终证明中约 7% 的非模板代码行。</p>
-<p>项目在转向 Prove2Me 后取得成功。Prove2Me 是由 Tianyi Peng 及其哥伦比亚大学合作者设计的开放协作数学形式化平台。Prove2Me 的帮助包括：</p>
-<ul>
-<li>维护一个定理陈述的有向无环图（DAG），代理据此决定下一步要尝试哪些证明。这对缓解记忆退化、支持多个代理并行工作尤其有帮助。</li>
-<li>通过把定理陈述和证明分到不同文件中，并独立维护二者之间的链接，加快 Lean 编译并减少资源消耗。</li>
-<li>为每个定理陈述维护自然语言描述，以便搜索和复用，从而得到更简单的证明路径。</li>
-</ul>
-<figure class="source-figure" data-source-image="1"><img alt="DAG showing Claude formalizing sub-theorems on the way to FLT" decoding="async" height="3264" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/afd8e238255ec2654f2322f3d3630dcf1e8ea4ca-6800x3264.png" width="6800"/><figcaption>Prove2Me 计划中的关键里程碑。Claude 依照这一计划形式化费马大定理。三个彩色区域对应 Claude 在抵达最终目标前必须证明的三个核心子定理。这张图与 Wiles 的原始证明高度一致。</figcaption></figure>
-<p>借助 Prove2Me 和基于 Claude Code 的多代理框架，一个代理团队在不到两周内完成了证明，消耗了约 60 亿个输出 token。这些 token 来自一个通用型内部研究模型。该模型大致相当于 Claude Fable 5.1。最终证明经过 Lean 检查，只使用 Lean 的三个标准公理。一个比较器还确认，这一定理的陈述与 Mathlib 自己的 FLT 陈述一致。</p>
-<h3>降低形式验证的负担</h3>
-<p>我们能够如此快速地产生这份证明，说明形式化大范围数学内容已经成为可能。这既可以帮助发现数学共同体知识体系中的错误，也可以减轻新工作的审稿负担。Kevin Buzzard 审阅 Claude 的 Lean 证明后告诉我们：</p>
-<blockquote>如果自动形式化 FLT 现在已经成为可能，那么我们就朝着自动形式化现代数学文献迈出了一大步。这些自动形式化技术将带来新的工具，找出当前数学知识体系中的错误，并减轻审稿人的负担。这些技术还将让我们能够严格检查 LLM 生成的数学内容，而这目前通常需要付出极其高昂的人力成本。</blockquote>
-<p>形式化也是人类建立对 AI 生成数学成果信心的重要因素。随着 AI 和 AI 辅助数学家比以往产生更多所谓的证明，AI 辅助形式化可以分担人类审查者的部分工作。我们预计，今后在为人类读者撰写的说明之外，同时提供形式化证明会变得普遍。我们并不认为形式化证明应该取代人类可以理解的讲解，但它可能是数学共同体跟上 AI 生成成果的唯一可行方式。</p>
-<p>编写 Lean 似乎也能帮助 Claude 证明新的结果。我们近期许多由 Claude 撰写的成果，都在证明过程中同步完成了形式化。Claude 似乎会利用这些部分证明，独立检查自己的假设。这有点像它编写数值模拟来确认方向是否正确。</p>
-<p>形式化 FLT 是一个极度消耗 token 的项目，但它也是迄今构建的最大 Lean 证明。Anthropic 研究人员进行了一项小实验，使用三个个人 Claude Max 计划来形式化 Hardy–Littlewood Circle Method 的应用。代理完全通过 Prove2Me 协作，只用了 3 天就共同完成了 Vinogradov’s Three Primes Theorem 的形式化。我们认为，只要有合适的脚手架，使用消费者 AI 订阅协作形式化重大成果是可行的。</p>
-<p>为此，Anthropic 以及其他实验室最近扩大了对外部研究人员的支持。支持对象包括从事纯数学和形式化工作的数学家。支持形式包括免费和折扣订阅，以及研究额度。我们也为更大型的科学项目提供专项资助。这些项目可以包括形式化其他重大定理，或改进 Lean、Mathlib。</p>
-<p>随着 AI 快速改变数学研究的面貌，Anthropic 和其他地方的数学家都在思考这对自身工作意味着什么。<sup>3</sup> 不过，在形式化领域，我们对 AI 所扮演的角色感到明确的积极。随着形式化成为更常见的工具，我们希望它能帮助维护人们对数学共同知识体系的信任。</p>
+<p>检查证明正确性的一种方法，是让计算机执行检查。Lean 等证明助手会算法化验证证明逻辑，从而给出高度确定的正确性保证。难点在于，人类必须把证明重写成 Lean 能理解的形式。人类证明会跳过显而易见的步骤，Lean 却要求每一步都明确写出。人类证明还建立在数百年已发表成果之上，而形式化只能从已经形式化的少量数学开始。</p>
+<p>当时预计费马大定理的形式化需要数年。数学界用于描述项目初始阶段的蓝图就有 86 页。</p>
+<p>Claude 在 11 天内完成证明，沿途产生了 30,300 个可由计算机核验的定理，最终使用其中 29,500 个。数十个 Claude 代理共同定义概念、证明中间定理，再用这些定理证明更困难的命题。Claude 的证明有 1300 万行 Lean 代码，规模超过该定理所依赖的主要社区库 Mathlib 的 5 倍。</p>
+<figure class="source-figure" data-source-image="1"><img alt="DAG showing Claude formalizing sub-theorems on the way to FLT" decoding="async" height="3264" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/afd8e238255ec2654f2322f3d3630dcf1e8ea4ca-6800x3264.png" width="6800"/><figcaption>Prove2Me 计划中的关键里程碑。Claude 依靠该计划形式化费马大定理。三个彩色区域对应它通往最终目标时必须证明的三个核心子定理。该图大体遵循 Wiles 的原始证明。</figcaption></figure>
+<p>Claude 的证明采用 Darmon、Diamond 和 Taylor 对 Wiles 证明的简化版本。人类提供的数学输入很少，主要是 Tianyi 偶尔给出的高层指令，例如“Jacobian 作为 scheme 很重要”，“尽快完成 Mazur 定理”。</p>
+<p>Claude 最初多次失败。代理虽然早期取得了一些进展，却很快失去项目状态，无法有效协作。这些失败努力约占最终证明非模板代码的 7%。</p>
+<p>转向 Tianyi Peng 及其哥伦比亚大学合作者设计的开放协作平台 Prove2Me 后，项目取得成功。平台维护定理陈述的有向无环图，帮助代理决定下一步尝试什么，也减轻记忆退化并支持并行工作。平台把定理陈述和证明放在不同文件中，独立维护两者之间的链接，从而加快 Lean 编译并减少资源消耗。平台还保存每个定理的自然语言描述，方便搜索和复用，形成更简单的证明路径。</p>
+<p>借助 Prove2Me 和基于 Claude Code 的多代理框架，团队在不到两周内完成证明。项目消耗约 60 亿输出 token，使用的是一个通用内部研究模型，能力大致相当于 Claude Fable 5.1。最终证明由 Lean 检查，只使用 Lean 的三个标准公理。比较器确认定理陈述与 Mathlib 自己的费马大定理陈述一致。</p>
+<h3>降低形式化核验负担</h3>
+<p>这项证明的完成速度表明，大范围形式化数学已经成为可能。它可以发现数学共同知识中的错误，也能减轻审稿负担。Kevin Buzzard 在审阅 Lean 证明后说，如果现在已经能自动形式化费马大定理，我们就向自动形式化现代数学文献迈出了一大步。相关技术可以发现现有数学语料中的错误，减轻审稿人的工作，也能严格检查大语言模型生成的数学。</p>
+<p>形式化也是人类建立 AI 数学结果信心的重要因素。随着 AI 和 AI 辅助数学家产出更多所谓的证明，AI 辅助形式化可以分担人工审查压力。我们预计，面向人类读者的论文将普遍同时提供形式化证明。形式化证明不应取代人类可读的说明，但它可能是数学界跟上 AI 生成贡献的唯一可行方式。</p>
+<p>编写 Lean 似乎也能帮助 Claude 证明新结果。许多近期由 Claude 完成的结果都与形式化同步进行。Claude 可能利用这些部分证明独立检查自己的假设，就像通过数值模拟确认方向一样。</p>
+<p>形式化费马大定理是一个消耗大量 token 的项目，也是迄今规模最大的 Lean 证明。Anthropic 研究人员用三个个人 Claude Max 计划做了小型实验，形式化 Hardy–Littlewood 圆法的应用。代理完全通过 Prove2Me 协作，在 3 天内共同完成了 Vinogradov 三素数定理的形式化。我们认为，只要脚手架合适，使用消费级 AI 订阅协作形式化重大结果是可行的。</p>
+<p>为此，Anthropic 和其他实验室最近扩大了对外部研究人员的支持，为纯数学和形式化研究提供免费或折扣订阅及研究额度。我们也提供大型科学项目的专项资助，包括形式化其他重大定理，或改进 Lean 与 Mathlib。</p>
+<p>AI 正在迅速改变数学研究。Anthropic 及其他机构的数学家正在思考这对自身工作意味着什么。形式化则是一个让我们明确认可 AI 作用的领域。随着形式化成为更常用的工具，我们希望它能帮助维护数学共同知识体系的信任。</p>
 <h3>致谢</h3>
-<p>我们的形式化工作只是费马定理悠久历史和形式数学发展史中的一小部分。Andrew Wiles 与 Richard Taylor 给出的首个完整证明，是三百多年数学发展的结晶。它整合了 Gerhard Frey、Jean-Pierre Serre、Ken Ribet、Barry Mazur、Robert Langlands、Jerrold Tunnell、Yutaka Taniyama、Goro Shimura、André Weil 等人的思想。Claude 的证明采用了 Henri Darmon、Fred Diamond 和 Richard Taylor 的讲解。</p>
-<p>我们的证明借用了伦敦帝国理工学院 Kevin Buzzard 领导的 FLT 项目，以及 flt-regular 项目中的部分成果。Lean 和 Mathlib 也都是许多人的心血结晶，数百位数学家为它们贡献了工作，其中许多人通过 Lean FRO 参与。我们感谢 Kevin Buzzard 审阅证明并提出意见。</p>
+<p>我们的形式化工作只是费马定理悠久历史和形式数学发展史的一小部分。Andrew Wiles 与 Richard Taylor 的首个完整证明，汇聚了三百多年的数学成果，也整合了 Gerhard Frey、Jean-Pierre Serre、Ken Ribet、Barry Mazur、Robert Langlands、Jerrold Tunnell、Yutaka Taniyama、Goro Shimura、André Weil 等人的思想。Claude 的证明遵循 Henri Darmon、Fred Diamond 和 Richard Taylor 的阐述。</p>
+<p>我们的证明采用了帝国理工学院 Kevin Buzzard 领导的费马大定理项目和 flt-regular 项目的部分成果。Lean 与 Mathlib 都是许多人的长期心血，数百位数学家为其贡献了代码，其中许多人通过 Lean FRO 参与。感谢 Kevin Buzzard 审阅证明并提出意见。</p>
 <h3>了解更多</h3>
-<p>完整证明以及书面讲解可在 <a href="https://github.com/" rel="noopener">GitHub</a> 上获取。</p>
+<p>完整证明已发布在 GitHub，并附有书面讲解。</p>
 <h3>推荐阅读</h3>
-<ul>
-<li><i>The Proof in the Code</i> 是一本介绍 Lean theorem prover 历史和数学形式化的近期著作。</li>
-<li>1996 年的《Fermat’s Last Theorem》BBC 纪录片采访了 Wiles 和其他参与证明的数学家。一些本文作者很喜欢这部纪录片。</li>
-<li>对于有数学背景的读者，可以阅读 Philip Wadler 的 <i>Propositions as Types</i>。这本书介绍了 propositions-as-types 的技术史。它是 Lean、Rocq 和 Agda 等证明助手背后的基础学科。</li>
-<li>Chen, S., Marwaha, K., Lu, X., Yuen, H., &amp; Peng, T. (2026). Prove2Me: An open collaborative platform for scaling math formalization. <i>arXiv</i>. <a href="https://doi.org/10.48550/arXiv.2608.28433" rel="noopener">https://doi.org/10.48550/arXiv.2608.28433</a></li>
-<li><i>Automating Math</i>，Adam Marblestone，发表于 <i>Asterisk Magazine</i>。</li>
-</ul>
+<p>《代码中的证明》介绍 Lean 定理证明器和数学形式化的历史。</p>
+<p>1996 年 BBC 关于费马大定理的纪录片采访了 Wiles 及其他参与证明的数学家，一些本文作者对它记忆犹新。</p>
+<p>具有数学背景的读者可以阅读 Philip Wadler 的《命题即类型》，了解命题即类型这一证明助手底层学科的技术史。Lean、Rocq 和 Agda 等证明助手都建立在这一思想上。</p>
+<p>Chen, S., Marwaha, K., Lu, X., Yuen, H., &amp; Peng, T. (2026). Prove2Me: An open collaborative platform for scaling math formalization. arXiv. https://doi.org/10.48550/arXiv.2608.28433</p>
+<p>Adam Marblestone 在 Asterisk Magazine 发表的《自动化数学》。</p>
 <h3>脚注</h3>
-<ol>
-<li>Peng 本科期间，他的研究导师想把 Peng 论文中的成果写进一篇 <i>Nature</i> 文章。导师问 Peng 是否确定证明正确。Peng 诚实地回答：“我有 99% 的把握，但这么长的证明很难做到 100% 确定。” Peng 因此错过了在 <i>Nature</i> 发表成果的机会。</li>
-<li>数学界还有许多努力核验证明的故事。其中最著名的包括 Thomas Hales 于 1998 年给出的 Kepler conjecture 证明。该证明经过四年评审，最终由 12 名审稿人组成的小组接受为“99% 确信”。后来，Hales 领导了一个 20 人项目 Flyspeck，将这份证明形式化。Grigori Perelman 于 2002 年给出的 Poincaré conjecture 证明，则花了数学界大约四年时间，并经过三份各 300 页的讲解，才被接受。Harald Helfgott 于 2013 年给出的 weak Goldbach conjecture 证明，至今仍在评审。有时，后来证明错误的结果会被接受多年，其他数学家还会在这些错误基础上建立理论。</li>
-<li>部分原因在于 Mathlib 简洁且经过充分审查，而我们的证明很可能远比必要长度更长。</li>
-</ol>
+<p>Peng 本科期间，他的研究导师想把 Peng 论文中的结果写入《Nature》。导师问他是否确定证明正确。Peng 诚实回答：“我有 99% 的把握，但这么长的证明很难做到 100% 确定。”Peng 因此错过了在《Nature》发表的机会。</p>
+<p>数学界还有许多难以核验成果的故事。最著名的例子之一是 Thomas Hales 于 1998 年提出的开普勒猜想证明。该证明审查了四年，最终由 12 名审稿人认定“99% 确定”。后来 Hales 领导 20 人团队，通过 Flyspeck 项目完成形式化。Grigori Perelman 于 2002 年提出的庞加莱猜想证明，数学界花了约四年时间，并撰写了三篇各 300 页的阐释后才接受。Harald Helfgott 于 2013 年提出的弱哥德巴赫猜想证明至今仍在审查。有些后来被证明错误的结果曾被接受多年，其他数学家还在错误基础上建立理论。</p>
+<p>这部分是因为 Mathlib 简洁且经过充分审阅，而我们的证明可能远比必要长度更长。</p>
 </section>
-</main>
-  <script id="airs-digest-theme-script">
+</main>  <script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;
       const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
@@ -335,5 +238,4 @@ figcaption{color:var(--muted);font-size:.92rem;border-left:3px solid var(--accen
       }
     })();
   </script>
-</body>
-</html>
+</body></html>

@@ -163,7 +163,12 @@ def _run_codex_cli(prompt: str) -> str:
                 encoding="utf-8",
                 errors="replace",
                 check=False,
+                timeout=int(os.environ.get("AIRS_CODEX_TIMEOUT", "600")),
             )
+        except subprocess.TimeoutExpired as exc:
+            raise RuntimeError(
+                f"codex timed out after {exc.timeout} seconds; set AIRS_CODEX_TIMEOUT to adjust."
+            ) from exc
         except FileNotFoundError as exc:
             raise RuntimeError(
                 "Codex CLI not found. Install it and run `codex login` once."

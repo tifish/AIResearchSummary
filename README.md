@@ -57,7 +57,7 @@ python -m pip install -r requirements.txt
 在仓库根目录运行下面任一入口：
 
 ```bat
-Refresh-Codex.cmd       :: 使用本机 Codex CLI（默认 gpt-5.6-sol / high）
+Refresh-Codex.cmd       :: 使用本机 Codex CLI（默认 gpt-6-astra / medium）
 Refresh-Claude.cmd      :: 使用本机 Claude Code CLI（默认 claude-fable-5 / high）
 Refresh-Grok.cmd        :: 使用 Grok Build CLI（默认 grok-4.5 / high）
 ```
