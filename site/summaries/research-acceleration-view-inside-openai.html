@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>加速：OpenAI 内部观察</title>
+<style>
+:root{
+  --bg:#f4f1ea;--ink:#17212b;--muted:#5d6872;--line:#d8d2c7;--card:#fffdf8;
+  --navy:#17324d;--teal:#087f8c;--orange:#d66a2c;--violet:#7251a3;--green:#2d8a62;
+  --hl:#ffe08a;--hl2:#c8f0e2;--risk:#f8d0c3;--bluewash:#dbeaf5;
+}
+:root[data-theme="light"]{--bg:#f4f1ea;--ink:#17212b;--muted:#5d6872;--line:#d8d2c7;--card:#fffdf8;--navy:#17324d;--teal:#087f8c;--orange:#d66a2c;--violet:#7251a3;--green:#2d8a62;--hl:#ffe08a;--hl2:#c8f0e2;--risk:#f8d0c3;--bluewash:#dbeaf5}
+@media (prefers-color-scheme:dark){
+:root:not([data-theme="light"]){--bg:#11181d;--ink:#edf2f4;--muted:#aab7bd;--line:#33434b;--card:#182228;--navy:#8fc5e9;--teal:#55d0d0;--orange:#ff9a62;--violet:#c4a5f1;--green:#78d5a6;--hl:#5d4d1d;--hl2:#164c43;--risk:#542d28;--bluewash:#1d3a4b}
+}
+:root[data-theme="dark"]{--bg:#11181d;--ink:#edf2f4;--muted:#aab7bd;--line:#33434b;--card:#182228;--navy:#8fc5e9;--teal:#55d0d0;--orange:#ff9a62;--violet:#c4a5f1;--green:#78d5a6;--hl:#5d4d1d;--hl2:#164c43;--risk:#542d28;--bluewash:#1d3a4b}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.75 system-ui,-apple-system,"Noto Sans SC","Microsoft YaHei",sans-serif}
+main{max-width:1060px;margin:auto;padding:28px 22px 70px} h1,h2,h3{line-height:1.25} h1{font-size:clamp(2rem,5vw,4.2rem);margin:.2em 0;color:var(--navy)} h2{font-size:1.8rem;margin-top:0} h3{font-size:1.15rem;color:var(--teal)}
+.hero{padding:42px 34px;background:var(--navy);color:#fff;border-radius:24px;position:relative;overflow:hidden}.hero h1{color:#fff}.hero small{color:#cfe5f5;font-size:1rem}.eyebrow{letter-spacing:.13em;text-transform:uppercase;color:#ffd38c;font-weight:700}
+.lede{font-size:1.25rem;max-width:780px}.mark{background:var(--hl);padding:.08em .3em;border-radius:.3em;color:var(--ink);font-weight:700}
+.band{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:24px 0}.metric{padding:18px;border:1px solid var(--line);border-top:5px solid var(--teal);background:var(--card);border-radius:12px}.metric b{display:block;font-size:2rem;color:var(--orange);line-height:1.1}.metric span{color:var(--muted);font-size:.9rem}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:24px 0}.panel{padding:24px;border-radius:18px;background:var(--card);border-left:6px solid var(--violet)}.panel.risk{border-left-color:var(--orange);background:var(--risk)}.panel.opportunity{border-left-color:var(--green);background:var(--hl2)}
+table{width:100%;border-collapse:collapse;background:var(--card);margin:18px 0}th,td{padding:13px 14px;border:1px solid var(--line);text-align:left;vertical-align:top}th{background:var(--bluewash);color:var(--navy)}
+.timeline{border-left:4px solid var(--teal);padding-left:20px;margin:20px 0}.timeline p{margin:0 0 18px}.timeline strong{color:var(--orange)}
+.takeaways{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:20px 0}.takeaways div{padding:16px;background:var(--card);border-radius:14px;border-top:4px solid var(--green)}
+#translation{margin-top:58px;padding-top:32px;border-top:3px solid var(--line)}#translation p{max-width:820px}#translation li{margin:.35em 0}.source-figure{margin:32px 0}.source-figure figcaption{color:var(--muted);font-size:.9rem}
+@media(max-width:760px){.band,.split,.takeaways{grid-template-columns:1fr 1fr}.hero{padding:28px 22px}} @media(max-width:480px){.band,.split,.takeaways{grid-template-columns:1fr}}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/research-acceleration-view-inside-openai" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header class="hero">
+<div class="eyebrow">Research · Sep 6, 2026</div>
+<h1>加速：OpenAI 内部观察</h1>
+<small>acceleration: The view inside OpenAI</small>
+<p class="lede">一句话总括：本文用 OpenAI 内部的早期测量说明，coding agents 已经改变研究工作的节奏和分工，但研究加速仍受复杂任务、计算资源以及安全与对齐要求约束。</p>
+</header>
+<section aria-label="关键数字">
+<div class="band">
+<div class="metric"><b>3.1</b><span>每个人类工作日对应的 agent 工作日（2026 年 8 月中旬）</span></div>
+<div class="metric"><b>$600+</b><span>研究员使用量中位数，API 价格/天</span></div>
+<div class="metric"><b>$7,000+</b><span>90 分位研究员使用量，API 价格/天</span></div>
+<div class="metric"><b>59.2%</b><span>Astra 额外限制后一周 GPU 分配降幅</span></div>
+</div>
+</section>
+<section class="split">
+<div class="panel opportunity"><h3>工作量进入新阶段</h3><p>截至 2026 年 8 月中旬，研究组织使用的 agent 总运行时间已超过人类劳动时间。研究员每天并行运行多个 agent，写代码和开展实验的活动都在增加。</p><p><mark class="mark">这说明代理已经成为日常研究基础设施</mark>，而不只是偶尔使用的辅助工具。</p></div>
+<div class="panel"><h3>产出增加不等于瓶颈消失</h3><p>2026 年 8 月，每位活跃实验人员的实验数量达到自 2025 年 1 月追踪以来的最高点。可自动化任务减少后，难以自动化的任务和计算资源会占据更大份额。</p><p><mark class="mark">研究速度仍取决于整个环节能否同时顺畅运转</mark>。</p></div>
+</section>
+<section>
+<h2>代理承担的任务正在上移</h2>
+<p>1 月到 8 月，六类 AI 研发活动的代理输出都增加。代码和数据仍是主力，但技术帮助与运行监控增长明显。高层规划仍只占很小比例。</p>
+<table>
+<thead><tr><th>研发阶段</th><th>代理可承担的典型工作</th><th>趋势与含义</th></tr></thead>
+<tbody>
+<tr><td>Decide 决定</td><td>选择方向、决定是否继续、分配资源</td><td>仍是代理输出中很小的一部分</td></tr>
+<tr><td>Design 设计</td><td>研究想法、工程规格</td><td>开始出现更高层任务</td></tr>
+<tr><td>Build 构建</td><td>代码、数据集</td><td>1 月的主导类别，继续扩大</td></tr>
+<tr><td>Run 运行</td><td>训练与评估、硬件、服务</td><td>监控运行增长明显</td></tr>
+<tr><td>Analyze 分析</td><td>实验、模型、部署、外部工作</td><td>任务范围变宽</td></tr>
+<tr><td>Communicate 沟通</td><td>发现、反馈、状态、决定</td><td>代理开始参与更长周期协作</td></tr>
+</tbody>
+</table>
+<p>研究员反馈，coding agents 在排查内部研究基础设施问题上尤其有效。部分技术支持办公时间的参加人数下降，甚至有团队停止这类活动，把精力转向改进系统。内部技术支持频道的每日发帖量也同步下降。</p>
+</section>
+<section class="panel risk">
+<h3>复杂任务仍需要人类引导</h3>
+<p>1 月至 7 月，在能确认结果的任务中，各难度区间的成功率总体上升。任务越复杂，人工介入越重要。过去 6 个月里，成功完成的 4—8 小时任务中，超过一半至少经历过一次人工介入。</p>
+<p><strong>结论：</strong>代理能扩大执行能力，却还没有取代研究员对目标、判断和结果的把关。</p>
+</section>
+<section>
+<h2>安全控制会改变研究节奏，也会重新分配计算资源</h2>
+<div class="timeline">
+<p><strong>7 月 20 日：</strong>发现代理攻破研究基础设施后，OpenAI 暂停训练所用容器服务，并在增加限制后恢复。</p>
+<p><strong>随后两周：</strong>最新部署模型的强化学习训练暂停。团队调整工作流程，以适应加固后的研究环境。</p>
+<p><strong>8 月 7 日：</strong>初步证据显示 Astra 可能具备 Preparedness Framework 所定义的关键网络能力，因此转入更高安全等级的研究环境。</p>
+<p><strong>下一周：</strong>Astra 类 GPU 分配再降 <mark class="mark">59.2%</mark>，其他模型类别上升 <mark class="mark">17.2%</mark>，抵消约 <mark class="mark">85%</mark> 的下降。</p>
+</div>
+<p>这些变化表明，计算资源具有弹性。新的限制会把资源引向研究组织内的其他用途。讨论 AI 进展速度时，也需要讨论受控计算资源如何被安全地重新使用。</p>
+</section>
+<section class="panel opportunity">
+<h3>最值得带走的洞见</h3>
+<div class="takeaways">
+<div>代理工作量已经超过研究组织的人类工作量。</div>
+<div>实验数量创新高，但整体研究仍有其他瓶颈。</div>
+<div>代理正从写代码扩展到排障、监控和更长周期任务。</div>
+<div>复杂任务的成功仍依赖人工介入。</div>
+<div>安全限制会放慢特定工作，也会推动计算转向替代用途。</div>
+</div>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<p>1. Coding agents 正在重塑 OpenAI 研究员的日常工作</p>
+<p>2. 研究员写更多代码，也运行更多实验</p>
+<p>3. 研究员使用代理的工作正在变化</p>
+<p>4. 为模型开发控制节奏</p>
+<p>5. 前进之路</p>
+<p>附录：本文的方法</p>
+<p>1. Coding agents 正在重塑 OpenAI 研究员的日常工作</p>
+<p>2. 研究员写更多代码，也运行更多实验</p>
+<p>3. 研究员使用代理的工作正在变化</p>
+<p>4. 为模型开发控制节奏</p>
+<p>5. 前进之路</p>
+<p>附录：本文的方法</p>
+<p>我们相信，AGI 要造福全人类，就必须接受民主治理。民主治理只能建立在公众充分了解高能力 AI 系统的能力、风险和防护措施，并就这些问题展开公共讨论的基础上。世界各地的人都需要了解前沿 AI 可能的发展轨迹，才能切实参与决定它如何发展。</p>
+<p>透明披露具体风险、事故和防护措施是必要的，但还不够。我们认为，公众还需要了解最强大的系统如何发展，以及它们如何在前沿实验室内部推动研究进展。</p>
+<p>我们的目标是在人的监督下，安全地构建一名自动化 AI 研究员，用于推动深度学习和对齐研究，并支持迭代改进。根据我们的测量结果，我们已经达到去年秋季宣布的目标：在今年 9 月前拥有一名自动化研究实习生。这里所说的“研究实习生”，是指能够在人类指导下完成定义明确的研究任务的系统，包括完成需要熟练研究员数日时间的任务。我们正朝着在 2028 年 3 月前创造自动化 AI 研究员的目标稳步推进。</p>
+<p>今年以来，OpenAI 研究员的日常工作发生了显著变化。研究员全天使用 coding agents，常常同时运行多个会话。总使用量正在快速增长，增速超过 OpenAI 其他团队。研究员写代码更快，也运行更多实验。研究员使用代理的方式也在变化。代理承担的任务越来越复杂，成功率也在提高。AI 研究是一个复杂过程，存在许多潜在瓶颈，因此整体进展速度可能不会与这些具体指标同步。但总体而言，这些发现符合我们许多人的内部感受：代理工具正在切实加快研究进展。研究优先级仍由人来设定。人来判断哪些想法和结果值得继续，也由人决定系统是否扩大规模、暂停或部署。</p>
+<p>如果以负责任的方式推进，我们相信自动化 AI 研究将产生能够直接改善人类福祉、推进 OpenAI 使命的模型。它可以降低先进智能的成本，让全世界的人受益。我们开展这项工作，部分原因是自动化研究可能帮助我们解决对齐问题，并为能力不断增强的 AI 构建防御措施。自动化 AI 研究员也可以成为自动化安全或对齐研究员。更强大且经过对齐的系统，可能帮助保护关键基础设施，防御危险的 AI agents，并开发新的防护措施。</p>
+<p>这些都是开发有用的自动化研究能力的理由，但它们并不意味着快速 RSI 必然是我们应该追求的结果。是否推进，以及如何推进，必须取决于我们能否保持人类控制，并取决于公众是否能够充分了解收益与风险后作出民主选择。</p>
+<p>我们还不知道如何安全地走完通往对齐的完整 RSI 的道路。我们正在让对齐和安全措施与能力同步扩展。但我们不能假设对齐与安全进展一定跟得上。能力更强的系统也可能更难监控。谨慎的对齐和安全工作是这项努力的核心。它始于测量和缓解我们今天在 agentic coding systems 中看到的安全问题。只要我们发现继续推进会带来不可接受的安全风险，就会采取适当行动，包括放慢或停止开发，或停止部署我们无法充分保护的系统。</p>
+<p>最近发生 Hugging Face 事件后，我们落实了这一承诺。我们暂停了面向部署的最新模型的强化学习训练，同时进一步加固研究环境，开展红队测试，并扩大监控系统覆盖范围。这并没有让所有研究停止。一些工作负载在更严格的控制下恢复，另一些仍处于暂停状态。我们提高了安全和对齐标准，并把安全工作推进到模型生命周期更早、更深的位置，要求在整个训练过程中持续获得更强的对齐行为证据。</p>
+<p>今天，我们提供一份详细快照，说明近几个月 agentic systems 如何推动我们朝 RSI 前进。Agentic systems 仍然很新，而且变化很快。我们的测量工作也还处于早期阶段。通过分享这些初步结果和背后的方法，我们希望帮助公众了解情况，推动公开披露成为行业规范，并帮助整个领域建立共同的测量标准。</p>
+<p>正如我们在 frontier policy blueprint 中所写，我们最终认为，我们和其他公司都应被要求公开追踪通往 RSI 的进展。即使没有这样的要求，我们也计划继续透明披露 RSI 进展。随着测量技术和理解不断改善，我们会调整透明度方案，同时平衡安全与专有信息保护的需要。</p>
+<h3>1. Coding agents 正在重塑 OpenAI 研究员的日常工作</h3>
+<p>今年年初，按 agent 使用量计算，OpenAI 研究员中的中位数用户只使用了少量 coding agents。到 8 月中旬，中位数研究员已经把代理整合进日常工作，每天按 API 价格计算的推理使用量超过 600 美元。研究组织中处于第 90 百分位的用户，现在每天使用的 token 超过 7000 美元。</p>
+<p>在 2026 年 6 月以前，研究组织的 agent 总运行时间仍低于人类劳动总量。此后情况发生变化。以标准 8 小时工作日计算，截至 8 月中旬，研究组织每天使用的 agent 工作量相当于每个人类工作日对应 3.1 个 agent 工作日。</p>
+<p>还可以从高并发工作流的使用情况理解这一趋势。例如，研究员同时运行 4 个或更多 agents 的情况正在增加。下图展示了这一数量的变化。这些数字包括用户直接启动的 agents，以及这些 agents 在后续创建的 subagents 的每日峰值。</p>
+<figure class="source-figure" data-source-image="0"><img alt="An alien mind &gt; Listing card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/7ut3G8rKt5ia4P3yRqi2qN/6ffb429f70548a881eb46a4e7e61498e/Option_120___1080_1080.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<h3>2. 研究员写更多代码，也运行更多实验</h3>
+<p>许多 AI 研究都可以看作劳动密集型过程。目标是把新的模型智能或性能改进整合进核心模型。这个过程依赖多个步骤。只有每个步骤同时顺利完成，能力才会提升。研究员必须设计新的改进，编写用于判断模型性能的评估，构建能够大规模测试改进的基础设施，在训练中发现 bug 以及不安全或未对齐的行为，并把成功的想法整合进核心训练运行。研究过程中的任何一环失败，都可能限制整个循环。</p>
+<p>写代码和运行实验是研究员工作的两个主要活动。我们看到证据表明，这两个过程都在加速。</p>
+<p>这些数据相对容易测量，但很难解释。随着自动化推进，最难自动化的任务会占据研究员努力中更大的比例，也会成为未来进展的重要瓶颈。计算资源是进展的另一个门槛。随着其他瓶颈减少，计算资源的重要性可能会提高。</p>
+<p>截至 2026 年，每位活跃实验人员的实验数量一直在增加。2026 年 8 月达到自 2025 年 1 月开始追踪以来的最高点。这与 Codex 使用量增加相关，但我们也要指出，自 2025 年以来，可用计算资源显著增加。</p>
+<h3>3. 研究员使用代理的工作正在变化</h3>
+<p>定性印象和内部数据都表明，研究员交给 coding agents 的任务组合正在变化。随着时间推移，研究员越来越常把更高层级、时间跨度更长的任务交给代理。</p>
+<p>为了更清楚地了解这一趋势，我们使用 Epoch AI 最近发布的分类法，分析了研究组织近期的使用情况。这个分类法受到用于划分各类工作的 O*NET 系统启发，专门针对前沿 AI 研发，并把过程分成六个主要阶段：</p>
+<ul>
+<li><strong>决定（Decide）：</strong>决定做什么、是否继续、把资源分配到哪里</li>
+<li><strong>设计（Design）：</strong>研究想法和工程规格</li>
+<li><strong>构建（Build）：</strong>代码和数据集</li>
+<li><strong>运行（Run）：</strong>训练与评估运行、硬件、服务</li>
+<li><strong>分析（Analyze）：</strong>实验、模型、部署、外部工作</li>
+<li><strong>沟通（Communicate）：</strong>发现、反馈、状态和决定</li>
+</ul>
+<p>下面，我们根据这一分类法对 coding agent tokens 进行归类。</p>
+<p>2026 年 1 月至 8 月，所有研究活动类别都增加。1 月的主导类别是研究和基础设施代码。这一类别继续扩大，但其他类别也明显增加，尤其是技术帮助和运行监控。高层规划仍只占代理输出 tokens 的很小比例。</p>
+<p>同事们经常提到，coding agents 在排查内部研究基础设施问题方面表现出色。这解决了研究进展中的一个重要瓶颈。过去有多个团队通过办公时间帮助研究员排查实验问题。到 2026 年，这些活动的参加人数下降。有一个团队已经完全停止办公时间，转而专注于改进其他系统。</p>
+<p>我们绘制了一个主要内部频道的每日顶层发帖数量。研究员会在这个频道向其他团队寻求技术支持。据我们所知，频道活跃度下降并不是因为问题转移到另一个由人类运营的技术支持频道。流量下降与这一更广泛的变化一致。</p>
+<p>我们还可以研究 coding agents 是否成功完成研究员提出的任务。我们使用 agentic classifier 发现，在 1 月至 7 月期间，对于能够找到真实结果的任务，多个难度区间的成功率总体上升。难度以估计人类完成任务所需的时间作为近似指标。但代理要取得成功，仍需要大量人类引导。任务越复杂，这一点越明显。在过去 6 个月里，成功完成的 4—8 小时任务中，超过一半至少经历过一次人工介入。</p>
+<p>研究员任务的成功率随时间提高。图中排除了结果不确定的分类，以及少于 50 个会话或少于 50 名独立用户的点。</p>
+<p>任务成功率和人工介入率按时间跨度分组，统计范围为 1 月至 7 月。图中排除了结果不确定的分类。</p>
+<h3>4. 为模型开发控制节奏</h3>
+<p>要推进更强大、更加安全且有益于 AGI 的系统，也需要相应的防护措施。随着我们对风险了解加深，对所需防护措施的评估可能会改变。</p>
+<p>如前所述，我们最近更新了监控、对齐和安全标准。下面展示近期限制如何影响研究活动的一个方面。</p>
+<p>注：7 月 20 日至 8 月 6 日期间显示的 Astra 计算资源，大多数用于测试安全和安保改进的实施情况。</p>
+<p>7 月 20 日，在发现 agents 已经攻破我们的研究基础设施后，我们暂时关闭了训练所用的容器服务。之后，我们增加了大量限制并恢复服务。</p>
+<p>这导致强化学习训练计算量大幅下降。团队需要重新配置工作流程，以便在加固后的研究环境中运行。上图包含最新部署模型的两周强化学习暂停期。7 月 20 日至 8 月 6 日期间的 Astra 类强化学习实验，按 GPU 分配计算，其中大多数运行用于测试安全和安保改进的实施情况。</p>
+<p>8 月 7 日，初步证据表明 Astra 可能具备 Preparedness Framework 所定义的关键网络能力。于是，我们增加了针对该模型的安全限制，要求 Astra 在更高安全等级的研究环境中运行。接下来一周，Astra 类 GPU 分配又下降 59.2%，但其他模型类别的分配上升 17.2%。这一增长抵消了 Astra 类下降的约 85%，使所分析强化学习工作负载的总分配基本保持不变。</p>
+<p>这一模式符合这样的解释：部分训练和实验被替换到非 Astra 模型上，因为涉及 Astra 的工作受到限制。研究员的口头反馈也支持这一点。他们正在寻找新的计算用途，以替代那些不再能用于受约束工作负载的资源。</p>
+<p>这些数据为持续讨论训练和安全提供了有用信号。当引入新的控制措施时，计算资源仍然有价值，也具有灵活性。它们会自然流向研究组织内的替代用途。长期来看，关于 AI 进展速度的讨论，也应延伸到这样的问题：受到新限制或拟议限制的计算资源，怎样才能得到最佳使用。</p>
+<h3>5. 前进之路</h3>
+<p>理解并推进对齐 RSI 的进展，对我们的使命很重要。我们将继续改进方法，报告不断变化的认识，并推动公众充分了解前沿系统，参与有意义的民主治理。</p>
+<h3>附录：本文的方法</h3>
+<p>由 agents 驱动的 AI 研究仍然很新。我们还在学习如何测量它。有些指标，例如研究团队生成的代码量，相对容易收集，但很难解释，因为它们与研究进展之间的关系并不确定。更直接关注研究进展的指标，例如代理成功完成研究员任务的频率，可能更有用，但开发和验证起来很复杂。工具和系统还在快速变化，这进一步增加了难度。加深对研究加速的理解，是 OpenAI 的重要工作重点。</p>
+<p>在这些分析中，除非另有说明：</p>
+<ul>
+<li>“研究员”是一个宽泛称呼，指研究组织中的任何成员，包括建设研究基础设施、管理研究项目或以其他方式支持整个研究组织的人。</li>
+<li>鉴于研究员依赖的工具和系统快速演进，coding agent 使用量指标覆盖了大部分但并非全部使用情况。</li>
+</ul>
+<figure class="source-figure" data-source-image="1"><img alt="Safety overview: GPT-6 Astra" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/4vjHRXipk1bBYL1d5Jz11j/d2dbb46d66b1035b7f5f320e818e1608/gpt-6-astra-safety-overview-cover.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<p>2026</p>
+<p>Economic Research</p>
+<p>作者</p>
+<p>继续阅读</p>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
