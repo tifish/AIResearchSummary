@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>使用 API 中的 GPT‑Live‑1 构建更自然的语音体验</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f5f4ef;
+  --card: #ffffff;
+  --ink: #182330;
+  --muted: #586576;
+  --line: #d8dfe5;
+  --data: #155ac6;
+  --risk: #a94724;
+  --opportunity: #087763;
+  --conclusion: #7243aa;
+  --hl: #e2edff;
+  --hl2: #e1f3eb;
+  --risk-bg: #fff0e7;
+  --conclusion-bg: #eee6f9;
+  --hero-bg: #172a3c;
+  --hero-ink: #edf4fa;
+  --hero-muted: #bed0df;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f5f4ef;
+  --card: #ffffff;
+  --ink: #182330;
+  --muted: #586576;
+  --line: #d8dfe5;
+  --data: #155ac6;
+  --risk: #a94724;
+  --opportunity: #087763;
+  --conclusion: #7243aa;
+  --hl: #e2edff;
+  --hl2: #e1f3eb;
+  --risk-bg: #fff0e7;
+  --conclusion-bg: #eee6f9;
+  --hero-bg: #172a3c;
+  --hero-ink: #edf4fa;
+  --hero-muted: #bed0df;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #111820;
+    --card: #1a2530;
+    --ink: #dde6ee;
+    --muted: #a5b4c3;
+    --line: #354554;
+    --data: #7bb0ff;
+    --risk: #ffa17c;
+    --opportunity: #6ad4b4;
+    --conclusion: #c3a0f2;
+    --hl: #203753;
+    --hl2: #193d36;
+    --risk-bg: #3b2924;
+    --conclusion-bg: #30273f;
+    --hero-bg: #0b2234;
+    --hero-ink: #e0eaf3;
+    --hero-muted: #adc3d5;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #111820;
+  --card: #1a2530;
+  --ink: #dde6ee;
+  --muted: #a5b4c3;
+  --line: #354554;
+  --data: #7bb0ff;
+  --risk: #ffa17c;
+  --opportunity: #6ad4b4;
+  --conclusion: #c3a0f2;
+  --hl: #203753;
+  --hl2: #193d36;
+  --risk-bg: #3b2924;
+  --conclusion-bg: #30273f;
+  --hero-bg: #0b2234;
+  --hero-ink: #e0eaf3;
+  --hero-muted: #adc3d5;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif; line-height: 1.85; }
+main { max-width: 1100px; margin: auto; padding: 32px 24px 80px; }
+h1, h2, h3 { line-height: 1.4; }
+h1 { font-size: clamp(30px, 4.5vw, 49px); margin: 14px 0; letter-spacing: -.025em; }
+h2 { font-size: 27px; margin: 0 0 20px; }
+h3 { font-size: 20px; margin: 0 0 12px; }
+p { margin: 0 0 17px; }
+a { color: var(--data); text-underline-offset: 3px; }
+.hero { padding: clamp(25px, 5vw, 55px); background: var(--hero-bg); color: var(--hero-ink); border-radius: 22px; }
+.eyebrow, .meta { font-size: 13px; letter-spacing: .05em; }
+.hero .eyebrow, .hero .english, .hero .meta { color: var(--hero-muted); }
+.english { font-size: 19px; line-height: 1.55; }
+.hero .lead { font-size: 21px; margin-top: 28px; }
+.hero .lead strong { display: block; margin-bottom: 8px; }
+.hero a { color: var(--hero-ink); }
+.metrics { display: grid; grid-template-columns: repeat(3, 1fr); margin: 25px 0 40px; border-block: 1px solid var(--line); }
+.metric { padding: 23px; }
+.metric + .metric { border-left: 1px solid var(--line); }
+.metric b { display: block; font-size: 36px; color: var(--data); line-height: 1.3; }
+.metric span { font-size: 14px; color: var(--muted); }
+.summary-block { margin: 0 0 38px; }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.flow { padding: 25px; background: var(--hl2); border-top: 4px solid var(--opportunity); }
+.control { padding: 25px; background: var(--card); border-top: 4px solid var(--data); }
+.insight { color: var(--conclusion); font-weight: 650; }
+mark { background: var(--hl); color: var(--data); padding: 1px 5px; border-radius: 4px; }
+mark.green { background: var(--hl2); color: var(--opportunity); }
+.table-wrap { overflow-x: auto; background: var(--card); border-radius: 12px; border: 1px solid var(--line); }
+table { width: 100%; border-collapse: collapse; font-size: 15px; min-width: 650px; }
+caption { text-align: left; padding: 16px 20px; font-weight: 650; color: var(--muted); }
+th, td { padding: 15px 18px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+thead { background: var(--hl); }
+th { color: var(--data); }
+tbody tr:last-child td { border-bottom: 0; }
+.note { font-size: 14px; color: var(--muted); margin-top: 13px; }
+.boundary { margin: 28px 0; padding: 22px 26px; background: var(--risk-bg); border-left: 5px solid var(--risk); }
+.boundary h3 { color: var(--risk); }
+.price { display: grid; grid-template-columns: 1fr 2fr; gap: 28px; align-items: center; padding: 30px; background: var(--conclusion-bg); }
+.price .number { font-size: 39px; color: var(--conclusion); font-weight: 750; line-height: 1.3; }
+.price small { display: block; color: var(--muted); font-size: 14px; }
+.takeaways { border-top: 2px solid var(--conclusion); padding-top: 27px; margin-top: 38px; }
+.takeaways ol { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 30px; padding-left: 25px; }
+.takeaways li { padding-left: 5px; }
+.takeaways li::marker { color: var(--conclusion); font-weight: 750; }
+#translation { max-width: 790px; margin: 65px auto 0; padding-top: 40px; border-top: 1px solid var(--line); font-size: 17px; }
+#translation > h2 { font-size: 32px; margin-bottom: 28px; }
+#translation h3 { margin-top: 38px; font-size: 24px; }
+#translation h4 { font-size: 19px; margin-top: 26px; }
+#translation li { margin: 10px 0; }
+#translation blockquote { margin: 25px 0; padding: 8px 0 8px 23px; border-left: 3px solid var(--opportunity); }
+#translation blockquote p:last-child { margin-bottom: 0; }
+.toc { padding: 14px 23px; border-left: 2px solid var(--line); color: var(--muted); margin: 24px 0; }
+.annotation { color: var(--muted); font-size: 15px; }
+.source-figure { margin: 32px 0; }
+.source-figure img { display: block; max-width: 100%; height: auto; margin-inline: auto; }
+.source-figure figcaption { font-size: 14px; color: var(--muted); margin-top: 12px; line-height: 1.65; }
+@media (max-width: 700px) {
+  main { padding: 16px 16px 50px; }
+  .metrics, .split, .price, .takeaways ol { grid-template-columns: 1fr; }
+  .metric + .metric { border-left: 0; border-top: 1px solid var(--line); }
+  .metric { padding: 18px 10px; }
+  .metric b { font-size: 31px; }
+  .hero .lead { font-size: 18px; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/introducing-gpt-live-1-in-the-api" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header class="hero">
+<div class="eyebrow">OpenAI · Product · 中文总结与译文</div>
+<h1>使用 API 中的 GPT‑Live‑1 构建更自然的语音体验</h1>
+<p class="english" lang="en">Build more natural voice experiences with GPT‑Live‑1 in the API</p>
+<p class="meta">2026 年 9 月 10 日 · <a href="https://openai.com/index/introducing-gpt-live-1-in-the-api">原文</a></p>
+<p class="lead"><strong>一句话总括</strong>GPT‑Live‑1 把实时对话交给能同时听与说的语音模型，再把深度推理和行动委派给后端，让开发者分别配置对话体验与任务处理能力。</p>
+</header>
+<section aria-label="中文总结" id="summary">
+<div class="metrics">
+<div class="metric"><b>+30 个百分点</b><span>Full Duplex Bench 相比 GPT‑Realtime‑2.1 的提升</span></div>
+<div class="metric"><b>近 80%</b><span>Speak 早期评估中，思考停顿期间打断的降幅</span></div>
+<div class="metric"><b>0.05 美元／分钟</b><span>前端语音层的 API 定价</span></div>
+</div>
+<div class="summary-block split">
+<article class="flow">
+<h2>对话可以继续，任务在后台处理</h2>
+<p>传统语音代理要串联语音转文字、推理模型和文字转语音。每次交接都会增加延迟，也可能破坏对话节奏。</p>
+<p>GPT‑Live‑1 用<mark class="green">单一模型同时处理听与说</mark>。它可以即时应对打断和简短回应，并把深度推理交给后端。</p>
+<p class="insight">自然语音体验不仅取决于声音，还取决于系统能否判断何时回应、何时等待。</p>
+</article>
+<article class="control">
+<h2>语音层与推理层可以分别选择</h2>
+<p>开发者可以通过系统提示词控制语气、语速和对话风格。后端可使用 GPT‑6 Astra，也可接入第三方模型。</p>
+<p>文中建议用 Luna 处理排期等高频任务，用 Astra 处理需要推理的复杂客户问题。</p>
+<p class="insight">这种分工让开发者能按任务调整推理深度、速度和成本。</p>
+</article>
+</div>
+<div class="summary-block">
+<h2>评测与客户反馈指向不同层面的改善</h2>
+<div class="table-wrap">
+<table>
+<caption>原文明确给出的结果与测量范围</caption>
+<thead>
+<tr><th scope="col">项目</th><th scope="col">数据或结果</th><th scope="col">范围与条件</th><th scope="col">说明什么</th></tr>
+</thead>
+<tbody>
+<tr><td>Full Duplex Bench</td><td><strong>提高 30 个百分点</strong></td><td>对比 GPT‑Realtime‑2.1；轮流发言延迟和互动行为提升明显</td><td>改善覆盖对话时序与互动方式。</td></tr>
+<tr><td>Tau3</td><td><strong>排名第 1</strong></td><td>搭配 GPT‑6 Astra，推理强度为 medium</td><td>端到端任务表现需要结合后端配置理解。</td></tr>
+<tr><td>Speak</td><td><strong>打断减少近 80%</strong></td><td>早期评估；对比此前基于轮次的系统；针对学习者思考停顿</td><td>更自然的互动也包括给用户留出思考时间。</td></tr>
+<tr><td>一则客户反馈</td><td><strong>代码库缩减 80%；删除 2.3 万行代码</strong></td><td>对比其原有级联架构；应用于患者实时对话</td><td>语音能力的整合可能减少架构协调工作。</td></tr>
+<tr><td>银行知识任务评测</td><td><strong>97 项任务</strong></td><td>banking_knowledge；以 Pass@1 衡量成功完成的比例</td><td>这是任务样本量。所提供正文未列出具体成功率。</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note">各行衡量的对象不同。客户早期评估和个别架构改造结果，应保留其原有适用范围。</p>
+<p class="insight">这些结果共同说明，语音代理的进步可以体现在任务表现、等待时机和开发复杂度上。</p>
+</div>
+<aside class="boundary">
+<h3>榜单结果要连同后端配置一起看</h3>
+<p>Tau3 第一名对应 GPT‑6 Astra 的 medium 配置。涉及自然停顿和自我修正的两项评测说明，则注明后端为 Terra，推理强度为 low。</p>
+<p>所提供正文没有列出所有评测的具体分数。<strong>理解系统能力时，需要区分语音层的互动能力与后端模型的任务处理能力。</strong></p>
+</aside>
+<div class="summary-block price">
+<div><div class="number">$0.05</div><small>每分钟 · 前端语音层</small></div>
+<div>
+<h2>API 开放语音层，后端按产品需求搭配</h2>
+<p>文章称，GPT‑Live‑1 于发布当日开放 API。开发者另行搭配后端模型和代理运行框架。</p>
+<p>可选声音扩展到更多口音、方言和语言。模型也支持电话场景，企业还可通过 OpenAI Presence 构建语音工作流。</p>
+<p class="insight">每分钟 0.05 美元描述的是前端语音层，不代表完整代理系统的总成本。</p>
+</div>
+</div>
+<div class="takeaways">
+<h2>最值得带走的洞见</h2>
+<ol>
+<li><strong>全双工改变对话节奏。</strong>系统既要接住打断，也要识别思考停顿和简短附和。</li>
+<li><strong>语音与推理分工更明确。</strong>同一种语音体验可以搭配不同后端，以适应任务需求。</li>
+<li><strong>工程收益可能相当可观。</strong>文中的客户案例显示架构明显简化，但这仍是具体客户的结果。</li>
+<li><strong>效果和成本都要看完整配置。</strong>榜单名次带有后端条件，公布的分钟价格只覆盖前端语音层。</li>
+</ol>
+</div>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<p>GPT‑Live‑1 将 ChatGPT 自然的全双工对话能力带入 API。开发者也能更细致地控制语音代理如何说话、如何行动。</p>
+<nav aria-label="原文目录第一组" class="toc">
+<ul>
+<li>简化语音代理架构，降低语音延迟</li>
+<li>衡量全双工的优势</li>
+<li>客户怎么说</li>
+<li>新增声音选项</li>
+<li>定价与开放情况</li>
+</ul>
+</nav>
+<nav aria-label="原文目录第二组" class="toc">
+<ul>
+<li>简化语音代理架构，降低语音延迟</li>
+<li>衡量全双工的优势</li>
+<li>客户怎么说</li>
+<li>新增声音选项</li>
+<li>定价与开放情况</li>
+</ul>
+</nav>
+<p>我们正在 API 中推出 GPT‑Live‑1。这款功能强大、对话自然的语音模型，可帮助开发者构建支持语音的应用和业务工作流。GPT‑Live‑1 最早在 ChatGPT 中推出，能够同时听与说。正如在 Codex 和 ChatGPT Work 中展示的那样，它可以将更深入的推理和行动委派给与之配合的模型和工具。</p>
+<p>此次 GPT‑Live‑1 的 API 版本重点加入了新的能力。开发者可以围绕自己的用户、工作流和目标，引导并定制语音体验。流畅处理打断是 GPT‑Live‑1 的核心优势之一，也已开始产生业务价值。在早期评估中，Speak 发现，GPT‑Live‑1 会在语言导师回应前给学习者更多思考时间。与此前基于轮次的系统相比，<mark>打断减少了近 80%</mark>。</p>
+<p>GPT‑Live‑1 在 API 中的主要优势：</p>
+<ul>
+<li><strong>打断处理：</strong>单一模型同时对输入和输出音频进行推理，从而更好地处理打断。这样可以避免语音转文字—大语言模型—文字转语音（STT–LLM–TTS）串联架构带来的延迟，以及交接环节的不稳定。</li>
+<li><strong>推理与工具调用委派：</strong>GPT‑Live‑1 可以将推理和工具调用委派给 GPT‑6 Astra 这样的后端文本模型，也可以交给第三方模型。</li>
+<li><strong>语气、语速和风格：</strong>开发者可以通过系统提示词，塑造代理的语气、语速和对话风格。</li>
+<li><strong>静默上下文管理与背景噪声处理：</strong>更好地应对背景噪声和静默，不打断对话，也不把每一步都说出来。</li>
+<li><strong>长时间会话的可靠性：</strong>在较长的互动过程中，更好地保留上下文并维持对话质量。</li>
+<li><strong>电话支持：</strong>支持部署用于电话通话的全双工语音代理，适用于餐厅预订、客户支持等场景。</li>
+</ul>
+<h3>试用 GPT-Live-1</h3>
+<ul>
+<li><strong>自然地打断它。</strong>先请它帮忙，再在它回答到一半时插话，改变问题或补充细节。</li>
+<li><strong>带着它出门。</strong>在户外步行时，或有日常背景噪声的环境中试着交谈，看看它如何持续跟上你的对话。</li>
+<li><strong>放轻松，随意聊。</strong>你可以笑、犹豫、简短回应，也可以暂时转头和身边的人说几句话，然后继续对话。</li>
+</ul>
+<p class="annotation">此演示有时间限制。使用此演示，即表示你同意 OpenAI 的条款，并知悉我们的隐私政策。</p>
+<p>借助 GPT‑Live‑1，Yelp Host 能应对背景噪声、旁边的交谈和打断，顺利完成预订。</p>
+<h3>简化语音代理架构，降低语音延迟</h3>
+<p>传统语音代理会把语音转文字、推理模型和文字转语音串联起来。每一次交接都会增加延迟。对话的时机、上下文或自然节奏也更容易在交接中丢失。协调这些阶段的工作通常落在开发者身上。用户打断、停顿或改变话题时该如何处理，也需要他们安排。</p>
+<p>GPT‑Live‑1 在单一模型中处理听与说，简化了语音层。它可以即时回应打断和简短回应，同时把更深入的推理委派给后端。这样，后台处理任务时，对话仍可继续。</p>
+<blockquote>
+<p>“与我们原来的级联实现相比，GPT‑Live‑1 让代码库缩减了 80%，删除了 2.3 万行代码。这让我们能够与患者进行自然的实时对话。团队也腾出了精力，去改善从预约到就医指引的整个体验。”</p>
+</blockquote>
+<p>开发者可以自行选择对话背后的模型、工具和代理运行框架。例如，可以为 GPT‑Live‑1 搭配 Luna 这样的模型，处理排期或订单更新等高频任务。对于需要推理的复杂客户问题，则可以使用 Astra 这样的模型。这种灵活性让开发者能够针对每项任务，选择合适的推理深度、速度和成本。</p>
+<p>GPT‑Live‑1 原生提供自动语音识别（ASR）转写文本和回复文本。它对字母与数字内容也有较强的理解能力，并支持关键词偏置。虽然 GPT‑Live‑1 不是基于轮次的模型，但它原生支持轮次检测。因此，开发者仍可围绕明确的轮次边界构建应用。</p>
+<h3>衡量全双工的优势</h3>
+<p>在我们的各项评估中，GPT‑Live‑1 在 Full Duplex Bench 上的表现比 GPT‑Realtime‑2.1 <mark>高出 30 个百分点</mark>。它在轮流发言的延迟和互动行为方面都有明显提升。搭配中等推理强度的 GPT‑6 Astra 时，它还在 Tau3 上排名第一。Tau3 通过端到端任务，衡量前沿语音代理的智能水平。</p>
+<p>评估航空、零售和电信领域的口语客户服务任务。Pass@1 衡量任务成功率。汇总结果给予各领域相同权重。</p>
+<p class="annotation">* GPT Live 后端：Astra（medium）。</p>
+<p>评估包含知识检索和账户工具的口语银行客服任务。Pass@1 指 97 项 banking_knowledge 任务中成功完成的比例。</p>
+<p class="annotation">* GPT Live 后端：Astra（medium）。</p>
+<p>评估停顿处理、对话中的轮流发言、打断，以及倾听时的简短附和。</p>
+<p>测试对背景说话声、用户对他人说话、倾听者的简短附和，以及打断的反应。</p>
+<p>衡量用户结束一轮发言后，代理多快开始回复。</p>
+<p>测试模型如何根据包含自然停顿、犹豫和自我修正的口头请求使用工具。Pass@1 对工具调用序列进行评分。</p>
+<p class="annotation">* GPT Live 后端：Terra（low）。</p>
+<p>针对包含停顿、犹豫和自我修正的工具使用请求，评估模型的口头回答。评分衡量回答与参考意图的吻合程度。</p>
+<p class="annotation">* GPT Live 后端：Terra（low）。</p>
+<h3>客户怎么说</h3>
+<blockquote>
+<p>“将 GPT‑Live‑1 加入 Yelp Host 和 Hatch 后，相比我们的传统语音架构，轮流发言的表现和准确性都有提升。当 Yelp Host 使用 GPT‑Live‑1 接听预订、餐饮订单等来电时，我们看到来电处理率有了明显改善。来电者也开始使用更完整、更自然的句子。这说明电话另一端的体验确实变得不同了。”</p>
+</blockquote>
+<blockquote>
+<p>“好的语言导师知道什么时候该给学习者留出空间，什么时候该介入。GPT‑Live‑1 为 Speak 的 Live Tutor Lessons 带来了这种自然感。在我们的早期评估中，与此前基于轮次的系统相比，它在学习者思考停顿期间造成的打断减少了近 80%。”</p>
+</blockquote>
+<blockquote>
+<p>“GPT‑Live-1 展示了全双工模型能带来什么。它让 AI 语音支持从走走停停的节奏，转向电话交谈的自然流畅。客户可以自然地停顿、打断和改变话题。语音表达也有了明显进步。Fin 能将这种自然对话与其专有的支持系统结合，完成解决问题所需的更深入工作。对我们而言，这是迄今最清晰的信号，展示了语音支持的发展方向。”</p>
+</blockquote>
+<blockquote>
+<p>“有了 Devin 和 GPT‑Live‑1，与 AI 工程师一起工作开始更像和队友协作。你可以口头梳理一个想法，检验一种方案是否经得起推敲，也可以在离开键盘时直接把工作交给它。”</p>
+</blockquote>
+<p>Yelp</p>
+<p>Speak</p>
+<p>Fin</p>
+<p>Cognition</p>
+<h3>新增声音选项</h3>
+<p>开发者需要符合产品定位的声音，也希望用户听起来觉得自然。随着 GPT‑Live‑1 推出，我们正从少量实时语音选项，扩展到覆盖更多口音、方言和语言的声音选择。这让开发者在决定助手听起来是什么样时，拥有更多选择。</p>
+<h4>试听新增声音</h4>
+<p>带有澳大利亚英语口音特点</p>
+<p>未来几个月，我们会继续增加声音选项，并扩大支持的语言范围。</p>
+<h3>定价与开放情况</h3>
+<p>GPT‑Live‑1 今日起通过 API 提供，前端语音层的价格为<mark>每分钟 0.05 美元</mark>。你可以为它搭配适合产品的后端模型和代理运行框架，构建能够随着任务需求扩展的语音体验。</p>
+<h4>将 GPT-Live-1 连接到 Codex</h4>
+<p>将 GPT-Live-1 连接到 Codex。这段节选展示了应用如何把对话上下文传递给 Codex，再将 Codex 的回答返回给 GPT-Live-1。连接设置和委派处理部分已省略。</p>
+<p>如需使用定制声音，请联系销售团队，了解资格要求和申请流程。</p>
+<p>在 GPT‑Live‑1 之上构建语音工作流，还可以使用 OpenAI Presence。Presence 通过该模型实现实时语音互动。它帮助企业部署可信赖的 AI 代理。这些代理能够回答问题、解决问题、使用企业系统，并执行获准的操作。需要时，它们也能将问题转交给人工处理。请联系你的 OpenAI 客户总监，了解更多信息。</p>
+<p>API Platform</p>
+<p>2026</p>
+<p>作者</p>
+<h3>继续阅读</h3>
+<figure class="source-figure" data-source-image="0"><img alt="Now everyone can put data to work — card image" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/6FhMXOSe8XadGwEUev6QjJ/916a64d20bcc59b8619fea1827fa6bd3/put-data-to-work--cover-v001.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="1"><img alt="FinServ Blog - Art Card Texture Square" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/6Bcg403pebiJhQdHUS17FK/572e478dc4579deca27c9700c662e908/finserv-art-card.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="2"><img alt="Introducing the Agents API — cover image" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/6iP1bamSOXsPLwzFAepmx2/8b8fec31ba235a13ee695a607d7fe641/cover-image.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
