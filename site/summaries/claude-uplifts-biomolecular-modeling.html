@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Claude 如何提升生物分子建模能力</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f5f3ee;
+  --card: #ffffff;
+  --ink: #202a35;
+  --muted: #617080;
+  --line: #d8dfe4;
+  --data: #1465a8;
+  --risk: #b3482f;
+  --opportunity: #137963;
+  --conclusion: #7044ad;
+  --hl: #dfedfa;
+  --hl2: #e9e0f5;
+  --soft-green: #e1f0e9;
+  --soft-risk: #fae8df;
+  --hero: #182c40;
+  --hero-ink: #edf4fb;
+  --hero-muted: #bdcddb;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f5f3ee;
+  --card: #ffffff;
+  --ink: #202a35;
+  --muted: #617080;
+  --line: #d8dfe4;
+  --data: #1465a8;
+  --risk: #b3482f;
+  --opportunity: #137963;
+  --conclusion: #7044ad;
+  --hl: #dfedfa;
+  --hl2: #e9e0f5;
+  --soft-green: #e1f0e9;
+  --soft-risk: #fae8df;
+  --hero: #182c40;
+  --hero-ink: #edf4fb;
+  --hero-muted: #bdcddb;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #111820;
+    --card: #1a2530;
+    --ink: #dce5ed;
+    --muted: #a3b3c2;
+    --line: #354452;
+    --data: #75baff;
+    --risk: #ffa089;
+    --opportunity: #6dd4b4;
+    --conclusion: #c5a0ff;
+    --hl: #213c53;
+    --hl2: #382d4d;
+    --soft-green: #19392f;
+    --soft-risk: #402b26;
+    --hero: #0c2235;
+    --hero-ink: #e0ebf5;
+    --hero-muted: #a9bed1;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #111820;
+  --card: #1a2530;
+  --ink: #dce5ed;
+  --muted: #a3b3c2;
+  --line: #354452;
+  --data: #75baff;
+  --risk: #ffa089;
+  --opportunity: #6dd4b4;
+  --conclusion: #c5a0ff;
+  --hl: #213c53;
+  --hl2: #382d4d;
+  --soft-green: #19392f;
+  --soft-risk: #402b26;
+  --hero: #0c2235;
+  --hero-ink: #e0ebf5;
+  --hero-muted: #a9bed1;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; line-height: 1.85; }
+main { max-width: 1120px; margin: auto; padding: 32px 24px 72px; }
+h1, h2, h3 { line-height: 1.4; }
+h1 { font-size: clamp(30px, 5vw, 49px); margin: 14px 0; letter-spacing: -.025em; }
+h2 { font-size: 27px; margin: 0 0 20px; }
+h3 { font-size: 20px; margin: 0 0 12px; }
+p { margin: 0 0 18px; }
+a { color: var(--data); text-underline-offset: 4px; }
+.hero { padding: 42px; background: var(--hero); color: var(--hero-ink); border-radius: 20px; }
+.eyebrow { font-size: 13px; letter-spacing: .12em; color: var(--hero-muted); }
+.original-title { font-size: 20px; color: var(--hero-muted); margin-bottom: 28px; }
+.hero .overview { font-size: 20px; max-width: 850px; margin-bottom: 0; }
+.hero .overview strong { color: var(--hero-ink); }
+.meta { color: var(--muted); font-size: 14px; margin: 18px 0 28px; }
+.metrics { display: grid; grid-template-columns: repeat(3, 1fr); margin: 30px 0 40px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.metric { padding: 24px; border-right: 1px solid var(--line); }
+.metric:last-child { border-right: 0; }
+.metric b { display: block; font-size: 38px; line-height: 1.3; color: var(--data); }
+.metric span { display: block; font-size: 14px; color: var(--muted); margin-top: 9px; }
+.summary-block { margin: 0 0 38px; }
+.table-wrap { overflow-x: auto; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+table { width: 100%; border-collapse: collapse; min-width: 580px; font-size: 15px; }
+th, td { text-align: left; padding: 15px 18px; vertical-align: top; border-bottom: 1px solid var(--line); }
+th { background: var(--hl); color: var(--data); }
+tr:last-child td { border-bottom: 0; }
+.note { font-size: 14px; color: var(--muted); margin: 12px 0; }
+mark { background: var(--hl); color: var(--data); padding: 1px 4px; border-radius: 3px; font-weight: 650; }
+.insight { border-left: 4px solid var(--conclusion); padding: 12px 20px; background: var(--hl2); margin: 20px 0 0; }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+.success, .limit { padding: 27px; border-radius: 12px; }
+.success { background: var(--soft-green); border-top: 4px solid var(--opportunity); }
+.limit { background: var(--soft-risk); border-top: 4px solid var(--risk); }
+.success h3 { color: var(--opportunity); }
+.limit h3 { color: var(--risk); }
+.split p:last-child { margin-bottom: 0; }
+.funding { padding: 28px 32px; background: var(--card); border-left: 5px solid var(--opportunity); }
+.funding ul { margin-bottom: 12px; padding-left: 23px; }
+.takeaways { margin: 40px 0; }
+.takeaways ol { padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; counter-reset: takeaway; }
+.takeaways li { counter-increment: takeaway; border-top: 2px solid var(--conclusion); padding: 18px 10px 8px; }
+.takeaways li::before { content: "0" counter(takeaway); display: block; color: var(--conclusion); font-size: 25px; font-weight: 750; }
+#translation { max-width: 820px; margin: 64px auto 0; padding-top: 38px; border-top: 3px solid var(--line); font-size: 17px; line-height: 1.95; }
+#translation h2 { font-size: 32px; margin-bottom: 28px; }
+#translation h3 { font-size: 25px; margin: 42px 0 22px; color: var(--conclusion); }
+#translation p { margin-bottom: 23px; }
+.source-figure { margin: 34px 0; padding: 16px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
+.source-figure img { display: block; max-width: 100%; height: auto; margin: auto; }
+figcaption { color: var(--muted); font-size: 14px; line-height: 1.8; margin-top: 14px; }
+@media (max-width: 680px) {
+  main { padding: 16px 16px 48px; }
+  .hero { padding: 26px 22px; }
+  .metrics, .split, .takeaways ol { grid-template-columns: 1fr; }
+  .metric { border-right: 0; border-bottom: 1px solid var(--line); padding: 18px 8px; }
+  .metric:last-child { border-bottom: 0; }
+  .metric b { font-size: 32px; }
+  .funding { padding: 23px; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/claude-uplifts-biomolecular-modeling" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header class="hero">
+<div class="eyebrow">ANTHROPIC · SCIENCE · 2026 年 9 月 17 日</div>
+<h1>Claude 如何提升生物分子建模能力</h1>
+<p class="original-title" lang="en">How Claude is uplifting biomolecular modeling</p>
+<p class="overview"><strong>一句话总括：</strong>Claude 优化了科学家已在使用的生物模型，让结构预测和蛋白质设计所需的计算资源显著减少，同时揭示了“能计算更大的系统”与“能准确预测更大的系统”之间的差距。</p>
+</header>
+<p class="meta">来源：Anthropic · 分类：Science · <a href="https://www.anthropic.com/research/claude-uplifts-biomolecular-modeling">原文页面</a></p>
+<section aria-label="中文总结" id="summary">
+<div class="metrics">
+<div class="metric"><b>30 多个</b><span>不到四周完成优化的开源模型数量，覆盖结构预测、蛋白质设计、蛋白质语言建模和基因组学。</span></div>
+<div class="metric"><b>约 4 倍</b><span>仅损失极少数值精度时的平均提速；保持输出完全相同时，整体平均提速接近 2 倍。</span></div>
+<div class="metric"><b>约 150 美元</b><span>GPU 与 token 合计花费，即可达到此前设计实验相近的计算机模拟表现。</span></div>
+</div>
+<section class="summary-block">
+<h2>收益来自底层计算和模型代码的共同优化</h2>
+<p>Claude 开发了 FlashPairformer，优化结构预测中的三角注意力和三角乘法。它还针对各模型缓存重复计算，并简化结果恒定的无效分支。<mark>通用内核与逐模型优化共同发挥作用</mark>，降低了现有科学工具的使用成本。</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>比较范围</th><th>原文报告的提速倍数</th><th>条件与含义</th></tr></thead>
+<tbody>
+<tr><td>早期优化：7 个开源生物模型</td><td>最高 2.5 倍</td><td>由 Claude Mythos 5.1 完成。</td></tr>
+<tr><td>本次 30 多个模型的整体结果</td><td>平均约 4 倍；输出相同时接近 2 倍</td><td>约 4 倍对应极少的精度损失。</td></tr>
+<tr><td>FlashPairformer：三角注意力</td><td>2.7–2.9 倍</td><td>相对于领域标准方案，具体取决于模型配置。</td></tr>
+<tr><td>FlashPairformer：三角乘法</td><td>1.7–3.2 倍</td><td>相对于领域标准方案，具体取决于模型配置。</td></tr>
+<tr><td>图注所述十余个结构预测模型</td><td>平均约 4 倍；输出相同时约 1.6 倍</td><td>这是结构预测子集的数据，与整体范围不同。</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note">倍数均为原文报告值。结构预测快速模式在汇总的生物分子界面评估中，与默认设置没有统计上可区分的差异。</p>
+<p class="insight">两位具有生物分子建模经验、但没有推理优化或内核工程经验的技术人员监督了这项工作。结果表明，AI 的科学价值也可以来自加快工具工程，让专业优化更容易完成。</p>
+</section>
+<section class="summary-block">
+<h2>内存门槛下降，准确性边界依然存在</h2>
+<div class="split">
+<div class="success">
+<h3>超过 10,000 个 token：有准确预测实例</h3>
+<p>Big 模式可在<mark>单个 NVIDIA GPU 节点</mark>上准确建模超过 10,000 个 token 的系统。复合物 I 和 70S 核糖体都超过这一规模。</p>
+<p>作为对照，原文提到 AlphaFold3 准确预测的 40S 核糖体含 7,663 个 token。更省内存的推理让更大的分子机器进入可建模范围。</p>
+</div>
+<div class="limit">
+<h3>超过 70,000 个 token：运行成功，结构不正确</h3>
+<p>在单个配备 8 块 GPU 的 B300 节点上，模型完成了规模从超过 31,000 到超过 70,000 个 token 的预测。</p>
+<p>这些系统比训练上下文大近两个数量级，但预测结构发生塌缩。计算容量的扩展尚未带来同等幅度的泛化能力。</p>
+</div>
+</div>
+<p class="note">这里的 token 包括氨基酸、核苷酸，以及小分子和离子中的原子。“单节点”不等于“单 GPU”。</p>
+</section>
+<section class="summary-block">
+<h2>设计成本显著下降，但这里验证的是模拟评分</h2>
+<p>研究用 Mythos 5.1、Mythos 5 和 Opus 5，分别针对 <mark>16 个靶点</mark>开展设计。三者的设计评分中位数和最高值，在靶点间取平均后，都与此前 Mythos 5.1 实验大致相当。</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>实验设置</th><th>此前实验</th><th>本次实验</th></tr></thead>
+<tbody>
+<tr><td>提示词长度</td><td>约 16,000 个词</td><td>约 1,100 个词，另附预装工具参考表</td></tr>
+<tr><td>代理与人工参与</td><td>鼓励使用子代理</td><td>单个 Claude 模型，无子代理，无人工引导设计</td></tr>
+<tr><td>时间窗口</td><td>24 小时</td><td>24 小时实际经过时间</td></tr>
+<tr><td>计算资源</td><td>每个靶点最多花费 10,000 美元的 Modal 资源，约合 2,500 NVIDIA H100 GPU 小时</td><td>一块 NVIDIA H200；GPU 小时数减少约两个数量级</td></tr>
+<tr><td>成本与效果</td><td>提供此前 Mythos 5.1 设计评分基线</td><td>GPU 与 token 合计约 150 美元，可达到此前相近的 ipSAE 表现</td></tr>
+</tbody>
+</table>
+</div>
+<p class="insight">ipSAE 是对湿实验结合表现具有预测价值的计算机模拟评分。这里支持的结论是：更少资源可以得到相近的模拟结果；本次对比并未报告同等的湿实验成功率。</p>
+</section>
+<section class="funding summary-block">
+<h2>开源代码与实验支持将结果交给社区检验</h2>
+<p>Anthropic 宣布开源全部优化代码，并与 Adaptyv Bio 联合举办蛋白质设计竞赛。竞赛设有 <strong>5 个前沿问题</strong>，涉及跨物种反应性、pH 敏感性、肽-MHC 特异性，以及 GPCR 等困难靶点。</p>
+<ul>
+<li><strong>最高 100 万美元：</strong>Claude 使用额度。</li>
+<li><strong>最高 25 万美元：</strong>Modal 计算额度。</li>
+<li><strong>超过 5,000 个设计：</strong>由双方合作进行湿实验验证。</li>
+<li><strong>Twist Bioscience：</strong>提供竞赛所需 DNA。</li>
+</ul>
+<p>这使支持范围从计算工具延伸到实验验证，有助于检验效率提升能否转化为实际的分子设计成果。</p>
+</section>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<ol>
+<li><strong>科学工具本身也是 AI 的重要应用对象。</strong>此次贡献主要是改进已有模型的推理效率，让同一类研究更容易开展。</li>
+<li><strong>加速倍数必须连同条件一起读。</strong>少量精度损失与输出完全相同，是两种不同设置；整体模型与结构预测子集也不能混为一谈。</li>
+<li><strong>内存优化拓宽了可计算范围。</strong>但超大系统的错误预测说明，运行规模不能替代准确性证据。</li>
+<li><strong>模拟成本下降只是验证链条的一环。</strong>相近的 ipSAE 评分很有意义，真正的结合表现仍需湿实验检验。</li>
+</ol>
+</section>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<p>本文介绍 Claude 如何让科学家用于预测和设计生物分子的开源模型运行得更快、更省内存。在 Claude Science 中工作的 Claude，用不到四周优化了 30 多个模型，平均提速约 4 倍。它还创建了一种低内存模式。该模式可在单个 NVIDIA GPU 节点上，准确预测超过 10,000 个 token 的生物分子系统。这里的 token 包括氨基酸、核苷酸，以及小分子和离子中的原子。我们将开源全部优化代码，并宣布与 Adaptyv Bio 联合赞助一项蛋白质设计竞赛。竞赛将获得最高 100 万美元的 Claude 使用额度，并对超过 5,000 个设计开展湿实验验证。最近，我们公布了一项结果：Claude 能以专家水平统筹使用开源蛋白质设计和结构预测模型，从头设计蛋白质结合体。从头设计的结合体是通过计算设计的小型蛋白质。它们能够紧密结合特定靶分子，从而激活靶分子、阻断其作用，或将某种物质递送给它。</p>
+<p>这项工作令人鼓舞地展示了 AI 的科学能力，也是推动药物发现的早期一步。不过，它消耗的资源超出了绝大多数蛋白质设计者的承受范围。我们允许 Claude 在 AI 基础设施平台 Modal 上，为每个靶点花费最多 10,000 美元。这大致相当于 2,500 NVIDIA H100 GPU 小时。</p>
+<p>为了让更多人能够开展这类研究，我们开始探索推理优化，让这些模型运行得更高效。作为早期成果，Claude Mythos 5.1 加速了 7 个开源生物模型，使它们的运行速度最高达到原来的 2.5 倍。</p>
+<p>本文介绍新的研究结果。一个内部通用研究模型成功优化了 30 多个深度学习模型。这些模型经过训练，可执行结构预测、蛋白质设计等多种生物学任务，也涵盖基因组学模型和蛋白质语言模型。Claude 只牺牲了极少的精度，就让这些任务平均提速约 4 倍。在输出完全相同的情况下，平均提速也接近 2 倍。Claude 还提高了这些模型的内存利用效率，使预测前所未有的大规模生物分子系统成为可能。我们将这些成果与此前智能体式蛋白质设计方法的简化结合起来。结果表明，Claude 所需的 GPU 小时数减少了两个数量级，仍能达到与此前报告结果相近的计算机模拟表现。</p>
+<p>除了蛋白质设计，分子生物学家也广泛使用这些专用生物模型，包括将其用于药物发现与开发。今天，我们将开源所有这些模型的优化代码（此处），供更广泛的社区使用。更多细节见技术报告（此处）。</p>
+<p>为了进一步支持社区，我们还将与 Adaptyv Bio 联合赞助一项蛋白质设计竞赛。Adaptyv Bio 率先开展了开放式蛋白质设计竞赛。我们共同选出了 5 个具有挑战性的问题，它们处于当前能力的前沿。我们将与 Adaptyv 一起，在 Modal 和 Twist Bioscience 的慷慨支持下，提供最高 100 万美元的 Claude 使用额度、25 万美元的 Modal 计算额度，以及超过 5,000 个设计的湿实验验证。更多信息见此处，申请入口见此处。</p>
+<h3>加速蛋白质结构预测和设计模型</h3>
+<p>蛋白质结构预测要解决的问题是：仅根据蛋白质的氨基酸序列，确定其三维结构。蛋白质设计则是创建具有特定结构、功能或一组性质的蛋白质。这两类计算工具相辅相成，让科学家能够研究关键的生物分子过程，例如癌症如何形成。它们也让科学家能够创造有用的分子，例如可能靶向这些癌症的药物。</p>
+<p>AlphaFold3、OpenFold3 和 Boltz-2 等现代结构预测模型，将大量运行时间和内存用在两种运算上：三角注意力（triangle attention）和三角乘法（triangle multiplication）。这两种运算作用于 token 三元组，使模型能够描述生物分子系统的几何结构。但它们的计算成本极高，因为运行时间和内存需求都随系统规模呈立方增长。系统规模扩大到 2 倍，所需时间和内存就增加到 8 倍；扩大到 3 倍，则增加到 27 倍。</p>
+<p>编写计算内核（kernel）是降低这些成本的常见方法。内核是一类底层软件转换层，用于 GPU 等加速计算硬件。三角注意力和三角乘法十分重要，因此已有专门针对它们的内核开发工作。先有 NVIDIA 的 cuEquivariance，近期又有 NVIDIA 的 BioNeMo Inference Runtime（BioNeMo-IR）。</p>
+<p>在我们优化结构预测模型推理的工作中，我们与 Claude 合作开发了 FlashPairformer。这是一组定制内核，可加速三角注意力和三角乘法。它达到了新的最佳水平。根据模型配置的不同，三角注意力的平均速度是领域标准方案的 2.7–2.9 倍，三角乘法则为 1.7–3.2 倍。</p>
+<figure class="source-figure" data-source-image="0"><img alt="Chart showing Claude's kernel optimization" decoding="async" height="1483" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/56c4bf34b8eacaa7e1c30648a1d87dd284c9c9b3-2048x1483.jpg" width="2048"/>
+<figcaption>我们与 Claude 合作开发了 FlashPairformer。这组定制内核可加速三角注意力和三角乘法。这两种运算是 Pairformer 架构的主要组成部分，而 Pairformer 是当前最先进生物分子结构预测模型的基础。图中结果均相对于领域标准方案报告。</figcaption>
+</figure>
+<p>除了开发可跨模型使用的内核，我们还让 Claude 逐一处理各个模型，以完成更有针对性的优化。这些改动包括缓存那些被重复计算的结果，以及将无效分支简化为其固定输出。综合这些改进后，结构预测模型平均提速 4 倍。对于每个模型，我们都确认了 Claude 的加速版本不会影响下游任务的表现，例如结构预测表现。</p>
+<p>通常，即使是经验丰富的工程师团队，也需要数周才能为一个模型完成这类优化。而且，这些工作往往无法直接用于其他模型。Claude 在两位 Anthropic 技术人员的监督下，用不到四周完成了 30 多个开源模型的加速。这些模型覆盖生物分子结构预测、蛋白质设计、蛋白质语言建模和基因组学。两位监督者具有生物分子建模经验，但此前没有推理优化或内核工程经验。我们的结果表明，前沿 AI 模型将帮助这一领域的其他研究者更快、更轻松地构建科学工具。</p>
+<figure class="source-figure" data-source-image="1"><img alt="Bar chart showing Claude's accelerated optimizations over dozens of structure models" decoding="async" height="1318" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/b5ed53a2cb9d20cf369be85a586c1b4d1c171c47-2048x1318.jpg" width="2048"/>
+<figcaption>Claude 的优化加速了十余个生物分子结构预测模型。在精度仅略有下降的情况下，平均提速约 4 倍；在输出完全相同的情况下，平均提速约 1.6 倍。注：ColabFold 1.6.3 同期发布的可选快速内核，尚未纳入此处的基准测试。</figcaption>
+</figure>
+<figure class="source-figure" data-source-image="2"><img alt="Bar chart showing how Claude’s optimizations also sped up multiple protein design models spanning hallucination, structure generation, and inverse folding." decoding="async" height="1029" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/55c1085595aeefe9253d497e046b9a007e33d689-2048x1029.jpg" width="2048"/>
+<figcaption>Claude 的优化也加速了多种蛋白质设计模型，涵盖幻觉式设计（hallucination）、结构生成和逆折叠。这些模型采用多种架构，包括 AlphaFold 类结构 Transformer、扩散、流匹配和图神经网络。</figcaption>
+</figure>
+<figure class="source-figure" data-source-image="3"><img alt="Chart showing the performance of Claude's fast mode" decoding="async" height="1323" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/7ff86777678b41a6e8852ffbade8737923dd80d3-2048x1323.jpg" width="2048"/>
+<figcaption>在汇总的一组生物分子界面上，我们为结构预测开发的快速模式与默认设置之间，没有统计上可区分的差异。如果预测界面的 DockQ 评分大于 0.23，我们就将其视为可接受的界面。</figcaption>
+</figure>
+<h3>让超大生物分子系统的建模成为可能</h3>
+<p>除了让这些蛋白质结构预测和设计模型运行得更快，我们还要求 Claude 降低大型分子机器建模过程中的内存使用。细胞中的许多工作由这类系统完成。例如，核糖体负责制造蛋白质，呼吸复合物为细胞供能，分子伴侣帮助其他蛋白质折叠。每个系统都由数十个组分构成。它们的功能取决于这些组分如何组合和相互作用。预测如此大型系统的结构，通常需要大量计算资源。例如，推理可能需要分布在多个 GPU 节点上。这类资源是多数分子生物学家无法获得的。</p>
+<p>Claude 创建了低内存的“Big”模式。只使用一个 NVIDIA GPU 节点，该模式就能准确建模超过 10,000 个 token 的系统，也能成功完成超过 70,000 个 token 系统的推理。这在此前是无法实现的。使用 Big 模式成功折叠的分子机器包括人类线粒体复合物 I、TRiC 分子伴侣复合物、一个蛋白酶体，以及一个细菌核糖体。每个预测结果都与实验测定的结构高度吻合。据我们所知，它们属于结构预测模型迄今准确折叠的最大结构之列。其中，复合物 I 和 70S 核糖体都超过 10,000 个 token。相比之下，AlphaFold3 准确预测的 40S 核糖体包含 7,663 个 token。</p>
+<figure class="source-figure" data-source-image="4"><img alt="Image of large molecular complexes created by Claude's &quot;big&quot; mode" decoding="async" height="2048" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/f050c0e37767591e3a7a0f1ea3346515b027f1f6-1908x2048.jpg" width="1908"/>
+<figcaption>Claude 创建的低内存“Big”模式，让开源结构预测模型能够在单个 NVIDIA GPU 节点上，准确预测超过 10,000 个 token 的生物分子系统。这表明，这些专用模型能够泛化到比训练上下文大近 1.5 个数量级的系统。上面三行展示预测准确的系统，最下面一行展示预测不准确的系统。如果界面的 DockQ 评分至少为 0.23，就将其视为准确。</figcaption>
+</figure>
+<p>为了测试 Claude 优化的极限，我们要求它预测比此前任何已实现规模都更大的结构。在单个配备 8 块 GPU 的 B300 节点上，Claude 生成了完整病毒衣壳和蛋白质区室的结构预测。这些系统的规模从超过 31,000 个 token 到超过 70,000 个 token 不等，比这些结构预测模型的训练上下文大近两个数量级。它们的结构未能得到正确预测，这或许并不令人意外。不过，如今只需一个 NVIDIA B300 节点，就能开展这一规模的推理，门槛已经显著降低。这意味着，随着工具改进，研究者或许很快就能通过计算对越来越复杂的生物系统进行建模。</p>
+<figure class="source-figure" data-source-image="5"><img alt="More images of large molecular machines" decoding="async" height="680" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/783de4f90edb45cdc1ace96c1fcee7694e7b8c26-2048x680.jpg" width="2048"/>
+<figcaption>“Big”模式让开源结构预测模型只使用一个 NVIDIA B300 节点，就能成功运行前所未有规模的推理。为验证概念，这些能力测试只执行一次主干网络前向计算，不进行循环迭代（recycles）。预测结构发生塌缩，表明模型在超出训练上下文近两个数量级的规模上缺乏泛化能力。</figcaption>
+</figure>
+<h3>Claude 高效地从头设计蛋白质结合体</h3>
+<p>在此前的蛋白质设计工作中，我们给 Claude 提供了一份约 16,000 个词的提示词。提示词鼓励它使用子代理，并允许它在 24 小时内，为每个靶点在 Modal 上花费最多 10,000 美元，约合 2,500 NVIDIA H100 GPU 小时。这一次，我们让单个 Claude 模型使用一块 NVIDIA H200，并给予 24 小时的实际经过时间。它收到的提示词约有 1,100 个词，另有一份预装工具参考表。整个过程没有子代理，也没有人类引导设计。</p>
+<p>我们让三个 Claude 模型——Mythos 5.1、Mythos 5 和 Opus 5——使用本文介绍的加速生物分子模型，针对 16 个靶点开展设计。我们用 ipSAE 为设计评分。这是一种计算机模拟评分，已有研究表明它对湿实验中的结合表现具有预测价值。在 16 个靶点上取平均后，三个 Claude 模型所生成设计的评分中位数和最高值，都达到了与此前 Mythos 5.1 设计实验大致相同的 ipSAE 水平。与此同时，GPU 小时数减少了约两个数量级。我们还计入了 Claude token 成本。结果发现，GPU 和 token 合计花费约 150 美元，就能达到与此前设计实验相当的计算机模拟表现。</p>
+<figure class="source-figure" data-source-image="6"><img alt="Chart showing Claude's performance on de protein design on these optimized models compared to Mythos 5.1 compared" decoding="async" height="1030" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/4c5c23f4aa600e7cd3837db9de7972dfce2e0b28-2048x1030.jpg" width="2048"/>
+<figcaption>单个 Claude 模型使用一块 NVIDIA H200，在 24 小时的实际经过时间内从头设计蛋白质结合体。其计算机模拟结合评分，与此前 Mythos 5.1 设计实验的结果相近，后者以虚线表示。此前的实验可以使用子代理，并消耗约 100 倍的 GPU 小时数。每条曲线表示一个 Claude 模型统筹使用加速生物分子模型时，所得 ipSAE 评分的中位数（上排）或最大值（下排）。ipSAE 是计算机模拟结合评分。图中分别展示评分随估算 GPU 花费（左列）、token 花费（中列）和两者合计花费（右列）的变化。结果在 16 个靶点上取平均，每个靶点最多进行 5 次独立运行。</figcaption>
+</figure>
+<h3>与 Adaptyv Bio 联合赞助蛋白质设计竞赛</h3>
+<p>上述优化帮助我们更高效地预测和设计分子，也让一些原本因资源需求过高而无法实现的能力成为可能。为了展示这些优化带来的提升，以及 Claude 对分子设计更广泛的影响，我们正与 Adaptyv Bio 合作推出一项蛋白质设计竞赛。我们选出了处于当前蛋白质设计能力前沿的 5 个问题。其中包括跨物种反应性、pH 敏感性和肽-MHC 特异性等挑战，也包括 GPCR 等困难靶点。</p>
+<p>我们将与 Adaptyv 团队合作，针对这些问题，对社区提交的超过 5,000 个设计进行实验验证。我们将为参与研究者提供最高 100 万美元的 Claude 使用额度，并另行提供资金，支持在 Adaptyv 开展实验验证。Modal 将提供最高 25 万美元的计算额度。Twist Bioscience 将提供竞赛所需的 DNA。更多信息及资格条件见此处，申请入口见此处。</p>
+<p>我们还已通过 Life Sciences Verification Program，开始向生命科学研究者提供用于生物学相关工作的前沿 AI 能力。我们最近接纳了首批机构，并于今天启动公开测试。更多信息见此处。</p>
+<h3>延伸阅读</h3>
+<p>以下资源提供了更深入的技术内容，以及有关上述结果的更详细信息：</p>
+<ul>
+<li>蛋白质设计竞赛页面与申请表；</li>
+<li>专用分子模型代码；</li>
+<li>技术报告。</li>
+</ul>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
