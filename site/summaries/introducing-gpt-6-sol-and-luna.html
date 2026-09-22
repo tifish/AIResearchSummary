@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>推出 GPT-6 Sol 和 Luna</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #ffffff;
+  --surface: #f2f5f7;
+  --ink: #20272e;
+  --muted: #596773;
+  --line: #d7dfe4;
+  --data: #1664b4;
+  --risk: #ae443c;
+  --opportunity: #087765;
+  --conclusion: #7844a3;
+  --hl: #e2efff;
+  --hl2: #dff3eb;
+  --risk-bg: #fff0ec;
+  --conclusion-bg: #f2eafb;
+  --strong-bg: #20272e;
+  --strong-ink: #f3f7fa;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #ffffff;
+  --surface: #f2f5f7;
+  --ink: #20272e;
+  --muted: #596773;
+  --line: #d7dfe4;
+  --data: #1664b4;
+  --risk: #ae443c;
+  --opportunity: #087765;
+  --conclusion: #7844a3;
+  --hl: #e2efff;
+  --hl2: #dff3eb;
+  --risk-bg: #fff0ec;
+  --conclusion-bg: #f2eafb;
+  --strong-bg: #20272e;
+  --strong-ink: #f3f7fa;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #15191d;
+    --surface: #20272d;
+    --ink: #e0e7eb;
+    --muted: #a5b2bc;
+    --line: #3b464f;
+    --data: #7db8ff;
+    --risk: #ff9d8f;
+    --opportunity: #63d3b6;
+    --conclusion: #c99bf0;
+    --hl: #20364d;
+    --hl2: #1c3932;
+    --risk-bg: #382725;
+    --conclusion-bg: #31263d;
+    --strong-bg: #0d1114;
+    --strong-ink: #e0e7eb;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #15191d;
+  --surface: #20272d;
+  --ink: #e0e7eb;
+  --muted: #a5b2bc;
+  --line: #3b464f;
+  --data: #7db8ff;
+  --risk: #ff9d8f;
+  --opportunity: #63d3b6;
+  --conclusion: #c99bf0;
+  --hl: #20364d;
+  --hl2: #1c3932;
+  --risk-bg: #382725;
+  --conclusion-bg: #31263d;
+  --strong-bg: #0d1114;
+  --strong-ink: #e0e7eb;
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body {
+  margin: 0;
+  color: var(--ink);
+  background: var(--bg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 17px;
+  line-height: 1.85;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+main { max-width: 1120px; margin: auto; padding: 52px 30px 72px; }
+header { padding-bottom: 30px; border-bottom: 2px solid var(--ink); }
+h1 { max-width: 900px; margin: 12px 0; font-size: 44px; line-height: 1.2; }
+h2 { margin: 0 0 20px; font-size: 27px; line-height: 1.4; }
+h3 { margin: 0 0 12px; font-size: 21px; line-height: 1.5; }
+p { margin: 0 0 18px; }
+a { color: var(--data); text-underline-offset: 3px; }
+.meta, .english, .note { color: var(--muted); }
+.meta { font-size: 14px; }
+.english { margin-bottom: 18px; font-size: 21px; line-height: 1.5; }
+.lead { max-width: 850px; font-size: 21px; }
+.label { color: var(--conclusion); font-weight: 750; }
+mark { padding: 1px 4px; color: var(--data); background: var(--hl); }
+mark.opportunity { color: var(--opportunity); background: var(--hl2); }
+.summary-band { padding: 32px 0; border-bottom: 1px solid var(--line); }
+.metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.metric { padding-left: 18px; border-left: 3px solid var(--data); }
+.metric:nth-child(2) { border-color: var(--opportunity); }
+.metric:nth-child(3) { border-color: var(--conclusion); }
+.metric strong { display: block; color: var(--data); font-size: 36px; line-height: 1.25; }
+.metric:nth-child(2) strong { color: var(--opportunity); }
+.metric:nth-child(3) strong { color: var(--conclusion); }
+.metric span { display: block; margin-top: 8px; font-size: 15px; }
+.table-wrap { width: 100%; overflow-x: auto; margin: 18px 0; }
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+caption { padding: 0 0 12px; text-align: left; color: var(--muted); font-size: 14px; }
+th, td { padding: 12px 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+th { background: var(--surface); font-weight: 700; }
+td strong { color: var(--data); }
+.note { font-size: 14px; }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.split > div { min-width: 0; }
+.signal { padding: 26px; background: var(--hl2); border-left: 4px solid var(--opportunity); }
+.caution { margin-top: 24px; padding: 24px; background: var(--risk-bg); border-left: 4px solid var(--risk); }
+.caution h3 { color: var(--risk); }
+.insight { margin: 28px 0 0; padding: 25px 28px; background: var(--strong-bg); color: var(--strong-ink); font-size: 19px; }
+.insight p { margin: 0; }
+.takeaways { padding: 30px 0; }
+.takeaways ol { margin: 0; padding-left: 26px; }
+.takeaways li { padding: 10px 0 10px 8px; }
+.takeaways li::marker { color: var(--conclusion); font-weight: 750; }
+#translation { margin-top: 24px; padding-top: 42px; border-top: 3px solid var(--conclusion); }
+.translation-body { max-width: 780px; margin: auto; }
+#translation > h2 { max-width: 780px; margin: 0 auto 28px; }
+.translation-body h3 { margin-top: 36px; }
+.translation-body h4 { font-size: 20px; margin: 30px 0 14px; }
+.translation-body ul { padding-left: 24px; }
+.contents { padding: 16px 22px; background: var(--surface); margin: 22px 0; }
+.contents ul { margin: 0; }
+.eval-note { padding-left: 17px; border-left: 2px solid var(--line); color: var(--muted); font-size: 15px; }
+.example { margin: 22px 0; padding: 20px 24px; background: var(--surface); border-left: 3px solid var(--line); }
+.example p:last-child { margin-bottom: 0; }
+code { font-family: Consolas, monospace; font-size: 0.92em; color: var(--data); }
+.source-figure { margin: 32px 0; }
+.source-figure img { display: block; max-width: 100%; width: 100%; height: auto; }
+.source-figure figcaption { margin-top: 10px; color: var(--muted); font-size: 14px; line-height: 1.7; }
+@media (max-width: 680px) {
+  main { padding: 28px 18px 44px; }
+  h1 { font-size: 32px; }
+  h2 { font-size: 24px; }
+  .english, .lead { font-size: 18px; }
+  .metrics, .split { grid-template-columns: 1fr; gap: 22px; }
+  .metric strong { font-size: 32px; }
+  th, td { padding: 10px 9px; }
+  .signal, .caution, .insight { padding: 20px; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/introducing-gpt-6-sol-and-luna" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header>
+<p class="meta">OpenAI · 2026 年 9 月 22 日 · 产品</p>
+<h1>推出 GPT-6 Sol 和 Luna</h1>
+<p class="english" lang="en">Introducing GPT-6 Sol and Luna</p>
+<p class="lead"><span class="label">一句话总括：</span>这次发布的重点是把 Astra 的能力进展带到更便宜的模型，并通过缓存改进，降低智能体反复执行专业任务时的持续成本。</p>
+<p class="meta">以下总结依据所提供的文章正文。模型表现、成本和产品安排均为原文所述。</p>
+</header>
+<section aria-label="关键数字" class="summary-band">
+<div class="metrics">
+<div class="metric">
+<strong>$0.27</strong>
+<span>Sol（xhigh）在 AutomationBench 上的单任务成本，得分为 33.2%。</span>
+</div>
+<div class="metric">
+<strong>约低 80%</strong>
+<span>Sol 在文中指定的 DeepSWE 和 OSWorld 对比中，单任务成本均约低 80%。</span>
+</div>
+<div class="metric">
+<strong>90% 折扣</strong>
+<span>缓存输入 token 的读取折扣，使复用上下文更有经济价值。</span>
+</div>
+</div>
+</section>
+<section class="summary-band">
+<h2>价格下降，让持续使用更容易负担</h2>
+<p>原文将 Sol 和 Luna 的降价概括为相较 GPT-5.6 促销价便宜 <mark>50%</mark>。具体价格如下。Luna 输出价格由 1.20 美元降至 0.50 美元，与“50%”这一概括并不完全一致，阅读时应以具体价格分别比较。</p>
+<div class="table-wrap">
+<table>
+<caption>API 价格；单位：美元／百万 token。旧价为对应 GPT-5.6 模型的促销价。</caption>
+<thead>
+<tr><th>模型</th><th>输入：旧价 → 新价</th><th>输出：旧价 → 新价</th><th>原文标注的降幅</th></tr>
+</thead>
+<tbody>
+<tr><td>GPT-6 Sol</td><td>4 → <strong>2</strong></td><td>20 → <strong>10</strong></td><td>50%</td></tr>
+<tr><td>GPT-6 Luna</td><td>0.20 → <strong>0.10</strong></td><td>1.20 → <strong>0.50</strong></td><td>50%</td></tr>
+</tbody>
+</table>
+</div>
+<p>文中仍将 Astra 定位为整体能力最强的模型。Sol 和 Luna 的价值在于扩大低成本任务的可选范围，而不是宣称所有任务都不再需要 Astra。</p>
+</section>
+<section class="summary-band">
+<h2>能力与成本必须放在同一张表里看</h2>
+<p>在 AutomationBench 上，Sol 的得分超过低推理强度的 Astra，也超过表中的 Claude 模型。但这些比较使用了不同的推理强度，不能直接视为所有使用条件下的统一排名。</p>
+<div class="table-wrap">
+<table>
+<caption>AutomationBench；得分单位为 %。成本倍数以 GPT-6 Sol（xhigh）为基准。</caption>
+<thead><tr><th>模型与推理强度</th><th>得分</th><th>每任务成本</th></tr></thead>
+<tbody>
+<tr><td>GPT-6 Sol（xhigh）</td><td><strong>33.2%</strong></td><td><strong>0.27 美元</strong></td></tr>
+<tr><td>GPT-6 Astra（low）</td><td>30.3%</td><td>Sol 的 3.9 倍</td></tr>
+<tr><td>Claude Opus 5（max）</td><td>26.9%</td><td>Sol 的 11.1 倍</td></tr>
+<tr><td>Claude Fable 5.1，使用 Opus 5 回退（max）</td><td>31.4%</td><td>超过 Sol 的 8.9 倍；未计回退成本</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note">AutomationBench 1.0.6 涵盖销售、营销、运营、支持、财务和人力资源，共使用 47 种工具。Fable 5.1 约有 40% 的任务触发 Opus 5 回退，因此其报告成本被低估。</p>
+<div class="table-wrap">
+<table>
+<caption>其他评测中的指定配置比较；成本降幅均为单任务成本，不是 token 单价降幅。</caption>
+<thead><tr><th>评测</th><th>模型与结果</th><th>对比对象与成本差异</th></tr></thead>
+<tbody>
+<tr><td>AutomationBench</td><td>Luna（high）较前代提高 5.4 个百分点</td><td>较前代成本低 58%</td></tr>
+<tr><td>Agents’ Last Exam</td><td>Sol（max）：56.4%</td><td>高于 Opus 5 在该评测中的最高分；成本低 60%</td></tr>
+<tr><td>DeepSWE v1.1</td><td>Sol（max）：68.8%</td><td>Fable 5（xhigh）：69.9%；Sol 成本约低 80%</td></tr>
+<tr><td>DeepSWE v1.1</td><td>Luna（max）：66.6%</td><td>表现接近 Opus 5 和 Fable 5（均为 medium）；成本分别低 93% 和 96%</td></tr>
+<tr><td>OSWorld 2.0 offline</td><td>Sol（xhigh）：60.5%</td><td>Opus 5（medium）：60.3%；Sol 成本约低 80%</td></tr>
+<tr><td>OSWorld 2.0 offline</td><td>Luna（max）超过 GPT-5.6 Sol（medium）</td><td>成本为对方的十分之一</td></tr>
+</tbody>
+</table>
+</div>
+<p>这些结果说明，<mark class="opportunity">接近某一能力水平所需的成本正在下降</mark>。但具体能节省多少，仍要连同任务类型和推理配置一起判断。</p>
+</section>
+<section class="summary-band">
+<div class="split">
+<div>
+<h2>事实性改善，不等于日常错误率减半</h2>
+<p>在内部事实性评测中，Sol 的错误约为前代的一半。Luna 在较高推理强度下达到 GPT-5.6 Sol 的水平，成本约为其百分之一。</p>
+<p>这表明较低价格与事实可靠性可以同时改善。但评测选取的是用户曾标记错误的对话，不能把结果直接外推为日常使用的错误概率。</p>
+</div>
+<div class="signal">
+<h3>更实用的协作，还包括少说空话</h3>
+<p>文章称，Sol 和 Luna 延续了 Astra 的沟通改进：表达更清楚，术语更少，低价值细节更少，回答也略短。</p>
+<p>内部对齐评测还显示，两者在编程工作中作出误导性陈述的比例低于前代。可信赖的协作不仅需要做对任务，也需要如实交代检查了什么。</p>
+</div>
+</div>
+<aside class="caution">
+<h3>高难度评测有明确的解释边界</h3>
+<p>事实性样本并不代表典型使用。编程欺骗评测也刻意选择容易诱发不诚实行为的任务，并使用最高推理强度。正文没有给出该项评测的具体欺骗率。</p>
+<p>此外，GPT 的评测来自研究环境或 API，竞品结果取自公开报告。系统提示和可用工具等差异，可能影响实际可比性。</p>
+</aside>
+</section>
+<section class="summary-band">
+<h2>缓存让成本优化延伸到整个工作流程</h2>
+<p>除了降低 token 单价，GPT-6 还提高了默认缓存命中率。缓存输入读取可享受 <mark>90% 折扣</mark>。开发者现在可以调整推理强度或启停工具，同时保留此前上下文的缓存复用。</p>
+<div class="split">
+<div>
+<h3>复用可以被观察和调整</h3>
+<ul>
+<li>Prompt Caching Dashboard 显示缓存输入量及其变化。</li>
+<li>诊断工具帮助定位未命中缓存的原因。</li>
+<li>显式断点让开发者决定缓存提示前缀的结束位置。</li>
+</ul>
+</div>
+<div>
+<h3>GitHub 提供了大规模使用结果</h3>
+<p>GitHub 报告称，过去几个月，这些改进覆盖了对 OpenAI 模型的数十亿次请求。需要重新处理的提示 token 占比下降了 <mark class="opportunity">超过 50%</mark>，帮助 Copilot 更快响应。</p>
+<p>这一结果衡量的是重新处理的 token 占比，并不等同于总账单下降超过 50%。</p>
+</div>
+</div>
+<div class="insight"><p>持续运行智能体时，模型单价只是成本的一部分。上下文能复用多少，也会影响成本和响应速度。</p></div>
+</section>
+<section class="summary-band">
+<h2>发布范围先覆盖 Work、Codex 和 API</h2>
+<p>按文章所述，模型自 <mark>2026 年 9 月 22 日</mark>起向 Plus、Pro、Business、Enterprise 和 Edu 用户开放，入口为 ChatGPT Work 和 Codex。Free 和 Go 用户可在桌面应用中使用 Luna。</p>
+<p>文章发布时，两款模型尚未在 Chat 中提供。API 名称为 <code>gpt-6-sol</code> 和 <code>gpt-6-luna</code>。ChatGPT 内采用当天逐步开放的方式，因此发布当天不同用户看到的可用状态可能不同。</p>
+</section>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<ol>
+<li><strong>更低成本才是这次发布的主线。</strong>Sol 和 Luna 将部分高端能力带到更适合反复使用的价格区间。</li>
+<li><strong>比较模型时，要同时看得分、推理强度和任务成本。</strong>单看模型名称或 token 单价，都不足以复现文章中的优势。</li>
+<li><strong>缓存是长期任务的重要变量。</strong>调整推理强度和工具时仍能复用上下文，让动态工作流程有了更多优化空间。</li>
+<li><strong>可靠性改善需要连同样本限制一起理解。</strong>刻意筛选的错误或欺骗场景，不能代表普通用户遇到问题的频率。</li>
+<li><strong>Astra 仍保留最高能力的定位。</strong>模型选择的重点，是让任务要求与成本预算匹配。</li>
+</ol>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<div class="translation-body">
+<p>让前沿智能融入日常工作，有了更多选择。</p>
+<nav aria-label="原文目录一" class="contents">
+<ul>
+<li>GPT-6 API 定价</li>
+<li>专业工作</li>
+<li>事实准确性</li>
+<li>编程</li>
+<li>计算机操作</li>
+<li>协作风格</li>
+<li>改进智能体和长对话的缓存</li>
+<li>持续改进对齐</li>
+<li>开放范围</li>
+</ul>
+</nav>
+<nav aria-label="原文目录二" class="contents">
+<ul>
+<li>GPT-6 API 定价</li>
+<li>专业工作</li>
+<li>事实准确性</li>
+<li>编程</li>
+<li>计算机操作</li>
+<li>协作风格</li>
+<li>改进智能体和长对话的缓存</li>
+<li>持续改进对齐</li>
+<li>开放范围</li>
+</ul>
+</nav>
+<p>本月早些时候，我们推出了 GPT-6 Astra。它是全球智能水平最高、对齐表现最好的模型。要求最高、最重要的项目，仍然需要充分发挥 Astra 的能力。不过，不同工作的规模、节奏和预算各不相同。</p>
+<p>因此，我们推出 GPT-6 Sol 和 GPT-6 Luna，进一步扩展 GPT-6 模型家族。GPT-6 Astra 带来了新一代智能。Sol 和 Luna 则进一步提升了成本效益，让更多人受益于这一代智能。我们采用了与 GPT-6 Astra 相近的方法来训练 Sol 和 Luna。支撑 Astra 在专业工作、事实准确性、编程、计算机操作和对齐方面达到领先水平的技术进展，由此进入了速度更快、价格更低的模型。</p>
+<p>在成本与智能水平构成的曲线上，GPT-6 系列处于领先位置。各档模型都具备出色能力，底层基础设施则能高效地大规模提供这些能力。缓存和推理方面的改进降低了我们的服务成本。我们将这些节省直接让利给用户和客户：与 GPT-5.6 的促销价格相比，Sol 和 Luna 的 API 价格降低了 50%。这些改进共同作用，让先进 AI 能以切实可行的成本，应用于更多日常任务和大规模应用。</p>
+<h3>GPT-6 API 定价</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>模型</th><th>输入</th><th>输出</th><th>价格降幅</th></tr></thead>
+<tbody>
+<tr><td>GPT-6 Sol 与 GPT-5.6 Sol 相比</td><td>$4 → $2</td><td>$20 → $10</td><td>便宜 50%</td></tr>
+<tr><td>GPT-6 Luna 与 GPT-5.6 Luna 相比</td><td>$0.20 → $0.10</td><td>$1.20 → $0.50</td><td>便宜 50%</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note">以上价格均按每 100 万 token 计算。</p>
+<p>GPT-6 Astra 仍然是我们整体表现最好的模型。如果你希望获得最佳结果，不愿在体验上作出妥协，请选择 Astra。</p>
+<h3>整个模型家族的能力提升</h3>
+<p>GPT-6 Sol 和 Luna 为你已经熟悉并使用的模型带来了更高的智能水平和成本效益。这些提升覆盖了完成复杂工作时最实用的能力。</p>
+<h4>专业工作</h4>
+<p>GPT-6 Sol 能够承担高难度工作任务。更高的使用限额和更低的成本，也让你有更多空间反复尝试。与价格相近的竞品模型相比，它提供了更强的智能和更好的结果。</p>
+<p>AutomationBench 测试跨应用的业务工作流程。在这项评测中，xhigh 推理强度的 GPT-6 Sol 超过了 max 推理强度的 Claude Opus 5，而每任务成本仅为 Opus 5 的 <mark>9%</mark>。在 high 推理强度下，GPT-6 Luna 比前代提高了 5.4 个百分点，每任务成本则降低了 58%。</p>
+<p class="eval-note">在 AutomationBench 1.0.6（在新窗口中打开）中，AI 智能体使用 47 种工具完成端到端工作流程。任务覆盖销售、营销、运营、支持、财务和人力资源。Claude Fable 5.1 的数据点低估了其实际成本，因为它没有计入回退使用 Opus 5 的成本。约 40% 的任务发生了这类回退。</p>
+<p>GPT-6 Sol 还以低得多的成本超过了 Claude Fable 5.1，甚至优于低推理强度的 GPT-6 Astra。</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>模型与推理强度</th><th>得分</th><th>每任务成本</th></tr></thead>
+<tbody>
+<tr><td>GPT-6 Sol（xhigh）</td><td>33.2%</td><td>$0.27</td></tr>
+<tr><td>GPT-6 Astra（low）</td><td>30.3%</td><td>GPT-6 Sol 的 3.9 倍</td></tr>
+<tr><td>Claude Opus 5（max）</td><td>26.9%</td><td>GPT-6 Sol 的 11.1 倍</td></tr>
+<tr><td>Claude Fable 5.1，使用 Opus 5 回退（max）</td><td>31.4%</td><td>超过 GPT-6 Sol 的 8.9 倍<br/>（未报告回退成本）</td></tr>
+</tbody>
+</table>
+</div>
+<p>Agents’ Last Exam 评估智能体处理复杂专业工作流程的能力。在这项评测中，max 推理强度的 GPT-6 Sol 得分为 56.4%。这高于 Claude Opus 5 在该评测中的最高分，而每任务成本低 60%。</p>
+<p class="eval-note">在 Agents’ Last Exam V1（在新窗口中打开）中，AI 智能体接受长程任务评估。这些任务具有经济价值，横跨 55 个细分行业，覆盖了大部分主要的计算机专业工作领域。</p>
+<h4>事实准确性</h4>
+<p>回答是否有用，取决于事实是否准确。我们正在持续提升事实可靠性。我们的内部事实性评测使用经过去标识化处理的真实对话。这些对话中，用户曾指出模型出错。在该评测中，GPT-6 Sol 的错误数量约为前代的一半。它以低得多的成本，接近了 Astra 的可靠性水平。GPT-6 Luna 也有显著进步。在较高推理强度下，它能够达到 GPT-5.6 Sol 的水平，成本约为后者的百分之一。</p>
+<p class="eval-note">这里的事实性评估使用了经过去标识化处理的 ChatGPT 对话。在这些对话中，用户曾标记此前模型给出的事实错误。这些容易诱发错误的对话并不代表典型使用场景。在典型使用中，事实错误更少见。评分没有控制回答长度。不过，我们对不同回答详略程度的测试表明，评分几乎不受回答长度影响。</p>
+<h4>编程</h4>
+<p>今年，编程智能体开始处理前所未有的复杂任务。任务范围更广，持续时间也更长。在 OpenAI，内部使用量呈指数级增长。如果按 API 价格折算，研究人员每天的 token 使用额，中位数已超过 600 美元，第 90 百分位已超过 7,000 美元（《研究加速：OpenAI 内部视角》）。随着编程智能体承担更长、更具挑战性的任务，持续使用的成本变得更加重要。GPT-6 Sol 和 Luna 将强大的编程表现与更低的 API 价格结合起来。开发者因此有更多迭代空间，团队也更有信心将更具挑战性的工作交给 Codex。</p>
+<p>FrontierCode 评估编程智能体提交的修改，是否已经达到可以合并进真实代码库的标准。在这项评测中，GPT-6 Sol 相比 GPT-5.6 Sol 有显著提升。它还能够以低得多的成本，达到 xhigh 推理强度的 Claude Fable 5.1 的水平。</p>
+<p class="eval-note">在 FrontierCode 1.1 Main（在新窗口中打开）中，AI 智能体编写的代码不仅按正确性评分，也按“可合并性”评分。后者包括测试质量、是否严格控制修改范围、代码风格，以及是否遵守代码库规范等。</p>
+<p>DeepSWE v1.1 测试模型处理真实代码库中复杂软件工程任务的表现。max 推理强度的 GPT-6 Sol 得分为 <mark>68.8%</mark>。与 Claude Fable 5 在该评测中的最高分相比，它只低 1.1 个百分点。Fable 5 的最高分是在 xhigh 推理强度下取得的 69.9%。GPT-6 Sol 的每任务成本约低 80%。</p>
+<p>max 推理强度的 GPT-6 Luna 得分为 66.6%。这与 medium 推理强度的 Claude Opus 5 和 Fable 5 相近。在这些比较中，Luna 的每任务成本比 Opus 5 低 93%，比 Fable 5 低 96%。</p>
+<p class="eval-note">在 DeepSWE 1.1（在新窗口中打开）中，AI 智能体需要解决原创的长程软件工程任务。</p>
+<h4>计算机操作</h4>
+<p>GPT-6 Astra 仍然是全球计算机操作能力最强的模型。与此同时，GPT-6 Sol 和 Luna 相比前代提供了更高的成本效益。在 OSWorld 2.0 offline 上，xhigh 推理强度的 GPT-6 Sol 与 medium 推理强度的 Claude Opus 5 得分相近，分别为 60.5% 和 60.3%。Sol 的每任务成本约低 80%。GPT-6 Luna（max）能够超过 GPT-5.6 Sol（medium），成本仅为后者的十分之一。</p>
+<p class="eval-note">在 OSWorld 2.0（在新窗口中打开）中，AI 智能体尝试完成长程计算机操作流程。任务涵盖日常生活和专业工作。我们报告的是 v2026.08.08 版本离线集上的部分奖励得分。</p>
+<h4>协作风格</h4>
+<p>我们还将 GPT-6 Astra 改进后的沟通风格带到了 Sol 和 Luna。我们认为，这种变化在技术和编程对话中会尤其明显。你会看到更清晰的表达、更少的术语，以及更少的奇怪措辞。低价值细节也会减少。整体回答会略短，但不会丢掉实质内容。</p>
+<blockquote class="example">
+<p>当然可以。我可以做出便当盒式布局的感觉，也能实现右上角的滑动页面切换器，而且不需要引入 React。这个交互很轻量，在现有网站中就能保持快速、流畅。我现在正在围绕这套方案调整全部四个页面。</p>
+</blockquote>
+<blockquote class="example">
+<p>完成了。打开已上线的网站即可查看。</p>
+<p>现在，全部四个页面都采用了色彩丰富的便当盒式布局。右上角还加入了带动画的 Home / Play / Place / Taste 滑动切换器。不需要 React，原生页面过渡就能保持轻量和流畅。</p>
+<p>食物插画由内置图像工具生成。提示词是：“一幅充满活力的水粉与墨线风格编辑插画，以饺子和辣味面条为主题。色彩鲜明，表现热气与香辛料，不含文字或标志。”</p>
+</blockquote>
+<blockquote class="example">
+<p>我会把页面调整为便当盒式网格布局，并将右上角的链接改成滑动页面切换器。我会保留现有网站，在改动技术配置之前，先确认这个交互是否需要 React。</p>
+</blockquote>
+<blockquote class="example">
+<p>更新后的网站已经上线。每个页面都采用了活泼的便当盒式布局，右上角的页面切换器也能在不同部分之间滑动切换。我检查了桌面端和窄屏移动端的显示与交互，也检查了浏览器后退导航。现有网站无需引入 React 就能完成这些改动。</p>
+</blockquote>
+<p>虽然风格偏好因人而异，但我们更喜欢这里 GPT-6 Sol 的回答。它不会那么快下结论。对于提问者可能已经清楚的细节，比如网站有四个页面，它也不会花太多篇幅重复说明。它减少了“便当盒式布局的感觉”“围绕这套方案调整”等模糊表达。同时，它更坦诚地说明了自己检查了什么、没有检查什么，也不会无必要地分享图像工具提示词之类的实现细节。</p>
+<h3>改进智能体和长对话的缓存</h3>
+<p>除了降低 token 价格，我们还在帮助基于 GPT-6 开发应用的开发者，进一步节省复用上下文的成本。我们改进了 GPT-6 的提示缓存（prompt caching），使其默认缓存命中率更高。这能帮助智能体复用更多上下文，更快地响应，并在读取缓存输入 token 时享受 <mark>90% 折扣</mark>。</p>
+<p>开发者也有了更多衡量和优化缓存表现的方法：</p>
+<ul>
+<li>
+<p><strong>监控与诊断。</strong>Prompt Caching Dashboard（在新窗口中打开）会显示有多少输入被缓存，以及缓存量如何随时间变化。诊断工具（在新窗口中打开）则帮助开发者了解哪些缓存机会被错过，以及应该如何修正。</p>
+</li>
+<li>
+<p><strong>调整推理强度和工具可用性，不再导致缓存失效。</strong>遇到更难的任务时，可以提高推理强度（在新窗口中打开）。后续问题较简单时，则可以降低强度。你也可以根据智能体需求的变化，启用或停用工具（在新窗口中打开）。这两类调整现在都会保留此前的上下文，供缓存复用。</p>
+</li>
+<li>
+<p><strong>优化需要缓存的前缀。</strong>显式断点允许开发者选择缓存提示前缀的结束位置。这让开发者能够更精细地控制缓存复用，并有望改善性能。</p>
+</li>
+</ul>
+<p>GitHub 报告称，过去几个月，在向 OpenAI 模型发出的数十亿次请求中，这些改进使需要重新处理的提示 token 占比下降了超过 50%。这帮助 Copilot 更快地作出响应。</p>
+<h3>持续改进对齐</h3>
+<p>GPT-6 Sol 和 Luna 延续了 Astra 引入的对齐工作。Astra 是我们迄今对齐表现最好的模型。在我们的对齐评测中，Sol 和 Luna 都优于各自的 GPT-5.6 前代。其中，它们对自身编程工作作出误导性陈述的比例有所降低。</p>
+<p>下面的评测刻意测试具有挑战性的情境，并不衡量典型使用中的失败率。完整结果请参阅系统卡（在新窗口中打开）。</p>
+<p class="eval-note">在我们的内部编程欺骗评测中，AI 智能体接到的任务经过专门挑选，目的是诱发不诚实行为。在典型使用中，欺骗行为要少见得多。欺骗率衡量的是：所有回答中，被检测出存在任何欺骗行为的回答所占比例。推理强度设为最高。</p>
+<h3>开放范围</h3>
+<p>从今天起，所有 Plus、Pro、Business、Enterprise 和 Edu 用户，都可以在 ChatGPT Work 和 Codex 中使用 GPT-6 Sol 和 GPT-6 Luna。Free 和 Go 用户可以在桌面应用中使用 GPT-6 Luna。这些模型尚未在 Chat 中提供。在 OpenAI API 中，它们的名称分别为 <code>gpt-6-sol</code> 和 <code>gpt-6-luna</code>。</p>
+<p>为了保持服务对所有用户的稳定性，我们计划在今天逐步向 ChatGPT 用户开放这些模型。如果你在 ChatGPT Work 或 Codex 中还看不到新模型，请稍后再试。</p>
+<p class="eval-note">GPT 的评测在我们的研究环境中进行，或通过我们的 API 完成。由于系统提示、可用工具等存在差异，输出可能与生产环境中的 ChatGPT 略有不同。竞品模型的评测结果来自公开报告。当没有 Claude Fable 5.1 的得分时，我们使用了 Claude Fable 5 的得分。</p>
+<h3>作者</h3>
+<h3>继续阅读</h3>
+<figure class="source-figure" data-source-image="0"><img alt="Better prompt caching for GPT-6 — Card image" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/72ZKzMh8JgRDfdg4EYRtwY/ee5e406a08b69f00b0beb4ac00270364/7kneoqlc2qh37z1utkmtfk-cover-v1.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="1"><img alt="Reimagining advertising with AI — Card cover" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/fHwkKLVG8WFHvuUPqMXtz/1c49ba0859fe1e1e21f5d64f692490f5/reimagining-advertising-with-ai-cover.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="2"><img alt="How to connect AI usage to business value — art card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/36T42HPkipcJAs08yNirmR/f73d9408ef4f0b08b5cce3b839656843/cover-018.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+</div>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
