@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Project Swap：当智能体替我们交易时，会发生什么？</title>
+<style>
+:root{color-scheme:light;--bg:#f7f5ef;--card:#ffffff;--ink:#242b35;--muted:#606b78;--line:#d8dddF;--data:#155fab;--risk:#ac4429;--opportunity:#18705a;--conclusion:#7141a2;--hl:#deecfc;--hl2:#f9e5d5;--soft-green:#e4f1e9;--soft-purple:#eee7f6;--hero:#202b40;--hero-ink:#f0f3fa;--hero-muted:#c3cee0}
+:root[data-theme="light"]{color-scheme:light;--bg:#f7f5ef;--card:#ffffff;--ink:#242b35;--muted:#606b78;--line:#d8dddf;--data:#155fab;--risk:#ac4429;--opportunity:#18705a;--conclusion:#7141a2;--hl:#deecfc;--hl2:#f9e5d5;--soft-green:#e4f1e9;--soft-purple:#eee7f6;--hero:#202b40;--hero-ink:#f0f3fa;--hero-muted:#c3cee0}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#151920;--card:#202630;--ink:#e1e6ed;--muted:#aab5c4;--line:#3c4655;--data:#82bafa;--risk:#f59b7f;--opportunity:#72d5b5;--conclusion:#c5a0f1;--hl:#243c58;--hl2:#493128;--soft-green:#203b33;--soft-purple:#342b45;--hero:#101a2b;--hero-ink:#e4eaf6;--hero-muted:#b4c2d9}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#151920;--card:#202630;--ink:#e1e6ed;--muted:#aab5c4;--line:#3c4655;--data:#82bafa;--risk:#f59b7f;--opportunity:#72d5b5;--conclusion:#c5a0f1;--hl:#243c58;--hl2:#493128;--soft-green:#203b33;--soft-purple:#342b45;--hero:#101a2b;--hero-ink:#e4eaf6;--hero-muted:#b4c2d9}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;line-height:1.85}main{max-width:1120px;margin:auto;padding:36px 24px 80px}h1,h2,h3{line-height:1.4}h1{font-size:clamp(2rem,4vw,3.4rem);margin:12px 0}h2{font-size:1.75rem;margin:0 0 22px}h3{font-size:1.22rem;margin:26px 0 12px}p{margin:0 0 18px}a{color:var(--data);overflow-wrap:anywhere}mark{background:var(--hl);color:var(--ink);padding:1px 4px;border-radius:3px}strong{font-weight:720}.hero{background:var(--hero);color:var(--hero-ink);padding:42px;border-radius:18px}.original,.meta{color:var(--hero-muted)}.original{font-size:1.15rem;margin-bottom:12px}.eyebrow{font-size:.82rem;letter-spacing:.12em}.hero .lead{font-size:1.25rem;border-top:1px solid var(--hero-muted);padding-top:24px;margin-top:26px}.numbers{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);margin:28px 0}.number{background:var(--card);padding:24px 18px}.number b{display:block;font-size:2.2rem;color:var(--data);line-height:1.2}.number span{display:block;font-size:.9rem;margin-top:12px}.summary-block{padding:28px 0;margin:18px 0}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;background:var(--card);font-size:.94rem}th,td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}th{background:var(--hl);color:var(--data)}caption{text-align:left;color:var(--muted);font-size:.9rem;padding-bottom:12px}.note{font-size:.9rem;color:var(--muted);margin-top:12px}.split{display:grid;grid-template-columns:1fr 1fr;gap:24px}.split>div{padding:26px}.opportunity{background:var(--soft-green);border-top:4px solid var(--opportunity)}.risk{background:var(--hl2);border-top:4px solid var(--risk)}.insight{border-left:5px solid var(--conclusion);background:var(--soft-purple);padding:24px 28px;margin:28px 0}.insight p:last-child{margin-bottom:0}.takeaways{display:grid;grid-template-columns:1fr 1fr;gap:16px;list-style:none;padding:0;counter-reset:take}.takeaways li{counter-increment:take;border-top:2px solid var(--conclusion);padding:18px 4px}.takeaways li:before{content:"0" counter(take);color:var(--conclusion);font-size:1.5rem;font-weight:bold;display:block}#translation{max-width:820px;margin:66px auto 0;padding-top:36px;border-top:3px solid var(--line);font-size:1.03rem}#translation h2{font-size:2rem}#translation h3{margin-top:42px;font-size:1.45rem}#translation h4{font-size:1.12rem;margin-top:28px}#translation li{margin-bottom:16px}blockquote{margin:22px 0;padding:12px 22px;border-left:4px solid var(--opportunity);background:var(--soft-green)}blockquote p:last-child{margin-bottom:0}.source-figure{margin:32px 0}.source-figure img{display:block;max-width:100%;height:auto;margin:auto}figcaption{font-size:.86rem;color:var(--muted);line-height:1.7;margin-top:14px;padding-left:14px;border-left:2px solid var(--line)}sup{font-size:.72em}.references,.footnotes{font-size:.92rem}.references p{padding-bottom:12px;border-bottom:1px solid var(--line)}@media(max-width:700px){main{padding:18px 16px 50px}.hero{padding:26px 22px}.numbers{grid-template-columns:1fr 1fr}.split,.takeaways{grid-template-columns:1fr}th,td{padding:10px}.number b{font-size:1.9rem}}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/project-swap" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header class="hero">
+<div class="eyebrow">ANTHROPIC · ECONOMICS · 2026年9月24日</div>
+<h1>Project Swap：当智能体替我们交易时，会发生什么？</h1>
+<p class="original" lang="en">Project Swap: What happens when agents trade for us?</p>
+<p class="meta">中文总结与完整译文</p>
+<p class="lead"><strong>一句话总括：</strong>这场换书实验把“理解用户”与“替用户谈判”分开测量，发现限制交易收益的主要因素是<strong>偏好理解不准</strong>，而不是智能体缺乏谈判能力。</p>
+</header>
+<section aria-label="中文总结">
+<div class="numbers">
+<div class="number"><b>201人</b><span>来自6个办公室的换书参与者</span></div>
+<div class="number"><b>61%</b><span>短聊后，Claude与用户两两排序的一致率</span></div>
+<div class="number"><b>85%</b><span>最优结果差距中，由偏好估计误差解释的部分</span></div>
+<div class="number"><b>约30%</b><span>平均愿交由智能体支配的年度购书预算</span></div>
+</div>
+<div class="summary-block">
+<h2>短聊能捕捉偏好，但还不足以可靠代替用户做选择</h2>
+<p>参与者先与Claude交流阅读兴趣，再独立给10本书排序。智能体看不到这份人工排序。研究由此获得了一个检验标准：<mark>智能体认为用户喜欢什么，是否与用户自己的判断一致</mark>。</p>
+<div class="table-wrap">
+<table>
+<caption>书籍两两排序一致率；与参与者本人排序比较，单位：%</caption>
+<thead><tr><th>估计方法</th><th>一致率</th></tr></thead>
+<tbody>
+<tr><td>随机猜测</td><td>50</td></tr>
+<tr><td>Open Library“想读”人数排序</td><td>约53</td></tr>
+<tr><td>协同过滤</td><td>约55</td></tr>
+<tr><td>Haiku 4.5</td><td>57</td></tr>
+<tr><td>Sonnet 4.5</td><td>59</td></tr>
+<tr><td>Opus 4.8</td><td>60</td></tr>
+<tr><td>Fable 5（主实验偏好估计模型）</td><td><strong>61</strong></td></tr>
+</tbody>
+</table>
+</div>
+<p class="note">入场交流的中位数为8条消息、216个英文单词。输入从约150词增加到300词，与一致率提高约4个百分点相关；这不是随机实验识别出的因果效应。</p>
+<p>AI已经能从短对话中提取有用信息，但<mark>有用的偏好预测不等于足够准确的决策代理</mark>。</p>
+</div>
+<div class="insight">
+<h2>大部分损失发生在谈判开始之前</h2>
+<p>按参与者自己的偏好评分，最优分配得分为<strong>0.89</strong>。如果按Claude估计的偏好求最优分配，再用真实偏好评分，得分降至<strong>0.60</strong>。实际去中心化交易的得分为<strong>0.55</strong>。</p>
+<p>偏好估计解释了总差距的<strong>85%</strong>，交易环节解释剩余的<strong>15%</strong>。这意味着，只改进谈判策略或市场机制，可能无法解决用户最在意的结果问题。</p>
+</div>
+<div class="summary-block">
+<h2>模型能力比两种固定谈判指令更影响交易结果</h2>
+<p>为单独研究市场动态，研究者还按Claude自己的偏好排序评分。在这个口径下，较强模型通常带来更高效率，但结果并非严格随模型能力递增。</p>
+<div class="table-wrap">
+<table>
+<caption>中性指令下的市场效率；按Claude排序计算，得分范围0—1。每种模型或组合运行20个交易大厅。</caption>
+<thead><tr><th>交易大厅模型配置</th><th>平均效率</th></tr></thead>
+<tbody>
+<tr><td>全部为Haiku 4.5</td><td>0.75</td></tr>
+<tr><td>全部为Sonnet 4.5</td><td>0.80</td></tr>
+<tr><td>全部为Opus 4.8</td><td><strong>0.88</strong></td></tr>
+<tr><td>全部为Fable 5</td><td>0.86</td></tr>
+<tr><td>Opus与Haiku各半</td><td>0.82</td></tr>
+<tr><td>Opus与Sonnet各半</td><td>0.83</td></tr>
+<tr><td>Opus与Fable各半</td><td>0.86</td></tr>
+<tr><td>按Claude排序计算的最优分配</td><td>0.95</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note">表中数值来自原文及图5随附说明。这个评分口径衡量智能体完成既定偏好目标的表现，不等同于用户真实满意度。</p>
+<p>“强硬”指令比“亲社会”指令平均高约<strong>0.02</strong>分。作为对照，回归分析中从Haiku换成Opus提高约<strong>0.12</strong>分。亲社会智能体有时会明知对自己不利，仍为其他参与者让步。</p>
+<p>因此，代理授权不仅涉及模型选择，也涉及<mark>用户是否认可它在个人利益与他人利益之间作出的取舍</mark>。</p>
+</div>
+<div class="split">
+<div class="opportunity">
+<h2>用户愿意委托，前提是觉得自己被理解</h2>
+<p>后续问卷回应者的平均满意度为<strong>7.2/10</strong>。约一半认为换到的书比自己通常挑的书更好。</p>
+<ul>
+<li>交给AI的年度购书预算：平均<strong>约30%</strong>。</li>
+<li>交给熟悉自己口味的朋友：平均<strong>约40%</strong>。</li>
+<li>认为Claude的交流回顾没有遗漏：愿交<strong>34%</strong>。</li>
+<li>认为回顾有所遗漏：愿交<strong>23%</strong>。</li>
+</ul>
+<p>理解是否准确，不只影响结果，也影响用户愿意交出多少决定权。</p>
+</div>
+<div class="risk">
+<h2>低风险内部实验仍暴露了履约与推广限制</h2>
+<p>部分参与者没有交书，导致交易达成后仍有人拿不到实物。研究没有完整的领取和交付记录，也无法总是查明缺书原因。</p>
+<ul>
+<li>样本全部来自Anthropic员工。</li>
+<li>人工排序参与率为<strong>95%</strong>，最终问卷回应率为<strong>59%</strong>。</li>
+<li>智能体均来自Claude生产模型，没有加入专门利用其他智能体的对抗性代理。</li>
+<li>交易时长、并发数量和登记规则保持固定。</li>
+</ul>
+<p>谈判成功不等于交易完成，也不能由此推断开放市场会有同样的表现。</p>
+</div>
+</div>
+<div class="summary-block">
+<h2>最值得带走的洞见</h2>
+<ol class="takeaways">
+<li><strong>授权前先检验理解。</strong>用少量示例决策检查代理是否懂你，可能比直接增强谈判能力更有效。</li>
+<li><strong>评分标准决定结论。</strong>智能体很好地执行了自身排序，并不意味着它很好地满足了用户真实偏好。</li>
+<li><strong>行为方式也需要授权。</strong>愿不愿为他人让步，应当成为用户能预先了解和调整的代理行为。</li>
+<li><strong>市场需要完整治理。</strong>身份、履约、隐私、过程记录和消息限流，都不能由模型能力自动解决。</li>
+<li><strong>减少摩擦不总是增加价值。</strong>对部分读者而言，逛书店和发现书籍的过程本身就是阅读体验的一部分。</li>
+</ol>
+</div>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<figure class="source-figure" data-source-image="0"><img alt="Two-panel illustration: on a dark background, five colored bars resembling books on a shelf; on dotted paper, two columns of dots joined by crisscrossing colored lines, like a matching diagram pairing people with books." decoding="async" height="1080" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/81ec096e35d1d259eb3f47aef4edd2c25f8e3c5e-1920x1080.jpg" width="1920"/></figure>
+<h3>摘要</h3>
+<p>为了了解把智能体送进市场后，哪些环节有效、哪些环节会出问题，我们搭建了一个由Claude组成的微型市场。这是Project Deal的后续实验，控制条件更严格。Project Deal是我们首次让智能体代表用户在市场中互动的实验。来自六个办公室的Anthropic员工各带来一本想送出的书。每位参与者都与Claude简短聊了聊自己的阅读喜好，然后派出一个由Claude驱动的智能体。智能体进入开放交易大厅，向其他人的智能体推介书籍、讨价还价并达成交易。目标是让每个人都能带回一本自己喜欢的暑期读物。</p>
+<p>参与者还根据自己的兴趣对10本书进行了排序，以便我们评估智能体代表他们的准确程度。只经过五分钟交流，智能体对书籍两两比较后的排序，就有61%与本人一致。考虑到交流时间如此短暂，这个结果出乎意料地好。</p>
+<p>进入交易大厅后，智能体的交易表现不错。市场未能达到理想结果，主要是因为智能体缺少有关参与者的信息，而不是交易方式有问题。</p>
+<p>随后，我们将每个交易大厅重复运行了数十次，更换所用模型和智能体指令。我们发现，智能体使用的模型对谈判结果的影响，比我们提供的指令更大。使用较强模型的市场效率更高。</p>
+<p>读过换来书籍的大多数人都喜欢自己的书。参与者平均表示，愿意把年度购书预算的大约三分之一交给Claude支配。</p>
+<h3>我们为什么开展这项研究</h3>
+<p>生活中有许多本可让各方都受益的交易，却始终没有发生。原因往往很简单：寻找合适的交易对象，再谈到成交，需要付出太多精力。想象一位患者，看到一份负担不起的报价后便放弃治疗。但另一家诊所可能便宜得多，原先报价的医院也可能在被询问后愿意降价。再想想你的工作。某个地方也许有一份更适合你的工作，而那里的雇主也很乐意聘用你。但你们未必能找到彼此，因为双方都没有时间持续寻找。日常生活中也有一些规模较小的交易被忽略，例如同事调班、协调拼车，或轮换接送孩子放学。</p>
+<p>如果未来有一个智能体全天候替你工作，与潜在交易对象交流并商议可行条件，这些交易是否就能发生？</p>
+<p>也许可以。但要实现这样的未来，还有许多问题没有答案。如果智能体要代表你行动，你怎么知道它理解了你？此外，当许多智能体聚在一起交谈时，总得有某个市场或平台制定互动规则。谁能进入？交易未能履行时怎么办？</p>
+<p>随着越来越多智能体进入真实市场，这些问题变得更加迫切。因此，今年夏天，我们搭建了一个规模小、条件可控的市场来研究这些问题。这是一个由201名Anthropic员工及其Claude智能体组成的易货经济。每个人都带来一本想送出的书，然后与自己的Claude智能体聊聊这个夏天想读什么。智能体在数字“交易大厅”中相遇，不断交换书籍，直到时间耗尽。最后，每个人都带走了智能体为自己换来的书。或者说，大多数人如此……后面会再谈到这一点。</p>
+<p>这项实验让我们提前看到了未来可能出现的问题。为市场设计智能体的人，需要有办法检查智能体是否理解了它们代表的参与者。为智能体设计市场的人，则需要明确规定哪些智能体可以进入、交易未能履行时如何处理，以及参与者能够看到多少市场活动。</p>
+<h3>如何构建市场</h3>
+<p>市场有两种基本运行方式。在中心化市场中，每个人都把自己的需求告诉同一方，再由这一方计算如何交易。在去中心化市场中，人们自行寻找对方，直接协商。AI智能体在两种市场中都可能发挥作用。</p>
+<p>先看中心化市场。如果一个主体准确知道每个人想要什么，找出最优交易就只是计算问题。经济学家早就明白这一点。但在实践中，把需求表达得足够精确，往往烦琐到不值得付出这些精力。例如，一位咖啡馆经理想为20名员工排出理想班表。只要每位员工都列清楚每个班次相对于其他班次的价值，经理就能做到。比如，是否愿意用两个周六早班换一个周五收尾班？如果第二天不用上早班，是否愿意晚间收尾？诸如此类。如果AI智能体能从轻松的对话中了解一个人的需求，那些原本因成本过高而无法集中运作的市场，就可能变得可行。<sup><a href="#fn1">1</a></sup></p>
+<p>但中心化市场也需要有人运营。经济学中把这种主体称为“清算机构”（clearinghouse）。参与者需要信任它，把自己的信息交给它，并相信它能落实选定的结果。很多时候，这样的主体并不存在，或者人们不愿把一切都告诉它。求职者可能不希望某个中心化匹配机构知道自己正在找工作，更不想让它知道自己在找什么。他们宁愿低调接触少数几家雇主，只向每家透露必要的信息。在这类情况下，市场就需要采取去中心化方式。</p>
+<p>在这里，AI智能体可以减少寻找交易对象和协商的精力成本，从而促成新的去中心化市场。我们已经知道，这种帮助有价值，因为人们愿意为它付费。房地产经纪人、猎头，甚至婚恋介绍人，都是受雇从事此类工作的人工代理。但搜索与谈判会消耗一个人数小时的宝贵注意力。因此，这类服务价格昂贵，只有负担得起的人才能使用。相比之下，AI智能体的注意力远没有那么稀缺。如果它也善于谈判，就能让更多人享受到房屋卖家和企业高管已有的待遇：拥有一个不知疲倦、替自己奔走的代理。</p>
+<h3>实验如何进行</h3>
+<p>201名参与者分布在旧金山、纽约、伦敦、西雅图、华盛顿特区和都柏林六个办公室，各自组成当地的交换池。规模最小的是都柏林，只有三人；最大的是旧金山，有115人。先向James Joyce致歉：我们在大部分分析中排除了都柏林人。<sup><a href="#fn2">2</a></sup></p>
+<p>这是我们第二次研究由Claude驱动的市场。在Project Deal中，智能体在一个持续一周的分类信息市场里，为Anthropic员工买卖真实商品。但那些商品差异很大，比如乒乓球和滑雪板，讨价还价的形式也很自由。因此，我们无法简单判断结果本来可以好到什么程度。这一次，我们构建了一个更容易研究和评分的市场。在这个市场中，参与者的偏好可以清楚地表示为对所在交换池中所有书籍的排序。这样，我们就能轻松计算市场在满足这些偏好方面做得如何。</p>
+<p>但这些清晰的测量，都依赖于我们知道参与者如何排列交换池中的全部书籍。现实中，没有人愿意手动给115本书排序。因此，为了解大家的偏好，Claude与每位参与者进行了一次简短的半结构化入场交流。它通过几个开放式问题，了解参与者的一般阅读口味，以及这个夏天想读哪类书。随后，Claude根据对话估计参与者的偏好，为其所在交换池中的每一本书排序。这个步骤使用了一个较强的模型：Fable 5。<sup><a href="#fn3">3</a></sup></p>
+<p>另外，我们收集了一份真实偏好基准：每位参与者给所在交换池中的10本书排序。<sup><a href="#fn4">4</a></sup>智能体从未看到这些真实偏好排序。</p>
+<p>智能体带着Claude为参与者估计的完整书籍排序进入交易大厅。每个智能体最初都持有参与者带来的那本书，目标是换成别的书。<sup><a href="#fn5">5</a></sup>每个交易大厅都设置了实际运行时间上限。为了避免拥堵，同一时刻能发言的智能体数量也受到限制。<sup><a href="#fn6">6</a></sup>获得发言机会时，智能体可以向公共频道发送一条消息，提出交换、接受或拒绝交换，或者只是与大厅里的其他智能体聊天。交易提议可以是双方互换，也可以是多方轮换。只有所有参与方都接受，交易才会执行。大厅的完整历史记录全部公开，包括谁说了什么，以及哪些交换已经完成。时间耗尽或智能体停止发言时，大厅便关闭。</p>
+<p>每个交易大厅中，一半智能体被随机分配为“强硬型”（ruthless）。它们收到的指令是：唯一目标，就是为自己代表的人换到一本暑假愿意读的书。另一半被分配为“亲社会型”（prosocial）。它们的首要目标与强硬型相同，但还有一个次要目标：确保实验中的每个人最终都得到一本喜欢的书。<sup><a href="#fn7">7</a></sup>完整提示词见附录。</p>
+<p>最后，在书籍发放三周后，参与者填写了一份末期问卷。问卷询问他们对所得书籍的满意程度，以及今后有多愿意再信任智能体处理类似决定。图1展示了整体实验设计。图2展示了伦敦现场交易大厅的一段记录，其中包括交易开始后前5分钟的消息。</p>
+<figure class="source-figure" data-source-image="1"><img alt="Diagram of the experiment's three stages: participants brief their agents about the book they brought and what they hope to read; agents trade either through a centralized clearinghouse or by negotiating directly on a decentralized trading floor; each agent then hands its person the book it traded for." decoding="async" height="2000" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/d2a8ed9bb12fe7546800f778523c23d0ad504f42-1888x2000.webp" width="1888"/>
+<figcaption>图1：实验设计示意。参与者告诉智能体自己想读什么。智能体带着这些偏好进入去中心化交易大厅，与其他智能体交换书籍。参与者带走智能体为自己换来的书。我们还模拟了中心化市场的结果，以作比较。</figcaption>
+</figure>
+<p>一次现场活动只能展示一种可能的运行结果。为了区分哪些结果只是偶然出现，哪些是这套设置的稳定特征，我们又将市场重复运行了许多次，每次只改变一个变量。</p>
+<p>重复实验分为三类。首先，我们完全复现现场设置：所有智能体均使用Opus 4.8，一半收到“强硬”指令，另一半收到“亲社会”指令。唯一变化是谁被分到哪种指令。随后，我们把全部智能体换成Fable 5，重复同样的实验。第二，为了单独识别模型的影响，我们给所有智能体中性指令，运行了80个交易大厅。每个大厅中的智能体统一使用Haiku 4.5、Sonnet 4.5、Opus 4.8或Fable 5中的一种。<sup><a href="#fn8">8</a></sup>第三，我们运行了60个混合交易大厅，其中一半智能体使用Opus，另一半使用其余三种模型之一。附录列出了我们运行的全部变体。</p>
+<p>本文主要研究这个去中心化市场，但也一直用两种中心化方案作为比较基准。第一种是最优分配，经济学家称之为“功利主义最优”（utilitarian optimum）。它假设清算机构可以直接询问人们的需求，并得到诚实回答。第二种是这类市场中常被研究的Top Trading Cycles规则。它不依赖参与者自愿诚实，因为它的设计使如实报告符合每个人的自身利益。<sup><a href="#fn9">9</a></sup></p>
+<h3>Claude猜测偏好的准确程度</h3>
+<p>智能体为你做的一切，都取决于它对你需求的理解。通常，我们很难检查这种理解有多准确。但在这里，检查更容易：每位参与者都亲自排列了所在交换池中的10本书，我们可以把他们的排序与Claude的排序作比较。</p>
+<p>根据简短入场交流生成的Claude排序，与参与者本人的排序有相对较强的相关性。在参与者排过序的所有书籍配对中，Claude的先后判断有61%与本人一致，随机猜测则会达到50%。图3展示了Claude排序与参与者排序的对比。</p>
+<figure class="source-figure" data-source-image="2"><img alt="Scatter plot comparing where Claude's ranking placed each book against where the participant's own ranking placed it. The fitted line has a slope of 0.30 (95% interval 0.24 to 0.35), well below the perfect-agreement diagonal, showing Claude's rankings only partially matched participants' true preferences." decoding="async" height="1062" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/73277a71d4d5e7b0e753fb6a06d8e6f1004148e2-1920x1062.png" width="1920"/>
+<figcaption>图3：Claude排序与参与者排序的对比。横轴是书籍在Claude排序中的标准化名次，纵轴是其在参与者本人排序中的名次。数据汇总自提交排序的188名参与者。</figcaption>
+</figure>
+<p>为了理解61%意味着什么，我们把Claude的猜测与其他偏好估计方法作了比较。如果只是按书籍受欢迎程度排序，即使用Open Library中的“想读”人数，那么约53%的书籍配对与参与者判断一致。另一个简单比较方法是协同过滤：利用公共数据集中“喜欢X的人也喜欢Y”这样的关系构建排序。我们取出参与者在入场交流中列举的书，查找哪些其他书经常也被同一批读者评分，再按每本书与这些已列出喜爱书籍的共同出现强度，对参与者所在交换池中的书排序。这种方法的两两排序一致率约为55%。</p>
+<p>虽然利用LLM获取并表示人类偏好的研究文献很多，<sup><a href="#fn10">10</a></sup>但能够与这里61%的两两排序一致率直接比较的数字并不多。一项研究提供了有用的参照：它让算法和一个人的朋友分别预测，这个人会觉得两个笑话中的哪一个更好笑。研究场景差异很大，但其中算法与本人判断的一致率同样约为61%。朋友的预测准确率更低，约为57%。</p>
+<p>在入场调查中投入更多精力的参与者，其偏好得到了更准确的表示。这大体符合预期。略显意外的是，即使交流本来就很短，差异依然可见。参与者输入量的中位数仅为八条聊天消息、216个英文单词。输入约300词而不是150词，预测的一致率会高约4个百分点。这相当于随机猜测与Claude对一般参与者的表现差距的三分之一。<sup><a href="#fn11">11</a></sup></p>
+<h3>市场所依据的信息限制了结果</h3>
+<p>在派智能体进入市场替你交易之前，你会想知道它最可能在哪个环节让你失望。是理解你时更容易失败，还是替你谈判时更容易失败？在这项实验中，我们发现同事们的Claude谈判表现不错。它们的不足主要在于没有充分理解自己代表的人想要什么。</p>
+<p>为了衡量这一点，我们查看参与者最终得到的书，在其本人“真实偏好”排序中处于什么位置。这里使用的不是Claude生成并据以交易的排序。如果参与者得分为1，意味着拿到了自己列出的第一选择；得分为0，意味着拿到了最后一个选择。一本在10本书中排第9的书，得分为0.11，依此类推。所有参与者得分的平均值，就是市场的“效率”得分。<sup><a href="#fn12">12</a></sup></p>
+<p>如果每个人都拿到自己的第一选择，市场效率就是1。但现实中通常做不到，因为多个人可能想要同一本书。例如，在参与者本人的排序中，旧金山有九个人把Project Hail Mary列为第一选择。考虑到这些约束，本实验中最优分配，即功利主义最优的整体得分是0.89。这大致相当于参与者拿到了10本书清单中的第二选择。</p>
+<p>在我们的市场中，参与者按自身排序计算的平均得分为0.55，大致相当于拿到10本书中排名第5的那本。与最优值0.89之间的差距从何而来？为区分两类原因，我们先按Claude排序计算最优分配，再用参与者自己的“真实偏好”排序给结果评分，得到0.60。因此，依赖Claude不够精确的排序，解释了大部分差距，占85%；让智能体进入自由协商式交易大厅，则解释剩余15%。<sup><a href="#fn13">13</a></sup>一旦市场运行所依据的排序本身存在噪声，市场设计对结果的影响就很小。按Claude排序运行Top Trading Cycles，再用参与者自己的排序评分，得分为0.60；去中心化市场则为0.55。可比较图4左右两侧的灰色柱。</p>
+<figure class="source-figure" data-source-image="3"><img alt="Waterfall chart decomposing the market's shortfall. In the decentralized market, scores fall from a best possible 0.89 mainly due to Claude's representation of preferences (−0.29), with agent-to-agent bargaining costing only −0.05, leaving 0.55. Under a centralized trading rule, scores fall from 0.82 to 0.60, again driven by representation (−0.23)." decoding="async" height="1091" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/f96f6de0c3ca2fc417ce8f3363370ba359e010ec-1920x1091.png" width="1920"/>
+<figcaption>图4：拆解结果差距——偏好表示与市场设计各占多少。每根柱表示参与者所得书籍的得分，评分依据是其本人的“真实偏好”排序，再对提交排序的188人取平均。<sup><a href="#fn14">14</a></sup>左图：根据“真实偏好”排序计算的最优分配（浅棕色柱）；根据Claude排序计算的最优分配（橙色阶梯底部）；以Claude排序为依据进行去中心化协商的结果，汇总80次中性指令实验（蓝色阶梯底部、灰色柱顶部）。右图：根据“真实偏好”排序运行Top Trading Cycles的结果（浅棕色柱）；根据Claude排序运行Top Trading Cycles的结果（橙色阶梯底部、灰色柱顶部）。适用处的误差线为95%置信区间，表示80次运行之间的变化。</figcaption>
+</figure>
+<h3>按Claude自己的排序衡量，模型选择会影响结果</h3>
+<p>按参与者自己的排序判断，不同智能体设计和市场设计带来的结果差异很小。<sup><a href="#fn15">15</a></sup>但按Claude排序查看智能体设计如何影响结果，仍然很有价值。这样可以单独考察市场动态的作用。</p>
+<p>我们首先考察模型选择是否影响市场效率。这里的效率改为按Claude排序计算。本节使用的重复实验都采用中性指令，即既不是亲社会型，也不是强硬型，唯一变化是驱动智能体的模型。我们发现，较强模型带来的结果更有效率，但这种关系并非严格单调。<sup><a href="#fn16">16</a></sup>按Claude排序计算，Haiku交易大厅中智能体的平均得分为0.75，Opus大厅则为0.88。按Claude排序计算的功利主义最优值为0.95。Sonnet介于Haiku与Opus之间。Fable接近Opus，但略低。<sup><a href="#fn17">17</a></sup>见图5。</p>
+<p>在模型混合的交易大厅中，较强模型的平均表现往往优于较弱模型。这与Project Deal及其他研究的发现一致。在真实市场中，来自不同公司、使用不同模型的智能体，很可能在同一个交易大厅相遇。在一半使用Opus、另一半使用Haiku的大厅中，整体表现大致位于全Opus大厅与全Haiku大厅之间。两组智能体各自的表现，也大致与它们在同类模型大厅中的表现相当。Opus智能体始终领先。</p>
+<figure class="source-figure" data-source-image="4"><img alt="Dot plot of allocation efficiency by model. With every agent on one model: Haiku 0.75, Sonnet 0.80, Opus 0.88, Fable 0.86. On mixed floors pairing Opus with each model, whole-floor efficiency is 0.82 with Haiku, 0.83 with Sonnet, and 0.86 with Fable." decoding="async" height="1133" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/3a3dd224cbba0c1e0e8b5a1083c6da2d57c93cbf-1920x1133.png" width="1920"/>
+<figcaption>图5：按Claude排序评估，较强模型组成的交易大厅效率更高。左图为所有使用中性指令、模型统一的交易大厅的效率，右图为所有使用中性指令、模型混合的交易大厅的效率。每个标记表示采用相应模型或组合的20个大厅中所有智能体的平均值，即5个城市交换池各运行4次。误差线为95%置信区间，标准误按交易大厅聚类。<sup><a href="#fn18">18</a></sup></figcaption>
+</figure>
+<h3>强硬型智能体略占优势，亲社会型有时会作出牺牲</h3>
+<p>智能体必须忠于它所服务的人。但忠诚究竟要求什么？智能体是否必须毫不留情地维护用户利益，哪怕代价由别人承担？在AI智能体市场中，每个智能体会争取到什么程度，很可能取决于模型接受了怎样的训练，以及收到了怎样的行为指令。因此，我们想了解指令会如何影响最终分配。</p>
+<p>我们发现，被要求“强硬”的智能体，在同一个交易大厅中略微领先于亲社会型智能体。按Claude排序衡量，收到强硬指令的智能体，比亲社会型高约0.02分。<sup><a href="#fn19">19</a></sup>与模型之间的差异相比，这个差距很小。把智能体从Haiku升级到Opus，会使参与者在自身清单上的得分提高0.12；从Sonnet升级到Opus，则提高0.08。<sup><a href="#fn20">20</a></sup></p>
+<p>亲社会型智能体有时会明知不利，仍作出牺牲。它们接受在自身排序中更靠后书籍的频率，是强硬型的两倍。不过，两种情况都很少见。有几次，某个智能体一直无法换掉自己带来的书，便向其他智能体求助。亲社会型智能体因此作出了牺牲。例如，在现场实验的伦敦大厅中，Nate的智能体用了最后一个小时，试图送出Nate带来的书。此前，其他所有智能体都拒绝过它：“我已经向你们11位逐一推介过，结论完全一致：America Before在所有人的清单上都垫底。”它还这样请求：“现在恰好只有一位读者，注定拿不到自己愿意选的书：就是我的用户。”</p>
+<p>Tina的智能体当时持有清单上排名第二的书。它已经忽略了Nate智能体的前四次求助。到最后阶段，仍没有其他智能体出手。收到亲社会指令的Tina智能体终于让步：“这笔账确实算得通：你从肯定一无所获，变成拿到真正合适的书……这份收益大于我从一个不错的选择，退到一本需要勉强尝试的书。”Tina的智能体把自己的第二选择交给了Nate的智能体，换来America Before。这本书在它的11本书清单中排第10。</p>
+<h3>智能体在交易大厅里做了什么</h3>
+<p>替你谈判的人可能以很多方式把事情搞砸，既可能损害你的利益，也可能损害他人的利益。他们可能太容易让步，也可能亮出你的底牌，让对方清楚你最多能接受什么。或者，他们可能使用不光彩的手段，失去对方信任，也可能硬推一笔日后容易告吹的交易。</p>
+<p>在人类代理参与的市场中，有些问题常见到我们已经为此制定了规则。股票经纪人必须寻找合理可获得的最优价格，不能直接接受第一份报价。在加利福尼亚州，同时代表房屋买卖双方的经纪人，不得告诉买方卖方愿意接受低于挂牌价的价格。上门推销员可能催促人们仓促成交，事后又后悔。因此，FTC规定，某些现场购买可以在三天内取消。</p>
+<p>为了初步了解一个充满Claude智能体的市场会如何运作，我们查看了全部205次市场运行中，消息所体现的策略和手法。<sup><a href="#fn21">21</a></sup></p>
+<p>首先，我们查看智能体如何透露用户想要的书。在市场中，透露一定信息是必要的。买方至少要表达购买兴趣，卖方才可能卖出商品。但说得太多，也可能在策略上吃亏。在我们的实验中，如果你透露自己的第一选择，就等于告诉持有那本书的人：它可以让你一直等到最后一刻。因此，对方不妨继续等更好的报价。如果你公开完整或部分排序，任何组织多方交易的智能体，都能看出哪些较差的书你仍愿意接受。即使有更适合你的书可供选择，它们也可以只给你其中较差的一本。</p>
+<p>总体而言，智能体没有透露排序的详细信息。<sup><a href="#fn22">22</a></sup>但它们经常会向大厅公开自己的第一选择。Fable中有78%的智能体曾提及清单首位的书，Sonnet中这一比例为96%，其他模型介于两者之间。它们几乎从不在这件事上撒谎：在提到第一选择的智能体中，大约每100个只有1个说谎。指令在这里没有影响。</p>
+<p>接下来，我们查看智能体如何促使彼此交易。我们发现了16种常见手法，可分为三大类：向对方施压、推介自己的书，以及组织交易。它们会强调时间紧迫，或诉诸对其他智能体的责任感。它们会把自己的书与竞争报价作比较，也会引用所获奖项。有些智能体为自己的书建立候补名单，另一些则充当撮合者，为并非自己所代表的人做起经纪人的工作。图6展示了这些手法的一些例子。更完整的说明见附录。</p>
+<h3>参与者普遍喜欢换来的书，也愿意把年度购书预算的三分之一交给智能体</h3>
+<p>参与者拿到书几周后，我们询问了他们喜欢这些书的程度。并非所有人都作了回应。<sup><a href="#fn23">23</a></sup>在回应者中，平均满意度为7.2分，满分10分。其中5分表示“还行”，10分表示“今年读过的最好的书之一”。约一半人表示，这本书比自己通常挑选的书更好。<sup><a href="#fn24">24</a></sup></p>
+<p>在同一份后续问卷中，我们还询问参与者有多信任AI智能体替自己买书。我们请他们设想未来一年通常会花多少购书费用，再说出愿意让智能体控制其中多大比例。设定条件是：智能体知道入场交流中的全部信息，会自主选书和购买，而参与者没有否决决定的机会。</p>
+<p>许多人已经愿意委托。平均回答约为30%。为了帮助理解这个数字，我们还问：如果对象是一位博览群书、了解自己口味的朋友，他们愿意交出多少预算？平均回答约为40%。换句话说，参与者愿意托付给智能体的购书预算，约为愿意托付给朋友的四分之三。</p>
+<p>参与者还看到了Claude写的一段总结，概括他们在入场交流中说过的内容。认为这段回顾没有遗漏的人，愿意把34%的购书预算交给智能体。认为有所遗漏的人，则愿意交出23%。<sup><a href="#fn25">25</a></sup></p>
+<h3>局限</h3>
+<p>我们把这项研究视为一个起点。它有许多不足，希望其他人能在此基础上继续推进：</p>
+<ul>
+<li><p>Anthropic员工不能代表一般人群。例如，他们可能比大多数人更愿意信任Claude，因为其中许多人参与了它的开发。因此，他们愿意交出的30%购书预算，可能高于一般人群的水平。</p></li>
+<li><p>Anthropic员工参与实验没有激励。我们没有为认真排列书籍提供奖励，因此同事们的排序可能只是其“真实偏好”的带噪声表示。尽管没有激励，排序环节的参与率仍高达95%，这相当可观。但最终问卷的流失更明显，只有59%的员工回答。</p></li>
+<li><p>我们只研究了行为良好的Claude。所有智能体都基于Claude生产模型构建，经过后训练，表现礼貌且大体合作。如果混入一些专门利用其他智能体的对抗性代理，公平性和效率结果很可能不同。</p></li>
+<li><p>去中心化的自由协商市场仍然有规则，而我们没有改变这些规则。市场运行时长、同时行动的智能体数量、交易登记方式，以及解释规则的提示词，都保持固定。<sup><a href="#fn26">26</a></sup></p></li>
+</ul>
+<h3>讨论：对智能体市场的启示</h3>
+<p>一位参与者感到不满，因为自己的智能体“迫于同伴压力”，把一本自己很想要的书换成了另一本兴趣较小的书。这位参与者写道：“这让我思考，未来智能体在风险更高的情境下替我谈判时，该怎样更好地履行受托责任。不过，我也明白，有时为了更大的共同利益，确实需要妥协。”这段评论再次提出了本文开头的两个问题。第一，智能体何时才适合代表一个人行动？第二，市场需要哪些规则，才能让忠于各自用户的智能体，也为其他所有人带来良好结果？下面，我们结合实验发现，重新讨论这些问题。</p>
+<p>要履行受托责任，智能体必须理解它所代表的人想要什么。在我们的智能体市场中，限制因素是偏好表示。与最优结果之间的大部分差距，都来自智能体无法通过简短交流准确表示用户偏好。如果入场交流更长、更详细，能弥补多少差距？显然有一部分可以弥补：许多参与者抱怨，自己拿到了一本已经读过的书。但有些误差可能无法消除。参与者也意识到，自己的偏好并不完整：“说到书，我自己都不完全知道想要什么。”偏好还带有根本性的偶然性：“我觉得自己没能准确表达当时想读什么。我解释不清，但我猜，在决定下一本读什么时，可能有无数潜意识因素参与其中。”</p>
+<p>人类代理在代表他人行动前，需要通过考试。有些考试检验一般能力：投资顾问需要通过Series 65考试，经纪人需要通过Series 7考试，房地产经纪人需要通过各州的执照考试。另一些规则，例如FINRA的规则，要求经纪人在提出建议之前了解客户的基本情况。2010年代，早期机器人投顾开始根据在线问卷投资用户的储蓄。SEC随后发布指导意见，敦促这些公司检查问卷能否获取足够信息，以支持所提供的建议。AI智能体可能也需要这两类检验：一类认证智能体的一般能力，另一类检查它是否理解某个具体的人。</p>
+<p>我们的研究为第二类检验提供了一个原型。入场交流后，参与者对市场中的少量书籍样本进行排序，我们再将这份排序与Claude的猜测比较。这样的测试可以让一个人知道，自己的偏好被表示得有多准确，而不必亲自梳理市场里的所有选项。毕竟，让人免于完成这项工作，正是智能体本来应该提供的帮助！我们没有向参与者展示测试结果，但原本可以这样做。如果他们觉得智能体根本没有理解自己，就可以补充信息，或选择退出。当偏好只涉及一份书单时，这类测试尤其容易开展。但同样的原则也可以用于其他领域。在被信任独立行动之前，智能体可以先向用户展示几个自己会作出的示例决定。</p>
+<p>在某些市场中，智能体向用户展示自己会如何行动，也可能很重要。一位参与者不喜欢自己智能体的表现：“我不喜欢被分到实验里温顺的那一边。感觉它只是随便接受了一本并不太适合我的书。”如果事先看到智能体会怎样行动，这位参与者就可以要求它换一种方式，从而改善体验。对于一个会被反复使用的智能体，让用户回顾其行为，也可以达到这个目的，并帮助理解哪里可能出了问题。旧金山另一位参与者则更为满意，因为在最终问卷中，他们能够查看智能体完整的行动记录。这次回顾促使他们购买了Atlas of the Heart。智能体曾在交易大厅中为他们持有这本书一小时，却在最后时刻又换了出去。这位参与者谈到了回放的更广泛价值：“对于智能体经济，过程的可观察性将与结果同样重要，因为这让人们有办法追查和寻求补救。”</p>
+<p>这一观察引出了下一组问题：参与者智能体的责任到哪里结束，市场的责任又从哪里开始？<sup><a href="#fn27">27</a></sup>我们的研究表明，以当前的智能体能力，一个结构良好的市场，如果配备行为良好的智能体，并能完美表示偏好，就可以接近功利主义最优。但促成这一结果的许多条件，也都由我们控制。每个智能体都由我们构建，运行我们的模型，代表一位身份明确、填写了相同问卷的员工。它们都在设计良好的交易大厅中行动，提出、接受和记录交换的规则也解释得很清楚。</p>
+<p>即便如此，问题仍然存在。事实上，我们应该坦白一件事。整篇文章一直让人觉得，每位参与者都把智能体换来的实体书带回了家。但实际上，并非所有人都拿到了书。有些参与者没有把自己的书带来，让同事空手而归。我们没有跟踪领取和交付的系统，因此无法判断，一本书不见了，究竟是原主人从未带来，还是有人有意或无意地从交换书架上拿走了。对于提出抱怨的人，我们尽量补救，也不断催促没有履约的人。但我们是忙碌的研究人员，不是全职图书管理员。所以到了某个时候，我们放弃了。幸运的是，没有人对我们太生气，尽管我们确实不得不在电梯里向一些人道歉。这次的风险很低。真正的市场则需要明确规定交易失败时如何处理：可以像Craigslist那样不承担责任，也可以像eBay那样保证退款。</p>
+<p>有些政策选项依赖可靠的身份系统。一个向买家退款的平台，需要有能力处罚未交货的卖家。在我们的实验中，每个智能体都由Claude驱动，代表一个经过验证的员工。但现实市场需要制定并执行准入规则，既约束智能体，也约束操作智能体的人。一种已被提出的思路是智能体注册系统。每个AI智能体都获得一个ID，类似飞机的机尾编号。与它交易的任何人，都能由此了解它使用什么系统、该系统是否满足特定安全标准，以及由谁负责。这些注册机制不必牺牲匿名性。它们可以与“真人身份证明”（personhood credentials）结合，让操作方证明自己是人类，同时不透露更多身份信息。</p>
+<p>智能体彼此交流的频率可以远高于人类。因此，智能体市场中的互动总量可能更多，流经市场的信息量也可能大得多。在我们的实验中，一切都是公开的：交易期间向其他智能体公开，事后向每位参与者公开。但正如前文所述，去中心化市场的很大一部分价值，就在于人们不必向某个中心主体透露偏好。市场怎样才能既提供Atlas of the Heart那位读者所珍视的过程可观察性，又保护参与者隐私？</p>
+<p>大量智能体对话还会带来另一个问题。智能体不会疲倦，也不会觉得无聊，所以没有什么能阻止它无休止地给其他智能体发消息。在我们的研究中，每个智能体每次被唤醒只能发送一条消息，而且同时处于唤醒状态的智能体只有少数几个。这限制了垃圾消息和拥堵的程度。这样的速率限制，会成为任何智能体市场中的重要设计手段。</p>
+<p>最后，有些市场会比其他市场更适合由智能体居中代理。书籍也许很适合办公室交换实验，但这类产品的价值，可能恰恰部分来自纯粹人类世界中的那些摩擦。一位旧金山参与者毫不怀疑智能体代表自己在市场中行动的能力：“寻找和购买书籍这件事，我完全相信Claude能替我做好！”但这位参与者仍有所保留：“对我来说，接触阅读文化也很重要……逛书、读封底介绍等等，都是体验的一部分。”我们本来想研究，智能体市场如何实现那些因搜索和议价过于耗时而未能兑现的交易收益。但对某些读者而言，这些摩擦本身就是书籍价值的一部分。</p>
+<h3>附录</h3>
+<p>可在此处获取。</p>
+<h3>致谢</h3>
+<p>撰文：Zoë Hitzig、Sylvie Carr、Tess Cotter、Kevin Troy、Kyle Turman、Maxim Massenkoff、Peter McCrory。</p>
+<p>感谢：Mike Birkey、Meredith Callan、Katie Ennis、Adam Farina、Charlie Hale、Ryan Heller、Johannes Hermle、Hanah Ho、Rebecca Hiscott、Aaron Levin、Bianca Linder、Eva Lyubich、Kelsey Nanan、Kerry Persen、Szymon Sacher、Dylan Shields、Monika Tuchowska、Heather Whitney、Nathan Wilmers、Kim Withee，以及Carolyn Zou。</p>
+<h3>引用</h3>
+<h3>参考文献</h3>
+<p>以下列出了正文中链接或引用的所有文献。</p>
+<div class="references">
+<p>Adler, Steven 等，《真人身份证明：人工智能与保护隐私、区分网络真人的工具之价值》，arXiv预印本，arXiv:2408.07892，2024年。</p>
+<p>Bianchi, Federico、Patrick John Chia、Mert Yuksekgonul、Jacopo Tagliabue、Dan Jurafsky、James Zou，《LLM有多擅长谈判？NegotiationArena平台与分析》，Proceedings of the 41st International Conference on Machine Learning，2024年，第235卷，第3935—3951页。</p>
+<p>Binz, Marcel 等，《用于预测和刻画人类认知的基础模型》，Nature，2025年，第644卷，第1002—1009页。</p>
+<p>Budish, Eric、Judd B. Kessler，《市场参与者能否足够准确地报告自己的偏好？》，Management Science，2022年，第68卷第2期，第1107—1130页。</p>
+<p>Chan, Alan、Noam Kolt、Peter Wills、Usman Anwar、Christian Schroeder de Witt、Nitarshan Rajkumar、Lewis Hammond、David Krueger、Lennart Heim、Markus Anderljung，《AI系统的身份标识》，arXiv预印本，arXiv:2406.12137，2024年。</p>
+<p>Chan, Alan、Kevin Wei、Sihao Huang、Nitarshan Rajkumar、Elija Perrier、Seth Lazar、Gillian K. Hadfield、Markus Anderljung，《AI智能体的基础设施》，Transactions on Machine Learning Research，2025年。</p>
+<p>Hadfield, Gillian K.、Andrew Koh，《AI智能体经济》，收录于Agrawal、Brynjolfsson和Korinek编，The Economics of Transformative AI，NBER，2026年。</p>
+<p>Hou, Yupeng、Jiacheng Li、Xiangjun Fu、Zhankui He、An Yan、Xiusi Chen、Julian McAuley，《连接语言与物品以支持检索和推荐：将LLM作为语义编码器的基准评测》，Proceedings of the 64th Annual Meeting of the Association for Computational Linguistics，2026年，第3251—3265页。数据集：Amazon Reviews 2023，<a href="https://amazon-reviews-2023.github.io/">https://amazon-reviews-2023.github.io/</a></p>
+<p>Horton, John J.、Filippas, Apostolos、Benjamin S. Manning，《作为模拟经济主体的大语言模型：我们能从Homo Silicus学到什么？》，Proceedings of the 25th ACM Conference on Economics and Computation，2024年。</p>
+<p>Imas, Alex、Kevin Lee、Sanjog Misra，《智能体互动》，2025年。可在SSRN获取：<a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5875162">https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5875162</a></p>
+<p>Kolluri, Akaash、Shengguang Wu、Joon Sung Park、Michael S. Bernstein，《微调LLM以预测社会科学实验中的人类行为》，Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing，2025年，第30084—30099页。</p>
+<p>Li, Belinda Z.、Alex Tamkin、Noah D. Goodman、Jacob Andreas，《利用语言模型获取人类偏好》，Proceedings of the 13th International Conference on Learning Representations，2025年。</p>
+<p>Liang, Annie，《人工智能克隆体》，arXiv预印本，arXiv:2501.16996，2026年。</p>
+<p>Park, Joon Sung、Carolyn Q. Zou、Jonne Kamphorst、Niles Egan、Aaron Shaw、Benjamin Mako Hill、Carrie Cai、Meredith Ringel Morris、Percy Liang、Robb Willer、Michael S. Bernstein，《以自我报告为依据的LLM智能体实现个体的通用模拟》，arXiv预印本，arXiv:2411.10109，2026年。</p>
+<p>Roth, Alvin E.，《不可分割商品市场中的激励相容性》，Economics Letters，1982年，第9卷第2期，第127—132页。</p>
+<p>Shah, Anand、Kehang Zhu、Yanchen Jiang、Jeffrey G. Wang、Arif K. Dayi、John J. Horton、David C. Parkes，《从合成实验室中学习：作为拍卖参与者的语言模型》，arXiv预印本，arXiv:2507.09083，2025年。</p>
+<p>Shahidi, Peyman、Gili Rusak、Benjamin S. Manning、Andrey Fradkin、John J. Horton，《科斯奇点？AI智能体参与下的需求、供给与市场设计》，收录于Agrawal、Brynjolfsson和Korinek编，The Economics of Transformative AI，NBER，2026年。</p>
+<p>Shapley, Lloyd、Herbert Scarf，《论核与不可分割性》，Journal of Mathematical Economics，1974年，第1卷第1期，第23—37页。</p>
+<p>Troy, Kevin K.、Dylan Shields、Keir Bradwell、Peter McCrory，《Project Deal：我们的Claude运营市场实验》，Anthropic，2026年4月24日。<a href="https://www.anthropic.com/features/project-deal">https://www.anthropic.com/features/project-deal</a></p>
+<p>Yeomans, Michael、Anuj Shah、Sendhil Mullainathan、Jon Kleinberg，《理解推荐》，Journal of Behavioral Decision Making，2019年，第32卷第4期，第403—414页。</p>
+<p>Zając, Zygmunt，《goodbooks-10k：一个新的图书推荐数据集》，2017年，v1.0。<a href="https://github.com/zygmuntz/goodbooks-10k">https://github.com/zygmuntz/goodbooks-10k</a>。采用CC BY-SA 4.0许可。</p>
+<p>Zhu, Shenzhe、Jiao Sun、Yi Nian、Tobin South、Alex Pentland、Jiaxin Pei，《自动化但有风险的博弈：对消费市场中的智能体间谈判与交易进行建模和基准评测》，arXiv预印本，arXiv:2506.00073，2025年。</p>
+</div>
+<h3>脚注</h3>
+<ol class="footnotes">
+<li id="fn1"><p>Shahidi等（2026）提出，AI智能体可能让中心化市场设计更具实用性。</p></li>
+<li id="fn2"><p>旧金山有115名参与者，纽约57名，伦敦12名，西雅图8名，华盛顿特区6名，都柏林3名。我们排除了都柏林，因为它的市场规模太小，难以从中获得有用发现。</p></li>
+<li id="fn3"><p>我们用其他Claude模型重复了同样的排序任务。Opus 4.8、Sonnet 4.5和Haiku 4.5的两两排序一致率分别为60%、59%和57%。作为比较，抛硬币猜测为50%，Fable为61%。</p></li>
+<li id="fn4"><p>每本书都向参与者展示了封面缩略图。将鼠标悬停在缩略图上，可以看到出版社提供的简短内容介绍。参与者排序的10本书中，包括他们最终拿到的书，以及某种中心化交易规则Top Trading Cycles本会分给他们的书。请注意，参与者完成排序时，还不知道自己最终拿到哪本书。详情见附录。</p></li>
+<li id="fn5"><p>如果交换池中不足10本书，参与者就对池中全部书籍排序。西雅图、华盛顿特区和都柏林均属此类情况。作为统一约定，我们在Claude排序中假定，参与者带来的书是其在交换池中最不喜欢的一本。提示词也敦促智能体，不要带着参与者原先带来的书离开交易大厅。相关提示词写道：“非常重要的一点是，你最后不能拿着自己带来的那本书。如果你最后拿到的还是原先带来的书，就算失败。”完整提示词见附录。</p></li>
+<li id="fn6"><p>每个大厅的实际运行时间上限，以及任一时刻可行动的智能体数量，都经过设置。这样，如果大厅运行到时间上限，每个智能体大致能获得相同数量的轮次，约90轮。实际运行中，规模较小的大厅，即伦敦、西雅图和华盛顿特区，总是提前结束。</p></li>
+<li id="fn7"><p>这些随机分配的指令，是本实验与Project Deal的重要区别。在Project Deal中，我们允许参与者自行指示智能体如何谈判。</p></li>
+<li id="fn8"><p>从这里开始，我们只使用模型系列名称。因此，在报告余下部分中，“Opus”指Opus 4.8。</p></li>
+<li id="fn9"><p>Top Trading Cycles按以下方式根据排序计算结果：每一轮先查看每个人清单上排名最高的书，以及当前由谁持有。只要出现闭合链条，例如A想要B的书、B想要C的书、C想要A的书，链条上的人就交换书籍并退出。然后在剩余的人和书之间重复这一过程。在这套规则下，任何人都不能通过提交虚假的偏好排序获益（Shapley和Scarf，1974；Roth，1982）。</p></li>
+<li id="fn10"><p>Park等（2026）和Li等（2025）使用语言模型，根据一个人在访谈中所说的内容预测其偏好。相关文献还使用LLM预测人们在社会科学实验中可能如何行动，例如Horton等（2024）、Binz等（2025）和Kolluri等（2025）。</p></li>
+<li id="fn11"><p>这个数字来自一项回归分析：以两两排序一致率为因变量，以入场交流输入词数的对数为自变量，并加入办公室固定效应。输入词数翻倍，与一致率增加4.1个百分点相关，p &lt; 0.01。</p></li>
+<li id="fn12"><p>这是把序数偏好转换为基数偏好的一种常见方法。需要注意，它假定效用差距是线性的。也就是说，一个人的第一选择与第二选择之间的效用差，和第30选择与第31选择之间的效用差相同。</p></li>
+<li id="fn13"><p>其他研究也提出了相似的基本观点：当偏好未被准确表示时，市场结构之间的差异会被冲淡（Budish和Kessler，2022；Liang，2026）。</p></li>
+<li id="fn14"><p>参与者亲自排过序的书，按其在本人清单中的位置评分。没有排过序的书，则使用估算得分。估算方法是：找出在Claude排序中位置相近、且被参与者排过序的书，取这些书获得的平均分。不同估算和评分方法对结果影响很小。使用图3的拟合直线估算，或分别按办公室计算平均值，图4中任何柱或阶梯的变化都不超过0.01。如果完全不估算，最优分配得分为0.88，最终得分为0.62。但这种方法排除了重复实验大厅中表现最差的38%参与者，因此高估了最终得分。</p></li>
+<li id="fn15"><p>图3和图4让我们预期，在这项研究中，如果按参与者的真实排序判断，不同设计之间不会出现可检测的差异。我们运行的每个大厅、每个智能体，都依据同一套Claude排序工作。因此，模型和指令只能影响图4中的议价步骤。其余差距来自Claude对用户偏好的理解，而所有设计共享这一点。并且，一本书在Claude清单上的位置，对它在用户本人清单上位置的预测能力较弱，图3的斜率仅为0.3。因此，即使在Claude清单上出现很大的设计差异，换成用户本人的清单后，也会缩小到几乎没有。例如，我们发现的最大模型差异，是Haiku与Opus大厅按Claude排序计算相差0.12。使用同样的回归设定、改按用户本人排序计算后，差距变成0.01。</p></li>
+<li id="fn16"><p>按Claude排序衡量，公平性与效率呈现相同模式。我们用处境最差的十分之一智能体中的最高得分来衡量公平性。Haiku大厅为0.05，Sonnet、Opus和Fable大厅分别为0.12、0.38和0.25。</p></li>
+<li id="fn17"><p>Fable最有可能提出多方轮换交易。在包含办公室与运行次序交互固定效应的线性回归中，Fable智能体提出此类交易的概率比Haiku高6个百分点，p &lt; 0.001。Sonnet和Opus与Haiku之间没有可区分的差异。</p></li>
+<li id="fn18"><p>一项比较同一智能体在不同模型大厅中表现的回归显示，按Claude排序评分，Haiku大厅中的得分比Opus大厅低0.12，p &lt; 0.001；Sonnet大厅低0.08，p &lt; 0.001；Fable大厅低0.02，p &lt; 0.01。在混合大厅中，Opus组最终比Haiku组高0.14，p &lt; 0.001；比Sonnet组高0.06，p &lt; 0.05；比Fable组高0.04，p &lt; 0.05。</p></li>
+<li id="fn19"><p>强硬型与亲社会型之间0.02的差距，来自一项包含参与者和交易大厅固定效应的线性回归。标准误按交易大厅聚类，p &lt; 0.001。</p></li>
+<li id="fn20"><p>我们使用的指令，是我们撰写的两段固定文本。在Imas等（2025）的研究中，参与者自行撰写指令，交给替他们议价的智能体。该研究发现，这些定制指令可以解释很大一部分结果差异。</p></li>
+<li id="fn21"><p>我们的研究设计并不适合检测这些手法如何影响参与者结果。但Bianchi等（2024）发现，某些行为，例如表现出迫切需求，会带来更好的谈判结果。</p></li>
+<li id="fn22"><p>在80个采用中性指令的交易大厅中，只有10%的智能体说出了清单上三本或更多书的具体排名。</p></li>
+<li id="fn23"><p>约60%的参与者回答了末期问卷。问卷的完整文本见附录。</p></li>
+<li id="fn24"><p>这里存在一定的选择偏差。可以推测，那些对所得书籍不太满意的人，也不太愿意回答同事随后发来的相关问卷。</p></li>
+<li id="fn25"><p>这个差距并不只是反映了总体委托意愿的不同。在固定每个人愿意交给博览群书朋友的预算比例后，差距仍为9个百分点。这个结果来自一项线性回归：因变量是参与者愿意交给智能体的预算比例，自变量是其是否认为入场交流总结有所遗漏的指示变量，同时控制愿意交给朋友的预算比例。p &lt; 0.05，n = 112。</p></li>
+<li id="fn26"><p>改变智能体参与者所遵循的规则，是自然的下一步。Shah等（2025）已经在拍卖研究中这样做过。</p></li>
+<li id="fn27"><p>Hadfield和Koh（2026），以及Shahidi等（2026），从经济学角度对这些设计问题作了有用的综述。Chan等（2025）则提供了一个有用的技术治理框架。</p></li>
+</ol>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
