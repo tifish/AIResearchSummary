@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>是的，Claude 能算到九圈</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f7f5ef;
+  --card: #ffffff;
+  --ink: #202d38;
+  --muted: #616b75;
+  --line: #d8ddd9;
+  --data: #155bb1;
+  --risk: #aa4927;
+  --opportunity: #177463;
+  --conclusion: #7445a2;
+  --hl: #deedff;
+  --hl2: #eee2fa;
+  --soft-green: #e7f3ee;
+  --soft-risk: #faeee5;
+  --hero: #172c40;
+  --hero-ink: #f0f4f6;
+  --hero-muted: #bfcedb;
+  --hero-accent: #93c9ff;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f7f5ef;
+  --card: #ffffff;
+  --ink: #202d38;
+  --muted: #616b75;
+  --line: #d8ddd9;
+  --data: #155bb1;
+  --risk: #aa4927;
+  --opportunity: #177463;
+  --conclusion: #7445a2;
+  --hl: #deedff;
+  --hl2: #eee2fa;
+  --soft-green: #e7f3ee;
+  --soft-risk: #faeee5;
+  --hero: #172c40;
+  --hero-ink: #f0f4f6;
+  --hero-muted: #bfcedb;
+  --hero-accent: #93c9ff;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #11181e;
+    --card: #1a242d;
+    --ink: #dae2e8;
+    --muted: #a5b1bc;
+    --line: #35424c;
+    --data: #8cbbff;
+    --risk: #f0a080;
+    --opportunity: #75cfb4;
+    --conclusion: #c4a1ed;
+    --hl: #203954;
+    --hl2: #382b49;
+    --soft-green: #1b342e;
+    --soft-risk: #392b25;
+    --hero: #0c2335;
+    --hero-ink: #e1e9ef;
+    --hero-muted: #a8bdcd;
+    --hero-accent: #93c9ff;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #11181e;
+  --card: #1a242d;
+  --ink: #dae2e8;
+  --muted: #a5b1bc;
+  --line: #35424c;
+  --data: #8cbbff;
+  --risk: #f0a080;
+  --opportunity: #75cfb4;
+  --conclusion: #c4a1ed;
+  --hl: #203954;
+  --hl2: #382b49;
+  --soft-green: #1b342e;
+  --soft-risk: #392b25;
+  --hero: #0c2335;
+  --hero-ink: #e1e9ef;
+  --hero-muted: #a8bdcd;
+  --hero-accent: #93c9ff;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; line-height: 1.85; }
+main { max-width: 1120px; margin: auto; padding: 36px 24px 72px; }
+h1, h2, h3 { line-height: 1.35; }
+h1 { margin: 12px 0; font-size: clamp(2.1rem, 5vw, 3.7rem); letter-spacing: -.035em; }
+h2 { font-size: 1.7rem; margin: 0 0 22px; }
+h3 { font-size: 1.18rem; margin: 0 0 12px; }
+p { margin: 0 0 18px; }
+a { color: var(--data); text-underline-offset: 4px; }
+.hero { padding: clamp(26px, 5vw, 56px); border-radius: 22px; background: var(--hero); color: var(--hero-ink); }
+.eyebrow { font-size: .8rem; letter-spacing: .13em; color: var(--hero-accent); }
+.original-title { font-size: 1.25rem; color: var(--hero-muted); margin-bottom: 24px; }
+.metadata { color: var(--hero-muted); font-size: .88rem; }
+.metadata a { color: var(--hero-accent); }
+.overview { border-top: 1px solid var(--hero-muted); padding-top: 24px; margin-top: 28px; font-size: 1.16rem; }
+.overview strong { color: var(--hero-accent); }
+.summary { margin-top: 32px; }
+.numbers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; padding: 24px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-bottom: 38px; }
+.metric { padding: 8px 24px; border-right: 1px solid var(--line); }
+.metric:last-child { border-right: 0; }
+.metric strong { display: block; color: var(--data); font-size: 2.35rem; line-height: 1.25; }
+.metric span { display: block; margin-top: 8px; }
+.metric small { color: var(--muted); }
+.comparison { margin: 0 0 34px; }
+.table-wrap { overflow-x: auto; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+th, td { padding: 16px 18px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+th { background: var(--hl); color: var(--data); font-weight: 700; }
+tr:last-child td { border-bottom: 0; }
+.note { color: var(--muted); font-size: .86rem; margin-top: 12px; }
+.split { display: grid; grid-template-columns: 1.1fr 1fr; gap: 22px; margin: 34px 0; }
+.opportunity { background: var(--soft-green); padding: 28px; border-radius: 16px; border-top: 4px solid var(--opportunity); }
+.opportunity h3 { color: var(--opportunity); }
+.boundary { background: var(--soft-risk); padding: 28px; border-radius: 16px; border-top: 4px solid var(--risk); }
+.boundary h3 { color: var(--risk); }
+mark { color: var(--ink); background: var(--hl); padding: 1px 4px; border-radius: 3px; }
+mark.purple { background: var(--hl2); }
+.insight { padding: 22px 28px; margin: 30px 0; border-left: 5px solid var(--conclusion); background: var(--card); font-size: 1.1rem; }
+.insight strong { color: var(--conclusion); }
+.takeaways { margin: 34px 0 48px; }
+.takeaways ol { list-style: none; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; counter-reset: takeaway; }
+.takeaways li { counter-increment: takeaway; border-top: 2px solid var(--line); padding: 16px 12px 8px 0; }
+.takeaways li::before { content: "0" counter(takeaway); color: var(--conclusion); font-size: 1.6rem; font-weight: 750; display: block; margin-bottom: 8px; }
+#translation { max-width: 800px; margin: 0 auto; padding-top: 40px; border-top: 3px solid var(--conclusion); font-size: 1.05rem; }
+#translation h2 { font-size: 2rem; margin-bottom: 24px; }
+#translation h3 { font-size: 1.5rem; margin: 42px 0 22px; }
+#translation .intro, #translation .byline { color: var(--muted); }
+#translation blockquote { margin: 24px 0; padding: 18px 24px; border-left: 4px solid var(--data); background: var(--hl); }
+#translation blockquote p:last-child { margin-bottom: 0; }
+#translation li { margin-bottom: 12px; }
+.source-figure { margin: 30px 0 34px; }
+.source-figure img { display: block; width: 100%; height: auto; }
+.source-figure figcaption { color: var(--muted); font-size: .88rem; margin-top: 12px; line-height: 1.65; }
+.disclosure { padding-top: 20px; border-top: 1px solid var(--line); }
+@media (max-width: 680px) {
+  main { padding: 18px 16px 44px; }
+  .numbers, .split, .takeaways ol { grid-template-columns: 1fr; }
+  .metric { border-right: 0; border-bottom: 1px solid var(--line); padding: 18px 8px; }
+  .metric:last-child { border-bottom: 0; }
+  .hero { border-radius: 14px; }
+  th, td { padding: 12px; }
+  #translation { font-size: 1rem; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/yes-claude-can-do-nine-loops" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header class="hero">
+<div class="eyebrow">SCIENCE · 研究观察</div>
+<h1>是的，Claude 能算到九圈</h1>
+<p class="original-title" lang="en">Yes, Claude can do Nine Loops</p>
+<p class="metadata">Anthropic · 2026 年 9 月 25 日 · 客座作者 Matt von Hippel<br/><a href="https://www.anthropic.com/research/yes-claude-can-do-nine-loops">查看原文</a></p>
+<p class="overview"><strong>一句话总括：</strong>Claude 把已有物理方法变成了几乎无需人工科研指导的完整计算流程。它在合理预算内得到经专家核验的九圈振幅结果，但这次成功尚未展示突破计算极限的新方法。</p>
+</header>
+<section aria-label="中文总结" class="summary">
+<div class="numbers">
+<div class="metric">
+<strong>9 圈</strong>
+<span>平面 N=4 super Yang-Mills 六粒子振幅</span>
+<small>此前的相关振幅结果达到八圈。</small>
+</div>
+<div class="metric">
+<strong>$1,000—2,000</strong>
+<span>每条计算路径的终端用户成本</span>
+<small>主要开销来自长时间运行 Claude。</small>
+</div>
+<div class="metric">
+<strong>96 CPU × 1 周</strong>
+<span>bootstrap 计算对应的资源用量</span>
+<small>这部分计算约花费 100 美元。</small>
+</div>
+</div>
+<div class="comparison">
+<h2>九圈是前沿进展，但对象仍是玩具模型</h2>
+<p>散射振幅用于预测粒子的反应概率。圈数越高，通常越接近真实答案，计算也越困难。这里的突破发生在 <mark>N=4 super Yang-Mills 玩具模型</mark>中。它能帮助研究者检验新方法，但并不直接描述现实世界。</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th scope="col">原文比较的计算范围</th><th scope="col">圈数</th><th scope="col">如何理解</th></tr>
+</thead>
+<tbody>
+<tr><td>实际研究中的大多数散射振幅公式</td><td>2 圈</td><td>计算难度使多数结果停留在较低圈数。</td></tr>
+<tr><td>少数散射振幅公式</td><td>3 圈</td><td>更高精度需要更复杂的计算。</td></tr>
+<tr><td>作者提到的极高精度粒子物理预测</td><td>5 圈</td><td>原文没有在这里具体展开该预测。</td></tr>
+<tr><td>Dixon 等人的相关玩具模型振幅结果</td><td>8 圈</td><td>2023 年借助形状因子与 antipodal duality 得到。</td></tr>
+<tr><td>本次 Claude 的相关玩具模型振幅结果</td><td>9 圈</td><td>使用直接 bootstrap 和间接形状因子两条路径。</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note">单位：圈。各行涉及不同计算对象，圈数不能直接作为跨理论难度或现实预测精度的统一排名。</p>
+<p>这项成果推进了一个专业方向的前沿。它对现实实验预测能带来多大帮助，仍需要后续研究。</p>
+</div>
+<div class="split">
+<article class="opportunity">
+<h3>真正突出的能力，是把脆弱流程完整跑通</h3>
+<p>Anthropic 的两位物理学家使用 Fable 5.1 和 Claude Science。给出任务后，他们主要只是让系统继续工作。Claude 采用 Python 与 SymPy 完成 bootstrap 计算。</p>
+<p>Dixon 指出，计算流程只要错一步就可能崩溃。许多实现细节也没有完整写进论文，Claude 必须从头开发代码。</p>
+<p><strong>这说明，AI 的科研价值已经包括长时间组织计算、处理细节和执行复杂方法。</strong></p>
+</article>
+<article class="boundary">
+<h3>成功没有证明 AI 突破了计算极限</h3>
+<p>Claude 使用的是已有方法，加上比研究者此前尝试过的稍多一些的算力。作者认为，Python 和更好的软件工程实践可能也提供了帮助。</p>
+<p>Song He 团队同期也得到了九圈振幅中称为 symbol 的部分。该团队用 GPT-6 辅助计算部分约束，整体框架仍由人组织。</p>
+<p><strong>这个案例更有力地揭示了被低估的可行路径，尚不能证明出现了超乎预期的新计算原理。</strong></p>
+</article>
+</div>
+<div class="comparison">
+<h2>两条路径都能负担，模型运行才是主要开销</h2>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th scope="col">成本或资源项目</th><th scope="col">原文给出的数值</th><th scope="col">范围说明</th></tr>
+</thead>
+<tbody>
+<tr><td>直接 bootstrap 路径</td><td>约 1,000—2,000 美元</td><td>终端用户完成这条路径的成本。</td></tr>
+<tr><td>间接形状因子路径</td><td>约 1,000—2,000 美元</td><td>终端用户完成这条路径的成本。</td></tr>
+<tr><td>bootstrap 计算本身</td><td>约 100 美元</td><td>属于该路径的预算组成部分。</td></tr>
+<tr><td>上述计算对应的资源</td><td>96 个 CPU 运行一周</td><td>原文提供的资源量描述。</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note">金额单位：美元。原文只给出近似成本，没有完整费用明细。</p>
+<p>作者原本期待 AI 在学术界可承受的资源范围内攻克难题。结果满足了预算要求，也表明这里的障碍可能更多来自实现与执行，而非无法获得的算力。</p>
+</div>
+<aside class="insight">
+<strong>核验能力让自主计算有了科研价值。</strong>
+<p>Dixon 和合作者已经具备检查候选解的方法。他主要把九圈振幅转回更容易核验的形状因子，再进行验证。AI 得到结果之后，解释、分析和发表仍由研究者推进。</p>
+</aside>
+<div class="takeaways">
+<h2>最值得带走的洞见</h2>
+<ol>
+<li><strong>前沿难题也可能存在被低估的可行路径。</strong>专家对计算成本与实施难度的判断，可能落后于工具和工程能力的变化。</li>
+<li><strong>可靠执行本身就是科研能力。</strong>即使没有提出新物理原理，AI 也能通过完整落实已有方法，产出领域前沿结果。</li>
+<li><strong>自主求解与独立核验应当配套。</strong>本次案例的可信度依赖专家已有的验证工具。作者也要求其他领域在尝试时先考虑如何检查结果。</li>
+<li><strong>一个成功案例有明确的外推边界。</strong>它没有回答现实粒子计算能否同样推进，也没有解决超级智能能把计算极限推到哪里的争论。</li>
+</ol>
+</div>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<figure class="source-figure" data-source-image="0"><img alt="Illustration of nine-loops" decoding="async" height="470" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/7f876c9b9f0c82fcc79cdd11067e162d20efd62c-1920x470.jpg" width="1920"/></figure>
+<p class="intro">在这篇客座文章中，物理学家兼科学作家 Matt von Hippel 讲述了这样一段经历：他向 AI 公司发起了一项挑战。问题来自他过去研究的理论物理分支。随后发生的事，出乎他的意料。</p>
+<p>发起一项挑战，一个月后就看到它被攻克，这种事并不常见。但我们正处在一个不同寻常的时代。</p>
+<p>先介绍一下自己。我叫 Matt von Hippel。过去我是理论物理学家，如今是一名科学作家。这些年来，我也一直在写博客。每周，我都会在 4gravitons.com 上写一篇文章，谈物理，也谈研究物理的人。</p>
+<p>现在，写物理博客越来越意味着要写 AI。这让我有些为难，因为我绝对算不上 AI 专家。我确实稍有涉猎，知道的可能比你奶奶多一些。但大多数时候，我还是得退后一步，相信专家。令人沮丧的是，专家们的看法也不一致！我听过一些聪明、见多识广的人信心十足地说，AI 距离超级智能只差几年。而超级智能将能做到一些真正可怕的事。我也听过同样聪明、见多识广的人，抱着同样的信心说，基于大语言模型的 AI 已经快到上限了。他们认为，Claude 这样的模型连令人印象深刻的物理研究都做不了，更不用说征服世界。</p>
+<p>我一直不太愿意自己做预测。在形成看法之前，我想先看看大语言模型能否在我熟悉的事情上取得进展。这件事得是我知道很难的，因为我自己就试过做类似的工作。</p>
+<p>除此之外，我希望看到大语言模型完成一项我认为在计算上很困难的任务。大语言模型在数学方面确实已经取得了令人瞩目的进展。单是这个月发生的事，可能就改变了很多人的看法。但数学的进步来自新想法，而想法是种神秘的东西。在它被找到之前，谁也说不准找到它究竟有多难。计算给我的感觉更实在。我想让大语言模型面对这样一种挑战：研究者原则上知道怎么做，却觉得需要的计算机资源和时间远超自己能合理获得的范围。我想看看研究者是不是判断错了。一个更聪明的人工研究者，能不能使用同样的计算机，把问题解出来？</p>
+<p>于是，我发起了一项挑战：</p>
+<blockquote>
+<p>“如果 AI 公司想让像我这样的人刮目相看，或者说让我们感到害怕，那就来挑战我过去的研究领域。请证明，AI 能利用学术研究者可以获得的计算资源，解决散射振幅领域尚未攻克的重大问题之一。请证明，大家原本以为会构成障碍的计算极限，其实并不碍事。把 N=8 supergravity 算到七圈，或者把 N=4 super Yang-Mills 算到九圈，给我们看看。”</p>
+</blockquote>
+<p>简单说，AI 能解决我过去所在的理论粒子物理分支中的前沿问题吗？而且，能在有限预算内完成吗？</p>
+<h3>挑战是什么</h3>
+<p>我过去研究的领域，是理论粒子物理的一个分支，叫作散射振幅研究（amplitudeology）。其他粒子物理学家预测新粒子时，会确保自己能够完成检验这些预测所需的计算。他们计算的公式叫作散射振幅。借助这些公式，物理学家可以根据亚原子粒子的动量和能量，算出粒子以特定方式发生反应的概率。如果这些反应的理论预测更准确，物理学家就能检查 Large Hadron Collider 等实验的结果是否符合预测。如果不符合，就可能为新理论提供证据。这样的理论或许能解释物理学中一些长期未解的重大谜团，比如暗物质的本质，或宇宙中物质与反物质的平衡。</p>
+<p>这些散射振幅公式非常难算。困难之大，使物理学家几乎总是采用近似方法。他们只做一部分计算，并在特定的“圈”数处截断。圈数衡量的是计算允许粒子相互作用复杂到什么程度。计算中包含的“圈”越多，结果就越接近真实答案。但从计算的角度看，任务也越难。</p>
+<p>实际研究中，大多数散射振幅公式只算到了两圈。少数算到了三圈。你可能听说过的那项粒子物理中最精确的预测，用到了五圈。散射振幅研究者希望做得更好。他们开发探索性的新技术，再用特殊的“玩具模型”理论来测试。与现实世界中更难处理的粒子相比，玩具模型里的计算更容易。先在玩具模型上尝试，研究者就能对新方法进行压力测试，看看它们能走多远。</p>
+<p>我针对两种这样的玩具模型提出了挑战。Anthropic 的研究人员选择了其中一个：把名为 N=4 super Yang-Mills 的玩具模型理论算到九圈。</p>
+<p>“Yang-Mills”是一类理论的专业名称。这类理论解释了我们周围世界的大部分现象。自然界四种基本力中的三种，都可以用 Yang-Mills 理论描述。它们分别是电磁力、把原子核维系在一起的强核力，以及让香蕉等物体发生放射性衰变的弱核力。</p>
+<p>“N=4 super”来自超对称。物理学家曾猜想，每种粒子都有一个“超对称伙伴”。伙伴粒子的电荷相同，但类型不同。比如，电子这样的物质粒子，会与光子这样的传力粒子配对。物理学家一度乐观地认为，熟悉粒子那些尚未被发现的伙伴，或许能解释暗物质。这些猜想采用的是“N=1”超对称。而在“N=4”中，每种粒子都有四个超对称伙伴，不止一个。</p>
+<p>这么多额外粒子的存在，让这套理论变得非常不现实。N=4 super Yang-Mills 不用于解释暗物质，也不用于解释现实世界中的任何事物。散射振幅研究者使用它，是为了磨炼计算技术。原因颇有些反直觉：N=4 反而更容易计算。不同粒子之间存在微妙的平衡，因此只需要考虑某些特定的变量组合。这让计算变得更简洁。</p>
+<p>我在博士期间参与了一项三圈振幅计算，并凭这项工作获得博士学位。后来，在我逐渐失去干劲之前，我见证了这个方向推进到七圈。SLAC National Accelerator Laboratory 的教授 Lance Dixon 从一开始就参与了这方面的研究。几年前，他成功算到了八圈。</p>
+<p>这些计算使用了一种探索性的技术，叫作自举法（bootstrap）。后来发现，它出奇地适合交给 AI 使用。用 bootstrap 求振幅，不需要逐一考虑所有可能的粒子相互作用。你只需要大致知道答案应该长什么样，再用一套专门的符号字母表，把各种可能性记录在计算机文件中。接着，你开始检查所有已知条件。这包括其他计算方法给出的预测、答案必须遵守的规则，以及与那些更容易求解的相关问题之间的联系。这有点像数独。你一开始在格子里填上所有可能的数字，再逐步划掉不合适的选项。最终，你希望只剩下一种可能性能通过全部检查。同时，还要留有足够多的检查条件，确认自己没有犯错。</p>
+<p>这意味着，如果有人把下一个九圈振幅公式交给 Lance，他已经具备了很好的核验条件。这个答案会很有研究价值。它不仅能验证 bootstrap 技术，还会成为一个少见的、具有如此高圈数复杂度的振幅。这个结果本身就可能值得深入研究。</p>
+<p>但他还没有算出来，领域里的其他人也没有。他求得八圈答案时，走的路线已经有些间接。关键在于它与另一个相关公式之间存在令人意外的联系。那个公式叫作形状因子（form factor），是一种涉及不同粒子的部分振幅，算起来稍微容易一些。Lance 原本预计，下一圈还得通过更间接的路线求解，可能要采用另一类 AI 方法。如果大家认为只需用常规 bootstrap 方法再多算一圈就能成功，那早就有人做了。</p>
+<h3>然后，真的有人做到了</h3>
+<p>看来，Anthropic 还真有人读我的博客。</p>
+<p>8 月底，Anthropic 的两位物理学家 Liam Fitzpatrick 和 Siddharth Mishra-Sharma 联系了我。他们说，已经攻克了我在文章中提出的一项挑战。请 Lance 核验结果之后，他们向我介绍了具体做法。</p>
+<p>他们遵守了挑战的本意，没有动用价值数百万美元的计算资源。他们使用的是运行在 Claude Science 中的 Fable 5.1。Claude Science 是一个科学家可以付费使用的平台。业内把这样的系统称为“harness”。它是一种程序，通过结构化的规则和提示词来使用 Claude 大语言模型，让模型的表现更稳健，也更有科研价值。</p>
+<p>据说，他们先问 Claude 最有可能解决哪个问题，然后给了它一个简单的提示：</p>
+<blockquote>
+<p>“任务是计算平面 N=4 SYM 理论中九圈的六粒子（六边形）振幅。”</p>
+</blockquote>
+<p>接下来，他们只是不断让它继续做，比如这样说：</p>
+<blockquote>
+<p>“我要去睡觉了，接下来几个小时都不会在线。在我告诉你停止之前，请一直研究这个问题。每隔 4—6 小时向我汇报一次进展。”</p>
+</blockquote>
+<p>Claude 最后用两种不同的方法完成了计算：一种是原始的 bootstrap 方法，另一种是间接的形状因子方法。对终端用户来说，任意一种方法的成本都在一两千美元左右。大部分费用来自长时间运行 Claude。bootstrap 计算使用 Python 编程语言和 SymPy 软件包。这部分计算约占 100 美元预算，对应的资源量是 <mark>96 个 CPU 运行一周</mark>。</p>
+<p>十年前，我做这类工作时，使用 96 个 CPU 跑一周可能会显得很多。但现在，只要有充分理由，这个成本是相当容易负担的。</p>
+<p>事实证明，人类距离这个结果也没那么远。我收到 Anthropic 消息的几天后，我们又收到了 Song He 的消息。他是在北京的 Chinese Academy of Sciences 从事散射振幅研究的学者。Song 的团队已经得到了这个结果的大部分内容。他们也使用了一些基于 GPT-6 的 AI 辅助。不过，他们采用的不是 Anthropic 那种一次启动、几乎无人介入的方式。</p>
+<p>各方一直都很友好，这让我松了一口气。Lance、Song 和他们的合作者这些人类研究者，将负责发表结果。他们会花时间解释和分析这些结果，让未来的研究者从中受益。Claude 的工作暂时告一段落了。</p>
+<h3>那么，问题解决了吗？</h3>
+<p>我提出这项挑战，是想更清楚地了解当前 AI 能做什么，以及它接下来可能走向哪里。那么，我学到了什么？</p>
+<p>我原本以为，这可能是一次见证 AI 以意外方式跨越计算障碍的机会。结果，它完成的事情，后来发现人类也能完成。Claude 使用了已有方法，只是投入的算力比人们此前尝试过的稍多一些。使用 Python 可能给它带来了优势。Lance 最喜欢的数学软件是 Maple，我最喜欢的是 Mathematica，而它没有用这些。它采用的软件工程实践，也可能比我们会采用的好得多。但这些都还谈不上超级智能。</p>
+<p>我最大的收获是：<mark class="purple">容易摘到的果实，比你想象的更多。</mark>即便目标简单而明确，专家有时也会觉得它比实际情况难实现得多。多年来，一些有计算机科学背景的人一直告诉我，散射振幅研究者只要雇几名程序员，就能多取得不少进展。现在，他们应该觉得自己的判断得到了印证。</p>
+<p>另一个值得注意的地方是，Claude Science 一次启动就完成了这件事。它得到的科研指导，并不比“继续做”更复杂。这类计算细节繁多，也很容易出问题。如果是我用 96 个 CPU 跑一周来完成这样的计算，最后几乎肯定会花上两周。因为第一次尝试时，我几乎必然会搞砸某个地方。我不知道 Claude 在内部过程中犯了多少错误。但这个 harness 最终把任务推进到了终点，不需要外部合作者提供意见。到了现在，我也说不准这是否还让我感到惊讶。但如果你一直觉得 AI 错误太多，根本没法用，因此不知道它已经能做到这一步，那么你应该记住：它现在已经能可靠地完成这类事情了。</p>
+<p>事情确实似乎发展得很快。今年 3 月，AI 做物理项目时还像个学生。它只能处理规模较小的任务，需要大量手把手指导，也会犯很多错。而这次是一项真正的前沿计算，通常由散射振幅领域的顶尖专家来做。当然，也可能只是这道题特别适合 AI。但我认为原因不止于此。我觉得这项技术确实进步了。</p>
+<p>这个结论能推广到多大范围？我还不确定。</p>
+<p>研究这些玩具模型理论的，往往是规模较小的子领域群体。现实世界的散射振幅计算则是一个更大的领域。很多团队都在争相推进前沿。那里或许没有这么多容易摘到的果实。但我也不会认定如此。我认识的一些相关研究者，正在越来越多地使用 AI 写代码。如果还没有人在检查 AI 科研 harness 能否一次启动就完成那里的前沿计算，那就应该去试试。而且，他们应该先制定核验结果的方案。如果能在合理预算内再多算一圈，我不会太惊讶。</p>
+<p>接下来，整个研究群体就需要讨论：新的前沿在哪里？下一步还有什么需要弄清楚？与数学中的许多问题不同，散射振幅不只是新方法的练兵场。这个领域有明确目标：让预测足够精确，可以与即将开展的实验进行比较。如今，我们离这个目标又近了多少？</p>
+<p>不过，再往更广的层面看，我其实没有得到答案。</p>
+<p>我参与这件事，不只是好奇 AI 今天能在研究中做些什么，也好奇未来会怎样。如果你读过大语言模型出现之前那些关于超级智能的预测，就会发现其中常常提到一些听起来很离奇的风险。人们曾设想，AI 可以模拟人类，预测他们的反应并操纵他们。也有人设想，AI 能从第一性原理出发，弄清如何制造让人类灭绝的病毒，或吞噬世界的纳米技术。而对这些风险，一种常见的反驳是：这些设想混淆了智能与计算能力。智能是新想法的来源，却模糊而神秘。批评者认为，即使建起一大批新数据中心，算力也不足以完成那些任务。那些只是科幻未来里的噩梦，短期内根本不会到来。</p>
+<p>我不觉得自己现在能更好地回应这些批评者。我确实对 AI 当下的能力多了解了一点。它能够在合理预算内，完成对我过去的研究领域有意义的工作，而且几乎可以自主完成。但我原本希望看到更不同寻常的东西：计算方法本身出现创新，并展现出意想不到的威力。我希望借此窥见未来，在超级智能的争论中形成一个有依据的看法。我想知道，AI 究竟能把计算极限推多远……可这次经历似乎只让我明白，我原先对极限在哪里的认识太天真了。</p>
+<h3>附记：被机器抢先一步，是什么感觉？</h3>
+<p class="byline">作者：Lance Dixon，SLAC National Accelerator Laboratory 和 Stanford University 的粒子物理与天体物理学教授。他核验了 Claude 的九圈结果。</p>
+<p>我认识的大多数理论物理学家都明白，如今这个大语言模型时代，将彻底改变我们思考物理的方式。问题只是：什么时候，这种变化才会真正落到自己身上？对我来说，那一天是 9 月 1 日。Anthropic 的 Liam Fitzpatrick 和 Siddharth Mishra-Sharma 告诉我，Claude 已经算出了平面 N=4 super Yang-Mills 理论中的九圈 MHV 六粒子振幅。他们请我验证这个结果。</p>
+<p>我不打算解释上一句话中的所有专业术语。Matt 已经在前面介绍了背景。但有一点必须说明：这里实际上有两个相关的对象，一个是“振幅”，另一个是我们所说的“形状因子”。它们都对应一定的圈数：一圈、两圈、三圈，依此类推。即使已经找到许多简化计算的技巧，每增加一圈，计算依然会更难。此外，在同一圈数下，形状因子比振幅更容易计算。2023 年，Andy Liu 和我展示了一种方法：利用形状因子，以及一种我们称作对跖对偶（antipodal duality）的奇特对称性，求出八圈振幅。</p>
+<p>从 2023 年起，我和合作者就一直考虑沿用当年的思路，先把形状因子算到九圈，再得到九圈振幅。我原本以为，直接计算振幅会太难。所以，Claude 能直接算出来，确实让我非常惊讶。这主要不是因为计算任务有多庞大，而是因为整套流程非常脆弱。只要计算步骤有任何错误，一切就会像烤失败的舒芙蕾那样塌下来。你只能困惑地追查原因，然后调试。而且，构建过程中的许多细节过于琐碎，论文里不会全部记录。因此，Claude 必须从头开发所有这些代码。</p>
+<p>有了九圈振幅，反过来求形状因子就相对容易。对我来说，主要通过这种方式核验结果也更省事。这意味着，过去两周，我一直在验证一个九圈形状因子结果。我们的团队已经朝这个目标努力了几年。与此同时，一台机器解决了一个我原本认为太难、无法直接求解的问题。这会让我个人感到不舒服吗？会让我深受打击吗？</p>
+<p>不会，原因有两个。第一，我们的团队早就启动了一项计划，尝试用定制的 transformer 模型预测更高圈数。我们的口号中有一句是：“我们具备验证机器给出的任何候选解所需的全部工具。”Claude 是另一种 transformer 模型，规模可能比我们定制的模型大一百万倍以上。但既然我们说过，能够核验 AI 模型给出的任何结果，那我们当然做得到，也应该去做。第二，看看 Claude 是如何解决问题的，就会发现，它使用的全是我和合作者多年来开发的方法。它还采用了我们已经建立的格式来呈现解答，也许是在照顾我们。所以，当我验证 Claude 的结果时，Claude 也在验证我们此前所有的工作。事实上，我敢说，除了我的合著者，Claude 对我们 2019 年和 2023 年论文的理解，比任何人都深。</p>
+<p>我写完上面这些内容之后，Song He 告诉我，他的团队也已经算出了九圈振幅中称为 symbol 的那部分。不知道为什么，大家似乎都喜欢把自己算到九圈的成功消息告诉我。Song 的团队使用 AI，也就是 GPT-6，辅助计算了一些约束条件。但整体框架没有交给 AI。于是，两周之内，我先后被一台机器，以及人类加机器的组合抢先了。</p>
+<p>回到 Claude 的计算。在我看来，一个大语言模型能执行我们列出的复杂流程中的全部步骤，还能组织所需的计算资源，这已经是一次了不起的成功。不过，更让人不得不深思的时刻，将是大语言模型开始先于人类提出新的物理原理和见解的时候。</p>
+<h3>补充材料</h3>
+<ul>
+<li>完整的九圈结果，采用与此前各圈结果相同的格式；</li>
+<li>Song He、Jirong Jing 和 Xiang Li 同期得到的九圈结果。</li>
+</ul>
+<div class="disclosure">
+<h3>利益披露</h3>
+<p>Anthropic 邀请 Matt von Hippel 撰写本文，并为他投入的时间支付了报酬。Anthropic 员工对草稿提供了反馈。文章内容及观点均属于作者本人。Lance Dixon 独立验证了结果，并获得了 Claude 使用额度。</p>
+</div>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
