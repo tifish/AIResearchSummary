@@ -131,7 +131,7 @@ def process_batch(work, args, state, site, force_digest=False) -> int:
             futures = _drain_completed(futures, wait_for_next=True)
 
     render(site, state)
-    print(f"Done. {done}/{submitted} generated (jobs={jobs}). Open site/index.html.")
+    print(f"Done. {done}/{total} generated (jobs={jobs}). Open site/index.html.")
     return done
 
 
@@ -209,8 +209,8 @@ def main() -> int:
             render(site, state)
             print("All articles already have a digest page.")
             return 0
-        process_batch(work, args, state, site, force_digest=True)
-        return 0
+        done = process_batch(work, args, state, site, force_digest=True)
+        return 0 if done == len(work) else 1
 
     if args.regenerate_all:
         records = load_articles(state)
@@ -224,8 +224,8 @@ def main() -> int:
             render(site, state)
             print("No articles to regenerate.")
             return 0
-        process_batch(work, args, state, site, force_digest=True)
-        return 0
+        done = process_batch(work, args, state, site, force_digest=True)
+        return 0 if done == len(work) else 1
 
     print("Discovering new AI research articles...")
     articles, source_errors = discover(sources, DEFAULT_SINCE, state)
@@ -254,7 +254,12 @@ def main() -> int:
     if new_articles:
         done += process_batch(new_articles, args, state, site, force_digest=False)
 
-    if done == 0:
+    expected = len(missing_digests) + len(new_articles)
+    if done != expected:
+        print(f"Refresh incomplete: {done}/{expected} article(s) generated.", file=sys.stderr)
+        return 1
+
+    if expected == 0:
         render(site, state)
         print("No new articles. Rendered site/index.html.")
         return 0

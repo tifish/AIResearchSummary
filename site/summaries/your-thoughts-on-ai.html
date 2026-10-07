@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>你希望从 AI 得到什么？ · What do you want from AI?</title>
+<style>
+:root {
+  --bg:#f7f6f2; --card:#ffffff; --ink:#1d1d1f; --muted:#6b6b70; --line:#e2dfd6;
+  --accent:#2563eb; --accent2:#dc2626; --accent3:#059669; --accent4:#7c3aed; --accent5:#d97706;
+  --hl:#fde68a; --hl2:#bfdbfe; --hl-ink:#1d1d1f;
+  --hero-bg:#fbf3e6; --soft-blue:#eaf1ff; --soft-red:#fdecec; --soft-green:#e7f6ef; --soft-purple:#f1ebff; --soft-amber:#fdf3e1;
+  --band-bg:#1e1b2e; --band-ink:#f3f1fa; --band-muted:#b8b3cc; --table-head:#f0ede4;
+}
+:root[data-theme="light"] {
+  --bg:#f7f6f2; --card:#ffffff; --ink:#1d1d1f; --muted:#6b6b70; --line:#e2dfd6;
+  --accent:#2563eb; --accent2:#dc2626; --accent3:#059669; --accent4:#7c3aed; --accent5:#d97706;
+  --hl:#fde68a; --hl2:#bfdbfe; --hl-ink:#1d1d1f;
+  --hero-bg:#fbf3e6; --soft-blue:#eaf1ff; --soft-red:#fdecec; --soft-green:#e7f6ef; --soft-purple:#f1ebff; --soft-amber:#fdf3e1;
+  --band-bg:#1e1b2e; --band-ink:#f3f1fa; --band-muted:#b8b3cc; --table-head:#f0ede4;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#121214; --card:#1b1b1f; --ink:#e8e6e1; --muted:#9a9aa2; --line:#2e2e35;
+    --accent:#60a5fa; --accent2:#f87171; --accent3:#34d399; --accent4:#a78bfa; --accent5:#fbbf24;
+    --hl:#5c4a12; --hl2:#1e3a5f; --hl-ink:#f5f1e6;
+    --hero-bg:#1c1a16; --soft-blue:#16202f; --soft-red:#2a1717; --soft-green:#132520; --soft-purple:#1f1a2e; --soft-amber:#29200f;
+    --band-bg:#0b0a10; --band-ink:#ece9f5; --band-muted:#a39db8; --table-head:#222228;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:#121214; --card:#1b1b1f; --ink:#e8e6e1; --muted:#9a9aa2; --line:#2e2e35;
+  --accent:#60a5fa; --accent2:#f87171; --accent3:#34d399; --accent4:#a78bfa; --accent5:#fbbf24;
+  --hl:#5c4a12; --hl2:#1e3a5f; --hl-ink:#f5f1e6;
+  --hero-bg:#1c1a16; --soft-blue:#16202f; --soft-red:#2a1717; --soft-green:#132520; --soft-purple:#1f1a2e; --soft-amber:#29200f;
+  --band-bg:#0b0a10; --band-ink:#ece9f5; --band-muted:#a39db8; --table-head:#222228;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font-family:-apple-system,"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif; line-height:1.75; font-size:16px; }
+.wrap { max-width:960px; margin:0 auto; padding:2rem 1.25rem 4rem; }
+a { color:var(--accent); }
+.hl { background:var(--hl); color:var(--hl-ink); padding:0 .2em; border-radius:3px; font-weight:600; }
+.hl2 { background:var(--hl2); color:var(--hl-ink); padding:0 .2em; border-radius:3px; font-weight:600; }
+.c-data { color:var(--accent); font-weight:700; }
+.c-risk { color:var(--accent2); font-weight:700; }
+.c-opp { color:var(--accent3); font-weight:700; }
+.c-key { color:var(--accent4); font-weight:700; }
+
+/* hero */
+.hero { background:var(--hero-bg); border:1px solid var(--line); border-radius:18px; padding:2.4rem 2rem; margin-bottom:1.6rem; }
+.hero .tag { display:inline-block; font-size:.8rem; letter-spacing:.08em; color:var(--accent5); border:1px solid var(--accent5); border-radius:999px; padding:.1rem .7rem; }
+.hero h1 { font-size:2.3rem; line-height:1.25; margin:.8rem 0 .2rem; }
+.hero .en { color:var(--muted); font-size:1.05rem; font-style:italic; margin:0 0 1rem; }
+.hero .meta { color:var(--muted); font-size:.88rem; }
+.oneline { margin-top:1.4rem; border-left:5px solid var(--accent4); padding:.6rem 1rem; background:var(--card); border-radius:0 10px 10px 0; font-size:1.08rem; }
+.oneline b { color:var(--accent4); }
+
+/* number band */
+.band { display:grid; grid-template-columns:repeat(4,1fr); gap:0; border-top:3px solid var(--accent); border-bottom:1px solid var(--line); margin:2rem 0; }
+.band div { padding:1rem .8rem; border-right:1px dashed var(--line); }
+.band div:last-child { border-right:none; }
+.band .num { font-size:1.8rem; font-weight:800; color:var(--accent); line-height:1.2; }
+.band .lbl { font-size:.85rem; color:var(--muted); }
+
+h2.sec { font-size:1.35rem; margin:2.4rem 0 .8rem; display:flex; align-items:center; gap:.6rem; }
+h2.sec .badge { display:inline-flex; width:1.8rem; height:1.8rem; border-radius:50%; align-items:center; justify-content:center; font-size:.9rem; color:var(--card); background:var(--accent); }
+h2.sec.risk .badge { background:var(--accent2); }
+h2.sec.opp .badge { background:var(--accent3); }
+h2.sec.key .badge { background:var(--accent4); }
+h2.sec.amb .badge { background:var(--accent5); }
+.insight { margin-top:.8rem; padding:.5rem .9rem; background:var(--soft-purple); border-left:4px solid var(--accent4); border-radius:0 8px 8px 0; font-size:.96rem; }
+
+/* split */
+.split { display:grid; grid-template-columns:1.1fr 1fr; gap:1.4rem; }
+.split .qs { background:var(--soft-blue); border-radius:14px; padding:1.2rem 1.4rem; }
+.split .qs ol { margin:.4rem 0 0; padding-left:1.3rem; }
+.split .qs li { margin:.5rem 0; }
+.split .why p { margin:.4rem 0; }
+
+/* table */
+table.cmp { width:100%; border-collapse:collapse; background:var(--card); border:1px solid var(--line); border-radius:10px; overflow:hidden; font-size:.95rem; }
+table.cmp th, table.cmp td { padding:.65rem .8rem; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
+table.cmp thead th { background:var(--table-head); font-size:.88rem; color:var(--muted); }
+table.cmp td.new { color:var(--accent3); font-weight:600; }
+.note { font-size:.82rem; color:var(--muted); margin-top:.4rem; }
+
+/* flow */
+.flow { display:grid; grid-template-columns:repeat(4,1fr); gap:.8rem; counter-reset:step; }
+.flow .step { position:relative; padding:1rem .9rem .9rem; border-top:4px solid var(--accent5); background:var(--soft-amber); border-radius:0 0 10px 10px; }
+.flow .step::before { counter-increment:step; content:counter(step); position:absolute; top:-1rem; left:.8rem; width:1.7rem; height:1.7rem; border-radius:50%; background:var(--accent5); color:var(--card); font-weight:800; display:flex; align-items:center; justify-content:center; font-size:.85rem; }
+.flow .step h4 { margin:.3rem 0 .3rem; font-size:1rem; }
+.flow .step p { margin:0; font-size:.9rem; }
+
+/* pros/cons */
+.duel { display:grid; grid-template-columns:1fr 1fr; gap:0; border:1px solid var(--line); border-radius:14px; overflow:hidden; }
+.duel > div { padding:1.2rem 1.4rem; }
+.duel .pro { background:var(--soft-green); border-right:1px solid var(--line); }
+.duel .con { background:var(--soft-red); }
+.duel h3 { margin:0 0 .5rem; font-size:1.1rem; }
+.duel .pro h3 { color:var(--accent3); }
+.duel .con h3 { color:var(--accent2); }
+.duel ul { margin:0; padding-left:1.2rem; }
+.duel li { margin:.4rem 0; }
+
+/* dark band */
+.dark { background:var(--band-bg); color:var(--band-ink); border-radius:16px; padding:1.6rem 1.8rem; margin-top:2.4rem; }
+.dark h2 { margin:0 0 .6rem; font-size:1.3rem; color:var(--band-ink); }
+.dark ul { margin:0; padding-left:1.2rem; }
+.dark li { margin:.45rem 0; }
+.dark .quiet { color:var(--band-muted); font-size:.92rem; margin-top:.8rem; }
+.dark .warn { color:var(--accent2); font-weight:700; }
+.dark .ok { color:var(--accent3); font-weight:700; }
+
+/* mosaic */
+.mosaic { display:grid; grid-template-columns:repeat(6,1fr); gap:.9rem; }
+.mosaic .t { border-radius:12px; padding:1rem 1.1rem; border:1px solid var(--line); background:var(--card); }
+.mosaic .t .n { font-size:1.6rem; font-weight:800; line-height:1; }
+.mosaic .t1 { grid-column:span 3; border-top:4px solid var(--accent); }
+.mosaic .t1 .n { color:var(--accent); }
+.mosaic .t2 { grid-column:span 3; border-top:4px solid var(--accent2); }
+.mosaic .t2 .n { color:var(--accent2); }
+.mosaic .t3 { grid-column:span 2; border-top:4px solid var(--accent3); }
+.mosaic .t3 .n { color:var(--accent3); }
+.mosaic .t4 { grid-column:span 2; border-top:4px solid var(--accent4); }
+.mosaic .t4 .n { color:var(--accent4); }
+.mosaic .t5 { grid-column:span 2; border-top:4px solid var(--accent5); }
+.mosaic .t5 .n { color:var(--accent5); }
+
+/* translation */
+#translation { margin-top:3.5rem; padding-top:1.5rem; border-top:2px solid var(--line); }
+#translation h2 { font-size:1.6rem; margin:0 0 1rem; }
+#translation .body { max-width:720px; margin:0 auto; font-size:1.02rem; line-height:1.9; }
+#translation h3 { font-size:1.3rem; margin:2.2rem 0 .8rem; color:var(--accent4); }
+#translation h4 { font-size:1.07rem; margin:1.8rem 0 .4rem; color:var(--ink); border-left:3px solid var(--accent); padding-left:.6rem; }
+#translation p { margin:.7rem 0; }
+#translation ul { padding-left:1.4rem; }
+#translation li { margin:.4rem 0; }
+.source-figure { margin:2rem auto; }
+.source-figure img { display:block; max-width:100%; height:auto; border-radius:10px; }
+.source-figure figcaption { margin-top:.6rem; font-size:.88rem; color:var(--muted); text-align:center; }
+
+@media (max-width:760px) {
+  .band { grid-template-columns:repeat(2,1fr); }
+  .band div:nth-child(2) { border-right:none; }
+  .split, .duel { grid-template-columns:1fr; }
+  .duel .pro { border-right:none; border-bottom:1px solid var(--line); }
+  .flow { grid-template-columns:1fr 1fr; row-gap:1.6rem; }
+  .mosaic .t { grid-column:span 6; }
+  .hero h1 { font-size:1.8rem; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/your-thoughts-on-ai" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<div class="wrap">
+<header class="hero">
+<span class="tag">Anthropic · Societal Impacts · 2026-09-29</span>
+<h1>你希望从 AI 得到什么？</h1>
+<p class="en">What do you want from AI?</p>
+<div class="meta">来源：<a href="https://www.anthropic.com/research/your-thoughts-on-ai">anthropic.com/research/your-thoughts-on-ai</a></div>
+<div class="oneline"><b>一句话总括：</b>Anthropic 再次用 AI 访谈员大规模收集用户对 AI 的经历与期待。这一次的真正新意在于：参与者可以<span class="hl">选择公开完整的原始访谈</span>，让任何人都能研究和核查。Anthropic 也坦白承认，这种开放带来了<span class="c-risk">无法完全消除的再识别风险</span>。</div>
+</header>
+<div class="band">
+<div><div class="num">81,000</div><div class="lbl">上一轮（2025 年 12 月）参与人数</div></div>
+<div><div class="num">9/29–10/6</div><div class="lbl">本轮开放时间（2026 年）</div></div>
+<div><div class="num">≈15 分钟</div><div class="lbl">单次访谈时长</div></div>
+<div><div class="num">≥2 周</div><div class="lbl">参与账户的最短注册时长</div></div>
+</div>
+<h2 class="sec"><span class="badge">1</span>三个问题，指向同一件事：谁来决定 AI 的走向</h2>
+<div class="split">
+<div class="qs">
+<strong class="c-data">本轮访谈的核心问题</strong>
+<ol>
+<li>你与 AI 相关的最有意义的经历是什么？<span class="c-opp">正面</span>和<span class="c-risk">负面</span>都算。</li>
+<li>工作、学校、医疗、政府等领域，有没有你希望 AI 帮助改变的地方？</li>
+<li>你希望开发 AI 的公司（包括 Anthropic）做些什么？</li>
+</ol>
+</div>
+<div class="why">
+<p>Anthropic 认为 AI 正处在关键时刻。能力越强，它就<span class="c-opp">越有用</span>，也<span class="c-risk">越危险</span>。</p>
+<p>前沿 AI 正在加速科学和医学发现。与此同时，<span class="hl">一次安全事件造成的破坏可能远超一年前</span>。</p>
+<p>文章的立场很明确：如何权衡收益与风险，<span class="c-key">不应只由 AI 公司决定</span>。</p>
+</div>
+</div>
+<div class="insight">洞见：问题从“你怎么看 AI”扩展到“你想让 AI 改变什么”和“你对公司有什么要求”，受访者被当作 AI 治理的利益相关方，而不只是产品用户。</div>
+<h2 class="sec opp"><span class="badge">2</span>和上一轮相比：最大的变化是“可公开”</h2>
+<table class="cmp">
+<thead>
+<tr><th>维度</th><th>2025 年 12 月研究</th><th>2026 年 9 月研究（本轮）</th></tr>
+</thead>
+<tbody>
+<tr><td>参与规模</td><td><span class="c-data">81,000 人</span></td><td>原文未给出（进行中）</td></tr>
+<tr><td>问题设置</td><td>对 AI 的期待与担忧</td><td class="new">已更新问题</td></tr>
+<tr><td>覆盖产品</td><td>原文未详述</td><td class="new">更多 Claude 产品：Claude 与 Claude Code</td></tr>
+<tr><td>公开程度</td><td>只公开高层结果和少量引语</td><td class="new">参与者首次可选择公开完整访谈</td></tr>
+<tr><td>后续影响</td><td>塑造 Anthropic Institute 议程；在世界经济论坛展示；指导社会影响与经济学研究</td><td>结果将用于社会影响研究和模型、产品开发</td></tr>
+</tbody>
+</table>
+<p class="note">注：表中内容均来自原文。本轮参与规模在原文中未提及，标为“未给出”。</p>
+<div class="insight">洞见：上一轮数据只能“听 Anthropic 转述”。这一轮的原始访谈可以被第三方独立分析，研究结论第一次变得<span class="hl2">可核查</span>。</div>
+<h2 class="sec amb"><span class="badge">3</span>公开决定被设计成四道关口</h2>
+<div class="flow">
+<div class="step"><h4>访谈前</h4><p>说明公开意味着什么：不附账户信息，但<span class="c-risk">可能被认出</span>；任何人都能阅读、保存和使用。</p></div>
+<div class="step"><h4>访谈中</h4><p>展示不应分享的敏感信息示例。</p></div>
+<div class="step"><h4>访谈后</h4><p>可以重读完整访谈，并再次看到收益与风险提醒。</p></div>
+<div class="step"><h4>最终确认</h4><p>选择公开后，系统<span class="hl">最后再确认一次</span>。</p></div>
+</div>
+<div class="insight">洞见：Anthropic 没有编辑或脱敏访谈，而是把保护责任前置给参与者本人，靠多次提醒和确认来降低误操作。</div>
+<h2 class="sec risk"><span class="badge">4</span>公开的收益与风险，原文都讲得很直白</h2>
+<div class="duel">
+<div class="pro">
+<h3>收益</h3>
+<ul>
+<li>观点不只被 Anthropic 听到，而是被<span class="c-opp">所有研究和改进 AI 的人</span>听到。</li>
+<li>各国研究者可以用自己的语言阅读，比较不同地区的回答，提出 Anthropic 没想到的问题。</li>
+<li>任何人都能<span class="hl">核查已发布结论是否忠实反映参与者原话</span>。</li>
+<li>成为这一时刻的公共记录。如果很多人要求公司改变做法，这些原话会一直公开，<span class="c-opp">AI 公司很难忽视</span>。</li>
+</ul>
+</div>
+<div class="con">
+<h3>风险</h3>
+<ul>
+<li>雇主、亲友、政府和其他公司都能读到。</li>
+<li>年龄、职业、城市、学校等看似无害的细节，<span class="c-risk">组合起来可能暴露身份</span>。</li>
+<li>有人可以借助 AI 拼凑细节。研究者已证明这种方法<span class="hl">对 Anthropic Interviewer 的访谈有效</span>。</li>
+<li>可能被诈骗者等滥用。Anthropic 可删除自己的副本，但删不掉别人已保存的内容，<span class="c-risk">应视为永久决定</span>。</li>
+</ul>
+</div>
+</div>
+<div class="insight">洞见：Anthropic 主动承认“已有研究证明可以再识别”，而不是只写“我们会保护你的隐私”。这是少见的风险披露方式。</div>
+<h2 class="sec"><span class="badge">5</span>数据去向：三种选择，三种结果</h2>
+<table class="cmp">
+<thead>
+<tr><th>你的选择</th><th>是否分析</th><th>是否公开完整访谈</th><th>其他说明</th></tr>
+</thead>
+<tbody>
+<tr><td>完成并公开</td><td>是</td><td class="new">是（含关联国家，不含姓名、邮箱等账户信息）</td><td>不编辑；研究结束后可能移除含机密信息或违反政策的访谈</td></tr>
+<tr><td>完成但不公开</td><td>是</td><td>否</td><td>可能发布汇总或去标识化结论</td></tr>
+<tr><td>中途点击“End interview”</td><td><span class="c-risk">否</span></td><td><span class="c-risk">否</span></td><td>部分访谈被永久删除，包括 Anthropic 在内都不会分析或发布</td></tr>
+</tbody>
+</table>
+<p class="note">注：来源为原文 FAQ。访谈将在研究和初步分析完成后在线发布。</p>
+<section class="dark">
+<h2>研究的局限，Anthropic 自己列出了三条</h2>
+<ul>
+<li><span class="warn">样本偏差：</span>参与者都是 Claude 用户，不能代表普通公众。</li>
+<li><span class="warn">二次筛选：</span>公开的访谈只是子集。愿意公开的人可能和不愿意公开的人不同。</li>
+<li><span class="warn">问题引导：</span>和任何访谈一样，提问方式会影响人们分享的内容。</li>
+</ul>
+<p class="quiet">即便如此，Anthropic 认为此前从未有过类似的公开资料，这<span class="ok">可能大幅推进</span>对“AI 如何改变人们生活”的研究。</p>
+</section>
+<h2 class="sec key"><span class="badge">★</span>最值得带走的洞见</h2>
+<div class="mosaic">
+<div class="t t1"><div class="n">01</div><p>从“公司转述”到“原文公开”：外部研究者第一次可以直接读到大规模用户对 AI 的原始表达，并核查公司的结论。</p></div>
+<div class="t t2"><div class="n">02</div><p>匿名≠不可识别：不附账户信息也挡不住 AI 拼凑细节。Anthropic 明确告诉用户，公开应视为永久。</p></div>
+<div class="t t3"><div class="n">03</div><p>公众意见被定位为 AI 治理输入，上一轮已进入世界经济论坛和 Anthropic Institute 议程。</p></div>
+<div class="t t4"><div class="n">04</div><p>公开记录是一种问责工具：多数人的批评一旦留存公开，公司就很难回避。</p></div>
+<div class="t t5"><div class="n">05</div><p>样本只来自 Claude 用户，且再经公开意愿筛选，解读结果时要记住这两层偏差。</p></div>
+</div>
+<section id="translation">
+<h2>完整译文</h2>
+<figure class="source-figure" data-source-image="0"><img alt="What do you want from AI?" decoding="async" height="1125" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/f11a2dcfffbb0f1e5913d794299b6857653413af-2000x1125.jpg" width="2000"/></figure>
+<div class="body">
+<p>我们正在启动一项新研究，借助 Anthropic Interviewer 了解你使用 AI 的经历，并希望你能参与。完成访谈后，你可以决定是否公开自己的访谈。公开后，任何人都可以阅读并从中学习，而不只是 Anthropic。你可以在这里参与。</p>
+<p>AI 的发展正处在一个关键时刻。它的能力越来越强，这意味着它可能更有用，也可能更危险。前沿 AI 正在快速推动科学和医学领域的发现。与此同时，滥用它的后果也越来越严重——如今一次安全事件造成的破坏，可能远超一年前。</p>
+<p>如何权衡这些收益和风险，不应只交给 AI 公司决定。你的声音可以为我们、其他 AI 实验室以及政策制定者提供指引，帮助大家一起应对这个不确定的未来。我们最想了解的问题是：</p>
+<ul>
+<li>你与 AI 相关的最有意义的经历是什么？正面和负面的都算。</li>
+<li>在世界的运转方式中（比如工作、学校、医疗或政府），有没有你希望 AI 帮助改变的地方？</li>
+<li>你希望开发 AI 的公司做些什么？</li>
+</ul>
+<p>这个项目延续了去年 12 月的一项类似研究。当时有 81,000 人向我们讲述了他们对 AI 的期待和担忧。那项研究塑造了 Anthropic Institute 的议程，曾在世界经济论坛上向各国领导人和决策者展示，并持续指导着我们正在进行的社会影响（Societal Impacts）与经济学研究。</p>
+<p>从那以后，AI 和 Anthropic 都发生了很大变化。AI 变得更强了，使用 Claude 的人更多了，人们对这项技术的感受也在改变。上一次研究只公开了高层次的结果和少量引语。这一次，我们希望你的想法能被广泛公开，让任何人都能从中学习。</p>
+<p>我们准备了一份常见问题解答（FAQ），帮助你在充分了解的前提下，决定是否公开访谈以及分享哪些内容。你可以在这里选择参与。</p>
+<h3>常见问题（FAQ）</h3>
+<h4>访谈的内容是什么？</h4>
+<p>访谈会询问你使用 AI 的经历，以及你希望从 AI 中得到什么。我们会问：哪些与 AI 相关的时刻对你最重要，无论正面还是负面；在世界的运转方式中，有没有你希望 AI 帮助改变的地方；以及你希望开发 AI 的公司（包括 Anthropic）做些什么。答案没有对错之分。我们希望听你用自己的话讲述自己的经历……另外，在你参加之前，我们也不想透露太多！</p>
+<h4>我必须公开分享我的访谈吗？</h4>
+<p>不必。这是可选的。</p>
+<h4>如果我公开访谈，会发布哪些内容？</h4>
+<p>我们会发布你的完整访谈，以及与这次对话关联的国家。我们不会包含你的 Claude 账户信息，例如姓名或电子邮件地址。</p>
+<h4>公开分享访谈有什么好处？</h4>
+<p>你的观点不仅会被我们听到，也会被所有有兴趣研究和改进 AI 的人听到。我们希望任何人都能研究 AI 如何影响人们，以及 AI 的发展应当如何推进。</p>
+<p>世界各地的研究者和政策制定者可以用自己的语言阅读访谈，阅读来自不同地区的回答，还可以提出我们没想到的问题。他们中许多人拥有我们团队所不具备的专业知识，可能会发现我们没想到去寻找的洞见。任何人都可以核查我们发布的结论是否真实反映了参与者的说法。</p>
+<p>你的访谈也会成为 AI 发展这一时刻公共记录的一部分，向未来的历史学家、记者和研究者开放，并可能影响社会如何回应这个时刻。AI 公司以及其他塑造 AI 发展的人也很难忽视这份记录。如果许多参与者都认为 Anthropic 这样的公司应该换一种做法，这些原话会一直公开，任何人都可以引用。</p>
+<h4>公开分享访谈有什么风险？</h4>
+<p>虽然我们不会发布你的 Claude 账户信息（例如姓名或电子邮件地址），但我们希望参与者考虑到：任何人都可以阅读公开的访谈。这包括雇主、朋友和亲属，也包括政府和其他公司。根据参与者分享的内容，其他人可能会把访谈和参与者本人联系起来。一些单独看来无害的细节，例如年龄、职业、所在城市或求学经历，都可能让别人更容易认出你。我们在访谈中不会询问这些细节，也建议参与者避免分享。</p>
+<p>访谈一旦公开，就可能被以参与者不希望的方式使用，包括被诈骗者和其他可能滥用个人信息的人利用。应你的要求，我们可以删除我们保存的副本，但无法删除别人已经保存的内容。因此，请把公开访谈的决定视为永久性的。</p>
+<h4>别人能从我公开的访谈中认出我吗？</h4>
+<p>我们不会附上你的姓名或账户信息。但我们不会编辑访谈，所以无法保证你不会因为自己说过的话而被重新识别。有人可能借助 AI 把一些零散的小细节拼凑起来，例如雇主或以往参与的项目，从而推断出参与者是谁。已有研究者证明，这种方法对 Anthropic Interviewer 的访谈确实有效。</p>
+<p>最好的保护方式，是不要分享可能识别你或他人身份的信息。在访谈过程中，我们会展示一些不应分享的信息示例。在决定是否公开之前，你也可以回顾完整的访谈内容。</p>
+<h4>我该如何决定是否公开分享访谈？</h4>
+<p>访谈开始前，我们会解释公开访谈意味着什么。我们会告诉参与者：公开版本不会包含他们的 Claude 账户信息，但别人可能从他们分享的内容中认出他们。我们也会说明，公开访谈意味着任何人都可以阅读、保存和使用它。应要求，我们可以删除我们的副本，但无法删除别人已经保存的内容。</p>
+<p>访谈过程中，你会看到一些我们建议不要分享的敏感信息示例。访谈结束后，你可以先重读自己说过的话，再决定是否公开。系统会再次提醒你公开的好处和风险。如果你选择公开，我们还会最后确认一次你的决定。</p>
+<h4>如果我不公开访谈，会怎样？</h4>
+<p>我们仍会把它作为社会影响研究的一部分进行分析，但不会发布你的完整访谈。我们仍可能发布和分享基于你的访谈得出的汇总或去标识化结论。如果你连分析也不希望，可以提前结束访谈（详见下文“我可以提前结束访谈并删除记录吗？”）。</p>
+<h4>如果我公开了访谈，还能改变主意吗？</h4>
+<p>无法完全撤回。访谈一旦公开，任何人都可以阅读、保存和使用它。应要求，我们可以删除我们的副本，但无法删除别人已经保存的内容。请把这个决定视为永久性的。了解更多。</p>
+<h4>发布前你们会编辑我的访谈吗？</h4>
+<p>不会，我们不打算在发布前编辑访谈。研究结束后，我们会做最后一次审查，并可能移除我们认为不宜发布的访谈。例如包含机密信息的访谈，或违反我们使用政策（Usage Policy）或服务条款（Terms of Service）的访谈。</p>
+<h4>Anthropic 会如何使用我的访谈？</h4>
+<p>我们会把访谈作为社会影响研究的一部分进行分析，公开分享研究结论，并用这些结果指导我们开发模型和产品。了解更多。</p>
+<h4>我可以提前结束访谈并删除记录吗？</h4>
+<p>可以。你可以随时点击“End interview”（结束访谈）按钮停止。如果提前结束，你的部分访谈会被永久删除，任何人（包括 Anthropic）都不会分析或发布它。</p>
+<h4>谁可以参加访谈？需要多长时间？</h4>
+<p>本研究从 2026 年 9 月 29 日持续到 10 月 6 日，面向 Claude 和 Claude Code 上的 Free、Pro 和 Max 用户开放，要求账户注册至少满两周。每次访谈大约 15 分钟，由 Anthropic Interviewer 进行——这是一个会向你提问的 AI。</p>
+<h4>这次研究与 2025 年 12 月的研究有何不同？</h4>
+<p>我们更新了问题，研究覆盖了更多 Claude 产品。而且，你第一次可以选择公开自己的访谈。</p>
+<h4>访谈会在何时、何处发布？</h4>
+<p>在我们完成研究和初步分析后，访谈会在网上发布。</p>
+<h4>这项研究有哪些局限？</h4>
+<p>本研究的参与者都是 Claude 用户，这并不是公众的代表性样本。公开发布的访谈又是其中的一个子集，因为选择公开的人可能与不选择公开的人有所不同。而且和任何访谈一样，我们提出的问题会影响人们分享的内容。即便如此，此前从未有过类似的公开资料。我们相信，它能大幅推进对“AI 如何改变人们生活”的研究。</p>
+</div>
+</section>
+</div>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

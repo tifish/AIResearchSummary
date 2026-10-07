@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>与 Ironclad 合作推进计算机使用能力 · 中文总结与译文</title>
+<style>
+:root{
+  --bg:#f7f6f2; --card:#ffffff; --ink:#1d1f24; --muted:#5d636e; --line:#e2dfd6;
+  --accent:#2563eb; --accent2:#dc2626; --accent3:#059669; --accent4:#7c3aed; --accent5:#d97706;
+  --hl:#fde68a; --hl2:#cfe0ff;
+  --soft1:#eaf1ff; --soft2:#fdecec; --soft3:#e6f6ef; --soft4:#f1ebff; --soft5:#fff4e0;
+  --hero-bg:#fbf3e4; --band-bg:#16213a; --band-ink:#eef2ff; --band-muted:#b6c0d8;
+  --bar-track:#ece9e1; --quote-bg:#f4f0ff;
+}
+:root[data-theme="light"]{
+  --bg:#f7f6f2; --card:#ffffff; --ink:#1d1f24; --muted:#5d636e; --line:#e2dfd6;
+  --accent:#2563eb; --accent2:#dc2626; --accent3:#059669; --accent4:#7c3aed; --accent5:#d97706;
+  --hl:#fde68a; --hl2:#cfe0ff;
+  --soft1:#eaf1ff; --soft2:#fdecec; --soft3:#e6f6ef; --soft4:#f1ebff; --soft5:#fff4e0;
+  --hero-bg:#fbf3e4; --band-bg:#16213a; --band-ink:#eef2ff; --band-muted:#b6c0d8;
+  --bar-track:#ece9e1; --quote-bg:#f4f0ff;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121419; --card:#1b1e25; --ink:#e7e9ee; --muted:#9aa2b1; --line:#2c313b;
+    --accent:#6ea0ff; --accent2:#f87171; --accent3:#34d399; --accent4:#b294ff; --accent5:#fbbf24;
+    --hl:#5a4710; --hl2:#1e3a68;
+    --soft1:#17223a; --soft2:#2c1a1d; --soft3:#132a22; --soft4:#221a35; --soft5:#2c2312;
+    --hero-bg:#1d1a14; --band-bg:#0b1020; --band-ink:#e7ecf8; --band-muted:#94a0bb;
+    --bar-track:#2a2e37; --quote-bg:#1f1a2e;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121419; --card:#1b1e25; --ink:#e7e9ee; --muted:#9aa2b1; --line:#2c313b;
+  --accent:#6ea0ff; --accent2:#f87171; --accent3:#34d399; --accent4:#b294ff; --accent5:#fbbf24;
+  --hl:#5a4710; --hl2:#1e3a68;
+  --soft1:#17223a; --soft2:#2c1a1d; --soft3:#132a22; --soft4:#221a35; --soft5:#2c2312;
+  --hero-bg:#1d1a14; --band-bg:#0b1020; --band-ink:#e7ecf8; --band-muted:#94a0bb;
+  --bar-track:#2a2e37; --quote-bg:#1f1a2e;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif;line-height:1.75;font-size:16px}
+.wrap{max-width:980px;margin:0 auto;padding:28px 20px 80px}
+mark{background:var(--hl);color:var(--ink);padding:0 3px;border-radius:3px}
+mark.b{background:var(--hl2)}
+.num{font-weight:800;color:var(--accent)}
+.risk{font-weight:700;color:var(--accent2)}
+.ok{font-weight:700;color:var(--accent3)}
+.key{font-weight:700;color:var(--accent4)}
+h2.sec{font-size:22px;margin:0 0 6px}
+.kicker{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.closing{margin-top:14px;padding-top:10px;border-top:1px dashed var(--line);font-weight:600}
+
+/* hero */
+.hero{background:var(--hero-bg);border:1px solid var(--line);border-radius:18px;padding:36px 32px;margin-bottom:22px}
+.hero h1{font-size:34px;line-height:1.3;margin:6px 0 4px}
+.hero .en{color:var(--muted);font-size:16px;font-style:italic;margin:0 0 14px}
+.hero .meta{font-size:13px;color:var(--muted)}
+.hero .meta span{display:inline-block;margin-right:12px;padding:2px 10px;border:1px solid var(--line);border-radius:999px;background:var(--card)}
+.oneline{margin-top:20px;padding:16px 18px;border-left:5px solid var(--accent4);background:var(--card);border-radius:0 12px 12px 0;font-size:17px}
+.oneline b.tag{display:inline-block;color:var(--accent4);margin-right:6px}
+
+/* number strip */
+.strip{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-radius:16px;overflow:hidden;border:1px solid var(--line);margin-bottom:22px}
+.strip div{padding:18px 16px;background:var(--card);border-right:1px solid var(--line)}
+.strip div:last-child{border-right:none}
+.strip .big{font-size:30px;font-weight:800;line-height:1.1}
+.strip .c1 .big{color:var(--accent)} .strip .c2 .big{color:var(--accent3)}
+.strip .c3 .big{color:var(--accent5)} .strip .c4 .big{color:var(--accent4)}
+.strip small{display:block;color:var(--muted);font-size:13px;margin-top:6px;line-height:1.5}
+
+/* split table */
+.split{display:grid;grid-template-columns:1.2fr 1fr;gap:22px;padding:24px;background:var(--soft1);border-radius:16px;margin-bottom:22px}
+table{width:100%;border-collapse:collapse;background:var(--card);border-radius:10px;overflow:hidden;font-size:15px}
+th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left}
+th{background:var(--soft4);font-size:13px}
+td.win{color:var(--accent3);font-weight:800}
+.note{font-size:12.5px;color:var(--muted);margin-top:8px}
+.bars .row{margin:10px 0}
+.bars .lab{font-size:13px;color:var(--muted);display:flex;justify-content:space-between}
+.bar{height:12px;background:var(--bar-track);border-radius:6px;overflow:hidden}
+.fill{height:100%;border-radius:6px}
+.fill.sol{background:var(--accent5)} .fill.astra{background:var(--accent)} .fill.int{background:var(--accent4)}
+.w416{width:41.6%} .w550{width:55%} .w637{width:63.7%} .w85{width:85%} .w94{width:94%}
+.t370{width:92.5%} .t192{width:48%} .t32{width:80%} .t20{width:50%}
+
+/* flow */
+.flow{padding:24px 4px;margin-bottom:22px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:14px;position:relative}
+.step{border-top:4px solid var(--accent3);padding:12px 4px 0}
+.step .n{display:inline-block;width:26px;height:26px;border-radius:50%;background:var(--accent3);color:var(--card);text-align:center;font-weight:800;font-size:14px;line-height:26px;margin-bottom:6px}
+.step h4{margin:0 0 4px;font-size:16px}
+.step p{margin:0;font-size:14px;color:var(--muted)}
+
+/* duel */
+.duel{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:22px}
+.duel > div{padding:22px}
+.duel .a{background:var(--soft3)} .duel .s{background:var(--soft5)}
+.duel .pct{font-size:42px;font-weight:800;line-height:1}
+.duel .a .pct{color:var(--accent3)} .duel .s .pct{color:var(--accent5)}
+.duel .full{grid-column:1/3;background:var(--card);border-top:1px solid var(--line);padding:14px 22px}
+
+/* dark band */
+.band{background:var(--band-bg);color:var(--band-ink);border-radius:16px;padding:26px 28px;margin-bottom:22px}
+.band .kicker{color:var(--band-muted)}
+.band ul{margin:10px 0 0;padding-left:0;list-style:none}
+.band li{padding:10px 0 10px 16px;border-left:3px solid var(--accent2);margin-bottom:8px}
+.band li b{color:var(--accent2)}
+.band .closing{border-top-color:var(--band-muted)}
+
+/* two col */
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:22px}
+.twocol .col{padding:20px;border-left:5px solid var(--accent4);background:var(--card);border-radius:0 14px 14px 0}
+.twocol .col.g{border-left-color:var(--accent)}
+.checklist{padding-left:0;list-style:none;margin:8px 0 0}
+.checklist li{padding-left:24px;position:relative;margin:6px 0}
+.checklist li::before{content:"✓";position:absolute;left:0;color:var(--accent3);font-weight:800}
+
+/* takeaways */
+.take{margin-bottom:30px}
+.mosaic{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:12px}
+.tile{padding:16px 18px;border-radius:14px;font-size:15px}
+.tile b{display:block;font-size:17px;margin-bottom:4px}
+.t1{grid-column:span 4;background:var(--soft1)} .t1 b{color:var(--accent)}
+.t2{grid-column:span 2;background:var(--soft2)} .t2 b{color:var(--accent2)}
+.t3{grid-column:span 3;background:var(--soft3)} .t3 b{color:var(--accent3)}
+.t4{grid-column:span 3;background:var(--soft4)} .t4 b{color:var(--accent4)}
+
+/* translation */
+#translation{max-width:740px;margin:50px auto 0;padding-top:30px;border-top:3px double var(--line)}
+#translation h2{font-size:28px;margin:0 0 18px}
+#translation h3{font-size:21px;margin:38px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+#translation p{margin:0 0 14px;font-size:16.5px;line-height:1.9}
+#translation .lede{font-size:18px;color:var(--muted)}
+#translation .toc{font-size:14.5px;color:var(--muted);padding-left:20px;border-left:3px solid var(--line);margin:0 0 22px}
+#translation table{margin:14px 0 20px}
+.video-note{margin:14px 0;padding:10px 14px;background:var(--soft5);border-radius:8px;font-size:14.5px}
+.video-note .tc{font-family:ui-monospace,Consolas,monospace;color:var(--accent5);font-weight:700;margin-right:8px}
+blockquote{margin:20px 0;padding:16px 20px;background:var(--quote-bg);border-left:4px solid var(--accent4);border-radius:0 10px 10px 0;font-size:16.5px}
+.byline{font-size:14px;color:var(--muted)}
+.footnotes{font-size:14px;color:var(--muted)}
+.footnotes ol{padding-left:22px}
+sup{color:var(--accent);font-weight:700}
+.source-figure{margin:28px 0}
+.source-figure img{max-width:100%;height:auto;display:block;border-radius:10px}
+.source-figure figcaption{font-size:13.5px;color:var(--muted);margin-top:8px;padding-left:10px;border-left:2px solid var(--line)}
+
+@media (max-width:760px){
+  .strip{grid-template-columns:1fr 1fr}
+  .strip div:nth-child(2){border-right:none}
+  .split,.twocol,.duel{grid-template-columns:1fr}
+  .duel .full{grid-column:auto}
+  .steps{grid-template-columns:1fr 1fr}
+  .mosaic{grid-template-columns:1fr}
+  .t1,.t2,.t3,.t4{grid-column:auto}
+  .hero h1{font-size:27px}
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/advancing-computer-use-with-ironclad" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<div class="wrap">
+<header class="hero">
+<div class="kicker">OpenAI · Research · 2026 年 10 月 6 日</div>
+<h1>与 Ironclad 合作推进计算机使用能力</h1>
+<p class="en">Advancing computer use with Ironclad</p>
+<div class="meta"><span>来源：OpenAI</span><span>分类：Research</span><span>合同 · 智能体 · 强化学习</span></div>
+<div class="oneline"><b class="tag">一句话总括</b>OpenAI 让专业软件厂商 Ironclad 提供<mark>真实任务、细粒度评分标准和练习环境</mark>，再用强化学习训练 GPT‑6 Astra。结果是模型在合同配置任务上<mark class="b">得分更高、用时减半</mark>。这也是一种可复制的"厂商共建"训练范式。</div>
+</header>
+<section aria-label="关键数字" class="strip">
+<div class="c1"><div class="big">+32%</div><small>Astra 平均得分相对 GPT‑5.6 Sol 的提升</small></div>
+<div class="c2"><div class="big">−48%</div><small>每次尝试的预估用时降幅（模拟估算）</small></div>
+<div class="c3"><div class="big">11 个</div><small>研究任务，每个配 8–50 条评分标准</small></div>
+<div class="c4"><div class="big">63.7%</div><small>开发中的内部模型得分，高于已发布的 Astra</small></div>
+</section>
+<section class="split">
+<div>
+<div class="kicker">正面对比</div>
+<h2 class="sec">更准也更快：两项指标同时改善</h2>
+<table>
+<thead><tr><th>指标（11 个研究任务平均）</th><th>GPT‑5.6 Sol<br/>High 推理</th><th>GPT‑6 Astra<br/>Max 推理</th></tr></thead>
+<tbody>
+<tr><td>平均评分标准得分（%）</td><td>41.6%</td><td class="win">55.0%</td></tr>
+<tr><td>每次尝试的预估平均用时（分钟）</td><td>37.0</td><td class="win">19.2</td></tr>
+</tbody>
+</table>
+<p class="note">注：两个模型各用自己得分最高的推理档位。用时按假定的模型处理与生成速度模拟估算，不是实测的客户节省时间。</p>
+</div>
+<div class="bars">
+<div class="kicker">得分（%）</div>
+<div class="row"><div class="lab"><span>GPT‑5.6 Sol</span><span>41.6</span></div><div class="bar"><div class="fill sol w416"></div></div></div>
+<div class="row"><div class="lab"><span>GPT‑6 Astra</span><span>55.0</span></div><div class="bar"><div class="fill astra w550"></div></div></div>
+<div class="row"><div class="lab"><span>内部模型</span><span>63.7</span></div><div class="bar"><div class="fill int w637"></div></div></div>
+<div class="kicker">预估用时（分钟，满格 40）</div>
+<div class="row"><div class="lab"><span>GPT‑5.6 Sol</span><span>37.0</span></div><div class="bar"><div class="fill sol t370"></div></div></div>
+<div class="row"><div class="lab"><span>GPT‑6 Astra</span><span>19.2</span></div><div class="bar"><div class="fill astra t192"></div></div></div>
+<p class="closing">过去常见的取舍是"想更准就得更慢"。这里两者<span class="ok">同时变好</span>，说明定向训练改善的是工作方法本身。</p>
+</div>
+</section>
+<section class="flow">
+<div class="kicker">方法</div>
+<h2 class="sec">四步把合同工作流变成训练信号</h2>
+<p>难点不在单个点击。智能体要在多步操作中<mark>始终记住业务规则</mark>。比如超过支出门槛才走财务审批，高于和低于门槛的申请都要走对路径。</p>
+<div class="steps">
+<div class="step"><span class="n">1</span><h4>懂行的人选任务</h4><p>Ironclad 员工和 OpenAI 内部用户选出 <b>11 个</b>任务，覆盖法务、商务、采购。熟练用户每个约需 <b>30–40 分钟</b>。</p></div>
+<div class="step"><span class="n">2</span><h4>细粒度评分</h4><p>按复杂度给每个任务设 <b>8–50 条</b>标准。能看清哪部分做对、哪里出错。</p></div>
+<div class="step"><span class="n">3</span><h4>真实软件环境</h4><p>Ironclad 提供产品的托管环境，模型在里面反复练习。</p></div>
+<div class="step"><span class="n">4</span><h4>合成任务 + 强化学习</h4><p>用 SEC EDGAR 公开合同（已过滤个人信息）生成训练任务，通过练习和反馈提升。</p></div>
+</div>
+<p class="closing">真正的壁垒是<span class="key">领域知识 + 评分标准 + 环境</span>这套组合。模型厂商自己很难凭空造出来。</p>
+</section>
+<section class="duel">
+<div class="a">
+<div class="kicker">同一任务 · GPT‑6 Astra</div>
+<div class="pct">≈94%</div>
+<p>满足的任务标准比例。预估用时约 <b>20 分钟</b>。</p>
+<div class="bar"><div class="fill astra w94"></div></div>
+</div>
+<div class="s">
+<div class="kicker">同一任务 · GPT‑5.6 Sol</div>
+<div class="pct">≈85%</div>
+<p>满足的任务标准比例。预估用时约 <b>32 分钟</b>。</p>
+<div class="bar"><div class="fill sol w85"></div></div>
+</div>
+<div class="full">单任务案例里，两者差距只有约 9 个百分点。但在合同场景中，<span class="risk">漏掉的那部分规则</span>往往正是审批或合规的关键。所以剩下的少数标准仍然决定能否放心交付。</div>
+</section>
+<section class="band">
+<div class="kicker">读数之前先看边界</div>
+<h2 class="sec">这些数字说明不了什么</h2>
+<ul>
+<li><b>范围有限：</b>结果只覆盖 11 个研究任务，不代表 Ironclad 的全部工作流。</li>
+<li><b>用时是模拟的：</b>基于假定的模型处理与生成速度估算，不是实测的客户时间节省。</li>
+<li><b>绝对水平仍不高：</b>Astra 平均只满足 55.0% 的标准，最好的内部模型也只有 63.7%。</li>
+<li><b>数据来源：</b>训练与评估未使用 OpenAI 客户数据、OpenAI 内部合同或非公开的 Ironclad 客户数据。</li>
+</ul>
+<p class="closing">进步是真实的，但离"无人值守"还远。文章自己也强调：人工监督和完整的合同平台仍然必要。</p>
+</section>
+<section class="twocol">
+<div class="col">
+<div class="kicker">对 Ironclad 的意义</div>
+<h2 class="sec">把客户痛点送进底层模型</h2>
+<p>合同流程既要<mark>处理例外</mark>，又要<mark>守住规则</mark>。智能体中途丢掉一条规则，软件公司就不敢放心托付。</p>
+<p>参与模型研发后，Ironclad 能直接影响模型在这类问题上的表现。模型变强后，它也能在更多产品里使用这些能力。</p>
+<p class="closing">这是一种互利结构：厂商出问题，模型方出训练能力。</p>
+</div>
+<div class="col g">
+<div class="kicker">公开招募</div>
+<h2 class="sec">OpenAI 想找什么样的伙伴</h2>
+<ul class="checklist">
+<li>一个智能体目前<b>无法可靠完成</b>的具体任务</li>
+<li>它失败在哪里的证据</li>
+<li>如何判定成功的标准</li>
+<li>深度懂行的人员</li>
+<li>安全的测试环境</li>
+<li>可安全用于研究的数据</li>
+</ul>
+<p class="closing">这份清单本身就是"如何让模型学会你的业务"的配方。</p>
+</div>
+</section>
+<section class="take">
+<div class="kicker">最值得带走的洞见</div>
+<div class="mosaic">
+<div class="tile t1"><b>垂直软件成了新的训练场</b>前沿模型的下一步提升，越来越依赖专业软件厂商提供真实任务和环境。厂商与模型方的合作可能成为常态。</div>
+<div class="tile t2"><b>漏掉一条规则就够致命</b>平均 55% 的达标率说明，复杂专业流程仍需人工把关。</div>
+<div class="tile t3"><b>准确和速度可以同时提升</b>得分高 32%，用时少 48%。定向训练改进的是做事方式，而不只是多花算力。</div>
+<div class="tile t4"><b>评分标准是核心资产</b>每个任务 8–50 条细粒度标准，让"做到多好"可以测量，也让强化学习有了明确信号。</div>
+</div>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<p class="lede">一项合同领域的研究合作，正在帮助我们训练和评估 AI 智能体处理复杂的专业工作。</p>
+<ul class="toc">
+<li>把合同工作流变成训练任务</li>
+<li>Astra 的表现</li>
+<li>这次合作对 Ironclad 意味着什么</li>
+<li>与我们合作推进面向复杂专业工作的 AI</li>
+</ul>
+<p>在发布 GPT‑6 Astra 时，我们展示了模型在专业工作中使用计算机的进步，从准备文档到测试网站都有涉及。我们的下一个目标，是让智能体更擅长、更高效地使用专业软件，解决复杂的业务问题。我们正在探索如何训练模型：理解一家公司的业务规则，执行多步骤工作流，并核验成果是否满足最初的要求。</p>
+<p>为了加快这项研究，我们正与少数最懂这些工作流的软件公司直接合作。我们一起挑选有挑战性、高价值的任务，把它们转化为研究问题，用来训练和评估我们的模型。最终目标是让模型在真实的业务应用中更强、更有用。</p>
+<p>我们的首个合作伙伴是 AI 合同领域的领先者 Ironclad。我们与 Ironclad 团队紧密协作，开发了一批任务。这些任务要求智能体配置协议、审批流程和可复用的法律条款。我们也在这些复杂工作流上取得了进展。Ironclad 的专业知识起到了关键作用。它帮助我们界定什么才算成功，也把真实的客户需求直接带进了前沿模型的开发。感谢他们的合作，我们很高兴分享双方共同取得的成果。</p>
+<p>GPT‑6 Astra 是我们首个用 Ironclad 任务训练的前沿模型。在我们的研究评估中，它的平均得分比 GPT‑5.6 Sol 高 32%，每次尝试的预估用时则低 48%。<sup>1</sup></p>
+<h3>把合同工作流变成训练任务</h3>
+<p>设想一个法务运营团队，要为软件采购搭建一套流程。财务部门可能需要审批超过一定金额的采购。安全部门可能需要审查某些申请。法务部门可能需要审查非标准条款。负责搭建流程的人，要把这份简短的清单落地成一张申请表单、几份文档模板、一套审批规则，以及一份最终协议的记录。</p>
+<p>AI 智能体做同样的工作时，必须在软件里一步步操作，同时始终记住这些要求。比如，它要为超过支出门槛的采购配置财务审批，还要检查高于和低于门槛的申请是否各自走对了路径。单个步骤做对还不够。完成后的流程，必须在它设计要覆盖的各种情形下都能正常运转。</p>
+<p>Ironclad 的员工，以及 OpenAI 内部使用 Ironclad 的同事，帮助我们的研究人员确定了 11 个任务，涵盖法务、商务和采购工作。其中包括：设置保密协议（nondisclosure agreement）；创建采购审批流程；更新一个可复用的法律条款，让它反映申请人所选的司法辖区。我们估计，有经验的用户完成每个任务平均需要约 30 到 40 分钟。</p>
+<p>根据任务的复杂程度，我们用 8 到 50 条标准评估每个任务。这样就能看出模型哪些部分做对了，哪些地方还有欠缺。Ironclad 还提供了其产品的托管软件环境，让模型可以在里面练习这些任务。我们的研究人员围绕有代表性的工作流开发了合成训练任务<sup>2</sup>，并使用强化学习（reinforcement learning），让模型在练习和反馈中不断进步。这几样东西结合在一起：与懂行的人共同挑选的任务、细致的评估标准、供模型练习的环境。它们确保我们改进的，正是对客户最重要的真实任务。</p>
+<h3>Astra 的表现</h3>
+<p>我们比较了 Astra 和 GPT‑5.6 Sol。Astra 使用 Max 推理档位，Sol 使用 High 推理档位。这是两个模型各自得分最高的设置。在 11 个研究任务上，Astra 的平均得分为 55.0%，GPT‑5.6 Sol 为 41.6%。与此同时，每次尝试的预估平均用时从 Sol 的 37.0 分钟降到了 Astra 的 19.2 分钟。<sup>3</sup> 在 Astra 开发过程中使用的一个内部模型，在这些任务上取得了更高的 63.7%。我们希望把这些进一步的提升带到未来的模型中。</p>
+<table>
+<thead><tr><th>指标</th><th>GPT‑5.6 Sol（High 推理）</th><th>GPT‑6 Astra（Max 推理）</th></tr></thead>
+<tbody>
+<tr><td>平均评分标准得分（Mean rubric score）</td><td>41.6%</td><td>55.0%</td></tr>
+<tr><td>每次尝试的预估平均用时</td><td>37.0 分钟</td><td>19.2 分钟</td></tr>
+</tbody>
+</table>
+<p>Astra 满足了更多任务要求，每次尝试的模拟用时也更少。下面两段视频展示了两个模型如何处理同一个研究任务。Astra（第一段）在预估 20 分钟内满足了约 94% 的任务标准。GPT‑5.6 Sol（第二段）在预估 32 分钟内满足了约 85%。</p>
+<div class="video-note"><span class="tc">00:00</span>GPT‑6 Astra 在预估 20 分钟内满足了约 94% 的任务标准。</div>
+<div class="video-note"><span class="tc">00:00</span>GPT‑5.6 Sol 在预估 32 分钟内满足了约 85% 的任务标准。</div>
+<h3>这次合作对 Ironclad 意味着什么</h3>
+<p>Ironclad 在这项工作中扮演的角色，反映了其客户非常熟悉的一项挑战：合同流程既要处理各种例外，又要守住企业赖以运转的规则。如果智能体在任务进行到一半时忘了其中某条规则，软件公司能放心交给它做的事情就会受限。这也说明了两点。第一，即使智能体越来越擅长复杂的合同任务，人工监督依然重要。第二，完整的合同平台依然不可或缺。与我们的研究人员合作，让 Ironclad 能把这些问题带进底层模型的开发过程，由双方共同研究。</p>
+<p>随着模型能力提升，Ironclad 有机会在更多自家产品中使用这些模型。对法务和业务团队来说，这可能意味着 AI 能承担复杂合同工作中更多的工作量，同时保留这些团队所依赖的管控措施。</p>
+<blockquote>“要让 AI 在合同的复杂领域真正有用，它不能只会完成单个操作。智能体需要理解完整的合同生命周期，包括各项业务工作流之间如何衔接，同时保留团队所依赖的管控措施。我们与 OpenAI 的合作，把这些真实世界的挑战带进了研究过程，也推动了这项技术向前发展。”</blockquote>
+<h3>与我们合作推进面向复杂专业工作的 AI</h3>
+<p>我们正在邀请少数软件公司，与我们的研究和工程团队直接合作，攻克当今智能体仍无法可靠完成的重要专业任务。如果你的团队有这样的任务，我们希望看到一个具体的例子：你要智能体做什么，它在哪里失败的证据，以及你会如何评判结果是否成功。合作伙伴还应能提供深度了解这项工作的人员、一个安全的测试环境，以及可以安全用于研究的数据。这能为我们提供一个起点，去调查失败的原因，并衡量模型是否有所改进。</p>
+<p>如果这正是你团队的情况，欢迎申请探讨研究合作。</p>
+<p class="byline">2026 · 作者</p>
+<div class="footnotes">
+<h3>脚注</h3>
+<ol>
+<li>这些结果只涵盖 11 个研究任务，并非 Ironclad 的全部工作流。用时是基于假定的模型处理与生成速度得出的模拟估算，不是实测的客户时间节省。</li>
+<li>我们基于 SEC EDGAR 数据库中公开的合同创建了模拟任务，并事先应用了旨在去除个人信息的过滤。我们在训练和评估中没有使用 OpenAI 客户数据、OpenAI 内部合同，也没有使用非公开的 Ironclad 客户数据或合同。</li>
+<li>见上方关于研究评估的脚注。</li>
+</ol>
+</div>
+<h3>继续阅读</h3>
+<figure class="source-figure" data-source-image="0"><img alt="Atlassian partnership card — official white SVGs on Neutral 088" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/3fWFo3Rbu3ABBh0ctAldTR/1790adae24af280abbb937cd88cb4957/atlassian-card-official.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="1"><img alt="Albertsons | How Albertsons Companies is reimagining retail from the inside out | Cover" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/1NIa0MXiVT1HpZdWR3jggG/1862b5773b745c19f38fe20e6b21fb61/how-albertsons-companies-is-reimagining-retail-from-the-inside-out-cover.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="2"><img alt="DevDay 2026 Recap — cover image (1:1)" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/1C75hfnvbohzm6Fx3hd7ux/1391c894029045aa51d520e4d80f6f4b/DevDay_Blog_ArtCard_1x1.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+</section>
+</div>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>分享 AI 在数学领域的进展 · 中文总结与译文</title>
+<style>
+:root {
+  --bg: #f7f6f2;
+  --card: #ffffff;
+  --ink: #1d1f24;
+  --muted: #5d6270;
+  --line: #e2dfd6;
+  --accent: #2f5bd8;
+  --accent2: #c2410c;
+  --accent3: #0f8a6a;
+  --accent4: #8b3fd1;
+  --hl: #fff1b8;
+  --hl2: #d9ecff;
+  --hero-bg: #13213f;
+  --hero-ink: #f3f5fb;
+  --hero-muted: #b7c2df;
+  --band-bg: #eef3ff;
+  --split-bg: #f1faf6;
+  --risk-bg: #fff3ec;
+  --quote-bg: #f5effc;
+  --table-head: #e9eefb;
+  --figure-bg: #efede7;
+}
+:root[data-theme="light"] {
+  --bg: #f7f6f2;
+  --card: #ffffff;
+  --ink: #1d1f24;
+  --muted: #5d6270;
+  --line: #e2dfd6;
+  --accent: #2f5bd8;
+  --accent2: #c2410c;
+  --accent3: #0f8a6a;
+  --accent4: #8b3fd1;
+  --hl: #fff1b8;
+  --hl2: #d9ecff;
+  --hero-bg: #13213f;
+  --hero-ink: #f3f5fb;
+  --hero-muted: #b7c2df;
+  --band-bg: #eef3ff;
+  --split-bg: #f1faf6;
+  --risk-bg: #fff3ec;
+  --quote-bg: #f5effc;
+  --table-head: #e9eefb;
+  --figure-bg: #efede7;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14161b;
+    --card: #1c1f26;
+    --ink: #e4e6eb;
+    --muted: #9aa1b0;
+    --line: #2e323c;
+    --accent: #7ea2ff;
+    --accent2: #ff9a5c;
+    --accent3: #4fd1a5;
+    --accent4: #c294ff;
+    --hl: #4a3f12;
+    --hl2: #1d3552;
+    --hero-bg: #0d1426;
+    --hero-ink: #eef1f8;
+    --hero-muted: #9fadcf;
+    --band-bg: #1a2133;
+    --split-bg: #16231f;
+    --risk-bg: #2a1d16;
+    --quote-bg: #221a2e;
+    --table-head: #222a3d;
+    --figure-bg: #1a1c22;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14161b;
+  --card: #1c1f26;
+  --ink: #e4e6eb;
+  --muted: #9aa1b0;
+  --line: #2e323c;
+  --accent: #7ea2ff;
+  --accent2: #ff9a5c;
+  --accent3: #4fd1a5;
+  --accent4: #c294ff;
+  --hl: #4a3f12;
+  --hl2: #1d3552;
+  --hero-bg: #0d1426;
+  --hero-ink: #eef1f8;
+  --hero-muted: #9fadcf;
+  --band-bg: #1a2133;
+  --split-bg: #16231f;
+  --risk-bg: #2a1d16;
+  --quote-bg: #221a2e;
+  --table-head: #222a3d;
+  --figure-bg: #1a1c22;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  line-height: 1.75;
+  font-size: 16px;
+}
+.wrap { max-width: 980px; margin: 0 auto; padding: 0 20px 64px; }
+mark { background: var(--hl); color: inherit; padding: 0 3px; border-radius: 3px; }
+mark.b { background: var(--hl2); }
+strong.c1 { color: var(--accent); }
+strong.c2 { color: var(--accent2); }
+strong.c3 { color: var(--accent3); }
+strong.c4 { color: var(--accent4); }
+
+.hero {
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+  padding: 56px 32px 44px;
+  margin: 0 -20px;
+  border-bottom: 4px solid var(--accent);
+}
+.hero .meta { color: var(--hero-muted); font-size: 14px; letter-spacing: .04em; }
+.hero h1 { font-size: 38px; line-height: 1.3; margin: 12px 0 6px; }
+.hero .en { color: var(--hero-muted); font-size: 18px; font-style: italic; margin: 0 0 24px; }
+.hero .oneline {
+  border-left: 4px solid var(--accent2);
+  padding: 10px 16px;
+  font-size: 18px;
+  max-width: 760px;
+}
+.hero .oneline b { color: var(--accent2); }
+
+.band {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0;
+  background: var(--band-bg);
+  margin: 32px 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+.band .cell { padding: 20px 22px; border-right: 1px solid var(--line); }
+.band .cell:last-child { border-right: none; }
+.band .num { font-size: 34px; font-weight: 800; line-height: 1.1; }
+.band .cell:nth-child(1) .num { color: var(--accent); }
+.band .cell:nth-child(2) .num { color: var(--accent2); }
+.band .cell:nth-child(3) .num { color: var(--accent3); }
+.band .cell:nth-child(4) .num { color: var(--accent4); }
+.band .lbl { color: var(--muted); font-size: 14px; margin-top: 6px; }
+
+h2.sec { font-size: 24px; margin: 44px 0 12px; }
+h2.sec .tag {
+  display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 99px;
+  border: 1px solid currentColor; margin-right: 10px; vertical-align: middle;
+}
+.t-data { color: var(--accent); }
+.t-risk { color: var(--accent2); }
+.t-opp { color: var(--accent3); }
+.t-end { color: var(--accent4); }
+.insight { font-weight: 600; margin-top: 14px; }
+.insight::before { content: "→ "; color: var(--accent4); }
+
+table.cmp { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+table.cmp th { background: var(--table-head); text-align: left; padding: 10px 14px; font-size: 14px; }
+table.cmp td { padding: 10px 14px; border-top: 1px solid var(--line); vertical-align: top; font-size: 15px; }
+table.cmp td:first-child { font-weight: 700; white-space: nowrap; }
+.note { color: var(--muted); font-size: 13px; margin-top: 8px; }
+
+.split {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+  background: var(--split-bg); padding: 26px; border-radius: 12px;
+}
+.split h3 { margin: 0 0 8px; font-size: 18px; color: var(--accent3); }
+.split p { margin: 0 0 8px; }
+@media (max-width: 720px) { .split { grid-template-columns: 1fr; } }
+
+.flow { list-style: none; padding: 0; margin: 0; border-left: 3px solid var(--accent); }
+.flow li { position: relative; padding: 4px 0 18px 26px; }
+.flow li::before {
+  content: ""; position: absolute; left: -9px; top: 10px; width: 14px; height: 14px;
+  border-radius: 50%; background: var(--card); border: 3px solid var(--accent);
+}
+.flow li b { color: var(--accent); }
+
+.risk { background: var(--risk-bg); border-left: 5px solid var(--accent2); padding: 20px 24px; border-radius: 0 12px 12px 0; }
+.risk ul { margin: 6px 0 0; padding-left: 20px; }
+
+.quote { background: var(--quote-bg); padding: 26px 30px; border-radius: 12px; font-size: 19px; line-height: 1.6; }
+.quote b { color: var(--accent4); }
+
+.mosaic { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+.mosaic div { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 18px; border-top: 4px solid var(--accent); }
+.mosaic div:nth-child(2) { border-top-color: var(--accent2); }
+.mosaic div:nth-child(3) { border-top-color: var(--accent3); }
+.mosaic div:nth-child(4) { border-top-color: var(--accent4); }
+.mosaic .n { font-size: 13px; color: var(--muted); font-weight: 700; }
+
+#translation { margin-top: 64px; border-top: 2px solid var(--line); padding-top: 24px; }
+#translation h2 { font-size: 28px; margin-bottom: 4px; }
+#translation .tr-body { max-width: 720px; margin: 0 auto; font-size: 17px; line-height: 1.9; }
+#translation .tr-body p { margin: 0 0 1.1em; }
+#translation h3 { font-size: 19px; margin: 2em 0 .6em; color: var(--muted); }
+.source-figure { margin: 2em 0; background: var(--figure-bg); padding: 10px; border-radius: 8px; }
+.source-figure img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+.source-figure figcaption { color: var(--muted); font-size: 14px; margin-top: 8px; }
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/sharing-ai-progress-in-mathematics" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<div class="wrap">
+<header class="hero">
+<div class="meta">OpenAI · Research · 2026 年 10 月 6 日</div>
+<h1>分享 AI 在数学领域的进展</h1>
+<p class="en">Sharing AI progress in mathematics</p>
+<div class="oneline"><b>一句话总括：</b>OpenAI 发布了一批由内部前沿模型产出的新数学成果。真正值得关注的是它的披露方式：以 <mark>Lean 形式化证明</mark>、推理摘要和算力估算为配套，并按第三方数学顾问小组的建议来发布。</div>
+</header>
+<div class="band">
+<div class="cell"><div class="num">10 份</div><div class="lbl">公开的模型推理过程摘要</div></div>
+<div class="cell"><div class="num">≈3 小时</div><div class="lbl">平均每项成果所用算力，折合 ChatGPT Pro 思考时长</div></div>
+<div class="cell"><div class="num">Lean</div><div class="lbl">多项证明已形式化，可由计算机检验</div></div>
+<div class="cell"><div class="num">IAS</div><div class="lbl">参考高等研究院独立顾问小组的建议</div></div>
+</div>
+<h2 class="sec"><span class="tag t-data">数据</span>发布内容：不只是论文，还有可核查的配套材料</h2>
+<table class="cmp">
+<thead><tr><th>发布组成</th><th>原文给出的内容</th><th>作用</th></tr></thead>
+<tbody>
+<tr><td>数学成果论文</td><td>托管在 GitHub 仓库，附论文修订与引用规则</td><td>让成果可引用、可迭代修正</td></tr>
+<tr><td>Lean 形式化</td><td>“许多”证明已形式化，后续继续补充</td><td>由计算机检验证明是否正确</td></tr>
+<tr><td>推理摘要</td><td><mark>10 份</mark>模型推理过程摘要</td><td>展示模型如何得到结果</td></tr>
+<tr><td>算力估算</td><td>以 ChatGPT Pro 用量计；平均每项约 <mark class="b">3 小时</mark> Pro 思考</td><td>让外界了解成果的成本</td></tr>
+<tr><td>尝试统计</td><td>尝试过的问题数量统计</td><td>帮助判断成功率与是否“挑着报”</td></tr>
+</tbody>
+</table>
+<p class="note">注：原文只说明仓库中包含“尝试问题数量”的统计，正文未给出具体数字；也未给出成果总数。</p>
+<p class="insight">披露算力和尝试次数，意味着读者能把“模型做出了什么”放在“花了多少成本、试了多少次”的背景下评估。</p>
+<h2 class="sec"><span class="tag t-opp">机会</span>为什么这种发布方式重要</h2>
+<div class="split">
+<div>
+<h3>可验证：Lean 降低了信任门槛</h3>
+<p>AI 产出的证明，最大的疑问是“它对不对”。</p>
+<p>Lean 能让计算机逐步检查证明。这把信任从“相信 OpenAI”转向<strong class="c3">“相信可检验的代码”</strong>。</p>
+</div>
+<div>
+<h3>可量化：3 小时 Pro 思考</h3>
+<p>平均每项成果约等于 ChatGPT Pro 思考 <mark>3 小时</mark>。</p>
+<p>这个尺度说明：这些成果并非靠海量算力堆出来，而是接近普通付费用户可以想象的单次长时推理。</p>
+</div>
+</div>
+<p class="insight">当新数学成果的成本以“小时”计，AI 对数学研究的影响就不再是偶发展示，而可能变成常规工具。</p>
+<h2 class="sec"><span class="tag t-data">流程</span>OpenAI 的披露路线</h2>
+<ol class="flow">
+<li><b>咨询规范：</b>与高等研究院数学与 AI 独立顾问小组合作，参考其公开建议。</li>
+<li><b>本次发布：</b>GitHub 仓库 + 修订与引用规则；同时探索符合该委员会准则的社区托管方案。</li>
+<li><b>持续补充：</b>获得更多 Lean 形式化后陆续更新仓库。</li>
+<li><b>社区投入：</b>资助围绕“理解 AI 产出重大成果”的研讨会、会议和专项计划，细节稍后公布。</li>
+<li><b>后续发布：</b>改进论文的引用、数学阐述和呈现方式；推进产出这些成果的模型的负责任发布。</li>
+</ol>
+<p class="insight">OpenAI 把这次发布当作一套“科学披露标准”的起点，而不是一次性的成果展示。</p>
+<h2 class="sec"><span class="tag t-risk">局限</span>原文没有回答的问题</h2>
+<div class="risk">
+<p>这篇公告本身很短，许多关键信息需要去仓库里看。</p>
+<ul>
+<li>正文<strong class="c2">没有列出具体定理</strong>或成果数量。</li>
+<li>“许多证明”已形式化，意味着<strong class="c2">并非全部</strong>都已形式化。</li>
+<li>OpenAI 自己承认，论文的引用、阐述和呈现质量仍有待改进。</li>
+<li>产出成果的模型仍是内部模型，尚未公开。</li>
+</ul>
+<p class="insight">评估这批成果的分量，需要数学界独立审阅，而不能只依赖公告本身。</p>
+</div>
+<h2 class="sec"><span class="tag t-end">结论</span>最值得带走的洞见</h2>
+<div class="quote">AI 开始产出新的数学成果后，竞争焦点正在从“能不能做出来”转向<b>“如何让数学界信任、理解并引用这些成果”</b>。</div>
+<div class="mosaic">
+<div><div class="n">01</div>OpenAI 采用了第三方（IAS 顾问小组）的建议来规范发布，这是向学术规范靠拢的信号。</div>
+<div><div class="n">02</div>Lean 形式化让 AI 证明的正确性可以被机器检验，削弱了“黑箱结论”的疑虑。</div>
+<div><div class="n">03</div>平均约 3 小时 ChatGPT Pro 思考的算力成本，说明这类成果的门槛可能比想象中低。</div>
+<div><div class="n">04</div>公开推理摘要和尝试统计，是对“只报成功案例”这一质疑的回应，但具体数字仍需查阅仓库。</div>
+</div>
+<section id="translation">
+<h2>完整译文</h2>
+<div class="tr-body">
+<p>我们正在发布一系列新的数学成果。它们都由一个内部前沿模型产出。</p>
+<p>为了改进向数学界分享成果的方式，我们一直在向普林斯顿高等研究院（Institute for Advanced Study）的独立机构“数学与人工智能顾问小组”（Advisory Group on Mathematics and Artificial Intelligence）咨询，共同制定最佳实践。这次发布成果的方式，也借鉴了他们的建议和公开发表的建议。</p>
+<p>这次，我们把成果发布在一个 GitHub 仓库中，并附上论文修订和引用的规则。我们也在继续探索其他由社区托管、且符合该委员会准则的发布方案。对于今后的发布，我们承诺通过完善引用、数学阐述和成果呈现，进一步提高论文质量，让成果更容易被理解。</p>
+<p>在 GitHub 仓库中，我们还分享了许多证明的 Lean 形式化版本。Lean 是一种编程语言，可以让计算机检查数学证明。获得更多形式化证明后，我们会持续更新仓库。</p>
+<p>为了促进科学透明和开放，我们还在仓库中公开了获得这些成果的更多细节。其中包括 10 份模型推理过程的摘要、以 ChatGPT Pro 用量折算的算力估算，以及尝试问题数量的统计。平均每项成果所用的算力，大约相当于 ChatGPT Pro 思考 3 小时。</p>
+<p>我们希望这些进展能推动人类知识的前沿，并促进数学的进一步发展。我们将资助一系列研讨会、会议和专项计划，主题是理解由 AI 产出的重大成果。更多信息将在近期公布。</p>
+<p>我们希望直接为科学家提供最先进的能力，目前正在推进以负责任的方式发布产出这些成果的模型。正因如此，持续在数学和其他科学领域评估我们的内部前沿模型才非常重要。这样我们才能加快开发推动这些领域发展的工具。我们会继续根据社区反馈采取行动，并更新今后披露重大科学进展的标准。</p>
+<p>2026</p>
+<h3>作者</h3>
+<h3>继续阅读</h3>
+<figure class="source-figure" data-source-image="0"><img alt="oai ironclad cua 1x1" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/23y88t0gUd7FSqVFa9n1uq/6d227695a77e7a2cf3e6607bc69e1cf2/oai_ironclad_cua_1x1.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="1"><img alt="Mental Health Bench art card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/1GVQAEpVME68kCI7Ol2ApW/abde191546741612492ae27f9baf7f3e/Mental_Health_Bench__art_card.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="2"><img alt="Introducing GPT-6 Sol and Luna — Art card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/4HANTuYDvaT04gpR91bEQ9/885481304c5675cb7525bcccbe8c5580/gpt-6-sol-luna-art.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+</div>
+</section>
+</div>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -135,7 +135,10 @@ def generate(meta: dict, agent: str) -> dict:
     """
     output = run_agent(build_prompt(meta), agent)
     if SUMMARY_MARK not in output or VALUE_MARK not in output or DIGEST_MARK not in output:
-        raise ValueError("agent output is missing a ===SUMMARY===/===VALUE===/===DIGEST=== marker")
+        raise ValueError(
+            "agent output is missing a ===SUMMARY===/===VALUE===/===DIGEST=== marker; "
+            f"response preview: {output[:800]!r}"
+        )
     before_summary, after_summary = output.split(SUMMARY_MARK, 1)
     title_zh = ""
     if TITLE_ZH_MARK in before_summary:
@@ -148,7 +151,10 @@ def generate(meta: dict, agent: str) -> dict:
         raise ValueError("agent did not return summary text")
     html = extract_html(digest_part)
     if "<html" not in html.lower():
-        raise ValueError("agent did not return an HTML digest")
+        raise ValueError(
+            "agent did not return an HTML digest; "
+            f"digest preview: {digest_part[:800]!r}"
+        )
     if not TRANSLATION_SECTION_RE.search(html) or TRANSLATION_HEADING_MARK not in html:
         raise ValueError("agent did not return the required complete translation section")
     html = inject_original_images(html, list(meta.get("article_images", [])))

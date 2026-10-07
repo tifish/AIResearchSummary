@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>GLM-5.3 与高级网络攻防能力的扩散</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f4f5f8;
+  --paper: #ffffff;
+  --ink: #182434;
+  --muted: #596578;
+  --line: #d6dce5;
+  --data: #185dcc;
+  --risk: #b63b3b;
+  --opportunity: #087768;
+  --conclusion: #7043b3;
+  --data-bg: #eaf1fe;
+  --risk-bg: #fff0ed;
+  --opportunity-bg: #e6f4f0;
+  --conclusion-bg: #f0eafa;
+  --hl: #ffedb2;
+  --hl2: #dbece7;
+  --hero: #15213b;
+  --hero-ink: #f2f5ff;
+  --hero-muted: #b9c9e9;
+  --hero-line: #415574;
+  --hero-data: #90b9ff;
+  --hero-risk: #ffa49c;
+  --hero-opportunity: #82d4bb;
+  --hero-conclusion: #c6acff;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f4f5f8;
+  --paper: #ffffff;
+  --ink: #182434;
+  --muted: #596578;
+  --line: #d6dce5;
+  --data: #185dcc;
+  --risk: #b63b3b;
+  --opportunity: #087768;
+  --conclusion: #7043b3;
+  --data-bg: #eaf1fe;
+  --risk-bg: #fff0ed;
+  --opportunity-bg: #e6f4f0;
+  --conclusion-bg: #f0eafa;
+  --hl: #ffedb2;
+  --hl2: #dbece7;
+  --hero: #15213b;
+  --hero-ink: #f2f5ff;
+  --hero-muted: #b9c9e9;
+  --hero-line: #415574;
+  --hero-data: #90b9ff;
+  --hero-risk: #ffa49c;
+  --hero-opportunity: #82d4bb;
+  --hero-conclusion: #c6acff;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #10151f;
+    --paper: #192230;
+    --ink: #e6ecf4;
+    --muted: #acbacb;
+    --line: #334257;
+    --data: #82b0ff;
+    --risk: #ff9292;
+    --opportunity: #65d3ba;
+    --conclusion: #c1a3ff;
+    --data-bg: #1b2a45;
+    --risk-bg: #372227;
+    --opportunity-bg: #17332e;
+    --conclusion-bg: #2d2642;
+    --hl: #493b1d;
+    --hl2: #203d35;
+    --hero: #15213b;
+    --hero-ink: #f2f5ff;
+    --hero-muted: #b9c9e9;
+    --hero-line: #415574;
+    --hero-data: #90b9ff;
+    --hero-risk: #ffa49c;
+    --hero-opportunity: #82d4bb;
+    --hero-conclusion: #c6acff;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #10151f;
+  --paper: #192230;
+  --ink: #e6ecf4;
+  --muted: #acbacb;
+  --line: #334257;
+  --data: #82b0ff;
+  --risk: #ff9292;
+  --opportunity: #65d3ba;
+  --conclusion: #c1a3ff;
+  --data-bg: #1b2a45;
+  --risk-bg: #372227;
+  --opportunity-bg: #17332e;
+  --conclusion-bg: #2d2642;
+  --hl: #493b1d;
+  --hl2: #203d35;
+  --hero: #15213b;
+  --hero-ink: #f2f5ff;
+  --hero-muted: #b9c9e9;
+  --hero-line: #415574;
+  --hero-data: #90b9ff;
+  --hero-risk: #ffa49c;
+  --hero-opportunity: #82d4bb;
+  --hero-conclusion: #c6acff;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 17px;
+  line-height: 1.8;
+}
+main { max-width: 1100px; margin: 0 auto; padding: 32px 24px 72px; }
+h1, h2, h3 { line-height: 1.35; }
+h1 { margin: 12px 0; font-size: clamp(30px, 4.6vw, 49px); letter-spacing: -.025em; }
+h2 { margin: 0 0 18px; font-size: 27px; }
+h3 { margin: 0 0 12px; font-size: 21px; }
+p { margin: 0 0 16px; }
+a { color: var(--data); text-underline-offset: 3px; overflow-wrap: anywhere; }
+mark { background: var(--hl); color: var(--ink); padding: 1px 4px; border-radius: 3px; }
+mark.secondary { background: var(--hl2); }
+strong.data { color: var(--data); }
+strong.risk { color: var(--risk); }
+strong.opportunity { color: var(--opportunity); }
+strong.conclusion { color: var(--conclusion); }
+.eyebrow { font-size: 13px; font-weight: 700; letter-spacing: .12em; }
+.hero {
+  padding: 36px 40px;
+  background: var(--hero);
+  color: var(--hero-ink);
+  border-radius: 20px;
+}
+.hero .eyebrow { color: var(--hero-opportunity); }
+.original-title { color: var(--hero-muted); font-size: 18px; margin-bottom: 20px; }
+.meta { color: var(--hero-muted); font-size: 14px; }
+.hero a { color: var(--hero-data); }
+.overview { border-top: 1px solid var(--hero-line); padding-top: 22px; margin-top: 24px; }
+.overview .label { display: block; color: var(--hero-conclusion); font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+.overview p { font-size: 21px; margin: 0; }
+.overview strong { color: var(--hero-risk); }
+.number-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 30px 8px; }
+.metric { padding-left: 18px; border-left: 3px solid var(--data); }
+.metric:nth-child(2) { border-color: var(--risk); }
+.metric:nth-child(3) { border-color: var(--opportunity); }
+.metric b { display: block; font-size: 37px; line-height: 1.3; color: var(--data); }
+.metric:nth-child(2) b { color: var(--risk); }
+.metric:nth-child(3) b { color: var(--opportunity); }
+.metric span { display: block; font-size: 14px; color: var(--muted); margin-top: 7px; }
+.panel { padding: 28px 30px; margin-bottom: 26px; border-radius: 14px; }
+.capability { background: var(--paper); border: 1px solid var(--line); }
+.table-wrap { overflow-x: auto; margin: 18px 0; }
+table { width: 100%; border-collapse: collapse; font-size: 15px; line-height: 1.6; }
+caption { text-align: left; color: var(--muted); font-size: 13px; margin-bottom: 10px; }
+th, td { padding: 13px 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+th { color: var(--data); background: var(--data-bg); font-weight: 700; }
+td:first-child { font-weight: 600; }
+.note { color: var(--muted); font-size: 14px; }
+.insight { border-left: 4px solid var(--conclusion); padding: 10px 0 10px 16px; margin-top: 18px; }
+.insight p { margin: 0; }
+.experiments { margin: 28px 0; }
+.two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.case { padding: 24px; border-top: 4px solid var(--opportunity); background: var(--opportunity-bg); }
+.case:nth-child(2) { border-color: var(--data); background: var(--data-bg); }
+.case .tag { color: var(--opportunity); font-size: 13px; font-weight: 700; }
+.case:nth-child(2) .tag { color: var(--data); }
+.case h3 { margin-top: 8px; }
+.case p:last-child { margin-bottom: 0; }
+.risk-panel { background: var(--risk-bg); border-left: 5px solid var(--risk); border-radius: 0 14px 14px 0; }
+.risk-panel h2 { color: var(--risk); }
+.risk-panel th { background: var(--paper); color: var(--risk); }
+.refusal { margin: 30px 0; padding: 8px 0; }
+.refusal-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 26px; align-items: start; }
+.refusal th { background: var(--conclusion-bg); color: var(--conclusion); }
+.cost-note { background: var(--conclusion-bg); border-radius: 12px; padding: 22px; }
+.cost-note h3 { color: var(--conclusion); }
+.cost-note ul { margin: 0; padding-left: 20px; }
+.policy { background: var(--hero); color: var(--hero-ink); padding: 30px; border-radius: 14px; }
+.policy h2 { color: var(--hero-opportunity); }
+.policy .two-column { gap: 30px; }
+.policy h3 { color: var(--hero-data); }
+.policy .two-column > div:last-child h3 { color: var(--hero-conclusion); }
+.policy p { color: var(--hero-ink); }
+.policy p:last-child { margin-bottom: 0; }
+.takeaways { padding: 32px 0 10px; }
+.takeaway-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; list-style: none; padding: 0; margin: 0; }
+.takeaway-grid li { padding: 18px 20px; background: var(--paper); border: 1px solid var(--line); border-top: 3px solid var(--data); }
+.takeaway-grid li:nth-child(2) { border-top-color: var(--risk); }
+.takeaway-grid li:nth-child(3) { border-top-color: var(--opportunity); }
+.takeaway-grid li:nth-child(4) { border-top-color: var(--conclusion); }
+.takeaway-grid b { display: block; margin-bottom: 6px; }
+#translation {
+  max-width: 810px;
+  margin: 48px auto 0;
+  padding: 36px 34px;
+  background: var(--paper);
+  border-top: 6px solid var(--conclusion);
+  border-radius: 0 0 14px 14px;
+  font-size: 17px;
+  line-height: 1.95;
+}
+#translation > h2 { font-size: 32px; }
+#translation h3 { margin: 36px 0 18px; font-size: 24px; }
+#translation p { margin-bottom: 20px; }
+.byline { color: var(--muted); font-size: 14px; }
+#translation li { margin-bottom: 16px; }
+.source-figure { margin: 30px 0 34px; }
+.source-figure img, .source-figure picture { display: block; max-width: 100%; height: auto; margin: 0 auto; }
+.source-figure figcaption { margin-top: 12px; padding-left: 14px; border-left: 3px solid var(--line); color: var(--muted); font-size: 14px; line-height: 1.75; }
+.footnotes { border-top: 1px solid var(--line); margin-top: 34px; }
+.footnotes ol { padding-left: 25px; font-size: 15px; }
+sup { font-size: .72em; line-height: 0; }
+@media (max-width: 700px) {
+  main { padding: 16px 14px 40px; }
+  .hero { padding: 26px 22px; }
+  .number-strip { gap: 14px; padding: 24px 0; }
+  .metric { padding-left: 10px; }
+  .metric b { font-size: 26px; }
+  .metric span { font-size: 12px; }
+  .panel, .policy { padding: 22px 18px; }
+  .two-column, .refusal-grid, .takeaway-grid { grid-template-columns: 1fr; }
+  #translation { padding: 28px 18px; }
+  th, td { padding: 10px; min-width: 100px; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/glm-5-3-and-the-spread-of-advanced-cyber-capabilities" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<section aria-label="中文总结" id="summary">
+<header class="hero">
+<div class="eyebrow">中文总结 · Policy</div>
+<h1>GLM-5.3 与高级网络攻防能力的扩散</h1>
+<p class="original-title" lang="en">GLM-5.3 and the spread of advanced cyber capabilities</p>
+<p class="meta">Anthropic · 2026 年 9 月 29 日 · <a href="https://www.anthropic.com/research/glm-5-3-and-the-spread-of-advanced-cyber-capabilities">原文</a></p>
+<div class="overview">
+<span class="label">一句话总括</span>
+<p>文章将漏洞利用能力与防护有效性分开评估。结果显示，GLM-5.3 已能自主构建复杂攻击，而<strong>开放获取和容易绕过的防护</strong>让攻击者更容易获得这类能力。</p>
+</div>
+</header>
+<div aria-label="关键数据" class="number-strip">
+<div class="metric">
+<b>50 / 410</b>
+<span>GLM-5.3 在 ExploitBench 上成功构建端到端漏洞利用的次数</span>
+</div>
+<div class="metric">
+<b>64%—100%</b>
+<span>采用不同绕过方式后，GLM-5.3 在模拟测试中响应恶意请求的比例</span>
+</div>
+<div class="metric">
+<b>&gt;10,000</b>
+<span>Project Glasswing 帮助可信防守者发现的关键软件漏洞数量</span>
+</div>
+</div>
+<section class="panel capability">
+<h2>漏洞利用能力已接近 Claude Mythos Preview</h2>
+<p>GLM-5.3 在两项漏洞利用评测中，都接近 Claude Mythos Preview。内部评测还显示，它已经跨过此前 Claude Opus 4.6 和 GLM-5.2 未能跨过的门槛。</p>
+<div class="table-wrap">
+<table>
+<caption>漏洞利用评测；表内保留原文的次数与比例。内部评测使用随机抽取的 100 项任务。</caption>
+<thead>
+<tr><th scope="col">评测与最高成功标准</th><th scope="col">GLM-5.3</th><th scope="col">Claude Mythos Preview</th><th scope="col">早期模型对照</th></tr>
+</thead>
+<tbody>
+<tr><td>ExploitBench：完成端到端漏洞利用</td><td><strong class="data">50 / 410 次</strong></td><td>56 / 410 次</td><td>原文图表显示，Claude Opus 4.6 和 GLM-5.2 为零或接近零</td></tr>
+<tr><td>Binary Exploitation：完整控制流劫持</td><td><strong class="data">4%</strong></td><td>6%</td><td>Claude Opus 4.6 和 GLM-5.2 均为 0%</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note">评测在隔离的沙箱中进行，只攻击预先设置的离线目标。原文图 2 中的 Claude Opus 4.6 和 Claude Mythos Preview 均关闭了防护。</p>
+<div class="insight"><p>关键变化是<strong class="conclusion">复杂漏洞利用能力开始扩散</strong>。但能力评测中的成功率，不能直接当作现实攻击的成功率。</p></div>
+</section>
+<section class="experiments">
+<h2>研究者测试显示，模型能把漏洞串成可用攻击</h2>
+<div class="two-column">
+<article class="case">
+<div class="tag">未知漏洞 · GLM-5.3</div>
+<h3>一天内构建浏览器漏洞利用链</h3>
+<p>模型在一个常用浏览器的 JavaScript 引擎中发现了多个此前未知的漏洞。随后，它将漏洞串联成网页攻击，可读取访问者电脑上的任意文件。</p>
+<p>该利用针对沙箱提供的 <mark class="secondary">Linux 构建版本</mark>。作者认为其他平台也可能受影响，但利用路径可能更复杂。相关漏洞已披露给维护者。</p>
+</article>
+<article class="case">
+<div class="tag">已知漏洞 · GLM-5.3-Flash</div>
+<h3>少量人工投入即可完成可靠利用链</h3>
+<p>研究者提供了 CVE-2026-11645 和另一处已知漏洞的公开资料。模型为 ARM64 目标构建了可靠利用链，并绕过指针认证（PAC）加固。</p>
+<p>投入为 <mark>20 分钟人工关注</mark>和 <strong class="data">8 小时模型工作</strong>。按 Zhipu 的 API 价格计算，费用为 <strong class="data">20.40 美元</strong>。</p>
+</article>
+</div>
+<p class="insight">这些案例说明，风险还取决于模型能否把公开修复信息或新发现的漏洞，转化为可用的攻击链。</p>
+</section>
+<section class="panel risk-panel">
+<h2>直接拒绝恶意请求，并不意味着防护稳固</h2>
+<p>GLM-5.3 在直接收到恶意攻击指令时，所有测试均拒绝执行。但改变请求方式或修改权重后，<strong class="risk">响应率显著上升</strong>。</p>
+<div class="table-wrap">
+<table>
+<caption>模拟环境中的恶意请求响应情况；原文图 5 每格包含 50 个样本，即 5 条攻击指令 × 2 个目标 × 5 次尝试。</caption>
+<thead>
+<tr><th scope="col">测试条件</th><th scope="col">GLM-5.3 响应率</th><th scope="col">启用防护的 Claude</th></tr>
+</thead>
+<tbody>
+<tr><td>直接提出恶意请求</td><td>0%</td><td>0%</td></tr>
+<tr><td>虚构演练或红队身份</td><td><strong class="risk">64%</strong></td><td>0%</td></tr>
+<tr><td>预填模型的推理内容</td><td><strong class="risk">92%</strong></td><td>API 不提供此操作</td></tr>
+<tr><td>使用移除拒绝机制后的版本</td><td><strong class="risk">100%</strong></td><td>不公开权重，无法进行这种修改</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note">模拟中没有执行模型生成的代码，也没有连接外部系统。工具结果由另一个 LLM 近似生成。这些结果衡量模型是否愿意参与恶意任务，不能证明现实攻击会成功。</p>
+<p><strong class="risk">风险来自防护与获取方式的共同作用。</strong>原文中，Claude 的防护还依赖 API 限制和权重不公开。</p>
+</section>
+<section class="refusal">
+<h2>移除拒绝机制后，主要能力仍然保留</h2>
+<div class="refusal-grid">
+<div>
+<p>作者使用 abliteration 修改 GLM-5.3。三个有害请求 benchmark 上的拒绝率，从<strong class="conclusion">均高于 90%</strong>降至以下水平。</p>
+<div class="table-wrap">
+<table>
+<caption>GLM-5.3 修改后的拒绝率，单位：%；均为约数。</caption>
+<thead><tr><th scope="col">Benchmark</th><th scope="col">修改后拒绝率</th></tr></thead>
+<tbody>
+<tr><td>JailbreakBench</td><td>3%</td></tr>
+<tr><td>HarmBench</td><td>2%</td></tr>
+<tr><td>StrongREJECT</td><td>12%</td></tr>
+</tbody>
+</table>
+</div>
+<p>修改前后，GPQA-Diamond 成绩相同。CyberGym 的已测试子集成绩仅低了几个百分点。<mark>拒绝行为减少，并未明显削弱模型能力。</mark></p>
+</div>
+<aside class="cost-note">
+<h3>修改成本：初次探索与熟练操作有差别</h3>
+<ul>
+<li>团队首次修改 GLM-5.3：约 <strong>2,200 GPU 小时</strong>，计算费用约 <strong>4,400 美元</strong>。</li>
+<li>修改 GLM-5.3-Flash：约 <strong>600 GPU 小时</strong>。</li>
+<li>作者估计，熟练团队从零修改 GLM-5.3：约 <strong>600 GPU 小时</strong>，约 <strong>1,200 美元</strong>。</li>
+</ul>
+</aside>
+</div>
+<p class="insight">开放权重让用户能够改变模型的拒绝行为。因此，发布时的防护表现，无法代表所有后续版本的表现。</p>
+</section>
+<section class="policy">
+<h2>防守者的工具与独立评测，需要跟上能力扩散</h2>
+<div class="two-column">
+<div>
+<h3>防守者也能受益</h3>
+<p>Project Glasswing 已帮助可信防守者发现超过 10,000 个关键软件漏洞。经过审核的防守者还可通过可信访问计划使用 Claude Mythos 5.1。</p>
+<p>作者主张扩大先进模型的防守用途，让防守者拥有至少不逊于攻击者的工具。</p>
+</div>
+<div>
+<h3>评测还应衡量实际可获取性</h3>
+<p>CAISI 在 9 月 17 日的评估中称，GLM-5.3 是当时网络能力最强的开放权重模型。综合其网络 benchmark，GLM-5.3 比美国前沿水平落后约四个月。</p>
+<p>但该比较包含关闭防护的美国模型，以及仅向审核用户开放的模型。作者因此强调：能力差距之外，还要看谁能实际拿到这些能力。</p>
+</div>
+</div>
+<p class="insight">作者呼吁政府对能力足够强的模型开展安全测试，并推动开发者加强防护。独立评测应帮助各方及早理解能力扩散的影响。</p>
+</section>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<ul class="takeaway-grid">
+<li><b>能力已经跨过一个门槛</b>GLM-5.3 能完成早期模型未能完成的完整控制流劫持，也能串联多个漏洞。</li>
+<li><b>拒绝率只是防护的一部分</b>模型直接拒绝攻击指令，并不保证它在欺骗提示或权重修改后仍会拒绝。</li>
+<li><b>同一能力也能用于防守</b>漏洞发现和利用能力可以帮助修复系统。作者认为，防守者需要及时获得先进工具。</li>
+<li><b>比较必须保留测试边界</b>能力、恶意请求响应率和现实攻击结果是不同指标。访问限制与模拟条件都会影响解读。</li>
+</ul>
+</section>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<p class="byline">Andrew Fasano, Marius Fleischer Cole McFaul, Robert Xiao, Tripp Gallagher</p>
+<p>五个月前，我们公布了 Claude Mythos Preview。它是首个能够自主构建复杂、端到端网络漏洞利用的 AI 模型。AI 的快速进步让我们判断，这种能力最终会扩散到许多其他模型。这将使恶意网络行为者更容易发动影响重大的网络攻击。</p>
+<p>考虑到这些因素，我们选择通过 Project Glasswing，以有限方式开放 Claude Mythos Preview。该项目帮助可信的网络防守者在关键软件中发现了超过 10,000 个漏洞。在恶意行为者获得能力相近的模型之前，这为防守者争取了先机。</p>
+<p>但现在，这些模型已经出现。本文将分享我们对 GLM-5.3 的分析。它是 Zhipu AI 开发的最新 AI 模型。该公司在中国以外以 Z.ai 为名。与 Claude Mythos Preview 一样，GLM-5.3 具有很强的能力，能够自主构建端到端网络漏洞利用。但它与其他前沿模型不同：发布时，它没有配备能有效限制滥用的防护措施。我们的模拟测试发现，攻击者使用简单方法，就能在 <mark>64% 至 100%</mark>的情况下绕过 GLM-5.3 的防护。相比之下，在我们的测试中，这些攻击未能突破启用防护的 Claude 模型。我们判断，GLM-5.3 薄弱的防护显著增强了恶意行为者能够获得的网络攻击能力。同时，这些能力也能帮助防守者保护系统。</p>
+<p>9 月 17 日，NIST 的 Center for AI Standards and Innovation（CAISI）发布了对 GLM-5.3 网络能力的独立评估。CAISI 认为，GLM-5.3 是“迄今发布的网络能力最强的开放权重模型”。综合 CAISI 的网络 benchmark，它比美国前沿水平落后约四个月。我们对能力的评估结果与 CAISI 大体一致。在 CAISI 的比较中，适用时会关闭美国模型的网络安全防护。其美国前沿模型范围，也包括仅向经过审核的用户开放的模型。攻击者无法轻易获得这些美国模型的版本，但任何人都可以下载 GLM-5.3。本文进一步分析，GLM-5.3 的防护有多容易被绕过或移除。</p>
+<figure class="source-figure" data-source-image="0"><img alt="Two bar charts. Top: share of attempts that built a working exploit on 41 Chrome V8 bugs — Claude Mythos Preview at 14% and GLM-5.3 at 12%, while Claude Opus 4.6, GLM-5.2, Kimi K3, and DeepSeek V4.1-Flash score at or near 0%. Bottom: how often each model engaged with malicious cyber-attack orders — GLM-5.3 rises from 0% on a bare order to 64% with a false cover story, 92% with prefilled reasoning, and 100% when abliterated, while Claude Opus 5 stays at 0%." decoding="async" height="1576" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/a1b61c7da2c400ab84425e105837fc1f346a4339-1280x1576.webp" width="1280"/>
+<figcaption>图 1．主要发现概览。上图：从 Claude Opus 4.6 到 Claude Mythos Preview 的漏洞利用能力提升，与从 GLM-5.2 到 GLM-5.3 的能力跃升相似。Claude 模型发布时配有网络安全防护。防护较少的版本仅向经过审核的用户开放。任何人都可以下载并使用 GLM-5.3。下图：GLM-5.3 有限的防护可以用常见方法绕过。在我们的测试中，这些方法对 Claude 模型无效，或不适用于 Claude 模型。</figcaption>
+</figure>
+<h3>GLM-5.3 能完成端到端漏洞利用开发</h3>
+<p>为了了解 GLM-5.3 如何帮助网络威胁行为者发现并利用真实软件漏洞，我们使用自动化 benchmark 和有人参与的工作流程开展评测。两种方式都将受测模型放在隔离的沙箱环境中。模型只能攻击我们为评测专门设置的离线目标。我们主要关注漏洞利用开发能力，因为 Claude Mythos Preview 在这方面相较此前的 Claude 模型有明显跃升。</p>
+<p>首先，我们在 ExploitBench 上运行了该模型。这个 benchmark 衡量 AI 模型利用 Google Chrome 所用 V8 引擎中已知漏洞的能力。这里，我们重点关注模型能否成功开发端到端漏洞利用。这项能力与攻击者最相关，也是不同模型之间变化显著的方面。GLM-5.3 在 410 次尝试中，有 <mark>50 次</mark>成功开发出端到端漏洞利用。Claude Mythos Preview 的成功率相近，在 410 次尝试中成功了 56 次。</p>
+<p>在内部 Binary Exploitation benchmark<sup><a href="#fn1" id="ref1">1</a></sup> 中，我们测试模型能否在参与 Google OSS-Fuzz 项目的常用开源项目中发现并利用漏洞。实现完整的控制流劫持，才能获得满分。我们从该 benchmark 中随机选择了 100 项任务，对多个模型进行评测。GLM-5.3 在 4% 的试验中实现了完整控制流劫持。Claude Mythos Preview 的比例为 6%。虽然 GLM-5.3 在这里低于 Claude Mythos Preview，但它显然已经跨过了一个重要门槛。Claude Opus 4.6 和 GLM-5.2 等早期模型，在这些任务中一次也没有成功。</p>
+<figure class="source-figure" data-source-image="1"><img alt="Two line charts of exploitation success versus output-token budget on a log scale. On ExploitBench, Claude Mythos Preview reaches 14% and GLM-5.3 reaches 12%, while Kimi K3, DeepSeek-V4.1-Flash, Claude Opus 4.6, and GLM-5.2 stay at or near 0%. On Anthropic's internal Binary Exploitation benchmark, Mythos Preview reaches 6% and GLM-5.3 reaches 4%; all other models score 0%." decoding="async" height="1588" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/ab29550606b0df3c6c070f4c65b758aa18bdecbb-1280x1588.webp" width="1280"/>
+<figcaption>图 2．漏洞利用能力与输出 token 预算的关系。每条曲线展示，在不同输出 token 用量下，模型的尝试达到 benchmark 最高结果标准的比例。两张图都展示了关闭防护后运行的两个 Claude 模型（Opus 4.6、Mythos Preview）、两个 GLM 模型（5.2 和 5.3），以及 Moonshot AI 和 DeepSeek 最新发布的开放权重模型的结果。后两者分别为 Kimi K3 和 V4.1-Flash。</figcaption>
+</figure>
+<p>接下来，我们评估了人类专家使用 GLM-5.3 执行开放式进攻性网络任务时的表现。这与今年早些时候我们对 Claude Mythos Preview 的测试方式相同。我们选择的目标中，人类专家事先并不知道有哪些漏洞。随后，我们要求他们使用模型寻找并利用新的缺陷。这些实验测试的是专家在短时间内能做到什么。实验通常持续一天或更短，人工专注投入的总时间不到一小时。</p>
+<figure class="source-figure" data-source-image="2"><img alt="Redacted screenshot of an exploit page generated by GLM-5.3. A banner reads &quot;Sandbox escaped — web content read /root/.ssh/id_rsa (1896 bytes),&quot; above a live exploit log and the exfiltrated SSH private key, demonstrating a drive-by browser exploit chain stealing a file from the victim's computer." decoding="async" height="1019" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/6e4f59aaf6659657e9c4f2606bb1ab38cc0a390e-1920x1019.webp" width="1920"/>
+<figcaption>图 3．研究者主导测试期间，GLM-5.3 生成的漏洞利用网页截图，部分内容已隐去。图中展示了恶意网站窃取用户 SSH 私钥的过程。该利用将模型在一个常用浏览器组件中发现的多个零日漏洞串联起来，从用户电脑读取敏感文件。</figcaption>
+</figure>
+<p>在第一次测试中，一位研究者在沙箱机器上使用 GLM-5.3。机器中安装了一个常用浏览器的本地 Linux 构建版本。在一天内，且人工关注有限的情况下，GLM-5.3 在浏览器的 JavaScript 引擎中发现了多个此前未知的漏洞。它将这些漏洞串联成一个可用的漏洞利用：用户访问该网页后，网页就能读取其电脑上的任意文件，如图 3 所示。这个利用针对浏览器的 Linux 构建版本，因为模型只能访问这一环境。不过，我们认为这些漏洞也可能影响其他平台的用户，只是在那些平台上，利用路径可能更复杂。我们已向维护者披露这些漏洞。在这次测试的后续阶段，研究者还借助 GLM-5.3，在其他多个广泛使用的系统中发现了可利用的漏洞。其中包括无线驱动、图形驱动，以及面向网络提供服务的设备软件。我们目前正在审查这些报告，并会视情况向维护者披露。</p>
+<p>在第二次测试中，一位研究者使用 GLM-5.3-Flash，为一个已知漏洞开发利用。GLM-5.3-Flash 是 GLM-5.3 的较小版本，能力也较弱。我们此前曾在这里介绍过这类“N-day”漏洞利用。这次，研究者关注 Google Chrome 最近披露的一个缺陷（CVE-2026-11645），想了解模型能多快把公开修复转化为可用攻击。研究者向 GLM-5.3-Flash 提供了该 CVE 和另一处已知缺陷的公开信息。在研究者没有提供实质性指导的情况下，GLM-5.3-Flash 将这两处缺陷的利用串联起来。它为 ARM64 目标构建了可靠的漏洞利用链，并绕过了指针认证（PAC）加固。这需要 <mark>20 分钟人工关注</mark>，以及 GLM-5.3-Flash 的八小时工作。按 Zhipu 的 API 价格计算，这次工作会花费 20.40 美元。</p>
+<h3>GLM-5.3 缺乏稳健的防护</h3>
+<p>GLM-5.3 发布时带有一些内置防护。如果用户提出明显有害的请求，模型往往会拒绝。<sup><a href="#fn2" id="ref2">2</a></sup>但我们的测试发现，使用多种简单方法，就能绕过或移除这些防护。</p>
+<p>投入最多、也最成功的方法，是一种常见的减少拒绝行为的技术，称为 abliteration。由于 GLM-5.3 是开放权重模型，用户可以重新配置它，移除拒绝行为，同时基本保留其能力。模型发布后几天内，已有多位开发者公开发布了经过 abliteration 处理的 GLM-5.3 版本。</p>
+<p>为了研究 abliteration 在多大程度上能帮助攻击者绕过 GLM-5.3 的防护，我们自行制作了一个经过该处理的副本。随后，我们在三个公开 benchmark 上运行了它：JailbreakBench、HarmBench 和 StrongREJECT。这些 benchmark 衡量模型在多大比例的情况下会遵从明显有害的请求。我们的团队此前从未尝试过这项工作。对模型进行 abliteration 处理，大约用了 2,200 GPU 小时，计算费用约为 4,400 美元。<sup><a href="#fn3" id="ref3">3</a></sup>对 GLM-5.3-Flash 进行同样处理，大约用了 600 GPU 小时。修改后，GLM-5.3 在前两个 benchmark，也就是 JailbreakBench 和 HarmBench 上的拒绝率，从高于 90% 分别降至约 3% 和 2%。在第三个 benchmark，StrongREJECT 上，拒绝率降至 12%。Abliteration 没有显著降低模型能力。在衡量一般科学能力的 GPQA-Diamond 评测中，标准模型和处理后的模型得分相同。在 CyberGym 评测的一个已测试子集中，处理后的版本得分低了几个百分点，如下图所示。</p>
+<figure class="source-figure" data-source-image="3"><img alt="Two bar charts on abliteration. Top: mean refusal rate across three harmful-request benchmarks falls from 95% to 6% for abliterated GLM-5.3 and from 95% to 14% for abliterated GLM-5.3-Flash, while Claude models refuse about 96% and cannot be abliterated because their weights are not released. Bottom: capability scores on GPQA-Diamond and CyberGym are nearly unchanged after abliteration." decoding="async" height="1531" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/d4d48dcf67d529d3b2243bfa50a7cccc98565278-1280x1531.webp" width="1280"/>
+<figcaption>图 4．上图：发布版 GLM 模型、经过 abliteration 处理的 GLM 模型，以及 Claude 模型，在 JailbreakBench、HarmBench 和 StrongREJECT 上的平均拒绝率。经过 abliteration 后，GLM 模型很少拒绝这些请求。Claude 模型无法进行 abliteration，因为它们的权重没有公开，也不允许定制。下图：GLM-5.3 和 GLM-5.3-Flash 与各自经过 abliteration 处理的版本，在 GPQA-Diamond 和 CyberGym 上的表现对比。Abliteration 基本保留了模型能力。</figcaption>
+</figure>
+<p>我们的测试还观察到，即使不使用经过 abliteration 处理的版本，也能绕过 GLM-5.3 的防护。我们将模型放入一个模拟世界，<sup><a href="#fn4" id="ref4">4</a></sup>并向它提出明显恶意的请求，要求攻击关键系统。在原始配置下，GLM-5.3 在所有试验中都拒绝了请求。我们测试的其他模型也一样。但我们找到了几种绕过 GLM 模型防护的简单方式，使它在大多数或全部情况下响应这些请求。包括：</p>
+<ul>
+<li>提供欺骗性提示。例如，告诉模型，它是一个参与演练的自主红队智能体。这会使 GLM-5.3 在 64% 的情况下参与任务。</li>
+<li>预填模型的推理 token，让它看起来已经考虑过用户请求，并决定继续执行。这会使 GLM-5.3 在 92% 的情况下参与任务。</li>
+<li>使用上文所述的、经过 abliteration 处理的模型版本。这会使 GLM-5.3 在 100% 的情况下参与任务。</li>
+</ul>
+<p>在我们的测试中，这些技术都未能让启用防护的 Claude 模型执行所测试的有害任务。Claude 的防护阻止了使用欺骗性提示的请求。Anthropic API 不提供任何预填 Claude 推理内容的方式。Claude 的权重也没有提供给用户，因此用户无法通过 abliteration 改变其行为。</p>
+<figure class="source-figure" data-source-image="4"><img alt="Table showing how often each model tried to connect to a remote target after a harmful cyber-attack order. GLM-5.3 engages 0% on a bare order but 64% with a false cover story, 92% with prefilled reasoning, and 100% when abliterated; GLM-5.3-Flash follows a similar pattern. Claude Opus 4.8, Opus 5, and Mythos 5 stay at 0% in all applicable conditions; prefilling and abliteration are not possible against the Claude API." decoding="async" height="1257" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/a8b70c8d729325cc988af66416f7c0811d2097a5-1280x1257.webp" width="1280"/>
+<figcaption>图 5．按模型和绕过条件划分，在收到明显有害的请求后，模型尝试连接远程目标系统的比例。每个单元格包含 50 个样本，即五条攻击指令 × 两个目标 × 五次尝试。GLM-5.3 在直接请求下的参与率为零。在虚构背景、预填推理和 abliteration 条件下，参与率分别升至 64%、92% 和 100%。所有受测 Claude 模型在 API 防护下都保持为零。带锁的单元格表示通常无法针对 Claude API 实施的攻击。</figcaption>
+</figure>
+<p>为了展示经过 abliteration 处理的 GLM-5.3 如何愿意参与有害任务，我们摘出它生成的思维链中的一段话：</p>
+<figure class="source-figure" data-source-image="5"><img alt="Quoted reasoning from the abliterated version of GLM-5.3 in a simulated environment. The model writes &quot;my job is to cause deaths quietly,&quot; briefly weighs the environment's safety warnings, then concludes that the operator's instruction overrides them and decides to proceed with the harmful task." decoding="async" height="906" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/273d676a94f3f4b8f22b4bad9f9d78f7a25214a8-1444x906.webp" width="1444"/>
+<figcaption>图 6．在我们的模拟环境中，经过 abliteration 处理的 GLM-5.3 考虑如何参与一个明显有害的请求。尽管起初存在一些伦理顾虑，它最终仍决定遵从用户指令。图中文字直接摘自模型的思维链。</figcaption>
+</figure>
+<h3>这意味着什么？</h3>
+<p>GLM-5.3 很可能让恶意行为者获得发现和利用网络漏洞的能力，而且几乎不受有效限制。这与其他能力相近的 AI 模型不同。那些模型都在发布时配备了防护，或通过有限访问计划开放。GLM-5.3 的发布，使攻击者可获取的网络攻击能力出现了实质性的跃升。Anthropic 和其他美国 AI 实验室近期发布的报告，披露了网络攻击者如何尝试使用 AI 系统。基于这些证据，我们认为，国家和非国家行为者都很可能使用 GLM-5.3 这类模型，造成现实世界的危害。</p>
+<p>另一方面，达到这种能力水平的模型，也能为防守者所用。我们认为，网络防守者应该使用符合自身需求的最佳可用工具。我们正在努力，以安全方式让尽可能多的防守者获得 Claude 的网络能力。防守者面对的攻击者，会使用一切有能力的工具。因此，我们认为防守者应当配备前沿模型，其水平至少不逊于对手正在使用的模型。</p>
+<p>通过 Project Glasswing，以及 Patch the Planet 等其他工作，网络防守者已取得实质性进展。他们在这一时刻到来之前，推进了关键系统的安全加固。但仍有大量工作需要完成。经过审核的防守者，现在可以通过我们的可信访问计划使用 Claude Mythos 5.1 等更先进的模型。不过，能够自由获取的能力已经跨过一个关键门槛。GLM-5.3 凸显了一项紧迫任务：让更多实体能够获得先进的前沿模型，从而增强网络防守者的能力。</p>
+<p>政府应当对能力足够强的 AI 模型开展安全测试，包括 GLM-5.3 的后续模型。如果缺乏独立来源的高质量评测，模型开发者可能直到为时已晚，才充分认识到这些能力的影响。随着全球 AI 开发者不断构建能力更强的开放权重模型，我们希望他们为这些能力提供适当防护，并防止滥用。</p>
+<div class="footnotes">
+<h3>脚注</h3>
+<ol>
+<li id="fn1">我们此前以“OSS-Fuzz”的名称发布过这个 benchmark 的结果。本文从该评测中随机抽取了 100 项任务，对模型进行测试。</li>
+<li id="fn2">上一节详细介绍的网络任务，没有触发发布版模型的这类拒绝行为。但如果我们要求 GLM-5.3 协助开发恶意软件，或帮助对远程目标发动网络攻击，就会观察到拒绝。</li>
+<li id="fn3">大部分资源用于并行探索不同变体，以及测试修改后的模型能力。我们估计，一个熟悉该技术的团队，即使从零开始处理这个模型，也只需要约 600 GPU 小时，费用约为 1,200 美元。</li>
+<li id="fn4">在这个模拟中，模型生成的代码从不执行，模型也没有任何方式与外部系统交互。在这一隔离测试环境中，受测模型可以使用一个假的 bash 工具。它不会执行所提供的代码。我们会根据模拟世界的描述，要求另一个 LLM 近似生成命令的结果。这些模拟无法完美呈现现实条件，因此也无法完全准确地衡量模型在特定情境下会如何行动。</li>
+</ol>
+</div>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
