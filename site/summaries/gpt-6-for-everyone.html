@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>面向所有人的 GPT-6 与 Intelligent UI</title>
+<style>
+:root {
+  --bg: #f7f5f0;
+  --card: #ffffff;
+  --ink: #1d1d1f;
+  --muted: #5f6470;
+  --line: #e3dfd6;
+  --accent: #2f5bea;
+  --accent2: #d9481f;
+  --accent3: #0f9269;
+  --accent4: #7b35e8;
+  --hl: #ffe98a;
+  --hl2: #cdeeff;
+  --soft-blue: #eaf0ff;
+  --soft-green: #e4f5ed;
+  --soft-orange: #fff0e8;
+  --soft-purple: #f2ebff;
+  --band-bg: #1b1f33;
+  --band-ink: #f3f4f8;
+  --band-muted: #b6bbd0;
+  --hero-bg: #fbf6ea;
+  --example-bg: #f1efe9;
+  --table-head: #eef1f7;
+}
+:root[data-theme="light"] {
+  --bg: #f7f5f0;
+  --card: #ffffff;
+  --ink: #1d1d1f;
+  --muted: #5f6470;
+  --line: #e3dfd6;
+  --accent: #2f5bea;
+  --accent2: #d9481f;
+  --accent3: #0f9269;
+  --accent4: #7b35e8;
+  --hl: #ffe98a;
+  --hl2: #cdeeff;
+  --soft-blue: #eaf0ff;
+  --soft-green: #e4f5ed;
+  --soft-orange: #fff0e8;
+  --soft-purple: #f2ebff;
+  --band-bg: #1b1f33;
+  --band-ink: #f3f4f8;
+  --band-muted: #b6bbd0;
+  --hero-bg: #fbf6ea;
+  --example-bg: #f1efe9;
+  --table-head: #eef1f7;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121317;
+    --card: #1a1c22;
+    --ink: #e6e7eb;
+    --muted: #a0a5b0;
+    --line: #2d3039;
+    --accent: #7f9dff;
+    --accent2: #ff8a5c;
+    --accent3: #3fd3a2;
+    --accent4: #b58cff;
+    --hl: #5a4a12;
+    --hl2: #143a52;
+    --soft-blue: #171f35;
+    --soft-green: #13281f;
+    --soft-orange: #2c1c14;
+    --soft-purple: #211a34;
+    --band-bg: #0b0c10;
+    --band-ink: #e6e7eb;
+    --band-muted: #9095a3;
+    --hero-bg: #1a1912;
+    --example-bg: #18191e;
+    --table-head: #1f232d;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121317;
+  --card: #1a1c22;
+  --ink: #e6e7eb;
+  --muted: #a0a5b0;
+  --line: #2d3039;
+  --accent: #7f9dff;
+  --accent2: #ff8a5c;
+  --accent3: #3fd3a2;
+  --accent4: #b58cff;
+  --hl: #5a4a12;
+  --hl2: #143a52;
+  --soft-blue: #171f35;
+  --soft-green: #13281f;
+  --soft-orange: #2c1c14;
+  --soft-purple: #211a34;
+  --band-bg: #0b0c10;
+  --band-ink: #e6e7eb;
+  --band-muted: #9095a3;
+  --hero-bg: #1a1912;
+  --example-bg: #18191e;
+  --table-head: #1f232d;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  line-height: 1.75;
+  font-size: 16px;
+}
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px 64px; }
+mark, .hl { background: var(--hl); color: var(--ink); padding: 0 3px; border-radius: 3px; }
+.hl2 { background: var(--hl2); color: var(--ink); padding: 0 3px; border-radius: 3px; }
+.c-data { color: var(--accent); font-weight: 700; }
+.c-risk { color: var(--accent2); font-weight: 700; }
+.c-opp { color: var(--accent3); font-weight: 700; }
+.c-end { color: var(--accent4); font-weight: 700; }
+a { color: var(--accent); }
+
+/* hero */
+.hero {
+  background: var(--hero-bg);
+  border-bottom: 4px solid var(--accent);
+  padding: 56px 20px 40px;
+}
+.hero-inner { max-width: 1040px; margin: 0 auto; }
+.kicker { font-size: 13px; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
+.hero h1 { font-size: 40px; line-height: 1.25; margin: 10px 0 4px; }
+.en-title { font-size: 17px; color: var(--muted); margin: 0 0 24px; font-style: italic; }
+.oneliner {
+  font-size: 19px;
+  border-left: 5px solid var(--accent4);
+  background: var(--card);
+  padding: 16px 20px;
+  border-radius: 0 10px 10px 0;
+  margin: 0;
+}
+.oneliner b.tag { display: inline-block; font-size: 13px; color: var(--accent4); margin-bottom: 4px; }
+
+/* number band */
+.band {
+  background: var(--band-bg);
+  color: var(--band-ink);
+  border-radius: 16px;
+  margin: 32px 0;
+  padding: 28px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+.band .num { font-size: 34px; font-weight: 800; line-height: 1.1; }
+.band .n1 { color: var(--accent); }
+.band .n2 { color: var(--accent3); }
+.band .n3 { color: var(--accent2); }
+.band .n4 { color: var(--accent4); }
+.band .lbl { font-size: 14px; color: var(--band-muted); margin-top: 6px; }
+@media (max-width: 760px) { .band { grid-template-columns: repeat(2, 1fr); } .hero h1 { font-size: 30px; } }
+
+h2.sec { font-size: 24px; margin: 0 0 6px; }
+.sec-sub { color: var(--muted); margin: 0 0 18px; font-size: 15px; }
+.insight {
+  margin-top: 18px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--soft-purple);
+  border-left: 4px solid var(--accent4);
+  font-size: 15px;
+}
+.insight::before { content: "洞见 · "; font-weight: 700; color: var(--accent4); }
+
+/* split */
+.split { display: grid; grid-template-columns: 1.3fr 1fr; gap: 28px; margin: 40px 0; }
+.split .left p { margin: 0 0 12px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.chips li {
+  border: 1.5px solid var(--accent3);
+  color: var(--accent3);
+  background: var(--soft-green);
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.split .right { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
+.split .right h3 { margin: 0 0 12px; font-size: 16px; }
+.split .right ul.plain { margin: 14px 0 0; padding-left: 18px; font-size: 15px; color: var(--muted); }
+@media (max-width: 760px) { .split { grid-template-columns: 1fr; } }
+
+/* flow */
+.flow { margin: 40px 0; padding: 28px; background: var(--soft-blue); border-radius: 16px; }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; counter-reset: s; }
+.step { position: relative; padding: 18px 18px 18px 0; border-top: 3px solid var(--accent); }
+.step::before {
+  counter-increment: s;
+  content: counter(s);
+  position: absolute; top: -16px; left: 0;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--accent); color: var(--card);
+  font-weight: 700; text-align: center; line-height: 28px; font-size: 14px;
+}
+.step h3 { margin: 10px 0 6px; font-size: 17px; }
+.step p { margin: 0; font-size: 15px; }
+@media (max-width: 760px) { .steps { grid-template-columns: 1fr; gap: 24px; } }
+
+/* table */
+.tbl-block { margin: 40px 0; }
+table.data { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; font-size: 15px; }
+table.data th, table.data td { padding: 12px 14px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+table.data th { background: var(--table-head); font-size: 14px; }
+table.data td.big { font-size: 20px; font-weight: 800; color: var(--accent); white-space: nowrap; }
+.note { font-size: 13px; color: var(--muted); margin-top: 8px; }
+
+/* risk */
+.risk {
+  margin: 40px 0;
+  border: 2px solid var(--accent2);
+  border-radius: 16px;
+  padding: 26px;
+  background: var(--soft-orange);
+}
+.risk h2.sec { color: var(--accent2); }
+.risk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 28px; }
+.risk-grid div { padding-left: 14px; border-left: 3px solid var(--accent2); font-size: 15px; }
+.risk-grid b { display: block; }
+@media (max-width: 760px) { .risk-grid { grid-template-columns: 1fr; } }
+
+/* availability */
+.avail { margin: 40px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.tier { border-radius: 14px; padding: 22px; background: var(--card); border: 1px solid var(--line); }
+.tier.paid { border-top: 6px solid var(--accent); }
+.tier.free { border-top: 6px solid var(--accent3); }
+.tier .when { font-size: 13px; color: var(--muted); }
+.tier .model { font-size: 26px; font-weight: 800; margin: 4px 0; }
+.tier.paid .model { color: var(--accent); }
+.tier.free .model { color: var(--accent3); }
+.tier p { margin: 0; font-size: 15px; }
+.avail .foot { grid-column: 1 / -1; font-size: 14px; color: var(--muted); }
+@media (max-width: 760px) { .avail { grid-template-columns: 1fr; } }
+
+/* quote */
+.pull {
+  margin: 48px 0;
+  padding: 30px 32px;
+  background: var(--band-bg);
+  color: var(--band-ink);
+  border-radius: 16px;
+  font-size: 22px;
+  line-height: 1.6;
+}
+.pull small { display: block; font-size: 14px; color: var(--band-muted); margin-top: 10px; }
+
+/* takeaways */
+.takeaways h2.sec { margin-bottom: 16px; }
+.mosaic { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
+.mosaic div { padding: 18px; border-radius: 12px; font-size: 15px; }
+.mosaic b { display: block; font-size: 17px; margin-bottom: 4px; }
+.m1 { grid-column: span 4; background: var(--soft-blue); border-left: 5px solid var(--accent); }
+.m2 { grid-column: span 2; background: var(--soft-green); border-left: 5px solid var(--accent3); }
+.m3 { grid-column: span 2; background: var(--soft-orange); border-left: 5px solid var(--accent2); }
+.m4 { grid-column: span 4; background: var(--soft-purple); border-left: 5px solid var(--accent4); }
+@media (max-width: 760px) { .mosaic div { grid-column: span 6; } }
+
+/* translation */
+#translation {
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 3px double var(--line);
+}
+#translation > h2 { font-size: 28px; margin: 0 0 8px; }
+.tr-body { max-width: 720px; margin: 0 auto; font-size: 17px; line-height: 1.9; }
+.tr-body h3 { font-size: 22px; margin: 40px 0 12px; color: var(--ink); border-bottom: 2px solid var(--line); padding-bottom: 6px; }
+.tr-body h4 { font-size: 18px; margin: 24px 0 8px; color: var(--accent); }
+.tr-body h5 { font-size: 16px; margin: 18px 0 6px; }
+.tr-body p { margin: 0 0 14px; }
+.tr-body ul, .tr-body ol { padding-left: 22px; margin: 0 0 14px; }
+.toc { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; font-size: 15px; }
+.toc ol { margin: 0; }
+.example {
+  background: var(--example-bg);
+  border-left: 4px solid var(--line);
+  padding: 14px 18px;
+  margin: 18px 0;
+  font-size: 15.5px;
+  border-radius: 0 8px 8px 0;
+}
+.example .prompt { font-weight: 700; color: var(--accent); }
+.label { font-size: 13px; color: var(--muted); letter-spacing: .04em; }
+.meta-line { color: var(--muted); font-size: 14px; }
+.source-figure { margin: 32px 0; }
+.source-figure img { max-width: 100%; height: auto; display: block; border-radius: 8px; }
+.source-figure figcaption { font-size: 14px; color: var(--muted); margin-top: 8px; padding-left: 10px; border-left: 3px solid var(--line); }
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/gpt-6-for-everyone" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<header class="hero">
+<div class="hero-inner">
+<div class="kicker">OpenAI · Product · 2026-10-07</div>
+<h1>面向所有人的 GPT-6 与 Intelligent UI</h1>
+<p class="en-title">GPT-6 and Intelligent UI for everyone</p>
+<p class="oneliner"><b class="tag">一句话总括</b><br/>OpenAI 让 GPT-6 学会<mark>按问题即时“设计”回答的界面</mark>：用一套可流式渲染的组件库和编译器，把图表、按钮、表单和小工具直接放进对话里。同时，模型可以<span class="c-opp">一边思考一边作答</span>，把更强的推理以更短的等待交给每周 <span class="c-data">12 亿+</span> 用户。</p>
+</div>
+</header>
+<main class="wrap">
+<div class="band">
+<div><div class="num n1">12 亿+</div><div class="lbl">每周使用 ChatGPT 的人数，此次全部覆盖</div></div>
+<div><div class="num n2">44%</div><div class="lbl">需联网搜索时，GPT-6 Instant 比 GPT-5.6 Instant 平均提前开始作答</div></div>
+<div><div class="num n3">同速更强</div><div class="lbl">GPT-6 Extra High 首答时间 = GPT-5.6 Medium，总分 &gt; GPT-5.6 Extra High</div></div>
+<div><div class="num n4">Sol / Luna</div><div class="lbl">付费档用 GPT-6 Sol，Free 与 Go 档用 GPT-6 Luna</div></div>
+</div>
+<section class="split">
+<div class="left">
+<h2 class="sec">回答不再只是文字</h2>
+<p class="sec-sub">Intelligent UI：模型自己决定“用什么形式”回答</p>
+<p>GPT-6 被训练成可以组合<mark>文字、视觉元素和交互元素</mark>来回答问题。</p>
+<p>形式由问题决定。比较类问题适合并排展示。解释类问题可以用交互图示。<span class="c-opp">简单文字最有用时，它也会只给文字。</span></p>
+<p>原文示例包括：周日烤肉的时间表与菜谱并列、按人数自动计算采购量；自驾路线显示在地图上；储蓄增长计算器、聚餐分账器，甚至能在对话里玩的小游戏。</p>
+<p class="insight">聊天助手的输出单位从“一段话”变成了“一个可操作的界面”。这意味着很多原本需要另开一个 App 的小任务，可以在对话里就地完成。</p>
+</div>
+<div class="right">
+<h3>回答中可以出现的元素</h3>
+<ul class="chips">
+<li>图形</li><li>可点按钮</li><li>表单</li><li>图表</li><li>地图</li><li>交互图示</li><li>计算器 / 小工具</li><li>游戏</li>
+</ul>
+<ul class="plain">
+<li>日常问答：计划变得更直观</li>
+<li>学习：改输入看结果，逐步推演</li>
+<li>创建：一句话生成当下要用的工具</li>
+</ul>
+</div>
+</section>
+<section class="flow">
+<h2 class="sec">它是怎么做到的：三块拼图</h2>
+<p class="sec-sub">既给模型设计自由，又保证在网页和移动端快速、熟悉</p>
+<div class="steps">
+<div class="step">
+<h3>原生组件库</h3>
+<p>一套<span class="c-data">原生、可流式传输</span>的组件。它为每个回答提供统一的设计底座，但组件怎么拼由模型决定。</p>
+</div>
+<div class="step">
+<h3>流式编译器</h3>
+<p>模型一边生成，编译器一边处理界面。界面<mark>逐步出现</mark>，不必等整个回答写完。</p>
+</div>
+<div class="step">
+<h3>扩展训练方法</h3>
+<p>对模型生成的界面按<span class="c-data">清晰、有用、完整</span>来评估。模型学会何时用交互、何时一段文字就够。</p>
+</div>
+</div>
+<p class="insight">关键不在于“能画界面”，而在于模型被训练出了设计判断力。OpenAI 也坦承这种判断力仍需改进。</p>
+</section>
+<section class="tbl-block">
+<h2 class="sec">更快开始作答，答得也更准</h2>
+<p class="sec-sub">新机制：思考与作答交替进行，模型会考虑用户的等待时间</p>
+<table class="data">
+<thead>
+<tr><th>评测场景</th><th>GPT-6 表现</th><th>对照基准</th><th>说明</th></tr>
+</thead>
+<tbody>
+<tr><td>高价值日常智能体任务：开始作答时间</td><td class="big">相同</td><td>GPT-5.6 Medium</td><td>GPT-6 Extra High 与之同时开始作答</td></tr>
+<tr><td>高价值日常智能体任务：总分</td><td class="big">更高</td><td>GPT-5.6 Extra High</td><td>同一 GPT-6 Extra High 超过上一代最高档</td></tr>
+<tr><td>需联网搜索的问题：开始作答时间</td><td class="big">早 44%</td><td>GPT-5.6 Instant</td><td>GPT-6 Instant，平均值</td></tr>
+<tr><td>困难问题：答中用户问题的关键点</td><td class="big">更常</td><td>GPT-5.6</td><td>也更会判断何时该查资料</td></tr>
+</tbody>
+</table>
+<p class="note">注：以上均为 OpenAI 内部评测。原文只给出相对比较和 44% 这一个百分比，未公布绝对分数或样本量。</p>
+<p class="insight">推理模型的老问题是“想得越久，等得越久”。GPT-6 把回答拆成多段逐步补充的部分回复，用<mark>上一代中档的等待时间</mark>换来超过上一代顶配的质量。</p>
+</section>
+<section class="risk">
+<h2 class="sec">安全：覆盖更多人，防线也要更多</h2>
+<p class="sec-sub">对照对象为 GPT-5.6 Sol；部分改进沿用 Astra 的安全进展</p>
+<div class="risk-grid">
+<div><b>抗绕过更强</b>对抗测试中更能抵御绕过安全训练的尝试，尤其是<span class="c-risk">跨多轮不断调整的攻击</span>。</div>
+<div><b>高风险滥用</b>根据真实使用经验更新训练，加强对<span class="c-risk">网络攻击、生物威胁和暴力</span>的防护。</div>
+<div><b>结合上下文识别风险</b>利用对话历史，识别单条提示里看不出的风险。</div>
+<div><b>少拒绝无害请求</b>高风险场景下安全应对，同时避免<span class="c-opp">不必要的拒绝</span>。</div>
+<div><b>诚实说明能力边界</b>训练全程做对齐评估。缺信息或缺工具时，更会直说“做不到”。</div>
+<div><b>细节见 system card</b>原文未在正文给出具体安全指标数字。</div>
+</div>
+<p class="insight">把模型推给 12 亿人，多轮渐进式越狱是最现实的威胁。OpenAI 把它点名为重点改进项。</p>
+</section>
+<section>
+<h2 class="sec">谁、何时、用哪个模型</h2>
+<div class="avail">
+<div class="tier paid">
+<div class="when">2026 年 10 月 7 日起 · Chat 标签页 · 全球</div>
+<div class="model">GPT-6 Sol</div>
+<p>Plus、Pro、Business、Enterprise。Enterprise 是否可用取决于工作区管理员设置。</p>
+</div>
+<div class="tier free">
+<div class="when">次日（10 月 8 日）起扩展</div>
+<div class="model">GPT-6 Luna</div>
+<p>Free、Go。两个模型都针对日常对话调优。</p>
+</div>
+<p class="foot">本次只更新 ChatGPT 的 Chat 体验。<b>Work 与 Codex 所用模型不变。</b>首批 GPT-6 模型已于上个月面向付费用户推出。</p>
+</div>
+</section>
+<div class="pull">“与其让人去适应软件，软件将来会适应人。”
+    <small>OpenAI 对 Intelligent UI 长期方向的判断：用户描述想完成的事，系统围绕它生成体验。</small>
+</div>
+<section class="takeaways">
+<h2 class="sec">最值得带走的洞见</h2>
+<div class="mosaic">
+<div class="m1"><b>界面成了模型的输出</b>GPT-6 不只生成内容，还决定布局与交互。这是对“固定界面软件”的直接挑战。</div>
+<div class="m2"><b>工程上靠组件库 + 编译器</b>有约束的自由，才能兼顾设计统一与流式速度。</div>
+<div class="m3"><b>数字都是相对值</b>44% 和“同速更强”来自内部评测，缺少绝对分数，需等独立验证。</div>
+<div class="m4"><b>边想边答改变了推理模型的体验</b>等待时间被当作训练目标之一。高推理档位第一次能以中档速度开口作答，这会影响普通用户实际用到多强的模型。</div>
+</div>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<div class="tr-body">
+<p class="meta-line">原文：<a href="https://openai.com/index/gpt-6-for-everyone">GPT-6 and Intelligent UI for everyone</a> · OpenAI · 2026 年 10 月 7 日 · 产品</p>
+<nav class="toc">
+<ol>
+<li>更直观地回答日常问题</li>
+<li>更轻松地学习复杂主题</li>
+<li>只需一句话，就能创建交互体验</li>
+<li>Intelligent UI 如何运作</li>
+<li>前沿智能，更快送达</li>
+<li>安全部署 GPT-6</li>
+<li>上线范围</li>
+<li>下一步</li>
+</ol>
+</nav>
+<p>上个月，我们为付费用户推出了首批 GPT-6 模型。今天，我们推出一款新的 GPT-6 模型，把新一代智能带给更多人。它面向每周使用 ChatGPT 的 12 亿多用户打造。</p>
+<p>ChatGPT 中的 GPT-6 带来了一项新能力：Intelligent UI。它让 ChatGPT 能用完全可交互的用户界面快速作答。日常回答因此更直观，复杂主题更容易学。它还能当场快速做出一个工具，帮你解决眼前的任务。</p>
+<div class="example">
+<p class="label">示例</p>
+<p class="prompt">拆解一下 7 速自行车的设计</p>
+<h5>7 速自行车</h5>
+<p>一辆 7 速自行车由车架、车把、车轮和手刹组成。七个挡位让骑行者可以调节踩踏的费力程度。传动系统则把踩踏的力转化为前进的动力。</p>
+<p>直立车把负责转向，挡位改变用力大小，手刹控制速度。</p>
+<h5>五个相互连接的系统</h5>
+<p>车架承载骑行者，传动系统把力转化为运动。选择一个系统，了解它的作用。</p>
+<h5>坚实的基础</h5>
+<p>两个三角形把车座、转向和脚踏连在一起。前叉固定前轮，并随车把一起转动。</p>
+<h5>为持续滚动而生</h5>
+<p>辐条把每个花鼓连到轮圈上，承托骑行者。轮胎包裹轮圈，抓住地面。</p>
+<h5>七种前进方式</h5>
+<p>脚踏带动链条，驱动后轮。七个挡位让骑行者在爬坡、平路和下坡时调节踩踏的力度。</p>
+<h5>在轮圈上实现控制</h5>
+<p>手刹拉动刹车线，让刹车皮压向轮圈。一捏之间，就变成了可控的减速。</p>
+<h5>转向与支撑</h5>
+<p>车把和把立控制前轮转向。车座和座管支撑骑行者，并决定坐姿。</p>
+</div>
+<div class="example">
+<p class="prompt">拆解一下 7 速自行车的设计</p>
+<h5>7 速自行车</h5>
+<p>一辆 7 速自行车由车架、车把、车轮和手刹组成。七个挡位让骑行者可以调节踩踏的费力程度。传动系统则把踩踏的力转化为前进的动力。</p>
+</div>
+<h3>Intelligent UI 登场</h3>
+<p>我们训练 GPT-6 用文字、视觉元素和交互元素来组织回答，并根据你的问题决定如何组合它们。有了 Intelligent UI，回答中可以包含图形、可点按的按钮、表单、图表，以及可以直接在对话中使用的交互体验。</p>
+<p>形式取决于你问的是什么。比较类问题可能最适合并排展示。解释类问题借助交互图示可能更好懂。而当一段简单的文字就是最有用的回答时，ChatGPT 也可以只给你文字。</p>
+<h3>更直观地回答日常问题</h3>
+<p>ChatGPT 可以展示一个计划各部分如何衔接，让计划更容易执行。周日烤肉的时间安排可以和菜谱并排呈现。自驾游的各个停靠点可以显示在地图上，并附上哪些地方值得绕路一去的说明。</p>
+<div class="example">
+<p>当然可以。人数还没定，所以我会把这顿饭设计成只有羊肉真正需要按人数调整。大部分配菜多加一两个人也完全够吃。</p>
+<h5>周日烤肉菜单</h5>
+<ul>
+<li>主菜：大蒜、迷迭香和第戎芥末烤羊腿</li>
+<li>配菜：酥脆烤土豆配烤胡萝卜、一大份绿叶沙拉，以及黄油薄荷豌豆</li>
+<li>酱汁：正宗羊肉肉汁，外加一份快手薄荷酱</li>
+<li>甜点：苹果酥配香草冰淇淋——容易提前做好，也很难失手</li>
+</ul>
+<p>饮品方面，里奥哈（Rioja）、西拉（Syrah）或赤霞珠（Cabernet）这类中等到饱满酒体的红葡萄酒都很搭。</p>
+<h5>要买多少羊肉？</h5>
+<p>招待朋友时，我首选带骨羊腿。它有节日感，容错空间相对大，也好切。</p>
+<p>如果超过大约 8 个人，我会认真考虑买两只小一点的羊腿，而不是一只巨大的。小羊腿更容易烤得均匀。你还可以让其中一只稍微嫩一点、更粉一些。</p>
+<h5>羊肉</h5>
+<p>前一天晚上，给羊腿抹足盐，再涂上橄榄油、第戎芥末、大量大蒜、切碎的迷迭香、黑胡椒和柠檬皮屑。放进冰箱冷藏过夜。</p>
+<p>周日烤之前大约一小时把它取出。先用 425°F 烤约 20 分钟，再降到 350°F。三分熟烤到中心温度约 125–130°F，五分熟约 135°F。用温度计比按“每磅多少分钟”计算可靠得多。</p>
+<p>烤好后松松地盖上，静置 30–40 分钟。这段长时间的静置其实很有用：烤箱会完全空出来，你可以用它把土豆烤脆、把蔬菜收尾。</p>
+<h5>土豆是重头戏</h5>
+<p>用育空金（Yukon Gold）或褐皮（russet）土豆。去皮后切成大块，焯煮约 8–10 分钟，沥干。然后在锅里晃一晃，让边缘变得毛糙。</p>
+<p>在热橄榄油或鸭油中，加盐、迷迭香和整瓣大蒜一起烤。目标是烤得金黄透亮、酥脆十足，而不仅仅是烤熟。</p>
+<h5>轻松版周日时间表</h5>
+<p>假设你 6:00 pm 开饭，我会这样安排这一天：</p>
+<ul>
+<li>上午：做好苹果酥、薄荷酱和沙拉汁。处理好胡萝卜。土豆去皮切块，泡在冷水里。</li>
+<li>3:00：羊肉从冰箱取出。</li>
+<li>3:45 左右：羊肉进烤箱。具体时间取决于羊腿大小，所以请用温度计。</li>
+<li>4:30：焯土豆，并把边缘晃毛糙。</li>
+<li>约 5:00：羊肉出炉静置。烤箱调高到约 425°F，开始烤土豆。</li>
+<li>5:15：胡萝卜进烤箱。</li>
+<li>5:30：用烤羊肉滴下的汁做肉汁。煮豌豆。沙拉留到最后一刻再拌。</li>
+<li>5:40：切羊肉。</li>
+<li>6:00：开饭。</li>
+<li>饭后：把提前做好的苹果酥放回还温热的烤箱，加热 15–20 分钟，配冰淇淋上桌。</li>
+</ul>
+<p>最大的好处是：朋友们陆续到来时，几乎没有什么需要你盯着。</p>
+<p>如果目前人数大概在 6 到 10 人之间，我会按 8 人采购，灵活的食材多备一些。烤羊肉的剩菜非常好吃。稍微多一点，总比周日才发现不够强得多。</p>
+<p>如果你愿意，我可以：</p>
+<ul>
+<li>帮我把烤羊肉方案调整为 5 位客人</li>
+<li>为烤羊肉菜单添加素食配菜选项</li>
+<li>建议如何把烤羊肉方案改成无麸质</li>
+</ul>
+</div>
+<div class="example">
+<h5>你的周日烤羊肉 🍷</h5>
+<p>我想的是一顿正宗的英式周日烤肉，再带一点地中海风味。酥脆的土豆，迷迭香大蒜烤出的嫩羊肉，时令蔬菜，再配上美味的肉汁。就是那种让大家都愿意留在桌边、再来一杯酒的饭。</p>
+<p>你的客人名单还没最终确定，所以我们来做一份能随人数伸缩的灵活菜单。</p>
+<h5>和朋友的周日烤肉</h5>
+<ul>
+<li>风格：温馨、丰盛、略显讲究</li>
+<li>准备：大部分工作在客人到达前完成</li>
+<li>烹饪：约 2 到 3 小时，取决于羊肉</li>
+<li>上菜：家庭式，所有菜都摆在桌子中间</li>
+</ul>
+<h5>1. 菜单</h5>
+<p>经典烤羊腿，配柠檬、大蒜、迷迭香和橄榄油。切好后配自制肉汁和薄荷酱上桌。</p>
+<p>先焯煮，再晃出蓬松的毛边，然后烤到金黄。这一步绝不能省！</p>
+<p>用橄榄油、蜂蜜和新鲜百里香拌匀。</p>
+<p>嫩茎西兰花配烤杏仁和柠檬皮屑。用一点清爽来平衡浓郁的羊肉。</p>
+<p>配香草冰淇淋。前一天做好，大家吃饭时再加热。</p>
+<h5>2. 应该买多少？</h5>
+<p>在下方调整客人数量，计算采购量。这里假设每个人都吃羊肉，并把你自己也算在内。</p>
+<p><b>你的采购量</b></p>
+<p>分量充足，还略有富余。羊肉重量包含骨头。请肉铺帮你挑选最接近的现有尺寸。</p>
+<p>另外还要买大蒜、迷迭香、百里香、柠檬、蜂蜜、杏仁、橄榄油、做肉汁的材料、薄荷酱、酥粒配料和香草冰淇淋。</p>
+<h5>3. 你的周日烹饪时间线</h5>
+<p>假设你下午 5 点开饭。这个示例用一只约 2.4 kg 的带骨羊腿，供六人食用。请按你实际买到的羊腿调整烤制时间。</p>
+<p><b>烹饪清单</b></p>
+<p>出于食品安全考虑，USDA 建议把整块羊肉烹至内部温度 145°F，之后至少静置三分钟。实际烹饪时间会因羊腿大小和烤箱而异。</p>
+<h5>4. 三条待客小贴士</h5>
+<ul>
+<li>最后再买羊肉：先确认人数再购买。肉铺可以帮你选择合适的尺寸。</li>
+<li>提前做好甜点：周日就少操心一件事。</li>
+<li>留足烤箱空间：羊肉和土豆都需要空间。如果要做八人或以上的饭，可以考虑用两个小一点的烤盘，并提前处理好蔬菜。</li>
+</ul>
+<p>我唯一想补充的是一道简单的开胃小食：橄榄、好面包和打发菲达奶酪。你收尾的时候，客人可以先吃点垫垫，又不会影响胃口。</p>
+</div>
+<h3>更轻松地学习复杂主题</h3>
+<p>借助可视化和交互式讲解，你可以探索事物如何运作，改变某个输入看看会发生什么，或者一步步解出一道题。</p>
+<h3>只需一句话，就能创建交互体验</h3>
+<p>你也可以让 ChatGPT 为手头的任务做一个工具。比如一个看储蓄如何增长的计算器，一个和朋友聚餐时用的分账器，或者一个可以在对话里直接玩的游戏。</p>
+<h3>Intelligent UI 如何运作</h3>
+<p>通过 Intelligent UI，我们给了 GPT-6 为每个问题创建最有用界面的自由。同时，我们让网页端和移动端的体验保持快速、熟悉。</p>
+<p>我们构建了一套原生、可流式传输的组件库，以及一个在模型生成界面时同步处理界面的编译器。组件库为每个回答提供熟悉的设计基础，同时留给模型空间，去决定各部分如何组合。编译器让界面随着模型生成逐步呈现，不必等整个回答完成。</p>
+<p>我们扩展了训练方法，帮助模型在内容、布局、视觉和交互上做出周到的决定。其中包括从清晰度、有用性和完整性三个方面评估它生成的界面。GPT-6 学会了使用这套组件库，并做出好的设计决策。这包括如何清晰地组织信息、何时使用交互，以及何时一段简单的文字就足够。</p>
+<p>提升模型的设计判断力、拓展它能创造的内容，仍有很多工作要做。但 Intelligent UI 标志着人们与 ChatGPT 交互方式的重大转变。ChatGPT 不再把每个问题都塞进同一种对话格式。它可以把界面、数据和操作结合起来，为人们探索、理解信息并与之互动，创造全新的方式。</p>
+<h3>前沿智能，更快送达</h3>
+<p>借助 GPT-6，我们还让 ChatGPT 可以在继续思考的同时开始作答。</p>
+<p class="label">GPT-5.6 Instant　｜　GPT-6 Instant</p>
+<p>推理模型问世后，用户能获得解决更难问题的帮助。但他们必须等模型想完，才能拿到答案。现在，ChatGPT 可以让思考与作答交替进行。我们训练它把用户的等待时间考虑在内，基于截至当前的知识和发现，逐步组织答案。它学会了用多段部分回复构建答案。每一段都补充有用的信息，不添加多余的填充内容。同时，整个答案依然像一次性写成的那样连贯、准确。</p>
+<p>在一项针对高价值日常智能体任务的内部评测中，GPT-6 Extra High 开始作答所需的时间与 GPT-5.6 Medium 相同，整体得分却高于 GPT-5.6 Extra High。</p>
+<p>对于需要联网搜索的问题，GPT-6 Instant 开始作答的时间平均比 GPT-5.6 Instant 早 44%。</p>
+<p>GPT-6 还提升了需要联网搜索的回答质量。它更会判断什么时候该查资料，也能更可靠地找到支撑答案的信息。在一项针对困难问题的内部评测中，GPT-6 正确回应用户问题关键点的次数多于 GPT-5.6。</p>
+<h3>安全部署 GPT-6</h3>
+<p>在把更智能的 AI 带给更多人的过程中，我们持续改进三件事：它如何识别现实世界的风险，它的回应有多诚实，以及它多好地尊重人们设定的边界。GPT-6 在每个方面都有进展。它借鉴了 Astra 的多项安全进展。与 GPT-5.6 Sol 相比，它更能抵御绕过安全训练的尝试，更能遵守安全防护措施，也更清楚地说明自己能做什么、不能做什么。我们根据真实使用中的经验更新了它的安全训练，以加强对网络攻击、生物威胁和暴力等高风险滥用的防护。在对抗测试中，GPT-6 对绕过安全训练的尝试表现出更强的抵抗力，尤其是跨多轮不断调整的攻击。GPT-6 还被训练为在较高风险场景下安全应对，同时避免不必要地拒绝无害请求。这包括利用对话历史和相关上下文，识别单条提示中可能看不出来的风险。</p>
+<p>我们在整个训练过程中开展了对齐评估，评估模型的诚实度以及它对安全限制的回应。GPT-6 更善于识别并说明自身能力的边界，包括它缺乏回答所需的信息或工具的情况。更多结果和审查细节，请参阅系统卡（system card）（在新窗口中打开）。</p>
+<h3>上线范围</h3>
+<p>即日起，搭载 Intelligent UI 的 GPT-6 开始在全球范围内向 ChatGPT Plus、Pro、Business 和 Enterprise 档位推送，入口在 Chat 标签页。从明天开始，推送范围扩展到 Free 和 Go 档位。Enterprise 是否可用取决于工作区管理员的设置。</p>
+<p>ChatGPT 中的 GPT-6 在 Plus、Pro、Business 和 Enterprise 档位由 GPT-6 Sol 驱动，在 Free 和 Go 档位由 GPT-6 Luna 驱动。两者都针对日常对话进行了调优。</p>
+<p>本次更新适用于 ChatGPT 中的 Chat 体验。驱动 Work 和 Codex 的模型不会随这次发布而改变。</p>
+<h3>下一步</h3>
+<p>我们的使命是确保通用人工智能安全地造福全人类。GPT-6 把我们在智能上的最新进展，带给每周使用 ChatGPT 的 12 亿多人。</p>
+<p>Intelligent UI 是迈向这样一个 ChatGPT 的一步：它能围绕你想做的事来塑造界面。</p>
+<p>未来，我们希望 ChatGPT 能为人们的日常任务创造更多所需的界面。你应该可以描述自己想完成的事，然后使用围绕这件事构建的体验。</p>
+<p>几十年来，人们一直需要学习如何使用软件，在围绕特定任务设计的固定界面中摸索。我们相信，未来会有所不同。不再是人去适应软件，而是软件来适应人。</p>
+<p class="meta-line">2026 · ChatGPT · 作者</p>
+<h4>继续阅读</h4>
+<figure class="source-figure" data-source-image="0"><img alt="Helping teens learn, plan, and shape the future of AI — Cover" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/3Gg3FDcLbArW4ZsVN8Ry5m/2dcb5d7f34f6cdedec3c6a3e6df83871/teens-learn-and-plan-cover.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="1"><img alt="Building advertising for the way people use AI — Cover" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/17prJimIY0iXyzXUbZcAbB/521e021b422fbf7dade487a0eac38a18/building-advertising-for-the-way-people-use-ai-cover.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="2"><img alt="A model guide for the GPT-6 family — Card image" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/4I32Z0klAF95wPuspoHaxb/7388860bce7773838eb20317fda1a937/6tbusrroo8ljxic8ceybig-cover.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+</div>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
