@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>推出面向开源软件的自愿加入式漏洞发现服务</title>
+<style>
+:root {
+  --bg: #f7f6f2;
+  --card: #ffffff;
+  --ink: #1d1f24;
+  --muted: #5d6270;
+  --line: #e1ddd3;
+  --accent: #1f5fd1;
+  --accent2: #c8372d;
+  --accent3: #11845b;
+  --accent4: #7a3fc4;
+  --hl: #fff0b3;
+  --hl2: #d9ecff;
+  --soft-blue: #eaf2ff;
+  --soft-red: #fdecea;
+  --soft-green: #e7f6ef;
+  --soft-purple: #f2ebfc;
+  --band-bg: #17213a;
+  --band-ink: #f2f4fa;
+  --band-muted: #a9b3cc;
+  --hero-bg: #fbf8ef;
+  --th-bg: #eef1f6;
+}
+:root[data-theme="light"] {
+  --bg: #f7f6f2;
+  --card: #ffffff;
+  --ink: #1d1f24;
+  --muted: #5d6270;
+  --line: #e1ddd3;
+  --accent: #1f5fd1;
+  --accent2: #c8372d;
+  --accent3: #11845b;
+  --accent4: #7a3fc4;
+  --hl: #fff0b3;
+  --hl2: #d9ecff;
+  --soft-blue: #eaf2ff;
+  --soft-red: #fdecea;
+  --soft-green: #e7f6ef;
+  --soft-purple: #f2ebfc;
+  --band-bg: #17213a;
+  --band-ink: #f2f4fa;
+  --band-muted: #a9b3cc;
+  --hero-bg: #fbf8ef;
+  --th-bg: #eef1f6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12141a;
+    --card: #1b1e26;
+    --ink: #e4e6ec;
+    --muted: #9aa0ae;
+    --line: #2e323d;
+    --accent: #6ea2ff;
+    --accent2: #ff7a6e;
+    --accent3: #43d19a;
+    --accent4: #b88bff;
+    --hl: #4a3f12;
+    --hl2: #1c3554;
+    --soft-blue: #182234;
+    --soft-red: #2d1a1a;
+    --soft-green: #15271f;
+    --soft-purple: #221a33;
+    --band-bg: #0b1020;
+    --band-ink: #e8ebf3;
+    --band-muted: #8e98b2;
+    --hero-bg: #191b22;
+    --th-bg: #232733;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12141a;
+  --card: #1b1e26;
+  --ink: #e4e6ec;
+  --muted: #9aa0ae;
+  --line: #2e323d;
+  --accent: #6ea2ff;
+  --accent2: #ff7a6e;
+  --accent3: #43d19a;
+  --accent4: #b88bff;
+  --hl: #4a3f12;
+  --hl2: #1c3554;
+  --soft-blue: #182234;
+  --soft-red: #2d1a1a;
+  --soft-green: #15271f;
+  --soft-purple: #221a33;
+  --band-bg: #0b1020;
+  --band-ink: #e8ebf3;
+  --band-muted: #8e98b2;
+  --hero-bg: #191b22;
+  --th-bg: #232733;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  line-height: 1.75;
+  font-size: 16px;
+}
+.wrap { max-width: 960px; margin: 0 auto; padding: 0 20px 64px; }
+mark { background: var(--hl); color: inherit; padding: 0 3px; border-radius: 3px; }
+mark.b { background: var(--hl2); }
+strong.data { color: var(--accent); }
+strong.risk { color: var(--accent2); }
+strong.opp { color: var(--accent3); }
+strong.concl { color: var(--accent4); }
+h2 { font-size: 1.45rem; margin: 0 0 14px; line-height: 1.35; }
+h3 { font-size: 1.12rem; margin: 0 0 8px; }
+.insight {
+  margin-top: 14px;
+  font-weight: 600;
+  color: var(--accent4);
+}
+
+/* hero */
+.hero {
+  background: var(--hero-bg);
+  border-bottom: 4px solid var(--accent);
+  padding: 48px 20px 36px;
+}
+.hero-inner { max-width: 960px; margin: 0 auto; }
+.kicker {
+  display: inline-block;
+  font-size: .82rem;
+  letter-spacing: .06em;
+  color: var(--accent2);
+  border: 1px solid var(--accent2);
+  border-radius: 999px;
+  padding: 2px 12px;
+  margin-bottom: 14px;
+}
+.hero h1 { font-size: 2.1rem; line-height: 1.3; margin: 0 0 8px; }
+.en-title { color: var(--muted); font-size: 1.02rem; font-style: italic; margin: 0 0 14px; }
+.meta { color: var(--muted); font-size: .88rem; }
+.meta a { color: var(--accent); }
+.oneliner {
+  margin-top: 22px;
+  background: var(--card);
+  border-left: 6px solid var(--accent4);
+  padding: 16px 20px;
+  border-radius: 0 10px 10px 0;
+  font-size: 1.08rem;
+}
+.oneliner .lbl { font-weight: 700; color: var(--accent4); margin-right: 6px; }
+
+/* number band */
+.band {
+  background: var(--band-bg);
+  color: var(--band-ink);
+  margin: 36px 0;
+  padding: 28px 24px;
+  border-radius: 14px;
+}
+.band h2 { color: var(--band-ink); }
+.nums { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 18px; }
+.num { border-top: 3px solid var(--accent); padding-top: 10px; }
+.num.r { border-color: var(--accent2); }
+.num.g { border-color: var(--accent3); }
+.num.p { border-color: var(--accent4); }
+.num .v { font-size: 1.9rem; font-weight: 800; line-height: 1.2; }
+.num .d { font-size: .88rem; color: var(--band-muted); }
+.band .insight { color: var(--band-ink); border-top: 1px dashed var(--band-muted); padding-top: 12px; }
+
+/* split */
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin: 36px 0; }
+.split > div { padding: 22px 24px; }
+.split .left { background: var(--soft-red); border-right: 1px solid var(--line); }
+.split .right { background: var(--soft-green); }
+.split .left h3 { color: var(--accent2); }
+.split .right h3 { color: var(--accent3); }
+.split-head { grid-column: 1 / -1; background: var(--card); border-bottom: 1px solid var(--line); }
+.split-foot { grid-column: 1 / -1; background: var(--card); border-top: 1px solid var(--line); }
+.split-foot .insight { margin: 0; }
+
+/* flow */
+.flow-sec { margin: 36px 0; padding: 0 4px; }
+.flow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; counter-reset: step; margin-top: 14px; }
+.step {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 34px 16px 14px;
+}
+.step::before {
+  counter-increment: step;
+  content: counter(step);
+  position: absolute; top: -14px; left: 16px;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--accent); color: var(--card);
+  font-weight: 700; text-align: center; line-height: 30px;
+}
+.step h3 { color: var(--accent); }
+
+/* table */
+.table-sec { background: var(--soft-blue); border-radius: 14px; padding: 24px; margin: 36px 0; }
+table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 8px; overflow: hidden; }
+th, td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+th { background: var(--th-bg); font-size: .9rem; }
+td.n { font-weight: 700; color: var(--accent); white-space: nowrap; }
+td.n.r { color: var(--accent2); }
+td.n.g { color: var(--accent3); }
+.note { font-size: .85rem; color: var(--muted); margin-top: 8px; }
+.twocol { display: grid; grid-template-columns: 1.4fr 1fr; gap: 18px; }
+
+/* quotes */
+.quotes { margin: 36px 0; }
+.qgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.q {
+  border-left: 4px solid var(--accent3);
+  padding: 8px 16px;
+  background: var(--card);
+}
+.q:nth-child(2) { border-color: var(--accent); }
+.q:nth-child(3) { border-color: var(--accent4); }
+.q:nth-child(4) { border-color: var(--accent2); }
+.q p { margin: 0 0 6px; }
+.q .who { font-size: .85rem; color: var(--muted); }
+
+/* caveat strip */
+.caveat {
+  margin: 36px 0;
+  border: 2px dashed var(--accent2);
+  border-radius: 12px;
+  padding: 20px 24px;
+  background: var(--card);
+}
+.caveat h2 { color: var(--accent2); }
+.caveat ul { margin: 0; padding-left: 20px; }
+
+/* access */
+.access { margin: 36px 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.access h2 { grid-column: 1 / -1; }
+.chip { background: var(--soft-purple); border-radius: 10px; padding: 14px 16px; }
+.chip b { color: var(--accent4); display: block; margin-bottom: 4px; }
+.access .insight { grid-column: 1 / -1; margin-top: 0; }
+
+/* takeaways mosaic */
+.takeaways { margin: 40px 0; }
+.mosaic { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
+.tk { border-radius: 12px; padding: 16px 18px; background: var(--card); border: 1px solid var(--line); }
+.tk .i { font-size: 1.6rem; font-weight: 800; line-height: 1; }
+.tk1 { grid-column: span 4; border-top: 5px solid var(--accent); }
+.tk1 .i { color: var(--accent); }
+.tk2 { grid-column: span 2; border-top: 5px solid var(--accent2); }
+.tk2 .i { color: var(--accent2); }
+.tk3 { grid-column: span 2; border-top: 5px solid var(--accent3); }
+.tk3 .i { color: var(--accent3); }
+.tk4 { grid-column: span 2; border-top: 5px solid var(--accent4); }
+.tk4 .i { color: var(--accent4); }
+.tk5 { grid-column: span 2; border-top: 5px solid var(--muted); }
+.tk5 .i { color: var(--muted); }
+
+/* translation */
+#translation {
+  margin-top: 56px;
+  padding-top: 28px;
+  border-top: 3px double var(--line);
+}
+#translation h2 { font-size: 1.6rem; }
+#translation .body { max-width: 720px; margin: 0 auto; font-size: 1.02rem; line-height: 1.9; }
+#translation h3 { font-size: 1.25rem; margin: 32px 0 10px; color: var(--accent); }
+#translation p { margin: 0 0 14px; }
+#translation blockquote {
+  margin: 16px 0;
+  padding: 4px 0 4px 16px;
+  border-left: 3px solid var(--line);
+  color: var(--ink);
+}
+#translation blockquote cite { display: block; color: var(--muted); font-style: normal; font-size: .9rem; }
+.source-figure { margin: 28px 0; }
+.source-figure img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+.source-figure figcaption { font-size: .88rem; color: var(--muted); margin-top: 8px; text-align: center; }
+
+@media (max-width: 720px) {
+  .split, .qgrid, .flow, .twocol, .access { grid-template-columns: 1fr; }
+  .split .left { border-right: none; border-bottom: 1px solid var(--line); }
+  .mosaic { grid-template-columns: 1fr; }
+  .tk1, .tk2, .tk3, .tk4, .tk5 { grid-column: auto; }
+  .hero h1 { font-size: 1.6rem; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/launching-opt-in-vuln-finding-service-for-open-source" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+
+<header class="hero">
+  <div class="hero-inner">
+    <span class="kicker">Frontier Red Team · 安全工具发布</span>
+    <h1>推出面向开源软件的自愿加入式漏洞发现服务</h1>
+    <p class="en-title">Launching an opt-in vulnerability-finding service for open-source software</p>
+    <div class="meta">Anthropic · 2026 年 10 月 8 日 · <a href="https://www.anthropic.com/research/launching-opt-in-vuln-finding-service-for-open-source">原文链接</a></div>
+    <div class="oneliner"><span class="lbl">一句话总括</span>AI 找漏洞的速度已经<mark>远远甩开人工验证</mark>。Anthropic 因此推出 OSS Scanner，让开源维护者可以主动选择<strong class="concl">直接接收未经人工审核的模型报告</strong>。早期抽检显示，这些报告的<strong class="data">误报率极低</strong>。</div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="band">
+    <h2>瓶颈换了位置：从“找不到”变成“审不完”</h2>
+    <div class="nums">
+      <div class="num"><div class="v">&lt;20% → &gt;85%</div><div class="d">CyberGym 基准上 LLM 的漏洞发现率（去年初 → 今年）</div></div>
+      <div class="num r"><div class="v">29,000+</div><div class="d">近六个月发现的候选漏洞</div></div>
+      <div class="num p"><div class="v">≈6,000</div><div class="d">其中经过人工审核和分级处理的数量</div></div>
+      <div class="num g"><div class="v">≈5,000</div><div class="d">应维护者要求直接发出的未验证报告</div></div>
+    </div>
+    <p class="insight">人工只消化了约五分之一的候选漏洞。限制披露速度的已经不是模型，而是人。</p>
+  </section>
+
+  <section class="split">
+    <div class="split-head">
+      <h2>为什么要绕过人工审核</h2>
+      <p>漏洞利用代码如今<mark>几分钟</mark>就能写出来。攻击者也在用同样的能力找同样的弱点。</p>
+    </div>
+    <div class="left">
+      <h3>旧路径：先验证，再披露</h3>
+      <p>报告质量有保障。但受人力限制，大量候选漏洞<strong class="risk">积压未发</strong>。</p>
+      <p>对缺少资源的项目，Anthropic 会继续走这条协调漏洞披露（CVD）流程。</p>
+    </div>
+    <div class="right">
+      <h3>新路径：模型直出的快速通道</h3>
+      <p>报告<strong class="opp">一生成就发出</strong>，扫描更快、更频繁。</p>
+      <p>这条路并非凭空设计。许多维护者收到首批报告后，<mark class="b">主动要求一次拿到全部</mark>，哪怕未经验证。</p>
+    </div>
+    <div class="split-foot"><p class="insight">在攻防竞速中，维护者愿意用一点准确性去换时间。新服务只是把这种需求变成了正式选项。</p></div>
+  </section>
+
+  <section class="flow-sec">
+    <h2>每份报告交付什么</h2>
+    <p>报告由最强模型（含 <strong class="data">Claude Mythos</strong>）生成。在数十个项目的试运行中，交付了数百份报告。其中多个漏洞被串联成<strong class="risk">无需身份验证的远程代码执行</strong>利用链。</p>
+    <div class="flow">
+      <div class="step"><h3>独立复现程序</h3><p>工程师拿到后可以直接跑起来验证。</p></div>
+      <div class="step"><h3>漏洞解释</h3><p>说明成因。条件允许时，还用二分查找定位漏洞是在哪次改动中引入的。</p></div>
+      <div class="step"><h3>候选补丁</h3><p>如有可用的修复方案，会一并附上。</p></div>
+    </div>
+    <p class="insight">附带复现和补丁，把“读报告”变成了“验证并合并”，大幅降低维护者的处理成本。</p>
+  </section>
+
+  <section class="table-sec">
+    <h2>准确率到底如何</h2>
+    <div class="twocol">
+      <div>
+        <table>
+          <thead><tr><th>专家抽检：早期版本（单位：漏洞个数）</th><th>数量</th><th>占比</th></tr></thead>
+          <tbody>
+            <tr><td>受检的严重/高危发现（覆盖 48 个项目）</td><td class="n">97</td><td class="n">100%</td></tr>
+            <tr><td>达到 CVD 披露标准</td><td class="n g">85</td><td class="n g">88%</td></tr>
+            <tr><td>真实存在，但与已知问题或其他发现重复</td><td class="n">11</td><td>—</td></tr>
+            <tr><td>无效（误报）</td><td class="n r">1</td><td>—</td></tr>
+          </tbody>
+        </table>
+        <p class="note">检查者为负责审核 CVD 发现的专业渗透测试人员。“—”表示原文未给出该项比例。</p>
+      </div>
+      <div>
+        <table>
+          <thead><tr><th>wolfSSL 反馈（单位：报告份数）</th><th>数量</th></tr></thead>
+          <tbody>
+            <tr><td>收到的报告</td><td class="n">74</td></tr>
+            <tr><td>无效报告</td><td class="n r">2</td></tr>
+            <tr><td>成为 CVE</td><td class="n g">5</td></tr>
+          </tbody>
+        </table>
+        <p class="note">数据来自 wolfSSL 的 Todd Ouska 引语。</p>
+      </div>
+    </div>
+    <p class="insight">97 个严重/高危发现里只有 1 个误报。“模型直出不可信”的直觉，至少在高危漏洞上已经站不住了。</p>
+  </section>
+
+  <section class="quotes">
+    <h2>维护者怎么说</h2>
+    <div class="qgrid">
+      <div class="q"><p>发现 PostgreSQL 缺陷的比例<mark>异常地高</mark>。快速通道让我们在问题进入正式版前就修掉了。</p><div class="who">Noah Misch · PostgreSQL</div></div>
+      <div class="q"><p>约 18 个月前的 AI 报告<strong class="risk">糟糕透顶</strong>。现在的报告<strong class="opp">和人写的一样好，有时更好</strong>。</p><div class="who">Anton Arapov · OpenSSL Corporation</div></div>
+      <div class="q"><p>74 份报告只有 2 份无效。附带补丁，能<mark class="b">直接融入现有流程</mark>。</p><div class="who">Todd Ouska · wolfSSL</div></div>
+      <div class="q"><p>报告对 HotCRP 复杂的权限模型理解到位，优先级排序也好。</p><div class="who">Eddie Kohler · HotCRP</div></div>
+    </div>
+    <p class="insight">一线维护者的评价已从“AI 报告是噪音”翻转为“附带利用代码的报告基本等于活干完了”。</p>
+  </section>
+
+  <section class="caveat">
+    <h2>仍需注意的局限</h2>
+    <ul>
+      <li>输出<strong class="risk">完全由模型生成</strong>，不经人工审核，报告可能出错或无效。</li>
+      <li>维护者反馈：严重程度评级<strong class="risk">有时偏高</strong>。</li>
+      <li>扫描器有时会<strong class="risk">误解项目的威胁模型</strong>。</li>
+      <li>Anthropic 明确表示无法保证扫描器完美，将根据反馈和模型进步持续改进。</li>
+    </ul>
+    <p class="insight">主要问题不是“漏洞是假的”，而是“漏洞有多严重”判断不准。这仍需要维护者自己把关。</p>
+  </section>
+
+  <section class="access">
+    <h2>谁能用，怎么用</h2>
+    <div class="chip"><b>OSS Scanner</b>核心维护者按模板向指定 GitHub 仓库提交 PR 报名。资格参照 OSS-Fuzz，要求对基础设施和用户安全有关键影响，逐个评估。</div>
+    <div class="chip"><b>Cyber Verification Program</b>向符合条件的安全专业人员开放先进网络安全能力，并减少拦截分类器的限制。</div>
+    <div class="chip"><b>Claude for OSS</b>免费提供 Claude Max 20x 订阅，用于修复漏洞、改进开源项目。</div>
+    <p class="insight">定位上，OSS Scanner 是 OSS-Fuzz 的“语言模型版”，与面向企业的 Claude Security 分工互补。</p>
+  </section>
+
+  <section class="takeaways">
+    <h2>最值得带走的洞见</h2>
+    <div class="mosaic">
+      <div class="tk tk1"><div class="i">01</div><p>AI 漏洞挖掘的主要瓶颈已转移到人工验证：29,000 多个候选漏洞中只审完约 6,000 个。</p></div>
+      <div class="tk tk2"><div class="i">02</div><p>漏洞利用只需几分钟，披露速度本身就是防御能力。</p></div>
+      <div class="tk tk3"><div class="i">03</div><p>模型直出报告在高危漏洞上已接近专家水准：97 个中 85 个达标，仅 1 个误报。</p></div>
+      <div class="tk tk4"><div class="i">04</div><p>复现程序加补丁的报告形态，让维护者的工作从“排查”变成“确认”。</p></div>
+      <div class="tk tk5"><div class="i">05</div><p>剩下的难点在严重度评估和威胁模型理解，这部分仍离不开项目方的判断。</p></div>
+    </div>
+  </section>
+
+  <section id="translation">
+    <h2>完整译文</h2>
+    <div class="body">
+      <p>我们正式推出 OSS Scanner。这是一个面向开源生态、需项目自愿加入（opt-in）的漏洞扫描服务。它的设计借鉴了我们在 Project Glasswing 中用 Claude 发现漏洞的经验。加入的项目将免费获得由我们最强模型执行的、全面且定期的安全扫描。</p>
+
+      <p>语言模型发现漏洞的能力进步很快，我们已在这个博客上多次详细报道。以学术漏洞发现基准 CyberGym 为例：去年年初，LLM 只能找出不到 20% 的漏洞；到了今年，这一比例已超过 85%。因此，开源维护者从 LLM 那里收到的东西，已经从过去以低质量内容（slop）为主，变成了高质量的漏洞报告。</p>
+
+      <p>过去六个月，我们用最新模型扫描了全球一些最重要的软件项目。我们发现了超过 29,000 个候选漏洞，但只对其中约 6,000 个完成了人工审核和分级处理（triage）。6,000 个漏洞已经是不小的数量。但我们验证这些发现的能力仍受限于人力，这个瓶颈依然存在。</p>
+
+      <p>我们正在扩大漏洞披露的规模。与此同时，越来越多的维护者在收到我们的首批报告后，直接要求我们把所有未经验证的报告连同修复建议一并批量提交。截至目前，应维护者“把手上所有内容都发过来，哪怕尚未验证”的要求，我们已直接向他们发送了近 5,000 份报告。如今，漏洞利用代码（exploit）几分钟就能开发出来。攻击者也在争分夺秒地寻找并利用同样的弱点。能更快发现并修复漏洞的项目，就能更好地保护自己的软件。</p>
+
+      <p>对于经人工验证的漏洞报告，我们将继续通过现有的协调漏洞披露（coordinated vulnerability disclosure，CVD）流程手动披露。对于没有资源自行分级处理报告的项目，这一点尤其重要。不过，我们现在也提供一条可选的快速通道，供希望第一时间收到漏洞报告的项目使用。</p>
+
+      <h3>我们的漏洞扫描器</h3>
+
+      <p>Google 的 OSS-Fuzz 用模糊测试器（fuzzer）扫描开源软件中的漏洞，给开源生态带来了积极影响。受此启发，我们推出 OSS Scanner，用我们最强的语言模型在开源代码中寻找漏洞。Claude Security 是我们面向大众开放的代码扫描与修补产品，重点是帮助企业保护自身系统。OSS Scanner 则为开源项目免费提供安全审计。</p>
+
+      <p>这一自愿加入的漏洞扫描器，其输出将完全由模型生成，不经过人工审核或分级处理。这样可以扫描得更快、更频繁。但这也意味着，报告有可能出错或无效。这些报告将由我们最强的模型（包括 Claude Mythos）生成，为开源项目提供最大的防御优势。</p>
+
+      <p>过去几周，我们和数十个开源项目一起验证了这条流程。最初的披露包含数百份漏洞报告。其中有多个漏洞，我们能够把它们串联起来，形成影响这些项目的无需身份验证的远程代码执行（unauthenticated remote code execution）利用链。每份报告都包含：一个可独立运行的复现程序（reproducer）；对漏洞的解释（在可能的情况下，包括通过二分查找确定漏洞何时引入）；以及修复该漏洞的候选补丁（如有）。现在，我们正把这项服务开放给更多开源项目。</p>
+
+      <p>以下是我们在测试 OSS Scanner 早期版本和原始模型输出时收到的部分反馈：</p>
+
+      <blockquote>
+        <p>“OSS Scanner 的发现中，揭示 PostgreSQL 缺陷的比例异常地高。有几份报告附带的修复几乎可以原样使用。快速通道还让我们得以在最新问题进入正式版（GA）发布之前就把它们解决掉。”</p>
+        <cite>——Noah Misch，PostgreSQL</cite>
+      </blockquote>
+
+      <blockquote>
+        <p>“大约 18 个月前，也就是 Project Glasswing 之前，早期的 AI 报告糟糕透顶。而我们从 Anthropic 收到的报告，包括原始模型输出在内，质量和人写的一样好，有时甚至更好。尤其是附带真实漏洞利用代码的报告，对工程师来说基本就是大功告成，因为可以立即验证。”</p>
+        <cite>——Anton Arapov，OpenSSL Corporation</cite>
+      </blockquote>
+
+      <blockquote>
+        <p>“我们发现这些报告的信号质量很高：在收到的 74 份报告中，只有两份无效，还有五份成为了 CVE。报告附带补丁，因此能直接融入我们现有的问题验证与修复流程。我们希望收到更多。”</p>
+        <cite>——Todd Ouska，wolfSSL</cite>
+      </blockquote>
+
+      <blockquote>
+        <p>“这些漏洞报告详尽清晰，对 HotCRP 复杂的权限模型理解到位，漏洞优先级排序也做得很好。”</p>
+        <cite>——Eddie Kohler，HotCRP</cite>
+      </blockquote>
+
+      <p>为了验证 OSS Scanner 的早期版本，我们请负责审核 CVD 发现的专业渗透测试人员，检查了扫描器在 48 个项目中找出的 97 个严重（critical）和高危（high-severity）漏洞。其中 85 个（88%）达到了我们 CVD 流程的标准。其余 12 个中，有 11 个是真实存在的漏洞，但与已知问题或本次扫描的其他发现重复；只有一个是无效的，也就是“误报”（false positive）。此后，我们已把其中许多发现发送给维护者。维护者很少告诉我们某个高危或严重发现是无效的，这与我们此前在开源领域的工作结果一致。也有维护者告诉我们，严重程度评级可能偏高，或者扫描器误解了项目的威胁模型。我们无法保证扫描器完美无缺。但我们会根据维护者的反馈，并随着模型的进步，持续改进这个系统。</p>
+
+      <h3>开始使用</h3>
+
+      <p>符合条件项目的核心维护者，可以按照标准项目模板向这个 GitHub 仓库提交 PR 来报名，我们的扩展 FAQ 中提供了更多指导。项目资格标准与 OSS-Fuzz 所用的标准类似。简单来说，项目应对“基础设施和用户安全具有关键影响”。我们会逐个评估并做出决定。</p>
+
+      <p>无论 OSS Scanner 是否适合你，我们新推出的 Cyber Verification Program 都会向符合条件的安全专业人员开放先进的网络安全能力，并减少拦截分类器的限制。Claude for OSS 则免费提供 Claude Max 20x 订阅，帮助修复漏洞、改进开源项目。</p>
+    </div>
+  </section>
+
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

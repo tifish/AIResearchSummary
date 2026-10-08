@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>缺失的那张天空地图 · The missing map of the sky</title>
+<style>
+:root {
+  --bg: #f7f6f2;
+  --card: #ffffff;
+  --ink: #1d2330;
+  --muted: #5f6675;
+  --line: #dfdcd3;
+  --accent: #2557d6;
+  --accent2: #d1492e;
+  --accent3: #16865a;
+  --accent4: #7a3fc4;
+  --hl: #fff0a8;
+  --hl2: #d9ecff;
+  --soft-blue: #eaf1ff;
+  --soft-red: #fdeee9;
+  --soft-green: #e6f6ee;
+  --soft-violet: #f2ebfc;
+  --th: #eef0f4;
+  --band: #141a2e;
+  --band-ink: #eef1fa;
+  --band-muted: #aab3cc;
+  --hero-bg: #0f1530;
+  --hero-ink: #f2f4fb;
+  --hero-muted: #b4bcd6;
+  --uv: #9b7bff;
+}
+:root[data-theme="light"] {
+  --bg: #f7f6f2;
+  --card: #ffffff;
+  --ink: #1d2330;
+  --muted: #5f6675;
+  --line: #dfdcd3;
+  --accent: #2557d6;
+  --accent2: #d1492e;
+  --accent3: #16865a;
+  --accent4: #7a3fc4;
+  --hl: #fff0a8;
+  --hl2: #d9ecff;
+  --soft-blue: #eaf1ff;
+  --soft-red: #fdeee9;
+  --soft-green: #e6f6ee;
+  --soft-violet: #f2ebfc;
+  --th: #eef0f4;
+  --band: #141a2e;
+  --band-ink: #eef1fa;
+  --band-muted: #aab3cc;
+  --hero-bg: #0f1530;
+  --hero-ink: #f2f4fb;
+  --hero-muted: #b4bcd6;
+  --uv: #9b7bff;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11141b;
+    --card: #191d27;
+    --ink: #e6e8ee;
+    --muted: #9aa1b0;
+    --line: #2c3240;
+    --accent: #7aa2ff;
+    --accent2: #ff8a6b;
+    --accent3: #4fd19a;
+    --accent4: #b994ff;
+    --hl: #4a3f12;
+    --hl2: #1d3554;
+    --soft-blue: #172238;
+    --soft-red: #2b1a17;
+    --soft-green: #132a20;
+    --soft-violet: #221a33;
+    --th: #212634;
+    --band: #0a0d16;
+    --band-ink: #e6e8ee;
+    --band-muted: #9aa1b0;
+    --hero-bg: #0b0f22;
+    --hero-ink: #e9ecf6;
+    --hero-muted: #9ea7c2;
+    --uv: #b49cff;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11141b;
+  --card: #191d27;
+  --ink: #e6e8ee;
+  --muted: #9aa1b0;
+  --line: #2c3240;
+  --accent: #7aa2ff;
+  --accent2: #ff8a6b;
+  --accent3: #4fd19a;
+  --accent4: #b994ff;
+  --hl: #4a3f12;
+  --hl2: #1d3554;
+  --soft-blue: #172238;
+  --soft-red: #2b1a17;
+  --soft-green: #132a20;
+  --soft-violet: #221a33;
+  --th: #212634;
+  --band: #0a0d16;
+  --band-ink: #e6e8ee;
+  --band-muted: #9aa1b0;
+  --hero-bg: #0b0f22;
+  --hero-ink: #e9ecf6;
+  --hero-muted: #9ea7c2;
+  --uv: #b49cff;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", "Segoe UI", sans-serif;
+  line-height: 1.75;
+  font-size: 16px;
+}
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 22px 64px; }
+a { color: var(--accent); }
+.hl { background: var(--hl); padding: 0 3px; border-radius: 3px; color: inherit; }
+.hl2 { background: var(--hl2); padding: 0 3px; border-radius: 3px; color: inherit; }
+.k-data { color: var(--accent); font-weight: 700; }
+.k-risk { color: var(--accent2); font-weight: 700; }
+.k-opp { color: var(--accent3); font-weight: 700; }
+.k-end { color: var(--accent4); font-weight: 700; }
+
+/* Hero */
+.hero {
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+  padding: 56px 22px 44px;
+  border-bottom: 4px solid var(--uv);
+}
+.hero-inner { max-width: 1040px; margin: 0 auto; }
+.hero .meta { color: var(--hero-muted); font-size: 13px; letter-spacing: .06em; text-transform: uppercase; }
+.hero h1 { font-size: 40px; line-height: 1.25; margin: 12px 0 6px; }
+.hero .en-title { color: var(--hero-muted); font-size: 18px; font-style: italic; margin: 0 0 26px; }
+.hero .oneline {
+  border-left: 4px solid var(--uv);
+  padding: 12px 18px;
+  font-size: 19px;
+  line-height: 1.7;
+  max-width: 860px;
+}
+.hero .oneline b { color: var(--uv); }
+.hero .label { display: inline-block; font-size: 12px; color: var(--hero-muted); margin-bottom: 4px; letter-spacing: .1em; }
+
+/* Number band */
+.numband {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0;
+  margin: 30px 0 10px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.numband div { padding: 18px 14px; border-right: 1px solid var(--line); }
+.numband div:last-child { border-right: none; }
+.numband .n { font-size: 30px; font-weight: 800; line-height: 1.1; display: block; }
+.numband .t { font-size: 13px; color: var(--muted); display: block; margin-top: 6px; line-height: 1.5; }
+.n.c1 { color: var(--accent); }
+.n.c2 { color: var(--accent2); }
+.n.c3 { color: var(--accent3); }
+.n.c4 { color: var(--accent4); }
+
+h2.sec {
+  font-size: 24px;
+  margin: 48px 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+h2.sec .badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--card);
+  font-size: 15px;
+  flex: none;
+}
+h2.sec.r .badge { background: var(--accent2); }
+h2.sec.g .badge { background: var(--accent3); }
+h2.sec.v .badge { background: var(--accent4); }
+.verdict {
+  margin-top: 16px;
+  font-weight: 600;
+  padding: 10px 14px;
+  border-left: 4px solid var(--accent4);
+  background: var(--soft-violet);
+  border-radius: 0 8px 8px 0;
+}
+
+/* Split columns */
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+.split .col { padding: 18px 20px; border-radius: 10px; }
+.split .col.blue { background: var(--soft-blue); border-top: 4px solid var(--accent); }
+.split .col.red { background: var(--soft-red); border-top: 4px solid var(--accent2); }
+.split .col.green { background: var(--soft-green); border-top: 4px solid var(--accent3); }
+.split .col.violet { background: var(--soft-violet); border-top: 4px solid var(--accent4); }
+.split h3 { margin: 0 0 8px; font-size: 17px; }
+.split ul { margin: 0; padding-left: 20px; }
+.split li { margin: 4px 0; }
+
+/* Table */
+table.data {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+table.data th, table.data td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+table.data th { background: var(--th); font-size: 13px; color: var(--muted); letter-spacing: .03em; }
+table.data tr.uv td { background: var(--soft-violet); }
+table.data td.band { font-weight: 700; white-space: nowrap; }
+.tnote { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+/* Timeline */
+.timeline { position: relative; margin: 10px 0 0; padding-left: 34px; }
+.timeline::before { content: ""; position: absolute; left: 13px; top: 6px; bottom: 6px; width: 2px; background: var(--accent); }
+.step { position: relative; margin-bottom: 18px; }
+.step .dot {
+  position: absolute; left: -34px; top: 2px;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--card); border: 2px solid var(--accent);
+  color: var(--accent); font-weight: 800; font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+}
+.step.learn .dot { border-color: var(--accent4); color: var(--accent4); }
+.step.check .dot { border-color: var(--accent3); color: var(--accent3); }
+.step h4 { margin: 0; font-size: 16px; }
+.step p { margin: 2px 0 0; color: var(--ink); }
+
+/* Dark band */
+.darkband {
+  background: var(--band);
+  color: var(--band-ink);
+  border-radius: 14px;
+  padding: 26px 28px;
+  margin-top: 48px;
+}
+.darkband h2 { margin: 0 0 10px; font-size: 22px; color: var(--band-ink); }
+.darkband p { color: var(--band-ink); }
+.darkband .sub { color: var(--band-muted); font-size: 14px; }
+.darkband .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 16px 0; }
+.darkband .flow div { border: 1px solid var(--accent2); border-radius: 8px; padding: 12px; font-size: 14px; line-height: 1.6; }
+.darkband .flow b { color: var(--accent2); display: block; font-size: 13px; margin-bottom: 4px; }
+.darkband .insight { border-top: 1px solid var(--accent2); padding-top: 12px; font-weight: 600; color: var(--band-ink); }
+
+/* Quote */
+.quote {
+  margin: 44px 0 0;
+  padding: 22px 26px;
+  border-left: 6px solid var(--accent3);
+  background: var(--soft-green);
+  font-size: 19px;
+  line-height: 1.7;
+}
+.quote .who { display: block; font-size: 13px; color: var(--muted); margin-top: 8px; }
+
+/* Mosaic */
+.mosaic { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
+.tile { padding: 18px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); }
+.tile .no { font-size: 28px; font-weight: 800; line-height: 1; display: block; margin-bottom: 8px; }
+.tile.a { grid-column: span 3; border-top: 4px solid var(--accent); }
+.tile.b { grid-column: span 3; border-top: 4px solid var(--accent3); }
+.tile.c { grid-column: span 2; border-top: 4px solid var(--accent2); }
+.tile.d { grid-column: span 2; border-top: 4px solid var(--accent4); }
+.tile.e { grid-column: span 2; border-top: 4px solid var(--accent); }
+.tile.a .no, .tile.e .no { color: var(--accent); }
+.tile.b .no { color: var(--accent3); }
+.tile.c .no { color: var(--accent2); }
+.tile.d .no { color: var(--accent4); }
+
+/* Translation */
+#translation {
+  margin-top: 70px;
+  padding-top: 30px;
+  border-top: 3px double var(--line);
+}
+#translation .reader { max-width: 760px; margin: 0 auto; }
+#translation h2 { font-size: 28px; margin: 0 0 6px; }
+#translation .tr-sub { color: var(--muted); font-size: 14px; margin: 0 0 24px; }
+#translation h3 { font-size: 21px; margin: 40px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+#translation p { margin: 0 0 16px; line-height: 1.95; font-size: 16.5px; }
+#translation p.map-note { font-size: 14.5px; color: var(--muted); border-left: 3px solid var(--uv); padding-left: 12px; }
+#translation p.outro { color: var(--muted); font-size: 14.5px; }
+.source-figure { margin: 30px 0 32px; }
+.source-figure img { display: block; width: 100%; max-width: 100%; height: auto; border-radius: 6px; }
+.source-figure figcaption { margin-top: 10px; font-size: 13.5px; line-height: 1.7; color: var(--muted); border-left: 3px solid var(--line); padding-left: 10px; }
+
+@media (max-width: 760px) {
+  .hero h1 { font-size: 30px; }
+  .split { grid-template-columns: 1fr; }
+  .darkband .flow { grid-template-columns: 1fr 1fr; }
+  .mosaic { grid-template-columns: 1fr; }
+  .tile.a, .tile.b, .tile.c, .tile.d, .tile.e { grid-column: auto; }
+  .numband div { border-right: none; border-bottom: 1px solid var(--line); }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/the-missing-map-of-the-sky" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<header class="hero">
+<div class="hero-inner">
+<div class="meta">Anthropic · Science · 2026 年 10 月 8 日</div>
+<h1>缺失的那张天空地图</h1>
+<p class="en-title">The missing map of the sky</p>
+<div class="oneline">
+<span class="label">一句话总括</span><br/>
+      天体物理学家 Brice Ménard 让 Claude Science 编排一队 AI 智能体，拼合半个世纪的紫外巡天数据，并用多波段关系<b>预测补全从未被观测过的约三分之一天空</b>，做出了第一张完整的全天紫外图。更重要的是，它证明了科研中那些“有用但总排不上号”的基础工作，如今可以在不挤占研究时间的情况下完成。
+    </div>
+</div>
+</header>
+<main class="wrap">
+<div class="numband">
+<div><span class="n c1">≈ 2/3</span><span class="t">GALEX 在 2003–2013 年间覆盖的天区</span></div>
+<div><span class="n c1">≈ 38,000</span><span class="t">GALEX 独立观测次数</span></div>
+<div><span class="n c2">≈ 1/3</span><span class="t">从未在紫外被观测、由模型预测补全的天区</span></div>
+<div><span class="n c3">≈ 10%</span><span class="t">遮挡检验中预测值与真实紫外测量的差距</span></div>
+<div><span class="n c4">1 亿+</span><span class="t">根据 Gaia 可见光数据叠加的恒星数量</span></div>
+<div><span class="n c4">十几版</span><span class="t">地图迭代版本数，合作历时数天</span></div>
+</div>
+<h2 class="sec"><span class="badge">1</span>紫外天图一直“缺一块”，原因是物理限制加上优先级问题</h2>
+<div class="split">
+<div class="col blue">
+<h3>观测上的硬限制</h3>
+<ul>
+<li>紫外光会被<span class="hl">臭氧层吸收</span>，只能从太空观测。</li>
+<li>最大的数据集来自 NASA 的 GALEX。它覆盖了<span class="k-data">约三分之二</span>的天空。</li>
+<li>GALEX 为保护探测器，<span class="k-risk">刻意避开了极亮恒星</span>，包括恒星最密集的银道面。</li>
+<li>Swift、FIMS/SPEAR 等补充了数据，但合起来仍有不少缺块。</li>
+</ul>
+</div>
+<div class="col red">
+<h3>人力上的软限制</h3>
+<ul>
+<li>统计方法早就能估计缺失数据。</li>
+<li>但做好需要<span class="hl">数周</span>细致工作，包括逐像素定标和反复分析。</li>
+<li>研究者自然会先去做更紧迫的研究。</li>
+<li>大多数领域都积压着这类“有用但排不上号”的项目。</li>
+</ul>
+</div>
+</div>
+<p class="verdict">缺口并非技术上做不到，而是没人有时间做。AI 改变的正是这一层约束。</p>
+<h2 class="sec v"><span class="badge">2</span>不同波段看到的是不同的银河系，紫外是最后缺的那一块</h2>
+<table class="data">
+<thead>
+<tr><th>波段</th><th>主要显现的内容</th><th>对理解银河系的作用</th></tr>
+</thead>
+<tbody>
+<tr><td class="band">可见光</td><td>主要是恒星</td><td>恒星本身的分布</td></tr>
+<tr><td class="band">红外</td><td>微小尘埃颗粒的辉光，集中在沿银河的一条带上</td><td>尘埃的分布</td></tr>
+<tr><td class="band">射电</td><td>恒星和尘埃淡去，氢气显现</td><td>形成新恒星的原材料</td></tr>
+<tr><td class="band">X 射线</td><td>恒星爆炸、物质盘旋落入黑洞等剧烈现象</td><td>高能过程</td></tr>
+<tr class="uv"><td class="band">紫外</td><td>被星光照亮的尘埃：年轻恒星周围的云团、恒星爆炸留下的环</td><td>此前唯一可用的天图<span class="k-risk">满是空洞</span></td></tr>
+</tbody>
+</table>
+<p class="tnote">注：内容均来自原文描述。本项目合成的紫外波段为远紫外 154 nm 与近紫外 232 nm。</p>
+<p class="verdict">作者教书时一直要为紫外图“道歉”。补齐这块之后，学生终于能在同一套经典天图里完整对比各个波段。</p>
+<h2 class="sec"><span class="badge">3</span>从数据搜集到恒星叠加：一条由智能体执行的六步流水线</h2>
+<div class="timeline">
+<div class="step">
+<span class="dot">1</span>
+<h4>搜集公开巡天</h4>
+<p>智能体上网检索公开的紫外巡天数据。仅 GALEX 就有<span class="k-data">数万张图像</span>，跨越数年、拍摄条件各异。</p>
+</div>
+<div class="step">
+<span class="dot">2</span>
+<h4>让每个巡天内部一致</h4>
+<p>重点处理亮星周围的<span class="hl">眩光</span>。多个智能体<span class="hl2">并行处理不同天区</span>，抹平不同时期的差异。</p>
+</div>
+<div class="step">
+<span class="dot">3</span>
+<h4>交叉定标与合并</h4>
+<p>不同仪器“看”紫外的方式略有不同。需要相互定标、统一分辨率、映射到同一坐标系。人只给高层指令。</p>
+</div>
+<div class="step learn">
+<span class="dot">4</span>
+<h4>图像修复填补约 1/3 天空</h4>
+<p>Claude 用已观测的 2/3 天空，学习紫外亮度与<span class="k-end">可见光、红外、射电</span>的关系。再把这种关系用到未观测区域，并给出每个点的<span class="hl">置信度</span>。</p>
+</div>
+<div class="step check">
+<span class="dot">5</span>
+<h4>遮挡检验</h4>
+<p>在已有数据的区域故意遮住一部分，让模型盲猜。几轮改进后，误差在<span class="k-opp">约 10% 以内</span>，人眼几乎看不出差别。</p>
+</div>
+<div class="step">
+<span class="dot">6</span>
+<h4>叠加单颗恒星</h4>
+<p>在弥散背景上，加入根据 ESA Gaia 可见光测量推算的<span class="k-data">1 亿多颗恒星</span>的紫外光。第一版完整地图完成。</p>
+</div>
+</div>
+<p class="verdict">关键一步是第 4 步。它不是凭空“画”出缺失区域，而是用其他波段的真实观测作为约束，并且对每个像素标注“实测”或“预测”以及不确定度。</p>
+<section class="darkband">
+<h2>试错：一个 Claude 自己列过、却漏过两轮审查的瑕疵</h2>
+<p class="sub">最暗天区里出现淡淡的圆圈，每个都比邻居稍亮或稍暗。</p>
+<div class="flow">
+<div><b>根源</b>每次 GALEX 观测是一块圆形天区，都带有不均匀的大气紫外辉光</div>
+<div><b>疏漏</b>Claude 开始时已把它列为已知问题，地图却通过了<strong>两轮</strong>智能体审查</div>
+<div><b>发现</b>作者某天晚上浏览图像时，用肉眼看了出来</div>
+<div><b>修正</b>一句指令后，Claude 对全部 <strong>38,000</strong> 次观测校正辉光，耗时几小时</div>
+</div>
+<p class="insight">智能体互审并不能替代领域专家的眼睛。一旦人指出问题，大规模返工的成本却极低。</p>
+</section>
+<h2 class="sec g"><span class="badge">4</span>人与 AI 的分工：人规划和把关，Claude 做长时间计算</h2>
+<div class="split">
+<div class="col green">
+<h3>作者做的事</h3>
+<ul>
+<li>定下目标：收集、统一、合并、填补。</li>
+<li>给出交叉定标等步骤的<span class="hl">高层指令</span>。</li>
+<li>设计遮挡检验，确认预测可信。</li>
+<li>发现圆圈瑕疵并要求修正。</li>
+<li>致谢中自述：贡献“仅限于引导”。</li>
+</ul>
+</div>
+<div class="col violet">
+<h3>Claude 和智能体做的事</h3>
+<ul>
+<li>编排智能体团队，检索与下载数据。</li>
+<li>去眩光、定标、重投影、合并。</li>
+<li>学习跨波段关系，完成预测与不确定度估计。</li>
+<li>每轮<span class="hl2">独立计算数小时</span>，此时作者去做别的项目。</li>
+<li>共迭代出<span class="k-end">十几个版本</span>。</li>
+</ul>
+</div>
+</div>
+<p class="verdict">工作节奏很固定：几轮对话规划，然后放手计算。这让项目“不必牺牲原本投入研究的时间”。</p>
+<h2 class="sec"><span class="badge">5</span>所用数据来源</h2>
+<table class="data">
+<thead>
+<tr><th>数据来源</th><th>机构</th><th>原文提到的作用</th></tr>
+</thead>
+<tbody>
+<tr><td class="band">GALEX</td><td>NASA</td><td>最大的紫外数据集。2003–2013 年，约 38,000 次观测，覆盖约 2/3 天空，避开亮星区域</td></tr>
+<tr><td class="band">Swift</td><td>NASA</td><td>补充紫外数据</td></tr>
+<tr><td class="band">FIMS/SPEAR</td><td>韩国</td><td>补充紫外数据</td></tr>
+<tr><td class="band">TD-1</td><td>欧洲</td><td>致谢中列出的测量来源</td></tr>
+<tr><td class="band">Planck</td><td>ESA</td><td>图注提到用于填补空缺的模板</td></tr>
+<tr><td class="band">Gaia</td><td>ESA</td><td>可见光测量，用于推算 1 亿多颗恒星的紫外光</td></tr>
+</tbody>
+</table>
+<p class="tnote">注：仅列原文明确提到的数据来源与用途。</p>
+<div class="quote">
+    “我猜很多科学家都能想到某张地图、某幅图或某个资源，也因为同样的原因一直被搁置。”
+    <span class="who">—— Brice Ménard</span>
+</div>
+<h2 class="sec v"><span class="badge">★</span>最值得带走的洞见</h2>
+<div class="mosaic">
+<div class="tile a"><span class="no">01</span>AI 最先改变的，可能是科研中的<strong>积压项目</strong>。这些工作的价值不在新发现，而在于为教学和其他研究者提供基础资源。</div>
+<div class="tile b"><span class="no">02</span>预测补全之所以可信，是因为它有<strong>多波段观测作为约束</strong>，经过遮挡检验（误差约 10%），并逐像素标注“实测/预测”和不确定度。</div>
+<div class="tile c"><span class="no">03</span>智能体之间的互审会漏掉问题。圆圈瑕疵通过了两轮审查，最终靠<strong>人眼</strong>发现。</div>
+<div class="tile d"><span class="no">04</span>人的角色转向目标设定、验证设计和最终质检。重复性的大规模计算交给智能体并行完成。</div>
+<div class="tile e"><span class="no">05</span>一旦问题被指出，对 38,000 次观测的全面返工只需几小时。<strong>迭代成本</strong>大幅下降，才有了十几个版本的打磨。</div>
+</div>
+<section id="translation">
+<div class="reader">
+<h2>完整译文</h2>
+<p class="tr-sub">原文：The missing map of the sky · Anthropic · 2026 年 10 月 8 日</p>
+<p>本文中，约翰斯·霍普金斯大学（Johns Hopkins University）天体物理学家、Anthropic 研究员 Brice Ménard 讲述了他如何与 Claude Science 合作，绘制出第一张完整的紫外光全天图。这张图将成为很有价值的教学工具。学生可以借助它，细致地看到银河系在这个波段下呈现的丰富结构。</p>
+<figure class="source-figure" data-source-image="0"><img alt="A semi-interactive view of our night sky through different imaging modes: UV, natural light, and infrared" decoding="async" height="1200" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/895ee62706be70c96f9f078f451ebd238bdffad1-2400x1200.webp" width="2400"/></figure>
+<p class="map-note">紫外波段下的整个天空，银河系中心位于图的正中（合成了 154 nm 远紫外与 232 nm 近紫外）。这张图约有三分之一（包括银道面的大部分）是借助 Claude Science、用本文介绍的方法预测出来的。地图另有几个图层：它们把每个像素标记为“实测”或“预测”，并给出不确定度估计。你可以在这里查看。</p>
+<p>在教天体物理时，我常常先给学生看一件事：用不同波长观察，天空的样子完全不同。每个波段都会凸显不同的特征。在可见光下，看到的主要是恒星。换成红外，就能看到微小尘埃颗粒发出的辉光，它们集中在沿银河分布的一条带上。到了射电波段，恒星和尘埃都淡去了，氢气显现出来——那是形成新恒星的原材料。而在 X 射线中，能看到剧烈的现象，比如恒星爆炸，或物质盘旋着落入黑洞。把这些特征放在一起，天文学家就能理解气体如何坍缩成恒星，恒星如何向星系播撒尘埃，以及像我们这样的星系如何成形。</p>
+<figure class="source-figure" data-source-image="1"><img alt="Three views of the sky: in visible light, infrared and radio." decoding="async" height="693" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/0b3e7031e03249c95a280e6a8fccae1946b0911e-2048x693.jpg" width="2048"/>
+<figcaption>天空的三种视图：可见光、红外和射电。图片来源：ESA Gaia DR3、NASA WISE、HI4PI。</figcaption>
+</figure>
+<p>讲到紫外光，以及它如何显现被星光照亮的尘埃时——从年轻恒星周围的云团，到恒星爆炸留下的环——我总得道个歉。我能拿出来的唯一一张紫外图，上面满是窟窿。</p>
+<h3>为什么一直没有完整的紫外图</h3>
+<p>紫外光会被大气中的臭氧层吸收。所以要在紫外波段观测宇宙，就必须到太空去。过去 50 年里，多台空间望远镜在紫外波段观测过天空的部分区域，并公开了数据。但仍有大片区域没有被观测过。</p>
+<p>最大的数据集来自 NASA 的 GALEX 任务。它从 2003 年运行到 2013 年，通过约 38,000 次独立观测，拍摄了大约三分之二的天空。但 GALEX 有意避开了有极亮恒星的位置，包括银河系平面（即银河系扁平的盘，恒星最密集的地方），因为那里有损坏卫星探测器的风险。其他空间望远镜，比如 NASA 的 Swift 和韩国的 FIMS/SPEAR，也获取了更多数据。但即便把这些数据集合在一起，仍有不少缺块。</p>
+<p>有一些统计技术可以估计缺失数据，从而拼出一张完整的全天紫外图。但要把这件事做好，需要数周艰苦细致的工作：既要在单个像素层面做一丝不苟的定标，又要反复进行复杂的分析。可以理解，天体物理学家往往会把这类工作放到一边，去做更紧迫的研究。大多数领域都积压着类似的项目。它们本可以讲清一个关键概念，或帮到其他研究者，却从来排不进任何人清单的前几位。有了 Claude，处理这类低优先级工作变得容易多了。</p>
+<h3>绘制缺失的地图</h3>
+<figure class="source-figure" data-source-image="2"><img alt="Four images showing the UV map being filled in. The first image has gaps, and they are progressively filled in." decoding="async" height="1202" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/ffffecf57d3c55d3d4890d503366964cfcb7b524-2000x1202.png" width="2000"/></figure>
+<p>今年夏天，我开始用 Claude Science 绘制一张完整的全天紫外图。指令说起来简单，做起来却不简单：收集所有可用的紫外数据集，把它们统一到同一尺度上，合并成一张图，再填补每一块从未被任何紫外望远镜观测过的天区。</p>
+<p>为此，Claude 编排了一支 AI 智能体（agent）团队。首先，智能体们在网上搜索公开的天文紫外巡天数据。每个巡天都包含海量的单个数据点或图像——以 NASA 的 GALEX 任务为例，就有数万张图像。这些数据跨越数年拍摄，拍摄条件也各不相同。</p>
+<p>下载数据后，智能体们必须让每个巡天在内部保持一致，使不同时期拍摄的图像可以相互比较。这需要特别关注亮星周围的区域。就像太阳或路灯会给地面上拍的照片带来眩光一样，恒星也会给空间望远镜拍下的天空图像带来眩光。必须先去除这种眩光，才能精确测量恒星周围较暗的紫外光。许多智能体并行处理天空的不同区域，把这些差异抹平了。</p>
+<p>接下来，要把各个巡天组合起来。这些数据集由不同望远镜上的不同仪器采集，每台仪器捕捉紫外天空的方式都略有不同。因此在合并成一张图之前，必须先让它们相互交叉定标，重新绘制到相同分辨率，并映射到统一的坐标系上。我给 Claude 下达了关于怎么做的高层指令，Claude 则派出一支智能体团队去执行这些任务。</p>
+<p>然后是最难的部分：填补地图上的空缺。大约三分之一的天空从未在紫外波段被观测过。为了处理这些空白，我让 Claude Science 使用一种叫“图像修复”（inpainting）的技术。这是机器学习中的常见方法：模型在数百万张照片上训练，学会图像中每个部分与周围环境的关系，再用这些知识修复图像中受损或缺失的部分。</p>
+<p>Claude 把这种方法与我们手头的其他信息结合起来。在缺少紫外数据的地方，我们确实有其他波段的观测，包括可见光、红外和射电。利用已在紫外波段测绘过的那三分之二天空，Claude 学到了紫外亮度与这些其他波段之间的关系。然后，它把这种关系应用到没有任何紫外数据的那三分之一天空上，估计出每个点应该是什么样子，以及它对这个估计有多大把握。</p>
+<p>为了检验模型预测的准确度，我让 Claude 选取已有紫外数据的区域，故意遮住其中一部分，人为制造出图像修复要填补的那种空白。模型必须在拿不到真实数值的情况下，用学到的知识补全画面。经过几轮改进后，它对被遮住数据的估计与真实紫外测量值的差距在约 10% 以内。这样的差异，人眼几乎察觉不到。</p>
+<p>最后，在这层经过图像修复的弥散背景之上，Claude 加入了超过 1 亿颗单个恒星的紫外光估计。这些估计是根据欧洲空间局（European Space Agency）Gaia 卫星的可见光测量推算出来的。第一版完整的全天紫外图就此完成。</p>
+<figure class="source-figure" data-source-image="3"><img alt="A DAG diagram showing how data flowed through Claude Code" decoding="async" height="1003" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/d9ab4af7ef75427cb33f028158aa09e8a880ad4a-2376x1003.png" width="2376"/>
+<figcaption>数据如何流经 Claude Science 流水线，最终生成地图。圆柱体是作为输入的公开数据集；蓝色方框是 Claude 执行的确定性步骤；紫色方框是 Claude 通过统计方式学到的组件；绿色方框是融合步骤和最终产品。</figcaption>
+</figure>
+<h3>反复试错</h3>
+<p>Claude 并不是第一次就把所有事情都做对了。比如有天晚上，我在浏览处理后的图像时，注意到最暗的一个天区有点不对劲：图上有一些淡淡的圆圈，每个都比相邻区域稍亮或稍暗一点。</p>
+<p>这些是 GALEX 单次观测留下的“足迹”。GALEX 的每张图像拍下的是一块圆形天区，而且每张都带有一层来自地球大气的、并不完全均匀的微弱紫外辉光。如果没有把这层辉光彻底去掉，每个圆圈就会显得比周围的稍亮或稍暗。Claude 在项目一开始就把这一点列为已知问题。但这张地图仍然通过了其他智能体的两轮审查，问题都没有被发现。</p>
+<p>我对 Claude 说：“我能看到一个个圆盘，上面有单次观测留下的印记；你能修正一下吗？”智能体们把问题追溯到残留的大气辉光。随后，Claude 在全部 38,000 次观测中校正了这层辉光。经过几个小时的处理，圆圈消失了。</p>
+<figure class="source-figure" data-source-image="4"><img alt="" decoding="async" height="1188" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/c03341ca843bc4a5cf1721da7a2ae520a7bf1996-2814x1188.jpg" width="2814"/>
+<figcaption>即使没有被直接观测，亮星也会污染附近的紫外观测。每一行展示的都是包含 GALEX 刻意避开区域的观测。左：单次指向观测显现为淡淡的圆盘。中：为每次指向扣除一个背景水平后，仍能看到一些圆盘。右：最终地图——Claude 又做了一轮额外的定标，空洞由预测结果和 Gaia 恒星填补。图片来源：NASA GALEX GR6/7（MAST/STScl）- UV-BKGD（Murthy 2014）• Swift-UVOT（NASA HEASARC）• FIMS/SPEAR（KASI/MAST）• TD-1 • ESA Gaia DR3（DPAC）• 用于填补空缺的 Planck 与 Ha 模板。</figcaption>
+</figure>
+<h3>最终的地图</h3>
+<p>我和 Claude 一起做出了十几个连续版本的地图，每一版都比上一版更精细。我们的合作持续了好几天，并形成了一种可以预期的节奏：我先在 Claude Science 里进行几轮交流，规划下一步；然后 Claude 独立进行数小时的计算，我则回去做其他项目。</p>
+<p>完成的地图以紫外光展示了整个天空，呈现出许多有趣的结构：明亮的年轻恒星周围发光的尘埃云；巨大的尘埃环和尘埃圈，勾勒出大质量恒星爆炸吹出的气泡。在远离银道面的地方，暗弱的尘埃丝状结构横贯天空，被整个银河系的星光共同照亮。银道面下方是大麦哲伦云和小麦哲伦云——两个邻近的小星系，因年轻恒星而明亮。我觉得它很美。它也可以和其他经典天图一起，帮助一代代学生体会银河系中各种物理过程的多样性。</p>
+<p>这一次，我终于能推进这样一个项目，而不必牺牲原本要投入研究的时间。我猜很多科学家都能想到某张地图、某幅图或某个资源，也因为同样的原因一直被搁置。</p>
+<h3>致谢</h3>
+<p>绘制这张地图所用的测量数据来自 GALEX 和 Swift（NASA）、FIMS/SPEAR（韩国）、TD-1（欧洲），以及 Planck 和 Gaia（ESA）。感谢参与这些任务、并让数据公开的每一个人。Claude Science 中的许多智能体付出了耐心的劳动，把这张地图拼合起来。我的贡献仅限于在过程中引导它们。</p>
+<h3>订阅 Anthropic Science</h3>
+<p class="outro">关于 AI 辅助的科学发现、实用工作流程，以及各学科一线笔记的专题文章。</p>
+</div>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
