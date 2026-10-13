@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<title>OpenAI 模型提出纳维–斯托克斯问题的解决方案</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--ink:#172033;--muted:#5d687a;--line:#d9dfeb;--accent:#4f46e5;--accent2:#0891b2;--accent3:#ea580c;--accent4:#16a34a;--hl:#fff1a8;--hl2:#dbeafe}
+:root[data-theme="light"]{--bg:#f5f7fb;--card:#fff;--ink:#172033;--muted:#5d687a;--line:#d9dfeb;--accent:#4f46e5;--accent2:#0891b2;--accent3:#ea580c;--accent4:#16a34a;--hl:#fff1a8;--hl2:#dbeafe}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101522;--card:#182033;--ink:#edf2ff;--muted:#a9b4c8;--line:#303b54;--accent:#9b91ff;--accent2:#38c6df;--accent3:#ff9a62;--accent4:#58d68d;--hl:#5b4d16;--hl2:#163456}}
+:root[data-theme="dark"]{--bg:#101522;--card:#182033;--ink:#edf2ff;--muted:#a9b4c8;--line:#303b54;--accent:#9b91ff;--accent2:#38c6df;--accent3:#ff9a62;--accent4:#58d68d;--hl:#5b4d16;--hl2:#163456}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.75 system-ui,-apple-system,"Segoe UI",sans-serif}main{max-width:980px;margin:auto;padding:32px 20px 72px}h1{font-size:clamp(30px,5vw,52px);line-height:1.15;margin:0 0 10px}.en{color:var(--muted);font-size:15px}.hero{padding:34px;border-radius:24px;background:linear-gradient(135deg,var(--hl2),var(--card));border:1px solid var(--line)}.kicker{color:var(--accent);font-weight:700;letter-spacing:.08em}.lead{font-size:21px;max-width:760px}.band{display:flex;flex-wrap:wrap;gap:12px;margin:22px 0}.metric{flex:1;min-width:170px;padding:18px;border-left:5px solid var(--accent2);background:var(--card);border-radius:12px}.metric b{display:block;font-size:28px;color:var(--accent)}section{margin-top:28px;padding:26px;border-radius:18px;background:var(--card);border:1px solid var(--line)}section:nth-of-type(2){background:var(--hl2)}section:nth-of-type(3){border-top:5px solid var(--accent3)}table{width:100%;border-collapse:collapse;margin:14px 0}th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left}th{color:var(--accent)}.takeaways{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.takeaways div{padding:16px;border-radius:12px;background:var(--hl);border:1px solid var(--line)}#translation{background:var(--card)}#translation p{max-width:780px}figure.source-figure{margin:28px 0;padding:18px;border-left:4px solid var(--accent4);background:var(--bg);border-radius:8px}figcaption{color:var(--muted);font-size:14px}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/navier-stokes-solution" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav><main>
+<header class="hero"><div class="kicker">RESEARCH · 2026-09-08</div><h1>OpenAI 模型提出纳维–斯托克斯问题的解决方案</h1><div class="en">An OpenAI model proposes a solution to the Navier–Stokes problem · OpenAI</div><p class="lead"><strong>一句话总括：</strong>OpenAI 的内部系统给出了纳维–斯托克斯问题的奇点构造证明，并用 Lean 完成形式化，展示了 AI 在高难度数学研究中的协作能力。</p></header>
+<div class="band"><div class="metric"><b>约 10,000</b>并发智能体</div><div class="metric"><b>88 小时</b>得到纳维–斯托克斯解答</div><div class="metric"><b>17 小时</b>Lean 形式化与验证</div><div class="metric"><b>1300 亿</b>相关输出 token</div></div>
+<section><h2>奇点可以由流体自身动力学形成</h2><p>证明从静止、光滑的流体出发。外力保持光滑，总能量始终有限，但涡旋向内盘旋并沿轴向拉伸，局部速度在有限时间内趋于无界。</p><p>加速度、压力梯度、动量传递和黏性项同时变大，又以精确方式抵消。结果说明黏性并不保证三维流体永远光滑。</p></section>
+<section><h2>规模化协作改变了搜索方式</h2><table><thead><tr><th>项目</th><th>规模与时间</th><th>含义</th></tr></thead><tbody><tr><td>全部尝试</td><td>490 万条消息；约 3000 亿 token</td><td>模型可并行探索多个证明方向</td></tr><tr><td>纳维–斯托克斯</td><td>270 万条消息；约 1300 亿 token</td><td>集中资源攻克最有希望的问题</td></tr><tr><td>Euler 正则性</td><td>近 100 个智能体；约 50 小时</td><td>先解决较易问题，再迁移思路</td></tr></tbody></table><p>不同群组先独立尝试，再由 Codex 汇总中间成果。模型更新后，智能体也随之切换。</p></section>
+<section><h2>结果仍须公开审查</h2><p>OpenAI 称结果对应官方表述中的 C、D 情形，并提供证明论文和 Lean 代码。公司不申请千禧年奖金，也承认数学界仍需检查证明。</p><p>OpenAI 还说明，项目没有接触相关研究者的未公开工作。团队承认无法完全排除去标识化产品数据间接改进模型的可能性。</p></section>
+<section><h2>最值得带走的洞见</h2><div class="takeaways"><div>AI 已能组织数千级智能体协作探索证明。</div><div>形式化验证让复杂推理更容易被复核。</div><div>算力规模带来新发现，也带来更高审查要求。</div><div>OpenAI 将这项成果视为能力进展的阶段性快照。</div></div></section>
+<section id="translation"><h2>完整译文</h2>
+<figure class="source-figure" data-source-image="0"><img alt="Diagram of a swirling vortex illustrating inward spiral and axial stretching." decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/75EbpsuBOy5LbUgCppWXD1/88da8c19dcf76d6f4f8fd7485dcb6346/navier-stokes-light-master.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<h2>问题</h2>
+<p>我们正在分享纳维–斯托克斯存在性与光滑性问题的一个解决方案。它是千禧年大奖问题之一。这个由 OpenAI 内部系统生成的证明表明，纳维–斯托克斯方程描述的流体动力学可以在有限时间内形成奇点。我们同时分享证明文稿和 Lean 形式化版本。</p>
+<p>千禧年大奖问题代表数学前沿最深刻的一批问题。三维光滑流体运动是否会失效，已经悬而未决约 90 年。</p>
+<p>我们的重要目标，是帮助科学家推动造福全人类的研究与技术。为解决纳维–斯托克斯问题，我们使用了一个能力显著强于 GPT‑6 Astra 的内部模型。我们认为，有必要让世界了解 AI 进步的速度，以及未来模型可能达到的水平。</p>
+<h2>问题</h2>
+<p>纳维–斯托克斯方程使用牛顿第二运动定律（“F=ma”）描述流体如何运动。它把流体视为连续介质，而不是逐个追踪分子。这些方程用于飞机设计、天气预报和血流研究。</p>
+<p>一个基本开放问题是，流体的连续介质近似是否会失效。具体来说，三维、不可压缩、密度恒定的流体，即使从光滑运动开始，是否也会形成“奇点”？这里的奇点是指流体速度在有限时间内无限增长。即使存在倾向于平滑运动的黏性，奇点仍可能形成。真实流体不可能以无限速度运动，因此这意味着方程对流体的建模出现失效。若要继续建模，就必须逐个追踪粒子的行为。</p>
+<p>这些方程源于十九世纪 Claude-Louis Navier 和 George Gabriel Stokes 的工作。1934 年，Jean Leray 证明解以广义形式存在，但解是否始终光滑，仍是核心未解问题。2000 年，Clay Mathematics Institute 将纳维–斯托克斯存在性与光滑性问题列为七个千禧年大奖问题之一。</p>
+<h2>结果</h2>
+<p>我们的系统给出了分析证明和 Lean 形式化，证明一个最初光滑且静止的流体可以在有限时间内形成奇点。流体受到光滑外力作用。整个动力学过程从静止到奇点形成，能量始终有限。这解决了纳维–斯托克斯千禧年问题，确立了官方表述中的“C”（以及“D”）。</p>
+<p>这个解是一种涡旋。流体旋转成旋涡，向内盘旋并不断拉长，像意大利面。中心区域不断收缩，同时速度加快，但能量仍保持有限，符合物理定律。技术难点在于，失效必须由流体自身运动产生，而不是人为施加无限外力。更准确地说，描述运动的加速度、压力梯度、动量传递和黏性项都必须变大，并以精确方式相互抵消。即使流体速度趋于无界，这种平衡仍使外力保持光滑。</p>
+<p>局部不可压缩运动的快照。橙色表示更快的角向旋转，青绿色表示更慢的旋转。环流速度也取决于半径。轨迹显示向内盘旋和轴向拉伸。</p>
+<h2>我们如何找到证明</h2>
+<p>自 8 月 28 日起，我们一直训练一个新的内部模型。它在包括数学在内的基准测试中表现前所未有。训练仍在继续，性能也在持续提升。</p>
+<p>9 月 1 日星期二，我们听到两个千禧年大奖问题已经解决的传闻。受这些传闻以及内部模型性能跃升的启发，我们启动了评估所有未解千禧年问题和其他几个高影响力问题的工作。</p>
+<p>我们使用由内部模型驱动的协调智能体系统。智能体可以读取缓存互联网内容并运行代码。智能体被分成多个组，组内可以通信。各组规模不同。负责纳维–斯托克斯问题的组包含约 10,000 个并发智能体。整个过程中，我们始终采用前沿模型评估的严格保障措施，包括监控和隔离。</p>
+<p>针对每个问题，我们让不同智能体组使用不同的问题表述，覆盖所有变体。对于纳维–斯托克斯问题，我们把 A、B 版本（会导向证明）和 C、D 版本（会导向反证）分配给不同组。</p>
+<p>除完整的千禧年问题外，我们还要求多智能体系统尝试一些“较容易”的问题。其中一个问题，是去掉黏性项后的纳维–斯托克斯极限问题中的类似爆破解。它被称为 Euler 方程的正则性问题。智能体出乎意料地解决了这个问题。具体解决的是无外力版本。近 100 个智能体协作约 50 小时，完成了 Euler 正则性反证。<sup>1</sup></p>
+<p>看到 Euler 解后，我们认为纳维–斯托克斯问题最值得投入。于是，我们把其他千禧年问题的智能体转移过来，并向它们提供 Euler 解。项目进行期间，训练得更充分的内部模型版本可用后，我们也更新了智能体。</p>
+<p>我们鼓励不同组探索多样方法。经过一段时间后，我们使用 Codex 汇总各组最有用的洞见，让各组相互借鉴。这些后续提示使用了智能体自己的中间结果。找到纳维–斯托克斯解的组就是这样得到引导的。</p>
+<p>智能体于 9 月 5 日星期六得出结论，距首批智能体启动约 88 小时。Lean 形式化与验证由 GPT‑6 Astra 额外耗时 17 小时完成。</p>
+<p>在所有尝试的问题中，智能体共发送 490 万条消息，使用约 3000 亿输出 token。解决纳维–斯托克斯问题时，智能体发送了 270 万条消息，使用约 1300 亿输出 token。</p>
+<h2>同期工作</h2>
+<p>我们的工作在 9 月 1 日开始。当时听到的传闻后来发现与 Anthropic 员工 Levent Alpöge 和纽约大学数学教授 Tristan Buckmaster 有关。9 月 6 日完成整个项目和 Lean 验证后，我们以为他们也有纳维–斯托克斯解，因此联系他们，提出共同发布并在联合公告中确认其优先权。随后我们得知，他们解决的是有外力 Euler 问题。在讨论中，我们提出让他们了解所用全部提示，之后也可以查看证明。我们承认他们在有外力 Euler 问题上的优先权，并祝贺这一卓越的数学成就。</p>
+<p>在他们公开发布之前，我们（研究人员和智能体）没有通过任何方式看到他们的工作。尤其是，我们没有访问任何特定用户数据来解决这个问题。虽然可能性很低，但我们无法排除源自产品使用的去标识化数据帮助改进模型。不过，我们的证明存在显著差异。Euler 情形中证明的具体结果也不同，分别是有外力与无外力。</p>
+<h2>进展与责任</h2>
+<p>发布这一结果，是为了报告 AI 模型取得的实质进展。我们无意以此申领千禧年奖金。</p>
+<p>这一里程碑凝聚了数学家和 AI 研究人员的大量工作。但它不是终点，而是 AI 开发进展在某一时刻的快照。</p>
+<p>我们相信，AI 进步已经进入下一个阶段。今天的结果进一步支持了这一判断。我们正在努力理解这个模型，并利用所得认识来指导和调整未来能力提升的节奏。我们的关键目标之一，是构建可引导、可问责并与人类保持联系的 AI 系统。为确保 AGI 造福全人类，这可能需要更审慎地选择进展速度。</p>
+<p>2026 · Generative Models · Author</p>
+<p>脚注</p>
+<p>阅读 Euler 证明论文 · Lean 形式化证明链接</p>
+<p>继续阅读</p>
+<figure class="source-figure" data-source-image="1"><img alt="An alien mind &gt; Listing card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/7ut3G8rKt5ia4P3yRqi2qN/6ffb429f70548a881eb46a4e7e61498e/Option_120___1080_1080.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="2"><img alt="Research acceleration: The view inside OpenAI &gt; Cover image" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/5kS3OG1Jfdja5xLmYcRwgr/f53b9dfe985df5969aff5dc41f2d1934/Art_Card__7_.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+</section></main>  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body></html>

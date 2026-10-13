@@ -147,8 +147,8 @@ def missing_digest_records(records, site, source_ids=None):
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Discover -> generate (summary + digest/translation) -> render the site.")
-    parser.add_argument("--agent", choices=["codex", "claude", "grok"], default="codex",
-                        help="codex=Codex CLI；claude=Claude Code CLI；grok=Grok Build CLI（均为 headless 调用、复用本机登录）。")
+    parser.add_argument("--agent", choices=["codex", "claude", "grok"], default="claude",
+                        help="默认使用 Claude Opus 5.5；codex=Codex CLI；claude=Claude Code CLI；grok=Grok Build CLI（均为 headless 调用、复用本机登录）。")
     parser.add_argument("--sources", default=None, help="逗号分隔的来源 id，默认全部。")
     parser.add_argument("--discover-only", action="store_true", help="只做发现（步骤一），列出发现到的文章，不生成、不渲染。")
     parser.add_argument("--url", default=None, help="只对这一篇文章生成摘要、总结和译文（步骤二，单篇测试，覆盖已有页面）。")

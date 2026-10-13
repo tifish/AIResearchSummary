@@ -7,9 +7,12 @@ Three backends, all headless CLI subprocesses reusing an existing local login
               AIRS_CODEX_REASONING_EFFORT picks its reasoning effort.
               AIRS_CODEX_BIN can override the Codex CLI executable.
   - claude  : Claude Code CLI (`claude -p`).
-              AIRS_CLAUDE_MODEL picks a model (default = account default).
-              AIRS_CLAUDE_EFFORT picks its effort level.
+              AIRS_CLAUDE_MODEL picks a model (default = claude-opus-5-5).
+              AIRS_CLAUDE_EFFORT picks its effort level (default = high).
               AIRS_CLAUDE_BIN can override the Claude Code executable.
+              If Claude declines an article on safety grounds, that article
+              is regenerated through Codex with AIRS_CLAUDE_REFUSAL_FALLBACK_MODEL
+              (default = gpt-6-sol).
   - grok    : Grok Build CLI in supported headless JSON mode.
               AIRS_GROK_MODEL picks a model (default = account default).
               AIRS_GROK_REASONING_EFFORT picks its reasoning effort.
@@ -54,6 +57,22 @@ _TRANSIENT_RE = re.compile(
     re.I,
 )
 
+# Claude declining an article for safety reasons (rather than a format slip).
+_REFUSAL_RE = re.compile(
+    r"safety|usage polic|refus|can'?t (?:help|generate|produce|complete)|cannot (?:help|generate|produce|complete)|"
+    r"won'?t (?:generate|produce)|unable to (?:help|generate|produce|complete)|"
+    r"安全|拒绝|无法(?:完成|生成|提供|协助)|不能(?:再)?生成",
+    re.I,
+)
+
+
+def claude_refusal_fallback_model() -> str:
+    return os.environ.get("AIRS_CLAUDE_REFUSAL_FALLBACK_MODEL") or "gpt-6-sol"
+
+
+def looks_like_refusal(text: str) -> bool:
+    return bool(_REFUSAL_RE.search(text or ""))
+
 
 def _run_claude_cli(prompt: str) -> str:
     """One headless Claude Code CLI call over the user's subscription login.
@@ -75,10 +94,10 @@ def _run_claude_cli(prompt: str) -> str:
         "--setting-sources", "",     # ignore user/project CLAUDE.md & settings
         "--no-session-persistence",
     ]
-    model = os.environ.get("AIRS_CLAUDE_MODEL")
+    model = os.environ.get("AIRS_CLAUDE_MODEL") or "claude-opus-5-5"
     if model:
         command.extend(["--model", model])
-    effort = os.environ.get("AIRS_CLAUDE_EFFORT")
+    effort = os.environ.get("AIRS_CLAUDE_EFFORT") or "high"
     if effort:
         command.extend(["--effort", effort])
 
@@ -122,7 +141,7 @@ def _run_claude_cli(prompt: str) -> str:
     return text
 
 
-def _run_codex_cli(prompt: str) -> str:
+def _run_codex_cli(prompt: str, model: str | None = None) -> str:
     """One headless Codex CLI call (`codex exec`) over the user's login.
 
     Pure text generation: read-only sandbox, ephemeral session (no session files
@@ -146,7 +165,7 @@ def _run_codex_cli(prompt: str) -> str:
             "--color", "never",
             "--output-last-message", str(out_path),
         ]
-        model = os.environ.get("AIRS_CODEX_MODEL")
+        model = model or os.environ.get("AIRS_CODEX_MODEL")
         if model:
             command.extend(["--model", model])
         effort = os.environ.get("AIRS_CODEX_REASONING_EFFORT")
@@ -270,15 +289,16 @@ def _run_grok_cli(prompt: str) -> str:
             prompt_path.unlink(missing_ok=True)
 
 
-def run_agent(prompt: str, agent: str = "codex", retries: int = 3) -> str:
+def run_agent(prompt: str, agent: str = "claude", retries: int = 3, model: str | None = None) -> str:
     """Run one generation step through the chosen backend and return its text.
 
     Transient errors (rate limit / overload / 5xx / timeout) are retried with
     exponential backoff, so higher --jobs concurrency doesn't drop articles on a
     momentary API hiccup. Non-transient errors (e.g. auth) fail immediately.
+    `model` overrides the codex model for this call only.
     """
     if agent == "codex":
-        attempt_fn = _run_codex_cli
+        attempt_fn = lambda text: _run_codex_cli(text, model)
     elif agent == "claude":
         attempt_fn = _run_claude_cli
     elif agent == "grok":

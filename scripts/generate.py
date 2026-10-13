@@ -12,7 +12,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-from agent_cli import extract_html, load_prompt, run_agent
+from agent_cli import claude_refusal_fallback_model, extract_html, load_prompt, looks_like_refusal, run_agent
 from extract_article import ensure_bs4, normalize_url
 from render_site import load_articles, prepare_digest_html
 
@@ -127,14 +127,29 @@ def inject_original_images(html_text: str, images: list[dict]) -> str:
     return str(soup)
 
 
+def has_all_markers(output: str) -> bool:
+    return SUMMARY_MARK in output and VALUE_MARK in output and DIGEST_MARK in output
+
+
 def generate(meta: dict, agent: str) -> dict:
     """One agent call -> {title_zh, summary_zh, value_zh, html}.
 
     Output is marker-delimited plain text (not JSON), so the model can write
     Chinese with arbitrary quotes/punctuation without breaking a JSON parse.
     """
-    output = run_agent(build_prompt(meta), agent)
-    if SUMMARY_MARK not in output or VALUE_MARK not in output or DIGEST_MARK not in output:
+    prompt = build_prompt(meta)
+    try:
+        output = run_agent(prompt, agent)
+    except RuntimeError as exc:
+        if agent != "claude" or not looks_like_refusal(str(exc)):
+            raise
+        output = str(exc)
+    if agent == "claude" and not has_all_markers(output) and looks_like_refusal(output):
+        # Claude declined this article on safety grounds: hand it to GPT via Codex.
+        fallback_model = claude_refusal_fallback_model()
+        print(f"  claude declined {meta.get('title') or meta['url']}; retrying with codex {fallback_model}", flush=True)
+        output = run_agent(prompt, "codex", model=fallback_model)
+    if not has_all_markers(output):
         raise ValueError(
             "agent output is missing a ===SUMMARY===/===VALUE===/===DIGEST=== marker; "
             f"response preview: {output[:800]!r}"

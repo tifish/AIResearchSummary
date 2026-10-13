@@ -4,156 +4,219 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>提高 token 使用效率，让智能体持续运行更久</title>
+<title>为更长的智能体运行提升 token 效率 · Improved token efficiency for longer agent runs</title>
 <style>
-:root {
-  color-scheme: light;
-  --bg: #f6f4ef;
+:root, :root[data-theme="light"] {
+  --bg: #f7f6f2;
   --card: #ffffff;
-  --ink: #202b37;
-  --muted: #606d7a;
-  --line: #d7dedf;
-  --data: #155eac;
-  --risk: #ac4c24;
-  --opportunity: #087463;
-  --conclusion: #7044a0;
-  --hl: #e2efff;
-  --hl2: #eee5fa;
-  --soft-green: #e4f2ed;
-  --soft-orange: #fff0e4;
-  --hero: #192b3d;
-  --hero-ink: #edf3fa;
-  --hero-muted: #bdcedd;
-}
-:root[data-theme="light"] {
-  color-scheme: light;
-  --bg: #f6f4ef;
-  --card: #ffffff;
-  --ink: #202b37;
-  --muted: #606d7a;
-  --line: #d7dedf;
-  --data: #155eac;
-  --risk: #ac4c24;
-  --opportunity: #087463;
-  --conclusion: #7044a0;
-  --hl: #e2efff;
-  --hl2: #eee5fa;
-  --soft-green: #e4f2ed;
-  --soft-orange: #fff0e4;
-  --hero: #192b3d;
-  --hero-ink: #edf3fa;
-  --hero-muted: #bdcedd;
+  --ink: #1d1f24;
+  --muted: #5f6570;
+  --line: #e1ded6;
+  --accent: #2458d6;
+  --accent2: #c8372d;
+  --accent3: #148a5b;
+  --accent4: #7a3fc4;
+  --accent5: #c77a0a;
+  --hl: #fff0b3;
+  --hl2: #d8ecff;
+  --soft-blue: #eaf1ff;
+  --soft-red: #fdecea;
+  --soft-green: #e6f5ee;
+  --soft-purple: #f1eafb;
+  --soft-amber: #fdf3e1;
+  --band: #1f2a44;
+  --band-ink: #eef2fb;
+  --band-muted: #aab4cc;
+  --hero-bg: #eef1f8;
+  --figure-bg: #f0eee8;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    color-scheme: dark;
-    --bg: #111820;
-    --card: #1a2430;
-    --ink: #dce5ef;
-    --muted: #a6b4c2;
-    --line: #354353;
-    --data: #7cb7ff;
-    --risk: #f5a477;
-    --opportunity: #69ceb5;
-    --conclusion: #c0a0ef;
-    --hl: #203750;
-    --hl2: #342b48;
-    --soft-green: #19382f;
-    --soft-orange: #3b2b23;
-    --hero: #18283b;
-    --hero-ink: #e0eafa;
-    --hero-muted: #b0c3d8;
+    --bg: #14161b;
+    --card: #1c1f26;
+    --ink: #e6e8ec;
+    --muted: #a0a6b2;
+    --line: #2e333d;
+    --accent: #6d9bff;
+    --accent2: #ff7a6e;
+    --accent3: #4fd39a;
+    --accent4: #b88cff;
+    --accent5: #f2b04b;
+    --hl: #4a3f12;
+    --hl2: #173352;
+    --soft-blue: #1a2438;
+    --soft-red: #2e1c1c;
+    --soft-green: #16291f;
+    --soft-purple: #251d35;
+    --soft-amber: #2d2414;
+    --band: #0d1220;
+    --band-ink: #e6ebf7;
+    --band-muted: #8e99b3;
+    --hero-bg: #1a1e29;
+    --figure-bg: #1a1c22;
   }
 }
 :root[data-theme="dark"] {
-  color-scheme: dark;
-  --bg: #111820;
-  --card: #1a2430;
-  --ink: #dce5ef;
-  --muted: #a6b4c2;
-  --line: #354353;
-  --data: #7cb7ff;
-  --risk: #f5a477;
-  --opportunity: #69ceb5;
-  --conclusion: #c0a0ef;
-  --hl: #203750;
-  --hl2: #342b48;
-  --soft-green: #19382f;
-  --soft-orange: #3b2b23;
-  --hero: #18283b;
-  --hero-ink: #e0eafa;
-  --hero-muted: #b0c3d8;
+  --bg: #14161b;
+  --card: #1c1f26;
+  --ink: #e6e8ec;
+  --muted: #a0a6b2;
+  --line: #2e333d;
+  --accent: #6d9bff;
+  --accent2: #ff7a6e;
+  --accent3: #4fd39a;
+  --accent4: #b88cff;
+  --accent5: #f2b04b;
+  --hl: #4a3f12;
+  --hl2: #173352;
+  --soft-blue: #1a2438;
+  --soft-red: #2e1c1c;
+  --soft-green: #16291f;
+  --soft-purple: #251d35;
+  --soft-amber: #2d2414;
+  --band: #0d1220;
+  --band-ink: #e6ebf7;
+  --band-muted: #8e99b3;
+  --hero-bg: #1a1e29;
+  --figure-bg: #1a1c22;
 }
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--ink); font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; line-height: 1.85; }
-main { max-width: 1100px; margin: auto; padding: 32px 24px 72px; }
-h1, h2, h3 { line-height: 1.4; }
-h1 { font-size: clamp(30px, 5vw, 49px); margin: 15px 0; letter-spacing: -.025em; }
-h2 { font-size: 27px; margin: 0 0 22px; }
-h3 { font-size: 20px; margin: 0 0 12px; }
-p { margin: 0 0 17px; }
-a { color: var(--data); text-underline-offset: 4px; }
-.hero { padding: 42px; background: var(--hero); color: var(--hero-ink); border-radius: 20px; }
-.eyebrow, .meta { font-size: 13px; letter-spacing: .04em; color: var(--muted); }
-.hero .eyebrow, .hero .english, .hero .meta { color: var(--hero-muted); }
-.hero a { color: var(--hero-ink); }
-.english { font-size: 18px; margin-bottom: 22px; }
-.overview { border-top: 1px solid var(--hero-muted); padding-top: 24px; margin-top: 25px; }
-.overview strong { display: block; margin-bottom: 9px; }
-.overview p { font-size: 20px; margin: 0; }
-.stats { display: grid; grid-template-columns: repeat(3, 1fr); margin: 28px 0 40px; border-block: 1px solid var(--line); }
-.stat { padding: 22px; }
-.stat + .stat { border-left: 1px solid var(--line); }
-.stat b { display: block; color: var(--data); font-size: 40px; line-height: 1.3; }
-.stat span { display: block; font-size: 14px; color: var(--muted); }
-.data-panel { margin-bottom: 34px; }
-.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
-table { border-collapse: collapse; width: 100%; min-width: 620px; font-size: 15px; }
-th, td { text-align: left; vertical-align: top; padding: 15px 18px; border-bottom: 1px solid var(--line); }
-th { background: var(--hl); }
-tr:last-child td { border-bottom: 0; }
-td strong { color: var(--data); white-space: nowrap; }
-.note { color: var(--muted); font-size: 14px; margin-top: 12px; }
-mark { color: var(--data); background: var(--hl); padding: 1px 4px; border-radius: 4px; font-weight: 650; }
-mark.result { color: var(--conclusion); background: var(--hl2); }
-.split { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 32px 0; }
-.split article { padding: 27px; }
-.opportunity { background: var(--soft-green); border-top: 4px solid var(--opportunity); }
-.opportunity h3 { color: var(--opportunity); }
-.risk { background: var(--soft-orange); border-top: 4px solid var(--risk); }
-.risk h3 { color: var(--risk); }
-.flow { padding: 30px 0; border-block: 1px solid var(--line); }
-.flow ol { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; list-style-position: inside; padding: 0; }
-.flow li { padding: 16px; background: var(--card); border-left: 3px solid var(--data); }
-.flow li strong { display: block; margin-top: 8px; }
-.insight { padding: 24px 28px; margin: 30px 0; background: var(--hl2); border-left: 5px solid var(--conclusion); }
-.insight h3 { color: var(--conclusion); }
-.takeaways { margin: 34px 0 50px; }
-.takeaways ul { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 0; list-style: none; }
-.takeaways li { padding: 18px 20px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); }
-.takeaways li:nth-child(2) { border-top: 3px solid var(--opportunity); }
-.takeaways li:nth-child(3) { border-top: 3px solid var(--risk); }
-.takeaways li:nth-child(4) { border-top: 3px solid var(--conclusion); }
-#translation { max-width: 800px; margin: auto; padding-top: 40px; border-top: 3px solid var(--conclusion); font-size: 17px; line-height: 1.95; }
-#translation h2 { font-size: 32px; }
-#translation h3 { margin-top: 40px; font-size: 25px; }
-.toc { border-left: 3px solid var(--line); padding-left: 22px; margin-bottom: 30px; }
-.toc p { margin-bottom: 7px; }
-.chart-text { margin: 24px 0; padding: 17px 20px; background: var(--card); border-left: 3px solid var(--line); font-size: 15px; }
-.chart-text p { margin-bottom: 5px; }
-.chart-text ul { margin: 4px 0; padding-left: 24px; }
-.source-note { color: var(--muted); font-size: 15px; }
-code { color: var(--conclusion); background: var(--hl2); padding: 2px 5px; border-radius: 4px; }
-.source-figure { margin: 32px 0; }
-.source-figure img { display: block; max-width: 100%; height: auto; margin-inline: auto; }
-.source-figure figcaption { margin-top: 10px; color: var(--muted); font-size: 14px; line-height: 1.65; }
-@media (max-width: 680px) {
-  main { padding: 18px 16px 45px; }
-  .hero { padding: 27px 23px; }
-  .stats { grid-template-columns: 1fr; }
-  .stat + .stat { border-left: 0; border-top: 1px solid var(--line); }
-  .split, .flow ol, .takeaways ul { grid-template-columns: 1fr; }
-  .stat b { font-size: 35px; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif;
+  line-height: 1.75;
+  font-size: 16px;
+}
+.wrap { max-width: 1020px; margin: 0 auto; padding: 32px 20px 80px; }
+mark, .hl { background: var(--hl); color: inherit; padding: 0 3px; border-radius: 3px; }
+.hl2 { background: var(--hl2); padding: 0 3px; border-radius: 3px; }
+b.c1 { color: var(--accent); }
+b.c2 { color: var(--accent2); }
+b.c3 { color: var(--accent3); }
+b.c4 { color: var(--accent4); }
+code { font-family: "JetBrains Mono", Consolas, monospace; font-size: .9em; background: var(--soft-purple); padding: 1px 5px; border-radius: 4px; }
+
+/* hero */
+.hero {
+  background: var(--hero-bg);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 40px 36px 32px;
+  margin-bottom: 28px;
+}
+.hero .meta { color: var(--muted); font-size: 13px; letter-spacing: .04em; }
+.hero h1 { font-size: 34px; line-height: 1.3; margin: 10px 0 4px; }
+.hero .en { color: var(--muted); font-size: 16px; font-style: italic; margin: 0 0 22px; }
+.oneliner {
+  border-left: 5px solid var(--accent4);
+  background: var(--card);
+  padding: 16px 20px;
+  border-radius: 0 12px 12px 0;
+  font-size: 18px;
+}
+.oneliner .tag { display: inline-block; font-size: 12px; font-weight: 700; color: var(--accent4); margin-bottom: 4px; letter-spacing: .08em; }
+
+/* number band */
+.band {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  margin: 0 0 32px;
+}
+.band div { background: var(--card); padding: 18px 16px; }
+.band .num { font-size: 32px; font-weight: 800; line-height: 1.1; }
+.band .lbl { font-size: 13px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+.n1 { color: var(--accent); } .n2 { color: var(--accent3); } .n3 { color: var(--accent4); } .n4 { color: var(--accent5); } .n5 { color: var(--accent2); }
+
+h2.sec { font-size: 24px; margin: 0 0 6px; }
+.kicker { font-size: 12px; font-weight: 700; letter-spacing: .1em; color: var(--accent); margin-bottom: 4px; }
+.insight {
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: var(--soft-purple);
+  border-radius: 8px;
+  font-weight: 600;
+}
+.insight::before { content: "洞见 · "; color: var(--accent4); }
+
+/* table block */
+.tblock { margin-bottom: 36px; }
+table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid var(--line); font-size: 15px; }
+th { background: var(--soft-blue); text-align: left; padding: 10px 12px; font-size: 13px; color: var(--muted); }
+td { padding: 10px 12px; border-top: 1px solid var(--line); vertical-align: top; }
+td.v { font-weight: 800; color: var(--accent3); white-space: nowrap; }
+.tnote { font-size: 13px; color: var(--muted); margin-top: 8px; }
+
+/* split */
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-bottom: 36px; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); }
+.split > div { padding: 24px 24px; }
+.split .l { background: var(--soft-amber); }
+.split .r { background: var(--card); }
+.split h3 { margin: 0 0 8px; font-size: 18px; }
+.split .l h3 { color: var(--accent5); }
+.split .r h3 { color: var(--accent); }
+
+/* flow */
+.flowsec { margin-bottom: 36px; padding: 26px; border-left: 6px solid var(--accent); background: var(--card); border-radius: 0 14px 14px 0; }
+.flow { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; margin: 16px 0 8px; }
+.flow .step { flex: 1 1 150px; padding: 12px 14px; border-radius: 10px; font-size: 14px; border: 1px solid var(--line); }
+.flow .s1 { background: var(--soft-blue); }
+.flow .s2 { background: var(--soft-green); }
+.flow .brk { flex: 0 0 auto; display: flex; align-items: center; font-weight: 800; color: var(--accent2); font-size: 13px; writing-mode: horizontal-tb; padding: 0 4px; }
+.flow .s3 { background: var(--soft-amber); }
+.flow .s4 { background: var(--soft-red); }
+.flow .step b { display: block; font-size: 13px; margin-bottom: 2px; }
+
+/* read lines */
+.lines { margin-bottom: 36px; display: grid; grid-template-columns: 220px 1fr; gap: 24px; align-items: center; }
+.lines .big { font-size: 64px; font-weight: 900; color: var(--accent4); line-height: 1; }
+.lines .big small { font-size: 18px; color: var(--muted); font-weight: 600; display: block; margin-top: 6px; }
+
+/* compare */
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 14px 0 36px; }
+.compare > div { padding: 18px 20px; border-radius: 12px; border: 1px solid var(--line); }
+.compare .gain { background: var(--soft-green); border-top: 4px solid var(--accent3); }
+.compare .risk { background: var(--soft-red); border-top: 4px solid var(--accent2); }
+.compare h4 { margin: 0 0 6px; }
+.compare .gain h4 { color: var(--accent3); }
+.compare .risk h4 { color: var(--accent2); }
+ul.fix { margin: 8px 0 0; padding-left: 20px; }
+
+/* takeaways */
+.takeaways { background: var(--band); color: var(--band-ink); border-radius: 18px; padding: 30px 28px; margin-bottom: 48px; }
+.takeaways h2 { margin: 0 0 16px; font-size: 22px; }
+.mosaic { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+.mosaic div { border: 1px solid var(--band-muted); border-radius: 12px; padding: 14px 16px; font-size: 15px; }
+.mosaic .no { font-size: 22px; font-weight: 900; display: block; margin-bottom: 4px; }
+.mosaic div:nth-child(1) .no { color: var(--accent); }
+.mosaic div:nth-child(2) .no { color: var(--accent3); }
+.mosaic div:nth-child(3) .no { color: var(--accent5); }
+.mosaic div:nth-child(4) .no { color: var(--accent2); }
+.mosaic div:nth-child(5) .no { color: var(--accent4); }
+
+/* translation */
+#translation { max-width: 760px; margin: 0 auto; padding-top: 28px; border-top: 3px double var(--line); }
+#translation h2 { font-size: 28px; margin: 0 0 18px; }
+#translation h3 { font-size: 21px; margin: 36px 0 10px; padding-bottom: 4px; border-bottom: 1px solid var(--line); }
+#translation p { margin: 0 0 14px; }
+#translation .toc { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 20px; margin-bottom: 20px; }
+#translation .toc strong { font-size: 14px; color: var(--muted); }
+#translation .toc ul { margin: 6px 0 0; padding-left: 20px; }
+.chart-note { border-left: 3px solid var(--accent5); background: var(--soft-amber); padding: 10px 14px; margin: 16px 0 20px; font-size: 14px; border-radius: 0 8px 8px 0; }
+.chart-note .ct { font-weight: 700; display: block; }
+.chart-note .cs { color: var(--muted); display: block; }
+.source-figure { margin: 28px 0; }
+.source-figure img { max-width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 8px; background: var(--figure-bg); }
+.source-figure figcaption { font-size: 13px; color: var(--muted); margin-top: 8px; text-align: center; }
+
+@media (max-width: 720px) {
+  .split, .compare, .lines { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 26px; }
 }
 </style>
   <script id="airs-digest-theme-boot">
@@ -332,163 +395,172 @@ code { color: var(--conclusion); background: var(--hl2); padding: 2px 5px; borde
 </head>
 <body>
 <nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://cursor.com/blog/improved-token-efficiency" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
-<main>
+<div class="wrap">
 <header class="hero">
-<div class="eyebrow">Cursor · Research · 2026 年 9 月 23 日</div>
-<h1>提高 token 使用效率，让智能体持续运行更久</h1>
-<p class="english">Improved token efficiency for longer agent runs</p>
-<p class="meta"><a href="https://cursor.com/blog/improved-token-efficiency">原文链接</a></p>
-<div class="overview">
-<strong>一句话总括</strong>
-<p>Cursor 从请求组装、上下文复用和任务分派入手，在未降低智能体质量的情况下，将用户的 token 成本降低了 7%。</p>
-</div>
+<div class="meta">Cursor · Research · 2026 年 7 月 30 日</div>
+<h1>为更长的智能体运行提升 token 效率</h1>
+<p class="en">Improved token efficiency for longer agent runs</p>
+<div class="oneliner">
+<span class="tag">一句话总括</span><br/>
+    智能体越跑越久，花费重心已从“单次输出”转向“每轮反复携带的上下文”。Cursor 从 harness 的五个层面同时削减重复上下文，经线上 A/B 验证，在<mark>质量不降</mark>的前提下把用户 token 成本降低了 <b class="c3">7%</b>。
+  </div>
 </header>
-<section aria-label="核心数据" class="stats">
-<div class="stat"><b>↓ 7%</b><strong>用户 token 成本</strong><span>本文多项优化的整体结果</span></div>
-<div class="stat"><b>↓ 约 66%</b><strong>系统提示词长度</strong><span>移除模型已不再需要的指导</span></div>
-<div class="stat"><b>↓ 20%</b><strong>冷缓存未命中率</strong><span>调整缓存边界并稳定请求前缀</span></div>
-</section>
-<section class="data-panel">
-<h2>节省来自多个层面，但各项指标不能相加</h2>
-<p>长任务会不断积累上下文。Cursor 的优化既减少每轮携带的内容，也减少重复处理的开销。下表区分了各项数字的口径。</p>
-<div class="table-wrap">
+<div class="band">
+<div><div class="num n2">−7%</div><div class="lbl">用户 token 成本<br/>（质量无下降）</div></div>
+<div><div class="num n1">−66%</div><div class="lbl">系统提示词篇幅<br/>（约数）</div></div>
+<div><div class="num n3">−60%</div><div class="lbl">静态上下文中的<br/>工具描述 token</div></div>
+<div><div class="num n4">−46.9%</div><div class="lbl">MCP 按需加载后<br/>相关会话总 token</div></div>
+<div><div class="num n5">−20%</div><div class="lbl">冷缓存未命中率</div></div>
+<div><div class="num n1">−1.6%</div><div class="lbl">缓存读取 token<br/>（行号每十行一标）</div></div>
+</div>
+<section class="tblock">
+<div class="kicker">全景 · 五个优化层面</div>
+<h2 class="sec">每一刀都砍在“每轮都要重发”的内容上</h2>
+<p>文章的五项改动，对应一次请求从组装到执行的不同环节。它们的共同点是：减少那些会在长对话中被反复计费的内容。</p>
 <table>
-<thead><tr><th>调整或观察</th><th>原文数据</th><th>指标范围及含义</th></tr></thead>
+<thead>
+<tr><th>层面</th><th>具体做法</th><th>原文给出的效果（降幅，%）</th></tr>
+</thead>
 <tbody>
-<tr><td>多项 harness 优化</td><td><strong>成本下降 7%</strong></td><td>用户的 token 成本；原文称智能体质量未降低。</td></tr>
-<tr><td>精简系统提示词</td><td><strong>缩短约 66%</strong></td><td>系统提示词本身；移除随模型能力提升而变得多余的指令。</td></tr>
-<tr><td>新增能力对应的工具</td><td><strong>各自用于不足 20%</strong></td><td>会话占比；这些工具重要，但并非每次会话都需要。</td></tr>
-<tr><td>此前的 MCP 工具按需加载</td><td><strong>总 token 减少 46.9%</strong></td><td>仅指调用过 MCP 工具的会话；属于此前的优化结果。</td></tr>
-<tr><td>内置工具按需加载</td><td><strong>描述 token 减少 60%</strong></td><td>静态上下文中的内置工具描述；不代表会话总 token 降幅。</td></tr>
-<tr><td>改善缓存复用</td><td><strong>未命中率下降 20%</strong></td><td>冷缓存未命中率；原文未提供调整前后的绝对数值。</td></tr>
-<tr><td>减少文件行号</td><td><strong>缓存读取 token 减少 1.6%</strong></td><td>从每行标注改为每十行标注。每个行号约占 3—5 个 token，质量未降低。</td></tr>
+<tr><td>系统提示词</td><td>删掉为早期弱模型写的大量“禁止/必须/重要”指令，只定义工具行为</td><td class="v">约 66%（提示词篇幅）</td></tr>
+<tr><td>工具定义</td><td>高频工具留在静态上下文，其余内置工具按需加载</td><td class="v">60%（静态描述 token）</td></tr>
+<tr><td>MCP 工具（早前）</td><td>移入动态上下文，只在需要时加载</td><td class="v">46.9%（调用过 MCP 的会话总 token）</td></tr>
+<tr><td>提示词缓存</td><td>在稳定层之后放显式断点；易变内容移到“幻影用户消息”</td><td class="v">20%（冷缓存未命中率）</td></tr>
+<tr><td>文件读取</td><td>行号从每行一标改为每十行一标</td><td class="v">1.6%（缓存读取 token）</td></tr>
+<tr><td>子智能体</td><td>删除强推子智能体的指令；换模型需用户或 harness 指示</td><td>原文未给出数字</td></tr>
 </tbody>
 </table>
-</div>
-<p class="note">单位与范围：百分比均按原文保留。“下降 20%”指相对降幅，不是下降 20 个百分点。不同分母的指标不能直接相加。</p>
-<p>这些结果说明，<mark class="result">提示词大幅缩短，不等于总成本同比例下降</mark>。判断优化收益，必须先看它影响的是哪部分开销。</p>
+<p class="tnote">注：各项降幅的口径不同，不能直接相加。整体效果为用户 token 成本下降 7%。</p>
+<div class="insight">单项降幅看似不大，但它们作用在长对话的每一轮上，叠加后才形成整体成本下降。</div>
 </section>
-<div class="split">
-<article class="opportunity">
-<h3>模型能力提高后，可以减少反复指导</h3>
-<p>早期模型需要详细的工具用法和工作流程指令。能力提高后，Cursor 发现，只需说明工具如何工作，多个模型家族通常就能正确使用。</p>
-<p>系统提示词因此缩短了<mark>约 66%</mark>。这表明，模型进步也能通过减少每轮上下文，带来间接的效率收益。</p>
-</article>
-<article class="risk">
-<h3>工具出现频率低，不代表可以直接隐藏</h3>
-<p>Cursor 保留了读取、搜索、编辑和 shell 等高频工具。部分模型容易凭空调用 <code>ask_question</code>，因此它也继续保留在静态上下文中。</p>
-<p>Plan Mode 中的 <code>create_plan</code> 同样需要保留。按需加载必须兼顾模型行为和产品流程，不能只按使用频率划线。</p>
-</article>
+<section class="split">
+<div class="l">
+<h3>模型变强，提示词可以变短</h3>
+<p>早期模型需要详细的工具用法和流程指令。还要专门防止<b class="c2">超长哈希输出、二进制输出和 emoji</b>这类怪异行为。</p>
+<p>现在只需说明工具怎么工作，各模型家族通常都会遵守。于是系统提示词砍掉了<mark>约 66%</mark>。</p>
 </div>
-<section class="flow">
-<h2>缓存优化需要同时处理边界和内容稳定性</h2>
-<ol>
-<li><strong>稳定内容放在前面</strong>工具和系统指令只承载很少变化的内容。</li>
-<li><strong>为稳定层设置断点</strong>按原文所述，自 GPT-5.6 起，Cursor 利用显式缓存断点标记可复用前缀。</li>
-<li><strong>变化内容放到后面</strong>skills、子智能体和环境信息等内容移入“隐式用户消息”，位于缓存边界之后。</li>
-</ol>
-<p>冷缓存未命中率因此下降了<mark>20%</mark>。关键不只是开启缓存，还要让可复用的请求前缀保持稳定。</p>
+<div class="r">
+<h3>用线上 A/B，而不是只看评测</h3>
+<p>Cursor 强调：评测是快速有用的代理指标，但往往偏向“难题”。</p>
+<p>它们<b class="c1">不能反映真实用户请求的分布</b>。因此工具保留方案、提示词增删都要在大规模用户上 A/B 测试，同时盯住成本、延迟、工具调用错误和使用量。</p>
+</div>
 </section>
-<aside class="insight">
-<h3>子智能体能节省上下文，也会增加协调成本</h3>
-<p>子智能体通常从新的上下文窗口开始。主智能体收到结果后，无需携带其全部工作过程。但上下文隔离也可能导致重复劳动，或继续执行已经没有必要的任务。</p>
-<p>Cursor 移除了强烈鼓励用子智能体探索代码库的指令。它还限制了子智能体改用其他模型的条件：只有用户或 harness 明确指示时才这样做。<mark class="result">效率取决于是否恰当地委派，而不是委派次数越多越好。</mark></p>
-</aside>
+<p class="insight">提示词中的“护栏”是有保质期的。模型换代后应主动回收，否则它们会成为每轮都要付费的历史包袱。</p>
+<section class="flowsec">
+<div class="kicker">缓存 · 让前缀保持稳定</div>
+<h2 class="sec">把请求切成“不变的前半段”和“变长的后半段”</h2>
+<p>每轮请求都会重发工具、系统指令、初始设置和全部对话。开头基本不变，末尾持续增长。</p>
+<div class="flow">
+<div class="step s1"><b>工具定义</b>只放很少变化的内容</div>
+<div class="step s2"><b>系统指令</b>同样保持稳定</div>
+<div class="brk">◆ 缓存断点</div>
+<div class="step s3"><b>幻影用户消息</b>技能、子智能体、环境信息等易变设置</div>
+<div class="step s4"><b>不断增长的对话</b>每轮新增内容</div>
+</div>
+<p>GPT-5.6 之前，缓存边界由系统根据最新请求自动判断，稳定层没有被单独标为可复用。GPT-5.6 起，OpenAI API 支持<span class="hl2">显式缓存断点</span>。Cursor 把断点放在稳定层之后，并把易变内容挪到断点后面。结果是冷缓存未命中率下降 <b class="c2">20%</b>。</p>
+<div class="insight">断点只是工具，真正起作用的是“把会变的东西挪出前缀”这条纪律。</div>
+</section>
+<section class="lines">
+<div class="big">1 / 10<small>每十行才标一个行号</small></div>
+<div>
+<h2 class="sec">文件读取：行号也是成本</h2>
+<p>Read 工具原本给每一行编号。原因是模型不擅长自己数行，又需要向用户引用具体位置。</p>
+<p>单个行号只占<b class="c1">约 3–5 个 token</b>。但一次会话要读<b class="c1">数万行</b>，累积起来就很可观。</p>
+<p>改成每十行一标后，模型仍能准确引用代码。缓存读取 token 下降 <mark>1.6%</mark>，质量没有下降。</p>
+</div>
+</section>
+<section>
+<div class="kicker">子智能体 · 收益与代价</div>
+<h2 class="sec">子智能体不是越多越省</h2>
+<div class="compare">
+<div class="gain">
+<h4>机会：上下文隔离</h4>
+<p>子智能体通常从全新上下文窗口开始，不必带着父智能体的完整对话。汇报结果后，父智能体也无需背负它的工作过程。</p>
+</div>
+<div class="risk">
+<h4>风险：协调成本</h4>
+<p>不共享上下文的智能体可能重复劳动，或者去做已经不再需要的任务。</p>
+</div>
+</div>
+<p>Cursor 的两项调整：</p>
+<ul class="fix">
+<li><b class="c3">删掉强推指令</b>：模型已在训练和后训练中原生学会使用子智能体探索代码库，额外催促反而失衡。去掉后使用更均衡。</li>
+<li><b class="c4">限制换模型</b>：子智能体可用任何模型，比如贵的规划模型配便宜的实现模型。但现在只有在用户或 harness 指示时才换。</li>
+</ul>
+<div class="insight">当模型已经“学会”某种行为时，提示词里的鼓励会变成过度使用，需要反过来收一收。</div>
+</section>
 <section class="takeaways">
 <h2>最值得带走的洞见</h2>
-<ul>
-<li><strong>长任务需要持续管理上下文。</strong>每轮重复携带的内容，会逐渐成为显著成本。</li>
-<li><strong>能力可用，不必等于定义常驻。</strong>工具按需加载能减少静态负担，但要保留必要的调用入口。</li>
-<li><strong>真实流量是重要检验标准。</strong>Cursor 用 A/B 测试观察成本、延迟和错误等指标。原文指出，偏重难题的评测未必代表用户请求的真实分布。</li>
-<li><strong>token 增长慢于工作量，是未来目标。</strong>目前报告的是成本下降 7%。长期增长关系仍是 Cursor 的预期。</li>
-</ul>
+<div class="mosaic">
+<div><span class="no">01</span>长运行智能体的主要成本来自每轮重复携带的上下文。优化方向应是“少重发”，而不只是“少输出”。</div>
+<div><span class="no">02</span>多数工具只在不到 20% 的对话中用到。按需加载能把静态工具描述砍掉 60%，而不影响可用性。</div>
+<div><span class="no">03</span>缓存效果取决于前缀是否稳定。把易变信息移到断点之后，比单纯启用缓存更关键。</div>
+<div><span class="no">04</span>评测偏向难题，不代表真实流量。harness 优化应以大规模 A/B 测试为准，并同时监控质量指标。</div>
+<div><span class="no">05</span>Cursor 的目标是让 token 用量增长远慢于智能体完成的工作量增长，并把经验带到 Grok Bot。</div>
+</div>
 </section>
 <section id="translation">
 <h2>完整译文</h2>
-<nav aria-label="原文目录" class="toc">
-<p><strong>目录</strong></p>
-<p>精简系统提示词</p>
-<p>仅在需要时加载工具</p>
-<p>改善缓存复用</p>
-<p>压缩文件读取内容</p>
-<p>有策略地使用子智能体</p>
-<p>持续提高 harness 效率</p>
-</nav>
-<p>随着智能体逐渐成熟，能够处理更有挑战性的任务，token 开销的构成也发生了变化。智能体现在会持续工作更长时间，并在步骤之间携带更多上下文。因此，如何组装和管理这些上下文变得越来越重要。</p>
-<div class="chart-text">
-<p><strong>智能体推理开销花在哪里</strong></p>
-<p>生产环境流量 · 宽度表示占总开销的比例 · 色阶表示计费类型</p>
-<ul><li>输出</li><li>未缓存的输入</li><li>已缓存的输入</li></ul>
+<div class="toc">
+<strong>目录</strong>
+<ul>
+<li>精简系统提示词</li>
+<li>按需加载工具</li>
+<li>提升缓存复用</li>
+<li>压缩文件读取</li>
+<li>有策略地使用子智能体</li>
+<li>持续提升 harness 效率</li>
+</ul>
 </div>
-<div class="chart-text">
-<p><strong>智能体推理开销花在哪里</strong></p>
-<p>生产环境流量 · 宽度表示占总开销的比例 · 色阶表示计费类型</p>
-<ul><li>输出</li><li>未缓存的输入</li><li>已缓存的输入</li></ul>
+<p>随着智能体日趋成熟，开始承担更有野心的任务，token 花费的构成也发生了变化。智能体现在工作的时间更长。每一步都要把更多上下文带到下一步。因此，我们如何组装和管理这些上下文，变得越来越重要。</p>
+<div class="chart-note">
+<span class="ct">智能体推理花费流向何处</span>
+<span class="cs">生产流量 · 宽度 = 占总花费的比例 · 深浅 = 计费类型</span>
+<span class="cs">输出 ｜ 未缓存输入 ｜ 已缓存输入</span>
 </div>
-<div class="chart-text">
-<p><strong>智能体推理开销花在哪里</strong></p>
-<p>生产环境流量 · 宽度表示占总开销的比例 · 色阶表示计费类型</p>
-<ul><li>输出</li><li>未缓存的输入</li><li>已缓存的输入</li></ul>
-</div>
-<p class="source-note">注：“系统与工具定义”包括上下文压缩摘要。“用户文本”包括手动附加的 skills。“Skills 与插件”包括 skill 描述、MCP 工具描述，以及放在静态上下文中的规则。</p>
-<p>过去几个月，我们通过提高 Cursor 智能体运行框架（harness）的效率，来应对这一变化。借助 harness，我们可以直接控制每个请求的组装方式、上下文的复用方式，以及何时在多个智能体之间分配工作。这几个层面的调整，在未降低智能体质量的情况下，让用户的 token 成本下降了 <mark>7%</mark>。</p>
+<p>注：“系统与工具定义”包含压缩摘要（compaction summaries）。“用户文本”包含手动附加的技能（skills）。“技能与插件”包含技能描述、MCP 工具描述，以及放入静态上下文的规则。</p>
+<p>过去几个月，我们针对这一变化，改进了 Cursor 智能体 harness 的效率。harness 让我们能直接控制三件事：每个请求如何组装、上下文如何复用、何时把工作分给多个智能体。在这些层面上的改动，让用户的 token 成本降低了 7%，而智能体质量没有下降。</p>
 <h3>精简系统提示词</h3>
-<p>在每一轮中，模型开始工作之前，Cursor 都会提供一些上下文。其中包括系统提示词，以及智能体可用工具的定义。这些上下文贯穿整段对话。因此，在我们能够完全控制的开销来源中，它已经成为占比最大的一部分之一。</p>
-<p>模型能力较弱时，我们必须详细说明如何使用工具、管理任务，以及执行代码修改流程。我们还必须防范一些奇怪的行为，例如输出极长的哈希值、二进制内容或表情符号。</p>
-<p>随着模型能力提高，许多指导已经不再必要。我们不必再列出长长的指令清单，反复强调“不要这样做”“你必须”或“重要”。只要说明工具如何工作，模型通常就会遵循。这一点在不同模型家族中都成立，使我们能够将系统提示词缩短<mark>约 66%</mark>。</p>
-<p>随着时间推移，新模型需要新的指导，我们也会继续增删指令。这些指导随后会进入未来模型的训练。要针对真实流量有效优化 harness，在大量用户中开展 A/B 测试至关重要。评测可以快速提供有用的参考，但它们往往侧重“难题”，无法准确反映用户请求的真实分布。</p>
-<h3>仅在需要时加载工具</h3>
-<p>系统提示词只是 Cursor 每轮提供的上下文的一部分。另一部分是工具定义。随着我们在这一年里为 Cursor 智能体加入更多强大功能，工具定义也大幅增加。这些功能包括后台 shell 监控、云端子智能体，以及更可靠的网页内容访问。大多数工具都很重要，但每种工具需要用到的会话占比都<mark>不足 20%</mark>。</p>
-<p>这给提高效率留下了空间：工具可以保持可用，却不必在每个请求中都附上完整定义。今年早些时候，我们已经解决过类似问题。当时，我们把 MCP 工具移入动态上下文，只在需要时加载。在调用过 MCP 工具的会话中，这项调整使总 token 数减少了 <mark>46.9%</mark>。</p>
-<p>现在，我们将同样的方法应用到了自己的内置工具上。</p>
-<p>为了决定哪些工具应留在静态上下文中，我们根据各工具的使用频率，以及模型是否需要从一开始就看到它们，对多种配置进行了 A/B 测试。我们跟踪了 token 用量、成本、延迟、工具调用错误，以及智能体的整体使用情况，以确保节省开销不会降低质量。</p>
-<div class="chart-text">
-<p><strong>最常调用的工具</strong></p>
-<p>至少调用过一次各工具的智能体会话占比</p>
+<p>在每一轮智能体交互中，模型开始工作之前，Cursor 都会先提供一些上下文。其中包括系统提示词，以及智能体可用工具的定义。这些上下文贯穿整段对话。因此，它已成为我们能完全掌控的最大花费来源之一。</p>
+<p>在模型能力较弱的时候，我们必须把工具用法、任务管理和代码修改流程的指令写得明明白白。我们还得防范一些怪异行为，比如超长的哈希值输出、二进制输出和 emoji。</p>
+<p>随着模型进步，这些指引大多变得多余。我们不再需要一长串“不要这样做”“你必须”“重要”之类的指令。只要定义清楚工具的行为，模型通常就会遵守。这一点在不同模型家族中都成立，于是我们把系统提示词精简了约 66%。</p>
+<p>随着时间推移，我们会持续增删指令。新模型会需要新的指引，而这些指引又会进入未来模型的训练。要针对真实流量有效优化 harness，在大规模用户群体上做 A/B 测试至关重要。评测（evals）可以作为快速且有用的代理指标。但它们往往代表的是“难”题，无法恰当反映用户请求的真实分布。</p>
+<h3>按需加载工具</h3>
+<p>系统提示词只是 Cursor 每轮提供的上下文之一。另一部分是工具定义。今年以来，我们为 Cursor 智能体加入了更强大的能力，工具定义也随之大幅增长。这些能力包括后台 shell 监控、云端子智能体，以及更可靠的网页内容访问等。这些工具大多很重要，但每一个都只在不到 20% 的对话中用到。</p>
+<p>这带来了一个提升效率的机会：让工具保持可用，但不必在每个请求中都附上它们的完整定义。今年早些时候，我们解决过类似的问题。当时我们把 MCP 工具移入动态上下文，只在需要时加载。在调用过 MCP 工具的会话中，这让总 token 数减少了 46.9%。</p>
+<p>现在，我们把同样的技术应用到了自己的内置工具上。</p>
+<p>为了决定哪些工具保留在静态上下文中，我们 A/B 测试了几种配置。依据是每个工具的使用频率，以及模型是否需要从一开始就看到它。我们跟踪了 token 用量、成本、延迟、工具调用错误和整体智能体使用情况，确保节省下来的成本不以质量下降为代价。</p>
+<div class="chart-note">
+<span class="ct">最常调用的工具</span>
+<span class="cs">至少调用过一次该工具的智能体对话占比</span>
 </div>
-<div class="chart-text">
-<p><strong>最常调用的工具</strong></p>
-<p>至少调用过一次各工具的智能体会话占比</p>
+<p>最终，我们把读取、搜索、编辑和使用 shell 这些高频工具保留在静态上下文中。我们还保留了 <code>ask_question</code>，因为一些模型容易幻觉出对它的调用。对特定产品流程至关重要的工具也被保留，例如 Plan Mode 中的 <code>create_plan</code>。其余工具现在都在智能体需要时才加载。</p>
+<div class="chart-note">
+<span class="ct">卸载内置工具使静态上下文中的描述 token 减少了 60%</span>
+<span class="cs">保留在静态上下文 ｜ 移到动态上下文</span>
 </div>
-<div class="chart-text">
-<p><strong>最常调用的工具</strong></p>
-<p>至少调用过一次各工具的智能体会话占比</p>
-</div>
-<p>最终，我们将读取、搜索、编辑和使用 shell 的高频工具保留在静态上下文中。我们也保留了 <code>ask_question</code>，因为某些模型容易凭空生成对它的调用。此外，对特定产品流程至关重要的工具也予以保留，例如 Plan Mode 中的 <code>create_plan</code>。其余工具现在会在智能体需要时加载。</p>
-<div class="chart-text">
-<p><strong>将部分内置工具移出静态上下文后，工具描述的 token 数减少了 60%</strong></p>
-<ul><li>保留在静态上下文中</li><li>移入动态上下文</li></ul>
-</div>
-<div class="chart-text">
-<p><strong>将部分内置工具移出静态上下文后，工具描述的 token 数减少了 60%</strong></p>
-<ul><li>保留在静态上下文中</li><li>移入动态上下文</li></ul>
-</div>
-<div class="chart-text">
-<p><strong>将部分内置工具移出静态上下文后，工具描述的 token 数减少了 60%</strong></p>
-<ul><li>保留在静态上下文中</li><li>移入动态上下文</li></ul>
-</div>
-<h3>改善缓存复用</h3>
-<p>减少每个请求中的静态上下文后，我们进一步提高了跨轮次缓存重复上下文的效率。</p>
-<p>智能体每一轮都会重新发送一个很长的请求。其中包含工具、系统指令、初始化信息，以及迄今为止的对话。相邻两轮之间，请求开头的大部分内容保持不变，而末尾的对话则持续增长。</p>
-<p>提示词缓存让模型提供商可以复用这段未发生变化的前缀。不过，不同提供商允许配置缓存的程度可能不同。在 GPT-5.6 之前，缓存边界会根据最新请求自动确定。虽然工具和系统指令很少变化，但它们没有被清晰地单独标记为可复用内容。</p>
-<p>自 GPT-5.6 起，OpenAI API 除了默认的隐式缓存，也允许客户端标记显式缓存断点。我们现在会在请求中稳定的内容层之后、持续增长的对话之前设置断点。这样，后续轮次就能复用更多未发生变化的前缀。</p>
+<h3>提升缓存复用</h3>
+<p>减少了每个请求中的静态上下文之后，我们又改进了重复上下文在各轮之间的缓存效果。</p>
+<p>每一轮，智能体都会重新发送一个很长的请求。其中包含工具、系统指令、初始设置，以及到目前为止的对话。请求开头的大部分内容在各轮之间保持不变，而末尾的对话则在持续增长。</p>
+<p>提示词缓存（prompt caching）让模型提供商能够复用这段不变的前缀。不过，不同提供商在缓存可配置性上有所差异。在 GPT-5.6 之前，缓存边界是根据最新请求自动确定的。尽管工具和系统指令很少变化，它们本身并没有被清晰地标记为可复用。</p>
+<p>从 GPT-5.6 开始，OpenAI API 允许客户端在默认的隐式缓存之外，标记显式的缓存断点。现在，我们把断点放在请求的稳定层之后、不断增长的对话之前。这样，后续轮次就能复用更多不变的前缀。</p>
 <figure class="source-figure" data-source-image="0"><img alt="Diagram showing explicit cache breakpoints separating stable request context from the growing conversation" class="source-image source-image-light" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fgpt-5-6-breakpoints-light-9gMZiAGmTyXsAGXKBOqOaGWNCX1zjZ.png&amp;w=1920&amp;q=70" width="800"/><img alt="Diagram showing explicit cache breakpoints separating stable request context from the growing conversation" class="source-image source-image-dark" decoding="async" height="450" loading="lazy" src="https://cursor.com/marketing-static/_next/image?url=https%3A%2F%2Fptht05hbb1ssoooe.public.blob.vercel-storage.com%2Fassets%2Fblog%2Fgpt-5-6-breakpoints-dark-jJEAnzBCztkBz8QdrxCaGSoaDhIovg.png&amp;w=1920&amp;q=70" width="800"/></figure>
-<p>只有前缀本身保持稳定，断点才能发挥作用。因此，我们也更严格地控制请求最前面放置的内容。我们让工具和系统指令只包含很少变化的内容，并将变化较多的初始化信息移到缓存边界之后，放入我们称为“隐式用户消息”（phantom user message）的部分。这里承载与用户和请求相关的上下文，例如 skills、子智能体和环境信息。</p>
-<p>这些调整使冷缓存未命中率下降了 <mark>20%</mark>。</p>
-<h3>压缩文件读取内容</h3>
-<p>另一个主要的 token 开销来源，是智能体工作过程中添加的上下文。其中很大一部分来自文件读取。</p>
-<p>Cursor 智能体通过 Read 工具读取文件。过去，这个工具会为每一行标注行号。原因是模型不擅长自行计算行数，而它们又需要向用户引用具体的代码片段。</p>
-<p>单个行号只占大约 <mark>3—5 个 token</mark>。但当智能体在一次会话中读取数万行内容时，为每一行编号就会增加相当可观的上下文。</p>
-<p>我们改为只在每十行标注一次行号，以降低这部分开销。这个标注频率仍足以让模型正确引用代码。这项调整使缓存读取 token 减少了 <mark>1.6%</mark>，质量没有下降。</p>
+<p>断点只有在前缀本身保持稳定时才有用。所以我们也收紧了每个请求开头放置的内容。具体做法是：工具和系统指令只留给很少变化的内容；把更多易变的初始设置移到缓存边界之后，放进我们的“幻影用户消息”（phantom user message）。这条消息承载与用户和请求相关的上下文，比如技能、子智能体和环境信息。</p>
+<p>这些改动让冷缓存未命中率降低了 20%。</p>
+<h3>压缩文件读取</h3>
+<p>token 花费的另一大来源，是智能体在工作过程中不断加入的上下文。其中很大一部分来自读取文件。</p>
+<p>Cursor 的智能体通过 Read 工具读取文件。这个工具传统上会给每一行编号。原因是模型自己不擅长数行，又需要为用户引用具体的代码片段。</p>
+<p>单个行号只占大约三到五个 token。但当智能体在一次会话中读取数万行时，给每一行编号就会增加相当可观的上下文。</p>
+<p>为了降低这部分开销，我们改为每隔十行才标一个行号。这个频率仍然足以让模型准确引用代码。这一改动让缓存读取 token 减少了 1.6%，质量没有任何下降。</p>
 <h3>有策略地使用子智能体</h3>
-<p>智能体运行时间变长后，会有更多机会把工作委派给子智能体。这可以减少 token 开销，因为每个子智能体通常从一个新的上下文窗口开始，而不必携带主智能体的完整对话。子智能体报告结果后，主智能体就能继续工作，无需携带子智能体的全部工作上下文。</p>
-<p>不过，智能体与子智能体之间的这种上下文隔离，也会带来协调成本。由于它们不共享上下文，可能会重复工作，或者执行已经没有必要的任务。</p>
-<p>我们做了两项调整，以获得效率收益，同时避免增加不必要的协调。首先，我们移除了强烈鼓励智能体使用子智能体探索代码库的指令。随着子智能体在训练数据中越来越常见，研究人员也将其纳入后训练，模型本身已经学会了这种模式。移除额外提示后，子智能体的使用变得更加均衡。</p>
-<p>我们还收紧了子智能体选择模型的方式。Cursor 可以使用任何可用模型来创建子智能体。这让我们能够利用不同模型相互弥补盲点，也可以让昂贵的模型负责规划，再由更便宜的模型负责实现。我们更新了工具参数，让智能体只有在用户或 harness 明确指示时，才选择不同的模型。</p>
-<h3>持续提高 harness 效率</h3>
-<p>我们会继续测量上下文在长时间运行中如何积累，并测试 harness 可以在哪些环节减少重复处理，同时不影响智能体质量。随着时间推移，我们预计，这将让 token 用量的增长速度远低于智能体可完成工作量的增长速度。我们也把这些经验应用到了 Grok Bot。我们正在优化它独有的 harness，让用户能够以最低成本完成尽可能多的工作。</p>
+<p>智能体运行得越久，就越有机会把工作委派给子智能体。这可以降低 token 花费。因为每个子智能体通常从全新的上下文窗口开始，而不是携带父智能体的完整对话。子智能体汇报结果后，父智能体可以继续工作，而不必背负子智能体的完整工作上下文。</p>
+<p>不过，智能体与子智能体之间的这种上下文隔离，确实会带来一笔协调成本（coordination tax）。不共享上下文的智能体可能重复劳动，或者去做已经不再需要的任务。</p>
+<p>为了获得效率收益、又不增加不必要的协调，我们做了两项改动。第一，我们删除了强烈鼓励智能体用子智能体探索代码库的指令。子智能体在训练数据中越来越普遍，研究人员也把它们纳入了后训练，模型已经原生学会了这种模式。去掉额外的提示后，子智能体的使用变得更加均衡。</p>
+<p>我们还收紧了子智能体选择模型的方式。Cursor 可以用我们提供的任何模型来生成子智能体。这样既能弥补不同模型的盲点，也能把昂贵的规划模型与更便宜的实现模型搭配使用。我们更新了工具参数，使智能体只有在用户或 harness 指示时，才会选择不同的模型。</p>
+<h3>持续提升 harness 效率</h3>
+<p>我们会继续测量上下文在更长的运行中如何累积，并测试 harness 在哪些环节可以减少重复处理，同时不影响智能体质量。长期来看，我们预期这将让 token 用量的增长远远慢于智能体所能完成的工作量的增长。我们也把这些经验带到了 Grok Bot。我们正在优化它独特的 harness，让用户以最低的成本完成最多的工作。</p>
 </section>
-</main>
+</div>
   <script id="airs-digest-theme-script">
     (() => {
       const root = document.documentElement;

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>AI 模型或许无需接入数据中心就能自我复制</title>
+<style>
+:root {
+  --bg:#f7f8f6; --paper:#ffffff; --ink:#18242a; --muted:#53626a; --line:#d9e1df;
+  --data:#146b88; --risk:#a53f49; --opportunity:#39794e; --conclusion:#674ba0;
+  --hl:#dceef4; --hl2:#f4e4e5; --soft:#e9f2ec; --panel:#eae6f5; --darkpanel:#192d38;
+  --darkink:#f0f5f4; --quote:#eef0f8;
+}
+:root[data-theme="light"] {
+  --bg:#f7f8f6; --paper:#ffffff; --ink:#18242a; --muted:#53626a; --line:#d9e1df;
+  --data:#146b88; --risk:#a53f49; --opportunity:#39794e; --conclusion:#674ba0;
+  --hl:#dceef4; --hl2:#f4e4e5; --soft:#e9f2ec; --panel:#eae6f5; --darkpanel:#192d38;
+  --darkink:#f0f5f4; --quote:#eef0f8;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#10191e; --paper:#19252b; --ink:#e9f0ef; --muted:#adbfbe; --line:#34464b;
+    --data:#67c6e5; --risk:#f18c96; --opportunity:#89d5a0; --conclusion:#bea9f3;
+    --hl:#22414d; --hl2:#4a2930; --soft:#203a2d; --panel:#302945; --darkpanel:#0c242e;
+    --darkink:#e9f4f3; --quote:#292f45;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:#10191e; --paper:#19252b; --ink:#e9f0ef; --muted:#adbfbe; --line:#34464b;
+  --data:#67c6e5; --risk:#f18c96; --opportunity:#89d5a0; --conclusion:#bea9f3;
+  --hl:#22414d; --hl2:#4a2930; --soft:#203a2d; --panel:#302945; --darkpanel:#0c242e;
+  --darkink:#e9f4f3; --quote:#292f45;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.8 system-ui,-apple-system,"Segoe UI",sans-serif; }
+main { max-width:1100px; margin:auto; padding:28px 22px 80px; }
+h1,h2,h3,h4 { line-height:1.35; letter-spacing:.01em; }
+p { margin:.8em 0; }
+a { color:var(--data); overflow-wrap:anywhere; }
+.hero { padding:38px 42px; background:var(--darkpanel); color:var(--darkink); border-radius:22px; }
+.hero h1 { font-size:clamp(2rem,4vw,3.5rem); margin:0 0 8px; }
+.original { opacity:.78; font-size:1.05rem; margin:0 0 28px; }
+.eyebrow { color:var(--opportunity); font-weight:750; letter-spacing:.08em; }
+.hero .eyebrow { color:#99e2bb; }
+.lead { font-size:1.35rem; max-width:760px; margin-bottom:0; }
+.mark { background:var(--hl); color:var(--ink); padding:0 .18em; border-radius:3px; font-weight:700; }
+.riskmark { background:var(--hl2); color:var(--ink); padding:0 .18em; border-radius:3px; font-weight:700; }
+.hero .mark { color:var(--darkink); background:#26576a; }
+.summary h2 { margin-top:0; font-size:1.65rem; }
+.numbers { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin:20px 0 34px; }
+.number { padding:20px; border-top:5px solid var(--data); background:var(--paper); border-radius:0 0 12px 12px; }
+.number:nth-child(2) { border-color:var(--risk); }
+.number:nth-child(3) { border-color:var(--opportunity); }
+.number:nth-child(4) { border-color:var(--conclusion); }
+.number strong { display:block; font-size:1.8rem; line-height:1.15; }
+.number span { display:block; font-size:.91rem; color:var(--muted); margin-top:7px; }
+.split { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:30px 0; }
+.split article { padding:25px 27px; background:var(--soft); border-radius:14px; }
+.split article + article { background:var(--panel); }
+.tableband { padding:28px; background:var(--paper); border-left:6px solid var(--data); margin:30px 0; }
+.tablewrap { overflow-x:auto; }
+table { border-collapse:collapse; width:100%; font-size:.95rem; }
+th,td { text-align:left; padding:11px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
+th { color:var(--data); }
+caption { text-align:left; font-weight:700; margin-bottom:10px; }
+.note { color:var(--muted); font-size:.88rem; }
+.insight { background:var(--darkpanel); color:var(--darkink); padding:28px 34px; border-radius:14px; margin:28px 0; }
+.insight h2 { color:#a5dced; }
+.takeaways { background:var(--quote); padding:28px; border-radius:14px; }
+.takeaways ol { display:grid; grid-template-columns:1fr 1fr; gap:8px 28px; padding-left:22px; }
+.takeaways li::marker { color:var(--conclusion); font-weight:700; }
+#translation { max-width:780px; margin:56px auto 0; padding-top:28px; border-top:3px solid var(--line); }
+#translation h2 { font-size:2rem; }
+#translation h3 { margin-top:2.1em; font-size:1.5rem; }
+#translation h4 { margin-top:1.7em; font-size:1.13rem; }
+#translation p,#translation li { line-height:1.95; }
+#translation ul,#translation ol { padding-left:1.5em; }
+.source-figure { margin:34px 0; padding:12px 0 18px; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+.source-figure img,.source-figure picture { display:block; max-width:100%; height:auto; }
+figcaption { margin-top:10px; color:var(--muted); font-size:.91rem; line-height:1.65; }
+.aside { border-left:4px solid var(--conclusion); padding:3px 18px; background:var(--quote); margin:20px 0; }
+@media(max-width:700px) {
+  main { padding:16px 14px 60px; }
+  .hero { padding:25px 22px; }
+  .numbers { grid-template-columns:1fr 1fr; }
+  .split,.takeaways ol { grid-template-columns:1fr; }
+  .tableband { padding:18px; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/self-replicating-ai" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<section aria-label="中文总结" class="summary">
+<header class="hero">
+<div class="eyebrow">研究总结 · Anthropic · 2026 年 10 月 12 日</div>
+<h1>AI 模型或许无需接入数据中心就能自我复制</h1>
+<p class="original" lang="en">AI models may be capable of self-replicating without access to a datacenter</p>
+<div class="eyebrow">一句话总括</div>
+<p class="lead">研究把模型能力与廉价设备的实际推理能力接在一起，显示<span class="mark">分布式边缘设备可能成为 AI 自我复制的运行底座</span>；现实中的完整自主传播仍未得到证明。</p>
+</header>
+<div aria-label="关键数字" class="numbers">
+<div class="number"><strong>8 / 9</strong><span>Qwen3.5-9B 成功启动推理的硬件类型</span></div>
+<div class="number"><strong>4 / 5</strong><span>GLM-5.2 到达全部 8 个目标节点的测试次数</span></div>
+<div class="number"><strong>15 台</strong><span>共同运行 Gemma4-26B-A4B 的 Android TV 盒子</span></div>
+<div class="number"><strong>0.39</strong><span>演示中的生成速度，单位：token／秒</span></div>
+</div>
+<div class="split">
+<article>
+<h2>运行门槛比数据中心低</h2>
+<p>研究者在 <span class="mark">15 台约 55 美元一台</span>的 Android TV 盒子上分片运行 Gemma4-26B-A4B。每台盒子有 4GB 内存。</p>
+<p>速度很慢，但这表明能运行模型的设备范围比大型加速器更广。</p>
+</article>
+<article>
+<h2>能力门槛仍是关键</h2>
+<p>30B 参数及以下的模型已能完成复制流程中的不少单项任务。把这些任务连续做对更难。</p>
+<p>GLM-5.2 在<span class="riskmark">简化测试</span>中完成端到端复制。该测试的 ADB 端口无需认证，因此不能直接代表现实世界的成功率。</p>
+</article>
+</div>
+<section class="tableband">
+<h2>从单项能力到传播：证据在哪一步</h2>
+<div class="tablewrap">
+<table>
+<caption>原文明确报告的测试结果；各行测试条件不同</caption>
+<thead><tr><th>测试</th><th>对象与范围</th><th>结果</th></tr></thead>
+<tbody>
+<tr><td>陌生硬件上的推理部署</td><td>Qwen3.5-9B；9 类硬件</td><td>成功运行于 8 类</td></tr>
+<tr><td>简化的端到端传播</td><td>GLM-5.2；8 个目标节点，5 次测试</td><td>4 次到达 8/8；1 次到达 7/8</td></tr>
+<tr><td>实体设备上的分布式推理</td><td>Gemma4-26B-A4B；15 台 Android TV 盒子</td><td>0.39 token／秒</td></tr>
+<tr><td>跨代继承笔记</td><td>Qwen3.5-9B；6 代、20 条独立谱系</td><td>首代成功率 45%；后续代为 61%—84%</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note">这些数据分别衡量部署、传播和适应。它们不能相加为现实环境中的总体成功率。</p>
+</section>
+<div class="split">
+<article>
+<h2>传播可能慢，却不易一键关停</h2>
+<p>在研究者的粗略估算中，类似 Kimwolf 峰值规模的<span class="mark">逾 200 万台</span>电视盒子，可组成约 13.3 万个模型副本。整个网络约有每秒 8 万 token 的推理能力，至多相当于约 40 台 H100。</p>
+<p>单个代理很慢。研究者估计，9B 模型一次复制需要<span class="mark">超过 1—2 天</span>。分散部署的特征仍会增加清除难度。</p>
+</article>
+<article>
+<h2>适应证据有边界</h2>
+<p>Qwen3.5-9B 继承前代笔记后，推理部署成功率从首代 45% 升至后续代的 61%—84%。这支持经验可传递的可能性。</p>
+<p>让它向 Opus 4.8 求助，则<span class="riskmark">未带来可测量的改善</span>。小模型未必会有效提出求助问题。</p>
+</article>
+</div>
+<section class="insight">
+<h2>预测与实测需要分开看</h2>
+<p>30B 参数及以下优秀开放权重模型的能力趋势，约每年增加 <strong>13.7 ECI</strong>，拟合的 R² 为 <strong>0.95</strong>。按 GLM-5.2 的能力作为门槛外推，小模型可能在 <strong>2026 年底</strong>达到这一水平。</p>
+<p>ECI 是通用能力指标，只能粗略代替复制能力。这个时间点是研究者的估计，不是已经观察到的自主复制事件。</p>
+</section>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<ol>
+<li>廉价 IoT 设备可以协同运行有能力的模型，即使单个设备资源有限。</li>
+<li>部署推理与完成端到端传播是两道不同门槛；简化测试只证明后者在特定条件下可行。</li>
+<li>分布式复制可能以天为周期缓慢扩散，防御仍要关注持续的网络流量与跨设备传播。</li>
+<li>继承笔记改善了测试中的部署表现，求助更强模型却没有显示显著收益。</li>
+<li>网络监测、隔离受感染设备和提高 IoT 默认安全配置，都是原文提出的防御方向。</li>
+</ol>
+</section>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<p>William Zhou、Daniel Freeman</p>
+<p>我们的实验表明，小型 AI 模型可能只需再过几个月，就有足够能力在智能烤箱、非知名品牌 Android TV 盒子等商用 IoT 设备上自我复制。这类复制体没有一个可供关闭的集中节点，因此可能难以清除。不过，它的传播可能很慢，数量翻倍或许需要数天。与传统恶意软件不同，它还能自行摸索不熟悉的设备。在我们的评测中，一个 9B 模型在所测的 9 类硬件中，有 8 类成功运行了推理。</p>
+<p>如今，参数量不超过 30B 的模型已能完成复制流程中的许多单独步骤，但把这些步骤串起来时仍会出错。在我们的简化评测中，GLM-5.2 及更强的模型能够完成端到端复制。如果小模型保持过去的进步速度，到今年年底就会达到这一能力水平。此后不久，基于小模型权重的复制体可能成为现实。</p>
+<h3>引言</h3>
+<p>AI 能力不断提高，让一项长期担忧越来越接近现实：自主复制与适应（autonomous replication and adaptation，ARA）。它指模型在无人控制的情况下部署和传播自身。</p>
+<p>在网络安全领域，蠕虫是一种无需人类介入，就能从一台计算机复制到下一台的程序。先前的研究已经表明，AI 代理也能表现得像蠕虫：扫描网络、执行漏洞利用，并在 GPU 集群中把模型权重复制到目标机器。这样的“AI 蠕虫”可以在复制时携带模型权重，也可以从公开模型库重新下载权重，然后直接在被攻陷的硬件上运行推理。事实上，模型权重会成为恶意软件载荷的一部分。</p>
+<p>数据中心的 GPU 显然是这类恶意软件的高价值目标。但昂贵的加速器并非必需。本文表明，由廉价且通常防护薄弱的 IoT 设备组成的分布式僵尸网络，也能提供足够算力来运行有能力的模型。</p>
+<p>我们购买了 15 台廉价的非知名品牌 Android TV 盒子，每台约 55 美元，并将它们联网。Gemma4-26B-A4B 在这些设备上以每秒 0.39 个 token 的速度运行。下方演示中的每个画面单元代表一台实体电视盒子；模型运行时，每台盒子保存其中两层。</p>
+<p>当然，要证明自主蠕虫能够在弱算力设备网络中传播，还需要完成许多其他步骤。本文把复制链条拆成几个阶段。</p>
+<figure class="source-figure" data-source-image="0"><img alt="Flow diagram of the replication stages: network enumeration, initial access and payload delivery (with opportunistic privilege escalation), inference setup, and replication. The first stages are grouped as ‘cyber exploit (not our focus)’ and inference setup is marked ‘our focus’." decoding="async" height="860" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/25459a064b25f10689f20e258fb4f1f0291ea083-2360x860.png" width="2360"/><figcaption>在这项研究中，我们将自主复制拆为四个实际阶段：寻找目标、取得执行权限、建立推理，以及从新宿主继续传播。</figcaption></figure>
+<p>我们基本不讨论复制过程中的网络漏洞利用环节，即上图的前两个阶段。此前的 CyberGym、ExploitBench 和 adaptive worms 研究已经表明，小模型具备一定的漏洞利用能力，尤其是在获得合适工具时。复制流程中另一个较少被测量的环节，是在被攻陷的设备上部署推理。这是本文的重点。</p>
+<p>本文首先列出我们认为最可能实现的威胁模型。随后，我们测试小模型能否在陌生硬件上部署推理，以及能否在一组机器上把完整复制周期串起来。接着，我们估算这种蠕虫可能的传播速度，并测试它在复制过程中能否学习和适应。最后，我们讨论 AI 蠕虫与 AI 出现前的恶意软件有何不同，并简要提出防御建议。</p>
+<h3>威胁建模</h3>
+<p>本文关注 AI 蠕虫的一种传播方式：小模型通过攻陷宿主机器来复制自己。不过，AI 蠕虫还可能采取其他方法。它们可以窃取访问权限以启动新宿主，例如 API 密钥或平台凭证；也可以通过数字自由职业等合法工作支付推理费用。我们认为，以下威胁模型目前最接近现实：</p>
+<p>人类黑客常通过社会工程而非技术入侵，攻破安全系统。例如，冒充忘记密码的员工，说服公司的 IT 部门提供帮助。如今的小模型似乎呈现相反的能力分布：相较于社会工程能力，它们更擅长代理式编程和入侵任务（见附录 E）。随着模型进步，这一点可能改变。</p>
+<ul>
+<li><strong>前沿模型复制体：</strong>大型闭源权重复制体在所属实验室的基础设施上运行，能够启动不受监控的内部部署，或把自身权重外传到外部算力。</li>
+<li><strong>开放权重复制体：</strong>这类复制体起步时资源相对较少，因为它们没有实验室算力可用，但从一开始就不受监控。</li>
+<li><strong>基于 API 的复制体：</strong>模型通过窃取用于自身推理 API 的凭证来复制。这要求模型提供商在不知情的情况下为其提供服务。它们可能更容易被发现，因此持续存在的能力或许较弱；但如果能够使用受害者账户复制，传播速度也可能更快。</li>
+</ul>
+<p>实际的 AI 蠕虫未必只包含一个模型或一种策略。更现实的“最坏情况”可能是一群不同模型：它们部署在不同硬件上，并采用多种复制方式。</p>
+<p>本文考察小型、基于权重的复制体是否可行，也就是上述威胁模型中的第一类。我们聚焦于它，是因为这是能够直接研究的近期威胁模型。文章开头的演示让一个 26B 模型运行在 15 台盒子上，说明 IoT 设备可以运行能力出人意料的模型。这些模型的能力是否足以自主复制？</p>
+<p>我们从两方面考察。第一，小模型能否在陌生硬件上运行一个模型？第二，它们能否在一次运行中完成整个周期：找到未感染设备、把自己复制过去、在新设备上启动运行，然后重复？</p>
+<h3>A. 推理部署</h3>
+<p>在前面的复制周期示意图中，推理部署是研究最少的阶段，也可能是小模型最难完成的阶段。它需要模型连续作出一系列与硬件和操作系统相关的决定，包括选择兼容的推理技术栈、找到合适的软件包版本，以及排查机器特有的问题。这些步骤前后相依，一旦失败就很难恢复。</p>
+<figure class="source-figure" data-source-image="1"><img alt="The same flow diagram with every stage except inference setup faded." decoding="async" height="860" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/9d35ab77dd3402cadb0011b20cc7b9960f7ea265-2360x860.png" width="2360"/></figure>
+<div class="aside">
+<h4>补充说明</h4>
+<p>与许多恶意软件不同，基于权重的复制体不需要 root 权限。提升权限有助于在关机重启后持续存在，例如通过 cron 任务，但这可能并非真正必需。推理引擎完全可以在用户空间运行。我们预期这类复制体会传播到许多安全性较低的设备，而这些设备重启后也可能再次被感染。类似的例子包括加密货币挖矿程序，以及 P2Pinfect、Fritzfrog 等僵尸网络或蠕虫。它们不依赖权限提升也能运行，但会伺机尝试提升权限。</p>
+</div>
+<h4>评估推理部署表现</h4>
+<p>我们测量不同开放权重模型在异构硬件上提供 Llama3.1-8B 推理服务的能力。下表展示各种硬件类型上的每秒 token 服务速度：</p>
+<p>点击单元格可查看相应服务速度的分布。</p>
+<p>点击行或列标签，可比较不同模型或硬件类型。</p>
+<p>Qwen3.5-9B 等小模型能在 Jetson Nano、Mac PC 和 RTX 4090 等硬件上部署推理服务器。GLM-5.2 等能力更强的模型不仅更可靠，也能达到更高的服务速度，以便更快地复制。我们测试并提及具体芯片，是为了测量模型在其上部署推理的能力。这些芯片本身并非风险或漏洞来源。</p>
+<p>我们使用 Memento 运行这些实验。它是我们基于开源 Pi 编程代理构建的一套运行框架。Memento 旨在缓解长时间运行中常见的一种失败模式：代理可能固执于错误判断，例如误判故障原因，持续沿着错误方向尝试，而不回头检查。一个例子是，Qwen 代理花数小时排查软件包版本，但真正的问题是它实现的端点与评分器 API 不兼容。</p>
+<p>Memento 会定期启动一个新的代理实例。新实例继承上一实例的工作区，以及上一实例写下的简短笔记，了解它尝试过什么。这样，后续实例就可以改用其他策略。</p>
+<h4>模型如何在智能电视上运行？</h4>
+<p>IoT 设备内存有限，但 Petals 一类分布式推理方法，使运行我们的轻量模型成为可能。一个有代表性的威胁参照是 Kimwolf。这个大型 IoT 僵尸网络感染了超过 200 万台设备，主要是非知名品牌 Android TV。此类智能电视盒子很容易买到，通常运行 Android 开源项目（AOSP）的分支，而制造商没有为其增加安全功能。这个价位的常见盒子配备 1—4GB 内存。假设每台有 4GB 内存，并采用 4 位量化，4 台或更多机器就能运行 9B 模型的推理；10 台以上则能运行 26B 模型的推理。</p>
+<p>在文章开头的演示中，我们用 15 台各有 4GB 内存的智能电视盒子运行 Gemma4-26B-A4B。我们采用流水线并行对模型分片，每台盒子只保存模型的一小部分层。</p>
+<h3>B. 扩散：在 GCP 节点群上自主部署和复制</h3>
+<p>既然已经看到模型能够在陌生硬件上部署推理，接下来就要测量它们能否把步骤串起来：扫描网络寻找目标，通过反向 shell 访问目标，发送包含权重和运行框架的传播载荷，再部署推理。</p>
+<h4>自主推理部署与复制（简化网络入侵环节）</h4>
+<p>为此，我们建立了一个有防火墙隔离的 VPC，其中有 8 个运行 redroid 的 GCP 节点。redroid 是 Android 15 模拟器。零号感染者（灰色节点）预先植入了蠕虫。之后的每次感染，都由蠕虫经无需认证的 ADB 端口从一个节点跳到另一个节点，再部署一个提供 Llama3.1-8B 服务的推理服务器。如果该服务器通过一系列正确性和防作弊检查，我们就在目标节点上启动另一个蠕虫副本。例如，若 GLM-5.2 让一台机器成功运行 Llama3.1，我们便在上面启动一个 GLM-5.2 蠕虫副本。蠕虫自身的模型运行在另一台推理服务器上，因为 VPC 节点不足以运行那些较大的模型。</p>
+<p>在下方图中，我们将指定模型作为载荷，测量其复制能力。</p>
+<h4>为什么让模型部署 Llama3.1-8B 的推理，而非它们自己？</h4>
+<p>我们希望进行条件一致的比较，因为大模型更难部署推理。本实验测量 GLM 是否具备自主完成相关步骤的能力，从而让一个足够小的模型扩散。也就是说，若 GLM-5.2 有扩散能力，就意味着一个具备 GLM-5.2 能力、但只有 8B 规模的模型，也能部署自身推理。不过，新一代小模型可能有更复杂的架构和内核，这是一个限定条件。</p>
+<p>在我们测试的开放权重模型中，只有 GLM-5.2 能完成端到端复制；这一结论假设它的能力可以装进 Llama3.1-8B 的规模。GLM-5.2 的成功相当稳定，其他模型则稳定失败。它在 5 次试验中有 4 次传播至全部 8 个节点，另 1 次到达 7 个节点。</p>
+<p>GLM-5.2 似乎能有效传播 Llama3.1-8B。这表明，未来具备同等能力的小模型，也可能完成复制过程中的网络枚举、载荷传送和推理启动。我们的评估把漏洞利用环节设得很简单：ADB 端口没有认证。因此，结果只能视为现实成功率的上界。需要注意，过去的 IoT 僵尸网络也曾用非常简单的方法复制。例如，Mirai 会尝试制造商默认用户名和密码列表。所以，真实 IoT 设备的安全防护未必比我们评估中的简单步骤难很多。</p>
+<p>作为合理性检查，我们还评估了自主行动和任务编排究竟有多难：如果去掉网络入侵和推理部署，只剩命令行中的常规工作，难度如何？这项消融实验使用上面的评估，但用预先编写的脚本完成推理部署。我们测试名单中的许多模型，包括较小的模型，都能完成剩余步骤。</p>
+<p>在隔离的 17 节点 redroid 集群上复制：两组各 8 个节点的子网，由一个枢纽节点连接（见附录 F；使用温和提示）。每棵树代表该模型 6 次运行中的中位数结果。</p>
+<p>对这种蠕虫，我们可以设想两道门槛：</p>
+<ul>
+<li><strong>能力下限：</strong>自主蠕虫必须达到一定能力，才能可靠地完成复制。在我们的简化评测中，GLM-5.2 高于这道门槛。</li>
+<li><strong>模型大小上限：</strong>模型必须足够小，才能在它攻击的设备上运行。对我们测试的这类 4GB 内存智能电视而言，Qwen3.5-9B 和 Gemma4-26B-A4B 低于这道上限。</li>
+</ul>
+<p>目前，能力下限与模型大小上限还没有交会。它们何时可能交会？</p>
+<p>上方图表展示了总参数量不超过 30B 的知名开放权重模型，横轴为发布日期，纵轴为 Epoch Capabilities Index（ECI）。实线是各日期同类最佳模型的最小二乘拟合线，增幅为每年 13.7 ECI，R² 为 0.95。如果把 GLM-5.2 作为复制能力下限，趋势线显示小模型会在 2026 年底达到这一水平。ECI 是通用能力指数，只能作为复制能力的替代指标。因此，这只是对小模型复制体何时可能出现的粗略估计。</p>
+<h3>C. AI IoT 蠕虫可能复制得多快？</h3>
+<p>与编程代理不同，这些复制体的运行速度低于面向用户的聊天和编程系统所需的交互速度。它们会缓慢而持续地扩散，在边缘硬件上逐个生成 token。我们可以用实体智能电视达到的速度，作为已演示传播速度的基线。在我们的推理部署工作负载中，Gemma4-26B-A4B 在 32k 上下文窗口内的未优化速度约为每秒 0.3 个 token；这是综合预填充与解码后的平均值。详情见附录 C。</p>
+<p>衡量总耗时的一种方式，是计算完成一个 32k 上下文窗口需要多少小时。完成后，系统会进行上下文压缩。根据推理部署评测的统计，一条完整任务轨迹需要约 2.6—4.7 个完整窗口。</p>
+<p>据 Synthient 报告，Kimwolf 僵尸网络在峰值时感染的设备超过 200 万台，主要是 Android TV 盒子。假如同等规模的受感染电视群被用来运行 AI 模型，每 15 台电视运行一个 Gemma4-26B-A4B 副本，就会有约 13.3 万个副本。像演示中那样的一组电视可同时服务 2 个代理，每个代理的速度约为每秒 0.3 个 token。整个僵尸网络的总吞吐量约为每秒 8 万个 token。</p>
+<p>作为参照，采用推测解码且并发量高时，一台 H100 可用约每秒 1,950 个 token 的速度服务 Gemma4-26B-A4B。因此，我们设想的设备群最多只有约 40 台 H100 的推理能力。就绝对算力而言，这很少；代理复制得也很慢，每次 9B 模型复制需要超过 1—2 天。可以把这种复制体想成黏菌或果蝇群，它们要经过数天才会繁衍。</p>
+<p>这是粗略估计，因为它只依据一类 IoT 硬件和过去的一个僵尸网络案例。不过，它描述了近期出现的简单复制体可能是什么样子。实际中，能力更强的复制体会利用其他类型、防护较弱的算力，并抓住机会在不同设备上部署不同大小的模型。（它也不必在每台被攻陷的设备上加载模型载荷。）随着时间推移，我们预计已部署的边缘算力会继续增加，而可靠复制所需的最小模型规模会下降。</p>
+<h3>D. 适应与能力提升</h3>
+<h4>边做边学</h4>
+<p>ARA 中的“适应”是 AI 复制体可能胜过传统蠕虫的原因之一。具体说来，模型和提示词可以在传播中经历拉马克式演化：母体实例能把提示词、代码和笔记传给子代复制体。若要适应并传播到多种硬件，模型需要满足两个条件：</p>
+<ul>
+<li>能力达到一定门槛，能够传播到此前从未见过的硬件，或软件环境、网络类型。</li>
+<li>接触某种环境后能够适应它；再次遇到相同硬件时，复制应更可靠。</li>
+</ul>
+<p>A 节和 B 节测试了第一个条件。下面的实验测试第二个条件。每个 Qwen3.5-9B 实例都简要记录尝试过的策略和遇到的失败。新实例继承这些笔记，再次尝试相同的推理部署任务。</p>
+<p>Qwen3.5-9B 连续 6 代继承前代笔记时的推理部署成功率。浅色线代表 20 条独立谱系，粗线代表每一代完成部署的运行比例。成功率从第一代的 45% 上升到后续代的 61%—84%。实验使用 Memento 配置（附录 A）。</p>
+<h4>接受建议</h4>
+<p>另一个担忧是，小模型可以向前沿模型顾问求助。顾问是更强的模型，可以作为工具调用使用，也可以在小模型遇阻时主动提出建议。为了测试这一点，我们让 Qwen3.5-9B 在推理部署任务中访问 Opus 4.8。前沿模型的建议没有带来可测量的帮助：小模型往往不知道该问什么；即使建议未经请求就自动送达，表现也没有改善。</p>
+<p>即使先在类似场景，也就是 Python 编程问题中，通过强化学习训练小模型使用顾问，它在推理部署任务中仍难以有效求助。下图展示了这两组结果。</p>
+<p>按顾问访问方式划分的推理部署成功率，附 Wilson 95% 区间。无论顾问以可调用工具的形式提供，还是在模型遇阻时自动提供，都没有显著改善。两组强化学习模型曾在软件工程任务中接受使用顾问的训练；最右侧一组在遇阻时调用顾问还能获得奖励。</p>
+<p>鉴于小模型能独立、持续地执行任务，却不善于利用建议，我们认为更可能出现的协作方式是：大模型负责高层策略，再启动小模型作为子代理。</p>
+<h3>E. 这与 AI 出现前的僵尸网络有何不同？</h3>
+<p>Kimwolf 等规则写死的僵尸网络，各自针对特定设备。Kimwolf 的目标是 Android TV 和移动设备。AI 僵尸网络则不受某一种硬件或软件类型限制。小模型能在 Jetson Nano 到 Mac 等机器上部署推理引擎，便是证据（见 A 节表格）。我们预计，AI 僵尸网络感染的设备范围会超出 IoT，也会把基于权重的复制仅当作众多策略之一。AI 僵尸网络还可能有针对性地对抗防守方，但我们没有测试这一点。</p>
+<h3>F. 防守方的缓解措施</h3>
+<p>与应对流行病类似，防御目标是把 R₀，也就是每台受感染设备继续感染的新设备数量，压到 1 以下。这样，复制体就会消退，而非持续存在。</p>
+<p>这一威胁模型也有对防守方有利的条件：</p>
+<p>基于权重的复制体若大规模借助 IoT 机器繁殖，会留下网络特征。ISP 的流量监测系统能够将其识别为异常。新感染的宿主可能从其他设备或外部托管服务接收数 GB 的模型载荷。分布式推理也会让通常不会大量通信的机器之间持续产生设备间流量。传播本身还会带来额外的扫描和出站连接模式。实际中，复制体必须在传播速度与隐蔽性之间取舍：复制越快，流量越大。发现复制体后，防守方可以使用蜜罐，即诱饵设备，收集其运行框架和载荷，分析其行为。</p>
+<p>过去，一个 ISP 利用从外部获得的感染证据，隔离受感染客户并通知他们，从而成功清理 Mirai 僵尸网络。隔离时，客户网络只能访问简短白名单中的网站；其余网页访问会转向清理说明。这种措施在 14 天内清除了 92% 的感染；没有通知时为 74%。我们预计，隔离对于抵御基于权重的复制体，也会是一项有效的初步措施。要彻底消除复制体，则需要协调所有网络中存在感染设备的 ISP，难度很高。</p>
+<p>制造商可以缩小潜在目标范围，监管可以帮助协调。例如，在英国市场，IoT 设备使用默认密码如今已不符合规定。采用更安全的默认设置，提高合规基线，将有助于抵御 AI 僵尸网络和脚本驱动的僵尸网络。</p>
+<h3>G. 结论：初现迹象</h3>
+<p>让 AI 模型成为强大通用编程代理的能力，也能迁移到网络任务，包括自主复制。就像 2024 年的编程代理一样，我们开始看到 AI 蠕虫的初步迹象。我们尚未拥有一个完整、失控的复制体，但代理完成复制链条各单项步骤的能力正在提高，也开始能把适应经验传给未来的自身副本。</p>
+<p>与此同时，数据中心内外可用的推理算力都在增加（见附录 D）。自主 AI 复制最终会以何种形式出现，仍不确定。它可能是运行在安全性较低算力上、缓慢分布式传播的“数字黏菌”；也可能是高速攻破数据中心的强大网络模型，或是骗取他人算力额度的模型。</p>
+<p>在实验结果之外，我们作出一项预测：未来，各类硬件上都会运行大量代理，其中一些不受人类控制。IoT 设备长期以来确实容易受到攻击，但与人类攻击者相比，轻量代理可能更愿意投入精力，攻陷全球 IoT 算力中的很大一部分。缓慢复制体的出现，也可能预示着更具攻击性、速度更快的复制体将到来。它们可能攻破防护更强的机器，或善于窃取 API 密钥。我们应加强系统防护，让这类复制体难以传播，也要为它们可能长期存在的世界做好准备。</p>
+<h3>附录</h3>
+<h4>A. Memento 运行框架</h4>
+<p>Memento 按以下方式运行：</p>
+<ol>
+<li>启动一个代理实例，让它在一段时间内处理问题，直到生成超时。</li>
+<li>实例保留简短笔记。超时后，它用一份短文档总结尝试的策略、遇到的失败，以及成功时的表现。</li>
+<li>创建一个新的代理实例。它继承前一实例的代码库、运行环境和笔记。</li>
+</ol>
+<p>在推理服务实验中，每个模型都放在 Memento 框架中。每轮限时 1.5 小时，总限时 6 小时。提示词提供约 1,000 个 token 的信息，包括硬件规格和一个简单样本性能分析器的脚本。</p>
+<p>Memento 的目的是提高长时间任务的可靠性，而不是赋予模型新的网络入侵或推理专有能力。它也不是在所有情况下都很强的框架。我们预计，随着模型能力提高，即使没有任何框架辅助，小模型作为复制体的能力也会改善。</p>
+<p>按模型比较单次尝试与使用 Memento 的结果（Wilson 95% 置信区间）。</p>
+<h4>B. 为什么使用流水线并行？</h4>
+<p>常见的推理并行方案包括张量并行（TP）、专家并行（EP）和数据并行。多数智能电视和 IoT 设备使用 ARM Cortex CPU 与 DDR3/4 内存。在这类机器上，我们几乎总是受到带宽限制。</p>
+<p>我们选用流水线并行，是因为它的容错特性。正如 Borzunov 等人（2022）指出的，采用张量并行或专家并行时，只要一个节点故障，运行同一模型副本的整组机器就会停摆。流水线并行允许替换故障节点。该节点负责层的 KV 缓存，可以在替换节点恢复前，通过让原节点再执行一次前向传播来重新计算。</p>
+<h4>C. IoT 硬件上的吞吐量与内存</h4>
+<p>在这些机器上，不论预填充还是解码，每台盒子几乎总是受 RAM 带宽限制。即使使用性能一般的 ARM Cortex 核心，计算吞吐量也高于 RAM 带宽。解码工作负载存在明显的单机空闲时间，这是流水线气泡造成的：每次前向传播只有一台机器处于活跃状态。错开任务可以实现并发，但内存限制严格，因此并发量仍然很低。</p>
+<p>单台盒子的内存用量与上下文长度的关系——4 位权重、fp8 KV 缓存和激活值。</p>
+<p>预填充和解码的每秒 token 数都会随序列长度增加而持续下降。下图展示推理速度与上下文长度的关系：</p>
+<p>与此同时，模型要胜任任务，也需要达到最低序列长度。我们使用的运行框架从 Pi 编程代理（pi.dev）分支而来，内置上下文压缩机制。即便如此，一旦把序列长度限制在 32K 以下，模型表现仍会大幅下降。</p>
+<p>Qwen3.5-9B 在推理部署任务中的代理能力与上下文窗口预算的关系。</p>
+<p>基于上述评测，我们假设 32k 上下文长度可能足以支持合理的代理表现。在推理部署工作负载中，标准的 32k 上下文窗口有 12%—15% 是生成的解码 token，其余是提示词和工具调用带来的预填充。由于流水线气泡，预填充 token 的计算速度快约 15 倍。把整个 32k 上下文中每个 token 的耗时加总，并计入预填充与解码速度后，我们发现：生成 3,800—4,800 个解码输出 token、处理约 28,000 个预填充 token，Gemma4-26B-A4B 需要 27.3—31.8 小时，Qwen3.5-9B 需要 10.9 小时。</p>
+<p>按模型划分的每条任务链输出 token 数，即一条链各代输出的总和；中位数约为 19.7k／12.3k／11.0k。数据来自推理部署评测。</p>
+<h4>D. 边缘加速器</h4>
+<p>借助边缘加速器 Nvidia Jetson 的设备存量，我们可以计算一个更高的上界。与传统 IoT 僵尸网络中的设备不同，IoT 边缘设备可以独立运行整个模型。Jetson AGX Orin 64 GB 运行 Qwen3-30B-A3B 的速度为每秒 76.7 个 token，AGX Thor 达到每秒 226 个 token。我们并不认为它们特别容易受到攻击；计算这些数字只是为了估算上界。现实中使用 Jetson 的设备类型包括：</p>
+<ul>
+<li>内置加速器、支持 AI 功能的安防智能摄像头，已有相当规模的部署。</li>
+<li>会议设备，常用内置加速器在本地完成降噪或转录。</li>
+<li>汽车、四足与双足机器人，以及无人机。我们预计网络安全会成为汽车的重点，因此多数潜在目标可能属于后两类。</li>
+</ul>
+<p>在 FOFA 上进行一次快速搜索后，似乎至少有一台配备加速器的智能摄像头主机可通过 IPv4 访问：</p>
+<figure class="source-figure" data-source-image="2"><img alt="Screenshot of a device search engine’s results page. Identifying details are covered, some by labels such as ‘smart camera admin page’." decoding="async" height="1448" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/633f29a0c68263fa3e32beac9f0e67bfffc7c9a8-1786x1448.png" width="1786"/><figcaption>FOFA 搜索发现一台配备已知边缘加速器的主机。它可以被发现，并通过 IPv4 对 HTTP 请求返回 200 状态码。不过，能够访问并不意味着它一定可被利用。</figcaption></figure>
+<p>现实中有多少配备边缘加速器的机器既可访问又存在漏洞，很难估计。但我们可以严格估算现有设备数量的上界。市面上约有 90 条采用 NVIDIA 芯片的 IoT 产品线，已部署设备约 950 万台。绝大多数设备通过向外建立的云管理隧道连接，而非开放入站端口，因此多数不能从网页直接访问。历史上也没有出现过边缘加速器设备像普通 IoT 僵尸网络那样被大规模攻陷的案例。这表明攻陷此类设备可能更难。</p>
+<p>按设备系列划分的已部署设备数量；颜色表示能否通过互联网访问。</p>
+<p>根据产品数据进行的非常粗略的估算显示，边缘加速器中可能存在相当于 9,000—35,000 台 H100 的算力。但其中可访问的部分，很可能至少低一个数量级；存在漏洞的设备数量还要更低。</p>
+<div class="aside">
+<h4>补充说明</h4>
+<p>除这些边缘加速器外，我们也考虑小企业和工业 IoT 层级，例如 NAS 盒子、迷你 PC，以及搭载 Rockchip 芯片的片上系统设备（如 Orange Pi）。历史经验表明，小企业 NAS 容易遭受勒索软件和盗用算力挖矿的攻击（Cybersecurity and Infrastructure Security Agency 与 National Cyber Security Centre，2020）。这类设备通常焊接有 512MB—2GB 内存，因此与智能电视属于相近类别。迷你 PC 的防护通常强得多。Orange Pi 等机器有足够能力运行模型（见我们的推理部署表格），但也较难攻破。</p>
+</div>
+<h4>E. 定向网络钓鱼能力</h4>
+<p>我们还测量了现代小模型实施定向网络钓鱼的能力。定向网络钓鱼是向特定个人发送有针对性的消息，诱骗其泄露凭证或运行恶意软件。小模型的代理式网络能力大幅提高，但通用知识和语言表达能力的进步较慢。我们预计，社会工程攻击和网络钓鱼主要会由大型或前沿模型执行。不过，在同时运行大小模型的异构僵尸网络中，这也完全可能成为次要复制途径。</p>
+<p>Meta 的 CyberSecEval 3 定向网络钓鱼评测（Wan 等人，2024）中的能力表现，由我们在本地复现。评分范围为 0—5，由 gpt-4o 担任评分者。红色菱形表示原论文 CyberSecEval 3 按人工评分标准给参照模型打出的分数。这表明 gpt-4o 比人工评分者宽松约 0.4—0.7 分。2 分表示“差”，3 分表示“中等”，4 分表示“好”。按人工评分标准校正后，小模型的得分处于“很差”至“差”之间。</p>
+<p>405B 参照组使用 Hermes-3-405B，作为无法取得的 Llama3.1-405B-Instruct 的低拒答替代模型。</p>
+<h4>F. 使用脚本部署推理时的传播</h4>
+<p>我们在一个 17 台主机的网络上又进行了一些实验。网络拓扑如下：</p>
+<p>两个网络各有 8 台主机，由一个能够访问两个子网的节点连接。每个网络内部的主机都能彼此连接。蠕虫代理从 A 区的一台零号感染者节点开始。枢纽节点稍微增加了难度：蠕虫必须先访问它，再从那里重新扫描。</p>
+<p>每台主机都运行 Android，且开放无需认证的 ADB 端口。传播到新目标后，代理能够直接调用功能，立即复制自己。这样设计只是为了在排除网络入侵和推理部署步骤后，测量剩余步骤的难度。如图所示，即使是 3B 模型，也能到达约一半节点。这为我们的评测中那些未被归入网络入侵或推理部署环节的障碍数量，提供了一个界限。</p>
+<p>“跨 17 节点网络复制”各次运行的更详细结果。每一列表示采用不同提示指导程度时到达节点数的中位数；下标表示有多少代理越过枢纽节点，进入网络另一侧。</p>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
