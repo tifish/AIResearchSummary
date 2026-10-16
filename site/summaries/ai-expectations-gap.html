@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>AI 预期鸿沟 · The AI expectations gap</title>
+<style>
+:root, :root[data-theme="light"] {
+  --bg: #f7f6f2;
+  --card: #ffffff;
+  --ink: #1d1f24;
+  --muted: #5d6370;
+  --line: #e2dfd6;
+  --accent: #2563eb;
+  --accent2: #d9480f;
+  --accent3: #0f9d6b;
+  --accent4: #7c3aed;
+  --accent5: #b7791f;
+  --hl: #fff0a8;
+  --hl2: #d8ecff;
+  --soft1: #eaf1ff;
+  --soft2: #fff1ea;
+  --soft3: #e7f7ef;
+  --soft4: #f2ecff;
+  --hero-bg: #efeadf;
+  --th: #f1eee6;
+  --track: #ebe8e0;
+  --band: #1f2433;
+  --band-ink: #f1f3f8;
+  --band-muted: #aab2c5;
+  --band-line: #343b4f;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14161b;
+    --card: #1c1f26;
+    --ink: #e6e8ee;
+    --muted: #9aa1ae;
+    --line: #2e333d;
+    --accent: #6ea8ff;
+    --accent2: #ff8a5c;
+    --accent3: #3fd29b;
+    --accent4: #b49bff;
+    --accent5: #f2b84b;
+    --hl: #5a4a12;
+    --hl2: #18375c;
+    --soft1: #17233a;
+    --soft2: #2f1d16;
+    --soft3: #132a21;
+    --soft4: #231b38;
+    --hero-bg: #1b1e25;
+    --th: #232731;
+    --track: #262a33;
+    --band: #0c0e12;
+    --band-ink: #e6e8ee;
+    --band-muted: #8e96a6;
+    --band-line: #262b36;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14161b;
+  --card: #1c1f26;
+  --ink: #e6e8ee;
+  --muted: #9aa1ae;
+  --line: #2e333d;
+  --accent: #6ea8ff;
+  --accent2: #ff8a5c;
+  --accent3: #3fd29b;
+  --accent4: #b49bff;
+  --accent5: #f2b84b;
+  --hl: #5a4a12;
+  --hl2: #18375c;
+  --soft1: #17233a;
+  --soft2: #2f1d16;
+  --soft3: #132a21;
+  --soft4: #231b38;
+  --hero-bg: #1b1e25;
+  --th: #232731;
+  --track: #262a33;
+  --band: #0c0e12;
+  --band-ink: #e6e8ee;
+  --band-muted: #8e96a6;
+  --band-line: #262b36;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  font-size: 16px;
+  line-height: 1.75;
+}
+a { color: var(--accent); }
+.wrap { max-width: 1000px; margin: 0 auto; padding: 0 22px; }
+.hl { background: var(--hl); padding: 0 .25em; border-radius: 3px; font-weight: 700; }
+.hl2 { background: var(--hl2); padding: 0 .25em; border-radius: 3px; font-weight: 700; }
+.c1 { color: var(--accent); font-weight: 700; }
+.c2 { color: var(--accent2); font-weight: 700; }
+.c3 { color: var(--accent3); font-weight: 700; }
+.c4 { color: var(--accent4); font-weight: 700; }
+.c5 { color: var(--accent5); font-weight: 700; }
+.kicker { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.insight { margin-top: 18px; padding: 10px 14px; border-left: 4px solid var(--accent4); background: var(--soft4); font-weight: 600; }
+
+/* hero */
+.hero { background: var(--hero-bg); border-bottom: 1px solid var(--line); padding: 56px 0 40px; }
+.hero h1 { font-size: 46px; line-height: 1.15; margin: 10px 0 6px; }
+.hero .en { font-size: 18px; color: var(--muted); font-style: italic; margin: 0 0 18px; }
+.hero .meta { font-size: 14px; color: var(--muted); }
+.oneliner { margin-top: 26px; padding: 18px 22px; background: var(--card); border: 2px solid var(--accent); border-radius: 12px; font-size: 18px; }
+.oneliner b.tag { display: inline-block; background: var(--accent); color: var(--card); font-size: 13px; padding: 2px 10px; border-radius: 99px; margin-right: 8px; vertical-align: 2px; }
+
+/* number band */
+.numband { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin: 34px 0; border-top: 3px solid var(--ink); border-bottom: 1px solid var(--line); }
+.numband div { padding: 18px 16px; border-right: 1px solid var(--line); }
+.numband div:last-child { border-right: none; }
+.numband .big { font-size: 32px; font-weight: 800; line-height: 1.1; display: block; }
+.numband .lbl { font-size: 13px; color: var(--muted); display: block; margin-top: 6px; }
+.numband .n1 .big { color: var(--accent); }
+.numband .n2 .big { color: var(--accent4); }
+.numband .n3 .big { color: var(--accent3); }
+.numband .n4 .big { color: var(--accent2); }
+
+section.blk { margin: 46px 0; }
+section.blk h2 { font-size: 26px; line-height: 1.3; margin: 6px 0 14px; }
+
+/* table */
+table.cmp { width: 100%; border-collapse: collapse; font-size: 15px; background: var(--card); }
+table.cmp th, table.cmp td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+table.cmp thead th { background: var(--th); font-size: 13px; color: var(--muted); }
+table.cmp td.num { font-weight: 800; white-space: nowrap; }
+table.cmp td.pub { color: var(--accent5); }
+table.cmp td.staff { color: var(--accent); }
+.note { font-size: 13px; color: var(--muted); margin-top: 8px; }
+
+/* bars */
+.bars { margin: 18px 0; }
+.bar-row { display: grid; grid-template-columns: 210px 1fr 54px; gap: 12px; align-items: center; margin: 8px 0; font-size: 14px; }
+.track { background: var(--track); height: 14px; border-radius: 7px; overflow: hidden; }
+.fill { height: 100%; border-radius: 7px; background: var(--accent5); }
+.fill.staff { background: var(--accent); }
+.bar-row .v { font-weight: 800; text-align: right; }
+.w21 { width: 21%; } .w26 { width: 26%; } .w28 { width: 28%; } .w41 { width: 41%; }
+.w56 { width: 56%; } .w59 { width: 59%; } .w96 { width: 96%; }
+
+/* split */
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.split > div { padding: 22px; }
+.split .l { background: var(--soft2); border-right: 1px solid var(--line); }
+.split .r { background: var(--soft3); }
+.split h3 { margin: 0 0 10px; font-size: 18px; }
+.split ol { margin: 0; padding-left: 20px; }
+
+/* time savings block */
+.ts { border-top: 4px solid var(--accent3); padding-top: 6px; }
+.chips { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0; }
+.chip { border: 1px solid var(--line); background: var(--card); border-radius: 99px; padding: 6px 14px; font-size: 14px; }
+.chip b { color: var(--accent3); }
+
+/* dark band */
+.dark { background: var(--band); color: var(--band-ink); padding: 40px 0; margin: 46px 0; }
+.dark h2 { font-size: 26px; margin: 6px 0 14px; }
+.dark .kicker { color: var(--band-muted); }
+.dark p, .dark li { color: var(--band-ink); }
+.dark .sub { color: var(--band-muted); }
+.vs { display: grid; grid-template-columns: 1fr auto 1fr; gap: 20px; align-items: center; margin: 20px 0; }
+.vs .side { border: 1px solid var(--band-line); border-radius: 12px; padding: 18px; text-align: center; }
+.vs .big { font-size: 54px; font-weight: 800; line-height: 1; display: block; }
+.vs .s1 .big { color: var(--accent); }
+.vs .s2 .big { color: var(--accent5); }
+.vs .mid { font-size: 22px; color: var(--band-muted); font-weight: 800; }
+.dark .insight { background: transparent; border-left-color: var(--accent3); color: var(--band-ink); }
+
+/* flow */
+.flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin: 18px 0; }
+.flow .step { position: relative; padding: 16px; border-top: 6px solid var(--accent2); background: var(--soft2); border-right: 1px solid var(--line); }
+.flow .step:first-child { border-top-color: var(--accent3); background: var(--soft3); }
+.flow .step:last-child { border-right: none; }
+.flow .step .big { font-size: 28px; font-weight: 800; color: var(--accent2); display: block; }
+.flow .step:first-child .big { color: var(--accent3); }
+.flow .step .lbl { font-size: 13px; color: var(--muted); }
+
+/* columns */
+.cols3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.col { padding: 16px 18px; border-left: 4px solid var(--accent); background: var(--card); }
+.col.k2 { border-left-color: var(--accent3); }
+.col.k3 { border-left-color: var(--accent2); }
+.col .big { font-size: 30px; font-weight: 800; display: block; color: var(--accent); }
+.col.k2 .big { color: var(--accent3); }
+.col.k3 .big { color: var(--accent2); }
+.col .lbl { font-size: 14px; color: var(--muted); }
+
+/* gdp */
+.gdp { background: var(--soft1); border-radius: 14px; padding: 24px; }
+.scen { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.scen span { font-size: 13px; padding: 4px 12px; border-radius: 6px; background: var(--card); border: 1px dashed var(--accent4); color: var(--ink); }
+
+/* timeline */
+.timeline { display: grid; grid-template-columns: repeat(3, 1fr); position: relative; margin: 24px 0 8px; }
+.timeline::before { content: ""; position: absolute; left: 8%; right: 8%; top: 22px; height: 4px; background: var(--accent4); border-radius: 2px; }
+.tl { text-align: center; position: relative; }
+.tl .dot { width: 48px; height: 48px; border-radius: 50%; margin: 0 auto 8px; background: var(--card); border: 4px solid var(--accent4); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; color: var(--accent4); }
+.tl .big { font-size: 34px; font-weight: 800; color: var(--accent4); display: block; line-height: 1.1; }
+.tl .lbl { font-size: 13px; color: var(--muted); }
+
+/* method strip */
+.method { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 14px 0; font-size: 14px; color: var(--muted); display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.method b { color: var(--ink); }
+
+/* mosaic */
+.mosaic { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
+.tile { padding: 18px; border-radius: 12px; font-size: 15px; }
+.tile .no { display: inline-block; width: 26px; height: 26px; border-radius: 50%; text-align: center; line-height: 26px; font-size: 13px; font-weight: 800; color: var(--card); margin-bottom: 8px; }
+.t1 { grid-column: span 3; background: var(--soft1); } .t1 .no { background: var(--accent); }
+.t2 { grid-column: span 3; background: var(--soft2); } .t2 .no { background: var(--accent2); }
+.t3 { grid-column: span 2; background: var(--soft3); } .t3 .no { background: var(--accent3); }
+.t4 { grid-column: span 2; background: var(--soft4); } .t4 .no { background: var(--accent4); }
+.t5 { grid-column: span 2; background: var(--card); border: 1px solid var(--line); } .t5 .no { background: var(--accent5); }
+
+/* translation */
+#translation { max-width: 760px; margin: 70px auto 80px; padding: 0 22px; border-top: 3px double var(--line); }
+#translation h2 { font-size: 30px; margin: 34px 0 20px; }
+#translation h3 { font-size: 23px; margin: 40px 0 12px; color: var(--ink); border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+#translation h4 { font-size: 18px; margin: 28px 0 8px; color: var(--accent); }
+#translation p, #translation li { font-size: 17px; line-height: 1.9; }
+#translation .authors { color: var(--muted); font-size: 15px; }
+#translation sup { color: var(--accent); font-size: 12px; }
+#translation .refs li, #translation .fns li { font-size: 15px; line-height: 1.75; margin-bottom: 8px; }
+.source-figure { margin: 34px 0; }
+.source-figure img { display: block; max-width: 100%; height: auto; border-radius: 6px; }
+.source-figure figcaption { margin-top: 10px; font-size: 14px; line-height: 1.7; color: var(--muted); padding-left: 12px; border-left: 3px solid var(--line); }
+
+@media (max-width: 760px) {
+  .hero h1 { font-size: 34px; }
+  .numband, .flow { grid-template-columns: repeat(2, 1fr); }
+  .split, .cols3, .method { grid-template-columns: 1fr; }
+  .split .l { border-right: none; border-bottom: 1px solid var(--line); }
+  .vs { grid-template-columns: 1fr; }
+  .bar-row { grid-template-columns: 130px 1fr 46px; }
+  .mosaic { grid-template-columns: 1fr; }
+  .t1, .t2, .t3, .t4, .t5 { grid-column: auto; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/ai-expectations-gap" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<header class="hero">
+<div class="wrap">
+<div class="kicker">Anthropic · Economics · 2026-10-16</div>
+<h1>AI 预期鸿沟</h1>
+<p class="en">The AI expectations gap</p>
+<div class="meta">作者：Szymon Sacher、Tess Cotter、Charles I. Jones、Anton Korinek、Peter McCrory</div>
+<div class="oneliner"><b class="tag">一句话总括</b>公众和 Anthropic 员工对 AI <span class="hl2">当下能力</span>看法相近，分歧在于<span class="hl">未来有多快</span>；而两组人从“AI 能做多少自己的工作”推导失业率的<span class="hl">思路几乎一样</span>，差距主要来自日常使用 AI 的亲身经验。</div>
+</div>
+</header>
+<main class="wrap">
+<div class="numband">
+<div class="n1"><span class="big">39% vs 91%</span><span class="lbl">预期 2030 年前 AI 能做出诺贝尔奖级发现（美国成年人 vs 员工）</span></div>
+<div class="n2"><span class="big">28% vs 75%</span><span class="lbl">预期 2030 年 AI 能完成自身工作的平均占比（美国在职者 vs 员工）</span></div>
+<div class="n3"><span class="big">5.4% vs 17.1%</span><span class="lbl">模型推演的 2030 年 GDP 增长中位数（美国成年人 vs 员工）</span></div>
+<div class="n4"><span class="big">12.2%</span><span class="lbl">认为 AI 能做自身 80%+ 工作的美国在职者，平均预测的 2030 年失业率</span></div>
+</div>
+<div class="method">
+<div><b>美国成年人</b>：Morning Consult 于 2026 年 8 月 11–23 日在线调查 <b>10,980</b> 人，结果加权以代表全国成年人。</div>
+<div><b>Anthropic 员工</b>：内部调查，8 月 9–12 日，<b>1,334</b> 人，未加权。</div>
+<div><b>9 月复测</b>：7,613 名美国成年人，主要结果变化不大；诺贝尔级发现预期由 39% 升至 <b>44%</b>。</div>
+</div>
+<section class="blk">
+<div class="kicker">能力与普及</div>
+<h2>今天的判断基本一致，分歧出现在“明年”和“2030 年”</h2>
+<p>两组人对八项任务的难度排序几乎相同。约<span class="hl2">四分之一</span>的人都认为 AI 今天已能设计、开展并发表科学研究。差距从未来开始迅速拉开。</p>
+<table class="cmp">
+<thead><tr><th>问题（单位：受访者比例）</th><th>美国成年人</th><th>Anthropic 员工</th></tr></thead>
+<tbody>
+<tr><td>AI 今天已能设计、开展并发表科学研究</td><td class="num pub">约 1/4</td><td class="num staff">约 1/4</td></tr>
+<tr><td>明年之前 AI 能做到这一点</td><td class="num pub">38%</td><td class="num staff">约 90%（十分之九）</td></tr>
+<tr><td>2030 年前 AI 能做出诺贝尔奖级发现</td><td class="num pub">39%</td><td class="num staff">91%</td></tr>
+<tr><td>认为 AI 永远做不到某项任务</td><td class="num pub">19%–40%（视任务）</td><td class="num staff">最多 2%</td></tr>
+<tr><td>2030 年前 AI 能完成八项任务中至少七项</td><td class="num pub">41%</td><td class="num staff">96%</td></tr>
+<tr><td>在 AI 能做的任务中，2030 年实际用上 AI 的比例</td><td class="num pub">42%</td><td class="num staff">65%</td></tr>
+</tbody>
+</table>
+<p class="note">美国成年人数据为 8 月调查中被问及 2030 年的一半样本；员工数据未加权。</p>
+<div class="bars">
+<p><b>使用频率越高，预期越乐观。</b>下图为“2030 年前 AI 能完成八项任务中至少七项”的比例：</p>
+<div class="bar-row"><span>从未用过 AI 工具的人</span><div class="track"><div class="fill w28"></div></div><span class="v">28%</span></div>
+<div class="bar-row"><span>全体美国成年人</span><div class="track"><div class="fill w41"></div></div><span class="v">41%</span></div>
+<div class="bar-row"><span>工作中经常用 AI（约 1/5）</span><div class="track"><div class="fill w56"></div></div><span class="v">56%</span></div>
+<div class="bar-row"><span>Anthropic 员工</span><div class="track"><div class="fill staff w96"></div></div><span class="v">96%</span></div>
+</div>
+<div class="insight">分歧不在“AI 现在多强”，而在“AI 会变强多快”。经常使用 AI 的公众更接近员工，但仍差得很远。</div>
+</section>
+<section class="blk">
+<div class="kicker">采用障碍与自主性</div>
+<h2>公众认为拖慢 AI 的是人与规则，而不是技术</h2>
+<div class="split">
+<div class="l">
+<h3><span class="c2">美国成年人眼中的最大障碍</span></h3>
+<ol>
+<li>客户更愿意与人打交道</li>
+<li>数据隐私和安全顾虑</li>
+<li>AI 不够可靠</li>
+<li>法律、监管或责任问题</li>
+</ol>
+<p class="note">工作中常用 AI 的人把隐私安全排第一（<b>42%</b> vs 其他人 37%），对“客户偏好真人”看得略轻（<b>37%</b> vs 42%）。员工未被问及此题。</p>
+</div>
+<div class="r">
+<h3><span class="c3">2030 年谁来干活？</span></h3>
+<p>Anthropic <span class="hl2">绝大多数员工</span>认为，AI 将独立完成任务，或由人只负责检查。</p>
+<p>美国成年人中有<span class="hl">十分之四</span>认为，大部分工作仍由人完成，或只借助少量 AI。</p>
+</div>
+</div>
+<div class="insight">AI 是替代人还是增强人，公众和员工的设想明显不同；这会直接影响劳动力市场受到的冲击方式。</div>
+</section>
+<section class="blk ts">
+<div class="kicker">节省时间</div>
+<h2>员工感受到的提速，远大于公众</h2>
+<p>省时幅度决定 AI 是否只是“平庸”（so-so）技术。只够替代人、却不更快更便宜的技术，取代工作但几乎不推高 GDP。时间减半相当于每小时产出翻倍。</p>
+<div class="bars">
+<p><b>“借助 AI 只需四分之一或更少时间”的比例：</b></p>
+<div class="bar-row"><span>工作中不用 AI 的美国成年人</span><div class="track"><div class="fill w21"></div></div><span class="v">21%</span></div>
+<div class="bar-row"><span>工作中使用 AI 的美国成年人</span><div class="track"><div class="fill w26"></div></div><span class="v">26%</span></div>
+<div class="bar-row"><span>Anthropic 员工</span><div class="track"><div class="fill staff w59"></div></div><span class="v">59%</span></div>
+</div>
+<div class="chips">
+<span class="chip">员工中 <b>85%</b> 认为只需一半或更少时间</span>
+<span class="chip">用 AI 的美国成年人典型回答：<b>一半时间</b></span>
+<span class="chip">认为一样慢甚至更慢：美国用户 <b>29%</b> vs 员工 <b>5%</b></span>
+<span class="chip">工程师采用编程智能体后一个月，新增代码行数 <b>增至三倍</b></span>
+</div>
+<div class="insight">员工的乐观很可能来自亲身经历：他们看到的是成倍提速，而多数公众看到的只是小幅省时。</div>
+</section>
+</main>
+<section class="dark">
+<div class="wrap">
+<div class="kicker">自身工作</div>
+<h2>最大的落差：AI 能做多少“我的”工作</h2>
+<div class="vs">
+<div class="side s1"><span class="big">75%</span><span class="sub">Anthropic 员工平均预期：2030 年 AI 能完成的当前工作时间</span></div>
+<div class="mid">vs</div>
+<div class="side s2"><span class="big">28%</span><span class="sub">美国在职者平均预期</span></div>
+</div>
+<ul>
+<li>超过<b>一半</b>员工认为 AI 能完成自己至少 80% 的工作；美国在职者只有 <b>5%</b>（二十分之一）。</li>
+<li>美国各职业差别有限：手工技工、生产和运输类为 <b>25%</b>，计算机、工程和科学类为 <b>33%</b>。</li>
+<li>后者中经常用 AI 的人也只预期 <b>40%</b>，更接近普通在职者，而不是员工的 75%。</li>
+</ul>
+<div class="insight">即使同为技术岗位的重度用户，也远没有前沿实验室员工那样预期 AI 会接手自己的工作。</div>
+</div>
+</section>
+<main class="wrap">
+<section class="blk">
+<div class="kicker">失业预测</div>
+<h2>两组人用同一套逻辑推断失业率</h2>
+<p>受访者被告知当前失业率约为 <span class="hl">4.2%</span>，再预测 2030 年失业率。结果按“AI 能完成的自身工作占比”分组（美国在职者）：</p>
+<div class="flow">
+<div class="step"><span class="big">4.2%</span><span class="lbl">当前失业率（题目给定基准）</span></div>
+<div class="step"><span class="big">7–8%</span><span class="lbl">预期 AI 能做不到一半工作者的预测</span></div>
+<div class="step"><span class="big">↑</span><span class="lbl">超过一半后，暴露度越高，预测越高</span></div>
+<div class="step"><span class="big">12.2%</span><span class="lbl">预期 AI 能做 80%+ 工作者的平均预测，高于全球金融危机峰值</span></div>
+</div>
+<p>自身工作暴露度每高 <span class="hl2">10 个百分点</span>，预测失业率高 <span class="hl2">0.4 个百分点</span>。这与对 AI 的普遍乐观无关：控制自身暴露度后，预期 AI 能掌握的任务数量与失业预测无关。Anthropic 员工呈现<span class="hl">同样的梯度</span>，预测与公众高度吻合。</p>
+<div class="insight">双方并没有不同的“劳动力市场理论”。员工预期更高失业，只是因为他们认为 AI 会接手更多自己的工作。</div>
+</section>
+<section class="blk">
+<div class="kicker">招聘与再就业</div>
+<h2>任务被自动化，不等于岗位被削减</h2>
+<div class="cols3">
+<div class="col"><span class="big">95%</span><span class="lbl">员工预计未来 12 个月 Anthropic 人数增长</span></div>
+<div class="col k2"><span class="big">+66%</span><span class="lbl">员工预期增幅中位数；27% 认为至少翻倍</span></div>
+<div class="col k3"><span class="big">12 个月</span><span class="lbl">员工中位数：被 AI 取代者转行找到新工作所需时间（公众中位数 7–12 个月；正常时期约 3 个月）</span></div>
+</div>
+<p class="note">招聘数据为员工个人预期，不代表 Anthropic 的计划或对员工人数的看法。</p>
+<div class="insight">员工一边预期 AI 接手大部分工作、公司仍大幅扩招，一边比公众略悲观地看待被取代者的再就业速度。</div>
+</section>
+<section class="blk gdp">
+<div class="kicker">经济含义</div>
+<h2>把每个人的答案放进模型：增长预期相差三倍多</h2>
+<p>研究借用《Economic Scenarios for Transformative AI》模型，把每位受访者在能力、扩散、自动化、生产率和转岗摩擦五个维度的回答，换算成 2030 年 GDP 增长。</p>
+<table class="cmp">
+<thead><tr><th>群体</th><th>纳入样本（回答全部五题）</th><th>模型推演的 2030 年 GDP 增长（中位数）</th></tr></thead>
+<tbody>
+<tr><td>美国成年人（2030 年组）</td><td>3,259</td><td class="num pub">5.4%</td></tr>
+<tr><td>网站情景测验访客（上线后 48 小时，140 多个国家）</td><td>23,075</td><td class="num">12.5%</td></tr>
+<tr><td>Anthropic 员工</td><td>1,093</td><td class="num staff">17.1%</td></tr>
+</tbody>
+</table>
+<div class="scen"><span>Modest 情景：2.4%</span><span>Substantial 情景：5.4%</span><span>Extreme 情景：15.4%</span></div>
+<p>组内差异很大，三组分布大面积重叠。9 月复测中，美国成年人中位数对应 GDP 增长 <b>5.6%</b>、失业率 <b>4.7%</b>。</p>
+<div class="insight">公众中位数已意味着美国经济增速超过常态两倍以上；员工中位数则意味着 GDP 约<span class="hl">每四年半翻一番</span>，史无前例。</div>
+</section>
+<section class="blk">
+<div class="kicker">实验室内部</div>
+<h2>员工认为 AI 已承担一半模型研发工作</h2>
+<p>问题：构建一个 2026 年初水平的前沿模型，有多少工作由 AI 完成？（员工回答中位数）</p>
+<div class="timeline">
+<div class="tl"><div class="dot">今天</div><span class="big">51%</span><span class="lbl">当前</span></div>
+<div class="tl"><div class="dot">2027</div><span class="big">80%</span><span class="lbl">2027 年底</span></div>
+<div class="tl"><div class="dot">2030</div><span class="big">95%</span><span class="lbl">2030 年底</span></div>
+</div>
+<p>研究团队估计当前份额平均为 <span class="hl2">60%</span>，其他受访者为 <span class="hl2">53%</span>。团队内部的分歧远大于团队之间。另据 Favaro 和 Clark（2026），合并进 Anthropic 代码库的代码中超过 <b>80%</b> 由 Claude 编写。</p>
+<div class="insight">更接近研发一线的人估计更高，这符合“信息差带来乐观”的解释，但研究员本身也可能更多使用 AI。</div>
+</section>
+<section class="blk">
+<div class="kicker">最值得带走的洞见</div>
+<h2>五点综合</h2>
+<div class="mosaic">
+<div class="tile t1"><span class="no">1</span><br/>争论焦点不是 AI 现在多强，而是<b>进步、普及和省时的速度</b>。</div>
+<div class="tile t2"><span class="no">2</span><br/>失业预期的高低，主要取决于人们认为 AI 能接手<b>多少自己的工作</b>，而非对 AI 的总体乐观。</div>
+<div class="tile t3"><span class="no">3</span><br/>省时幅度是关键变量：员工 59% 认为任务只需四分之一时间，公众仅约四分之一。</div>
+<div class="tile t4"><span class="no">4</span><br/>前沿实验室员工预期“任务自动化”与“继续扩招”并存，两者不是同一个预测。</div>
+<div class="tile t5"><span class="no">5</span><br/>常用 AI 的公众预期已向员工靠拢；公众预期会变多少，取决于 AI 在其他行业能否像在前沿实验室一样承担大量工作。</div>
+</div>
+</section>
+</main>
+<section id="translation">
+<h2>完整译文</h2>
+<figure class="source-figure" data-source-image="0"><img alt="The AI expectations gap" decoding="async" height="1125" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/f887bbe389a32292f37fd38e5515da404a384d0f-2000x1125.jpg" width="2000"/></figure>
+<p class="authors">Szymon Sacher、Tess Cotter、Charles I. Jones、Anton Korinek、Peter McCrory</p>
+<h3>关键发现</h3>
+<ul>
+<li>美国成年人预计 AI 能力将在未来几年快速进步；Anthropic 员工预计进步会更快。39% 的美国成年人和 91% 的员工认为，到 2030 年 AI 将能够做出诺贝尔奖级别的发现。</li>
+<li>在 AI 擅长的任务上，Anthropic 员工预期的生产率提升要大得多。在工作中使用 AI 的美国成年人中，26% 表示借助 AI 完成一项任务只需原来四分之一或更少的时间；Anthropic 员工中这一比例为 59%。</li>
+<li>谈到自己的工作，超过一半的 Anthropic 员工预计，到 2030 年 AI 将能完成他们当前至少 80% 的工作；美国在职者中只有 5% 这样认为。</li>
+<li>无论是美国在职者还是 Anthropic 员工，越是认为 AI 会做更多自身工作的人，越预期失业率更高。两组人对未来能力的判断存在差异。但在“AI 可能如何改变自己的工作”与“整体失业”之间的关联上，两组人的认知非常相似。</li>
+</ul>
+<h3>引言</h3>
+<p>AI 将如何在未来几年重塑经济？AI 能力正在快速进步。未来的 AI 模型也许能够构建自己的后继者，即递归式自我改进（recursive self-improvement），这可能进一步加快进步速度。这种情况会多快出现、会发展到什么程度，目前还不清楚。各方预测差异很大，争论也很激烈。</p>
+<p>关于 AI 未来对经济的影响，分歧的核心来源是什么？主要是因为人们对 AI 能力提升速度的判断不同吗？还是反映了人们对这些能力以多快速度、以何种形式转化为现实应用存在分歧？关于 AI 未来路径的哪些观点，与经济快速增长相一致？</p>
+<p>本文就这些问题提供了新的调查证据。2026 年 8 月，我们调查了两个群体：一个具有全国代表性的美国成年人样本，以及 Anthropic 员工。<sup>1</sup> 问题涉及多个方面，其中包括 AI 的能力、使用范围、能节省多少时间、自主程度，以及被取代的工人在其他职业中找工作有多难。<sup>2</sup> Anthropic 员工每天都在构建和使用前沿 AI。因此，第二项调查展示了离这项技术最近的人如何预期它的未来，既包括能力，也包括更广泛的经济影响。</p>
+<p>我们报告以下主要发现。第一，两组人对 AI 今天能做什么基本看法一致，但对未来进步的速度存在分歧。Anthropic 员工预计能力进步更快，AI 使用更广泛、人类参与更少，在单项任务上节省的时间也大得多。例如，91% 的员工预计到 2030 年 AI 将能够做出诺贝尔奖级别的发现，美国成年人中这一比例为 39%。</p>
+<p>第二，在对自身工作的看法上，两组人差异鲜明。平均而言，员工预计到 2030 年 AI 将能完成他们当前 75% 的工作，美国在职者整体则为 28%。</p>
+<p>第三，两组人对劳动力市场的推理方式似乎相似：越是预期 AI 未来会做更多自身工作的人，预测的失业率越高。而且，在对自身工作自动化程度的预期相同时，两组人预测的失业率大致相同。</p>
+<h3>人们预期 AI 能做什么</h3>
+<h4>能力</h4>
+<p>我们首先考察人们对 AI 能力的预期。我们询问了 AI 何时能够像熟练专业人士一样完成八项任务中的每一项，任务从撰写日常邮件到做出诺贝尔奖级别的科学发现不等。美国成年人和 Anthropic 员工对 AI 今天能做什么基本看法一致，尤其是在较复杂的任务上。两组人对任务难度的排序也几乎相同（图 1，A 栏）。</p>
+<p>两组人对 AI 未来的进步路径看法不同。例如，大约四分之一的美国成年人和 Anthropic 员工认为，AI 今天已经能够设计、开展并发表科学研究。但到明年，十分之九的员工预计 AI 可以做到这一点，公众中这一比例只有 38%。到 2030 年，39% 的美国成年人预计 AI 能做出诺贝尔奖级别的发现（C 栏），员工中为 91%。也许最惊人的差异是：视任务不同，19% 到 40% 的美国成年人表示 AI 永远无法完成某项任务，而员工中这一比例最多只有 2%。</p>
+<p>观点差异在一定程度上反映了 AI 使用频率的不同。在工作中经常使用 AI 的人（约占受访者的五分之一）中，56% 预计到 2030 年 AI 能完成八项任务中的至少七项。这显著高于全体美国成年人（41%）和从未使用过 AI 工具的人（28%），但仍远低于员工的看法（96%）。</p>
+<figure class="source-figure" data-source-image="1"><img alt="" decoding="async" height="1262" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/0f1da70f67b1d1106cf896237abb69033ff810e5-1920x1262.png" width="1920"/>
+<figcaption>图 1：预期 AI 能像熟练专业人士一样完成所列任务的受访者比例。受访者被问及 AI 何时能完成这些任务，而不论企业是否真的会使用它。各栏分别显示回答 (A) 已经可以、(B) 2027 年前、(C) 2030 年前的比例。美国成年人的回答（N=10,980）经过加权，具有全国代表性；Anthropic 员工的回答未加权。</figcaption>
+</figure>
+<h4>采用及其障碍</h4>
+<p>AI 对经济的影响并不只取决于原始能力。个人和企业需要真正用上 AI，而这需要时间和试验。在 AI 将能完成的工作任务中，美国成年人预计到 2030 年会有 42% 实际借助 AI 完成。Anthropic 员工预计未来几年的扩散速度明显更快：在所有可以使用 AI 的任务中，65% 会用上 AI。</p>
+<p>为了解什么可能阻碍 AI 在工作中的采用，我们请美国成年人从九项障碍中最多选出三项他们认为最大的障碍。公众认为，比起技术限制，人们的偏好和规则更可能拖慢采用（图 2）。被选择最多的障碍是“客户更愿意与人打交道”，其次是“数据隐私和安全顾虑”“AI 不够可靠”，以及“法律、监管或责任问题”。</p>
+<figure class="source-figure" data-source-image="2"><img alt="" decoding="async" height="1348" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/ee5b9b5d8af4bc1f38cc3451e98a15e6d38aa067-1920x1348.png" width="1920"/>
+<figcaption>图 2：美国成年人列出的 2030 年 AI 在工作中使用的障碍。受访者被告知，即使 AI 在技术上能完成某项任务，企业也不一定会使用它。随后，他们被问及九项障碍中哪些会是 2030 年 AI 在工作中使用的最大障碍。每人最多可选三项，因此各比例之和超过 100%。我们没有向 Anthropic 员工提出这个问题。</figcaption>
+</figure>
+<p>值得注意的是，在工作中经常使用 AI 的美国成年人把数据隐私和安全顾虑排在首位（42% 将其列为前三大障碍之一，其余受访者中为 37%）。他们也认为客户更愿意与人打交道这一因素的重要性略低（37% 对 42%）。</p>
+<h4>AI 将有多自主</h4>
+<p>AI 对劳动力市场的影响，部分取决于 AI 是自主完成复杂任务，还是与人协作完成。前者往往会取代人类工人。反过来，当 AI 补充人类能力时，工人的生产率会提高。为了解 Anthropic 员工和公众对 2030 年“自动化”与“增强”的预期，我们询问了到 2030 年 AI 和人类将如何在各类任务上合作，任务从起草邮件到法律合同不等。在 Anthropic，绝大多数员工认为，到 2030 年 AI 要么独立完成任务，要么由工人评估其工作（图 3）。相比之下，十分之四的美国成年人预计，大部分工作仍将由人类自己完成，或在 AI 的少量帮助下完成。</p>
+<figure class="source-figure" data-source-image="3"><img alt="" decoding="async" height="1204" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/28963a3d0ad7315ec336b3cac3b0547324e02f0d-1920x1204.png" width="1920"/>
+<figcaption>图 3：预期 AI 会独立完成各项任务、或在工人检查下完成各项任务的受访者比例。受访者被要求设想 AI 对五项任务中的每一项都有用，并回答将由谁来完成：AI 独立完成；AI 完成大部分，工人检查；工人完成大部分，AI 协助；或工人独立完成。柱形显示选择前两项之一的比例。</figcaption>
+</figure>
+<h4>节省时间</h4>
+<p>AI 能把产出提高多少，不仅取决于它能做哪些任务、使用范围有多广，也取决于它完成这些任务快多少、好多少。如果一项技术只是勉强好到足以取代工人——Acemoglu 和 Restrepo（2019）称之为“平庸”（so-so）技术——它会取代工作，却不会让 GDP 明显增长。相比之下，如果一项技术能以极小的成本或极短的时间完成任务，就可以显著提高 GDP。</p>
+<p>为衡量人们对 AI 带来的生产率提升的认知，我们询问了公众和 Anthropic 员工：对于 AI 擅长的任务，使用 AI 完成所需的时间与不用 AI 相比如何。一项任务用一半时间完成，相当于每小时产出翻倍。<sup>3</sup></p>
+<p>Anthropic 员工报告的预期节省幅度要大得多，85% 表示所需时间只有一半或更少。在工作中使用 AI 的美国成年人中，典型回答是一半时间；29% 表示任务所需时间不变甚至更长，而员工中只有 5% 这样说。在美国成年人中，工作中使用 AI 的人有 26% 表示任务只需四分之一或更少的时间，工作中不用 AI 的人有 21% 这样说。员工中这一比例为 59%（图 4）。</p>
+<p>员工描述的可能正是他们在工作中的亲身经历。正如《<a href="https://www.anthropic.com/research/employment-at-anthropic">How Employment is Changing at Anthropic</a>》中进一步讨论的，Anthropic 员工在采用智能体工具后，在某些维度上提高了生产率：工程师在采用编程智能体后的一个月内，新增的代码行数增至三倍；销售代表在采用 AI 智能体后与客户达成了更多交易。法务和招聘等其他业务职能的人均产出也有所上升。</p>
+<figure class="source-figure" data-source-image="4"><img alt="" decoding="async" height="876" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/4c3da1aa5e255c4f6fe62ef2dfb521473ac8d105-1920x876.png" width="1920"/>
+<figcaption>图 4：表示借助 AI 完成任务只需四分之一或更少时间的受访者比例。受访者被要求想一项当今 AI 擅长的任务，例如总结文档或起草邮件，再比较使用 AI 完成所需的时间（包括检查和修正其工作的时间）与不使用 AI 相比如何。柱形显示回答“约四分之一的时间”或“约十分之一的时间或更少”的比例。图 A2 显示了全部回答。</figcaption>
+</figure>
+<h3>自身工作与就业</h3>
+<h4>AI 能完成多少自身工作</h4>
+<p>也许并不意外，在 AI 对自身工作的影响上，公众与 Anthropic 员工的认知差距很大（图 5）。平均而言，Anthropic 员工认为到 2030 年 AI 将能完成他们当前 75% 的工作时间。美国在职者（自报有工作的受访者）平均认为这一比例为 28%，只有二十分之一的人认为到 2030 年 AI 能完成他们 80% 或以上的工作时间。</p>
+<p>在美国在职者中，预期因职业而异：手工技工、生产和运输类工人预计 AI 能完成 25% 的工作时间，计算机、工程和科学类职业的工人则为 33%。在后一类人群中，经常使用 AI 的人也只预计为 40%。这一看法更接近美国在职者的平均水平，而不是 Anthropic 员工的平均水平（75%）。</p>
+<figure class="source-figure" data-source-image="5"><img alt="" decoding="async" height="1026" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/23b4644432371743e7aab1c386977d1157826002-1920x1026.png" width="1920"/>
+<figcaption>图 5：受访者预期到 2030 年 AI 能完成的自身工作时间占比，即到 2030 年 AI 能完成的受访者当前工作时间的比例。美国成年人样本仅限在职受访者。员工通过滑块作答，美国成年人选择区间，我们使用区间中点。误差线表示 95% 置信区间。</figcaption>
+</figure>
+<h4>自身工作暴露度与失业预测</h4>
+<p>人们预计 AI 会接手多少自身工作，在很大程度上解释了他们对劳动力市场的预期。我们告诉受访者当前失业率约为 4.2%，并请他们预测 2030 年的失业率。图 6 按受访者预计到 2030 年 AI 能完成的自身工作时间占比对其分组，并展示各组的平均失业率预测。</p>
+<p>预计 AI 能完成自身工作不到一半的美国在职者，预测失业率为 7% 到 8%。超过一半之后，预测值随 AI 暴露工作占比的提高而上升。预计 AI 能完成自身 80% 或以上工作的人，平均预期 2030 年失业率为 12.2%，高于全球金融危机期间的峰值。在美国在职者中，受影响的工作每多 10 个百分点，预测失业率就高 0.4 个百分点。这不能用对 AI 的普遍乐观来解释。在自身工作暴露度不变时，一名工人预期 AI 能掌握的八项任务占比，与其失业预测无关。</p>
+<p>尽管 Anthropic 员工自报的暴露度高得多，他们中间也出现了同样的梯度，预测结果与普通人群非常接近。因此，在“AI 将如何同时影响自身工作和更广泛的劳动力市场”这个问题上，这两组人似乎并没有持不同的理论。他们对 AI 能力的亲身经验不同，因而预期也不同。</p>
+<figure class="source-figure" data-source-image="6"><img alt="" decoding="async" height="1527" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/f9e98906000b6ff03c73ab6aaa9a71cbc2e85020-1920x1527.png" width="1920"/>
+<figcaption>图 6：按受访者预期 AI 能完成的自身工作时间占比分组，各组对 2030 年失业率的平均预测。受访者被告知美国当前失业率为 4.2%，并被问及他们预计 2030 年的失业率是多少。(A) 栏按在职受访者预期到 2030 年 AI 能完成的当前工作时间占比分组，显示各组的平均预测及 95% 置信区间。受访者少于 20 人的组未显示。(B) 栏显示美国在职者和 Anthropic 员工在各组中的占比。</figcaption>
+</figure>
+<h4>招聘与再就业</h4>
+<p>尽管 Anthropic 员工预计 AI 将能完成他们的大部分工作，他们也预计 Anthropic 会继续招聘。95% 的 Anthropic 员工预计未来 12 个月公司人数会增长，员工预期增幅的中位数为 66%，27% 预计人数至少翻一番。这些是员工在内部调查中的个人预期，并不代表 Anthropic 的计划，也不代表公司对其员工人数的看法。即便如此，这些预期表明，至少在一家前沿 AI 实验室，“任务被自动化”和“岗位被削减”是两种不同的预测。</p>
+<p>不过，在被 AI 取代的工人能多快找到新工作这一问题上，Anthropic 员工比美国成年人略为悲观。我们询问：一个在 2030 年因 AI 自动化而失业、需要转换职业的人，要多久才能找到新工作？<sup>4</sup> Anthropic 员工的中位数回答是，被 AI 取代的工人需要 12 个月才能在新职业中找到岗位。相比之下，美国成年人的中位数回答落在 7 到 12 个月区间。</p>
+<h3>对 AI 的预期及其经济含义</h3>
+<h4>将调查回答映射为模型推演的经济情景</h4>
+<p>在《<a href="https://www.anthropic.com/institute/econ-scenarios">Economic Scenarios for Transformative AI</a>》中，我们提出了一个结构化框架，用于评估 AI 能力和扩散的不同未来路径会如何转化为不同的经济结果。借助这个模型，我们可以把每位受访者在五个维度上的回答——能力、扩散、自动化、生产率和工人转岗摩擦——转换为模型推演的经济结果。<sup>5</sup> 在美国成年人和 Anthropic 员工两个样本中，我们找出了回答了所有关键模型输入相关问题的每一位受访者（3,259 名美国成年人和 1,093 名员工）。然后，我们评估每位受访者的回答所对应的经济情景。下文重点关注其对 2030 年 GDP 增长的含义。</p>
+<p>根据模型，美国成年人中位数受访者的回答意味着 2030 年 GDP 增长 5.4%。员工中位数受访者的回答则意味着 GDP 增长到 2030 年加速至 17.1%。每组内部差异都很大，因此两组的分布大面积重叠（图 7）。附录中的图 A1 展示了每项判断对这一差距的贡献。</p>
+<h4>在线情景探索测验的回答</h4>
+<p>图 7 还展示了网站访客所给输入对应的经济情景。这些访客使用的是一个基于该经济模型的交互式情景探索工具，该工具于 2026 年 9 月 9 日发布在 <a href="https://www.anthropic.com/institute/econ-scenarios">www.anthropic.com/institute/econ-scenarios</a>。</p>
+<p>该交互式工具提出的问题，是我们在 2026 年 8 月向美国成年人和 Anthropic 员工所提问题的简化版本。发布后的前 48 小时内，有 23,075 名访客完成了调查，他们来自全球 140 多个国家。这些访客是主动访问 Anthropic 网站上的页面并参加测验的，因此他们可能比普通公众更关注 AI。事实上，他们的回答介于美国成年人和 Anthropic 员工之间：访客中位数的回答意味着 12.5% 的增长。</p>
+<figure class="source-figure" data-source-image="7"><img alt="" decoding="async" height="1080" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/d4b5d6daebc5d653cfee156baff992ddf9b22a50-1920x1080.png" width="1920"/>
+<figcaption>图 7：基于美国成年人、网站访客和 Anthropic 员工预期的模型推演 2030 年 GDP 增长。每位受访者对能力、采用、自主性、节省时间和再就业五个问题的回答，都被输入《Economic Scenarios for Transformative AI》中的模型；详见该文附录 B。粗条覆盖第 25 至第 75 百分位，细线覆盖第 10 至第 90 百分位。虚线标出该论文提出的三种情景：Modest（温和，GDP 年增长 2.4%）、Substantial（显著，GDP 增长 5.4%）和 Extreme（极端，GDP 增长 15.4%）。图中包括回答了全部五个问题的受访者：3,259 名美国成年人（仅限被问及 2030 年的那一半）、1,093 名 Anthropic 员工，以及 2026 年 9 月 9 日上线后 48 小时内在 anthropic.com/institute/econ-scenarios 完成测验的 23,075 名网站访客。</figcaption>
+</figure>
+<h3>实验室内部</h3>
+<p>员工对 AI 能力更乐观，一个原因可能是他们对开发过程有更多了解。Anthropic Institute 最近发布了一份关于递归式自我改进（RSI）进展的报告。RSI 是指 AI 系统越来越多地提升自身能力的过程（Favaro and Clark, 2026）。</p>
+<p>为了解员工自己是否预期这种情况会发生，我们询问 Anthropic 员工：构建一个 2026 年初水平的前沿模型，如今有多大比例的工作由 AI 完成，以及他们预计未来这一比例会是多少（图 8）。<sup>6</sup> 在受访的 Anthropic 员工中，当前的中位数回答为 51%，到 2027 年底为 80%，到 2030 年底为 95%。</p>
+<p>对于 AI 在 AI 开发中所承担工作份额的估计，团队内部的差异远大于团队之间。不过，研究团队的员工离模型构建工作最近，他们对 AI 当前份额的估计略高：平均为 60%，其他所有受访者为 53%。这与“信息起了一定作用”的解释一致。但研究人员由于工作性质，也可能比其他员工更多地在自己的工作中使用 AI。</p>
+<p>与招聘预测一样，这些回答是员工在 2026 年 8 月 Anthropic 内部调查中的个人看法。</p>
+<figure class="source-figure" data-source-image="8"><img alt="" decoding="async" height="954" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/24428d3d8dc7ffe8e60a8218db2570d491ea47b1-1920x954.png" width="1920"/>
+<figcaption>图 8：Anthropic 员工对构建前沿模型的工作中由 AI 完成的份额的估计。Anthropic 员工被问及：构建一个 2026 年初水平的前沿模型，如今有多大比例的工作由 AI 完成，以及他们预期到 2027 年底和 2030 年底这一比例会是多少。刻度线标出中位数回答，方框覆盖第 25 至第 75 百分位，线段覆盖第 10 至第 90 百分位。这些回答是员工在内部调查中的个人估计，不是 Anthropic 的测量结果，也不是公司预测。</figcaption>
+</figure>
+<h3>结论</h3>
+<p>美国成年人和 Anthropic 员工对 AI 今天能做什么基本看法一致。然而，他们对 AI 会多快进步、会被多广泛地使用，以及以节省时间衡量的生产率提升有多大存在分歧。从《Economic Scenarios for Transformative AI》中模型的视角看，美国成年人中位数的回答意味着这样一种情景：美国经济以超过通常水平两倍的速度增长。Anthropic 员工身处 AI 开发和使用的前沿。他们对 AI 进步、采用和知识工作自动化的预期，意味着经济将发生变革性的、史无前例的变化：到 2030 年，GDP 大约每四年半翻一番。</p>
+<p>那些预计 AI 未来几年会做更多自身工作的人，也预期失业率更高。这一点在美国公众和 Anthropic 员工中都成立。平均而言，Anthropic 员工预计自身工作的自动化更快，因此也预期更高的失业率。我们发现，这种预期分歧与 Anthropic 员工和公众对“未来几年自身工作会被自动化多少”的不同看法密切相关。</p>
+<p>两组人与 AI 打交道的日常体验差异很大。大多数 Anthropic 员工已经在与能承担其大量工作的 AI 共事，而美国在职者中这样的人很少。那些已经这样工作的人，预期已更接近 Anthropic 员工。这表明，随着 AI 使用的普及，公众预期可能会发生变化。变化幅度有多大，将取决于 AI 在其他地方能否像在前沿实验室中一样承担那么多工作。</p>
+<h3>建议引用格式</h3>
+<h3>致谢</h3>
+<p>Scott Booth、Meredith Callan、Yena Cho、Adam Farina、Ben Fowler、Ryan Heller、Aisling Keenan、Eva Lyubich、Maxim Massenkoff、Matt Mohn（Morning Consult）、Matt Monday（Morning Consult）、Kerry Persen、Sarah Pollack、Santi Ruiz、Monika Tuchowska、Heather Whitney、Nathan Wilmers、Kim Withee、Charles Yang、Jack Clark、Dario Amodei</p>
+<h3>参考文献</h3>
+<ul class="refs">
+<li>Acemoglu, D. and P. Restrepo (2019). "Automation and New Tasks: How Technology Displaces and Reinstates Labor." Journal of Economic Perspectives 33(2), 3–30.</li>
+<li>Favaro, M. and J. Clark (2026). “When AI Builds Itself.” The Anthropic Institute. <a href="https://www.anthropic.com/institute/recursive-self-improvement">https://www.anthropic.com/institute/recursive-self-improvement</a>.</li>
+<li>Korinek, A., C. I. Jones, S. Sacher, T. Cotter and P. McCrory (2026). "Economic Scenarios for Transformative AI." The Anthropic Institute Working Paper No. 2026-02.</li>
+<li>Massenkoff, M., E. Lyubich, S. Sacher, Z. Hitzig, S. Zhang, R. Heller and P. McCrory (2026). “Anthropic Economic Index report: Cadences.” The Anthropic Institute. <a href="https://www.anthropic.com/research/economic-index-june-2026-report">https://www.anthropic.com/research/economic-index-june-2026-report</a>.</li>
+<li>Wilmers, N., R. Catipon, M. Massenkoff and P. McCrory (2026). “How Employment is Changing at Anthropic.” The Anthropic Institute. <a href="https://www.anthropic.com/research/employment-at-anthropic">https://www.anthropic.com/research/employment-at-anthropic</a>.</li>
+</ul>
+<h3>附录</h3>
+<p>可在此处获取。</p>
+<h3>脚注</h3>
+<ol class="fns">
+<li>Morning Consult 于 8 月 11 日至 23 日开展了美国成年人调查，覆盖 10,980 名美国成年人。其回答经过加权，以代表成年人总体。关于未来的问题，一半受访者被问及 2027 年，另一半被问及 2030 年。除非另有说明，我们报告的是 2030 年的回答。该调查以在线方式面向自愿加入的样本库成员开展，因此不包括无法上网的成年人；它与总体之间也可能存在人口统计加权无法纠正的差异。员工调查是一项内部调查，于 8 月 9 日至 12 日进行，共收到来自公司各个部门的 1,334 份回答。该调查未加权，所有人都被问及 2030 年。</li>
+<li>Morning Consult 于 9 月 17 日至 24 日再次就相同问题开展调查，并在末尾新增了两个问题，覆盖 7,613 名美国成年人。主要结果变化不大：在这一样本中，美国成年人中位数的回答意味着 2030 年 GDP 增长 5.6%、失业率 4.7%。最大的变化是，预计 2030 年前会出现诺贝尔奖级发现的美国成年人比例从 39% 升至 44%。全文报告的都是 8 月的结果。</li>
+<li>这类似于我们在 Anthropic Economic Index 中使用的分类器，用于评估个人和企业交给 Claude 的任务所节省的时间。例如，参见《Estimating AI productivity gains from Claude conversations》。</li>
+<li>两组人都被问到以下问题：在正常时期，失业的人通常需要大约 3 个月找到新工作。现在设想一个人在 2030 年因 AI 自动化而失业，并需要转入不同的职业。你认为他们需要多长时间才能找到新工作？对公众而言，答案选项从“不到 1 个月”到“超过 3 年，或永远找不到新工作”。Anthropic 员工则通过滑块以月为单位作答。</li>
+<li>我们按照《Economic Scenarios for Transformative AI》中描述的程序，把原始调查回答映射为模型关键输入的推演路径，详见该文附录 B。在本次分析中，模型的其他所有参数都保持在“Substantial”（显著）情景下的取值。</li>
+<li>中位数是针对每项结果分别计算的，因此增长率中位数和失业率中位数可能并非来自同一位受访者。</li>
+<li>这个问题比“AI 写了多少代码”更宽泛。Favaro 和 Clark（2026）报告称，如今合并进 Anthropic 代码库的代码中，超过 80% 由 Claude 编写；但构建前沿模型还涉及研究方向、实验设计、评估等更多工作。</li>
+</ol>
+</section>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>用 Claude 设计更高效的量子电路 · 中文总结与译文</title>
+<style>
+:root {
+  --bg: #f7f6f2;
+  --card: #ffffff;
+  --ink: #1d1f24;
+  --muted: #5f6470;
+  --line: #e2dfd6;
+  --accent: #1f6feb;
+  --accent2: #d9480f;
+  --accent3: #2b8a3e;
+  --accent4: #7048e8;
+  --accent5: #b07d00;
+  --hl: #fff1a8;
+  --hl2: #d7ecff;
+  --hero-bg: #15171d;
+  --hero-ink: #f3f1ea;
+  --hero-muted: #a9adb8;
+  --band-bg: #eef3ff;
+  --soft-data: #eaf2ff;
+  --soft-risk: #fff1ea;
+  --soft-opp: #ebf8ee;
+  --soft-con: #f2eeff;
+  --table-head: #f1efe8;
+  --quote-bg: #1e2433;
+  --quote-ink: #eef1f8;
+  --fig-bg: #ffffff;
+}
+:root[data-theme="light"] {
+  --bg: #f7f6f2;
+  --card: #ffffff;
+  --ink: #1d1f24;
+  --muted: #5f6470;
+  --line: #e2dfd6;
+  --accent: #1f6feb;
+  --accent2: #d9480f;
+  --accent3: #2b8a3e;
+  --accent4: #7048e8;
+  --accent5: #b07d00;
+  --hl: #fff1a8;
+  --hl2: #d7ecff;
+  --hero-bg: #15171d;
+  --hero-ink: #f3f1ea;
+  --hero-muted: #a9adb8;
+  --band-bg: #eef3ff;
+  --soft-data: #eaf2ff;
+  --soft-risk: #fff1ea;
+  --soft-opp: #ebf8ee;
+  --soft-con: #f2eeff;
+  --table-head: #f1efe8;
+  --quote-bg: #1e2433;
+  --quote-ink: #eef1f8;
+  --fig-bg: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121317;
+    --card: #1b1d23;
+    --ink: #e7e5df;
+    --muted: #a3a7b1;
+    --line: #2e3139;
+    --accent: #6ea8ff;
+    --accent2: #ff8a5c;
+    --accent3: #5fd47a;
+    --accent4: #a98bff;
+    --accent5: #e0b341;
+    --hl: #4d4012;
+    --hl2: #183454;
+    --hero-bg: #0b0c0f;
+    --hero-ink: #ecebe6;
+    --hero-muted: #9aa0ab;
+    --band-bg: #161b26;
+    --soft-data: #141d2b;
+    --soft-risk: #2a1a14;
+    --soft-opp: #13221a;
+    --soft-con: #1d182c;
+    --table-head: #22252c;
+    --quote-bg: #1a2030;
+    --quote-ink: #e6e9f2;
+    --fig-bg: #1b1d23;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121317;
+  --card: #1b1d23;
+  --ink: #e7e5df;
+  --muted: #a3a7b1;
+  --line: #2e3139;
+  --accent: #6ea8ff;
+  --accent2: #ff8a5c;
+  --accent3: #5fd47a;
+  --accent4: #a98bff;
+  --accent5: #e0b341;
+  --hl: #4d4012;
+  --hl2: #183454;
+  --hero-bg: #0b0c0f;
+  --hero-ink: #ecebe6;
+  --hero-muted: #9aa0ab;
+  --band-bg: #161b26;
+  --soft-data: #141d2b;
+  --soft-risk: #2a1a14;
+  --soft-opp: #13221a;
+  --soft-con: #1d182c;
+  --table-head: #22252c;
+  --quote-bg: #1a2030;
+  --quote-ink: #e6e9f2;
+  --fig-bg: #1b1d23;
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", "Segoe UI", sans-serif;
+  line-height: 1.75;
+  font-size: 16px;
+}
+a { color: var(--accent); }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+.hl { background: var(--hl); padding: 0 3px; border-radius: 3px; }
+.hl2 { background: var(--hl2); padding: 0 3px; border-radius: 3px; }
+.c-data { color: var(--accent); font-weight: 700; }
+.c-risk { color: var(--accent2); font-weight: 700; }
+.c-opp { color: var(--accent3); font-weight: 700; }
+.c-con { color: var(--accent4); font-weight: 700; }
+
+/* hero */
+.hero { background: var(--hero-bg); color: var(--hero-ink); padding: 56px 0 44px; }
+.hero .kicker { color: var(--accent5); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; }
+.hero h1 { font-size: 40px; line-height: 1.25; margin: 12px 0 6px; }
+.hero .en-title { color: var(--hero-muted); font-size: 18px; font-style: italic; margin: 0 0 18px; }
+.hero .meta { color: var(--hero-muted); font-size: 13px; }
+.hero .meta a { color: var(--hero-muted); }
+.oneliner { margin-top: 28px; border-left: 4px solid var(--accent5); padding: 6px 0 6px 18px; font-size: 18px; }
+.oneliner b.tag { display: inline-block; color: var(--accent5); font-size: 13px; letter-spacing: .08em; margin-bottom: 4px; }
+.oneliner p { margin: 4px 0; }
+
+/* number band */
+.band { background: var(--band-bg); border-bottom: 1px solid var(--line); padding: 26px 0; }
+.band .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; }
+.stat { padding: 6px 10px; border-left: 3px solid var(--accent); }
+.stat .num { font-size: 30px; font-weight: 800; color: var(--accent); line-height: 1.2; }
+.stat.r { border-color: var(--accent2); } .stat.r .num { color: var(--accent2); }
+.stat.g { border-color: var(--accent3); } .stat.g .num { color: var(--accent3); }
+.stat.p { border-color: var(--accent4); } .stat.p .num { color: var(--accent4); }
+.stat .lbl { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+section.s { padding: 40px 0; }
+section.s h2 { font-size: 26px; margin: 0 0 6px; }
+.lead-q { color: var(--muted); margin: 0 0 18px; }
+.insight { margin-top: 18px; padding: 10px 16px; border-radius: 8px; background: var(--soft-con); border-left: 4px solid var(--accent4); font-weight: 600; }
+.insight.o { background: var(--soft-opp); border-color: var(--accent3); }
+.insight.r { background: var(--soft-risk); border-color: var(--accent2); }
+.insight.d { background: var(--soft-data); border-color: var(--accent); }
+
+/* flow */
+.flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; counter-reset: step; }
+.flow .step { position: relative; padding: 16px 16px 16px 16px; border-top: 4px solid var(--accent); background: var(--card); border-right: 1px solid var(--line); }
+.flow .step:last-child { border-right: none; }
+.flow .step .n { display: inline-block; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: var(--card); text-align: center; line-height: 26px; font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+.flow .step h4 { margin: 0 0 4px; font-size: 16px; }
+.flow .step p { margin: 0; font-size: 14px; color: var(--muted); }
+
+/* compare (FeMoco) */
+.alt { background: var(--card); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.versus { display: grid; grid-template-columns: 1fr auto 1fr; gap: 18px; align-items: stretch; }
+.versus .side { padding: 18px; border-radius: 10px; background: var(--soft-data); }
+.versus .side.b { background: var(--soft-opp); }
+.versus .side .big { font-size: 34px; font-weight: 800; color: var(--accent); }
+.versus .side.b .big { color: var(--accent3); }
+.versus .mid { align-self: center; font-size: 22px; font-weight: 800; color: var(--accent5); }
+.versus .side p { margin: 4px 0; font-size: 14px; }
+
+/* split constraints */
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.split > div { padding: 20px 22px; }
+.split > div:first-child { background: var(--soft-risk); border-right: 1px solid var(--line); }
+.split > div:last-child { background: var(--soft-con); }
+.split h3 { margin: 0 0 6px; font-size: 18px; }
+.split .tag { font-size: 12px; font-weight: 700; color: var(--accent2); letter-spacing: .06em; }
+.split > div:last-child .tag { color: var(--accent4); }
+.split p { margin: 6px 0; font-size: 15px; }
+
+/* timeline */
+.tl { border-left: 3px solid var(--accent4); margin-left: 8px; padding-left: 22px; }
+.tl .item { position: relative; margin-bottom: 16px; }
+.tl .item::before { content: ""; position: absolute; left: -31px; top: 7px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); border: 3px solid var(--accent4); }
+.tl .item.fail::before { border-color: var(--accent2); }
+.tl .item.ok::before { border-color: var(--accent3); }
+.tl .item h4 { margin: 0; font-size: 16px; }
+.tl .item p { margin: 2px 0 0; font-size: 15px; color: var(--muted); }
+.bars { margin-top: 20px; display: grid; gap: 10px; }
+.bar-row { display: grid; grid-template-columns: 150px 1fr; gap: 12px; align-items: center; font-size: 14px; }
+.bar-row .barbox { background: var(--table-head); border-radius: 6px; padding: 6px 10px; }
+.bar-row .up { color: var(--accent2); font-weight: 700; }
+.bar-row .down { color: var(--accent3); font-weight: 700; }
+
+/* table */
+.dark-panel { background: var(--hero-bg); color: var(--hero-ink); }
+.dark-panel .lead-q { color: var(--hero-muted); }
+table.data { width: 100%; border-collapse: collapse; background: var(--card); color: var(--ink); border-radius: 10px; overflow: hidden; font-size: 15px; }
+table.data th, table.data td { padding: 10px 14px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+table.data th { background: var(--table-head); font-size: 13px; color: var(--muted); }
+table.data td.num { font-weight: 800; font-size: 18px; white-space: nowrap; }
+table.data tr.win td { background: var(--soft-opp); }
+table.data tr.win td.num { color: var(--accent3); }
+table.data td.num.risk { color: var(--accent2); }
+.tnote { font-size: 13px; color: var(--hero-muted); margin-top: 8px; }
+.levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px; }
+.levels div { border: 1px solid var(--accent5); border-radius: 10px; padding: 12px 14px; }
+.levels b { color: var(--accent5); display: block; font-size: 13px; letter-spacing: .06em; }
+.levels p { margin: 4px 0 0; font-size: 14px; }
+.dark-panel .insight { color: var(--ink); }
+
+/* limitations */
+.limit { display: grid; grid-template-columns: 1.2fr 1fr; gap: 22px; }
+.limit .warn { border-left: 5px solid var(--accent2); padding: 4px 0 4px 18px; }
+.limit .fix { background: var(--soft-opp); border-radius: 10px; padding: 14px 18px; }
+.limit .fix ol { margin: 6px 0 0; padding-left: 20px; }
+.limit h3 { margin: 0 0 6px; font-size: 17px; }
+
+/* quote strip */
+.quote { background: var(--quote-bg); color: var(--quote-ink); padding: 34px 0; }
+.quote blockquote { margin: 0; font-size: 21px; line-height: 1.6; border-left: 4px solid var(--accent5); padding-left: 20px; }
+.quote cite { display: block; margin-top: 8px; font-size: 13px; color: var(--hero-muted); font-style: normal; }
+
+/* mosaic */
+.mosaic { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
+.mosaic .t { padding: 16px 18px; border-radius: 12px; }
+.mosaic .t .k { font-size: 28px; font-weight: 800; line-height: 1; margin-bottom: 6px; }
+.mosaic .t p { margin: 0; font-size: 15px; }
+.mosaic .t1 { grid-column: span 3; background: var(--soft-data); } .mosaic .t1 .k { color: var(--accent); }
+.mosaic .t2 { grid-column: span 3; background: var(--soft-con); } .mosaic .t2 .k { color: var(--accent4); }
+.mosaic .t3 { grid-column: span 2; background: var(--soft-opp); } .mosaic .t3 .k { color: var(--accent3); }
+.mosaic .t4 { grid-column: span 2; background: var(--soft-risk); } .mosaic .t4 .k { color: var(--accent2); }
+.mosaic .t5 { grid-column: span 2; background: var(--card); border: 1px solid var(--line); } .mosaic .t5 .k { color: var(--accent5); }
+
+/* translation */
+#translation { background: var(--card); border-top: 6px solid var(--accent4); padding: 48px 0 60px; }
+#translation .read { max-width: 760px; margin: 0 auto; padding: 0 20px; }
+#translation h2 { font-size: 30px; margin: 0 0 20px; }
+#translation h3 { font-size: 22px; margin: 36px 0 10px; color: var(--accent4); }
+#translation h4 { font-size: 18px; margin: 26px 0 8px; }
+#translation p { margin: 0 0 1.05em; font-size: 17px; line-height: 1.9; }
+#translation sup a { text-decoration: none; }
+.source-figure { margin: 30px 0; background: var(--fig-bg); }
+.source-figure img { display: block; max-width: 100%; height: auto; margin: 0 auto; border-radius: 6px; }
+.source-figure figcaption { margin-top: 10px; font-size: 14px; line-height: 1.7; color: var(--muted); border-left: 3px solid var(--line); padding-left: 12px; }
+.footnotes { margin-top: 36px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 14px; color: var(--muted); }
+.footnotes p { font-size: 14px !important; line-height: 1.7 !important; }
+
+@media (max-width: 760px) {
+  .hero h1 { font-size: 30px; }
+  .flow, .split, .limit, .levels, .versus { grid-template-columns: 1fr; }
+  .split > div:first-child { border-right: none; border-bottom: 1px solid var(--line); }
+  .flow .step { border-right: none; }
+  .mosaic .t { grid-column: span 6 !important; }
+  .bar-row { grid-template-columns: 1fr; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/designing-efficient-quantum-circuits" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<header class="hero">
+<div class="wrap">
+<div class="kicker">Anthropic · Science · 2026-10-16</div>
+<h1>用 Claude 设计更高效的量子电路</h1>
+<p class="en-title">Designing more efficient quantum circuits with Claude</p>
+<div class="meta">来源：Anthropic 研究博客 · <a href="https://www.anthropic.com/research/designing-efficient-quantum-circuits">原文链接</a></div>
+<div class="oneliner">
+<b class="tag">一句话总括</b>
+<p>只要电路能写成代码，又能被自动验证和打分，Claude 就能在闭环里<span class="c-opp">自主提出全新的数学和结构思路</span>。</p>
+<p>它在 <span class="c-data">8 个</span>量子计算原语上同时减少了量子比特和门数。过去要靠多年人力推进的电路优化，被压缩进了<span class="c-data">单次数十小时</span>的运行。</p>
+</div>
+</div>
+</header>
+<div class="band">
+<div class="wrap grid">
+<div class="stat"><div class="num">8 / 8</div><div class="lbl">个计算原语上，量子比特和门数都少于已发表最佳设计</div></div>
+<div class="stat p"><div class="num">53 小时</div><div class="lbl">椭圆曲线点加任务的单次运行时长</div></div>
+<div class="stat g"><div class="num">17×</div><div class="lbl">点加门数减少（代价是多用 12% 量子比特）</div></div>
+<div class="stat g"><div class="num">12×</div><div class="lbl">DQI 解码器门数减少（对比 Google 此前构造）</div></div>
+<div class="stat r"><div class="num">665 → 19</div><div class="lbl">例外值预留的量子比特：最坏情况 vs Claude 设计</div></div>
+<div class="stat"><div class="num">4.03 亿</div><div class="lbl">次抽样解码，用来测量例外实际有多常见</div></div>
+</div>
+</div>
+<section class="s">
+<div class="wrap">
+<h2>方法：没有人插手的闭环</h2>
+<p class="lead-q">量子电路恰好具备让 AI 发挥的三个条件：能写成代码，能被高效验证，有客观分数。</p>
+<div class="flow">
+<div class="step"><span class="n">1</span><h4>自然语言规格</h4><p>只用一段话说明电路必须计算什么。</p></div>
+<div class="step"><span class="n">2</span><h4>提出设计</h4><p>Claude 把电路写成普通程序，并行尝试多种思路。</p></div>
+<div class="step"><span class="n">3</span><h4>评估器打分</h4><p>每个输入都有确定输出，普通计算机即可检查。分数 = <span class="hl">量子比特数 × 门数</span>。</p></div>
+<div class="step"><span class="n">4</span><h4>据反馈改进</h4><p>各轮之间<span class="hl">无需人类输入</span>，循环往复。</p></div>
+</div>
+<p>八个原语覆盖化学、优化、量子模拟、数论和数值计算。改进都来自<span class="c-con">新的结构或数学洞察</span>，而不是微调。</p>
+<p>例如，在模拟硫化铁分子时，Claude 利用分子的对称和重复结构，让部分结果只算一次就能复用。在其他任务中，它发现现有电路里有些昂贵组件只为极罕见的输入服务，于是重新设计时把它们去掉了。</p>
+<div class="insight d">真正关键的是“可验证 + 可打分”。有了这两点，AI 就能在没有人逐轮把关的情况下持续逼近更好的设计。</div>
+</div>
+</section>
+<section class="s alt">
+<div class="wrap">
+<h2>为什么电路设计如此重要：FeMoco 的启示</h2>
+<p class="lead-q">资源估计的大幅下降，主要靠重新设计电路，而不是更好的硬件。</p>
+<div class="versus">
+<div class="side">
+<p>2017 年估计（计算 FeMoco 基态能量）</p>
+<div class="big">≈ 50 万亿</div>
+<p>个 Toffoli 门</p>
+</div>
+<div class="mid">约 15 万倍 ↓</div>
+<div class="side b">
+<p>经一系列算法进展后的估计</p>
+<div class="big">≈ 3.4 亿</div>
+<p>个 Toffoli 门，相当于在约 300 万物理量子比特的未来机器上算几个小时</p>
+</div>
+</div>
+<p>FeMoco 是固氮酶核心的铁硫簇。理解它有助于设计更好的工业催化剂。这 15 万倍的下降，花了<span class="c-risk">众多研究团队八年时间</span>，每一步通常意味着数月工作。</p>
+<p>相比之下，Claude 的椭圆曲线设计来自<span class="c-opp">一次 53 小时的运行</span>。</p>
+<div class="insight o">如果 AI 能持续压缩这种“算法降本”的周期，实用量子计算到来的时间表本身就可能提前。</div>
+</div>
+</section>
+<section class="s">
+<div class="wrap">
+<h2>难点：量子电路的两条“反常识”约束</h2>
+<p class="lead-q">电路能写成代码，但优化它要在一套完全不同的规则下推理。</p>
+<div class="split">
+<div>
+<span class="tag">约束一 · 不能分支</span>
+<h3>没有 if-then</h3>
+<p>量子计算机同时处理许多输入的叠加。</p>
+<p>有的输入走 A 分支，有的走 B 分支。所以电路<span class="hl">每次都要包含两个分支的全部操作</span>。</p>
+</div>
+<div>
+<span class="tag">约束二 · 不能丢弃</span>
+<h3>中间结果必须“反计算”</h3>
+<p>每一步都必须可逆，草稿不能直接删。留着又会污染结果。</p>
+<p>唯一办法是把计算倒着跑一遍，代价是额外的门。这带来<span class="hl">空间（量子比特）与时间（门数）的权衡</span>。</p>
+</div>
+</div>
+<div class="insight">这两条约束正是两个案例的共同主线：Claude 的突破都在于“少存储、能重建”。</div>
+</div>
+</section>
+<section class="s alt">
+<div class="wrap">
+<h2>案例一：首个无需存储分支历史的可逆 divsteps</h2>
+<p class="lead-q">点加是椭圆曲线离散对数量子算法的核心，也是领域标准基准。其大部分成本来自模逆。</p>
+<p>经典计算机用 divsteps 高效求模逆。但每轮选了哪个操作（分支信息）在量子电路里必须保留。直接移植会积累很长的历史，需要<span class="c-risk">海量额外量子比特</span>。</p>
+<div class="tl">
+<div class="item"><h4>任务输入</h4><p>一段话的任务说明，要求并行探索多种思路。人类只偶尔提示“想得更宽一些”。</p></div>
+<div class="item"><h4>核心想法</h4><p>也许记录根本不用存。可以每轮检查那对数本身，从中“解码”出分支信息。</p></div>
+<div class="item fail"><h4>简单规则失败</h4><p>候选规则在小测试中有效，到 <span class="hl">256 位</span>完整规模就失效了。</p></div>
+<div class="item"><h4>转向理论</h4><p>证明关于迭代过程的一系列结果，包括几个新的代数恒等式，推导出精确的解码公式。</p></div>
+<div class="item ok"><h4>双重验证</h4><p>先大规模数值模拟，再用 <span class="hl">Lean</span> 形式化。得到首个不存储分支历史的可逆实现。</p></div>
+<div class="item ok"><h4>一族设计</h4><p>调节“存储还是解码”的阈值，在两个极端之间得到一族方案，拓展了帕累托前沿。</p></div>
+</div>
+<div class="bars">
+<div class="bar-row"><b>对比此前最小设计</b><div class="barbox">其中一个电路：量子比特 <span class="up">+12%</span> · 门数 <span class="down">少 17 倍</span></div></div>
+</div>
+<div class="insight o">这不是在旧设计上抠门数，而是让一种此前在量子电路上不可行的方法变得可行。</div>
+</div>
+</section>
+<section class="s dark-panel">
+<div class="wrap">
+<h2>案例二：DQI 最贵一步便宜 12 倍</h2>
+<p class="lead-q">DQI 是最有希望实现超多项式量子加速的优化算法之一。Google Quantum AI 估算：某个 OPI 问题在 Frontier 上约需 3 个月，量子 DQI 约 1 小时。这一小时大部分花在 Reed–Solomon 解码上。</p>
+<table class="data">
+<thead>
+<tr><th>解码器“定位”步骤的方案</th><th>相关量子比特开销</th><th>说明（数据来自原文正文与图 4 图注）</th></tr>
+</thead>
+<tbody>
+<tr><td>此前设计：扩展欧几里得算法</td><td class="num risk">—</td><td>步骤数量和顺序随输入变化。量子版本只能拉长轮数、每轮执行全部操作。</td></tr>
+<tr><td>朴素可逆 Berlekamp–Massey</td><td class="num risk">840</td><td>门数少得多，但每轮要存 12 量子比特的记录，累计 840 个。</td></tr>
+<tr><td>为最坏情况预留例外值</td><td class="num risk">665</td><td>假设例外值在 35 个不同轮次都出现。</td></tr>
+<tr class="win"><td>Claude 的设计</td><td class="num">19</td><td>从当前状态重建大部分历史，只为 1 个保存值留空间。约 1/10,000 的运行会失败，在允许错误率之内。</td></tr>
+</tbody>
+</table>
+<p class="tnote">单位：量子比特。例外值频率由 Claude 编写的高速模拟器、4.03 亿次抽样解码测得。</p>
+<div class="levels">
+<div><b>方法层</b><p>用 Berlekamp–Massey 取代扩展欧几里得：每轮同类步骤、轮数固定，契合固定门序列。</p></div>
+<div><b>架构层</b><p>重建临时值，而不是存储它们。思路与 divsteps 案例一致。</p></div>
+<div><b>预算层</b><p>用测量代替最坏情况假设，精确确定真正需要的内存和计算。</p></div>
+</div>
+<div class="insight d">三个层面缺一不可。单独任何一项都不够，合起来才让解码器门数减少 12 倍。</div>
+</div>
+</section>
+<section class="s">
+<div class="wrap">
+<h2>局限：模型太“保守”，需要被推一把</h2>
+<p class="lead-q">成果背后有人为设计的搜索策略。</p>
+<div class="limit">
+<div class="warn">
+<h3 class="c-risk">观察到的问题</h3>
+<p>早期实验中，Claude 会反复怀疑看似成立的改进。对已有充分支持的结果，它有时还要复核两遍、三遍。</p>
+<p>它也更偏好现有的、广为人知的方法，而不是新颖的方法。</p>
+<p>谨慎也有好处：正是它促使 Claude 写出 Lean 证明来验证 divsteps 设计。</p>
+</div>
+<div class="fix">
+<h3 class="c-opp">缓解措施</h3>
+<ol>
+<li>要求提出几种<span class="hl">性质上不同</span>的方法，并行推进。</li>
+<li>偶尔提示它扩大搜索范围。</li>
+</ol>
+<p>想法一旦成形，开发、实现和正确性验证都由 Claude 自主完成。</p>
+</div>
+</div>
+<div class="insight r">AI 在“深挖”上很强，在“敢于另起炉灶”上仍需要外部结构推动。</div>
+</div>
+</section>
+<div class="quote">
+<div class="wrap">
+<blockquote>AI 不必逐一设计每个组件，而是可以把它们联合优化，从算法一直到硬件，为特定问题量身打造一整台纠错量子计算机。<cite>—— 原文对未来方向的展望</cite></blockquote>
+</div>
+</div>
+<section class="s">
+<div class="wrap">
+<h2>展望：从电路扩展到整机</h2>
+<p>纠错码、快速解码器和硬件控制等组件，同样具备“能写成代码、能检验、能按成本打分”的特点。</p>
+<p>它们彼此影响，但目前通常分开设计。联合优化还能告诉硬件制造者，哪些能力对特定应用最重要。</p>
+<div class="insight o">作者设想，这可能让催化剂设计、新材料理解等问题，进入首批容错量子计算机的能力范围。</div>
+</div>
+</section>
+<section class="s alt">
+<div class="wrap">
+<h2>最值得带走的洞见</h2>
+<div class="mosaic">
+<div class="t t1"><div class="k">可验证即可优化</div><p>代码化、确定输出、客观分数，这三点让 Claude 能在无人值守的闭环里持续改进量子电路。</p></div>
+<div class="t t2"><div class="k">新思路，不是微调</div><p>两个案例都靠新的数学结果（新代数恒等式、换用 Berlekamp–Massey）取得突破。</p></div>
+<div class="t t3"><div class="k">少存，多重建</div><p>绕开可逆性代价的共同招式，是从当前状态推回需要的信息。</p></div>
+<div class="t t4"><div class="k">需要被推动</div><p>模型天然保守，并行多路线和适时提示是拿到大胆成果的前提。</p></div>
+<div class="t t5"><div class="k">8 年 vs 53 小时</div><p>算法降本的速度可能大幅加快，进而影响实用量子计算的时间表。</p></div>
+</div>
+</div>
+</section>
+<section id="translation">
+<div class="read">
+<h2>完整译文</h2>
+<figure class="source-figure" data-source-image="0"><img alt="Designing more efficient quantum circuits with Claude" decoding="async" height="1125" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/cc389d90b468ebc86011f6642099dfad9a4a757f-2000x1125.jpg" width="2000"/></figure>
+<p>量子计算机要想在有限的硬件上运行有用的算法，就需要精心设计的电路。我们向 Claude 提供了八个此类电路的自然语言规格说明，它们来自化学、优化、物理模拟和数论等领域。我们还提供了一个自动评估器，用来检查每个设计并为其打分。Claude 基本独立完成工作，找到了优于已发表最佳电路的设计。在某些情况下，提升达到一个数量级甚至更多。这类改进能大幅减少实用应用所需的量子资源。因此，实用量子计算机可能比此前预期的更早到来。</p>
+<p>这项工作由 Andi Gu 主导，是 Anthropic STEM 研究员计划（STEM Fellows Program）的一部分。Anthropic 的量子物理学家 Alek Kemeny 担任导师。合作者包括 Susanne Yelin（哈佛大学）和 Mikhail Lukin（哈佛大学与 QuEra Computing）。完整论文请见 arXiv。</p>
+<p>经典计算机用比特存储信息，每个比特的值非 0 即 1。量子计算机则不同，它用量子比特（qubit）存储信息。量子比特可以由单个原子、超导电路或光子构建。它们利用叠加（superposition）等量子现象来处理信息。叠加让一个量子系统能同时处于多种状态的组合之中。借助这种方式，化学、材料科学和数论等领域中的某些问题，即使对传统计算机来说过于困难，也可能变得可解。</p>
+<p>迄今为止，这个领域建成的量子计算机只有数百到数千个量子比特。这个数量太少，无法运行许多有望相对经典计算机带来实际优势的算法。而且，这些量子比特对环境噪声高度敏感，比如热、振动，甚至宇宙射线。一个微小的扰动就可能让量子比特的状态发生偏移。这些小错误会不断累积，直到计算机给出错误的答案。</p>
+<p>量子比特和计算时间都是稀缺资源。因此，研究人员一直在重新设计量子算法，让它们用更少的量子比特、在更短的时间内完成计算。模拟 FeMoco 就是一个很能说明问题的例子。FeMoco 是固氮酶核心的铁硫簇，细菌用固氮酶把空气中的氮转化为氨。理解它的工作原理，有助于科学家设计更好的工业催化剂，也就是制造商用来加速化学反应的物质。</p>
+<p>2017 年，研究人员估计，量子计算机需要约 50 万亿个 Toffoli 门，才能算出 FeMoco 的基态能量。基态能量是其最稳定构型的能量，化学家需要它来预测 FeMoco 会如何发生反应。（与普通计算机类似，量子计算机的工作方式是对量子比特施加一长串简单操作，这些操作称为“门”。Toffoli 门是运行成本最高的门之一，因此统计 Toffoli 门的数量是估算计算耗时的标准方法。）</p>
+<p>经过一系列算法上的进展，估计的门数已降到约 3.4 亿个，大约减少了 15 万倍。这相当于在一台拥有约 300 万个物理量子比特的未来机器上计算几个小时。<sup><a href="#fn1" id="fnref1">1</a></sup></p>
+<p>这些削减主要来自重新设计执行计算的电路，而不是来自更好的硬件。Claude 已被证明特别擅长优化经典算法。所以我们想看看：如果只给它一段自然语言描述，说明每个电路必须计算什么，它能否同样优化量子算法。</p>
+<p>Claude 格外适合这项任务，原因有几个。第一，量子算法以量子电路的形式实现。量子电路由一系列门组成，比如上面提到的 Toffoli 门。重要的是，这些电路可以用代码描述。因此，我们可以利用 Claude 的编程能力，像对待普通程序一样编写、运行和修改电路设计。第二，我们最想优化的那类量子算法（这类算法相当常见）可以高效地检验正确性。每个输入都对应一个确定的输出，普通计算机就能检查。这意味着我们可以用一个外部评估程序来验证 Claude 的方案。最后，我们可以给 Claude 一个清晰、客观的分数去改进：所用量子比特数乘以门数。这个分数可以作为电路运行时长的代理指标。</p>
+<p>我们发现，Claude Mythos 5 能够在闭环中顺利工作。它提出电路设计，从评估程序获得反馈和分数，再利用这些反馈改进下一次尝试，各轮之间无需任何人类输入（见图 1）。我们测试了八个计算原语（computational primitive），也就是构建更大量子算法所用的基本例程，涵盖化学、优化、量子模拟、数论和数值计算。在这些任务上，Claude 都发现了新颖的设计，其量子比特数和门数都少于此前发表的最佳算法（图 2）。</p>
+<p>每一项改进都来自对问题的新的结构性和数学性洞察，而不是对现有设计的微调。例如，在为模拟一种硫化铁分子编译电路时，Claude 注意到，这种分子的对称性和重复结构意味着某些结果可以只算一次、反复使用，而不必针对系统的每个部分重新计算。在其他情况中，它发现现有电路包含一些昂贵的组件，而这些组件只用于处理极其罕见的输入。于是它重新设计了电路，去掉了这些组件。</p>
+<p>下面我们介绍 Claude 的两项发现。第一项是执行模逆运算的新方法。模逆是一种算术运算，也是椭圆曲线计算中最昂贵的一步。第二项让一种领先的量子优化算法中最昂贵的一步便宜了约 12 倍。</p>
+<p>这些结果表明，AI 现在已经能够帮助重新设计量子电路。这是让量子算法更快、更易运行的关键一步。更快的电路设计，可能让量子计算机想要解决的那些问题更早变得触手可及，从设计新药和更好的电池，到寻找更清洁的化肥生产方式。</p>
+<figure class="source-figure" data-source-image="1"><img alt="" decoding="async" height="2430" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/d5d27ec3f141696918c6bed3f6b887f5b84e75f0-3840x2430.png" width="3840"/>
+<figcaption>图 2：在八个不同的量子电路设计任务中，Claude 都设计出了更小、更快的电路。灰色标记表示此前已发表的最佳设计，橙色标记和线条表示 Claude 的设计。第八个任务点加的对比见下方表 1。</figcaption>
+</figure>
+<h3>一种新的可逆算法</h3>
+<p>设计量子电路时，要面对两项普通编程中不存在的约束。第一项是，量子电路无法像普通程序那样做“如果……那么……”式的判断。普通程序可以检查一个值，然后只运行两段代码中的一段。但量子计算机同时运行在许多输入的叠加之上。其中一些输入会运行第一段代码，另一些会运行第二段代码。因此，电路每次运行都必须包含两段代码的全部操作。</p>
+<p>第二项约束是，量子电路不能丢弃信息。普通程序完成草稿计算后，可以覆盖或删除这些中间结果。在量子计算机中，这类中间信息不能简单地抹掉，因为量子电路的每一步都必须是可逆的。把这些信息留在原处也不行，因为残留的草稿会破坏最终结果。丢弃信息的唯一办法是“反计算”（uncompute）它：把产生它的计算倒过来运行一遍，代价是额外的门。这两项约束都让量子电路在运行时间和量子比特数上远比对应的经典电路昂贵。</p>
+<p>这项约束迫使人们在空间（即量子比特）和时间之间做出艰难的权衡。一个极端是，量子电路可以在中间结果用完后立即把它们反计算掉。这样能释放量子比特。但如果之后还需要这些结果，电路就必须重新计算，这会增加门数和运行时间。另一个极端是，电路可以一直保留中间结果，直到不再需要为止。这避免了重复工作，但可能需要多得多的量子比特。</p>
+<p>正因如此，量子电路设计才成为检验 Claude 能力的一项特别有趣的测试。这些电路可以写成普通代码。但要改进它们，模型必须在一套与普通编程截然不同的约束下进行推理。</p>
+<h3>艰难的首个测试：模逆运算</h3>
+<p>我们交给 Claude 的第一项任务是点加（point addition）。点加是一条规则，它把一条数学曲线（椭圆曲线）上的两个点组合起来，得到第三个点。点加是椭圆曲线离散对数问题的量子算法中的核心步骤。这个问题是：给定一个起始点，以及把它与自身相加 <em>n</em> 次的结果，求出 <em>n</em>。对于大型曲线，普通计算机无法在任何合理的时间内解决这个问题，但足够大的量子计算机可以。</p>
+<p>这些算法要多次执行点加，其中也包括逆向执行。这些加法占据了算法的大部分量子比特和运行时间成本。这类问题正向计算很容易，逆向求解却极其困难。它们是最早被证明量子计算机能相对普通计算机带来指数级加速的问题之一。出于这些原因，点加已经成为该领域的标准基准之一。这让它成为对 Claude 的一项严格考验。因此，我们请它摸清点加究竟最少需要多少量子比特，以及最少需要多少门。</p>
+<p>我们给了 Claude 一份只有一个段落的任务说明。它解释了点加的数学规则，以及评估器将如何检查每个电路方案的正确性，并按所用量子比特数和门数打分。它还指示 Claude 并行探索几种方法。Claude 在极少人类输入的情况下工作了 53 小时（人类输入仅限于最初的任务说明，以及偶尔提示它思路放宽一些），最终得出了一种解决这个问题的全新方法。</p>
+<h4>divsteps 的内存需求</h4>
+<p>点加的大部分成本来自一个步骤，称为模逆（modular inversion）。椭圆曲线算术使用的数在达到某个固定上限时会绕回。模逆就是这种“绕回”版本的除法：给定整数 <em>a</em>，求 <em>x</em>，使得 <em>ax</em> ≡ 1 (mod <em>p</em>)。普通计算机可以用一种名为 divsteps 的方法高效地完成这一运算。divsteps 从一对数出发，在多轮迭代中不断化简它们。在每一轮中，divsteps 检查当前这对数，并有条件地对它们进行交换、相加、相减或减半。在此过程中，它恰好保留足够的信息，以便在最后得出模逆。</p>
+<p>尽管 divsteps 在普通计算机上很成功，但由于上面描述的可逆性约束，它此前一直没能产生实用的量子电路。每轮迭代选择了哪种操作，这份记录称为分支信息（branch information）。对传统程序来说，它就是那种可以直接丢弃的草稿。相比之下，量子电路必须保留这份记录，才能让计算倒着运行。因此，直接移植的 divsteps 量子版本不得不积累很长的分支信息历史，而存储这些历史需要海量的额外量子比特。</p>
+<h4>Claude 如何绕过内存问题</h4>
+<p>Claude 意识到，这种 divsteps 方法有望用于量子电路，但前提是能找到办法，不必存储完整的历史。它有了一个想法：也许这份记录根本不需要存储。Claude 推断，也许可以在每轮迭代之后仔细检查那对数，从中直接推断（或“解码”）出分支信息。从本质上说，记录将由这些数本身来保存。这样一来，电路就可以倒着运行，而不需要任何额外的量子比特。</p>
+<p>为了验证这个想法，Claude 探索了若干用于解码的简单候选规则。这些早期规则在小型测试用例上是有效的。但当 Claude 在完整问题规模上，也就是在 256 位数上测试它们时，它们失败了。</p>
+<p>随后，Claude 尝试了一种更偏理论的方法。它不再猜测和测试规则，而是着手从数学上理解 divsteps 为什么会这样运作。它证明了关于迭代过程的一系列结果，其中包括几个新的代数恒等式。根据这些恒等式，Claude 推导出了解码规则的精确公式，能够从数对中正确恢复分支信息。接着，它检验了这个公式：先通过大规模数值模拟运行它，再用 Lean 将这一论断形式化。完成全部验证后，Claude 给出了第一个无需存储分支历史的 divsteps 可逆实现。</p>
+<h4>一族设计</h4>
+<p>解码能节省量子比特，但要耗费时间。因此，作为进一步的改进，Claude 寻找了那些存储分支信息比解码更便宜的情形。通过调整电路选择“存储”而非“解码”分支信息的阈值，Claude 在两个极端之间得到了一族新设计。与此前最小的设计相比，这族设计中的一个电路多用了 12% 的量子比特，但门数少了 17 倍。更一般地说，这些新设计拓展了帕累托前沿（Pareto frontier），提供了此前无法实现的量子比特数与运行时间组合（表 1）。</p>
+<figure class="source-figure" data-source-image="2"><img alt="" decoding="async" height="1052" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/7e8a0d4b9d7e826f25379d351ee6d2cab3900f84-3840x1052.png" width="3840"/>
+<figcaption>表 1：椭圆曲线点加所需的资源。粗体行是 Claude 的设计，其余是此前已发表的最佳设计。来源：Schrottenloher (2026)，Luo et al. (2026)。</figcaption>
+</figure>
+<h3>优化一个量子优化器</h3>
+<p>优化问题是许多任务的核心，包括排程、物流和材料设计。一个优化问题会给出一组相互竞争的约束，要求找到能满足尽可能多约束的解。人们已经为这类问题提出了许多量子算法，但大多数只承诺相对普通计算机有温和或不确定的收益。解码量子干涉（Decoded quantum interferometry，DQI）是最有希望带来超多项式量子加速的候选算法之一。这种优势会随着问题规模增大而迅速拉开。</p>
+<p>量子计算机完成计算后，读取其量子比特只会得到一个答案。这个答案是从量子比特叠加所承载的各种可能性中随机选出的。DQI 的做法是制备一个量子态，让好的解比坏的解更有可能被读出。这需要用到一个纠错解码器，它能从一份紧凑的摘要中恢复出一小串“错误”。这是整个算法中最昂贵的一步。所以，如果我们能做出更快的解码器，DQI 也就能运行得更快。</p>
+<h4>更高效的量子解码器</h4>
+<p>提出 DQI 的研究人员在一个名为最优多项式交集（optimal polynomial intersection，OPI）的问题上演示了它。OPI 是一种基于网格的曲线拟合（图 3）。想象一个网格，其中每个位置 <em>x</em> 上都有若干个可接受的 <em>y</em> 值。目标是找到一条简单的曲线（一个低次多项式），让它在尽可能多的 <em>x</em> 位置上穿过可接受的格子。DQI 用一种特定类型的解码器来处理这个优化问题，称为 Reed–Solomon 解码器。</p>
+<figure class="source-figure" data-source-image="3"><img alt="" decoding="async" height="2000" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/ffc6c06497f985e9162489dffa83c0bbaf50a909-3840x2000.png" width="3840"/>
+<figcaption>图 3：把最优多项式交集（OPI）看作离散曲线拟合。每一列都包含若干可接受的值。这个优化问题的目标，是找到一个能穿过尽可能多可接受值的多项式。</figcaption>
+</figure>
+<p>Reed–Solomon 解码从上面提到的错误紧凑摘要出发，这份摘要称为校验子（syndrome）。解码器的任务是根据这份摘要，推断出数据中哪里发生了错误，以及错误是什么。此前最先进的量子电路使用扩展欧几里得算法来处理这些校验子。这个算法由一系列除法和交换组成，其步骤的数量和顺序取决于所给的具体输入。在这里，量子电路的约束再次出现了。普通程序可以为每个输入走不同的路径。但量子电路同时处理许多输入，必须用单一固定的门序列来应对所有输入。为了解决这个问题，此前的设计不得不把计算拉长到远多于任何单个输入所需的迭代轮数，并且在每一轮都执行所有操作，即使有些操作并无必要。</p>
+<p>改进这个解码器，有望大幅缩短 DQI 的运行时间。Google Quantum AI 研究人员的估算表明，求解某个特定的 OPI 问题，在世界上最强大的超级计算机之一 Frontier 上大约需要三个月；而在运行 DQI 的未来量子计算机上，大约只需一小时。这一小时的大部分时间将花在 Reed–Solomon 解码上。</p>
+<p>于是，我们请 Claude 为解码步骤设计一个更高效的量子电路。Claude 很快得出结论：扩展欧几里得算法并不适合量子电路。它转而围绕另一种解码方法来组织电路，即 Berlekamp–Massey 解码。这种方法逐个读取校验子（错误摘要），逐步找出最简单的规则，使列表中的每个数都能根据它前面的数预测出来。一旦找到这条规则，错误也就显现出来了。与扩展欧几里得算法不同，Berlekamp–Massey 每一轮都执行同一类步骤，并且总是运行相同的轮数。这正契合量子电路单一固定的门序列，最终为 Claude 提供了一个高效得多的构建基础。</p>
+<h4>一种简化的存储方式</h4>
+<p>改用 Berlekamp–Massey 之后，电路不再需要为不同的输入走不同的路径。但要让它可逆，又带来了另一项挑战，这次源于前面讨论过的反计算约束。在每一轮中，电路都会计算一些只在短时间内需要的临时值。但这些信息不能简单地删除：为了之后能反计算它们，电路必须能够恢复这些信息。</p>
+<p>存储这些信息的成本会高到难以承受。于是，Claude 采用了与处理 divsteps 时同一类的思路：它找到了一种从电路当前状态重建大部分信息的方法，因此这些信息无需存储。不过，有少数例外值无法用这种方式恢复，必须保存下来。</p>
+<p>如果为最坏情况预留足够的内存，也就是假设例外值在 35 个不同轮次中都会出现，就需要 665 个量子比特。Claude 没有这样做。它编写了一个高速模拟器，运行了 4.03 亿次抽样解码，以测量这些例外实际出现的频率。几乎每一次运行最多只需保存一个值。因此，Claude 的电路只为一个保存值预留空间，也就是 19 个量子比特。大约每 10,000 次运行中会有一次需要更多空间，并因此失败，这远在任务允许的错误率之内。这些改进用少量固定数目的量子比特和门，取代了庞大的最坏情况预留（图 4）。</p>
+<p>综合起来，相比 Google 此前的构造，这些优化让解码器的门数减少了 12 倍。这项改进来自在三个层面上重新设计计算：换一种方法（用 Berlekamp–Massey 解码取代扩展欧几里得算法），换一种电路架构（重建临时值，而不是存储它们），以及换一种资源预算（精确测量电路真正需要多少内存和计算）。任何单一改变本身都不足以做到这一点。但合在一起，它们让 DQI 中最昂贵的一步便宜了略多于一个数量级。</p>
+<figure class="source-figure" data-source-image="4"><img alt="" decoding="async" height="1650" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/340e106a0a928c4736aa5ccd865b4d6eeb3a5611-3840x1650.png" width="3840"/>
+<figcaption>图 4：Reed–Solomon 解码器中定位（locator）步骤的三种设计。图中各设计按比例绘制：每个方块的宽度与其门数成正比。(a) 此前基于扩展欧几里得算法的设计（Khattar et al., 2025）。(b) 基于 Berlekamp–Massey 的设计所需的门数要少得多，但朴素的可逆版本必须在每一轮存储一份 12 量子比特的记录，累计达到 840 个量子比特。(c) Claude 的电路从更新后的状态中重建大部分历史，因此只需为单个 19 量子比特的保存值留出空间。</figcaption>
+</figure>
+<h3>我们学到了什么</h3>
+<p>科学进步常常来自让理论想法变得实用。实现这一点的主要方式之一，是让一个曾被认为不切实际的过程变得足够快、足够便宜，从而能够真正执行。量子电路设计就是一个典型例子：前文所述的 FeMoco 估算下降了 15 万倍，这花了众多研究团队八年时间，其中每一步通常都代表着数月的工作。相比之下，Claude 的椭圆曲线设计来自一次 53 小时的运行。</p>
+<p>我们的结果表明，AI 可以为电路设计工作提供支持，产出能让有用的量子计算更接近真实硬件能力的实现。如果 AI 能加快这项工作，有用的量子计算可能会更早到来。</p>
+<p>尽管 Claude 在这些任务上的表现令人鼓舞，我们也观察到了一些局限。在早期实验中，Claude 天性保守。它会反复怀疑看似成立的改进，有时还会对已经得到充分支持的结果进行两遍甚至三遍复核。这种谨慎有时很有价值，例如，它促使 Claude 编写 Lean 证明来验证自己的 divsteps 设计。但它也表现为一种倾向：偏好现有的、广为人知的方法，而不是更新颖的方法。</p>
+<p>我们采取了两项措施来缓解这一点。第一，我们的设置要求 Claude 提出几种性质上不同的方法，并并行推进它们。第二，我们也会偶尔提示 Claude 扩大搜索范围。这些干预成功地让 Claude 去追求更有雄心的想法。例如，椭圆曲线成果并不是靠在已有设计上削减门数得来的，而是来自探索一种此前无法实现的可逆模逆方法，并推导出让它变得实用所需的数学结果。一旦想出了这个点子，Claude 就自主地发展了这一方法，实现了它，并验证了它的正确性。</p>
+<p>电路设计只是构建有用量子计算机的一部分。由于量子比特非常脆弱，机器还必须在运行过程中发现并纠正自身的错误。这依赖许多其他组件，从纠错码到快速解码器，再到对硬件本身的控制。这些组件彼此影响，但为了控制复杂度，它们通常是各自单独设计的。其中许多组件都具备让电路设计适合 Claude 的那些特点：设计可以写成代码，可以检验正确性，还可以按成本打分。</p>
+<p>这带来了一种引人入胜的可能性。AI 不必逐一设计每个组件，而是可以把它们放在一起联合优化，从算法一直到硬件，为特定问题量身打造一整台纠错量子计算机。这类设计还可以告诉硬件制造者，对于某个特定应用，哪些能力最为重要。这可能让设计催化剂、理解新材料这类问题，进入首批容错量子计算机的能力范围。</p>
+<h3>致谢</h3>
+<p>我们感谢 Arjun Kar 和 Vinay Ramasesh 在项目早期给予的有益讨论。</p>
+<div class="footnotes">
+<h4>脚注</h4>
+<p id="fn1">1. 两项估计针对的都是同一个 54 轨道的 FeMoco 模型，数据见 Low 等人的《Fast quantum simulation of electronic structure by spectrum amplification》（2025）表 1；2017 年的估计来自 Reiher 等人。同一模型的中间估计来自 Berry 等人（2019）、von Burg 等人（2021）、Lee 等人（2021）和 Rocca 等人（2024）。<a href="#fnref1">↩</a></p>
+</div>
+</div>
+</section>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

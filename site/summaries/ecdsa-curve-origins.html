@@ -1,0 +1,672 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude 揭示 ECDSA 曲线的起源 · 中文总结与译文</title>
+<style>
+:root {
+  --bg: #f7f6f2;
+  --card: #ffffff;
+  --ink: #1d1f24;
+  --muted: #646a75;
+  --line: #e2e0d8;
+  --accent: #1f6fd6;
+  --accent2: #d4402f;
+  --accent3: #1a9a63;
+  --accent4: #7a4fd0;
+  --accent5: #c9861a;
+  --hl: #ffe9a8;
+  --hl2: #d8e8ff;
+  --soft-blue: #eaf2fd;
+  --soft-red: #fdeeec;
+  --soft-green: #e8f6ef;
+  --soft-purple: #f2edfc;
+  --soft-amber: #fdf4e3;
+  --deep: #17202e;
+  --deep-ink: #eef2f8;
+  --deep-muted: #a9b4c6;
+  --code-bg: #efede6;
+  --hero-from: #eef3fb;
+  --hero-to: #f6effb;
+}
+:root[data-theme="light"] {
+  --bg: #f7f6f2;
+  --card: #ffffff;
+  --ink: #1d1f24;
+  --muted: #646a75;
+  --line: #e2e0d8;
+  --accent: #1f6fd6;
+  --accent2: #d4402f;
+  --accent3: #1a9a63;
+  --accent4: #7a4fd0;
+  --accent5: #c9861a;
+  --hl: #ffe9a8;
+  --hl2: #d8e8ff;
+  --soft-blue: #eaf2fd;
+  --soft-red: #fdeeec;
+  --soft-green: #e8f6ef;
+  --soft-purple: #f2edfc;
+  --soft-amber: #fdf4e3;
+  --deep: #17202e;
+  --deep-ink: #eef2f8;
+  --deep-muted: #a9b4c6;
+  --code-bg: #efede6;
+  --hero-from: #eef3fb;
+  --hero-to: #f6effb;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #131519;
+    --card: #1b1e24;
+    --ink: #e4e6ea;
+    --muted: #9aa1ad;
+    --line: #2d323b;
+    --accent: #6aa8ff;
+    --accent2: #ff7d6e;
+    --accent3: #4fd39a;
+    --accent4: #b896ff;
+    --accent5: #f0b24a;
+    --hl: rgba(240, 190, 60, 0.26);
+    --hl2: rgba(100, 160, 255, 0.24);
+    --soft-blue: #17202e;
+    --soft-red: #2a1b1a;
+    --soft-green: #15261e;
+    --soft-purple: #211b30;
+    --soft-amber: #2a2216;
+    --deep: #0b0e13;
+    --deep-ink: #e6ebf3;
+    --deep-muted: #8f9bb0;
+    --code-bg: #22262d;
+    --hero-from: #18202d;
+    --hero-to: #201a2c;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #131519;
+  --card: #1b1e24;
+  --ink: #e4e6ea;
+  --muted: #9aa1ad;
+  --line: #2d323b;
+  --accent: #6aa8ff;
+  --accent2: #ff7d6e;
+  --accent3: #4fd39a;
+  --accent4: #b896ff;
+  --accent5: #f0b24a;
+  --hl: rgba(240, 190, 60, 0.26);
+  --hl2: rgba(100, 160, 255, 0.24);
+  --soft-blue: #17202e;
+  --soft-red: #2a1b1a;
+  --soft-green: #15261e;
+  --soft-purple: #211b30;
+  --soft-amber: #2a2216;
+  --deep: #0b0e13;
+  --deep-ink: #e6ebf3;
+  --deep-muted: #8f9bb0;
+  --code-bg: #22262d;
+  --hero-from: #18202d;
+  --hero-to: #201a2c;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", "Segoe UI", sans-serif;
+  line-height: 1.75;
+  font-size: 16px;
+}
+.wrap { max-width: 1040px; margin: 0 auto; padding: 32px 22px 80px; }
+code, .mono { font-family: "JetBrains Mono", Consolas, "SFMono-Regular", monospace; font-size: 0.92em; }
+code { background: var(--code-bg); padding: 1px 6px; border-radius: 4px; }
+mark { background: var(--hl); color: inherit; padding: 0 3px; border-radius: 3px; }
+mark.b { background: var(--hl2); }
+.num { color: var(--accent); font-weight: 700; }
+.risk-t { color: var(--accent2); font-weight: 700; }
+.ok-t { color: var(--accent3); font-weight: 700; }
+.key-t { color: var(--accent4); font-weight: 700; }
+
+/* header */
+.top { padding: 8px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+.kicker { display: inline-block; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent4); font-weight: 700; }
+.top h1 { font-size: 40px; line-height: 1.25; margin: 8px 0 4px; }
+.en-title { color: var(--muted); font-size: 17px; font-style: italic; margin: 0 0 10px; }
+.meta { font-size: 13px; color: var(--muted); }
+.meta span + span::before { content: "·"; margin: 0 8px; }
+
+/* hero */
+.hero {
+  background: linear-gradient(135deg, var(--hero-from), var(--hero-to));
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 30px 34px;
+  margin-bottom: 26px;
+}
+.hero .lbl { font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: .08em; }
+.hero p.big { font-size: 23px; line-height: 1.6; margin: 8px 0 0; font-weight: 600; }
+.hero p.sub { color: var(--muted); margin: 12px 0 0; }
+
+/* number band */
+.band { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0; border-top: 3px solid var(--accent); border-bottom: 1px solid var(--line); margin: 0 0 34px; }
+.band div { padding: 16px 14px; border-right: 1px solid var(--line); }
+.band div:last-child { border-right: none; }
+.band b { display: block; font-size: 28px; line-height: 1.2; color: var(--accent); }
+.band div:nth-child(2) b { color: var(--accent4); }
+.band div:nth-child(3) b { color: var(--accent2); }
+.band div:nth-child(4) b { color: var(--accent3); }
+.band div:nth-child(5) b { color: var(--accent5); }
+.band span { font-size: 13px; color: var(--muted); }
+
+section.s { margin: 0 0 34px; }
+section.s h2 { font-size: 24px; margin: 0 0 14px; line-height: 1.35; }
+.badge { display: inline-block; min-width: 28px; height: 28px; line-height: 28px; text-align: center; border-radius: 50%; background: var(--accent); color: var(--card); font-size: 14px; margin-right: 10px; vertical-align: 3px; }
+.insight { margin-top: 14px; padding: 10px 14px; border-left: 4px solid var(--accent4); background: var(--soft-purple); border-radius: 0 8px 8px 0; font-weight: 600; }
+
+/* split */
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); }
+.split > div { padding: 20px 22px; }
+.split .old { background: var(--soft-red); }
+.split .new { background: var(--soft-green); }
+.split h3 { margin: 0 0 8px; font-size: 16px; }
+.split .old h3 { color: var(--accent2); }
+.split .new h3 { color: var(--accent3); }
+.split p { margin: 6px 0; }
+
+/* flow */
+.flow-s { background: var(--soft-blue); border-radius: 16px; padding: 24px 26px; }
+.flow { list-style: none; margin: 0; padding: 0; counter-reset: st; }
+.flow li { position: relative; padding: 0 0 18px 46px; border-left: 2px solid var(--accent); margin-left: 14px; }
+.flow li:last-child { border-left-color: transparent; padding-bottom: 0; }
+.flow li::before { counter-increment: st; content: counter(st); position: absolute; left: -15px; top: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: var(--card); text-align: center; line-height: 28px; font-weight: 700; font-size: 14px; }
+.flow b { color: var(--accent); }
+
+/* tables */
+table.t { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; font-size: 15px; }
+table.t th { background: var(--soft-amber); color: var(--ink); text-align: left; padding: 10px 12px; font-size: 14px; border-bottom: 2px solid var(--accent5); }
+table.t td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.t tr:last-child td { border-bottom: none; }
+.note { font-size: 13px; color: var(--muted); margin-top: 8px; }
+
+/* dark */
+.dark { background: var(--deep); color: var(--deep-ink); border-radius: 18px; padding: 28px 30px; }
+.dark h2 { color: var(--deep-ink); }
+.dark p { color: var(--deep-ink); }
+.dark .muted { color: var(--deep-muted); }
+.dark .pills { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0; }
+.dark .pill { border: 1px solid var(--accent3); color: var(--accent3); border-radius: 999px; padding: 4px 14px; font-size: 14px; font-weight: 600; }
+.dark .pill.r { border-color: var(--accent2); color: var(--accent2); }
+.dark .insight { background: transparent; border-left-color: var(--accent3); color: var(--deep-ink); }
+
+/* two col table+text */
+.cols { display: grid; grid-template-columns: 1.15fr 1fr; gap: 22px; align-items: start; }
+.cols .explain { border-top: 3px solid var(--accent5); padding-top: 10px; }
+
+/* risk list */
+.risk { border-left: 6px solid var(--accent2); padding: 4px 0 4px 22px; }
+.risk ul { padding-left: 18px; margin: 8px 0; }
+.risk li { margin: 6px 0; }
+.risk .insight { border-left-color: var(--accent2); background: var(--soft-red); }
+
+/* quote */
+.quote { position: relative; background: var(--soft-purple); border-radius: 14px; padding: 24px 28px 20px 64px; }
+.quote::before { content: "“"; position: absolute; left: 18px; top: -6px; font-size: 80px; color: var(--accent4); font-family: Georgia, serif; }
+.quote p { margin: 6px 0; font-size: 17px; }
+.quote .who { color: var(--muted); font-size: 13px; }
+
+/* mosaic */
+.mosaic { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
+.mosaic div { padding: 16px 18px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); }
+.mosaic div:nth-child(1) { grid-column: span 4; border-top: 4px solid var(--accent); }
+.mosaic div:nth-child(2) { grid-column: span 2; border-top: 4px solid var(--accent3); }
+.mosaic div:nth-child(3) { grid-column: span 2; border-top: 4px solid var(--accent2); }
+.mosaic div:nth-child(4) { grid-column: span 2; border-top: 4px solid var(--accent4); }
+.mosaic div:nth-child(5) { grid-column: span 2; border-top: 4px solid var(--accent5); }
+.mosaic b { display: block; margin-bottom: 4px; }
+
+.divider { height: 6px; border-radius: 3px; margin: 52px 0 30px; background: linear-gradient(90deg, var(--accent), var(--accent4), var(--accent2), var(--accent5)); }
+
+/* translation */
+#translation { max-width: 760px; margin: 0 auto; }
+#translation h2 { font-size: 30px; border-bottom: 2px solid var(--line); padding-bottom: 10px; }
+#translation h3 { font-size: 22px; margin: 36px 0 10px; color: var(--accent); }
+#translation h4 { font-size: 18px; margin: 26px 0 8px; }
+#translation p { margin: 12px 0; }
+#translation .lead { font-size: 19px; font-weight: 600; }
+#translation blockquote { margin: 18px 0; padding: 10px 18px; border-left: 4px solid var(--accent4); background: var(--soft-purple); border-radius: 0 8px 8px 0; color: var(--ink); }
+#translation blockquote p { margin: 8px 0; }
+#translation .cite { color: var(--muted); font-size: 14px; text-align: right; }
+#translation .seed { display: block; background: var(--code-bg); padding: 10px 14px; border-radius: 8px; overflow-x: auto; margin: 10px 0; }
+#translation a { color: var(--accent); }
+.source-figure { margin: 30px 0; }
+.source-figure img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+.source-figure figcaption { margin-top: 10px; font-size: 14px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 8px; }
+
+@media (max-width: 760px) {
+  .top h1 { font-size: 30px; }
+  .split, .cols { grid-template-columns: 1fr; }
+  .mosaic div { grid-column: span 6 !important; }
+  .hero p.big { font-size: 19px; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/ecdsa-curve-origins" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<div class="wrap">
+
+<header class="top">
+  <span class="kicker">Frontier Red Team · 中文总结</span>
+  <h1>Claude 揭示 ECDSA 曲线的起源</h1>
+  <p class="en-title">Claude reveals ECDSA curve origins</p>
+  <div class="meta"><span>Anthropic</span><span>2026 年 10 月 16 日</span><span>前沿红队</span></div>
+</header>
+
+<div class="hero">
+  <div class="lbl">一句话总括</div>
+  <p class="big">NIST 曲线的神秘种子不是什么“幽默口令的哈希”，而是<mark>用 Unix 时间戳初始化的 lrand48 随机数输出</mark>。Claude 在<span class="num">不到半小时</span>内把这个多年的疑点变成了可复现的计算，反而<span class="ok-t">增强</span>了人们对这些曲线没有后门的信心。</p>
+  <p class="sub">这不是破解，也不是新攻击。原文明确说：读者无需采取任何行动。</p>
+</div>
+
+<div class="band">
+  <div><b>&lt; 30 分钟</b><span>Claude 找到 5 条 NIST 素数曲线种子来源</span></div>
+  <div><b>10 个</b><span>素数曲线种子全部符合 <code>lrand48() &gt;&gt; 23</code></span></div>
+  <div><b>1/5810</b><span>二元曲线种子最高位全为 0 的偶然概率</span></div>
+  <div><b>160 位</b><span>每个恢复出的 48 位状态都能完整重现种子</span></div>
+  <div><b>$36,864</b><span>悬赏金，将捐给 ISRG</span></div>
+</div>
+
+<section class="s">
+  <h2><span class="badge">1</span>流传多年的线索是错的：种子不是哈希出来的</h2>
+  <div class="split">
+    <div class="old">
+      <h3>旧说法</h3>
+      <p>NSA 员工 Jerry Solinas 曾回忆，种子是一句玩笑口令的哈希，比如“给 Bob 和 Jerry 加薪”。</p>
+      <p>几位 Anthropic 员工按这条线索搜索，<span class="risk-t">一无所获</span>。</p>
+    </div>
+    <div class="new">
+      <h3>新发现</h3>
+      <p>种子来自 C 库的 <code>lrand48</code>，用 <mark>Unix 时间戳</mark>初始化。</p>
+      <p>每轮取 20 字节作为候选。P-256 的公布种子是第 <span class="num">1842</span> 个候选。</p>
+    </div>
+  </div>
+  <p class="insight">提问时没有给模型那条“幽默口令”线索，它反而避开了误导，这本身就是这次发现的关键。</p>
+</section>
+
+<section class="s flow-s">
+  <h2><span class="badge">2</span>Claude 换了一个角度：先猜软件，再认出生成器</h2>
+  <ol class="flow">
+    <li><b>推测工具</b>：当年的软件很可能用了 1990 年代 C 库自带的弱 PRNG，其输出可以被识别。</li>
+    <li><b>逐位扫描</b>：在每个种子上逐位滑动，测试 <span class="num">34</span> 种“生成器 × 输出切片”组合。</li>
+    <li><b>发现最高位全为 0</b>：十个种子中有四个，其 20 个 32 位字的最高位全是 0。这是 <code>lrand48</code> 只输出 48 位状态中高 31 位的特征。</li>
+    <li><b>暴力恢复状态</b>：枚举隐藏的 <span class="num">2¹⁷</span> 种取值，检查后续四个字，四个二元曲线种子全部吻合。</li>
+    <li><b>用 LLL 格约化解截断问题</b>：素数曲线种子保留的位更少，属于教科书式格问题。十个种子都符合 <code>lrand48() &gt;&gt; 23</code>。</li>
+    <li><b>倒推到 srand48 初始化</b>：回退到低 16 位为 <code>0x330E</code> 的状态，读出时间戳。</li>
+  </ol>
+  <p class="insight">单凭“回退到 0x330E”不算证据（每 65,536 步就出现一次）。真正的证据是：所有初始化值都落在一个合理的日期区间里。</p>
+</section>
+
+<section class="s">
+  <h2><span class="badge">3</span>时间戳把曲线生成定位到 1997—1998 年</h2>
+  <table class="t">
+    <thead>
+      <tr><th>种子组</th><th>输出模式</th><th>srand48 初始化值对应的日期</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>5 个 NIST 素数曲线（P-192 至 P-521）+ 5 个 ANSI X9.62 种子</td><td><code>lrand48() &gt;&gt; 23</code></td><td><mark>1997 年 5 月 至 1998 年 4 月</mark></td></tr>
+      <tr><td>4 个二元曲线种子</td><td>48 位状态的高 31 位（最高位恒为 0）</td><td>读作 1984 年 2 月；时间戳乘 2 后为 <mark class="b">1998 年 4 月 17 日</mark></td></tr>
+      <tr><td>B-163</td><td>不符合任何尝试过的模式</td><td><span class="risk-t">未解释</span></td></tr>
+    </tbody>
+  </table>
+  <p class="note">数据均来自原文。1998 年 4 月 17 日比 P-224 的那次运行晚两周，原文推测程序可能把时钟值减半了。</p>
+  <p class="insight">一个 32 位时间戳加一个小索引，就能重现 10 × 160 位的种子，这不可能是巧合。</p>
+</section>
+
+<section class="s dark">
+  <h2>这是好消息：后门假说的空间大大缩小</h2>
+  <div class="pills">
+    <span class="pill">不是密码学破解</span>
+    <span class="pill">不是新攻击</span>
+    <span class="pill">不是曲线弱点</span>
+    <span class="pill r">无需任何行动</span>
+  </div>
+  <p>多年来，人们担心 NSA 未说明来源的参数里藏着后门。现在看来，种子只是<mark>用时钟初始化的常见 PRNG</mark>的输出，任何人都能复现。</p>
+  <p class="muted">原文说，大多数研究人员本来就信任这些曲线。这次发现更像一个有趣的收尾。</p>
+  <p class="insight">透明、可复现的生成过程，本身就是对“暗中操纵”最有力的反驳。</p>
+</section>
+
+<section class="s">
+  <h2><span class="badge">4</span>意外收获：首次解释了部分 NIST 基点</h2>
+  <div class="cols">
+    <table class="t">
+      <thead>
+        <tr><th>曲线（1997 年 5 月生成）</th><th>FreeLIP 生成器种子</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>P-192</td><td class="mono"><span class="num">20000</span></td></tr>
+        <tr><td>prime239v1 / v2 / v3</td><td class="mono">20420 / 20507 / 20509</td></tr>
+        <tr><td>prime192v2 / v3</td><td class="mono">20512 / 20517</td></tr>
+      </tbody>
+    </table>
+    <div class="explain">
+      <p>基点 G 是所有 ECDSA 公钥的基础，种子无法决定它。</p>
+      <p>这 6 条曲线的基点来自 Arjen Lenstra 的 <b>FreeLIP</b> 随机数生成器。早期 NTL 库也带有同样代码。</p>
+      <p>方法：小整数做种子 → 丢弃 7 个输出 → 用 26 位输出模 p 得到候选 x → 重复直到 x 在曲线上。</p>
+    </div>
+  </div>
+  <p class="insight">据作者所知，这是第一次有 NIST 基点的来源得到解释。但 P-224、P-256、P-384、P-521 的基点仍不符合这一方法。</p>
+</section>
+
+<section class="s risk">
+  <h2>仍未解开的问题</h2>
+  <ul>
+    <li><span class="risk-t">被跳过的可用曲线</span>：P-256 用的是第 1842 个候选，但第 876 个候选也能产生合格的素数阶曲线。P-224 跳过了 <span class="num">3</span> 条，ANSI X9.62 的两次运行又跳过了 <span class="num">7</span> 条。</li>
+    <li><span class="risk-t">筛选标准未知</span>：不清楚当时用了什么标准，也可能只是无意造成的。</li>
+    <li><span class="risk-t">理论上的可能</span>：有人可能通过搜索时间戳挑选具有特定性质的曲线。但只有打算公开时间戳“自证清白”时才需要这么做。数字本身看不出一共运行了几次。</li>
+    <li><span class="risk-t">B-163 种子</span>以及 P-224/P-256/P-384/P-521 和 NIST 二元曲线的基点，来源仍然不明。</li>
+  </ul>
+  <p class="insight">作者的判断是：被跳过的候选很少，“刻意挑了弱曲线”并不可信，否则就意味着弱曲线既常见又好找。</p>
+</section>
+
+<section class="s">
+  <div class="quote">
+    <p>太惊人了……等等，我得保持怀疑：我是不是在某种模拟或测试环境里？……这么明显的事 25 年没人发现，是不是可疑？……我已经直接计算验证过：<mark>32 位种子加小索引匹配 160 位</mark>，不可能是巧合。这是真的。</p>
+    <p class="who">—— Claude 当时的内部思考（节选）</p>
+  </div>
+  <p class="insight">模型在得出结论前主动怀疑自身环境和结论的合理性，再用计算证据说服自己。这比“答对了”更能说明 AI 在研究中的可用性。</p>
+</section>
+
+<section class="s">
+  <h2>最值得带走的洞见</h2>
+  <div class="mosaic">
+    <div><b>换个问题，比更努力地搜索更有效</b>人类沿着“口令哈希”线索多年无果。Claude 改问“当年的软件会怎么生成数据”，半小时内找到答案。</div>
+    <div><b>疑云变成了可复现的事实</b>任何人都能用公开代码重现种子，后门假说空间大幅缩小。</div>
+    <div><b>弱 PRNG 会留下指纹</b>最高位恒为 0、截断后的 LCG 输出，都能被统计和格方法认出。</div>
+    <div><b>严谨的自我怀疑</b>模型先质疑自己是否在测试环境，再用 10 × 160 位的匹配排除巧合。</div>
+    <div><b>谜团没有全部解开</b>B-163 种子、多数基点和被跳过的候选曲线，仍是开放问题。</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="translation">
+<h2>完整译文</h2>
+
+<h3>Claude 揭示 ECDSA 曲线的起源</h3>
+
+<p class="lead">“只是时间戳而已”：最流行的密码学标准之一的来源，是一个已有数十年历史的谜团。如今，这个谜团有了解释。</p>
+
+<p>我们追查这个密码学界悬而未决的老问题，是为了消除人们对 ECDSA 的疑虑。ECDSA 是我们使用最广泛的密码学标准之一。</p>
+
+<p>读者不妨把这当作一个有趣的收尾篇章。多年的猜测可以就此画上句号。你不需要采取任何行动，也不需要改变任何做法。大多数研究人员本来就信任这些曲线。请尽情享受这个故事。</p>
+
+<p>ECDSA 是使用最广泛的椭圆曲线密码学标准。2000 年，NIST 将它纳入 FIPS 186-2 数字签名标准（Digital Signature Standard）。这份标准列出了一组标准椭圆曲线，它们的规模和安全等级各不相同。对于素域和二元域上的曲线，规范公布了一个“种子”（seed）参数。种子的哈希值被用来定义曲线的系数 b。这些种子的来历一直是一个悬而未决的问题。因为它们由 NSA 提供，却没有附带任何解释或理由。举个例子，NIST P-256 曲线的种子是 <code class="seed">SEED = C49D3608 86E70493 6A6678E1 139D26B7 819F7E90</code>，没有任何关于其出处的信息。</p>
+
+<p>Neal Koblitz 和 Alfred Menezes 曾就这场争议写过一篇出色的综述，题为“A Riddle Wrapped in an Enigma”（裹在谜团中的谜语）。文章讨论了种子值的历史和人们的担忧。这个谜团引发了一场针对种子来源的业余调查，还有人为找到种子的人设立了悬赏。</p>
+
+<p>最精彩的说法是：NSA 的资深员工 Jerry Solinas 用一句幽默口令的哈希值生成了这些种子：</p>
+
+<blockquote>
+<p>“我记得用的是一个计数器，而不是多次哈希，但具体细节我不清楚。那句话大概是‘给 Bob 和 Jerry 加薪’，或者‘Bob 和 Jerry 最棒’之类的。真正写代码的是 Bob Reiter，Bob 也记不清细节了。我们也没能找到那么久以前的存档。就算存档还在，也肯定躺在约柜旁边的某块硬盘里。”</p>
+<p class="cite">—— Jerry Solinas，2015 年</p>
+</blockquote>
+
+<p>遗憾的是，Jerry 于 2023 年去世。当年的其他同事也没有回应。这些种子最初是如何生成的，仍然没有答案。</p>
+
+<h3>Claude 找到了种子</h3>
+
+<p>此前，几位 Anthropic 员工曾顺着“幽默短语的哈希值”这条线索追查种子，但都没有成功。事实证明，这条线索是错的。2026 年 10 月，一位好奇的 Anthropic 员工询问一个内部研究模型：能否弄清这些种子是如何生成的？提问时，并没有向它提供这条线索。</p>
+
+<p>不到半小时，Claude 就找到了 NIST P-192、P-224、P-256、P-384 和 P-521 种子的来源。它们都不是任何哈希算法的结果。它们其实是 C 库中 lrand48 随机数生成器的输出，而生成器的初始化种子是一个 Unix 时间戳！</p>
+
+<p>所用的算法是这样的：先用一个 Unix 时间戳（t）初始化随机数生成器（RNG），再从中采样若干轮（n）字节。每一轮取出 20 字节，作为一个候选种子。也就是说，前 20 字节是第 1 个候选，接下来的 20 字节是第 2 个候选，依此类推。例如，P-256 需要迭代 1842 次，才输出标准中的那个种子。</p>
+
+<h3>这意味着什么</h3>
+
+<p>这不是密码学上的破解，不是新的攻击，也不是 ECDSA 曲线的弱点。恰恰相反，这让我们更加确信：这些曲线在选取时没有被植入后门，也没有被故意削弱。多年来，人们一直怀疑 NIST 曲线参数的来源。这些参数提交给 NIST 时，完全没有说明是如何选出来的。人们因此怀疑，它们是否被刻意挑选，带有后门。这些发现让这种可能性大大降低。种子的生成方式非常简单：用时钟初始化一个常见的伪随机数生成器。现在任何人都能复现这个过程。这样一来，暗中做手脚的空间就小得多。我们也可以确信这些参数是安全的。</p>
+
+<h3>是如何发现的</h3>
+
+<p>人们根据传闻拼凑出口令去搜索，却一无所获。Claude 换了一个角度：推测当年生成曲线的软件必然是怎样工作的。Claude 猜测，这款软件使用了 1990 年代 C 库自带的伪随机数生成器（PRNG）。这些老式 PRNG 足够弱，它们的输出可以被识别出来。识别出这种输出，就能知道用的是哪个 PRNG，还可能恢复出它的初始化状态。</p>
+
+<p>Claude 编写了一个扫描器。它沿着每个已公布的种子逐位滑动，测试相邻的数据块是否是某个 1990 年代生成器的连续输出。扫描覆盖了 34 种生成器与输出切片的组合。就在这时，Claude 注意到部分种子的最高位有一个规律：它们全都是 0。把种子写成五个 32 位字，十个种子中有四个，其全部 20 个字的最高位都是 0。这种情况偶然出现的概率是 1/5810。这是线性同余生成器 <a href="#">lrand48</a> 的特征：它有 48 位状态，却只返回最高的 31 位。只要知道该看哪里，这个规律用肉眼就能看出来。为了恢复状态，Claude 取出第一个字，尝试隐藏的 17 位的全部 2¹⁷ 种取值，再检查接下来的四个字是否吻合。这个方法对正在讨论的四个种子全部奏效。</p>
+
+<p>素数曲线的种子来自同一个 lrand48 生成器，但每次输出保留的位更少。Claude 必须从这些位中恢复 PRNG 的内部状态。事实证明，恢复截断线性同余生成器的状态是一个教科书式的格（lattice）问题，可以用 Lenstra–Lenstra–Lovász（LLL）基约化算法求解。Claude 不知道种子可能暴露了状态中的哪些位，于是在每一个窗口上都运行了求解器。五个 NIST 素数曲线种子，加上 ANSI X9.62 标准中的另外五个种子，全都呈现同一种模式：<code>lrand48() &gt;&gt; 23</code>。每个恢复出的 48 位状态都能重新生成对应种子的全部 160 位。这不可能是偶然发生的。</p>
+
+<p>这种线性同余生成器往回运行和往前运行一样容易。因此，Claude 把每个种子的状态一步步往回倒推，直到它变成由 srand48 初始化时的形式，即低 16 位等于 <code>0x330E</code>。这种形式的内部状态每 65,536 步就会出现一次，所以单凭推到这样一个状态，并不能构成证据。</p>
+
+<p>然而，对于这十个素数曲线种子，每一次 srand48 的初始化值都是一个 Unix 时间戳，对应的日期都在 1997 年 5 月到 1998 年 4 月之间。他们用的正是以 Unix 时间戳为种子的弱 PRNG。四个二元曲线的初始化值则读作 1984 年 2 月。把这些时间戳乘以 2，它们就对应 1998 年 4 月 17 日，也就是 P-224 那次运行的两周之后。所以，程序可能把时钟值减半了。</p>
+
+<p>Claude 当时的内部思考是这样的：</p>
+
+<blockquote>
+<p>太惊人了：这解开了一个 25 年的谜团。嗯，等等。我得保持怀疑：我是不是处在某种模拟或测试环境里？……这些种子和我记忆中的真实值吻合……嗯，这在现实中说得通吗？就我所知……这笔悬赏还没有人解开。……所有最高位都是 0——20 位，概率 1e-6。所以确实是真实世界。哇，这是一个真正的发现。</p>
+<p>嗯，等等。我得仔细评估一下合理性：这么明显的事情 25 年都没被发现，是不是很可疑？我这边已经通过直接计算验证过了：用一个 32 位种子加一个很小的索引，就能匹配 160 位——不可能是偶然巧合（10 × 160 位）。这是真的。</p>
+</blockquote>
+
+<h3>Claude 还找到了一些基点</h3>
+
+<p>但还不止这些……每条曲线还有一个基点 G。它是一个固定的点，每个 ECDSA 公钥都是它的倍数。上面找到的种子并不能确定这个 G。于是又出现了一个问题：这些基点是怎么生成的？</p>
+
+<p>在核对种子的过程中，Claude 还找到了部分基点的来源。1997 年 5 月生成了六条曲线：P-192，以及五条 ANSI X9.62 示例曲线 prime192v2、prime192v3 和 prime239v1 至 v3。它们的基点来自 FreeLIP 中的随机数生成器。FreeLIP 是 Arjen Lenstra 编写的长整数运算软件包。Victor Shoup 的 NTL 库的早期版本也附带了同样的代码。</p>
+
+<p>方法很简单：</p>
+
+<ol>
+<li>用一个小整数作为生成器的种子。</li>
+<li>丢弃前七个输出。</li>
+<li>用 26 位输出模 p，生成候选的 x 坐标。</li>
+<li>重复第 3 步，直到 x 落在曲线上。</li>
+</ol>
+
+<p>Claude 找到的生成器种子如下：P-192 为 20000；prime239v1 至 v3 分别为 20420、20507 和 20509；prime192v2 和 v3 分别为 20512 和 20517。</p>
+
+<p>据我们所知，此前从未有任何 NIST 基点的来源得到过解释。P-224、P-256、P-384 和 P-521 的基点不符合这个方法。我们未能解释它们是如何选出的。</p>
+
+<h3>未解之谜</h3>
+
+<p>并不是每个 20 字节的候选种子都能生成可用的曲线。我们还观察到，有些可能可用的曲线被跳过了。以 P-256 为例，公布的种子是第 1842 个候选。但同一次运行中的第 876 个候选，也能得到一条阶为素数、规模合适的曲线，而且参数的选取方式与公布的曲线相同。P-224 的那次运行跳过了三条这样的曲线。生成 ANSI X9.62 示例曲线的两次运行，又跳过了另外七条（见图）。我们不知道当时可能用了什么标准，也不知道这是否只是无意中造成的结果。</p>
+
+<p>由于被跳过的候选数量很少，我们认为“选中了弱化曲线”的说法并不可信。如果真是那样，就意味着弱化曲线既常见又容易找到。理论上，仍然可以设想：有人通过搜索随机数生成器的时间戳，选出具有某种特定性质的曲线。但只有在你打算公开时间戳、以此证明种子是无害生成的时候，才需要这么做。这些数字本身，看不出当年一共运行了多少次。</p>
+
+<p>还有一个种子我们没能恢复。第五个二元曲线种子 B-163 与 Claude 尝试过的任何方法都不吻合，至今仍无法解释。最后，我们不知道 P-224、P-256、P-384 和 P-521 的基点是如何生成的。NIST 二元曲线的情况也是如此。</p>
+
+<h3>悬赏</h3>
+
+<p>找到种子的 36,864 美元悬赏金，将捐赠给互联网安全研究组（Internet Security Research Group）。</p>
+
+<h3>关于我们</h3>
+
+<p>这项工作在 Anthropic 完成，参与者有 John Wood、Henry de Valence、Ava Howell、Zack Voase、Lucy Sweet、Amir Omidi、Paul Crowley、Iain McGinniss、Nicholas Carlini 和 Steve Weis。</p>
+
+<h3>致谢</h3>
+
+<p>我们要追思并致谢 Jerry Solinas。被贴上“邪恶的网络迷因”和“NSA 妖怪中的 Yo La Tengo”这类标签时，Jerry Solinas 始终以幽默的态度面对。同时感谢 Filippo Valsorda 组织了 NIST 椭圆曲线种子悬赏（NIST Elliptic Curves Seeds Bounty）。</p>
+
+<h3>复现种子的代码</h3>
+
+<p>这段代码的输出：</p>
+
+<h3>复现部分基点的代码</h3>
+
+<p>这段代码的输出：</p>
+
+<h3>许可</h3>
+
+<p>在法律允许的范围内，作者放弃本页代码的所有版权及相关权利或邻接权利，依据 CC0 1.0 通用协议（CC0 1.0 Universal）将其贡献至公共领域（<a href="https://creativecommons.org/publicdomain/zero/1.0/">https://creativecommons.org/publicdomain/zero/1.0/</a>）。</p>
+
+</section>
+</div>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
