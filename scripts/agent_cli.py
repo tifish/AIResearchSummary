@@ -3,8 +3,8 @@
 Three backends, all headless CLI subprocesses reusing an existing local login
 (no per-backend SDK dependency — the CLIs get new models/flags first):
   - codex   : Codex CLI (`codex exec`).
-              AIRS_CODEX_MODEL picks a model (default = account default).
-              AIRS_CODEX_REASONING_EFFORT picks its reasoning effort.
+              AIRS_CODEX_MODEL picks a model (default = gpt-6-astra).
+              AIRS_CODEX_REASONING_EFFORT picks its reasoning effort (default = medium).
               AIRS_CODEX_BIN can override the Codex CLI executable.
   - claude  : Claude Code CLI (`claude -p`).
               AIRS_CLAUDE_MODEL picks a model (default = claude-opus-5-5).
@@ -12,7 +12,7 @@ Three backends, all headless CLI subprocesses reusing an existing local login
               AIRS_CLAUDE_BIN can override the Claude Code executable.
               If Claude declines an article on safety grounds, that article
               is regenerated through Codex with AIRS_CLAUDE_REFUSAL_FALLBACK_MODEL
-              (default = gpt-6-sol).
+              (default = gpt-6-astra).
   - grok    : Grok Build CLI in supported headless JSON mode.
               AIRS_GROK_MODEL picks a model (default = account default).
               AIRS_GROK_REASONING_EFFORT picks its reasoning effort.
@@ -67,7 +67,7 @@ _REFUSAL_RE = re.compile(
 
 
 def claude_refusal_fallback_model() -> str:
-    return os.environ.get("AIRS_CLAUDE_REFUSAL_FALLBACK_MODEL") or "gpt-6-sol"
+    return os.environ.get("AIRS_CLAUDE_REFUSAL_FALLBACK_MODEL") or "gpt-6-astra"
 
 
 def looks_like_refusal(text: str) -> bool:
@@ -165,10 +165,10 @@ def _run_codex_cli(prompt: str, model: str | None = None) -> str:
             "--color", "never",
             "--output-last-message", str(out_path),
         ]
-        model = model or os.environ.get("AIRS_CODEX_MODEL")
+        model = model or os.environ.get("AIRS_CODEX_MODEL") or "gpt-6-astra"
         if model:
             command.extend(["--model", model])
-        effort = os.environ.get("AIRS_CODEX_REASONING_EFFORT")
+        effort = os.environ.get("AIRS_CODEX_REASONING_EFFORT") or "medium"
         if effort:
             command.extend(["-c", f'model_reasoning_effort="{effort}"'])
         command.append("-")  # read the prompt from stdin
@@ -289,7 +289,7 @@ def _run_grok_cli(prompt: str) -> str:
             prompt_path.unlink(missing_ok=True)
 
 
-def run_agent(prompt: str, agent: str = "claude", retries: int = 3, model: str | None = None) -> str:
+def run_agent(prompt: str, agent: str = "codex", retries: int = 3, model: str | None = None) -> str:
     """Run one generation step through the chosen backend and return its text.
 
     Transient errors (rate limit / overload / 5xx / timeout) are retried with

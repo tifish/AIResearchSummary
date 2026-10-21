@@ -54,7 +54,7 @@ python -m pip install -r requirements.txt
 
 ## 刷新
 
-默认使用 Claude Opus 5.5（high effort）生成文章；每日自动刷新使用 `Refresh-Claude.cmd`。
+默认使用 Codex 的 GPT-6 Astra（`gpt-6-astra`，medium effort）生成文章；自动刷新入口为 `Refresh-Codex.cmd`。直接运行 `python refresh.py` 也使用相同默认值。Claude 和 Grok 仅在显式选择对应入口或 `--agent` 时使用。
 
 在仓库根目录运行下面任一入口：
 
@@ -67,16 +67,16 @@ Refresh-Grok.cmd        :: 使用 Grok Build CLI（默认 grok-4.5 / high）
 它们都调用 `refresh.py`，也可以直接运行并传参：
 
 ```bat
-python refresh.py                      :: 默认 Claude Opus 5.5 / high
+python refresh.py                      :: 默认 GPT-6 Astra / medium
 python refresh.py --agent codex        :: 走 Codex CLI（codex exec）；需已安装 codex 且运行过 codex login
-                                       :: 可选：set AIRS_CODEX_MODEL=... 指定模型（默认用账号默认模型）
-                                       :: 可选：set AIRS_CODEX_REASONING_EFFORT=... 指定推理强度
+                                       :: 可选：set AIRS_CODEX_MODEL=... 指定模型（默认 gpt-6-astra）
+                                       :: 可选：set AIRS_CODEX_REASONING_EFFORT=... 指定推理强度（默认 medium）
                                        :: 可选：set AIRS_CODEX_BIN=... 指定 Codex CLI；默认用 PATH 中的 codex
 python refresh.py --agent claude       :: 走 Claude Code CLI（claude -p）；需已安装 claude 且登录过 Claude Code
                                        :: 可选：set AIRS_CLAUDE_MODEL=... 指定模型（默认 claude-opus-5-5）
                                        :: 可选：set AIRS_CLAUDE_EFFORT=... 指定 effort（默认 high）
                                        :: 可选：set AIRS_CLAUDE_BIN=... 指定 Claude CLI；默认用 PATH 中的 claude
-                                       :: Claude 因安全原因拒绝某篇文章时，该篇自动改用 Codex 的 gpt-6-sol 生成
+                                       :: Claude 因安全原因拒绝某篇文章时，该篇自动改用 Codex 的 gpt-6-astra 生成
                                        :: 可选：set AIRS_CLAUDE_REFUSAL_FALLBACK_MODEL=... 指定兜底模型
 python refresh.py --agent grok         :: 走 Grok Build headless CLI；需已安装 grok 且运行过 grok login
                                        :: 可选：set AIRS_GROK_MODEL=... 指定模型（默认用 Grok Build 的默认模型）
