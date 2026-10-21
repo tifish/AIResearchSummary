@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>提升在低资源编程语言中的编程能力</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f5f4f0;
+  --card: #ffffff;
+  --ink: #202b38;
+  --muted: #596577;
+  --line: #d5dce3;
+  --data: #175fba;
+  --risk: #ac452e;
+  --opportunity: #167357;
+  --conclusion: #7045a2;
+  --hl: #e4efff;
+  --hl2: #eee6f8;
+  --opportunity-bg: #e7f3ec;
+  --risk-bg: #fff0e8;
+  --hero-bg: #172b43;
+  --hero-ink: #eef4fc;
+  --hero-muted: #bed0e5;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f5f4f0;
+  --card: #ffffff;
+  --ink: #202b38;
+  --muted: #596577;
+  --line: #d5dce3;
+  --data: #175fba;
+  --risk: #ac452e;
+  --opportunity: #167357;
+  --conclusion: #7045a2;
+  --hl: #e4efff;
+  --hl2: #eee6f8;
+  --opportunity-bg: #e7f3ec;
+  --risk-bg: #fff0e8;
+  --hero-bg: #172b43;
+  --hero-ink: #eef4fc;
+  --hero-muted: #bed0e5;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #111820;
+    --card: #1a2531;
+    --ink: #dce5ef;
+    --muted: #a7b5c6;
+    --line: #354352;
+    --data: #7bb6ff;
+    --risk: #ffab8f;
+    --opportunity: #72d6aa;
+    --conclusion: #c4a0f2;
+    --hl: #203955;
+    --hl2: #352846;
+    --opportunity-bg: #18372e;
+    --risk-bg: #3c2924;
+    --hero-bg: #142337;
+    --hero-ink: #e1eaf6;
+    --hero-muted: #b2c4db;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #111820;
+  --card: #1a2531;
+  --ink: #dce5ef;
+  --muted: #a7b5c6;
+  --line: #354352;
+  --data: #7bb6ff;
+  --risk: #ffab8f;
+  --opportunity: #72d6aa;
+  --conclusion: #c4a0f2;
+  --hl: #203955;
+  --hl2: #352846;
+  --opportunity-bg: #18372e;
+  --risk-bg: #3c2924;
+  --hero-bg: #142337;
+  --hero-ink: #e1eaf6;
+  --hero-muted: #b2c4db;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif; line-height: 1.85; }
+main { max-width: 1120px; margin: auto; padding: 32px 24px 72px; }
+h1, h2, h3 { line-height: 1.4; }
+h1 { font-size: clamp(2rem, 4.4vw, 3.5rem); margin: 16px 0; }
+h2 { font-size: 1.7rem; margin: 0 0 22px; }
+h3 { font-size: 1.15rem; margin: 0 0 12px; }
+p { margin: 0 0 18px; }
+a { color: var(--data); text-underline-offset: 4px; }
+.hero { padding: clamp(24px, 5vw, 56px); background: var(--hero-bg); color: var(--hero-ink); border-radius: 20px; }
+.meta, .english { color: var(--hero-muted); }
+.meta { font-size: .85rem; letter-spacing: .04em; }
+.english { font-size: 1.15rem; }
+.hero .lead { margin-top: 30px; max-width: 780px; font-size: 1.16rem; }
+.hero .label { display: block; font-size: .85rem; color: var(--hero-muted); margin-bottom: 8px; }
+.numbers { display: grid; grid-template-columns: repeat(3, 1fr); margin: 24px 0 40px; border-block: 1px solid var(--line); }
+.number { padding: 24px; }
+.number + .number { border-left: 1px solid var(--line); }
+.number strong { display: block; color: var(--data); font-size: 2.5rem; line-height: 1.3; }
+.number span { font-size: .9rem; color: var(--muted); }
+.summary-block { margin: 40px 0; }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }
+.build { border-top: 4px solid var(--data); padding-top: 20px; }
+.preserve { border-top: 4px solid var(--opportunity); padding-top: 20px; }
+.table-panel { background: var(--card); border: 1px solid var(--line); padding: 28px; border-radius: 12px; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+caption { text-align: left; color: var(--muted); font-size: .85rem; padding-bottom: 12px; }
+th, td { text-align: left; padding: 13px 15px; border-bottom: 1px solid var(--line); }
+th { background: var(--hl); color: var(--data); }
+td:first-child { font-weight: 600; }
+.note { font-size: .88rem; color: var(--muted); margin-top: 14px; }
+mark { background: var(--hl); color: var(--data); padding: 1px 4px; border-radius: 3px; }
+.conclusion { color: var(--conclusion); font-weight: 650; }
+.cost { padding: 26px 30px; background: var(--opportunity-bg); border-left: 5px solid var(--opportunity); }
+.cost h3 { color: var(--opportunity); }
+.migration { padding: 30px; background: var(--hl2); border-radius: 12px; }
+.migration h2 { color: var(--conclusion); }
+.risk { margin-top: 24px; padding: 24px; background: var(--risk-bg); border-left: 5px solid var(--risk); }
+.risk h3 { color: var(--risk); }
+.takeaways { padding: 30px 0; border-block: 1px solid var(--line); }
+.takeaways ol { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 34px; padding-left: 24px; }
+.takeaways li { padding-left: 6px; }
+.takeaways li::marker { color: var(--conclusion); font-weight: 700; }
+#translation { max-width: 800px; margin: 64px auto 0; padding-top: 36px; border-top: 3px solid var(--conclusion); }
+#translation h3 { margin-top: 36px; font-size: 1.4rem; }
+#translation p { margin-bottom: 22px; }
+.source-nav { color: var(--muted); margin: 22px 0; }
+.source-nav p { margin-bottom: 8px !important; }
+.source-figure { margin: 32px 0; }
+.source-figure img { display: block; max-width: 100%; height: auto; margin: auto; }
+.source-figure figcaption { color: var(--muted); font-size: .9rem; margin-top: 12px; }
+.source-tags { color: var(--muted); }
+@media (max-width: 700px) {
+  main { padding: 16px 16px 48px; }
+  .numbers, .split, .takeaways ol { grid-template-columns: 1fr; }
+  .number + .number { border-left: 0; border-top: 1px solid var(--line); }
+  .number { padding: 20px; }
+  .table-panel, .migration { padding: 20px; }
+  th, td { padding: 10px; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/low-resource-programming-languages" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header class="hero">
+<div class="meta">OpenAI · 2026 年 10 月 19 日 · 发布文章</div>
+<h1>提升在低资源编程语言中的编程能力</h1>
+<p class="english">Advancing coding in low‑resource programming languages</p>
+<p class="lead"><span class="label">一句话总括</span>OpenAI 用两项互补评估展示了最新模型的进展：既能在训练资料较少的语言中构建软件，也更能在迁移老旧代码时保留原有业务行为。</p>
+</header>
+<section aria-label="核心数据" class="numbers">
+<div class="number"><strong>87.4%</strong><span>GPT‑6 Astra 在 20 种语言上的平均测试通过率，采用最高推理强度</span></div>
+<div class="number"><strong>约 78%</strong><span>GPT‑6 Luna 相比 GPT‑5.6 Sol 的估算平均 API 成本降幅</span></div>
+<div class="number"><strong>97.9%</strong><span>GPT‑6.1 Sol 在较高推理强度下的 COBOL 迁移准确率</span></div>
+</section>
+<section class="summary-block">
+<h2>两项评估分别检验构建能力与行为保真</h2>
+<div class="split">
+<div class="build">
+<h3>MultiLangBench：从零做出可用功能</h3>
+<p>模型需要用指定语言构建兼容 SQLite 的数据库引擎。评估通过数据库文件统一输入与输出，再用 SQLite 参考实现核验结果。</p>
+<p>任务覆盖代码组织、状态管理、错误处理和功能扩展。它检验的是持续开发中的工程能力。</p>
+</div>
+<div class="preserve">
+<h3>COBOL 迁移：保持原程序的输出</h3>
+<p>模型需要把 COBOL 程序迁移到 C++、Java、Kotlin、Python 或 Rust。隐藏测试要求可观察输出<mark>逐字节一致</mark>，只有全部测试通过才算成功。</p>
+<p>这一标准把业务行为是否保留，放在了迁移是否成功的核心位置。</p>
+</div>
+</div>
+<p class="conclusion">两项结果应分开理解：构建评估报告测试通过率，迁移评估则以全部测试通过作为成功条件。</p>
+</section>
+<section class="summary-block table-panel">
+<h2>构建能力全面提升，COBOL 仍是难点</h2>
+<div class="table-wrap">
+<table>
+<caption>MultiLangBench 测试通过率，单位：%；Astra 与 Luna 均采用最高推理强度。仅列出原文给出的语言分项与总体均值。</caption>
+<thead><tr><th scope="col">语言或范围</th><th scope="col">GPT‑5.6 Sol</th><th scope="col">GPT‑6 Astra</th><th scope="col">GPT‑6 Luna</th></tr></thead>
+<tbody>
+<tr><td>20 种语言平均</td><td>26.8</td><td>87.4</td><td>40.3</td></tr>
+<tr><td>COBOL</td><td>10.9</td><td>72.1</td><td>17.1</td></tr>
+<tr><td>OCaml</td><td>25.6</td><td>85.8</td><td>34.1</td></tr>
+<tr><td>Fortran</td><td>21.4</td><td>83.5</td><td>31.4</td></tr>
+<tr><td>Visual Basic</td><td>27.5</td><td>89.4</td><td>41.6</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note">Astra 在 20 种语言中的 19 种上超过 83%。COBOL 的通过率为 72.1%，仍是最难的一种语言。</p>
+<p>Astra 和 Luna 在每种受测语言上都优于 GPT‑5.6 Sol。进步覆盖了全部受测语言，但不同语言之间仍有明显差距。</p>
+<p class="conclusion">总体均值不能替代具体语言的结果。评估 AI 能否用于某个代码库时，仍需关注该语言的能力缺口。</p>
+</section>
+<aside class="summary-block cost">
+<h3>Luna 的价值还体现在成本下降</h3>
+<p>GPT‑6 Luna 的估算平均 API 成本为<mark>每个样本 0.77 美元</mark>，GPT‑5.6 Sol 为 3.48 美元，约低 78%。与此同时，平均测试通过率从 26.8% 提升至 40.3%。</p>
+<p>这组结果显示，在该评估中，更高的通过率也可以伴随更低的 API 成本。</p>
+</aside>
+<section class="summary-block migration">
+<h2>迁移准确率接近评估上限，业务验证仍不可省</h2>
+<div class="table-wrap">
+<table>
+<caption>COBOL 迁移评估；准确率单位：%。相对 API 成本以低推理强度的 GPT‑5.6 Sol 为参照。</caption>
+<thead><tr><th scope="col">模型</th><th scope="col">推理强度</th><th scope="col">准确率</th><th scope="col">相对 API 成本</th></tr></thead>
+<tbody>
+<tr><td>GPT‑5.6 Sol</td><td>低</td><td>5.4</td><td>基准</td></tr>
+<tr><td>GPT‑6.1 Sol</td><td>低</td><td>86.6</td><td>基准的 61%</td></tr>
+<tr><td>GPT‑6.1 Sol</td><td>较高</td><td>97.9</td><td>原文未提供</td></tr>
+</tbody>
+</table>
+</div>
+<p>在相同的低推理强度下，GPT‑6.1 Sol 的准确率达到 86.6%，API 成本低 39%。提高推理强度后，准确率达到 97.9%，接近这项评估的上限。</p>
+<div class="risk">
+<h3>能运行，不代表财务结果一致</h3>
+<p>COBOL 的定点运算默认截去多余小数位，只有明确要求时才舍入。迁移后的程序如果改为舍入，可能不报错，却产生不同的财务结果。</p>
+<p>因此，评估成绩体现了行为保持能力的进展。用于生产软件时，仍需专家审查，并依据系统的业务规则和依赖关系进行测试。</p>
+</div>
+</section>
+<section class="summary-block">
+<h2>资料稀缺的语言，支撑着高频使用的服务</h2>
+<p>COBOL、Fortran 和 Visual Basic 可供模型学习的代码与文档较少，却服务于重要基础设施。原文列出的 COBOL 应用覆盖如下：</p>
+<ul>
+<li><mark>超过 40%</mark>的网上银行系统。</li>
+<li><mark>80%</mark>的线下信用卡交易。</li>
+<li><mark>95%</mark>的 ATM 交易。</li>
+</ul>
+<p>Fortran 则用于天气预报和核反应堆安全分析。维护这些系统时，团队可能面对文档缺失、原开发者离职，以及只存在于代码中的业务规则。</p>
+<p class="conclusion">这类编程能力的实际意义，在于帮助团队理解、维护和改造关键服务背后的既有软件。</p>
+</section>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<ol>
+<li><strong>新建与迁移是不同能力。</strong>前者看能实现多少功能，后者看能否保留原有行为。</li>
+<li><strong>语言覆盖扩大了，差距仍存在。</strong>Astra 在 19 种语言上超过 83%，COBOL 仍相对困难。</li>
+<li><strong>成本与能力可以同时改善。</strong>Luna 的构建评估与 GPT‑6.1 Sol 的低推理强度迁移评估都展示了这一点。</li>
+<li><strong>高分不能取代业务验证。</strong>舍入规则等细节足以让正常运行的迁移代码产生不同结果。</li>
+<li><strong>公开评估有助于定位缺口。</strong>OpenAI 表示将发布 MultiLangBench 的评估配置、测试套件和各语言结果，供开发者检查。</li>
+</ol>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<div class="source-nav">
+<p>1. 从零构建 SQLite（MultiLangBench）</p>
+<p>2. 迁移 COBOL 代码库</p>
+<p>提升面向企业软件的能力</p>
+</div>
+<div class="source-nav">
+<p>1. 从零构建 SQLite（MultiLangBench）</p>
+<p>2. 迁移 COBOL 代码库</p>
+<p>提升面向企业软件的能力</p>
+</div>
+<p>我们最新的模型进展，增强了在 COBOL、Fortran 和 Visual Basic 等低资源编程语言中构建和迁移软件的能力。与 Python、JavaScript 等语言相比，这些语言可供模型学习的代码和文档更少。但它们支撑着世界各地的关键基础设施和基本服务。COBOL 支撑着超过 40% 的网上银行系统、80% 的线下信用卡交易和 95% 的 ATM 交易（在新窗口中打开）。Fortran 则用于天气预报（在新窗口中打开）和核反应堆安全分析（在新窗口中打开）。提升 AI 处理这些语言的能力，可以帮助团队维护和改造基本服务所依赖的软件。</p>
+<p>这项工作的方向来自开发者和企业客户的反馈。他们告诉我们，编程模型在处理这些语言时往往表现不佳。维护和改造此类软件可能很困难。文档可能不完整，最初的开发者可能已经离职，重要的业务规则也可能只存在于代码中。无论团队是在修复错误，还是将软件迁移到另一种语言，都需要保留系统所依赖的行为。</p>
+<p>为了衡量进展，我们开发了两项评估。MultiLangBench 测试模型能否使用 20 种不同的编程语言，从零构建兼容 SQLite 的数据库引擎。我们的 COBOL 迁移评估则测试模型能否将现有程序迁移到另一种语言，同时保持其行为不变。两项评估共同检验了两种互补的能力：构建新软件，以及保留现有软件的功能与行为。</p>
+<p>我们的最新模型在两项评估中都有显著进步，以更低的成本实现了高得多的准确率。</p>
+<p>在 MultiLangBench 上，GPT‑6 Astra 在 20 种编程语言中的平均测试通过率达到 87.4%，高于 GPT‑5.6 Sol 的 26.8%。每种受测语言的表现都有提升。GPT‑6 Luna 也优于 GPT‑5.6 Sol，测试通过率达到 40.3%，估算 API 成本则低约 78%。</p>
+<p>在我们的 COBOL 迁移评估中，GPT‑6.1 Sol 采用低推理强度时，准确率达到 86.6%。相比之下，GPT‑5.6 Sol 仅为 5.4%，而 GPT‑6.1 Sol 的成本还低了 39%。采用较高推理强度时，准确率达到 97.9%，几乎达到这项评估的上限。</p>
+<p>这些结果共同表明，我们的模型处理多种编程语言的能力正在显著增强，成本效益也在提高。</p>
+<h3>1. 从零构建 SQLite（MultiLangBench）</h3>
+<p>MultiLangBench 要求模型使用指定的编程语言，构建一个兼容 SQLite 的数据库引擎。模型必须组织代码库、管理状态、处理错误，并在保留现有功能的同时添加新功能。</p>
+<p>为了比较不同语言的实现，我们使用数据库文件作为统一接口。待评估程序接收一个初始数据库和一条 SQL 查询，然后输出修改后的数据库。我们使用 SQLite 的参考实现，检查输出数据库的内容是否符合预期。这样，无论构建引擎使用哪种语言，我们都能应用同一组测试。</p>
+<p>我们将 SQLite 现有测试套件中的测试改编为这种格式。这项评估衡量模型在较长的编程会话中能实现多少可用功能，并同时报告测试通过率和 API 成本。</p>
+<p>采用最高推理强度时，GPT‑6 Astra 在 20 种语言中的平均测试通过率达到 87.4%，高于 GPT‑5.6 Sol 的 26.8%。每种受测语言的表现都有提升。其中，COBOL 从 10.9% 升至 72.1%，OCaml 从 25.6% 升至 85.8%，Fortran 从 21.4% 升至 83.5%，Visual Basic 从 27.5% 升至 89.4%。Astra 在 20 种语言中的 19 种上得分超过 83%。COBOL 仍然最难，得分为 72%。</p>
+<p>GPT‑6 Luna 提供了成本更低的选择，并且在每种受测语言上也都优于 GPT‑5.6 Sol。采用最高推理强度时，其平均测试通过率达到 40.3%。其中，COBOL 从 10.9% 升至 17.1%，OCaml 从 25.6% 升至 34.1%，Fortran 从 21.4% 升至 31.4%，Visual Basic 从 27.5% 升至 41.6%。实现这些提升时，每个样本的估算平均 API 成本为 0.77 美元。GPT‑5.6 Sol 则为 3.48 美元，前者约低 78%。</p>
+<p>我们正在 GitHub 上发布 MultiLangBench 的评估配置和测试套件（在新窗口中打开），以及各语言的结果。开发者可以检查评估测试了哪些内容，查看自己使用的语言上的表现，并找出与自身工作相关的重要能力缺口。</p>
+<h3>2. 迁移 COBOL 代码库</h3>
+<p>我们的第二项评估要求模型将 COBOL 程序迁移到 C++、Java、Kotlin、Python 或 Rust，同时保持每个程序的功能与行为不变。</p>
+<p>成功迁移既需要理解程序的业务逻辑，也需要理解 COBOL 特有的语言行为。COBOL 程序通常处理金融交易和业务记录。其中，舍入规则、记录缺失时的处理方式等细节，都体现了业务要求。例如，除非明确要求舍入，否则 COBOL 的定点运算会截去多余的小数位。如果重写后的程序改为对这些数值进行舍入，即使运行时没有报错，也可能产生不同的财务结果。</p>
+<p>为了测试这些行为是否得以保留，我们使用隐藏测试评估模型，要求可观察输出逐字节一致。只有全部测试通过，迁移才算成功。此类保持行为不变的能力，对维护和改造老旧系统的团队很有用。不过，将其用于生产软件时，仍需要专家审查，并依据系统的业务规则和依赖关系进行测试。</p>
+<p>在这项评估中，GPT‑6.1 Sol 采用低推理强度时，准确率达到 86.6%。GPT‑5.6 Sol 在相同设置下的准确率为 5.4%，而 GPT‑6.1 Sol 的 API 成本仅为其 61%。采用较高推理强度时，准确率达到 97.9%，使这项评估接近饱和。这些评估结果表明，在为团队提供更准确、更经济的代码迁移能力方面，我们取得了进展。这些团队正在改造其业务所依赖的软件。</p>
+<h3>提升面向企业软件的能力</h3>
+<p>这些评估，加上开发者和企业客户的直接反馈，帮助我们了解模型在哪些方面正在进步，又在哪些方面仍有不足。</p>
+<p>我们的目标是帮助模型将软件工程技能应用到更多语言中。这些技能包括理解不熟悉的代码仓库、规划修改、使用构建工具、运行测试，以及调试失败问题。</p>
+<p>你可以通过 API 试用我们的最新模型，让它们处理团队所用语言中的编程任务。欢迎反馈哪些方面表现良好、模型在哪些方面仍有困难，以及我们接下来应重点关注哪些语言或工作流程。这些反馈会帮助我们改进模型的训练和评估方式，从而更好地支持你所依赖的软件。</p>
+<p class="source-tags">软件与工程</p>
+<figure class="source-figure" data-source-image="0"><img alt="Rosalind Academic Plan - Card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/7EaxSuBblXvd3Y6G2WLoET/4563ce56737d9c0ed1f05358f43c8a7d/rosalind-academic-plan-card.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<p class="source-tags">GPT</p>
+<figure class="source-figure" data-source-image="1"><img alt="Sharing AI progress in mathematics — Cover" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/49FAj0M0Ly8nk84Uu8btWC/9919efdae7fff54b0f8b0d80398248ac/ai-progress-in-mathematics-cover.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<p class="source-tags">学习范式</p>
+<figure class="source-figure" data-source-image="2"><img alt="oai ironclad cua 1x1" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/23y88t0gUd7FSqVFa9n1uq/6d227695a77e7a2cf3e6607bc69e1cf2/oai_ironclad_cua_1x1.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<p class="source-tags">2026</p>
+<p>作者</p>
+<p>继续阅读</p>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

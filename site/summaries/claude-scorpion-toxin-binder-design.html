@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude 如何设计针对蝎子神经毒素的蛋白质结合体</title>
+<style>
+:root {
+  --bg:#f6f5f0; --card:#ffffff; --ink:#202b35; --muted:#62707b; --line:#d5dddF;
+  --data:#166caa; --risk:#b54a37; --opportunity:#18755b; --conclusion:#7350a5;
+  --hl:#dceefa; --hl2:#eee3fa; --risk-bg:#fae9e3; --opportunity-bg:#e3f1e9;
+  --hero:#182d3e; --hero-ink:#edf4f8; --hero-muted:#b8cfdf;
+}
+:root[data-theme="light"] {
+  --bg:#f6f5f0; --card:#ffffff; --ink:#202b35; --muted:#62707b; --line:#d5dddf;
+  --data:#166caa; --risk:#b54a37; --opportunity:#18755b; --conclusion:#7350a5;
+  --hl:#dceefa; --hl2:#eee3fa; --risk-bg:#fae9e3; --opportunity-bg:#e3f1e9;
+  --hero:#182d3e; --hero-ink:#edf4f8; --hero-muted:#b8cfdf;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#141b21; --card:#1d2831; --ink:#dce5eb; --muted:#a6b6c2; --line:#3a4b58;
+    --data:#73bff1; --risk:#f39a80; --opportunity:#73cda7; --conclusion:#c4a3f1;
+    --hl:#213d50; --hl2:#3a2c4c; --risk-bg:#3b2a28; --opportunity-bg:#203b33;
+    --hero:#102433; --hero-ink:#e1edf4; --hero-muted:#abc5d5;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:#141b21; --card:#1d2831; --ink:#dce5eb; --muted:#a6b6c2; --line:#3a4b58;
+  --data:#73bff1; --risk:#f39a80; --opportunity:#73cda7; --conclusion:#c4a3f1;
+  --hl:#213d50; --hl2:#3a2c4c; --risk-bg:#3b2a28; --opportunity-bg:#203b33;
+  --hero:#102433; --hero-ink:#e1edf4; --hero-muted:#abc5d5;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI","Noto Sans SC",sans-serif; line-height:1.85; }
+main { max-width:1080px; margin:auto; padding:32px 24px 72px; }
+.hero { padding:44px; border-radius:20px; background:var(--hero); color:var(--hero-ink); }
+.eyebrow { color:var(--hero-muted); font-size:.85rem; letter-spacing:.08em; }
+h1 { margin:16px 0 10px; font-size:clamp(1.9rem,4vw,3rem); line-height:1.3; }
+.original { color:var(--hero-muted); line-height:1.5; font-size:1.1rem; }
+.overview { margin-top:28px; padding-top:22px; border-top:1px solid var(--hero-muted); }
+h2 { font-size:1.65rem; line-height:1.45; margin:0 0 20px; }
+h3 { line-height:1.5; font-size:1.18rem; }
+p { margin:0 0 1.1em; }
+.metrics { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin:28px 0; padding:25px 0; border-block:1px solid var(--line); }
+.metric strong { display:block; color:var(--data); font-size:2.3rem; line-height:1.3; }
+.metric span { color:var(--muted); font-size:.95rem; }
+.panel { margin:28px 0; padding:30px; background:var(--card); border-radius:14px; }
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; margin:18px 0; font-size:.95rem; }
+th,td { padding:12px 14px; text-align:left; border-bottom:1px solid var(--line); vertical-align:top; }
+th { background:var(--hl); color:var(--data); }
+.note { color:var(--muted); font-size:.88rem; }
+mark { background:var(--hl); color:var(--data); padding:1px 4px; border-radius:4px; font-weight:650; }
+.conclusion { background:var(--hl2); color:var(--conclusion); padding:16px 20px; border-left:4px solid var(--conclusion); }
+.columns { display:grid; grid-template-columns:1fr 1fr; gap:22px; margin:28px 0; }
+.opportunity { background:var(--opportunity-bg); padding:26px; border-top:4px solid var(--opportunity); }
+.opportunity h3 { color:var(--opportunity); margin-top:0; }
+.risk { background:var(--risk-bg); padding:26px; border-top:4px solid var(--risk); }
+.risk h3 { color:var(--risk); margin-top:0; }
+.flow { padding:25px 0; border-block:1px solid var(--line); margin:28px 0; }
+.flow ol { padding-left:24px; }
+.flow li { padding:7px 0; }
+.takeaways { margin:32px 0 48px; }
+.takeaways ul { display:grid; grid-template-columns:1fr 1fr; gap:16px; list-style:none; padding:0; }
+.takeaways li { padding:20px; background:var(--card); border-left:3px solid var(--conclusion); }
+#translation { max-width:790px; margin:0 auto; border-top:3px solid var(--line); padding-top:42px; }
+#translation h2 { font-size:2rem; }
+#translation h3 { margin-top:2.3em; font-size:1.4rem; }
+#translation h4 { margin-top:2em; }
+#translation p { margin-bottom:1.3em; }
+.source-meta { color:var(--muted); font-size:.9rem; border-bottom:1px solid var(--line); padding-bottom:18px; margin-bottom:26px; }
+blockquote { margin:28px 0; border-left:4px solid var(--conclusion); padding:16px 22px; background:var(--hl2); }
+blockquote p:last-child { margin-bottom:0; }
+.attribution { color:var(--muted); font-size:.92rem; }
+a { color:var(--data); }
+.source-figure { margin:32px 0; }
+.source-figure img { display:block; max-width:100%; height:auto; margin:auto; }
+figcaption { color:var(--muted); font-size:.9rem; margin-top:12px; }
+.footnotes { border-top:1px solid var(--line); margin-top:30px; padding-top:16px; font-size:.95rem; }
+@media(max-width:680px) {
+  main { padding:18px 16px 48px; }
+  .hero { padding:26px 22px; }
+  .metrics { gap:12px; }
+  .metric strong { font-size:1.65rem; }
+  .columns,.takeaways ul { grid-template-columns:1fr; }
+  .panel { padding:22px 16px; }
+  th,td { padding:10px; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/claude-scorpion-toxin-binder-design" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header class="hero">
+<div class="eyebrow">Anthropic · Research</div>
+<h1>Claude 如何设计针对蝎子神经毒素的蛋白质结合体</h1>
+<p class="original">How Claude designed protein binders against scorpion neurotoxins</p>
+<div class="overview">
+<p><strong>一句话总括：</strong>这项研究让 Claude 主导蛋白质设计，并通过实验筛出了针对四种蝎子神经毒素的 17 个结合体，展示了 AI 加快早期发现的能力；这些分子能否中和毒素、保护活体，仍待验证。</p>
+</div>
+</header>
+
+<div class="metrics" aria-label="设计规模与实验结果">
+<div class="metric"><strong>64 小时</strong><span>从初始提示到 180 个候选设计</span></div>
+<div class="metric"><strong>318,484</strong><span>生成的蛋白质设计总数</span></div>
+<div class="metric"><strong>17 / 211</strong><span>实验达标设计数 / 测试设计数</span></div>
+</div>
+
+<section class="panel">
+<h2>单毒素设计获得实验支持，多毒素目标尚未实现</h2>
+<p>团队希望覆盖五种毒素，最终确认了针对其中四种的结合体。<mark>没有任何多毒素设计对一种以上毒素达到判定标准</mark>，说明同时覆盖多种毒素仍是关键难点。</p>
+<div class="table-wrap">
+<table>
+<caption>送测设计的目标分组，单位：个设计</caption>
+<thead><tr><th>设计目标</th><th>送测数量</th><th>原文报告的结果</th></tr></thead>
+<tbody>
+<tr><td>单一毒素</td><td>60，每种毒素 12 个</td><td>11 个达标，成功率 18%</td></tr>
+<tr><td>两种 β 家族毒素</td><td>30</td><td>未实现对一种以上毒素达标</td></tr>
+<tr><td>三种 α 家族毒素</td><td>30</td><td>未实现对一种以上毒素达标</td></tr>
+<tr><td>全部五种毒素</td><td>91</td><td>未实现对一种以上毒素达标</td></tr>
+<tr><td>全部设计</td><td>211</td><td>17 个达标，均仅针对单一毒素达标</td></tr>
+</tbody>
+</table>
+</div>
+<div class="table-wrap">
+<table>
+<caption>17 个达标结合体的靶点分布，单位：个设计</caption>
+<thead><tr><th>毒素</th><th>Cn2</th><th>AaH II</th><th>AaH I</th><th>LqhIII</th></tr></thead>
+<tbody><tr><td>达标数量</td><td>7</td><td>4</td><td>4</td><td>2</td></tr></tbody>
+</table>
+</div>
+<p class="note">总体判定要求为：两家实验室的每次重复实验均显示结合，且每个 K<sub>D</sub> 均不高于 1 µM；对无关人类蛋白 CLEC12A 不出现信号。LqhIII 仅由 Adaptyv Bio 评估。</p>
+<p class="conclusion">这些结果支持 AI 用于单靶点早期发现，但还不能证明它已解决通用抗毒液所需的多靶点设计。</p>
+</section>
+
+<section class="flow">
+<h2>自主工作占主要部分，人工引导与算力仍然重要</h2>
+<ol>
+<li><strong>设定目标：</strong>团队提供初始提示，明确毒素靶点、工具以及新颖性、评分和筛选规则。</li>
+<li><strong>大规模搜索：</strong>Claude 使用 12 种设计工具，生成 318,484 个设计，并对 553,052 个设计—毒素配对进行共同折叠预测和筛选。</li>
+<li><strong>四次后续提示：</strong>大多数入选设计是在第三次后续提示之后选出的，其中包括最强结合体 Cn2-B1。</li>
+<li><strong>实验验证：</strong>模型选出 180 个设计。团队在其协助下增加 31 个，最终送测 211 个。</li>
+</ol>
+<p>整个设计过程使用了约 <mark>10,000 GPU 小时</mark>。AI 缩短了设计周期，但成果仍依赖人工方向引导、大量计算和实验验证。</p>
+</section>
+
+<section class="columns">
+<div class="opportunity">
+<h3>最强结合体提供了有希望的功能线索</h3>
+<p>Cn2-B1 和 Cn2-B2 在两家实验室均表现出<mark>个位数纳摩尔级 K<sub>D</sub></mark>。数值越低，结合越紧密。</p>
+<p>竞争实验提示，它们与已被报道可在小鼠中中和 Cn2 的抗体 LR，占据相同或邻近的结合位点。</p>
+<p><strong>这一结果为中和能力提供了线索，但还不是功能验证。</strong></p>
+</div>
+<div class="risk">
+<h3>结合毒素与成为抗毒液之间仍有距离</h3>
+<p>本研究只验证了与重组毒素的结合。尚未开展细胞中的中和实验，也未开展活体动物疗效实验。</p>
+<p>后续还需确认对毒液中提纯毒素的结合能力，并评估功能、安全性、稳定性、成本和供应。</p>
+<p><strong>当前产出是候选结合体，不能称为抗毒液。</strong></p>
+</div>
+</section>
+
+<section class="panel">
+<h2>被忽视疾病的机会，在于加快发现并推动后续开发</h2>
+<p>全球每年至少有 <mark>120 万人</mark>被蝎子蜇伤，死亡人数超过 <mark>3,250 人</mark>。死者多为医疗资源不足地区的儿童。研发成本高、商业回报有限，使这一领域长期缺少投入。</p>
+<p>团队将公开全部 <strong>211 个设计及其结合数据</strong>，供其他研究者继续研究。外部专家认为，这是有希望的第一步。</p>
+<p class="conclusion">更快获得结合体可以降低早期发现的门槛。真正的健康收益，还取决于能否把它们变成安全、可负担且能送达患者手中的药物。</p>
+</section>
+
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<ul>
+<li><strong>实验是关键分界线。</strong>数十万个计算设计，最终只有 17 个通过本文的结合判定标准。</li>
+<li><strong>单靶点成功不等于广谱成功。</strong>五种毒素虽有相同的整体折叠，但两两序列一致性只有 26%—62%。本次尚未实现多毒素结合目标。</li>
+<li><strong>自主设计仍需要引导。</strong>四次后续提示影响了最终结果，最强结合体也是在第三次提示之后入选的。</li>
+<li><strong>治疗价值需要更多证据。</strong>紧密结合与竞争实验值得继续追踪，但细胞中和、活体保护和药物可及性仍是后续关卡。</li>
+</ul>
+</section>
+
+<section id="translation">
+<h2>完整译文</h2>
+<div class="source-meta">
+<p>发布</p>
+<p>团队</p>
+<p>科学</p>
+<p>主题</p>
+<p>生命科学<br>发现<br>智能体<br>研究项目<br>全球健康<br>科学</p>
+<p>2026 年 9 月 23 日</p>
+</div>
+
+<p><strong>摘要：</strong>我们正在探索 Claude 如何帮助加快药物发现。作为这项工作的一部分，我们让一个内部研究模型设计针对蝎子神经毒素的微型结合体，即能够紧密附着于靶点的小型蛋白质。Claude 根据我们的初始提示和四次后续提示开展工作。这些提示由我们与金融投资研究公司 Citrini Research 合作制定。Adaptyv Bio 和 Twist Bioscience 的团队对 211 个设计进行了结合实验。其中，17 个达到了我们的标准。我们将公开全部 211 个设计及其数据，供这一领域的研究者使用。</p>
+
+<p>今年 8 月，我们展示了 Claude 如何仅凭一条提示设计蛋白质微型结合体。在这些结果发布前一个月，Citrini Research 的团队向我们提出了一个有趣的问题：Claude，以及更广泛意义上的 AI 药物发现，能否让一群积极投入的非专业人士解决一个真实的人类健康问题？我们的生命科学研究团队成员着手寻找答案。首先，我们与 Claude 一起讨论可以研究的问题。最后，我们决定请 Claude 协助设计针对蝎子神经毒素的新型蛋白质结合体，希望未来能将其用于开发蝎毒抗毒液。</p>
+
+<p>每年至少有 120 万人被蝎子蜇伤，导致超过 3,250 人死亡。死者多为世界上一些医疗资源不足地区的儿童。新疗法的开发费用高昂，也很难收回研发成本。由于投入极少，蝎毒中毒被称为一种被忽视的热带病。</p>
+
+<p>我们首先使用了此前蛋白质结合体研究中的同一条提示，并与 Citrini 一起进行了修改。<sup><a href="#fn1">1</a></sup> 在接下来的 64 小时里，一个运行于 Claude Science 中的内部研究模型主要自主开展工作。期间，我们通过四次后续提示引导它。在我们的监督下，Claude 分析了研究数据，生成了图表，并起草了最终报告。</p>
+
+<p>Claude 的这轮设计工作产生了 17 个蛋白质结合体。每个结合体都能结合四种已知对人类有危险的蝎子神经毒素中的一种。整个过程中，Claude 共生成 318,484 个蛋白质设计，并从中选出 180 个进行测试。我们的团队在 Claude 的协助下又增加了 31 个。合作方 Adaptyv Bio 和 Twist Bioscience 是两家合同研究组织（CRO）。它们在实验室测试了全部 211 个设计，检查这些设计能否与预定的毒素靶点结合。其中，17 个设计达到了我们对结合体的判定标准。我们尚未确认这些结合体能否在细胞环境中中和蝎毒，因此不声称已经制成抗毒液。</p>
+
+<p>我们将 Claude 的成果交给了两位外部专家 Susana Vázquez Torres 和 Timothy P. Jenkins。他们认为，这项工作是有希望的第一步。如果 AI 现在能在几天内设计出针对多种难处理毒素的可信结合体，并在几周内通过实验确认，那么理论上，这可以加快毒液中毒及其他被忽视疾病领域的发现进程。一如既往，真正的挑战是把这些结合体变成安全、可负担且广泛可及的药物。</p>
+
+<p>我们在技术报告中提供了更多细节，并将公开全部 211 个设计及其数据。</p>
+
+<blockquote>
+<p>为几乎任何靶点设计结合体，似乎已经不再是不切实际的目标。我们现在可以非常迅速地获得结合极为紧密的分子。结合本身已不再是主要瓶颈。蛇和蝎子等有毒动物的咬伤、蜇伤会造成大量人员死亡或重伤，尤其是在医疗服务不足的地区。要产生真正的影响，就需要解决治疗开发流程中超出结合本身的环节。挑战在于利用这些非凡的工具，开发出能成为真正药物的分子。这些药物必须安全、可负担，并且广泛可及。</p>
+</blockquote>
+<p class="attribution">Susana Vázquez Torres，西班牙马德里 Spanish National Cancer Research Centre（CNIO）结构生物学项目博士后研究员。</p>
+
+<h3>针对四种蝎子的五种毒素，从头设计结合体</h3>
+
+<p>蝎毒含有多种蛋白质神经毒素。最有可能伤害人类或致人死亡的神经毒素，会附着在钠通道上。钠通道是嵌入神经细胞膜的大型蛋白质，使神经细胞能够发放电信号。当钠通道受到干扰时，神经会在错误的时间发放信号。这会释放大量肾上腺素等应激化学物质。严重时，可导致心力衰竭和肺部积液，偶尔会造成死亡。</p>
+
+<p>目前已有一些用于治疗蝎子蜇伤的抗毒液。它们通常利用经过免疫的动物所产生的抗体制造，整个过程可能需要数月。研究人员从数千只蝎子身上采集毒液，用它们给马进行免疫，再从马的血液中提纯产生的抗体。传统抗毒液在早期使用时可能有效，但通常只能针对少数几种神经毒素。它们的生产成本也很高。在许多地区，这些抗毒液价格昂贵，或供应不足。</p>
+
+<p>从头设计（de novo design）提供了一种潜在的解决方案。结合体是能够紧密附着于特定靶点的分子，抗体就是一种天然实例。原则上，如果一个结合体能瞄准神经毒素上与钠通道连接的部分，就可能阻止毒素接触通道。从头设计会针对特定靶点，从零开始生成蛋白质结合体。这些结合体通过计算设计，还可以针对效力和稳定性等成药相关性质进行优化。这可能使它们更容易供应到蜇伤最常发生的地区。</p>
+
+<p>我们的方法受到此前一项研究的启发。那项研究从头设计了能够中和蛇神经毒素并保护小鼠的蛋白质。据我们所知，尚未有研究报道针对蝎子神经毒素的从头设计结合体。</p>
+
+<p>在这轮设计中，我们选择了来自四个地区的五种蝎毒神经毒素作为靶点：墨西哥的 Cn2、巴西的 Ts1、北非的 AaH I 和 AaH II，以及中东的 LqhIII。我们还决定将设计对准每种毒素的通道结合位点。Claude 搜索了 Protein Data Bank（PDB）和 AlphaFold database（AFDB），选出用于设计的毒素结构。对于每种毒素，它选择了五个热点，即毒素上的特定氨基酸位置。设计出的结合体预期会附着在这些位置上。</p>
+
+<p>我们主要想知道，Claude 能否设计出针对单种毒素的结合体。同时，我们也想知道，它能否设计出针对多种毒素的结合体。尝试多毒素设计有一个实际原因：它可以减少通用抗毒液混合制剂所需的分子种类。这种制剂将是最具成本效益、也最不受地域限制的治疗方案。我们选择这五种蝎毒毒素——Cn2、Ts1、AaH I、AaH II 和 LqhIII——作为多毒素设计的一项高难度测试。它们的蛋白质整体形状具有相同的折叠方式，但任意两种毒素的氨基酸序列一致性仅为 26% 至 62%。</p>
+
+<p>为了探索 Claude 的能力边界，我们要求它设计四类结合体：</p>
+<ul>
+<li>分别针对五种毒素中每一种的结合体；</li>
+<li>同时针对 β 家族毒素 Ts1 和 Cn2 的结合体；</li>
+<li>同时针对 α 家族毒素 AaH II、AaH I 和 LqhIII 的结合体；</li>
+<li>同时针对全部五种毒素的结合体。</li>
+</ul>
+
+<blockquote>
+<p>在短短几天内，并行设计出针对五种毒素的可信结合体，充分展示了 AI 正在推动的治疗发现范式转变。对于动物毒液中毒等被忽视的疾病，这一点尤其重要。由于商业激励不足，这些疾病领域长期缺乏创新。能够以智能体方式处理动物毒素特有的广泛靶点空间，会显著加快发现速度，也让切实可行的治疗方案离我们更近。</p>
+</blockquote>
+<p class="attribution">Timothy P. Jenkins，Technical University of Denmark 副教授。</p>
+
+<h3>Claude 以相当高的自主性推进设计工作</h3>
+
+<p>我们的初始提示明确了神经毒素靶点、蛋白质设计与折叠工具，以及新颖性、评分和筛选规则。除了选择结构和氨基酸热点，Claude 还自行设定了设计必须达到的质量阈值。它决定如何分配对各个可用设计工具的使用，并制定了针对多种毒素的结合体设计策略。</p>
+
+<p>最终，Claude 使用 12 种设计工具生成了 318,484 个设计，并过滤掉任何类似毒素或已知蛋白质的设计。Claude 对 553,052 个设计—毒素配对进行了共同折叠预测和筛选，将每一对预测为一个复合物结构。在收到我们的初始提示 64 小时后，它给出了包含 180 个设计的最终名单。这轮工作使用了约 10,000 GPU 小时。<sup><a href="#fn2">2</a></sup></p>
+
+<p>收到第一条提示后，Claude 自主工作了 24 小时。它的结果让我们决定继续提示它推进这轮工作，寻找更好的设计。我们的后续提示主要用于引导 Claude 设计多毒素结合体。180 个设计中的大多数，都是在第三次后续提示之后由 Claude 选出的，其中包括我们最强的结合体 Cn2-B1。应我们的要求，Claude 将蛋白质序列通过电子邮件发送给 Twist Bioscience，邮件中注明由 Claude 撰写。Twist Bioscience 随后制备这些蛋白质，以测试它们与毒素的结合能力。后来，我们与 Claude 合作又增加了 31 个设计，使总数达到 211 个。其中，60 个针对单种毒素，每种毒素 12 个；30 个针对两种 β 家族毒素；30 个针对三种 α 家族毒素；91 个针对全部五种毒素。</p>
+
+<p>在团队评估的 211 个设计中，有 17 个达到了我们的结合体标准，每个都仅针对一种毒素达标。没有任何针对多种毒素的设计，能对一种以上毒素达到我们的标准。除了受限于当前能力，Claude 在这方面遇到困难还可能有许多原因，包括我们的提示方式、现有设计工具的局限，甚至多毒素设计本身在生物学上的可行性。七个设计是 Cn2 的结合体，四个针对 AaH II，四个针对 AaH I，两个针对 LqhIII。在 60 个单毒素设计中，11 个成为达标结合体，占 18%。这一比例与典型蛋白质设计项目相符，也与我们此前的工作一致。</p>
+
+<h3>在实验室测试 Claude 的设计</h3>
+
+<p>完成这轮设计后，我们将设计交给 Adaptyv Bio 和 Twist Bioscience，测试其结合能力。两家机构都在各自实验室制备了这些设计，但采用了不同形式。Adaptyv Bio 使用无细胞系统进行表达。这种系统使用从细菌中提取的蛋白质合成机制，而非活细胞。Twist Bioscience 则在哺乳动物细胞中表达这些设计，具体使用的是人类肾细胞。它们将设计与抗体柄部 Fc 融合。这两种方式可以互补，用来测量底层的结合过程。我们将两者结合使用，以提高对结果的信心。</p>
+
+<p>两家实验室都通过表面等离子体共振（SPR）测量结合情况。在这一过程中，毒素流经设计蛋白，SPR 仪器实时追踪毒素与其结合及脱离的速度。获得的曲线称为传感图，可用于得到解离常数（K<sub>D</sub>）。这一指标衡量结合强度，也就是亲和力。K<sub>D</sub> 越低，结合越紧密。</p>
+
+<p>评估这些设计时，我们为“某种毒素的结合体”设定了严格标准。一个设计必须在两家实验室都被判为命中。<sup><a href="#fn3">3</a></sup> 也就是说，每次重复实验都必须显示它与该毒素结合，而且每一个 K<sub>D</sub> 都必须为 1 µM 或更低，即结合至少达到这一强度。我们还要求，该设计对 CLEC12A 不显示任何信号。CLEC12A 是一种无关的人类蛋白，用于检测脱靶结合或非特异性“黏附”。</p>
+
+<h3>Claude 的 Cn2 结合体很可能与一种毒素中和抗体结合在相同位点</h3>
+
+<p>抗体和纳米抗体仍是从头设计分子需要超越的标杆。已有三种这样的分子被报道对 Cn2 或 AaH II 的亲和力（K<sub>D</sub>）低于 1 nM（纳摩尔）。研究也已证明，它们能够保护小鼠免受蝎毒毒素伤害。</p>
+
+<p>我们最强的两个结合体被命名为 Cn2-B1 和 Cn2-B2。它们的靶点 Cn2 来自墨西哥蝎子 Centruroides noxius，是一种神经毒素。在 Adaptyv Bio 和 Twist Bioscience 的实验中，这两个结合体都能与 Cn2 紧密结合，亲和力（K<sub>D</sub>）处于个位数纳摩尔范围。</p>
+
+<p>要判断两个分子，例如一个抗体和一个微型蛋白，是否结合在靶点的同一位点，可以进行竞争实验。该实验检测两个结合体能否同时附着在靶点上。如果一个分子的存在降低了另一个分子的结合程度，那么它们很可能在竞争同一结合位点。</p>
+
+<p>我们的竞争实验提示，这些 Cn2 结合体各自附着的位置，与一种名为 LR 的抗体所识别的表位，即结合位点，相同或相邻。已有研究报道，LR 能在小鼠体内中和 Cn2。LR 的结合位点覆盖了 Cn2 上与钠通道连接、并导致神经异常放电的部分。我们尚未在细胞环境或活体动物中测试最强的两个结合体 Cn2-B1 和 Cn2-B2。不过，它们与 LR 发生竞争这一事实，提示它们很可能具有中和 Cn2 的能力。</p>
+
+<h3>获得结合体，只是开发抗毒液的第一步</h3>
+
+<p>我们的结果只证明了这些设计能与重组毒素结合。重组毒素是在实验室中根据每种毒素的基因制备的，并非从毒液中提纯而来。本研究最大的两项局限是：我们没有在体外，也就是实验室培养的细胞中，测试任何设计的中和作用；也没有在体内，也就是小鼠等活体动物中，测试它们的疗效。</p>
+
+<p>如果要推动其中一个设计成为疗法，Cn2-B1 将是最有力的候选之一。不过，首先需要确认它也能结合从毒液中提纯的毒素。然后，我们会通过膜片钳记录，在体外评估它的功能。膜片钳可以测量通过钠通道的电流，用于判断结合体是否阻止了毒素对通道的作用。接下来，还需要在小鼠中测试，确认它是否真的具有保护作用。除了中和毒素，一种疗法还必须安全、稳定、可负担，并能供应到发生蜇伤的地区。要让患者用上它，还需要临床医生、资助方和政策制定者的合作。</p>
+
+<p>我们将公开全部 211 个设计及其结合数据，供其他研究者在此基础上继续研究。我们希望，对 Claude 能力的这次展示，以及随之公开的数据，能帮助加快抗毒液设计领域的进一步研究。</p>
+
+<h3>延伸阅读</h3>
+<p>以下资源提供了更深入的技术内容，以及对上述结果的更详细说明：</p>
+<ul>
+<li>技术报告；</li>
+<li>数据发布：全部 211 个设计、它们的预测结构与评分，以及实验数据；</li>
+<li>我们此前关于蛋白质设计和提升生物分子建模能力的文章。</li>
+</ul>
+
+<div class="footnotes">
+<h3>脚注</h3>
+<p id="fn1"><strong>01</strong> Citrini 撰写了一篇介绍此次合作的文章，见此处。</p>
+<p id="fn2"><strong>02</strong> 我们知道，这远超大多数研究者能够获得的计算资源。另外，我们已将这些模型的平均速度提升至约原来的 4 倍。我们还表明，使用简化提示，让单个智能体在单张 GPU 上运行 24 小时，也能获得相近的计算模拟评分。</p>
+<p id="fn3"><strong>03</strong> LqhIII 仅由 Adaptyv Bio 评估。</p>
+</div>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

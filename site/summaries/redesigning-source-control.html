@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>在 Anthropic 重新设计源代码管理</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f5f3ee;
+  --card: #ffffff;
+  --ink: #242936;
+  --muted: #626b78;
+  --line: #d7dbe1;
+  --data: #175caf;
+  --risk: #af442b;
+  --opportunity: #14745c;
+  --conclusion: #7448a4;
+  --hl: #e2edfc;
+  --hl2: #eee5f8;
+  --soft-green: #e5f1eb;
+  --soft-risk: #f9eae2;
+  --hero: #202c40;
+  --hero-ink: #f1f4fa;
+  --hero-muted: #c1cde0;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f5f3ee;
+  --card: #ffffff;
+  --ink: #242936;
+  --muted: #626b78;
+  --line: #d7dbe1;
+  --data: #175caf;
+  --risk: #af442b;
+  --opportunity: #14745c;
+  --conclusion: #7448a4;
+  --hl: #e2edfc;
+  --hl2: #eee5f8;
+  --soft-green: #e5f1eb;
+  --soft-risk: #f9eae2;
+  --hero: #202c40;
+  --hero-ink: #f1f4fa;
+  --hero-muted: #c1cde0;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #141820;
+    --card: #1d2430;
+    --ink: #dce3ec;
+    --muted: #a5b0c1;
+    --line: #384355;
+    --data: #80b8ff;
+    --risk: #f09b7f;
+    --opportunity: #76d2b4;
+    --conclusion: #c6a0f1;
+    --hl: #24384f;
+    --hl2: #382b49;
+    --soft-green: #1c3630;
+    --soft-risk: #3b2a26;
+    --hero: #101b2b;
+    --hero-ink: #e0e8f3;
+    --hero-muted: #afbed4;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #141820;
+  --card: #1d2430;
+  --ink: #dce3ec;
+  --muted: #a5b0c1;
+  --line: #384355;
+  --data: #80b8ff;
+  --risk: #f09b7f;
+  --opportunity: #76d2b4;
+  --conclusion: #c6a0f1;
+  --hl: #24384f;
+  --hl2: #382b49;
+  --soft-green: #1c3630;
+  --soft-risk: #3b2a26;
+  --hero: #101b2b;
+  --hero-ink: #e0e8f3;
+  --hero-muted: #afbed4;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; line-height: 1.85; }
+main { max-width: 1120px; margin: auto; padding: 32px 24px 72px; }
+h1, h2, h3 { line-height: 1.35; }
+h1 { font-size: clamp(2rem, 5vw, 3.6rem); margin: 16px 0; letter-spacing: -.03em; }
+h2 { font-size: 1.8rem; margin-top: 0; }
+h3 { font-size: 1.2rem; }
+p { margin: 1em 0; }
+a { color: var(--data); text-underline-offset: 3px; }
+.hero { padding: 42px; background: var(--hero); color: var(--hero-ink); border-radius: 22px; }
+.eyebrow, .original-title, .meta { color: var(--hero-muted); }
+.eyebrow { font-size: .85rem; letter-spacing: .12em; }
+.original-title { font-size: 1.2rem; margin-top: 0; }
+.hero .overview { font-size: 1.18rem; max-width: 850px; }
+.hero strong { color: var(--hero-ink); }
+.meta { font-size: .9rem; }
+.metrics { display: grid; grid-template-columns: repeat(3, 1fr); margin: 28px 0 38px; border-block: 1px solid var(--line); }
+.metric { padding: 22px; }
+.metric + .metric { border-left: 1px solid var(--line); }
+.metric b { display: block; font-size: 2.1rem; color: var(--data); line-height: 1.3; }
+.metric span { display: block; color: var(--muted); font-size: .9rem; margin-top: 8px; }
+.summary-block { margin: 34px 0; }
+.table-wrap { overflow-x: auto; background: var(--card); border-radius: 12px; padding: 12px 20px; }
+table { width: 100%; border-collapse: collapse; font-size: .96rem; }
+caption { text-align: left; color: var(--muted); padding: 8px 0 16px; }
+th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--data); }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.explain { padding: 26px; background: var(--soft-green); border-top: 4px solid var(--opportunity); }
+.caution { padding: 26px; background: var(--soft-risk); border-top: 4px solid var(--risk); }
+.explain h3 { color: var(--opportunity); }
+.caution h3 { color: var(--risk); }
+.insight { border-left: 5px solid var(--conclusion); background: var(--hl2); padding: 20px 28px; font-size: 1.12rem; }
+mark { background: var(--hl); color: var(--data); padding: .06em .22em; border-radius: 3px; font-weight: 650; }
+.conclusion { color: var(--conclusion); font-weight: 650; }
+.takeaways { padding: 30px 0 12px; border-top: 2px solid var(--conclusion); }
+.takeaways ol { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 32px; padding-left: 24px; }
+.takeaways li { padding-left: 5px; }
+.takeaways li::marker { color: var(--conclusion); font-weight: 700; }
+#translation { max-width: 820px; margin: 58px auto 0; padding-top: 36px; border-top: 1px solid var(--line); font-size: 1.03rem; }
+#translation h2 { color: var(--conclusion); }
+#translation h3 { margin-top: 2.3em; font-size: 1.5rem; }
+#translation h4 { margin-top: 1.8em; font-size: 1.2rem; }
+.source-meta { color: var(--muted); font-size: .9rem; border-bottom: 1px solid var(--line); padding-bottom: 18px; }
+.source-figure { margin: 32px 0; padding: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
+.source-figure img { display: block; width: 100%; height: auto; }
+figcaption { color: var(--muted); font-size: .9rem; text-align: center; margin-top: 10px; }
+#translation li { margin: 18px 0; }
+code { font-size: .92em; color: var(--data); overflow-wrap: anywhere; }
+.footnotes { font-size: .93rem; color: var(--muted); }
+@media (max-width: 680px) {
+  main { padding: 16px 16px 48px; }
+  .hero { padding: 26px 22px; }
+  .metrics, .split, .takeaways ol { grid-template-columns: 1fr; }
+  .metric + .metric { border-left: 0; border-top: 1px solid var(--line); }
+  .metric { padding: 18px 8px; }
+  th, td { padding: 10px 8px; }
+  .table-wrap { padding: 8px; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/redesigning-source-control" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header class="hero">
+<div class="eyebrow">ANTHROPIC · RESEARCH</div>
+<h1>在 Anthropic 重新设计源代码管理</h1>
+<p class="original-title">Redesigning source control at Anthropic</p>
+<p class="meta">2026 年 10 月 13 日 · <a href="https://www.anthropic.com/research/redesigning-source-control">原文</a></p>
+<p class="overview"><strong>一句话总括：</strong>Anthropic 用 Scion 展示了一种面向大规模 AI 编码的源代码管理架构：把计算移到服务端，让客户端只获取所需数据，并重新安排审查、测试与运维工作。</p>
+</header>
+<section aria-label="中文总结">
+<div class="metrics">
+<div class="metric"><b>30,000+</b><span>2026 年 9 月每天合入的代码变更数；5 月约为 2,500 次。</span></div>
+<div class="metric"><b>7 人 · 5 个月</b><span>完成 Scion、Antique、相关系统及全面迁移。</span></div>
+<div class="metric"><b>约 1/200</b><span>Scion 相对此前 git 镜像设施的 CPU 和内存需求。</span></div>
+</div>
+<div class="summary-block">
+<h2>代码生产提速后，基础设施成为瓶颈</h2>
+<p>Anthropic 的主分支历史接近 <mark>100 GB</mark>，压缩后的工作副本超过 <mark>25 GB</mark>。仅 CI 每天就要执行约 <mark>2,500 万次</mark>代码检出。按最直接的方式获取，git 每日流量将超过 <mark>600 PB</mark>。</p>
+<p>团队曾运行数百个内部 git 镜像，也使用了浅克隆、稀疏检出和仓库快照。随着合入速度上升，维护这些方案越来越困难。<span class="conclusion">AI 的影响因此不止是减少写代码的时间，也会放大检出、历史查询和合入流程的成本。</span></p>
+</div>
+<div class="summary-block split">
+<article class="explain">
+<h3>始终在线，让客户端可以更轻</h3>
+<p>Scion 假定客户端始终在线。历史查询、提交、合并和变基由服务端执行。客户端维护有容量上限的缓存，并按需获取文件。</p>
+<p>所有查询也通过 API 提供。许多 CI 任务无需创建工作副本。<strong>减少必须传输和落盘的数据，是扩展能力的核心。</strong></p>
+</article>
+<article class="caution">
+<h3>换取规模，需要放弃部分通用性</h3>
+<p>Scion 与 git 差异很大，需要配套的代码审查、搜索和 CI。它主要适合超大单体仓库，以及数万名工程师或大量智能体持续产出代码的场景。</p>
+<p>Anthropic 的内部 token 使用能力也很特殊。<strong>这些结果不能直接推及普通团队。</strong></p>
+</article>
+</div>
+<div class="summary-block">
+<h2>收益来自数据结构、缓存与协议的共同调整</h2>
+<p>Scion 以只记录变更文件的 changeset 为基础，再按需生成历史查询等派生数据。客户端只请求缺失且需要的对象。不可变对象可以由多级缓存直接提供。</p>
+<div class="table-wrap">
+<table>
+<caption>原文报告的规模与性能数据；均为 Anthropic 内部场景，比较范围各不相同。</caption>
+<thead><tr><th>指标与范围</th><th>原文数据</th><th>实际意义</th></tr></thead>
+<tbody>
+<tr><td>每日合入变更，2026 年 5 月至 9 月</td><td>约 2,500 次 → 超过 30,000 次</td><td>源代码管理必须承受持续增长的写入负载。</td></tr>
+<tr><td>Scion 各级缓存命中率</td><td>均超过 99%</td><td>大部分请求无需访问上游服务。</td></tr>
+<tr><td>基础设施 CPU 和内存需求，相对此前 git 镜像</td><td>降至约 1/200</td><td>改变数据获取方式大幅降低了资源需求。</td></tr>
+<tr><td>CI 与研究任务的代码检出</td><td>提速两个数量级；分钟级 → 秒级</td><td>任务等待时间减少，并释放计算资源。</td></tr>
+<tr><td>CI 的 CPU 容量收益</td><td>25%</td><td>源代码管理优化也能改善下游资源利用。</td></tr>
+<tr><td>Claude Mythos Preview 重写导入管线</td><td>内存用量降至 1/20；速度达到 4 倍</td><td>模型同时推动负载增长和基础设施优化。</td></tr>
+</tbody>
+</table>
+</div>
+<p class="conclusion">这一案例说明，支撑 AI 编码的成本并非只能靠增加机器来消化，也可以通过改变数据流和计算位置来降低。</p>
+</div>
+<div class="summary-block insight">
+<h3>工程师的重点转向约束、意图和取舍</h3>
+<p>团队仍然审查每个变更请求，但更关注变更意图，而不是逐行阅读。工程师需要阻止智能体违反系统约束，也要避免对假设性风险进行过度设计。</p>
+<p>模型能大量编写测试、寻找优化和监控组件。<strong>人对系统边界和关键取舍的判断，仍是这套工作方式的重要前提。</strong></p>
+</div>
+<div class="summary-block split">
+<article class="caution">
+<h3>高并发合入，改变了测试的时间位置</h3>
+<p>测试运行期间，可能已有数百乃至数千项变更合入。团队未能有效采用合入队列的全仓库锁机制，转而投入合入后和部署前的自动化测试。</p>
+<p>并发变更仍可能冲突。原文称 Claude 通常能很快修复。<strong>这是一项明确的流程取舍，并不意味着冲突消失。</strong></p>
+</article>
+<article class="explain">
+<h3>更可推广的是设计经验，而非整套产品</h3>
+<p>作者预计，这类问题在未来 <mark>6 至 12 个月</mark>会更常见。可供 git 平台借鉴的方向包括服务端 RPC、新服务器架构，以及更好组合的稀疏和浅克隆能力。</p>
+<p><strong>现有生态可以吸收部分优化，不一定要全面迁移到 Scion。</strong></p>
+</article>
+</div>
+<div class="takeaways">
+<h2>最值得带走的洞见</h2>
+<ol>
+<li><strong>瓶颈会迁移。</strong>写代码更快之后，仓库、构建和 CI 的吞吐能力更加重要。</li>
+<li><strong>工作负载决定架构。</strong>大量始终在线的智能体，为服务端计算和按需取数提供了条件。</li>
+<li><strong>工程判断仍不可替代。</strong>系统约束、设计取舍和变更意图，需要工程师持续把关。</li>
+<li><strong>借鉴应有边界。</strong>Scion 的内部收益很显著，但其适用规模、配套系统和 token 投入都具有特殊性。</li>
+</ol>
+</div>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<div class="source-meta">
+<p>发布</p>
+<p>团队</p>
+<p>工程</p>
+<p>主题</p>
+<p>编程</p>
+<p>智能体</p>
+<p>生产力</p>
+<p>Claude Code</p>
+<p>10 月 15 日更新，补充介绍了率先采用 Scion 所用多项技术的项目。</p>
+<p>产品</p>
+<p>2026 年 2 月 23 日</p>
+</div>
+<p>在 Anthropic，编写代码已不再是构建系统或开展研究的瓶颈。Claude 能够自主迭代研究流程，对复杂程序做细粒度优化，还能从零搭建新服务。它完成这些工作的速度和规模，都是我们前所未见的。如今的瓶颈，是整套按照人类工作规模设计的开发者基础设施：源代码管理、构建和 CI。</p>
+<p>2026 年 5 月，Anthropic 每天平均合入约 2,500 项代码变更。到了 9 月，每天合入的变更已超过 30,000 项。我们预计，这一增长速度短期内不会放缓。合入代码的潜在需求几乎没有上限。每消除一个瓶颈，代码产出量就会立即进一步增加。</p>
+<figure class="source-figure" data-source-image="0"><img alt="" decoding="async" height="2160" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/1e2a750dba61db4a76b72eec5b0cf50b8a7f878c-3840x2160.png" width="3840"/>
+<figcaption>2026 年 1 月至 9 月，每天合入我们单体仓库的变更数量。</figcaption>
+</figure>
+<p>为了支撑这种增长，我们开发了内部版本控制系统 Scion，并在五个月内将单体仓库从 git 全面迁移过去。同一时期，我们还开发并上线了名为 Antique 的代码审查界面、代码搜索功能、功能丰富的源代码管理身份与访问管理（IAM）系统，以及管理和合入大量已审查代码的新方法等。本文将重点介绍 Scion 的开发过程。这是一个很有意思的案例：Claude 的编程能力既是我们最初面临这一局面的原因，也帮助我们迅速构建出高质量、可扩展的系统来应对它。</p>
+<h3>不断增长的单体仓库</h3>
+<p>在介绍我们构建的系统之前，需要先说明，我们的工作负载非常特殊。毫不意外，Anthropic 使用 Claude 编写软件的程度远超几乎所有其他公司。因此，我们往往最先发现，那些面向人类工作规模设计的工具会在哪些地方开始吃力。源代码管理只是其中一个例子。我们预计，短期内不会有很多组织遇到这些问题。但我们也认为，其他使用 AI 编码工具的组织，可能用不了多久就会遇到同样的压力。因此，我们希望分享自己的系统和经验。</p>
+<p>Git 是一个去中心化系统。每个克隆都是完整、独立的仓库。即使完全离线，也能计算差异、读取历史记录和逐行追溯信息（blame），并检出任意修订版本。对绝大多数仓库而言，这种设计是合适的。这也是 git 成为标准的重要原因。</p>
+<p>随着单体仓库不断增长，我们的情况越来越不适合这种设计。仅主分支的历史记录就接近 100 GB，压缩后的工作副本也超过 25 GB。仅 CI 每天就执行约 2,500 万次代码检出。这还没有计算开发环境、智能体沙箱和研究任务。如果采用最直接的获取方式，每天产生的 git 流量将超过 600 PB。</p>
+<p>Git 提供了一些只处理仓库一部分内容的工具，例如浅克隆、稀疏检出和 promisor remotes。除此之外，超大单体仓库还有一些常见的应对方案，例如内部 git 镜像，以及存放在 blob 存储中的仓库快照，也称为 seeds。我们全都用过。高峰时期，我们运行了数百个内部 git 镜像来承受负载。这些方案为我们争取了时间。但随着合入速度上升，运维难度也越来越大。在两次刷新之间，seeds 与 main 最新版本的距离不断拉大。要让 diff 和 blame 等依赖历史记录的操作在部分克隆上正常运行，也需要越来越精细的维护。</p>
+<figure class="source-figure" data-source-image="1"><img alt="" decoding="async" height="1238" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/ff019752973f6d83d2f6ba3bf56636aced3ea82c-3840x1238.png" width="3840"/>
+<figcaption>扩展 git 检出能力的典型架构。</figcaption>
+</figure>
+<p>退一步看，我们发现，和大多数公司一样，我们实际上把 git 当作只有一份权威副本的中心化系统来使用。然而，几乎所有客户端都是智能体和任务，它们本来就必须在线。让 git 擅长分布式、离线工作的那些特性，反而随着仓库增长，开始妨碍我们的扩展能力。于是我们问自己：如果从一开始就以智能体始终在线这一事实为前提，源代码管理应该是什么样子？</p>
+<h3>面向智能体规模的源代码管理原则</h3>
+<p>随着智能体编程的发展，人们对软件开发方式的许多常见假设都在变化。构建 Scion 时，我们主动接受了这些变化。这让我们能够在若干核心原则上，采取与 git 根本不同的做法。超大单体仓库的源代码管理已有先例，尤其是 Google 的 Piper 和 Meta 的 Sapling<sup><a href="#fn02">2</a></sup>。因此，我们可以在构建 Scion 时借鉴它们来之不易的经验。我们的原则如下：</p>
+<ul>
+<li>
+<p><strong>客户端始终在线。</strong>Git 假设客户端会离线工作，因此需要一份完整的仓库副本。我们的客户端几乎全是智能体和任务。因此，Scion 的客户端与协议围绕始终可访问的服务端设计，让客户端在需要时再获取数据。</p>
+</li>
+<li>
+<p><strong>客户端与服务端不对称。</strong>在 git 中，每个客户端都有能力成为功能完整的服务端。在 Scion 中，服务端负责回答文件历史和 blame 查询、创建提交、执行合并与变基等操作。客户端则维护有容量上限的本地对象缓存，将工作副本文件写入磁盘，监控文件系统变更，并为用户提供便捷的服务端交互方式。客户端自身能完成的计算很少。但作为交换，它需要保存在本地的数据也少得多。</p>
+</li>
+<li>
+<p><strong>全面的源代码管理服务可以支撑许多新应用。</strong>使用 git 时，如果 CI 任务或工具需要查询仓库信息，例如某一行最后由谁修改，或两次提交之间有什么关系，就必须维护一份本地仓库副本。否则，就只能寄希望于供应商专有的 API 能提供答案。在 Scion 中，客户端使用的所有源代码查询能力也都通过 API 开放。因此，许多任务根本不需要本地仓库。没有这种低成本的程序化访问能力，我们的许多内部工具就无法在大规模场景下实用运行，例如自动二分定位和自动回退管线。</p>
+</li>
+<li>
+<p><strong>所有部分都必须能够水平扩展。</strong>高峰时期，我们运行了数百个 git 镜像，这给容量带来了巨大压力。一旦仓库超过镜像的磁盘或内存上限，这种方式就无法继续扩展。Scion 将仓库数据分布存储，每个组件都能独立扩展。系统中任何位置都不存在一份完整物化的仓库副本，服务端也不例外。Scion 没有相当于 packfiles 的结构。packfiles 是 git 将对象压缩后打包形成的文件。由于没有这种结构，Scion 也不需要进行仓库维护。</p>
+</li>
+<li>
+<p><strong>提交必须成本低、可增量处理，而且无锁。</strong>在 git 中，先在本地提交，再通过推送分享工作。在 Scion 中，每次提交、变基或合并都发生在服务端，因此没有需要推送的内容。但这些操作都必须足够快。创建提交并更新其下游数据结构的成本，必须随变更规模增长，而不能随整个仓库的规模增长。否则，服务端就无法跟上。除 main ref 或发布分支外，Scion 的开发流程不鼓励使用 refs，也就是分支和标签等指向提交的引用。原因是，要求所有服务器达成一致的全局状态，会成为潜在的扩展难题。</p>
+</li>
+<li>
+<p><strong>工作副本是可选的，而且从设计之初就支持稀疏检出。</strong>我们的单体仓库非常大，CI 每天又需要检出数千万次代码。因此，我们希望尽可能避免检出。例如，一个 CI 任务需要获取某次提交与其合并基点之间的差异，在 Scion 中可以直接向服务端请求。写入也是如此。许多写入工作负载同样可以跳过检出，完全通过 API 运行。Scion 协议以稀疏检出和虚拟化检出为核心。前者只包含客户端请求的目录，后者按需生成文件。因此，当任务确实需要磁盘上的文件时，客户端只需为它实际读取的内容付出成本。</p>
+</li>
+</ul>
+<h3>Scion 如何工作</h3>
+<p>理解这些原则在构建 Scion 时如何落地，会很有帮助。这些经验可以用于其他源代码管理系统，也可以推广到软件开发生命周期中的其他阶段。</p>
+<h4>数据结构</h4>
+<p>在 Scion 中，工作单元是“变更集”（changeset），也就是预写日志中的一条记录。changeset 保存了 git 提交通常应有的大部分信息。但 git 提交存储的是指向树的指针，而 changeset 存储的是相对于第一个父提交发生变化的文件列表<sup><a href="#fn01">1</a></sup>。它还保存基于内容寻址的指针，指向 blob 存储中经过压缩的文件内容。changeset 在服务端创建，随后立即在所有位置可用。</p>
+<figure class="source-figure" data-source-image="2"><img alt="" decoding="async" height="2995" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/71c83868210b4b571abb068ea4cd76de749566b1-3840x2995.png" width="3840"/>
+<figcaption>Scion 中 changeset 的结构。</figcaption>
+</figure>
+<p>这种结构让我们能以很高的吞吐量接收 changeset。系统不需要接收 packfiles，不需要锁或跨服务器协调，也不需要移动 refs。严格来说，Scion 确实支持 refs。但创建和获取提交都不涉及它们。因此，移动一个 ref 只需对 Spanner 中的一行执行比较并交换（compare-and-swap）操作。这项操作与创建 changeset 分开进行。</p>
+<p>changeset 只记录发生了什么变化。因此，仅靠它本身，无法快速回答某一行最后由谁编辑、哪些提交影响了某个文件等问题。为回答这些问题，Scion 会根据 changeset 构建额外的数据结构，包括用于文件 blame 和路径历史的专用结构，以及用于提交图的跳表。我们把不直接属于 changeset 的所有内容称为“派生数据”，并通过同一套通用机制计算它们。每一种派生数据都采用递归定义。因此，某个 changeset 对应的派生数据值，由其父 changeset 对应的值计算而来。</p>
+<p>这套机制有三个好处。第一，如果一种新的数据结构能加快某项操作，我们就可以轻松增加一种派生数据。第二，对于每种派生数据，我们可以选择立即计算，也可以推迟处理，从而避免物化不需要的数据。第三，客户端从来看不到这些数据结构的内部细节。因此，我们可以优化它们，而不必修改客户端。随着系统发展，我们多次增加新的派生数据类型，例如用于检测复制关系或按路径搜索文件的新索引。</p>
+<h4>扩展 Scion</h4>
+<p>一个规模不大的 Scion 服务器集群，为客户端所需的所有操作提供源代码管理 API，例如获取 changeset、计算差异、寻找合并基点和获取 blob。所有源代码管理数据都采用内容寻址。因此，一份数据存储后就不会再改变，任何服务器都可以缓存它，无需与其他服务器核对。由此，服务器可以水平扩展，只需要很少的协调。它们本质上是大型缓存，同时还能即时计算派生数据，并将结果写回 Spanner。</p>
+<p>Scion 的众多使用方不再需要维护各自的本地仓库。过去，需要查询源代码管理信息的 CI 任务或工具，必须承担获取和维护仓库的繁重工作。涉及提交祖先关系和 blame 时，情况尤其如此。迁移早期，我们还没有自己的客户端、仓库格式和协议。那时，Scion 只回答这些“元数据”查询。获取文件内容和生成工作副本的数据密集程度要高得多，需要另外设计。</p>
+<p>Scion 的 <code>scn</code> 客户端在几个重要方面偏离了 git 的获取协议。因此，它更适合一种高度可扩展的架构，所需 CPU 资源也显著少于 git 服务器。Scion 的协商过程不会告诉服务端，客户端已经拥有什么。相反，它只围绕客户端需要的树和 blob 进行。从根树开始，客户端先检查本地存储中缺少哪些树，再递归请求这些树。随后，它对 blob 重复同样的过程。每个请求都针对一个不会改变的特定对象。因此，任何缓存都能响应，整个架构与传统分层缓存非常相似。由于不存在单个数 GB 大小的 packfile 响应，这一过程也很高效，并且可以中断后继续。稀疏检出乃至虚拟化检出都不需要特殊支持，因为客户端不会请求自己不需要的树。</p>
+<p>在计算集群中，客户端通过套接字与名为 <code>scion-daemon</code> 的守护进程通信。该进程为整个节点存储对象。我们的大多数节点都需要访问单体仓库，而同一节点上的任务会重复使用大部分相同对象。每个守护进程都从定期刷新的快照启动。之后，它只与所在区域的树和 blob 缓存服务器通信，这些服务器称为 <code>scion-cache</code>。缓存服务器直接从内存流式传输对象，使用的就是守护进程最终消费的磁盘格式。因此，它们不必花时间计算客户端缺少哪些对象，也不必进行增量压缩。缓存缺少某个对象时，会向权威的 <code>scion-servers</code> 请求。这些服务器再根据需要从 Spanner 或云存储读取数据。</p>
+<p><code>scion-daemon</code>、<code>scion-cache</code> 和 <code>scion-server</code> 都响应这一协议中的同一组 RPC。因此，客户端无需了解缓存拓扑。理论上，任何层级都可以与其他任意层级通信。但我们严格执行分层规则，以隔离故障域。我们希望避免某个区域的 <code>scion-cache</code> 故障后，流量压垮上游 <code>scion-servers</code>，进而拖垮整个系统。</p>
+<figure class="source-figure" data-source-image="3"><img alt="" decoding="async" height="1718" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/cba1eaaa67385fd00f210badaacd147de480120b-3840x1718.png" width="3840"/>
+<figcaption>Scion 的检出架构。</figcaption>
+</figure>
+<p>这套系统每一层的缓存命中率都超过 99%，而且不需要长期保留的状态。因此，必要时很容易扩容。按 CPU 和内存需求计算，我们现在的 Scion 基础设施规模，只有此前 git 镜像基础设施的约 1/200。CI 和研究任务检出代码的速度提高了两个数量级，从分钟级缩短到秒级。这为整个计算集群释放了可观的容量。仅 CI 就获得了 25% 的 CPU 容量收益。客户端和缓存都不需要进行仓库维护，也简化了任务的生命周期管理。</p>
+<h3>构建 Scion 的收获</h3>
+<p>我们开始构建 Scion 的时间，与 Claude Mythos Preview 和 Claude Tag 在内部可用的时间大致相同。这两个版本都进一步加大了我们对 Scion 的需求，同时也显著加快了开发速度。</p>
+<p>有一个例子尤其令人印象深刻。今年早些时候，我们主要靠手工编写了第一版从 git 导入 Scion 的管线，作为原型。我们当时觉得它已经很好了。直到拿到 Claude Mythos Preview 的早期内部快照后，这个看法才改变。我们让它重写整个管线，没有给出进一步指示。它生成的版本，内存用量只有原来的 1/20，速度达到原来的 4 倍。同时，它保留了导入顺序和数据结构方面所有隐含的不变条件。</p>
+<p>构建和运营 Scion 的经验，为面向智能体规模的软件开发提供了一些有趣的启示。</p>
+<p><strong>小团队快速开发会变得更加常见。</strong>一个七人团队同时构建了 Scion 和 Antique。Antique 是我们的代码审查工具，完全值得另写一整篇博客介绍。除此之外，团队还构建了六个相关系统，并在五个月内完成全面迁移。在这一过程中，每天合入的代码量还增长到了原来的 10 倍。过去，开发和部署这样的源代码管理系统，往往需要公司投入更多工程师，并用数年时间迭代迁移。我们认为，未来这种快速、灵活的迁移会更常见。</p>
+<figure class="source-figure" data-source-image="4"><img alt="" decoding="async" height="2160" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/dd91296719203f38229824bb9bc9e9a61c76ed67-3840x2160.png" width="3840"/>
+<figcaption>2026 年 1 月至 9 月，每周合入 Scion 和 Antique 代码库的变更数量。</figcaption>
+</figure>
+<p><strong>工程师的价值没有降低，但工作正在改变。</strong>参与这个系统的所有工程师，如今都会认为 Claude 比自己更擅长写代码。但工程师仍然提供了不可或缺的理解，包括系统间高层组件的关系，以及设计层面的取舍。他们会围绕我们要解决的问题，以及明确需要达到的规模，作出有依据的选择。我们经常发现，工程师的职责是对 Claude 说“不”。</p>
+<p>智能体有时会为了满足一种本就不该允许的模式，而违反系统的核心约束。这在迁移期间尤其常见。例如，多个系统曾试图通过线性读取提交日志，强行查找某项变更何时合入 main，而不是向代码审查工具查询。</p>
+<p>Anthropic 还广泛使用对抗式审查。它在许多方面非常有效，但有时也会陷入局部视角。因此，需要经验丰富的工程师引导 Claude，避免它为了回应假设性的担忧，对系统的某些部分进行过度设计。例如，一次审查对信任另一个内部服务表现得过于防御，导致 Claude 增加了过多的校验和复杂性。团队成员仍然审查系统的每一个变更请求。但现在，他们检查的是变更的意图，而不是逐行阅读代码。</p>
+<p><strong>我们能够显著提升优化程度和质量。</strong>Claude 编写大量代码的速度远超我们自己。因此，Scion 是我们参与过的代码库中，测试最充分、防护最周全的项目之一。即便时间紧张，我们仍然为遇到过的每一种非简单基础设施交互和源代码管理交互，构建了与外部环境隔离的模拟。我们还加入了模糊测试和精细的限流机制。Claude 也常常顺手发现重要优化。例如，一项祖先关系查询的算法优化，解决了未利用我们某个索引的问题。这原本可能需要专家分析和调优数天乃至数周。到了第二天，它又完成了类似的工作。</p>
+<figure class="source-figure" data-source-image="5"><img alt="" decoding="async" height="4684" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/c706fa6efb4b9e5cd2566cb080acbfce7218042d-3840x4684.png" width="3840"/>
+<figcaption>在原生 Scion 仓库中观察到的性能提升。</figcaption>
+</figure>
+<p><strong>我们为单体仓库的新型安全能力奠定了基础。</strong>在超大单体仓库中，管理安全性、信息安全与合规，和管理体量及规模同样重要。从构建 Scion 之初，我们就考虑了这些问题。它支持丰富的仓库访问控制，也支持为单个目录设置权限。这让我们可以保护最敏感的代码，同时保留单体仓库的好处。此外，我们构建的代码审查工具，可以为批准流程表达复杂的语义约束。这让我们能够区分只修改注释等简单变更，与涉及敏感逻辑的变更。人工审查者因此可以专注于影响最重大的变更。</p>
+<p><strong>运维可以达到新的水平。</strong>我们的团队大量使用 Claude Tag。它帮助我们监控系统中的每个组件。例如，我们创建了一些 Slack 频道，要求 Claude 极其专注地关注某一个组件的健康状况。我们把这些 Claude 称为“超级粉丝”（superfans）。我们有关注 <code>scion-daemon</code> 的超级粉丝、关注 <code>scion-cache</code> 的超级粉丝、关注 Antique 合入队列的超级粉丝，等等。它们可以访问遥测数据和日志，就像一位经验丰富的工程师，专门不断刷新图表、寻找异常。我们的所有系统也都有传统告警。但这些超级粉丝能够发现细微而新颖的问题。相比之下，传统告警显得很单一。</p>
+<p><strong>我们正在彻底重新审视原有假设。</strong>这个项目促使我们认真检查其他按照人类工作规模设计的流程。例如，在智能体规模下，一套标准的合入队列并不太合理。当测试运行期间可能有数百乃至数千项变更合入时，CI 究竟意味着什么？我们一直未能有效采用行业标准做法，也就是在合入队列上使用全仓库锁。因此，我们转而投入合入后和部署前的自动化测试。这确实意味着并发变更可能产生冲突。但通常，Claude 修复这些冲突的速度，比人类发现它们的速度还快。</p>
+<h3>为更广泛的生态作贡献</h3>
+<p>能力不断增强的 AI 智能体带来了扩展方面的挑战。我们认为，Scion 只是答案的一部分。我们分享这些细节，是希望提供一个团队如何应对类似挑战的实例。不过，我们并不认为自己的方案或考量适合所有情况。</p>
+<p>Scion 绝不是适合通用场景的 git 替代品。我们在这里介绍的理念，实际上只对极其庞大的单体仓库有意义。这类仓库可能服务于数万名工程师，也可能服务于大量持续产出代码的智能体。此外，Anthropic 还有一项特殊之处：我们在内部使用中能够投入的 token，远超其他企业现实中愿意承担的水平。这样做既是为了满足自身的软件开发需求，也是为了测试 Claude 的能力。</p>
+<p>从实际角度看，很难把 Scion 以一种对其他组织普遍有用的形式提供出去。它与 git 差异很大。这意味着企业需要迁移开发生命周期中的每一个环节，而且它还需要自己的代码审查、代码搜索和 CI。我们内部的这些组件都经过高度定制，其他组织很难直接采用。我们也担心，如果试图构建一个满足所有人的公开版本，最终可能并没有多大用处。</p>
+<p>不过，我们预计，未来 6 至 12 个月，这类问题会变得更加普遍。如果每一家使用 git 的公司都独自应对类似挑战，就会浪费工程资源。因此，我们认为，最有影响力的做法是分享自己的思考。这样，其他开发者就能把 Scion 中一些最成功的部分应用到 git 上，而不必偏离 git 的整体模型。</p>
+<p>Git 服务端不必与 git 客户端采用相同的工作方式。已经有一些新的服务端架构，能够显著提升扩展能力。Git 平台可以像 Scion 一样提供全面的服务端 RPC。甚至可以在不同代码托管平台之间将其标准化，让 git 客户端学会与之通信。协商协议也不必完全保持今天的样子。Git 中各种稀疏和浅克隆功能，也可以更好地组合使用。</p>
+<p>最后，我们希望感谢 git 社区。近二十年来，社区一直在扩展这个平台，为数百万开发者提供支持。我们的贡献要窄得多：分享我们较早观察到的、智能体软件开发与这些系统相互作用的情况。借此，我们希望与 GitHub、GitLab 和 OSS 社区合作，满足开发者不断变化的需求。当软件开发生命周期与 AI 的指数级增长交汇时，我们都身处其中。</p>
+<h3>脚注</h3>
+<div class="footnotes">
+<p id="fn01"><strong>01</strong> 相对于合并的第一个父提交存储变更文件，是一种设计风格上的选择。实践中我们发现，在单体仓库中采用主干开发时，人们只关心主线上提交的历史或 blame 信息。</p>
+<p id="fn02"><strong>02</strong> 具体来说，是 Sapling 的服务端组件 Mononoke。Scion 使用的许多技术都由它率先采用，尤其是 Bonsai 数据模型。</p>
+</div>
+<h3>作者与致谢</h3>
+<h4>致谢</h4>
+<p>本文由 Nick G. 与源代码管理团队撰写。团队成员包括 S.G.、R.K.、Dan C.、Garrett H.、Ben L.、Colin M. 和 Joe P.。感谢 Vilas J. 和 Sergiu D. 在这段雄心勃勃的历程中支持源代码管理团队。也感谢 Amir O. 对 Antique 的早期贡献。</p>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

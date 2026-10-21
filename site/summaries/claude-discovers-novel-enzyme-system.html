@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Claude 发现带有类 CRISPR 重复序列的新型酶系统</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f6f4ef;
+  --card: #ffffff;
+  --ink: #202a35;
+  --muted: #626d79;
+  --line: #d6dcdF;
+  --data: #155ab0;
+  --risk: #a14c23;
+  --opportunity: #157464;
+  --conclusion: #7242a8;
+  --hl: #e3eefc;
+  --hl2: #e7f2ed;
+  --risk-bg: #fcf0e5;
+  --conclusion-bg: #eee8f7;
+  --hero: #182b3c;
+  --hero-ink: #eff4fa;
+  --hero-muted: #b9cbdc;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f6f4ef;
+  --card: #ffffff;
+  --ink: #202a35;
+  --muted: #626d79;
+  --line: #d6dcdf;
+  --data: #155ab0;
+  --risk: #a14c23;
+  --opportunity: #157464;
+  --conclusion: #7242a8;
+  --hl: #e3eefc;
+  --hl2: #e7f2ed;
+  --risk-bg: #fcf0e5;
+  --conclusion-bg: #eee8f7;
+  --hero: #182b3c;
+  --hero-ink: #eff4fa;
+  --hero-muted: #b9cbdc;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #111820;
+    --card: #19232d;
+    --ink: #dde5ee;
+    --muted: #a5b1bd;
+    --line: #354451;
+    --data: #7eb8ff;
+    --risk: #f2ac79;
+    --opportunity: #6dd5b7;
+    --conclusion: #c4a0f3;
+    --hl: #1c3450;
+    --hl2: #193a33;
+    --risk-bg: #392a22;
+    --conclusion-bg: #30263f;
+    --hero: #172737;
+    --hero-ink: #e2ebf4;
+    --hero-muted: #acbfd2;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #111820;
+  --card: #19232d;
+  --ink: #dde5ee;
+  --muted: #a5b1bd;
+  --line: #354451;
+  --data: #7eb8ff;
+  --risk: #f2ac79;
+  --opportunity: #6dd5b7;
+  --conclusion: #c4a0f3;
+  --hl: #1c3450;
+  --hl2: #193a33;
+  --risk-bg: #392a22;
+  --conclusion-bg: #30263f;
+  --hero: #172737;
+  --hero-ink: #e2ebf4;
+  --hero-muted: #acbfd2;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif; line-height: 1.85; }
+main { max-width: 1080px; margin: auto; padding: 36px 24px 72px; }
+.hero { padding: 44px; background: var(--hero); color: var(--hero-ink); border-radius: 18px; }
+.eyebrow { font-size: .8rem; letter-spacing: .12em; color: var(--hero-muted); }
+h1 { font-size: clamp(2rem, 4vw, 3.1rem); line-height: 1.3; margin: 16px 0; }
+.original-title { font-size: 1.08rem; line-height: 1.5; color: var(--hero-muted); }
+.hero .overview { font-size: 1.17rem; margin: 28px 0 0; }
+h2 { font-size: 1.7rem; line-height: 1.45; margin: 0 0 20px; }
+h3 { font-size: 1.2rem; line-height: 1.5; margin: 0 0 12px; }
+p { margin: 0 0 18px; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 30px 10px; border-bottom: 1px solid var(--line); }
+.stat { border-left: 3px solid var(--data); padding-left: 18px; }
+.stat strong { display: block; color: var(--data); font-size: 2rem; line-height: 1.4; }
+.stat span, .note { color: var(--muted); font-size: .92rem; }
+.summary-block { margin: 34px 0; }
+.table-wrap { overflow-x: auto; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+table { width: 100%; border-collapse: collapse; text-align: left; }
+th, td { padding: 15px 18px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--data); background: var(--hl); font-size: .95rem; }
+tr:last-child td { border-bottom: 0; }
+td strong { color: var(--data); }
+.note { margin-top: 10px; }
+mark { color: var(--data); background: var(--hl); padding: 1px 5px; border-radius: 4px; font-weight: 650; }
+mark.green { color: var(--opportunity); background: var(--hl2); }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.finding { border-top: 4px solid var(--opportunity); padding: 24px; background: var(--hl2); }
+.limit { border-top: 4px solid var(--risk); padding: 24px; background: var(--risk-bg); }
+.finding h3 { color: var(--opportunity); }
+.limit h3 { color: var(--risk); }
+.flow { padding: 26px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.flow ol { padding-left: 24px; }
+.flow li { margin: 12px 0; }
+.insight { padding: 25px 28px; border-left: 5px solid var(--conclusion); background: var(--conclusion-bg); }
+.insight h3 { color: var(--conclusion); }
+.takeaways { margin: 36px 0 54px; }
+.takeaways ul { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 0; list-style: none; }
+.takeaways li { padding: 18px 20px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
+.takeaways li strong { color: var(--conclusion); }
+#translation { max-width: 800px; margin: auto; padding-top: 40px; border-top: 3px solid var(--line); font-size: 1.04rem; line-height: 1.95; }
+#translation h2 { margin-bottom: 28px; }
+#translation h3 { margin-top: 42px; font-size: 1.45rem; }
+#translation p { margin-bottom: 22px; }
+.source-frontmatter { color: var(--muted); font-size: .9rem; border-bottom: 1px solid var(--line); padding-bottom: 20px; margin-bottom: 28px; }
+.source-frontmatter p { margin: 3px 0 !important; }
+blockquote { margin: 26px 0; padding: 15px 24px; border-left: 4px solid var(--conclusion); background: var(--conclusion-bg); }
+blockquote p:last-child { margin-bottom: 0 !important; }
+.source-figure { margin: 36px 0; }
+.source-figure img { display: block; max-width: 100%; height: auto; margin: auto; }
+figcaption { margin-top: 12px; padding-left: 14px; border-left: 2px solid var(--line); font-size: .9rem; line-height: 1.6; color: var(--muted); }
+a { color: var(--data); text-underline-offset: 3px; }
+@media (max-width: 650px) {
+  main { padding: 18px 16px 44px; }
+  .hero { padding: 28px 24px; }
+  .stats { gap: 12px; }
+  .stat { padding-left: 10px; }
+  .stat strong { font-size: 1.5rem; }
+  .split, .takeaways ul { grid-template-columns: 1fr; }
+  th, td { padding: 12px; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/claude-discovers-novel-enzyme-system" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header class="hero">
+<div class="eyebrow">Anthropic · Research · 研究总结与完整译文</div>
+<h1>Claude 发现带有类 CRISPR 重复序列的新型酶系统</h1>
+<p class="original-title" lang="en">Claude discovers a novel enzyme system with CRISPR-like repeats</p>
+<p class="overview"><strong>一句话总括：</strong>这项研究展示了 Claude 如何在研究人员给定的大方向下，从海量 DNA 数据中识别出此前未被描述的系统特征，并将发现推进到人工实验验证阶段。</p>
+</header>
+<div aria-label="本次数据库搜索的规模" class="stats">
+<div class="stat"><strong>21 小时</strong><span>搜索数据所用时间</span></div>
+<div class="stat"><strong>约 950 个</strong><span>参与搜索的智能体</span></div>
+<div class="stat"><strong>2.1 亿</strong><span>使用的 token 数</span></div>
+</div>
+<section class="summary-block">
+<h2>从超过 20 万个 RT 中筛出 20 个重点候选</h2>
+<p>Claude 不仅搜集序列，还判断哪些候选系统值得进一步研究。原文指出，专家完成这类分析通常需要<mark>数周至数月</mark>。这说明 AI 的作用已延伸到研究对象的发现与筛选。</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>筛选阶段</th><th>原文数量</th><th>这一阶段做了什么</th></tr></thead>
+<tbody>
+<tr><td>收集逆转录酶（RT）</td><td><strong>超过 200,000 个</strong></td><td>建立待分析的 RT 集合</td></tr>
+<tr><td>挑选新候选系统</td><td><strong>3,500 个</strong></td><td>识别有进一步研究价值的系统</td></tr>
+<tr><td>深入分析并生成报告</td><td><strong>20 个</strong></td><td>选出最有研究价值的候选，供研究人员审阅</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note">范围：本次 RT 研究。各行分别统计 RT 或候选系统，不能视为同一种对象的统一计数。</p>
+<p>这一结果展示的是大规模分析和候选筛选能力。文中没有给出严格的人机对照实验，因此不能据此计算确定的效率提升倍数。</p>
+</section>
+<section class="summary-block split">
+<div class="finding">
+<h3>新发现是系统的组合特征</h3>
+<p>ART 主要存在于噬菌体中。它由 <mark class="green">RT、邻近的伙伴基因、规则排列的 DNA 重复序列阵列</mark>三部分组成。</p>
+<p>其中的 RT 此前已被研究识别。Claude 似乎首次注意到配套的非编码 DNA 序列阵列，以及一个功能未知的辅助蛋白。贡献在于识别这些要素构成的系统。</p>
+</div>
+<div class="limit">
+<h3>像 CRISPR，不等于已具备其功能</h3>
+<p>初步实验表明，ART 阵列会表达出一组不同的短 RNA。这为它可能具有类似机制提供了线索。</p>
+<p><strong>ART 的主要功能仍未知。</strong>文中没有证明它可以编程，也没有证明它能切割、复制或粘贴 DNA。结构上的相似性提出了值得检验的问题。</p>
+</div>
+</section>
+<section class="summary-block flow">
+<h2>AI 推进计算发现，人类承担实验验证</h2>
+<ol>
+<li><strong>人类设定方向：</strong>要求 Claude 在大型 DNA 数据库中寻找有意思的新 RT 实例。</li>
+<li><strong>智能体自主调查：</strong>搜索数据库、研究 RT 家族、筛选候选，并对异常重复序列展开分析。</li>
+<li><strong>形成可审查的证据：</strong>统计重复次数和间距，对照已知系统，检索文献，提交报告。</li>
+<li><strong>人类完成实验：</strong>研究人员开展实验验证，Claude 协助解释数据。</li>
+</ol>
+<p>团队所有实验室工作均由人类科学家完成。这里的自主发现，具体体现为 AI 在计算分析中主动发现异常并追踪证据。</p>
+</section>
+<aside class="summary-block insight">
+<h3>假设生成变快后，科学判断更重要</h3>
+<p>在团队的一般研究流程中，一轮任务可生成<mark>数百至数千份</mark>候选报告。大多数候选会在后续证据审查中被排除，一次调查最终也可能没有值得实验测试的对象。</p>
+<p>团队正在研究哪些提案值得测试，并将经验反馈到 Claude 的指令中。AI 扩大了探索范围，也让筛选标准和实验验证成为更关键的环节。</p>
+</aside>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<ul>
+<li><strong>发现可以来自重新理解已知对象。</strong>RT 已经被识别过，新的贡献是看出它与周围序列及辅助蛋白的关联。</li>
+<li><strong>AI 可以主动追踪异常。</strong>Claude 从重复序列入手，继续测量、比较和查阅文献，形成了可供审阅的发现报告。</li>
+<li><strong>可验证的线索还不是功能定论。</strong>短 RNA 的表达已获初步实验支持，ART 的作用和可编程性仍需研究。</li>
+<li><strong>更多假设需要更好的筛选。</strong>人类的科学判断与实验工作，仍是把候选发现推进为可靠知识的关键。</li>
+</ul>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<div class="source-frontmatter">
+<p>01 关于我们的实验室</p>
+<p>02 我们如何开展研究</p>
+<p>03 Claude 发现 ART</p>
+<p>发布时间</p>
+<p>团队</p>
+<p>科学</p>
+<p>主题</p>
+<p>生命科学</p>
+<p>发现</p>
+<p>智能体</p>
+<p>研究计划</p>
+<p>科学</p>
+<p>2026 年 10 月 20 日</p>
+</div>
+<p>我们在 Anthropic 成立了一个新的生命科学研究团队，并建起了实验室。我们的重点是利用 Claude 开展基础生物学研究：探索 DNA 数据集，识别尚未被表征的蛋白质家族，大规模提出假设，再通过实验室实验加以检验。本文将介绍开展这项工作的团队，并分享早期成果。在科学家仅提供总体方向的情况下，Claude 发现了一种新型酶系统。它的某些特征让人联想到 CRISPR。</p>
+<p>自然界存在种类多得惊人的分子机器。许多彻底改变生物学和医学的发现，都始于科学家注意到其中某个不同寻常之处。限制性内切酶是一类能在特定短序列处切割 DNA 的蛋白质。科学家最初在细菌的免疫系统中发现了它们。在那里，它们会破坏入侵病毒的 DNA。研究人员随后意识到，可以用这些酶在选定的位置切开 DNA，并将一种生物的基因拼接到另一种生物中。生物技术产业由此兴起。</p>
+<p>Taq polymerase 是一种能在高温下复制 DNA 的酶。科学家在 Yellowstone 一处温泉中的细菌里发现了它。它后来成为 PCR 的基础，而 PCR 这项 DNA 复制技术广泛应用于现代诊断。CRISPR 最初引起注意，是因为某些细菌的 DNA 中出现了不寻常的重复序列。如今，它已成为基因编辑药物的基础。</p>
+<p>2026 年春天，我们组建了一个研究团队，想了解通用 AI 模型能否让这类发现更系统、更迅速。我们认为，要实现这种加速，需要建立一种新的生物学研究方式。在这种方式中，智能体与人类在整个流程的每一步开展协作。为此，我们需要建立自己的实验室，并组建一支统一的团队。团队的工作覆盖各个环节，从训练 Claude 的生物学能力，到在实验室中开展实验。</p>
+<p>今天，我们分享首批研究计划之一的早期成果。在这项研究中，Claude 自主发现了一种新型酶系统。它与一个 DNA 重复序列阵列相关联，这种模式让人联想到 CRISPR。我们目前还不知道它的功能。不过，Claude 发现的系统具有一组特征。此前，只有少数其他系统同时具有这些特征，而那些系统都可编程，能够执行切割、复制和粘贴 DNA 等操作。除了已经改变科学与医学的 CRISPR，还有几种类似系统正在开发中，被视为很有潜力的工具。</p>
+<p>Claude 找到的系统以逆转录酶（reverse transcriptase，RT）为核心。这类酶能以 RNA 为模板合成 DNA。其中的 RT 存在于一种巨型噬菌体中，此前的研究已经识别出了它。但 Claude 似乎是第一个注意到该系统关键特征的：一个与之关联的非编码 DNA 序列阵列，以及一个功能未知的额外辅助蛋白。</p>
+<p>CRISPR 基因组编辑的先驱之一、MIT 和 Broad Institute 教授 Feng Zhang 在审阅预印本后表示：</p>
+<blockquote>
+<p>这是一个令人振奋的例子，展示了 AI 智能体如何为生物学发现作出贡献。发现与逆转录酶相关联的 RNA 重复序列阵列，确实很有意思，值得进一步研究。我希望这项工作能鼓励更多科学家探索 AI 如何帮助他们开展研究。</p>
+</blockquote>
+<p>我们向 Claude 提供了一条提示，要求它在一个庞大的 DNA 序列数据库中寻找有意思的新 RT 实例。我们的参与仅限于最初的提示和实验室工作。Claude 智能体则负责梳理数据库、研究不同的 RT 家族，并自行判断哪些候选值得关注。约 950 个智能体花了 21 小时搜索这些数据，共使用了 2.1 亿个 token。随后，其中一个智能体注意到了一个引人注目的现象：在一个形态不寻常的 RT 基因旁边，存在某种重复出现的 DNA 序列模式。经过进一步分析和实验室测试，我们认识到，这种模式标志着一个此前尚未被表征的酶系统。它存在于噬菌体，也就是感染细菌的病毒中。我们将其命名为阵列相关逆转录酶（array-associated reverse transcriptases，ART）。</p>
+<figure class="source-figure" data-source-image="0"><img alt="A graphic of Claude identifying patterns in DNA" decoding="async" height="1160" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/0f6064436a364b73ce0d2a80848ac56be7ae9ddd-1360x1160.gif" width="1360"/>
+<figcaption>Claude 发现此前无人注意到的重复模式时，正在读取的原始 DNA 序列。</figcaption>
+</figure>
+<p>我们仍在研究 ART 的主要功能。不过，我们认为尽早分享这类发现很重要。一方面，这能展示 Claude 的能力。另一方面，也能让更广泛的研究群体了解我们正在做什么。我们已经发布了一篇预印本（此处），更详细地讨论了这项研究。</p>
+<h3>关于我们的实验室</h3>
+<p>我们是一支长期探索非同寻常蛋白质的科学家团队。我们擅长利用计算方法系统地读取 DNA、解读其进化过程，并挑选值得进一步表征的生物系统。在加入 Anthropic 之前，我们的研究帮助人们更好地理解了 CRISPR 系统的进化与调控。我们还发现了可用于下一代细胞疗法和基因疗法的新酶，并开发了加快识别 DNA 异常的工具。这些异常包括人类致病性变异。我们隶属于 Anthropic 的生命科学组织。同属这一组织的其他团队从事药物发现，以及 Claude 在生物学和化学方面的训练等工作。</p>
+<p>我们的实验室位于湾区，看起来与典型的分子生物学实验室没有什么不同。我们的研究仅涉及较低的生物安全等级，即 BSL-1 和 BSL-2。我们不处理能够感染人类的病原体。所有实验室工作都由人类科学家完成。我们曾通过 Model Hardware Standard 等项目，尝试利用 AI 加速实验室工作。不过，我们的分子生物学研究常常需要临时调整工作流程，这种方式不太适合此类工作。</p>
+<h3>我们如何开展研究</h3>
+<p>我们的许多工作流程，都是让 Claude 搜索大量与功能未知的蛋白质相关联的 DNA 序列。一种典型流程从调查某个蛋白质家族开始。Claude 会阅读相关文献，并利用公开数据复现已有结果，以检验自己的方法。随后，它会寻找不符合任何已描述系统的家族成员或基因组邻近要素。针对每个候选，Claude 都会撰写一份便于人类阅读的简短报告。报告会提出可能的功能，并说明支持这些判断的证据。在后续分析中，Claude 会对证据进行批判性评估。通常，大多数候选都会在这一阶段被排除。一次调查结束后，可能只剩下一个值得测试的候选，也可能一个都没有。</p>
+<p>如果某个候选通过了我们的审查，我们就会在实验室中进行测试。我们会在标准实验室菌株中表达该蛋白质，并从生物化学和结构层面对其进行表征。Claude 则帮助解释数据。我们使用 Claude Science 和 Claude Code 开展工作。这些工具任何科学家都可以使用。有时，我们也会使用自己搭建的协调框架，让多个 Claude 会话并行运行。</p>
+<p>Claude 提出假设的能力非常强，因此假设本身也成了我们的研究对象。一次研究任务就能产生数百至数千份候选报告。我们一直在问：那些被我们认为值得测试的提案，与被搁置的提案，究竟有什么区别？我们会把学到的经验反馈到给 Claude 的指令中，教它模仿我们自己的科研判断偏好。</p>
+<h3>Claude 发现 ART</h3>
+<p>过去几年，研究人员发现了更多逆转录酶（RT）。它们大多存在于细菌中，是细菌免疫系统的一部分。几乎所有 RT 家族都是通过基因组分析，也称基因组挖掘发现的。这需要研究人员搜索序列数据库，寻找尚无人表征的基因，注意其中的异常之处，再弄清它们的作用。</p>
+<p>Claude 智能体收集了超过 20 万个 RT，并从中挑出 3,500 个新的候选系统。随后，它们进一步筛选出最有研究价值的 20 个候选，对其进行分析，并生成便于人类阅读的报告。对于专业科学家来说，这类分析可能需要数周至数月。</p>
+<p>在研究过程中，Claude 注意到一个不寻常的 RT 家族，并决定进一步详细研究。智能体在梳理 RT 附近的原始 DNA 序列时惊叹道：“[RT 旁边的 DNA] 太惊人了：我肉眼就能看出一个串联重复序列阵列……那是一个类似 CRISPR 的……重复序列阵列？！”</p>
+<p>接下来，它的做法与人类科学家面对潜在发现时很相似。它统计了重复序列的数量，测量了它们之间的间距，并将这种排列方式与已知 RT 系统进行了比较。它还检索了文献，查看是否有人报道过这种模式。经过全面分析，它确信自己发现了一个新的生物系统，并提交了一份报告供人类审阅。</p>
+<p>它发现的 ART 系统主要存在于噬菌体中，由三部分组成：RT、旁边的一个伙伴基因，以及由等间距 DNA 重复序列组成的长阵列。这种重复序列的排列方式类似于 CRISPR 阵列。CRISPR 阵列存储着一组不同的 RNA 序列，使 CRISPR-Cas 系统成为可编程的生物技术工具。我们的初步实验表明，ART 阵列也会表达出一组不同的短 RNA。这提示该系统可能存在类似的机制。</p>
+<p>我们正在开展进一步实验，以确定 ART 如何发挥作用。分享这些早期发现，是为了向研究群体展示：Claude 能够自主检测异常，并推动后续分析，从而开启生物学发现。</p>
+<p>更多细节可参阅我们的技术报告（此处）。</p>
+<h3>与我们合作</h3>
+<p>我们希望这项工作能向更广泛的科学界展示，利用 AI 生成假设具有怎样的价值。我们也希望与其他科学家合作，将这种方法拓展到基因组学及其他领域的更多问题。如果你有研究问题的提案，我们很愿意听听你的想法。</p>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

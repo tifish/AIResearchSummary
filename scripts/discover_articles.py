@@ -350,6 +350,10 @@ def parse_anthropic_articles(markup: str) -> list[dict[str, str]]:
         parsed = urllib.parse.urlsplit(url)
         if parsed.netloc != "www.anthropic.com" or not parsed.path.startswith(("/research/", "/news/", "/features/")):
             continue
+        # Team navigation links can inherit a nearby publication's date.
+        # They are landing pages, not individual research articles.
+        if parsed.path.rstrip("/") == "/research/team" or parsed.path.startswith("/research/team/"):
+            continue
 
         time_node = anchor.find("time")
         date_text = clean_text(time_node.get_text(" ", strip=True)) if time_node else ""
