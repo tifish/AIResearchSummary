@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>利用数千个 AI 智能体，在生物学数据中发现新的研究线索</title>
+<style>
+:root {
+  --bg:#f6f5f1; --card:#ffffff; --ink:#202b38; --muted:#626e7c; --line:#d7dde3;
+  --data:#1768b2; --risk:#b34f36; --opportunity:#14765e; --conclusion:#7551ad;
+  --hl:#e1eefb; --hl2:#eee5fa; --soft:#e7f2ec; --riskbg:#faece4;
+  --hero:#182c42; --heroink:#eef3fa; --heromuted:#c1d1e3;
+}
+:root[data-theme="light"] {
+  --bg:#f6f5f1; --card:#ffffff; --ink:#202b38; --muted:#626e7c; --line:#d7dde3;
+  --data:#1768b2; --risk:#b34f36; --opportunity:#14765e; --conclusion:#7551ad;
+  --hl:#e1eefb; --hl2:#eee5fa; --soft:#e7f2ec; --riskbg:#faece4;
+  --hero:#182c42; --heroink:#eef3fa; --heromuted:#c1d1e3;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#111820; --card:#1a2430; --ink:#dce4ee; --muted:#a6b3c3; --line:#354353;
+    --data:#79baff; --risk:#f09c7e; --opportunity:#6cd3ad; --conclusion:#c1a1f2;
+    --hl:#203952; --hl2:#382b4e; --soft:#1b3831; --riskbg:#3a2a25;
+    --hero:#0c2236; --heroink:#e1eaf5; --heromuted:#aabed5;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:#111820; --card:#1a2430; --ink:#dce4ee; --muted:#a6b3c3; --line:#354353;
+  --data:#79baff; --risk:#f09c7e; --opportunity:#6cd3ad; --conclusion:#c1a1f2;
+  --hl:#203952; --hl2:#382b4e; --soft:#1b3831; --riskbg:#3a2a25;
+  --hero:#0c2236; --heroink:#e1eaf5; --heromuted:#aabed5;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif; line-height:1.85; }
+main { max-width:1080px; margin:auto; padding:28px 24px 72px; }
+header { background:var(--hero); color:var(--heroink); padding:44px; border-radius:20px; }
+h1 { font-size:clamp(28px,4.5vw,44px); line-height:1.35; margin:12px 0; }
+h2 { font-size:26px; line-height:1.5; margin:0 0 18px; }
+h3 { font-size:20px; line-height:1.5; margin:0 0 12px; }
+p { margin:0 0 18px; }
+.english,.meta { color:var(--heromuted); }
+.english { font-size:17px; line-height:1.55; }
+.meta,.eyebrow { font-size:14px; letter-spacing:.04em; }
+.overview { font-size:19px; border-top:1px solid var(--heromuted); padding-top:22px; margin-top:24px; }
+.numbers { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; padding:30px 0; border-bottom:1px solid var(--line); }
+.number { color:var(--data); font-size:36px; font-weight:750; display:block; line-height:1.4; }
+.numbers p { margin:4px 0 0; color:var(--muted); font-size:15px; }
+.analysis { padding:34px 0; }
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; background:var(--card); margin:20px 0; font-size:16px; }
+th,td { text-align:left; vertical-align:top; padding:15px 18px; border-bottom:1px solid var(--line); }
+th { color:var(--data); background:var(--hl); }
+.note { font-size:14px; color:var(--muted); }
+mark { background:var(--hl); color:var(--data); padding:1px 4px; border-radius:4px; }
+mark.purple { background:var(--hl2); color:var(--conclusion); }
+.process { background:var(--soft); border-left:5px solid var(--opportunity); padding:26px 30px; }
+.process h2 { color:var(--opportunity); }
+.process ol { padding-left:24px; margin-bottom:0; }
+.columns { display:grid; grid-template-columns:1fr 1fr; gap:28px; padding:36px 0; }
+.columns article { border-top:4px solid var(--opportunity); padding-top:20px; }
+.columns article:last-child { border-color:var(--conclusion); }
+.caution { background:var(--riskbg); border-left:5px solid var(--risk); padding:24px 30px; }
+.caution h3 { color:var(--risk); }
+.takeaways { margin:34px 0 46px; }
+.takeaways ul { display:grid; grid-template-columns:1fr 1fr; gap:16px; list-style:none; padding:0; }
+.takeaways li { background:var(--card); border-left:3px solid var(--conclusion); padding:20px; }
+#translation { max-width:790px; margin:auto; padding-top:36px; border-top:2px solid var(--line); font-size:17px; }
+#translation h2 { font-size:30px; }
+#translation h3 { margin-top:38px; color:var(--opportunity); }
+#translation blockquote { margin:26px 0; padding:16px 24px; border-left:4px solid var(--conclusion); background:var(--hl2); }
+#translation blockquote p { margin:0; }
+.source-figure { margin:30px 0; }
+.source-figure img { display:block; max-width:100%; height:auto; margin:auto; }
+figcaption { color:var(--muted); font-size:14px; margin-top:12px; line-height:1.65; }
+.source-nav { color:var(--muted); padding:0; list-style:none; margin:20px 0; }
+.footer-text { color:var(--muted); font-size:15px; }
+a { color:var(--data); }
+@media(max-width:650px) {
+  main { padding:16px 18px 48px; }
+  header { padding:28px 24px; }
+  .numbers { gap:14px; }
+  .number { font-size:27px; }
+  .columns,.takeaways ul { grid-template-columns:1fr; }
+  th,td { padding:12px; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/scaling-ai-research-for-complex-biological-data" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header>
+<div class="eyebrow">OpenAI · Publication · 2026 年 10 月 21 日</div>
+<h1>利用数千个 AI 智能体，在生物学数据中发现新的研究线索</h1>
+<p class="english">Using thousands of AI agents to uncover new leads in biological data</p>
+<p class="overview"><strong>一句话总括：</strong>这项合作把大规模基因扰动数据与分散的科学文献连接起来，展示了数千个并行 AI 智能体如何帮助科学家提出更具体、可供实验检验的生物学假设。</p>
+</header>
+<section aria-label="研究规模与专家评价" class="numbers">
+<div><span class="number">32 分钟</span><p>分析和解读数百万个小鼠脑细胞的既有实验数据。</p></div>
+<div><span class="number">数千个</span><p>由 GPT‑Rosalind 驱动的 AI 智能体并行工作。</p></div>
+<div><span class="number">75%</span><p>盲评比较中，专家更偏好分布式智能体报告的比例。</p></div>
+</section>
+<section class="analysis">
+<h2>并行分工扩大了文献覆盖，也改善了解读评价</h2>
+<p>在模型和资源保持不变的测试中，单智能体随着工作量增加，检索的文献变少。最大工作量下，两种方式的引用数量出现明显差距。</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>比较指标与范围</th><th>单智能体</th><th>分布式智能体</th></tr></thead>
+<tbody>
+<tr><td>最大工作量下引用的文献数量（篇）</td><td>11</td><td><strong>超过 700</strong></td></tr>
+<tr><td>报告的专家盲评偏好</td><td>原文未单独列出比例</td><td><strong>75% 的比较中获偏好</strong></td></tr>
+</tbody>
+</table>
+</div>
+<p>团队另估计，逐项进行同等人工分析和文献综述需要<mark>数月至一年</mark>。智能体完成此次分析用了 32 分钟。前者是团队估计，不能视为实测的人机耗时对照。</p>
+<p>这些结果说明，AI 的作用不仅是缩短分析时间，也可能让研究者查看更多结果，并为解释找到更广的文献依据。</p>
+</section>
+<section class="process">
+<h2>从实验图谱到推理图谱，把观察变成待检验的问题</h2>
+<ol>
+<li><strong>分配任务：</strong>每个智能体调查一项基因扰动，分析细胞反应。</li>
+<li><strong>连接知识：</strong>检索科学文献，提出能够解释实验结果的机制。</li>
+<li><strong>汇总线索：</strong>将基因、细胞效应、相关论文和可能机制连接成推理图谱。</li>
+</ol>
+<p>智能体复现了人工分析中的发现，也提出了额外线索。它们对新颖性和科学价值的评估与盲评专家的判断相符。研究的产出因此是<mark class="purple">帮助安排后续实验的线索</mark>。</p>
+</section>
+<section class="columns">
+<article>
+<h3>共同调控 mTOR 的基因，在小脑中表现不同</h3>
+<p>Tsc1 与 Tsc2 的扰动对若干神经元群体产生了相似影响。但在小脑中，Tsc2 扰动改变了<mark>数十个</mark>神经元通信相关基因的活性，Tsc1 扰动引起的变化却很小。</p>
+<p>这一区别可能与结节性硬化症有关。它把宽泛的疾病问题缩小到特定神经元群体和细胞变化，有助于研究者明确哪些变化可能被现有药物纠正。</p>
+</article>
+<article>
+<h3>DCTN1 的异常反应，提出了胆固醇分布的新问题</h3>
+<p>扰动 Dctn1 后，参与胆固醇合成的基因表达上升。智能体将这一观察与胆固醇运输异常的相关研究联系起来。</p>
+<p>由此产生的假设是：DCTN1 扰动是否改变了神经元内的胆固醇分布，并促成神经退行性病变？这一联系提供了可以继续实验检验的方向。</p>
+</article>
+</section>
+<aside class="caution">
+<h3>新的研究线索仍需实验验证</h3>
+<p>专家认为 DCTN1 假设新颖、重要，值得跟进。但文中的潜在机制和治疗方向仍待检验。科学家仍需决定研究优先级、设计实验并解释结果。</p>
+</aside>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<ul>
+<li><strong>分工方式会影响研究质量。</strong>固定模型和资源后，分布式智能体仍展示了更广的文献覆盖，并获得更高的专家偏好。</li>
+<li><strong>弱信号和意外结果也可能有价值。</strong>扩大探索范围，有助于发现原定研究主线之外的线索。</li>
+<li><strong>跨领域连接能让问题更具体。</strong>细胞反应与已有文献结合后，可以形成明确的机制假设。</li>
+<li><strong>高质量线索是下一轮实验的起点。</strong>此次工作的价值在于帮助科学家选择值得检验的想法，疾病机制和治疗用途仍需验证。</li>
+</ul>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<p>OpenAI、PerturbAI 和 Scripps Research 如何利用分布式 AI 智能体，帮助科学家从数百万个脑细胞的数据中识别有潜力的研究线索</p>
+<p>了解 OpenAI、PerturbAI 和 Scripps Research 如何并行部署数千个 AI 智能体，从数百万个脑细胞的复杂数据中识别值得研究的生物学联系。</p>
+<p>视频来源：PerturbAI。</p>
+<ul class="source-nav">
+<li>大规模实验中的意外线索</li>
+<li>分工协作，深化推理</li>
+<li>寻找下一个值得开展的实验</li>
+</ul>
+<ul class="source-nav">
+<li>大规模实验中的意外线索</li>
+<li>分工协作，深化推理</li>
+<li>寻找下一个值得开展的实验</li>
+</ul>
+<p>如果科学家能在几分钟内发现有关 Alzheimer’s 病和 Parkinson’s 病的新线索，而不用花上几个月，会怎样？OpenAI、PerturbAI（在新窗口中打开）和 Scripps Research（在新窗口中打开）展开合作。团队利用数千个由 GPT‑Rosalind（在新窗口中打开）驱动的 AI 智能体，仅用 <mark>32 分钟</mark>就分析并解读了数百万个小鼠脑细胞的既有实验数据（在新窗口中打开）。智能体将基因功能受扰的影响与科学文献中的发现联系起来，找到了出人意料的生物学联系。这些联系有助于科学家理解疾病，并确定新疗法的研究方向。这项工作展示了 AI 如何帮助研究者更充分地探索大型生物学实验揭示的信息。</p>
+<p>现代实验产生的数据，远远超过科学家能够深入研究的范围。研究者现在可以改变数千个基因，并测量这些改变对数百万个细胞的影响。但要理解这些结果对人类疾病意味着什么，就需要把复杂的实验发现与数十年来分散的科学知识联系起来。AI 可以在这里发挥作用，帮助科学家发现原本可能被忽略的潜在线索。</p>
+<blockquote><p>“我们构建细胞图谱，是希望其他科学家能借此作出我们尚未想象到的发现。AI 可以帮助更多研究者探索这些资源，把意外观察转化为新的待检验问题。”</p></blockquote>
+<p>团队把分析任务分给了数千个由 GPT‑Rosalind 驱动的 AI 智能体。我们将这种方法称为分布式生物学推理。智能体研究了一份全脑 CRISPR 图谱（在新窗口中打开）。这份数据集展示了基因功能受扰如何影响小鼠全脑的不同细胞类型。每个智能体负责调查一项基因扰动，分析细胞反应，检索科学文献，并为结果提出解释。它们的报告被汇总成一份推理图谱，将基因、细胞效应、相关论文和可能的生物学机制连接起来。</p>
+<p>研究团队估计，如果一次处理一项扰动，完成同等的人工分析和文献综述需要数月至一年。智能体复现了人工分析中的发现，同时找到了更多线索。它们对新颖性和科学价值的评估，也与盲评中人类专家的判断相符。这些发现有助于确定后续实验的优先顺序，以检验所提出的生物学机制。</p>
+<p>其中一些发现为理解脑部疾病提供了新线索。智能体识别出了两个疾病相关基因对脑细胞影响的意外差异。它们还发现，胆固醇调控与神经退行性病变之间可能存在联系。这些发现可以帮助科学家研究疾病如何发生，以及未来的疗法可能在哪些环节进行干预。</p>
+<blockquote><p>“有时线索已经在那里，只是散落在不同领域，我们还没有把它们联系起来。神经元功能与胆固醇代谢之间可能存在的联系说明，把这些碎片拼在一起，可以为我们理解疾病生物学提供新思路。”</p></blockquote>
+<p>研究者现在就可以开始探索这些发现。推理图谱已经开放（在新窗口中打开），科学家可以用它比较相关基因、调查意外反应，并识别值得跟进的线索。新发现常常诞生于不同领域研究者的合作。他们汇集各自的专业知识，以意想不到的方式连接熟悉的概念。AI 可以把新数据与分散在不同学科中的知识联系起来，从而大幅扩大这类连接的规模。机会不只是更快地分析数据。将 AI、实验生物学、人类专业知识和科学文献结合起来，可以帮助科学家把更多数据转化为可检验的想法。</p>
+<h3>大规模实验中的意外线索</h3>
+<p>实验中一些最有意思的线索，可能不在科学家最初打算研究的主线之内。在涵盖数千项扰动的数据集中，这些线索很容易被忽略。</p>
+<p>智能体发现了 Tsc1 和 Tsc2 之间一个意外的差异。这两个基因共同控制 mTOR。mTOR 是细胞生长、代谢和衰老的重要调控因子。扰动其中任一基因，对若干神经元群体产生的影响相似。但在帮助协调运动的小脑中，Tsc2 扰动改变了数十个参与神经元通信的基因的活性。相比之下，Tsc1 扰动引起的变化很小。</p>
+<p>这种差异可能与人类疾病有关。在结节性硬化症患者中，小脑异常与 TSC2 突变密切相关。降低 mTOR 活性的药物可以治疗某些脑肿瘤和癫痫发作，但这种疾病伴随的学习和行为困难仍然难以解决。智能体锁定了一个特定的神经元群体，以及值得调查的细胞变化：哪些变化可能通过现有药物得到纠正？哪些变化可能指向新的治疗方法？这为研究者提供了一组更具体的问题，可在实验室中检验。</p>
+<h3>分工协作，深化推理</h3>
+<p>如果把整个数据集交给一个智能体，它能否做得和数千个并行工作的智能体一样好？我们在保持模型和资源不变的情况下测试了这一点。随着工作量增加，单智能体检索的文献变少。在最大工作量下，它只引用了 <mark>11 篇文献</mark>，而分布式智能体引用了<mark>超过 700 篇</mark>。人类专家也更偏好分布式智能体给出的解读。</p>
+<p>科学家的时间有限，往往会优先关注数据中最强的信号。分布式智能体可以帮助考察更广泛的反应，包括细微或意外的反应，并将它们与相关科学文献联系起来。并行运行智能体，可以同时调查多项扰动。这有助于科学家更充分地探索实验所包含的信息，找到原本可能被忽略的潜在线索。</p>
+<p>在最大工作量下，分布式智能体引用了超过 700 篇文献，而单智能体仅引用了 11 篇。</p>
+<h3>寻找下一个值得开展的实验</h3>
+<p>当一项发现能够指向值得开展的实验时，它的价值就更大了。智能体在 DCTN1 中找到了一条这样的线索。这个基因的突变会导致 Perry 综合征。这是一种具有类似 Parkinson’s 病症状的神经退行性疾病。</p>
+<p>DCTN1 参与神经元内部的物质运输。在全脑 CRISPR 图谱中，扰动 Dctn1 后，参与胆固醇合成的基因表达增加了。智能体将这一观察与已有研究联系起来。相关研究提示，胆固醇运输出现问题，可能会导致细胞制造更多胆固醇。这为后续实验提出了一个问题：DCTN1 扰动是否会改变胆固醇在神经元内部的分布？这些变化是否会促成神经退行性病变？如果会，恢复正常的胆固醇分布，能否帮助保护神经元？</p>
+<p>人类专家也认为，这一假设新颖、重要，值得进一步研究。这个例子说明，将意外结果与已有知识联系起来，可以把线索转化为可检验的想法，并可能开辟疾病治疗的新方向。</p>
+<p>在盲评比较中，人类专家有 <mark>75%</mark> 的时候更偏好分布式智能体的报告，而非单智能体的报告。</p>
+<figure class="source-figure" data-source-image="0"><img alt="Improving ChatGPT for low-resource programming languages — listing image" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/5nGzHT5se0oEzcJbDGqwyz/5aafc7c71c35b11d713436e853f0b4b0/low-resource-programming-languages-cover.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<p>科学家仍然处于科学发现的核心位置。通过发现更多有潜力的线索，AI 可以帮助研究者决定跟进哪些想法、设计实验并解释结果。目标是把生物学实验中的更多信息转化为知识。随着时间推移，这些知识可以为开发更好的药物提供指导。</p>
+<figure class="source-figure" data-source-image="1"><img alt="Rosalind Academic Plan - Card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/7EaxSuBblXvd3Y6G2WLoET/4563ce56737d9c0ed1f05358f43c8a7d/rosalind-academic-plan-card.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<p class="footer-text">2026</p>
+<figure class="source-figure" data-source-image="2"><img alt="Sharing AI progress in mathematics — Cover" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/49FAj0M0Ly8nk84Uu8btWC/9919efdae7fff54b0f8b0d80398248ac/ai-progress-in-mathematics-cover.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<p class="footer-text">科学</p>
+<p class="footer-text">作者</p>
+<p class="footer-text">继续阅读</p>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
