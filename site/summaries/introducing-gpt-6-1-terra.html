@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>推出 GPT-6.1 Terra</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f5f4ef;
+  --card: #ffffff;
+  --ink: #202b36;
+  --muted: #5d6977;
+  --line: #d8dedf;
+  --data: #185db3;
+  --risk: #ac4829;
+  --opportunity: #157256;
+  --conclusion: #7444a2;
+  --hl: #e3edfc;
+  --hl2: #eee4f8;
+  --opportunity-bg: #e6f3eb;
+  --risk-bg: #faeee7;
+  --hero: #172a3c;
+  --hero-ink: #edf3fa;
+  --hero-muted: #bacbdc;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f5f4ef;
+  --card: #ffffff;
+  --ink: #202b36;
+  --muted: #5d6977;
+  --line: #d8dedf;
+  --data: #185db3;
+  --risk: #ac4829;
+  --opportunity: #157256;
+  --conclusion: #7444a2;
+  --hl: #e3edfc;
+  --hl2: #eee4f8;
+  --opportunity-bg: #e6f3eb;
+  --risk-bg: #faeee7;
+  --hero: #172a3c;
+  --hero-ink: #edf3fa;
+  --hero-muted: #bacbdc;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #11181f;
+    --card: #1a242d;
+    --ink: #dce5ec;
+    --muted: #a7b5c3;
+    --line: #354450;
+    --data: #84b8ff;
+    --risk: #f3a080;
+    --opportunity: #77d3ad;
+    --conclusion: #c6a2f0;
+    --hl: #203751;
+    --hl2: #352940;
+    --opportunity-bg: #1b332c;
+    --risk-bg: #382a25;
+    --hero: #152538;
+    --hero-ink: #e0eaf4;
+    --hero-muted: #adc0d4;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #11181f;
+  --card: #1a242d;
+  --ink: #dce5ec;
+  --muted: #a7b5c3;
+  --line: #354450;
+  --data: #84b8ff;
+  --risk: #f3a080;
+  --opportunity: #77d3ad;
+  --conclusion: #c6a2f0;
+  --hl: #203751;
+  --hl2: #352940;
+  --opportunity-bg: #1b332c;
+  --risk-bg: #382a25;
+  --hero: #152538;
+  --hero-ink: #e0eaf4;
+  --hero-muted: #adc0d4;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif; line-height: 1.85; }
+main { max-width: 1080px; margin: auto; padding: 30px 24px 70px; }
+h1, h2, h3 { line-height: 1.35; }
+h1 { font-size: clamp(30px, 5vw, 50px); margin: 12px 0; }
+h2 { font-size: 27px; margin: 0 0 20px; }
+h3 { font-size: 20px; margin: 0 0 14px; }
+p { margin: 0 0 17px; }
+a { color: var(--data); text-underline-offset: 4px; }
+.hero { padding: 38px; border-radius: 20px; background: var(--hero); color: var(--hero-ink); }
+.english { font-size: 19px; color: var(--hero-muted); }
+.meta { font-size: 14px; color: var(--hero-muted); }
+.hero .lead { font-size: 20px; max-width: 820px; margin-bottom: 0; }
+.kicker { font-size: 13px; letter-spacing: .12em; color: var(--hero-muted); }
+.band { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); margin: 26px 0 36px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.metric { background: var(--card); padding: 22px; }
+.metric strong { display: block; font-size: 34px; color: var(--data); line-height: 1.4; }
+.metric span { display: block; font-size: 14px; color: var(--muted); }
+.block { margin: 36px 0; }
+.table-wrap { overflow-x: auto; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+caption { text-align: left; padding: 17px; color: var(--muted); font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 15px 17px; border-bottom: 1px solid var(--line); }
+th { background: var(--hl); color: var(--data); }
+tr:last-child td { border-bottom: 0; }
+.note { font-size: 14px; color: var(--muted); margin-top: 12px; }
+mark { background: var(--hl); color: var(--data); padding: 1px 4px; border-radius: 4px; }
+.insight { border-left: 4px solid var(--conclusion); padding: 14px 20px; background: var(--hl2); margin-top: 18px; }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin: 36px 0; }
+.opportunity { background: var(--opportunity-bg); padding: 25px; border-radius: 12px; }
+.opportunity h3 { color: var(--opportunity); }
+.risk { padding: 25px; border-top: 4px solid var(--risk); background: var(--risk-bg); }
+.risk h3 { color: var(--risk); }
+.price { padding: 28px; border: 1px solid var(--line); background: var(--card); }
+.takeaways { margin: 36px 0 45px; }
+.takeaways ol { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 32px; padding-left: 24px; }
+.takeaways li { padding: 10px; border-bottom: 2px solid var(--line); }
+.takeaways li::marker { color: var(--conclusion); font-weight: bold; }
+#translation { max-width: 780px; margin: 55px auto 0; padding-top: 35px; border-top: 3px solid var(--conclusion); font-size: 17px; }
+#translation h2 { margin-bottom: 30px; }
+#translation h3 { margin-top: 36px; font-size: 24px; }
+#translation .source-contents { color: var(--muted); margin: 0 0 24px; }
+#translation .source-contents p { margin-bottom: 6px; }
+#translation .source-tagline { font-size: 23px; font-weight: bold; margin: 32px 0 20px; }
+.source-figure, figure[data-source-image] { margin: 32px 0; }
+.source-figure img, figure[data-source-image] img { display: block; max-width: 100%; height: auto; margin: auto; }
+figcaption { color: var(--muted); font-size: 14px; margin-top: 12px; }
+.source-end { color: var(--muted); border-top: 1px solid var(--line); padding-top: 22px; margin-top: 35px; }
+@media (max-width: 680px) {
+  main { padding: 16px 16px 45px; }
+  .hero { padding: 25px; }
+  .band, .split, .takeaways ol { grid-template-columns: 1fr; }
+  th, td { padding: 12px; min-width: 120px; }
+  .price { padding: 20px; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/introducing-gpt-6-1-terra" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header class="hero">
+  <div class="kicker">OpenAI · Product · 2026 年 10 月 26 日</div>
+  <h1>推出 GPT-6.1 Terra</h1>
+  <p class="english">Introducing GPT-6.1 Terra</p>
+  <p class="meta">中文总结与完整译文</p>
+  <p class="lead"><strong>一句话总括：</strong>OpenAI 展示了 GPT-6.1 Terra 如何以更低成本和更快速度完成电脑操作任务，同时减少事实错误、提升编程能力。</p>
+</header>
+
+<section aria-label="关键数字" class="band">
+  <div class="metric"><strong>+15 个百分点</strong><span>Agents’ Last Exam：中等推理强度下，相比 GPT-5.6 Terra 的得分提升。</span></div>
+  <div class="metric"><strong>53.6% → 16.7%</strong><span>内部易诱发错误提示测试：低推理强度下的错误率变化。</span></div>
+  <div class="metric"><strong>低 50%</strong><span>标准 API 价格相较 GPT-5.6 Terra 和 GPT-6.1 Sol 的降幅。</span></div>
+</section>
+
+<section class="block">
+  <h2>电脑操作的进步，体现在得分、成本和速度三方面</h2>
+  <p>文中最具体的对比来自 Agents’ Last Exam。它包含将建筑图纸转成 3D 模型、逐镜头审阅动画影片等专业任务。对这些工作，<mark>完成质量与单次任务成本需要一起看</mark>。</p>
+  <div class="table-wrap">
+    <table>
+      <caption>Agents’ Last Exam 对比；比例均为原文报告值，成本、token 单价和完成速度分别列出。</caption>
+      <thead><tr><th>条件与对比对象</th><th>能力表现</th><th>成本或速度</th></tr></thead>
+      <tbody>
+        <tr><td>中等推理强度；对比 GPT-5.6 Terra</td><td>得分高 15 个百分点</td><td>成本约为三分之一</td></tr>
+        <tr><td>与 GPT-6 Astra 对比</td><td>表现相当</td><td>每个 token 的价格为十分之一</td></tr>
+        <tr><td>最高推理强度；对比 Claude Opus 5.5</td><td>token 使用效率超过其 3 倍</td><td>每个 token 的价格为四分之一；每项任务成本约为九分之一</td></tr>
+        <tr><td>与 GPT-6 Astra、GPT-6.1 Sol 对比；原文未单列推理强度</td><td>任务完成速度超过两者的 3 倍</td><td>原文未提供绝对耗时</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">以上均为 OpenAI 文中报告的评测结果。每个 token 的单价与完成一项任务的总成本是不同指标。</p>
+  <div class="insight">这些结果支持文章的核心定位：GPT-6.1 Terra 的价值不仅是能力提升，也在于让高频电脑操作的成本更易承受。</div>
+</section>
+
+<div class="split">
+  <section class="opportunity">
+    <h3>视觉理解正在连接到实际操作</h3>
+    <p>在 MMMU-Pro 上，GPT-6.1 Terra 在所有推理设置下均优于 GPT-5.6 Terra。它以更低成本，接近 GPT-6 Astra 和 GPT-6.1 Sol 的得分。</p>
+    <p>在 OSWorld 2.1 上，它以中等推理强度超过 GPT-5.6 Terra 的最佳成绩。每项任务成本也低得多。</p>
+    <p>这些结果把视觉能力的用途扩展到桌面任务执行，而不只是看懂图片。</p>
+  </section>
+  <section class="risk">
+    <h3>安全能力同步加强，但仍需看清评测范围</h3>
+    <p>GPT-6.1 Terra 在 Preparedness Framework 的网络安全领域达到 Critical 阈值。它保留了为 GPT-6 Astra 开发的保护措施。</p>
+    <p>据 OpenAI 评估，它比 GPT-5.6 Terra 更能遵守任务范围，也更倾向于如实说明限制和潜在阻碍。提示注入测试还显示了较强的抵抗能力。</p>
+    <p>文章提供的是测试中的表现，未给出这些安全改进的具体比例。</p>
+  </section>
+</div>
+
+<section class="block">
+  <h2>事实错误明显减少，编程能力提升也有边界</h2>
+  <p>事实准确性的改善在低推理强度下尤其明显。编程成绩也显著上升，但文章仍将最复杂的编程任务推荐给 GPT-6.1 Sol 和 GPT-6 Astra。</p>
+  <div class="table-wrap">
+    <table>
+      <caption>事实错误与编程评测；百分比为各测试内的错误率或任务解决率，百分点表示得分或比例差。</caption>
+      <thead><tr><th>测试与条件</th><th>对比基准</th><th>GPT-6.1 Terra 结果</th></tr></thead>
+      <tbody>
+        <tr><td>内部易诱发错误提示测试；低推理强度</td><td>GPT-5.6 Terra 错误率 53.6%</td><td>错误率 16.7%；下降近 37 个百分点</td></tr>
+        <tr><td>同一内部测试；最高推理强度</td><td>与前代相比</td><td>错误率降至 4.3%；下降 18 个百分点，接近 GPT-6 Astra 和 GPT-6.1 Sol</td></tr>
+        <tr><td>Terminal-Bench 4.0；GPT-6.1 Terra 使用最高推理强度</td><td>GPT-5.6 Terra 公布的任务解决率为 21.5%</td><td>任务解决率 50.3%，超过前代公布成绩的两倍</td></tr>
+        <tr><td>Terminal-Bench-Science 0.1；最高推理强度</td><td>GPT-6.1 Sol、Opus 5.5</td><td>以更低成本超过 GPT-6.1 Sol；与 Opus 5.5 的差距在 5 分以内，估算成本不到其五分之一</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="insight">错误率下降与编程成绩提升共同扩大了模型的实用范围。不过，内部事实性测试的错误率不能直接视为所有真实场景中的错误率。</div>
+</section>
+
+<section class="price">
+  <h2>价格下调，面向高频工作开放</h2>
+  <p>从 <mark>2026 年 10 月 26 日</mark>起，ChatGPT Work 和 Codex 中的所有 Plus、Pro、Enterprise、Edu 用户均可使用 GPT-6.1 Terra。API 模型名为 <code>gpt-6.1-terra</code>。</p>
+  <div class="table-wrap">
+    <table>
+      <caption>标准 API 定价，单位：美元／百万 token。</caption>
+      <thead><tr><th>输入</th><th>缓存输入</th><th>输出</th></tr></thead>
+      <tbody><tr><td>1</td><td>0.05</td><td>5</td></tr></tbody>
+    </table>
+  </div>
+  <p class="note">原文称，相同使用额度可支持比 GPT-5.6 Terra 更多的任务。与 GPT-6.1 Sol 或 GPT-6 Astra 相比，任务数量优势更明显，但未提供具体倍数。</p>
+  <p>文章以读取发票并录入会计软件为例，说明降价所针对的是需要反复执行的大量工作。</p>
+</section>
+
+<section class="takeaways">
+  <h2>最值得带走的洞见</h2>
+  <ol>
+    <li><strong>评估自动化要看每项任务成本。</strong>token 单价、token 使用效率和完成速度共同影响实际价值。</li>
+    <li><strong>视觉推理与电脑操作开始形成更直接的联系。</strong>文中评测覆盖从理解图纸到执行多步骤桌面任务。</li>
+    <li><strong>较低推理强度下的准确性改善很显著。</strong>内部测试错误率从 53.6% 降至 16.7%，但这一数字有明确的测试范围。</li>
+    <li><strong>成本优势没有抹平能力边界。</strong>对于最复杂的编程任务，文章仍推荐 GPT-6.1 Sol 和 GPT-6 Astra。</li>
+  </ol>
+</section>
+
+<section id="translation">
+  <h2>完整译文</h2>
+
+  <div class="source-contents">
+    <p>从视觉理解到行动</p>
+    <p>事实准确性和编程能力大幅提升</p>
+    <p>安全与对齐</p>
+    <p>定价与可用性</p>
+  </div>
+
+  <div class="source-contents">
+    <p>从视觉理解到行动</p>
+    <p>事实准确性和编程能力大幅提升</p>
+    <p>安全与对齐</p>
+    <p>定价与可用性</p>
+  </div>
+
+  <p class="source-tagline">让快速、强大的电脑操作能力服务于大规模应用</p>
+
+  <p>我们推出了 GPT-6.1 Terra。这是一款快速、高效的模型，融合了细致的视觉推理、精准的电脑操作，以及更清晰自然的写作能力。与 GPT-5.6 Terra 相比，它有了显著提升。它擅长处理工作日里常见的沟通和电脑任务，包括起草提案、解读技术图纸、填写表单和编辑视频。</p>
+
+  <p>Terra 继续推动我们各模型系列在成本与智能之间取得更好的平衡，在速度、能力和成本上提供了新的选择。它的标准 API 价格比 GPT-5.6 Terra 和 GPT-6.1 Sol 低 50%。这让开发者更容易将大量工作自动化，例如读取收到的发票，再把详细信息录入会计软件。在 ChatGPT Work 和 Codex 中，使用 GPT-6.1 Terra 可以让套餐额度支持更多工作。相同的使用额度能完成比 GPT-5.6 Terra 更多的任务。与 GPT-6.1 Sol 或 GPT-6 Astra 相比，能完成的任务数量则多得多。</p>
+
+  <h3>从视觉理解到行动</h3>
+
+  <p>我们使用 Agents’ Last Exam 测量了 GPT-6.1 Terra 的电脑操作能力。这项基准测试包含多种专业任务，例如将建筑图纸转成 3D 模型，以及逐镜头审阅一部动画影片，为修复团队制作带有时间码的记录。在中等推理强度下，GPT-6.1 Terra 的得分比 GPT-5.6 Terra 高 15 个百分点，成本约为其三分之一。它的表现甚至与 GPT-6 Astra 相当，而每个 token 的价格仅为后者的十分之一。在最高推理强度下，Terra 的 token 使用效率超过 Claude Opus 5.5 的三倍，每个 token 的价格则为其四分之一。因此，每项任务的成本约为后者的九分之一。Terra 的速度也快得多。它完成任务的速度超过 GPT-6 Astra 和 GPT-6.1 Sol 的三倍。</p>
+
+  <p>在视觉推理基准测试 MMMU-Pro 上，GPT-6.1 Terra 在每一种推理设置下都优于 GPT-5.6 Terra。它甚至以低得多的成本，取得了接近我们能力最强的前沿模型 GPT-6 Astra，以及 GPT-6.1 Sol 的分数。</p>
+
+  <p>OSWorld 2.1 测试 AI 智能体使用桌面应用完成多步骤任务的能力，例如根据技术图纸构建 3D 模型。在中等推理强度下，GPT-6.1 Terra 就超过了 GPT-5.6 Terra 的最佳成绩，而每项任务的成本仅为后者的一小部分。</p>
+
+  <h3>事实准确性和编程能力大幅提升</h3>
+
+  <p>今年，我们投入了大量资源，以减少模型产生的幻觉和事实错误。在我们内部使用易诱发错误提示进行的基准测试中，低推理强度下的错误率从 GPT-5.6 Terra 的 53.6% 降至 GPT-6.1 Terra 的 16.7%，下降了近 37 个百分点。在最高推理强度下，错误率下降了 18 个百分点，降至 4.3%。这一水平已接近 GPT-6 Astra 和 GPT-6.1 Sol 的错误率。</p>
+
+  <p>在软件工程方面，GPT-6.1 Terra 比 GPT-5.6 Terra 有了大幅提升。Terminal-Bench 4.0 测试编程智能体通过命令行解决问题的能力，例如修复一个在加载过程中出现布局偏移的网页。在最高推理强度下，GPT-6.1 Terra 能解决 50.3% 的任务。这个比例超过 GPT-5.6 Terra 已公布的 21.5% 成绩的两倍。对于最复杂的编程任务，GPT-6.1 Sol 和 GPT-6 Astra 仍是更好的选择。</p>
+
+  <p>Terminal-Bench-Science 0.1 测试智能体使用代码完成科研任务的能力，例如追踪延时摄影视频中的细胞分裂。在最高推理强度下，GPT-6.1 Terra 以更低成本超过了 GPT-6.1 Sol。它与 Opus 5.5 的分差在 5 分以内，估算成本却不到后者的五分之一。</p>
+
+  <h3>安全与对齐</h3>
+
+  <p>在让强大的 AI 变得更高效、更易获得的同时，我们也持续通过训练、测试和改进来完善防护措施。根据我们的 Preparedness Framework，GPT-6.1 Terra 在网络安全领域达到 Critical 阈值。它也保留了为 GPT-6 Astra 开发的保护措施。</p>
+
+  <p>GPT-6.1 Terra 继承了 GPT-6 系列在对齐方面的改进。根据我们的评估，与 GPT-5.6 Terra 相比，GPT-6.1 Terra 更倾向于遵守任务范围，并向用户如实说明自身限制和潜在阻碍。在提示注入测试中，GPT-6.1 Terra 也表现出较强的抵抗能力。此类恶意指令旨在让模型偏离用户的任务。更多细节见系统卡（在新窗口中打开）。</p>
+
+  <h3>定价与可用性</h3>
+
+  <p>从今天起，ChatGPT Work 和 Codex 中的所有 Plus、Pro、Enterprise 和 Edu 用户都可以使用 GPT-6.1 Terra。开发者也可以通过 OpenAI API 使用它，模型名称为 <code>gpt-6.1-terra</code>。</p>
+
+  <p>标准 API 定价为：每百万输入 token 1 美元，每百万缓存输入 token 0.05 美元，每百万输出 token 5 美元。</p>
+
+  <div class="source-end">
+    <p>2026</p>
+    <p>GPT</p>
+    <p>作者</p>
+  </div>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
