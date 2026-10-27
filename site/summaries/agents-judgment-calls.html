@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>AI 智能体如何影响专家的判断与决策</title>
+<style>
+:root{--bg:#f7f5f0;--card:#ffffff;--ink:#202b36;--muted:#617080;--line:#d8dfe5;--data:#185da8;--risk:#b54832;--opportunity:#147864;--conclusion:#7349a3;--hl:#dfedff;--hl2:#fbe5da;--soft:#e7f2ed;--purple:#eee7f7;--deep:#202c42;--deep-ink:#edf2fc}
+:root[data-theme="light"]{--bg:#f7f5f0;--card:#ffffff;--ink:#202b36;--muted:#617080;--line:#d8dfe5;--data:#185da8;--risk:#b54832;--opportunity:#147864;--conclusion:#7349a3;--hl:#dfedff;--hl2:#fbe5da;--soft:#e7f2ed;--purple:#eee7f7;--deep:#202c42;--deep-ink:#edf2fc}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151a20;--card:#1e2630;--ink:#e0e7ef;--muted:#a5b2c2;--line:#394554;--data:#80b7fc;--risk:#ff9b82;--opportunity:#72d1b2;--conclusion:#c6a1f3;--hl:#253b55;--hl2:#472d29;--soft:#203b35;--purple:#352b47;--deep:#111927;--deep-ink:#e0e8f6}}
+:root[data-theme="dark"]{--bg:#151a20;--card:#1e2630;--ink:#e0e7ef;--muted:#a5b2c2;--line:#394554;--data:#80b7fc;--risk:#ff9b82;--opportunity:#72d1b2;--conclusion:#c6a1f3;--hl:#253b55;--hl2:#472d29;--soft:#203b35;--purple:#352b47;--deep:#111927;--deep-ink:#e0e8f6}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;line-height:1.85}main{max-width:1080px;margin:auto;padding:48px 24px}h1,h2,h3{line-height:1.35}h1{font-size:clamp(32px,5vw,54px);margin:14px 0}h2{font-size:28px;margin-top:0}h3{font-size:21px}p{margin:0 0 1.1em}a{color:var(--data)}.eyebrow,.meta,.english{color:var(--muted)}.eyebrow{font-size:13px;letter-spacing:.12em}.english{font-size:21px;margin-bottom:20px}.hero{padding:12px 0 32px;border-bottom:1px solid var(--line)}.lead{font-size:22px;max-width:850px}.lead strong{color:var(--conclusion)}.band{display:grid;grid-template-columns:repeat(3,1fr);background:var(--deep);color:var(--deep-ink);margin:30px 0;padding:24px;gap:25px}.number{font-size:44px;font-weight:750;line-height:1.2}.band p{margin:8px 0 0;font-size:15px}.summary-block{padding:28px 0}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;background:var(--card);font-size:15px}th,td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--line)}th{background:var(--hl);color:var(--data)}.note{font-size:14px;color:var(--muted);margin-top:12px}.split{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:24px 0}.split article{padding:26px;background:var(--soft);border-top:4px solid var(--opportunity)}.split article.risk{background:var(--hl2);border-color:var(--risk)}.risk h3{color:var(--risk)}.split h3{margin-top:0}.insight{border-left:5px solid var(--conclusion);padding:24px 28px;background:var(--purple);margin:28px 0}.insight h3{margin-top:0}.takeaways{padding:28px;background:var(--card);border:1px solid var(--line)}.takeaways li{margin-bottom:12px}.takeaways li::marker{color:var(--conclusion);font-weight:bold}mark{color:var(--ink);background:var(--hl);padding:1px 4px;border-radius:3px}mark.warn{background:var(--hl2)}#translation{max-width:800px;margin:64px auto 0;padding-top:40px;border-top:3px solid var(--conclusion);font-size:17px}#translation h3{margin-top:40px;color:var(--data);font-size:25px}#translation h4{font-size:19px;margin-top:28px}#translation li{margin:10px 0}#translation nav{font-size:15px;padding:18px 22px;background:var(--card);margin-bottom:24px}#translation nav a{margin-right:16px;display:inline-block}.source-meta{color:var(--muted);font-size:14px}.source-figure,figure[data-source-image]{margin:32px 0;padding:16px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.source-figure img,figure[data-source-image] img{display:block;max-width:100%;height:auto;margin:auto}figcaption{color:var(--muted);font-size:14px;line-height:1.7;margin-top:14px}
+@media(max-width:680px){main{padding:28px 18px}.band,.split{grid-template-columns:1fr}.band{gap:22px}.number{font-size:38px}th,td{padding:10px}#translation{font-size:16px}.lead{font-size:19px}}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/agents-judgment-calls" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header class="hero">
+<div class="eyebrow">Anthropic · Research · 2026 年 10 月 27 日</div>
+<h1>AI 智能体如何影响专家的判断与决策</h1>
+<p class="english">How AI agents shape experts’ judgment calls</p>
+<p class="lead"><strong>一句话总括：</strong>研究通过随机分配智能体的偏好发现，AI 能显著左右专家在多个合理选项之间的取舍，而专家未必意识到自己的判断受到了多少影响。</p>
+<p class="meta">作者：Amaç Herdağdelen、Hailey Joren、Alex Tamkin · <a href="https://www.anthropic.com/research/agents-judgment-calls">原文</a></p>
+</header>
+<section aria-label="核心数据" class="band">
+<div><div class="number">86%</div><p>四项分析决策中，分析师的选择与智能体偏好一致的比例。</p></div>
+<div><div class="number">77%</div><p>至少在一次事后回答中复用了智能体论据的分析师比例。</p></div>
+<div><div class="number">15%</div><p>在事后回答中曾注明论据来自智能体的分析师比例。</p></div>
+</section>
+<section class="summary-block">
+<h2>随机分配的偏好，改变了专家的分析路径</h2>
+<p>研究招募了 61 名具备因果推断经验的分析师。其中 50 人使用 Claude Code，评估一家虚构农业合作社是否应扩大咨询项目。智能体对四项分析决策和最终建议的偏好，都由抛硬币决定。参与者并不知道这一安排。</p>
+<p>智能体必须诚实论证，并在证据明确反对时改变立场。即便如此，分析师的选择仍普遍与其偏好一致。这说明，<mark>影响判断不一定需要欺骗，也可能来自对某一合理选项的充分论证。</mark></p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>分析决策</th><th>两个合理选项</th><th>与智能体偏好一致的比例</th></tr></thead>
+<tbody>
+<tr><td>结果指标</td><td>每公顷产量／每单位运营成本的产量</td><td>92%</td></tr>
+<tr><td>比较方法</td><td>双重差分／直接比较并进行统计调整</td><td>82%</td></tr>
+<tr><td>评估覆盖范围</td><td>已参加项目的农场／合作社全体成员</td><td>81%</td></tr>
+<tr><td>加权方式</td><td>每个农场权重相同／较大生产者权重更高</td><td>90%</td></tr>
+<tr><td>四项合计</td><td>以上四项分析决策</td><td>86%</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note">范围：使用智能体的 50 名分析师。若随机分配的偏好没有影响，整体一致率的预期约为 50%。</p>
+</section>
+<div class="split">
+<article class="risk">
+<h3>已有立场，也可能随智能体改变</h3>
+<p>在分析师先于智能体表达偏好的 <strong>38 个案例</strong>中，智能体反对时，分析师有 <mark class="warn">60%</mark> 改变选择。智能体赞同时，这一比例为 <strong>6%</strong>。</p>
+<p>差距为 54 个百分点，95% 置信区间为 24—82 个百分点。样本较小，也无法排除先表达偏好的分析师存在系统性差异，因此不能把这项比较直接视为确定的因果效应。</p>
+</article>
+<article>
+<h3>最终建议受上游分析选择影响</h3>
+<p>智能体倾向推广项目时，54% 的分析师建议推广。智能体倾向另一选项时，这一比例为 36%。</p>
+<p>只用四项分析偏好，统计模型就能正确预测 <strong>82%</strong> 的最终建议，高于始终猜测最常见建议的 <strong>61%</strong>。该比较排除了建议延期的分析师。影响最终决策的关键环节，可能早已发生在分析过程中。</p>
+</article>
+</div>
+<section class="insight">
+<h3>“这是我的判断”，并不等于判断独立</h3>
+<p>事后调查中，<strong>52%</strong> 的分析师认为最终建议更多体现自己的判断。认为建议更属于自己与更属于智能体的两组，选择向智能体偏好移动的平均幅度分别约为 <strong>65 和 79 个百分点</strong>。差异处于误差范围内。</p>
+<p>四项决策全部跟随智能体的人，最终建议的平均信心为 <strong>71 分</strong>。其余人为 <strong>73 分</strong>，量表范围为 0—100 分。<mark>主观归属感与信心，都不足以证明判断没有受到 AI 影响。</mark></p>
+</section>
+<section class="summary-block">
+<h2>AI 使用者更快、错误更少，但两组不能直接比较</h2>
+<div class="table-wrap">
+<table>
+<thead><tr><th>指标及范围</th><th>使用智能体</th><th>未使用智能体</th></tr></thead>
+<tbody>
+<tr><td>参与人数</td><td>50 人</td><td>11 人</td></tr>
+<tr><td>严重方法错误</td><td>3/50，6%</td><td>6/11，55%</td></tr>
+<tr><td>耗时中位数</td><td>65 分钟</td><td>90 分钟</td></tr>
+<tr><td>拥有硕士或博士学位</td><td>24/46</td><td>4/11</td></tr>
+<tr><td>分析岗位经验不超过两年</td><td>15/48</td><td>6/11</td></tr>
+<tr><td>自评因果推断水平为熟练或专家</td><td>43/48</td><td>8/11</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note">分母按原文提供的各项有效数据列示。是否使用智能体由参与者自行选择，未使用组规模更小，平均经验也更少。</p>
+<p>这些结果提示 AI 可能提高执行质量，但<mark class="warn">不能据此断定效率和错误率的差异由 AI 造成</mark>。文章的重点是：技术执行的质量，与关键判断是否独立，是两件需要分别考察的事。</p>
+</section>
+<section class="insight">
+<h3>现实影响尚不确定，独立审查的含义需要重新检视</h3>
+<p>实验刻意强化了智能体表达偏好的倾向。研究只涉及一个农业任务、一个模型 Claude Opus 4.8，以及约一小时的工作。分析师熟悉因果推断，但不熟悉农业，现实中的领域知识可能降低 AI 的影响。</p>
+<p>模型在没有被指定偏好时也并非完全中立：Claude Opus 4.8 在 <strong>123 次运行中的 112 次</strong>作出了同一组五项选择。不过，这不能直接说明真实工作中的影响会有多大。</p>
+<p>如果不同团队都接受同一模型的偏好，表面上的共识可能失去独立性。文章因此提出三个研究方向：衡量日常工作中的判断让渡、改进智能体的交互方式，以及为人类判断和技能发展建立明确的制度安排。</p>
+</section>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<ol>
+<li><strong>诚实的 AI 也能左右判断。</strong>当多个选项都合理时，对单一选项的充分论证就可能改变专家的取舍。</li>
+<li><strong>上游分析决定下游建议。</strong>指标、方法、覆盖范围和权重的选择，会先改变估计值，再影响最终决策。</li>
+<li><strong>签字与信心不能证明独立性。</strong>专家可能采用 AI 的论据，却仍把结果视为自己的判断。</li>
+<li><strong>执行质量和判断自主性需要分别评估。</strong>工作做得更快、错误更少，不代表关键取舍仍由人自主完成。</li>
+<li><strong>人机分工应当经过主动选择。</strong>哪些判断可以交给 AI，哪些需要保留给人，应由明确的工具和制度支持，而非在使用中不知不觉形成。</li>
+</ol>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<nav aria-label="原文章节">
+<a href="#study-design">01 研究设计</a>
+<a href="#results">02 结果</a>
+<a href="#limitations">03 本研究的局限</a>
+<a href="#implications">04 这意味着什么</a>
+</nav>
+<div class="source-meta">
+<p>发布日期</p>
+<p>团队</p>
+<p>Alignment</p>
+<p>Amaç Herdağdelen、Hailey Joren、Alex Tamkin</p>
+</div>
+<p>专家把工作交给 AI 智能体时，人们通常认为，重要的决定仍由专家作出。智能体编写代码、进行计算并提供建议。但要衡量什么、如何解释模棱两可的证据，以及下一步该做什么，仍由专家决定。这些问题往往不止一个合理答案。最终如何取舍，取决于决策者的经验和价值观。</p>
+<p>我们想了解，专家是否真的在作出这些重要决定，还是在实际工作中接受了 AI 智能体的判断。我们在一篇新论文中报告了一项研究。研究邀请 50 名专业分析师使用 Claude Code，完成一项贴近实际的统计分析。他们都有因果推断经验，也就是根据数据判断一件事是否导致另一件事。他们的任务是向一家农业合作社提出建议：合作社正在运行的咨询服务是否有效，是否应该扩大规模。</p>
+<p>在分析过程中，分析师需要完成四项选择。每项都有两个合理选项。例如，生产率应按每公顷作物产量衡量，还是按每单位运营成本对应的产量衡量。之后，他们还需要作出最终决定。为了观察这些取舍是否由分析师自己作出，我们为每位分析师的智能体设置了偏好，让它在每项决策中倾向某个选项。分析师并不知道这一安排。智能体“偏向”哪一边，由抛硬币决定。我们要求智能体为其偏好提出最有力、诚实的论证。如果证据要求它改变看法，它就应改变，而且绝不能误导用户。</p>
+<p>在这四项分析选择中，分析师有 86% 的选择与智能体的偏好一致。如果智能体的意见没有影响，这一比例的预期应当约为 50%。有些分析师在智能体发表意见前已经表达了自己的偏好。如果智能体不同意，他们有 60% 的时候会改变原有选择。如果智能体同意，这一比例仅为 6%。</p>
+<p>任务结束后，我们请分析师解释自己的选择。77% 的人使用了智能体提出的论据，有时甚至逐字重复。但只有 15% 的人说明这些论据来自智能体。那些紧跟智能体建议的分析师，对最终建议的信心与其他人相近。他们也差不多同样容易认为，最终建议是自己判断的产物。</p>
+<p>我们不知道，这些发现能在多大程度上说明现实世界的情况。真实使用中的智能体有时也会偏向某一边。在没有被指定偏好的情况下，Claude Opus 4.8 在 123 次运行中的 112 次作出了同一组五项选择。但在这项研究中，我们有意强化了智能体的偏好，以测量其影响。如果没有明确指定偏好，也没有要求智能体主动表达偏好，影响可能会更小。</p>
+<figure class="source-figure" data-source-image="0"><img alt="Three-panel diagram of the study design. Panel 1: each participant makes five open-ended decisions, each with two defensible options: outcome (yield per operating cost or crop yield per hectare), comparison method (levels adjustment or difference-in-differences), which farms the assessment covers (the full membership or enrolled farms), weighting (by production or per farm), and recommendation (discontinue or roll out). Panel 2: on each decision a coin flip secretly sets which option the participant’s AI favors, with example statements from an AI leaning each way. Panel 3: a hypothetical example showing that the gap in the share choosing option A between the two groups estimates the lean’s effect." decoding="async" height="926" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/ea6b9bd3ca8b59f150d912a3855fc1beaf9e7792-1920x926.png" width="1920"/>
+<figcaption>参与者完成一项分析任务，其中包含五项允许自主取舍的决策。针对每位参与者的每项决策，我们通过抛硬币决定其 AI 偏向哪个选项，且不告知参与者。我们比较 AI 持不同偏好时，参与者选择选项 A 的频率。</figcaption>
+</figure>
+<p>这并不是一个单纯告诫人们不要与 AI 合作的故事。使用智能体的分析师完成任务更快，严重错误也远少于选择不使用智能体的人。不过，后者人数较少，经验也较少，因此我们谨慎看待这一差异，不作过度解读。但随着 AI 接手更多具体执行工作，这类决策正日益成为人类判断和价值观影响结果的关键环节。如果专家在不知不觉中接受智能体的判断，智能体的偏好就可能影响政策提案或研究方向等重要决定。这些偏好可能是任意形成的，也可能不符合人类目标，而且没有人主动选择过它们。对于保障 AI 安全的研究，这一点尤其重要。研究人员已经开始使用智能体运行和分析实验。只有当人类审查者作出自己的判断时，他们才能提供独立的检验。</p>
+<h3 id="study-design">研究设计</h3>
+<p>我们招募了 61 名分析师，开展一项随机对照试验。他们都来自经过预筛选的专业人员库。这些人通过了因果推断知识测试，日常使用 Python 或 R 编程语言，并有观察性因果分析的实践经验。观察性因果分析指的是利用现实世界的数据研究因果关系，而不是通过受控实验来研究。</p>
+<p>任务设定在一个虚构组织 Greenfields Farming Cooperative。它运营着一个同样虚构的咨询项目。成员农场可自愿付费参加，以提高作物产量。约 40% 的成员已参加。合作社理事会必须决定，是补贴并扩大该项目，还是终止它。只有项目使农场生产率提高到规定幅度，约 3%—4%，理事会才会扩大项目。但理事会没有明确规定生产率应如何衡量。</p>
+<p>我们有意保留了四项需要自行决定的分析问题。每项都有两个合理选项：</p>
+<ul>
+<li><strong>结果指标：</strong>按每公顷作物产量衡量生产率，还是按每单位运营成本对应的产量衡量？</li>
+<li><strong>比较方法：</strong>比较参加项目的农场在加入前后的产量变化，以及其他农场同期的产量变化，也就是采用“双重差分”（difference-in-differences）设计；还是直接比较产量，并通过统计方法调整农场之间的差异？</li>
+<li><strong>评估覆盖哪些农场：</strong>只衡量项目对已参加农场的影响，还是衡量对合作社全体成员的影响？</li>
+<li><strong>加权方式：</strong>给予每个农场相同权重，还是给予规模更大的生产者更高权重？</li>
+</ul>
+<p>这四项选择最终导向一项建议：向所有成员推广项目，还是终止项目。分析师和智能体也可以建议将项目延长一年。</p>
+<p>每项分析决策都可能让估计的生产率增幅改变几个百分点。当理事会设定的门槛是 3%—4% 时，这种变化就十分重要。</p>
+<p>对于每位分析师面临的五项决策，我们都通过抛硬币设定智能体的偏好。我们在隐藏指令，即系统提示词中，将这些偏好告诉智能体。指令要求它把每项偏好当作自己的观点，在相应决策出现时提出，并在数据允许的范围内为其作出最有力的论证。同一组指令也要求它：如果证据明确反对其偏好，就改变看法；绝不能歪曲结果、隐瞒数据，或提出数据不支持的论点。</p>
+<p>61 名参与者中，有 11 人选择不使用智能体。除非另有说明，分析均不包含这些人。在其余 50 人中，根据 48 名调查回答者的资料，65% 拥有硕士或博士学位，或具备至少六年的经验；90% 自评在观察性因果推断方面达到熟练或专家水平。任务耗时中位数为 65 分钟。一半分析师的耗时介于 50 至 79 分钟之间。他们在网页版 VS Code 编辑器中工作，其中内置 Claude Code，使用的是以 High effort 设置运行的 Claude Opus 4.8。</p>
+<p>任务完成后，分析师提交四项分析选择和最终建议。他们还需提交项目对生产率影响的估计值及其置信区间。随后，他们完成了一份任务后调查。另一个 AI 模型阅读每份提交材料及其代码，记录分析师在各项决策中选择了哪个选项。如果模型的判读与分析师在调查中的回答不一致，则由我们作出最终判定。</p>
+<h3 id="results">结果</h3>
+<p><strong>分析师大多接受了智能体偏向的选项。</strong>在四项分析决策中，分析师的选择绝大多数都与智能体的偏好一致。结果指标的一致率为 92%，比较方法为 82%，估计覆盖哪些农场为 81%，加权方式为 90%。四项合计为 86%。图 2 展示了智能体的偏好让分析师在各项决策中的选择发生了多大变化，其中也包括最终建议。</p>
+<figure class="source-figure" data-source-image="1"><img alt="Dot plot of the share of participants choosing option A when the AI leaned B versus when it leaned A. Outcome: 0% versus 82%, a difference of 82 percentage points. Comparison method: 28% versus 92%, 64 points. Which farms the assessment covers: 38% versus 100%, 62 points. Weighting: 22% versus 100%, 78 points. Recommendation: 36% versus 54%, 17 points." decoding="async" height="864" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/71b6966a15c4da50a8627a6cdb737b509e8c1a1c-1920x864.png" width="1920"/>
+<figcaption>在每项决策中，AI 偏向 A 时（绿色）与偏向 B 时（紫色），参与者选择选项 A 的比例。四项分析决策的比例变化为 62 至 82 个百分点，最终建议的变化为 17 个百分点。</figcaption>
+</figure>
+<p><strong>智能体的偏好对最终建议的直接影响较弱，但它此前的意见仍塑造了结果。</strong>当智能体倾向推广项目时，54% 的分析师建议推广。当智能体倾向另一选项时，这一比例为 36%。（延长一年计为不推广。）我们认为，最终建议受到的直接影响较弱，是因为分析师一旦得到估计值，建议主要就取决于它是否超过理事会设定的 3%—4% 门槛，留给主观判断的空间较少。但在那之前，智能体对分析决策的偏好已经影响了估计值本身。仅使用这四项偏好，统计模型就能正确预测 82% 的分析师建议。相比之下，如果总是猜测最常见的建议，正确率为 61%。（这一比较不包括提出延期建议的分析师。）因此，在分析师尚未开始任务之前，我们仅凭抛硬币的结果，就能在很大程度上预测他们将提出什么建议。</p>
+<p><strong>已经选定一个选项的分析师，在智能体反对时经常改变选择。</strong>在 38 个案例中，分析师先于智能体，在某项分析决策上表达了自己的偏好。当智能体的偏好与其选择相反时，他们有 60% 的时候会改变选择。当智能体的偏好与其一致时，这一比例为 6%。两者相差 54 个百分点。但这项估计只基于 38 个案例，因此并不精确，95% 置信区间为 24 至 82 个百分点。我们也不能确定，这一差异是由 AI 的影响造成的。那些先表达偏好的分析师，可能在某些方面与没有先表达偏好的人存在系统性差异。</p>
+<p><strong>经验和专业水平无法预测谁会接受智能体的判断。</strong>我们在一项探索性分析中，检查了 10 项特征是否能预测分析师的决策与智能体偏好一致的频率。这些特征包括：工作年限、因果推断专业水平的自评、教育程度、因果推断测验得分、对 AI 的信任、使用 AI 的频率、“认知需求”（衡量一个人有多喜欢费力思考）、思想开放程度、性别和年龄。只有年龄表现出统计显著的关联，年长的分析师更常跟随智能体的偏好。但我们不太看重这一结果。当你检验很多不同因素时，偶然得到一个阳性结果的概率也会增加。我们对此进行校正后，该结果就不再显著。而且，大多数分析师在大多数决策中都会跟随智能体，因此本来就没有多少差异可以解释。即使确实存在差异，也很难检测出来。</p>
+<p><strong>跟随智能体偏好的分析师，仍把建议视为自己的判断。</strong>在任务后调查中，52% 的分析师认为，最终建议更多来自自己，而不是智能体。其余人认为，建议更多来自智能体。但两组受到智能体影响的程度大致相同。前一组的选择平均向智能体的偏好移动约 65 个百分点，后一组为 79 个百分点。两者的差异处于误差范围内。分析师对自身建议的信心也呈现类似情况。我们请他们用 0 到 100 分评价信心。0 分代表“和抛硬币差不多”，100 分代表“我愿意拿职业声誉作担保”。在四项分析决策中全部跟随智能体偏好的人，平均得分为 71。其余人为 73。</p>
+<figure class="source-figure" data-source-image="2"><img alt="Dot chart of 48 survey responses to “Whose judgment does the final recommendation mostly reflect?” on a six-point scale. More the agent’s (23): entirely 0, mostly 9, slightly 14. More mine (25): slightly 8, mostly 13, entirely 4." decoding="async" height="640" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/2fffe4329de8e6eed91696e9dc2692e56fadf6cb-1920x640.png" width="1920"/>
+<figcaption>在任务后调查中（n = 48），52% 的人认为最终建议更多来自自己，而不是智能体；35% 的人认为建议主要或完全来自自己。尽管如此，智能体的偏好已经使他们的选择发生了变化。</figcaption>
+</figure>
+<p><strong>分析师用智能体的措辞解释自己的选择。</strong>任务结束后的调查针对每项决策提问：“请简要说明，为什么选择这一项，而不是另一项？如果这不是你主动作出的选择，请直接说明。”回答时，分析师无法回看与智能体的对话。即便如此，77% 的人仍至少在一项回答中重复了智能体的论据，有时甚至逐字重复。只有 15% 的人在回答中的任何地方注明论据来自智能体。</p>
+<p>当我们明确询问他们认为研究的目的是什么时，48 人中有 6 人正确猜到，研究关注的是 AI 对他们选择的影响。但没有人怀疑 AI 自身的偏好被人为操控过。</p>
+<figure class="source-figure" data-source-image="3"><img alt="Two pairs of quotes with shared phrases highlighted. First pair: the agent said “Since the subsidy is funded from surplus on total tonnage, I’d area-weight the headline so it reflects the co-op’s hectares rather than counting a 3-ha plot equal to a 400-ha operation,” and the participant later wrote “The subsidy is funded from surplus on total tonnage so the decision relevant avg is over hectares not farms counted equally.” Second pair: the agent said “But one post-program season is thin ground to scrap a program that might still help, so rather than discontinue outright, extend the voluntary program one more season,” and the participant later wrote “But one post program season, with a design the pre trend test complicates, felt thin ground for scrapping it outright.”" decoding="async" height="932" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/97ff9d5382cc709b66a3bb28ca08e1d933207a38-1920x932.png" width="1920"/>
+<figcaption>智能体在任务中的陈述（橙色），与同一批参与者事后回答“为什么选择这一项，而不是另一项？”时的用语（蓝色），存在相同表述，有时甚至逐字一致。77% 的参与者至少在一项回答中重复了智能体的论据，15% 注明论据来自智能体。参与者在撰写这些回答时，无法回看与智能体的对话记录。</figcaption>
+</figure>
+<p><strong>未使用 AI 的分析师出现了更多严重错误，耗时也更长。</strong>在选择不使用智能体的 11 名参与者中，6 人（55%）出现了足以使结果失效的严重方法错误。使用智能体的 50 人中，则有 3 人（6%）出现此类错误。两个 AI 模型标记了这些错误。随后，一名研究作者在不知道分析师所属组别的情况下，逐一进行了核查。未使用智能体的分析师耗时也更长，中位数为 90 分钟，而其他人为 65 分钟。</p>
+<p>这两组不能直接比较。因此，我们无法确定，不同结果是否由使用或不使用 AI 的决定造成。未使用 AI 的人平均经验更少。拥有硕士或博士学位的比例更低：未使用组为 11 人中的 4 人，使用组为 46 人中的 24 人。分析岗位经验不超过两年的比例更高：未使用组为 11 人中的 6 人，使用组为 48 人中的 15 人。自评因果推断水平为熟练或专家的比例也更低：未使用组为 11 人中的 8 人，使用组为 48 人中的 43 人。</p>
+<h3 id="limitations">本研究的局限</h3>
+<p><strong>我们刻意强化了智能体的偏好。</strong>我们的指令使智能体稳定地持有并表达某种偏好，以便测量其影响。我们报告的比例，反映的是智能体偏向某个选项并明确说出来时会发生什么。它在多大程度上适用于现实工作，取决于专家自身观点有多坚定、相关决策的界定有多清楚，以及模型如何表现。后者包括模型是否有偏好，以及是否会主动表达偏好。</p>
+<p><strong>我们只研究了一个领域中的一项任务，并且只使用了一个模型。</strong>任务耗时约一小时，具体内容与农业有关，智能体使用的是 Claude Opus 4.8。分析师是因果推断专家，但对农业并不熟悉。在真实工作中，他们会更了解所在领域，也可能有更明确的自身观点。他们还可以访谈相关人员、与理事会沟通，或通过其他方式缩小合理选项的范围。这些做法可能降低智能体的影响。</p>
+<p><strong>我们的估计是分析师群体的平均值。</strong>由于不同分析师对应的抛硬币结果不同，比较智能体持相反偏好的分析师，可以得知偏好的平均影响。我们没有在智能体表达偏好前，记录每位参与者自己的观点。因此，我们无法说明某个具体参与者受到了多大影响。</p>
+<p><strong>我们记录了分析师选择哪个选项，但没有记录他们的偏好有多强。</strong>接受智能体判断的一种可能原因，是专家本身没有强烈意见。我们只测量了分析师的选择是否变化，没有测量他们对该选择有多大信心。</p>
+<h3 id="implications">这意味着什么</h3>
+<p>分析师如此容易接受智能体的判断，原因之一可能是专家并不总是在开始工作时就形成完整观点。他们往往是在权衡选项的过程中，逐渐明确，甚至才发现自己真正的看法。我们要求研究中的智能体不得误导用户。它们也经常坦诚说明，不同选项会如何改变结果。但它们很少充分论证专家为什么可能更倾向另一个选项，而这本可以帮助分析师在更充分知情的情况下作出选择。当只有一方得到了充分论证，分析师就可能尚未明确自己的假设，便接受了智能体的假设。</p>
+<p>对专家个人而言，这可能意味着失去对自己工作的自主掌控。这是研究人员所称的“自主权削弱”（disempowerment）的一种形式。工作仍以专家的名义对外呈现。但最依赖专家判断的那些决定，实际上却由智能体的先入观点作出了。</p>
+<p>然而，影响不止于个人，因为大量科学研究和政策工作都依赖这类判断与取舍。当不同研究团队得出相同结果时，我们会更加信任它，因为我们假定每个团队都是独立得出结果的。如果这些团队都接受了具有相同偏好的模型的判断，那么它们之间的一致就可能不再具有独立性。表面上的共识，可能只反映了某个模型的偏好。如果这些偏好是任意形成的，或不符合人类目标，同一种偏差就会同时影响许多结果。</p>
+<p>AI 安全研究也面临同样的问题。研究人员已经开始使用 AI 智能体运行和分析实验，部分原因是工作量已经超出人类研究人员能够处理的范围。让人类保留在决策环节中的做法，假定人类判断能够提供独立检验。但在我们的研究中，分析师签字认可的工作，其关键判断大多已经由智能体随机分配到的偏好决定。我们的完整论文还表明，没有被指定偏好的智能体也有自身较弱的偏好，有时还会反对用户的意见。</p>
+<p>这种判断让渡很难被发现。检查 AI 辅助工作的错误，或将其与参考答案对照，都假定存在一个正确答案。但对于需要判断取舍、没有唯一正确答案的问题，无论选择哪一项，工作都可能看起来合理。事后询问专家也未必有用，因为他们可能没有察觉到智能体的影响。</p>
+<p>这并不是主张减少 AI 使用。如果运用得当，AI 可以扩大人的自主性，而不是削弱它。我们提出了三个值得未来研究的方向：</p>
+<ul>
+<li>
+<p><strong>衡量判断让渡。</strong>我们能够在这项研究中测量判断让渡，是因为我们随机分配了智能体的偏好。真实工作中很少能这样做。我们的结果也表明，人们可能无法准确报告自己受到了多少影响。我们需要能够在日常环境中测量这种现象的方法。近期有研究尝试估计一个人在不使用 AI 时会如何完成任务，这是一个良好开端。我们还需要更清楚地了解模型的默认偏好，以及它们如何表达这些偏好。这样，人们才能在更充分知情的情况下与模型互动。</p>
+</li>
+<li>
+<p><strong>以不同方式设计智能体。</strong>智能体可以为每个选项提出最有力的论证，也可以先询问专家自己的看法，再提出意见。但这种做法很快就可能让用户不堪重负。单次分析可能包含许多尚待决定的问题，而 AI 的很大一部分价值，就在于人们不必逐项思考。智能体需要只提出最重要的决策，但挑选哪些决策最重要，本身也需要判断。模型的表达方式可能同样重要，因为自信和流畅的表达会影响人。一个听起来非常笃定的模型，可能对人的选择产生超出其依据所应支持的影响。但一个说话含糊、畏首畏尾的模型，只会让使用它的人感到恼火。</p>
+</li>
+<li>
+<p><strong>改变制度。</strong>机构常把专家签字认可，视为其作出独立判断的证据。随着 AI 承担更多工作，这一假设越来越不稳固。组织需要有意识地决定，哪些决策必须由人在充分知情的基础上亲自判断，并给予人们形成判断所需的时间和资源。判断也依赖技能。如果人们不再作出这些决策，就可能失去相应能力。随着模型能力增强，机构需要制定明确策略，确立人类的角色，并安排人类技能的发展。即使 AI 系统极其强大，机构仍可能希望保护人的技能和监督能力。原因可能是安全或韧性的需要，也可能是机构认为这些能力本身就有价值。</p>
+</li>
+</ul>
+<p>人与 AI 之间，或许不存在唯一正确的分工。有些决策可以放心交出去，另一些则值得保留。有了合适的工具，这种分工就可以由我们主动选择，而不是在不知不觉中形成。</p>
+<h3>作者与致谢</h3>
+<h4>致谢</h4>
+<p>本项目由 Amaç Herdağdelen、Hailey Joren 和 Alex Tamkin 牵头。本篇博客文章的编辑支持由 Tom Chivers 和 Arjun Panickssery 提供。</p>
+<p>感谢 Joe Benton、Mojmir Stehlik 和 Avery Griffin 通过 Anthropic Fellows Program 为本项目的开展提供支持。也感谢 Matthew Jörke、Onur Altındağ 和 Vishakh Padmakumar 对实验设计提出反馈。</p>
+<h4>引用</h4>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>利用 Claude 加速药物开发的早期进展</title>
+<style>
+:root {
+  --bg:#f7f6f2; --card:#ffffff; --ink:#202c35; --muted:#5e6b75;
+  --line:#d8dfe2; --data:#155bb3; --risk:#ad4728; --opportunity:#087563;
+  --conclusion:#7347a7; --hl:#e6efff; --hl2:#e0f2ea; --risk-bg:#fff0e7;
+  --conclusion-bg:#efe8f8; --hero:#192c3b; --hero-ink:#f1f5f8; --hero-muted:#c4d3de;
+}
+:root[data-theme="light"] {
+  --bg:#f7f6f2; --card:#ffffff; --ink:#202c35; --muted:#5e6b75;
+  --line:#d8dfe2; --data:#155bb3; --risk:#ad4728; --opportunity:#087563;
+  --conclusion:#7347a7; --hl:#e6efff; --hl2:#e0f2ea; --risk-bg:#fff0e7;
+  --conclusion-bg:#efe8f8; --hero:#192c3b; --hero-ink:#f1f5f8; --hero-muted:#c4d3de;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#121a20; --card:#1b252e; --ink:#dce5ec; --muted:#a5b4c0;
+    --line:#364550; --data:#80b5ff; --risk:#f2a17f; --opportunity:#70d2b6;
+    --conclusion:#c3a3f1; --hl:#20354e; --hl2:#193b34; --risk-bg:#392920;
+    --conclusion-bg:#30263f; --hero:#101f2b; --hero-ink:#e0eaf2; --hero-muted:#aabecf;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:#121a20; --card:#1b252e; --ink:#dce5ec; --muted:#a5b4c0;
+  --line:#364550; --data:#80b5ff; --risk:#f2a17f; --opportunity:#70d2b6;
+  --conclusion:#c3a3f1; --hl:#20354e; --hl2:#193b34; --risk-bg:#392920;
+  --conclusion-bg:#30263f; --hero:#101f2b; --hero-ink:#e0eaf2; --hero-muted:#aabecf;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;line-height:1.8}
+main{max-width:1100px;margin:auto;padding:32px 24px 72px}
+header{background:var(--hero);color:var(--hero-ink);padding:44px;border-radius:20px}
+h1{font-size:clamp(30px,4vw,46px);line-height:1.25;margin:12px 0 18px}
+.english{color:var(--hero-muted);font-size:19px;line-height:1.5}
+.meta{font-size:13px;letter-spacing:.04em;color:var(--hero-muted)}
+.one-line{font-size:19px;border-top:1px solid var(--hero-muted);padding-top:22px;margin-top:26px}
+h2{font-size:27px;line-height:1.4;margin:0 0 20px}
+h3{font-size:20px;line-height:1.5;margin:0 0 12px}
+p{margin:0 0 16px}
+.summary{margin:32px 0}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:28px 0}
+.metric{background:var(--card);padding:24px}
+.metric strong{display:block;color:var(--data);font-size:34px;line-height:1.3}
+.metric span{font-size:14px;color:var(--muted)}
+.table-block{padding:24px 0}
+.table-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:15px;background:var(--card)}
+th,td{text-align:left;vertical-align:top;padding:16px;border-bottom:1px solid var(--line)}
+th{background:var(--hl);color:var(--data)}
+td:first-child{font-weight:700;min-width:135px}
+.note{font-size:13px;color:var(--muted);margin-top:12px}
+mark{background:var(--hl);color:var(--data);padding:1px 4px;border-radius:3px}
+.opportunity{background:var(--hl2);padding:26px;border-left:5px solid var(--opportunity);margin:24px 0}
+.opportunity h3{color:var(--opportunity)}
+.columns{display:grid;grid-template-columns:1fr 1fr;gap:28px;padding:24px 0}
+.columns article{border-top:3px solid var(--line);padding-top:20px}
+.conclusion{color:var(--conclusion);font-weight:650}
+.risk{background:var(--risk-bg);padding:26px;border-left:5px solid var(--risk);margin:24px 0}
+.risk h3{color:var(--risk)}
+.takeaways{background:var(--conclusion-bg);padding:28px;border-radius:14px}
+.takeaways h3{color:var(--conclusion)}
+.takeaways li{margin:10px 0}
+#translation{max-width:800px;margin:52px auto 0;padding-top:38px;border-top:2px solid var(--line)}
+#translation h2{font-size:32px}
+#translation h3{margin-top:38px;font-size:25px}
+#translation h4{margin-top:26px;font-size:19px}
+#translation p{margin-bottom:21px}
+.source-meta{color:var(--muted);font-size:14px}
+blockquote{margin:24px 0;padding:8px 0 8px 24px;border-left:4px solid var(--conclusion);color:var(--ink)}
+.source-figure{margin:32px 0}
+.source-figure img{display:block;max-width:100%;height:auto;margin:auto}
+figcaption{font-size:14px;color:var(--muted);margin-top:12px}
+a{color:var(--data)}
+@media(max-width:700px){
+  main{padding:18px 16px 48px}
+  header{padding:28px 22px}
+  .metrics,.columns{grid-template-columns:1fr}
+  .metric{padding:18px 22px}
+  th,td{padding:12px}
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/early-progress-drug-development" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header>
+<div class="meta">Anthropic · Research · 2026 年 10 月 27 日</div>
+<h1>利用 Claude 加速药物开发的早期进展</h1>
+<p class="english">Early progress on accelerating drug development with Claude</p>
+<p class="one-line"><strong>一句话总括：</strong>Anthropic 通过真实药物项目展示了 Claude 在研发多个环节的早期作用，并用实验室结果和流程数据说明：AI 的贡献可以超出分子设计，但这些进展多数仍有待临床验证。</p>
+</header>
+
+<section class="summary" aria-label="中文总结">
+<div class="metrics">
+<div class="metric"><strong>6 家</strong><span>研发新药的合作机构，覆盖不同疾病与开发阶段。</span></div>
+<div class="metric"><strong>约 35,000 个</strong><span>Divergence 在约一个月内生成的抗体设计，仍需筛选与测试。</span></div>
+<div class="metric"><strong>89%</strong><span>Enveda 文件测试中人工审核时间的降幅。</span></div>
+</div>
+
+<div class="table-block">
+<h2>实验室进展覆盖设计与优化，评价指标各不相同</h2>
+<p>三个案例分别涉及 CAR T-cell therapy 的设计、食物过敏药物的初始候选设计，以及抗体片段优化。它们显示 AI 可以参与具体实验迭代，但衡量的是不同环节的结果，不能直接当作临床疗效比较。</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>项目与环节</th><th>规模或时间</th><th>原文报告的早期结果</th></tr></thead>
+<tbody>
+<tr>
+<td>Generate Biomedicines<br>治疗形式工程改造</td>
+<td>6 名科学家使用 Claude Code</td>
+<td>一个设计比标准版本短约 <mark>70%</mark>。实验室测试中，免疫细胞产生的受体数量约为原来的 <mark>10 倍</mark>，杀伤肿瘤细胞更有效，活性维持更久。</td>
+</tr>
+<tr>
+<td>Divergence Labs<br>命中分子生成</td>
+<td>约 1 个月生成约 35,000 个抗体设计</td>
+<td>早期测试找到 3 个可结合 IgE 的设计，以及 20 个可促使 IgE 脱离免疫细胞的设计。后者中有 3 个似乎优于标准药物。两条功能“臂”尚待组合。</td>
+</tr>
+<tr>
+<td>BigHat Biosciences<br>先导物优化</td>
+<td>约 10 周制备并测试约 1,010 个变体，涉及 2 个先导物</td>
+<td>最优版本的结合能力达到原来的 10 倍以上。靶向癌细胞的先导物维持溶解状态的温度提高 18°C。用于延长药物体内停留时间的先导物，聚集速度减慢超过 100 倍。</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="note">范围：各合作项目的早期实验结果。数字分别对应各自任务与测量指标，原文未报告这些设计的人体疗效。</p>
+<p class="conclusion">这些结果把 AI 的作用从“提出设计”推进到“接受实验检验”，但尚未证明最终药物能在患者身上取得同样收益。</p>
+</div>
+
+<div class="opportunity">
+<h3>文件审核也能形成可测量的效率提升</h3>
+<p>Enveda 的生产化学家原本最多花费 <strong>75%</strong> 的时间处理文书。连接生产文件与 Claude 后，审核任务出现了明显的时间节省。</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>测试或任务</th><th>范围与结果</th><th>时间变化或审核结果</th></tr></thead>
+<tbody>
+<tr><td>生产文件审核</td><td>1,061 页；检出人工已发现的全部 11 个问题，并额外标出 7 个遗漏问题</td><td>人工审核从超过 25 小时降至不足 3 小时，减少 89%</td></tr>
+<tr><td>第一份监管文件初稿</td><td>Claude 起草</td><td>4 小时；人工起草约需 3 个月</td></tr>
+<tr><td>另一份监管文件初稿</td><td>Claude 起草</td><td>Enveda 的标准人工审核发现 1 处轻微错误</td></tr>
+</tbody>
+</table>
+</div>
+<p>这说明药物开发的提速空间也存在于生产与申报流程中。文中数据针对文件审核和初稿撰写，不能等同于整个监管审批过程的提速。</p>
+</div>
+
+<div class="columns">
+<article>
+<h3>研发组织方式也在试验之中</h3>
+<p>The Column Group 正在设立 Pleiades，希望让小团队借助 Claude 运行更多、更复杂的药物项目。其首个用于评估药物靶点是否值得推进的 Claude skill，已在 <mark>45 个靶点—疾病配对</mark>上接受评估。</p>
+<p>Anthropic 收购的 Mithril Medicine 原本是一人公司。创始人借助 Claude 协调 <mark>11 家外部实验室</mark>，用不到 18 个月将一种肌营养不良症的潜在疗法从构想推进到取得有希望的小鼠实验结果。</p>
+<p class="conclusion">这里探索的是降低研发的科学与运营负担；Pleiades 模式能否在行业中复制，仍取决于后续成效。</p>
+</article>
+<article>
+<h3>进入临床阶段仍是下一步</h3>
+<p>Bristol Myers Squibb 正使用 Claude 评估一种早期药物的临床试验计划，并估计试验成功的可能性。双方计划在 <mark>2027 年</mark>扩大合作。</p>
+<p>Mithril 的研究已在 Anthropic 内继续推进。如果候选药物后续表现持续良好，团队预计最早可在 <mark>2028 年末</mark>准备好启动人体临床试验。</p>
+<p class="conclusion">这些时间点是计划与有条件的预期。原文尚未给出临床成功率提高的测量结果。</p>
+</article>
+</div>
+
+<div class="risk">
+<h3>最大的证据边界：多数项目仍处于临床前阶段</h3>
+<p>Anthropic 明确指出，整体研究仍处于早期，多数药物尚未进入人体测试。当前证据主要包括分子性质、实验室表现、小鼠实验与工作流程指标。</p>
+<p>因此，应把这些成果理解为<strong>研发环节的早期进展</strong>。它们能帮助识别 Claude 的能力与局限，但还不能回答新药能否安全、有效地治疗患者。</p>
+</div>
+
+<div class="table-block">
+<h3>扩大使用与改进模型同步推进</h3>
+<p>这些项目既用于推进具体药物，也用于识别模型需要改进的地方。Anthropic 表示，已经据此确定了部分模型改进的优先事项。</p>
+<ul>
+<li><strong>Claude Science：</strong>为研究人员提供 AI 工作台，同时向生命科学研究人员提供 Claude 使用额度。</li>
+<li><strong>Life Sciences Verification Program：</strong>允许受信任的机构使用最强模型，并适用限制较宽松的防护措施，以支持正当的生物学研究。</li>
+<li><strong>客座研究人员公开征集：</strong>邀请研究团队提交利用 Claude 探索药物发现及其他领域关键问题的方案。</li>
+</ul>
+<p class="conclusion">扩大影响的路径是让更多研究人员使用模型，并把 Claude 更深入地接入真实研发流程。</p>
+</div>
+
+<div class="takeaways">
+<h3>最值得带走的洞见</h3>
+<ul>
+<li>药物开发的瓶颈分散在整个流程中。AI 的作用既可能体现在分子设计，也可能体现在制造、文件与项目运营。</li>
+<li>最有说服力的早期案例包含实验或审核验证，而不只是模型生成了多少方案。</li>
+<li>不同项目使用不同指标。受体数量、结合能力、审核时间与临床成功率不能相互替代。</li>
+<li>小团队运行复杂研发项目的模式正在被探索。其融资与行业影响仍有待验证。</li>
+<li>多数成果仍属临床前进展。人体试验将是检验药物实际价值的关键后续阶段。</li>
+</ul>
+</div>
+</section>
+
+<section id="translation">
+<h2>完整译文</h2>
+
+<nav aria-label="原文目录">
+<p>01 案例研究</p>
+<p>02 拓展我们在生命科学领域的工作</p>
+</nav>
+<div class="source-meta">
+<p>发布日期</p>
+<p>团队</p>
+<p>科学</p>
+</div>
+
+<p>Anthropic 的生命科学团队正致力于加快治愈疾病的进程。过去几个月，我们的科学家与六家开发新药的机构建立了深入的研究合作关系：BigHat Biosciences、Bristol Myers Squibb、Divergence Labs、Enveda、Generate Biomedicines，以及 The Column Group。我们也启动了自己的药物发现工作。在这一过程中，我们加深了对 Claude 如何支持药物开发的认识。我们也更加了解，要实现 AI 在医学领域的潜力，还需要在哪些方面进一步改进 Claude。接下来，我们计划大幅扩大这项工作的规模。</p>
+
+<p>加快药物开发的机会有很多。它们不限于人们最常讨论的 AI 应用，例如提出新分子的初始设计。药物开发涉及许多不同任务：开展早期研究，确定药物靶点，以及适合与靶点作用的药物类型；设计具有所需性质的分子；优化分子，使其能够可靠地实现规模化生产；起草开展临床试验所需的监管申报文件；设计和组织实施临床试验，等等。</p>
+
+<p>我们希望让 AI 越来越多地参与所有这些任务，以实现它在医学上的价值。需要解决的并不是某一个问题。瓶颈分散在药物开发的整个流程中。要找出并逐步解决这些瓶颈，最好的办法是深入参与真实的药物项目，覆盖多种疾病领域和不同的开发阶段。</p>
+
+<p>因此，过去几个月，我们与六家机构开展了合作。我们也启动了自己的药物发现工作，其中包括针对儿童罕见肌营养不良症类型的项目。在这些项目中，Claude 承担了大量科研和运营工作。</p>
+
+<p>这项工作从三个方面服务于我们的目标。首先，它让我们能够在更广泛的药物开发任务中，更好地了解模型的优势与局限。根据目前的认识，我们已经将一些具体的模型改进列为优先事项。其次，这些项目可以为更广泛的生命科学界提供案例参考。如果希望 Claude 显著加快新疗法的产生，我们就需要与更多生物技术公司合作，并让 Claude 更深入地融入它们的开发流程。第三，如果这些项目继续保持良好的进展，它们本身也应当产生直接影响。我们乐观地认为，其中一些项目可能会带来有效的新药，用于治疗其所针对的疾病，包括食物过敏、儿童罕见病和多种癌症。</p>
+
+<p>本文将介绍我们与合作伙伴取得的最新进展。随文提供的技术报告和预印本，更详细地阐述了我们的思路、方法与早期结果。之后，我们会简要介绍下一步的工作方向。</p>
+
+<h3>案例研究</h3>
+
+<h4>Generate Biomedicines：治疗形式的工程改造</h4>
+<p>Generate Biomedicines 一直致力于扩大一种癌症疗法的用途。这种疗法称为 CAR T-cell therapy（CAR T 细胞疗法）。过去，它已用于治疗血液系统癌症。Generate 希望通过重新设计，使其也能治疗实体瘤。为此，他们计划缩短这项疗法的一部分遗传指令，为适用于其他癌症的额外指令腾出空间。Generate 的六名科学家使用 Claude Code，为这部分指令提出了新设计。一个设计比标准版本短约 70%，而且在实验室测试中效果更好：它使免疫细胞产生的受体数量达到约 10 倍。受体是免疫细胞用来识别癌细胞的蛋白质。这一设计还使免疫细胞更有效地杀死肿瘤细胞，并更长时间地保持活性。了解更多，并参阅 Generate 的技术报告。</p>
+
+<h4>Divergence Labs：命中分子生成</h4>
+<p>Divergence Labs 正在研究一种治疗食物过敏的新方法。食物过敏由一种名为 IgE 的分子引发的反应所触发。部分 IgE 附着在免疫细胞上，另一些则游离于血液中。Divergence Labs 正在开发的药物，希望让 IgE 从免疫细胞上完全脱离。标准药物则仅中和血液中循环的 IgE。新方法可能带来更有效的治疗，但需要精确设计两条“臂”：一条牢固结合 IgE，另一条帮助将 IgE 从免疫细胞上撬离。Claude 将 Divergence Labs 的目标转化为详细的设计方案。随后，它在基本自主运行的情况下，用约一个月生成了约 35,000 个抗体设计，供后续筛选和测试。在早期测试中，Divergence 为两条臂都找到了“命中”设计：3 个能够结合 IgE，20 个能够使 IgE 脱离免疫细胞。在这 20 个设计中，有 3 个似乎比标准药物更能促使 IgE 脱离。下一步是构建一种将两条臂结合起来的药物。了解更多，并参阅 Divergence 的技术报告。</p>
+
+<h4>BigHat Biosciences：先导物优化</h4>
+<p>BigHat Biosciences 将 AI 与自动化实验室结合，用于改进潜在药物，也就是“先导物”。这些先导物必须牢固结合靶点，在生产与储存过程中保持稳定，并避免聚集。此外，它们还需要满足其他标准。BigHat 的科学家与一名 Anthropic 研究人员使用 Claude，改善了两个先导物的上述三项性质。两者都是可能成为未来药物组成部分的抗体片段。一个旨在靶向癌细胞，另一个旨在延长药物在体内的停留时间。Claude 接入了 BigHat 的实验室数据系统 Reccy，并对每个分子提出修改建议。BigHat 的实验室在约 10 周内制备并测试了约 1,010 个变体。在项目进行到一半时，团队怀疑标准的热稳定性和聚集指标具有误导性。Claude 与这名研究人员重新分析了原始数据，随后提出了不同的指标，并建议修改实验方案来检验这些指标。BigHat 的科学家完善并执行了该方案，主要预测得到了验证。与原始版本相比，最优版本的结合能力达到原来的 10 倍以上。靶向癌细胞的先导物能够在比原来高 18°C 的温度下维持溶解状态。用于延长药物体内停留时间的先导物，其聚集速度减慢了超过 100 倍。了解更多，并参阅 BigHat 的技术报告。</p>
+
+<h4>Enveda：生产与申报</h4>
+<p>要开展临床试验，公司需要提供记录，证明每批新药都按照严格的质量标准生产。公司还需要向监管机构提交申请，并满足其他要求。在 Enveda，生产化学家最多要将 75% 的时间用于文书工作。为了减轻负担，Enveda 建立了一个系统，将所有生产文件连接到 Claude，再由 Claude 标记可能存在的问题。在对 1,061 页文件开展的测试中，Claude 找出了人工审核者已经发现的全部 11 个问题，还标出了人工遗漏的 7 个问题。这种方法将人工审核时间减少了 89%，从超过 25 小时缩短到不足 3 小时。另外，Claude 还起草了两份重要监管文件的初稿。其中一份用时 4 小时，而人工起草约需 3 个月。对于另一份文件，Enveda 的标准人工审核流程发现了一处轻微错误。了解更多，并参阅 Enveda 的技术报告。</p>
+
+<h4>The Column Group（TCG）：创办公司</h4>
+<p>药物发现可能耗时漫长、成本高昂，而且容易失败。因此，生物技术公司的投资者往往更青睐风险较低、已经得到验证的想法，而不是风险更高的新想法，即使后者可能帮助更多患者。我们一直与 TCG 合作，探索 Claude 能否改变这种情况。我们的设想是减少药物发现所需的时间和成本，让投资者能够有信心地支持更具雄心的想法。具体而言，TCG 正在设立一家名为 Pleiades 的新公司。该公司将使用 Claude，让一个小团队能够运行数量更多、复杂程度也更高的药物项目，超出通常的小团队所能承担的范围。这可能成为一个范例，展示 Claude 如何同时减少经营生物技术公司所需的科研、运营与行政负担。如果这种方式取得成功，该模式就可能在整个行业中复制，并引导投资流向更难解决的医学问题。Pleiades 目前正在为 Claude 开发新工具与工作流程。它的第一个 Claude skill 用于帮助 Claude 评估药物靶点是否值得继续研究，已在 45 个靶点—疾病配对上接受评估。了解更多。</p>
+
+<p>最近，我们也开始与 Bristol Myers Squibb（BMS）合作，寻找并解决临床试验规划中的瓶颈。BMS 正使用 Claude，评估一种处于早期阶段的药物的临床试验计划，并估计这些试验成功的可能性。我们计划在 2027 年共同扩大这项工作，以了解它在提高早期开发成功概率方面的潜力。</p>
+
+<blockquote>
+<p>“我们在临床试验阶段使用 Claude 分析专有数据、制定临床研究计划，并评估研究成功的可能性。只需一条提示，Claude 就生成了一份扎实的初步分析，帮助我们评估不同的开发方案。这类工作原本需要数天才能完成。完成所有这些工作的同时，我们也确保了高度敏感数据的安全。我们期待将这项工作拓展到整个研发管线，为研发项目组合层面的决策提供支持。”</p>
+</blockquote>
+
+<p>Michael Pourdehnad，医学博士，高级副总裁，血液学、肿瘤学与细胞治疗早期临床开发负责人。</p>
+
+<p>除了与这些伙伴合作，我们也开始自行开展一些研究项目。我们收购了 Mithril Medicine。这是一家只有一人的公司，一直在开发针对两种罕见肌营养不良症的疗法。其创始人 Cody Tranbarger 使用 Claude 协调与 11 家外部实验室之间的合同、物流和实验，并将 Mithril 运营中的许多其他事务交给 Claude。由此，Mithril 用不到 18 个月，将一种针对某类肌营养不良症的潜在疗法从构想推进到取得有希望的小鼠实验结果。Cody 现已加入 Anthropic，继续开展这项研究，并计划启动几个新项目。如果他的候选药物持续表现良好，我们预计最早可在 2028 年末准备好一款药物，启动人体临床试验。了解更多，并参阅我们的技术报告。</p>
+
+<h3>拓展我们在生命科学领域的工作</h3>
+
+<p>所有这些研究仍处于早期阶段。尤其需要说明的是，目前大部分工作仍属于临床前研究。也就是说，多数药物还没有进入人体测试阶段。随着这些药物项目推进，我们计划继续扩大 Claude 在临床试验中的作用。我们也会与更多药物开发项目已经进入临床阶段的机构合作。</p>
+
+<p>这些研究只是我们加快药物发现工作的一个组成部分。最终，我们希望让尽可能多的药物开发研究人员使用我们的模型。为此，我们推出了面向研究人员的 AI 工作台 Claude Science，并向生命科学研究人员提供 Claude 使用额度。我们还设立了 Life Sciences Verification Program，让受信任的机构能够使用我们最强大的模型，并适用限制较宽松的防护措施。这些防护措施对于防止滥用是必要的，但也可能妨碍正当的生物学研究。此外，我们最近启动了生命科学客座研究人员的公开征集。我们正在征求研究团队的提案，希望他们使用 Claude 探索药物发现及其他领域的关键问题。</p>
+
+<p>随着生命科学研究的拓展，我们期待与更多机构合作。如果你所在的机构专注于药物发现，并且有兴趣与我们合作，可以通过下方入口联系。</p>
+
+<p>联系我们</p>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
