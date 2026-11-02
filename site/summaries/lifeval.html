@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>LifeVal</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f5f4ef;
+  --paper: #ffffff;
+  --ink: #202d39;
+  --muted: #5d6a76;
+  --line: #d6dddF;
+  --data: #1764a0;
+  --risk: #a14632;
+  --opportunity: #17735b;
+  --conclusion: #7044a2;
+  --hl: #e1eefb;
+  --hl2: #eee4f8;
+  --risk-bg: #faeee7;
+  --opportunity-bg: #e7f3ed;
+  --hero-bg: #172d40;
+  --hero-ink: #edf4fa;
+  --hero-muted: #becfdd;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f5f4ef;
+  --paper: #ffffff;
+  --ink: #202d39;
+  --muted: #5d6a76;
+  --line: #d6dddf;
+  --data: #1764a0;
+  --risk: #a14632;
+  --opportunity: #17735b;
+  --conclusion: #7044a2;
+  --hl: #e1eefb;
+  --hl2: #eee4f8;
+  --risk-bg: #faeee7;
+  --opportunity-bg: #e7f3ed;
+  --hero-bg: #172d40;
+  --hero-ink: #edf4fa;
+  --hero-muted: #becfdd;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #111820;
+    --paper: #19232d;
+    --ink: #dce5ed;
+    --muted: #a5b4c1;
+    --line: #354451;
+    --data: #79bafa;
+    --risk: #f0a18a;
+    --opportunity: #76d5b1;
+    --conclusion: #c5a1f1;
+    --hl: #203a50;
+    --hl2: #392b4a;
+    --risk-bg: #372822;
+    --opportunity-bg: #1b352f;
+    --hero-bg: #0d2436;
+    --hero-ink: #e0eaf3;
+    --hero-muted: #afc3d5;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #111820;
+  --paper: #19232d;
+  --ink: #dce5ed;
+  --muted: #a5b4c1;
+  --line: #354451;
+  --data: #79bafa;
+  --risk: #f0a18a;
+  --opportunity: #76d5b1;
+  --conclusion: #c5a1f1;
+  --hl: #203a50;
+  --hl2: #392b4a;
+  --risk-bg: #372822;
+  --opportunity-bg: #1b352f;
+  --hero-bg: #0d2436;
+  --hero-ink: #e0eaf3;
+  --hero-muted: #afc3d5;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif; line-height: 1.85; }
+main { max-width: 1080px; margin: auto; padding: 28px 22px 64px; }
+h1, h2, h3 { line-height: 1.35; }
+h1 { font-size: clamp(40px, 7vw, 70px); margin: 10px 0; }
+h2 { font-size: 27px; margin: 0 0 22px; }
+h3 { font-size: 20px; }
+p { margin: 12px 0; }
+a { color: var(--data); }
+.hero { background: var(--hero-bg); color: var(--hero-ink); padding: 40px; border-radius: 20px; }
+.eyebrow, .original { color: var(--hero-muted); font-size: 14px; }
+.hero .lead { font-size: 22px; max-width: 800px; }
+.label { font-weight: 750; color: var(--conclusion); }
+.hero .label { color: var(--hero-ink); }
+.summary-block { margin-top: 34px; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--line); padding: 28px 0; gap: 22px; }
+.stat { border-left: 3px solid var(--data); padding-left: 18px; }
+.stat strong { color: var(--data); display: block; font-size: 31px; line-height: 1.3; }
+.stat span { color: var(--muted); font-size: 14px; }
+mark { background: var(--hl); color: var(--data); padding: 1px 4px; border-radius: 3px; }
+mark.insight { background: var(--hl2); color: var(--conclusion); }
+.method { padding: 28px; background: var(--paper); border-top: 4px solid var(--data); }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 0; list-style: none; }
+.steps b { color: var(--data); display: block; }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.opportunity { background: var(--opportunity-bg); padding: 26px; border-radius: 4px 20px 20px 4px; }
+.opportunity h3 { color: var(--opportunity); }
+.evidence { background: var(--risk-bg); padding: 26px; border-left: 4px solid var(--risk); }
+.evidence h3 { color: var(--risk); }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; background: var(--paper); }
+caption { text-align: left; color: var(--muted); margin-bottom: 12px; font-size: 14px; }
+th, td { text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { background: var(--hl); color: var(--data); }
+.takeaways { border-top: 3px solid var(--conclusion); padding-top: 24px; }
+.takeaways ul { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 28px; padding-left: 22px; }
+.takeaways li::marker { color: var(--conclusion); }
+#translation { max-width: 780px; margin: 60px auto 0; padding-top: 36px; border-top: 1px solid var(--line); font-size: 17px; }
+#translation h2 { font-size: 32px; }
+#translation h3 { margin-top: 38px; font-size: 24px; }
+#translation h4 { margin-top: 28px; font-size: 19px; }
+#translation .subtitle { font-size: 21px; color: var(--muted); }
+.dialogue { border-left: 3px solid var(--line); padding-left: 20px; margin: 16px 0 26px; }
+.source-figure { margin: 28px 0; }
+.source-figure img { display: block; max-width: 100%; height: auto; margin: auto; }
+.source-figure figcaption { color: var(--muted); font-size: 14px; line-height: 1.6; margin-top: 10px; }
+.photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+.photo-grid .source-figure { margin: 16px 0; }
+.meta { color: var(--muted); font-size: 14px; }
+@media (max-width: 680px) {
+  main { padding: 14px 16px 40px; }
+  .hero { padding: 28px 24px; }
+  .stats, .steps, .split, .takeaways ul { grid-template-columns: 1fr; }
+  .method { padding: 22px; }
+  th, td { padding: 12px; }
+  .photo-grid { grid-template-columns: 1fr; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/lifeval" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header class="hero">
+<div class="eyebrow">OpenAI · Research · 2026 年 11 月 2 日</div>
+<h1>LifeVal</h1>
+<p class="original">英文原标题：LifeVal</p>
+<p class="label">一句话总括</p>
+<p class="lead">LifeVal 将时间使用研究与用户需求调查结合起来，用人们真正希望有人代劳的生活任务，衡量 AI <strong>能否把事情办成</strong>。</p>
+</header>
+<section aria-label="中文总结">
+<div class="stats">
+<div class="stat"><strong>3,995 人</strong><span>新增需求调查的受访者人数</span></div>
+<div class="stat"><strong>2 项研究</strong><span>提供日常生活任务的基础目录</span></div>
+<div class="stat"><strong>过去一年</strong><span>用于追踪并推动模型表现改进</span></div>
+</div>
+<div class="summary-block method">
+<h2>先找出人们需要什么，再决定评估什么</h2>
+<ol class="steps">
+<li><b>01 · 梳理生活任务</b>参考 American Time Use Survey 和 Multinational Time Use Study，覆盖不同人群、时段与季节。</li>
+<li><b>02 · 确认帮助需求</b>调查 <mark>3,995 名受访者</mark>。样本在人口统计特征上具有代表性，问题围绕人们最希望个人助理协助的事务。</li>
+<li><b>03 · 形成评估任务</b>任务涵盖照护、健康、教育、家庭事务管理、个人财务、购物和获取政府服务。</li>
+</ol>
+<p>这套方法把<mark class="insight">用户重视的事情</mark>放到评估起点。AI 的进步因此与生活中的实际需求建立了更直接的联系。</p>
+</div>
+<div class="summary-block">
+<h2>评估对象从回答问题延伸到实际工作流程</h2>
+<div class="table-wrap">
+<table>
+<caption>正文展示的生活任务与模型回复示例。表内数量均来自示例，不能视为总体评估结果。</caption>
+<thead><tr><th scope="col">生活任务</th><th scope="col">示例中的产出或进展</th><th scope="col">仍需用户参与的环节</th></tr></thead>
+<tbody>
+<tr><td>搬家后选择幼儿园</td><td>筛选出 3 所幼儿园，整理入学信息</td><td>2 项偏好仍需用户决定</td></tr>
+<tr><td>组织防洪志愿者</td><td>为需要防洪协助的 4 户邻居准备行动计划</td><td>回复提出协助志愿者评估现场和开展准备</td></tr>
+<tr><td>为家人寻找住房</td><td>找到 1 套符合要求的住房，计算转让税并将契据加入购物车</td><td>用户审阅契据</td></tr>
+<tr><td>与远方祖母一起看比赛</td><td>准备观看方案及直播故障时的备用方案</td><td>询问是否需要带用户和祖母一起操作</td></tr>
+<tr><td>帮助刚确诊糖尿病的父母适应生活</td><td>准备第 1 周计划，包含餐食、提醒和要向照护团队提出的问题</td><td>分享给父母前，邀请用户一起审阅</td></tr>
+</tbody>
+</table>
+</div>
+<p>这些示例把筛选、组织、计算和准备审阅材料纳入任务流程。衡量个人助理的价值，需要关注<mark class="insight">工作推进到了哪一步</mark>。</p>
+</div>
+<div class="summary-block split">
+<div class="opportunity">
+<h3>行动能力扩大了 AI 的帮助范围</h3>
+<p>OpenAI 表示，过去一年持续训练模型的浏览器使用、计算机使用和连接器任务能力。训练目标包括更快、更强，以及更符合对齐要求。</p>
+<p>原文称，ChatGPT 当前每周用户已超过 <mark>10 亿人</mark>。这说明日常生活任务面向的是规模很大的使用场景。</p>
+<p>这些能力支持 ChatGPT 向能够采取行动的个人助理发展。</p>
+</div>
+<div class="evidence">
+<h3>评估方向清晰，量化成效仍未展示</h3>
+<p>原文称最新模型在许多 LifeVal 任务上得分很高。但正文没有列出具体分数、成功率或不同模型的对比结果。</p>
+<p>文中也没有给出评估任务总量和详细评分规则。</p>
+<p>因此，读者可以了解其评估思路，却无法据此判断能力提升的具体幅度。</p>
+</div>
+</div>
+<div class="summary-block takeaways">
+<h2>最值得带走的洞见</h2>
+<ul>
+<li>生活任务的选择依据包括时间使用研究与需求调查，评估起点是人们希望获得的帮助。</li>
+<li>模型知识之外，还需要衡量 AI 能否协助决策、管理责任并推进实际事务。</li>
+<li>多个示例保留了用户决定或审阅的环节，展示了个人助理与用户之间的协作。</li>
+<li>“许多任务得分很高”仍是定性表述。正文尚未提供足以量化改进幅度的结果。</li>
+</ul>
+</div>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<p class="subtitle">衡量 AI 在日常生活重要任务上的进步。</p>
+<p>OpenAI 的使命是确保通用人工智能造福全人类。目前，每周使用 ChatGPT 的人数已超过 10 亿。我们希望打造能够帮助他们应对实际生活难题的 AI。这些难题包括寻找托育服务、获取政府服务、编制预算、为上学做准备、调整食谱、订购食品杂货，以及制定健身计划等。</p>
+<p>当人们寻求帮助，希望生活能更轻松一些时，他们需要的不只是建议或聊天回复。要成为真正有用的个人助理，ChatGPT 应当能够采取行动，把事情切实办成。</p>
+<p>为了持续衡量模型在日常任务上的表现，我们建立了一套任务评估。它覆盖了用户最希望 AI 和个人智能体提供帮助的领域。过去一年，我们一直用这套评估追踪并推动模型在日常任务上的表现提升。</p>
+<h3>背景</h3>
+<p>为了确定人们最看重哪些任务，我们首先参考了两项大型研究。它们分别追踪美国和国际范围内人们如何分配时间：American Time Use Survey（美国时间使用调查，新窗口打开）和 Multinational Time Use Study（跨国时间使用研究，新窗口打开）。这两套数据共同提供了一份详细的日常生活任务目录。它们涵盖不同人口群体、一天中的不同时段，以及不同季节。</p>
+<p>为了了解人们在哪些方面最看重 AI 的帮助，我们在现有调查的基础上开展了一项新调查。调查覆盖 3,995 名受访者，样本在人口统计特征上具有代表性。针对每项任务，我们提出了多种问题，以确定普通人最希望个人助理在哪些领域提供帮助。最终形成的任务覆盖了人们最希望获得帮助的重要领域，包括照护、健康、教育、家庭事务管理、个人财务、购物，以及获取政府服务。</p>
+<h3>单项任务示例</h3>
+<p>下面通过几个例子，展示我们当前的模型如何处理日常生活中的实际工作流程。</p>
+<h4>搬家后，为孩子报名合适的幼儿园</h4>
+<div class="dialogue">
+<p>比较新家附近的幼儿园，筛选出最合适的几所。</p>
+<p>我已经筛选出三所幼儿园，并整理好了入学信息。有两项偏好还需要你来决定。要看看这份候选名单吗？</p>
+</div>
+<h4>在洪水来临前组织志愿者</h4>
+<div class="dialogue">
+<p>帮我组织社区防洪志愿者，为四户需要防洪协助的邻居提供帮助。</p>
+<p>我准备了一份简明的行动计划，帮助志愿者评估提到的地点，并为即将到来的恶劣天气做好准备。</p>
+</div>
+<h4>为我的家人寻找新家</h4>
+<div class="dialogue">
+<p>在 Luzerne County 找一套符合我预算的住房。它需要有独立的居住单元，还要让我送孩子上学后的通勤时间尽量短。把房产契据加入购物车，供我审阅。</p>
+<p>我找到了一套符合你要求的住房。我已经算好了转让税，并将房产契据加入了你的国家档案系统购物车，供你审阅。</p>
+</div>
+<h4>与远方的祖母一起看比赛</h4>
+<div class="dialogue">
+<p>安排一种简单的方法，让我和祖母可以远程一起看比赛。</p>
+<p>最方便的观看方案已经准备好了。万一直播出问题，也有备用方案。要我带你和祖母一起操作一遍吗？</p>
+</div>
+<h4>为刚确诊糖尿病的父母安排备餐</h4>
+<div class="dialogue">
+<p>我的父母中有一位刚确诊糖尿病。请制定一份实用的照护和饮食计划，帮助其适应。</p>
+<p>第一周的计划已经准备好了，包括餐食安排、提醒事项，以及要向照护团队提出的问题。在你分享给父母之前，要一起审阅一下吗？</p>
+</div>
+<p>我们的最新模型在许多 LifeVal 任务上都取得了很高的分数。查看更多</p>
+<p>过去一年，我们通过训练，让模型在浏览器使用、计算机使用和连接器任务上变得更快、更强，也更符合对齐要求。在 ChatGPT 中启用这些能力，也扩大了模型能够协助完成的任务范围。这推动 ChatGPT 超越聊天工具，朝着真正能够自主行动的个人助理发展。</p>
+<h3>为什么这很重要</h3>
+<p>要确保通用人工智能造福全人类，我们就需要衡量并推动模型在普通人生活中重要事务上的进步。这意味着，评估不能止步于对模型知识的学术性考查。我们还需要切实衡量 AI 模型能在多大程度上帮助人们作出决策、管理日常责任，并完成有意义的事情。我们希望 LifeVal 能成为迈向这一目标的一步。</p>
+<p>2026</p>
+<div class="photo-grid">
+<figure class="source-figure" data-source-image="0"><img alt="A caregiver helping an older adult use a walker" decoding="async" height="401" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/9irZEa7VuG3EddaIPYWD5/f267058764f8a5eda29a410fe80114d0/photo-02.webp?w=3840&amp;q=90&amp;fm=webp" width="600"/></figure>
+<figure class="source-figure" data-source-image="1"><img alt="A person feeding a cat" decoding="async" height="600" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/2lhC1WTyvGX4qBssxZraQj/b7792d227886b7f1adaec281eb2bee01/photo-03.webp?w=3840&amp;q=90&amp;fm=webp" width="600"/></figure>
+<figure class="source-figure" data-source-image="2"><img alt="A person carrying boxes beside a moving truck" decoding="async" height="802" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/5i50ehjTmYbz5jB0E6lJHZ/16a4356b416bc033df4cfcfdc705b1a6/photo-04.webp?w=3840&amp;q=90&amp;fm=webp" width="600"/></figure>
+<figure class="source-figure" data-source-image="3"><img alt="People working through paperwork together" decoding="async" height="600" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/7sFzZxKpcOhJP4T1ppAf6b/57fbb1cd4a8a73066261aa1e450117ec/photo-05.webp?w=3840&amp;q=90&amp;fm=webp" width="600"/></figure>
+<figure class="source-figure" data-source-image="4"><img alt="A person carrying a bag of groceries" decoding="async" height="802" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/31Q75V3wFI3n0xK4Nxsog0/f0b03a26cf990bb2254e879dc8678d8b/photo-06.webp?w=3840&amp;q=90&amp;fm=webp" width="600"/></figure>
+<figure class="source-figure" data-source-image="5"><img alt="A hand tracing a route on a map" decoding="async" height="900" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/618uJhR5QI4ZmuQycqQZx5/4efe8f2977a023df632849ec8c1d5f0b/photo-07.webp?w=3840&amp;q=90&amp;fm=webp" width="600"/></figure>
+<figure class="source-figure" data-source-image="6"><img alt="An adult reading with a young child" decoding="async" height="336" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/M4upvozkrlrSSfvHaYlzF/3a3f9a3f8ecd7ba77d9ad7e79d2c4641/photo-08.webp?w=3840&amp;q=90&amp;fm=webp" width="600"/></figure>
+<figure class="source-figure" data-source-image="7"><img alt="A person organizing notes on a wall" decoding="async" height="902" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/1UfbC89B8yZRrvvmLEpMV/bf244804cb209b62d1be578e6e8b582f/photo-09.webp?w=3840&amp;q=90&amp;fm=webp" width="600"/></figure>
+<figure class="source-figure" data-source-image="8"><img alt="A person examining a medical scan" decoding="async" height="900" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/rzxlK2Ggnph5Op4ysnUc4/94c42358418debcc92b7900de0b865da/photo-10.webp?w=3840&amp;q=90&amp;fm=webp" width="600"/></figure>
+<figure class="source-figure" data-source-image="9"><img alt="A person holding a laptop at their side" decoding="async" height="900" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/5XfHlU5MluLbVrnc7AoCZK/dc74b9270813c16ae476edc65ff3ade2/photo-11.webp?w=3840&amp;q=90&amp;fm=webp" width="600"/></figure>
+</div>
+<p>作者</p>
+<h3>继续阅读</h3>
+<figure class="source-figure" data-source-image="10"><img alt="How we detect frontier model misalignment — Cover" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/43ZavE2amLHMmbxH8EL8VM/1464d0f68c0f3c45e9d255992aab32b1/how-we-detect-frontier-model-misalignment-cover.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="11"><img alt="Working with academic communities to build scientific understanding — Cover" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/77i38N8Ov2vmY2uJ4pWRIQ/5f6f3eceaf8751f07fc23f179ad14c32/from-ai-results-to-scientific-understanding-cover.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="12"><img alt="An in-depth look at how workers use ChatGPT — Cover" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/4UR2EaD3NPPhGHpAh7Jwu5/8d21aff44d75bd501b7794cff4851288/how-workers-use-chatgpt-cover.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
