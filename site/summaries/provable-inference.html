@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>大语言模型可证明推理的进展</title>
+<style>
+:root{--bg:#f7f5f0;--card:#ffffff;--ink:#232b35;--muted:#626d79;--line:#d8dee4;--data:#185db3;--risk:#b24632;--opportunity:#16705b;--conclusion:#7144a2;--hl:#e3edfc;--hl2:#f2e6fb;--soft-green:#e6f2ed;--soft-risk:#f9e9e2;--hero:#202e42;--hero-ink:#eef3fb;--hero-muted:#c2cede}
+:root[data-theme="light"]{--bg:#f7f5f0;--card:#ffffff;--ink:#232b35;--muted:#626d79;--line:#d8dee4;--data:#185db3;--risk:#b24632;--opportunity:#16705b;--conclusion:#7144a2;--hl:#e3edfc;--hl2:#f2e6fb;--soft-green:#e6f2ed;--soft-risk:#f9e9e2;--hero:#202e42;--hero-ink:#eef3fb;--hero-muted:#c2cede}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15191f;--card:#1d242d;--ink:#dce3ec;--muted:#a6b2c1;--line:#38424f;--data:#82b8ff;--risk:#f39a82;--opportunity:#70d3b6;--conclusion:#c6a0f1;--hl:#203853;--hl2:#372a49;--soft-green:#1c3731;--soft-risk:#3c2926;--hero:#101b2a;--hero-ink:#e0e9f5;--hero-muted:#adbed3}}
+:root[data-theme="dark"]{--bg:#15191f;--card:#1d242d;--ink:#dce3ec;--muted:#a6b2c1;--line:#38424f;--data:#82b8ff;--risk:#f39a82;--opportunity:#70d3b6;--conclusion:#c6a0f1;--hl:#203853;--hl2:#372a49;--soft-green:#1c3731;--soft-risk:#3c2926;--hero:#101b2a;--hero-ink:#e0e9f5;--hero-muted:#adbed3}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;line-height:1.85}main{max-width:1120px;margin:auto;padding:32px 24px 72px}h1,h2,h3,h4{line-height:1.35}h1{font-size:clamp(30px,5vw,49px);margin:12px 0}h2{font-size:28px;margin:0 0 22px}h3{font-size:21px;margin:28px 0 12px}h4{font-size:18px}p{margin:0 0 18px}a{color:var(--data)}.hero{padding:40px;border-radius:20px;background:var(--hero);color:var(--hero-ink)}.english,.meta{color:var(--hero-muted)}.english{font-size:20px;line-height:1.5}.eyebrow{font-size:13px;letter-spacing:.12em}.lead{font-size:21px;margin-top:26px}.label{font-weight:750}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:30px 0}.metric{padding:22px;background:var(--card)}.metric strong{display:block;font-size:35px;color:var(--data);line-height:1.3}.metric span{font-size:14px;color:var(--muted)}.summary-block{margin:36px 0}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;background:var(--card);font-size:15px}th,td{text-align:left;border-bottom:1px solid var(--line);padding:13px 15px;vertical-align:top}th{background:var(--hl);color:var(--data)}.note{font-size:14px;color:var(--muted);margin-top:12px}.split{display:grid;grid-template-columns:1fr 1fr;gap:24px}.opportunity{background:var(--soft-green);padding:26px;border-top:4px solid var(--opportunity)}.opportunity h3{color:var(--opportunity);margin-top:0}.risk{background:var(--soft-risk);padding:26px;border-left:4px solid var(--risk)}.risk h3{color:var(--risk);margin-top:0}.process{display:grid;grid-template-columns:1fr 1fr;gap:22px;padding:24px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.process strong{color:var(--conclusion)}.insight{padding:22px 28px;background:var(--hl2);border-left:5px solid var(--conclusion)}.takeaways{display:grid;grid-template-columns:1fr 1fr;gap:16px;list-style:none;padding:0}.takeaways li{padding:20px;background:var(--card);border-bottom:3px solid var(--conclusion)}mark{background:var(--hl);color:var(--data);padding:1px 4px}strong.conclusion{color:var(--conclusion)}#translation{max-width:820px;margin:64px auto 0;padding-top:36px;border-top:3px solid var(--line);font-size:17px}#translation h2{margin-bottom:26px}#translation h3{font-size:25px;margin-top:42px}#translation h4{font-size:20px;margin-top:30px}#translation li{margin-bottom:12px}#translation blockquote{margin:22px 0;padding:14px 22px;border-left:4px solid var(--conclusion);background:var(--hl2)}.source-nav{color:var(--muted);font-size:15px}.byline{padding-bottom:22px;border-bottom:1px solid var(--line);font-size:15px}.footnotes{font-size:15px;color:var(--muted)}.source-figure{margin:30px 0}.source-figure img{max-width:100%;height:auto;display:block}.source-figure figcaption{color:var(--muted);font-size:14px;margin-top:10px}code{overflow-wrap:anywhere}sup{font-size:12px}@media(max-width:700px){main{padding:18px 16px 48px}.hero{padding:26px 22px}.metrics,.split,.process,.takeaways{grid-template-columns:1fr}.metric strong{font-size:30px}th,td{padding:10px}.lead{font-size:19px}}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/provable-inference" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header class="hero">
+<div class="eyebrow">Anthropic · Research · 2026 年 11 月 2 日</div>
+<h1>大语言模型可证明推理的进展</h1>
+<p class="english">Progress on provable inference for large language models</p>
+<p class="lead"><span class="label">一句话总括：</span>FlashProve 将隐藏权重的密码学推理证明推进到 4000 亿参数模型，并用 Lean 证明协议的核心安全性质，让“回复确实来自指定模型”成为可核验的主张。</p>
+<p class="meta">它展示了可行性，也明确保留了性能开销、实现审计和适用范围上的限制。</p>
+</header>
+
+<div class="metrics" aria-label="FlashProve 关键实测数据">
+<div class="metric"><strong>110 token/秒</strong><span>单张 H100 的证明生成速度</span></div>
+<div class="metric"><strong>18.78 MB</strong><span>评测中每份证明的大小</span></div>
+<div class="metric"><strong>17 秒</strong><span>24 个 CPU 线程的证明验证时间</span></div>
+</div>
+
+<section class="summary-block">
+<h2>能核验模型身份，但代价仍明显高于普通推理</h2>
+<p>评测对象是采用公开 4 位量化权重的 <strong>Llama 4 Maverick</strong>。它共有 4000 亿参数，每个 token 约使用 170 亿参数。FlashProve 利用这种稀疏激活结构，减少证明所需的工作。</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>环节或指标</th><th>原文实测值与范围</th><th>实际含义</th></tr></thead>
+<tbody>
+<tr><td>离线承诺</td><td>每个模型约 39 分钟；约可支持 1,600 万次请求</td><td>无需为每次请求重新执行离线阶段，但使用一定次数后要重新承诺</td></tr>
+<tr><td>在线证明</td><td>24 个请求一批，约 223 秒；每个请求窗口为 1,024 个 token</td><td>通过事后批处理提高吞吐量</td></tr>
+<tr><td>客户端数据</td><td>承诺约 6.5 MB；每份证明 18.78 MB</td><td>验证者无需下载约 232 GB 的量化模型</td></tr>
+<tr><td>CPU 验证</td><td>24 线程为 17 秒；单线程为 21 秒</td><td>客户端不需要 GPU，但验证仍需时间</td></tr>
+<tr><td>相对 vLLM 的 GPU 时间</td><td>同批请求约 72 倍，各次运行为 66—77 倍；最高测试负载下约 94 倍</td><td>证明成本依然是部署的重要约束</td></tr>
+<tr><td>证明服务器内存</td><td>单张 80 GB GPU，另需约 290 GB 主机内存</td><td>单卡可运行，但仍需较高配置的服务器</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note">比较基线使用同一模型的 FP8 版本，在 8 张 H100 上运行 vLLM。倍数按每张 GPU 的时间计算。原文将整体开销概括为约 70—95 倍。</p>
+<p><strong class="conclusion">这项进展降低了验证者的硬件门槛，但没有消除提供方的高额证明成本。</strong></p>
+</section>
+
+<section class="summary-block">
+<h2>先固定权重，再证明输出来自这些权重</h2>
+<div class="process">
+<div><strong>01 · 离线承诺</strong><p>提供方发布一个简短的模型权重“指纹”。它固定一组确切权重，同时隐藏权重本身。</p></div>
+<div><strong>02 · 在线核验</strong><p>提供方生成证明。持有承诺、提示词和回复的人，可以核验指定权重是否产生了这些 token。</p></div>
+</div>
+<p>系统使用 <mark>zkSNARK</mark>。证明不泄露权重、中间计算值，也不泄露每层选择了哪些专家。<strong>模型架构并不隐藏。</strong></p>
+<p>因此，用户得到的是对模型来源和计算过程的保证，而不是对回答内容正确性的保证。</p>
+</section>
+
+<section class="summary-block split">
+<div class="opportunity">
+<h3>四类信任问题有了可核验的依据</h3>
+<ul>
+<li><strong>AI 发展节奏：</strong>证明一段时期内确实由声称的模型完成了推理请求。</li>
+<li><strong>篡改检测：</strong>识别服务器被入侵后替换模型或修改输出的行为。</li>
+<li><strong>文本来源：</strong>核验代码审查等任务是否确实使用了指定模型。</li>
+<li><strong>模型审批：</strong>让每个请求与获准使用的模型绑定。</li>
+</ul>
+<p>这些用途把对提供方声明的信任，部分转化为对密码学证明的检查。</p>
+</div>
+<div class="risk">
+<h3>证明范围决定它不能回答什么</h3>
+<p>证明硬件执行了推理，<strong>不能证明它没有同时训练模型</strong>。当前证明针对整数模型的贪心解码。浮点实现或采样输出可能无法匹配。</p>
+<p>系统只支持最长 <mark>1,024 个 token</mark> 的上下文。侧信道攻击也不在本次发布的保障范围内。</p>
+<p>它提供的是有边界的完整性保证，不能直接等同于全面合规或全面安全。</p>
+</div>
+</section>
+
+<section class="summary-block">
+<h2>速度提升很大，但不同系统的数字不能直接等同</h2>
+<div class="table-wrap">
+<table>
+<thead><tr><th>系统</th><th>模型与硬件条件</th><th>原文报告的表现</th></tr></thead>
+<tbody>
+<tr><td>zkLLM（2024）</td><td>13B 模型；单张 A100</td><td>批内约 2.5 token/秒</td></tr>
+<tr><td>VerInf</td><td>Llama 4 Maverick；DGX Spark</td><td>1,000 个 token 需 14.3 小时；证明 93.6 GB；验证接近一天</td></tr>
+<tr><td>FlashProve</td><td>Llama 4 Maverick；单张 H100</td><td>110 token/秒；证明约 19 MB；数秒级验证</td></tr>
+<tr><td>Attestable</td><td>稠密 Gemma 4 31B；单张 H100</td><td>53—77 token/秒；撰文时未发布对应开源库</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note">模型、硬件和证明口径不同。这些数据展示技术进展，不构成统一条件下的排名。</p>
+<p>同一个 Maverick 模型上，证明体积和验证时间的变化尤其显著。它说明零知识证明开始接近大模型服务的实际规模。</p>
+</section>
+
+<section class="summary-block insight">
+<h2>形式化证明增强可信度，但实现仍需审计</h2>
+<p>Lean 覆盖协议的<strong>完备性、可靠性和零知识性</strong>。可执行的 Lean 验证器也有相应保证。日常使用的快速 C++ 验证器则<strong>没有形式化保证</strong>，只是目前所有测试结果都与 Lean 验证器一致。</p>
+<p>仍需人工确认形式化命题是否准确表达了预期含义。还需审计可执行代码是否符合协议，尤其是负责保护权重隐私的证明器。</p>
+<p><strong class="conclusion">“协议已证明”与“整个软件系统已验证”之间，仍有明确的信任缺口。</strong></p>
+</section>
+
+<section class="summary-block">
+<h2>最值得带走的洞见</h2>
+<ul class="takeaways">
+<li><strong>模型身份可以成为可验证事实。</strong>无需仅凭回复风格或服务商声明判断模型来源。</li>
+<li><strong>证明者与验证者的成本高度不对称。</strong>提供方承担大量计算，用户用 CPU 即可检查。</li>
+<li><strong>MoE 结构与事后批处理是效率关键。</strong>当前结果不能直接推广到所有架构和推理方式。</li>
+<li><strong>应用前要逐项核对保证范围。</strong>整数贪心解码、短上下文、架构公开和实现审计，都是当前边界。</li>
+</ul>
+</section>
+
+<section id="translation">
+<h2>完整译文</h2>
+
+<nav class="source-nav" aria-label="原文目录">
+<ol>
+<li>执行摘要</li>
+<li>引言</li>
+<li>AI 普及带来的信任挑战</li>
+<li>我们的系统：FlashProve</li>
+<li>通过形式化验证建立可信度</li>
+<li>既有工作</li>
+<li>局限性</li>
+</ol>
+</nav>
+
+<div class="byline">
+<p>发布</p>
+<p>团队</p>
+<p>Frontier Red Team</p>
+<p>Roy Rinberg（Anthropic）、Alex Allain（Anthropic）；Alessandro Chiesa（EPFL、StarkWare）、Miranda Christ（MIT、RESI）、Rahul Dalal（Anthropic STEM Fellows Program、Succinct）、Giacomo Fenzi（EPFL）、Ben Mayer（Anthropic Fellows Program、MIT）、Guy Weissenberg（EPFL）</p>
+</div>
+
+<h3>执行摘要</h3>
+<p>当你和朋友面对面交谈时，有很多办法确认对方确实是本人。你可以看到对方、听到声音，也可以握手。但当你与 AI 模型交谈时，几乎没有这样的办法。如今，用户向模型提问后，无法核实回复是否确实来自开发者声称正在响应的那个模型。路由服务可能出于成本考虑，暗中换用了另一个模型。攻击者甚至可能篡改了 token 流。仅凭模型输出判断并不可靠，即使回复质量很高也是如此。推理的密码学证明可以解决这个问题。它让模型提供方先对一个模型作出承诺，再证明每条回复确实由这个模型生成。这类证明可以用于消费者产品、内部安全等多种场景，也可以成为核验 AI 发展节奏要求是否得到遵守的工具之一。</p>
+<p>具体来说，我们在一种名为“zkSNARK”的强大密码学证明上取得了进展。它具有很强的隐藏能力和效率优势，因此特别适合可证明推理。本文将介绍其中一些进展，重点是我们称为 FlashProve 的系统。简要技术概述如下：</p>
+<ul>
+<li>对于大型模型 Llama 4 Maverick，即一个拥有 4000 亿参数的混合专家模型，单张 H100 GPU 的证明生成速度约为每秒 110 个 token。每个 1,024-token 请求的证明大小约为 19 MB。这里使用的是 4 位量化权重，并在预填充（prefill）阶段使用整数运算。所消耗的 GPU 时间约为使用常见开源库 vLLM 运行模型本身的 70—95 倍。</li>
+<li>此前的开源系统要慢几个数量级，我们将在第 6 节讨论。Claude 找到了新的方法，将密码学和安全文献中的前沿工具用于这一问题。同时，它仍遵循密码学证明系统中成熟的设计原则。对模型作出的承诺，以及后续的推理证明，都会隐藏模型权重。隐藏模型架构并不是本系统的目标。</li>
+<li>Claude 擅长优化，但它经常作出难以评估的决策。大型复杂系统中的情况尤其如此。为应对这一问题，我们使用形式化验证语言 Lean，为所声称的安全保证提供可审计的顶层命题。</li>
+</ul>
+<p>今天，我们发布五项成果：</p>
+<ol>
+<li>本文，概述我们的系统及其潜在应用；</li>
+<li>一份技术报告，解释系统细节；</li>
+<li>一份由 Claude 编写的协议规范文档；</li>
+<li>可执行代码，包括一个证明器和两个验证器。两个验证器分别是用 C++ 编写的快速验证器，以及用 Lean 编写、具有正确性证明的验证器；</li>
+<li>顶层数学命题的 Lean 证明，以及一个用于辅助审计的 Lean 定理交互式可视化工具。</li>
+</ol>
+<p>我们以 Apache 2.0 许可证发布代码、Lean 证明和文档。<sup><a href="#fn1">1</a></sup>这篇研究文章旨在分享阶段性进展，并不代表整个研究议程已经完成。我们明确希望其他人查看我们的成果，采用它们，并进一步改进。</p>
+
+<h3>引言</h3>
+<p>如今，用户向 AI 模型发送请求后，无法确切知道生成回复的是否就是自己选中的模型。对日常使用而言，这个问题没那么紧迫。用户通常更关心输出，而未必在意具体由哪个模型生成。但在一些场景中，这种保证会很有用。例如，独立评估者在模型发布前后进行测试时，需要确认自己评估的模型就是实际提供服务的模型。通过第三方路由服务使用模型的客户，希望确认收到的 token 来自自己付费购买的模型。如果网络攻击者冒充某个模型，并修改了 token 流，用户也无法仅凭输出察觉。</p>
+<p>然而，要让模型回复可以被验证并不容易。大多数前沿模型的权重都不公开。即使用户能拿到权重，要检查某条回复是否由这些权重对应的模型生成，也需要重新运行模型。所需计算资源远超普通用户，甚至评估者能够承担的范围。</p>
+<p>可证明推理（provable inference，PI）的目标，是让计算资源有限、也不了解权重的用户，能够验证回复是否来自所请求的模型。PI 的动机之一，是增强客户对 AI 提供方的信任。它还能向独立评估者提供保证，让提供方证明自己履行了某些承诺和法律义务。因此，它也关系到如何控制 AI 前沿发展的节奏，以及如何监管 AI。</p>
+<p>实现 PI 的一种方式，是使用一种称为零知识简洁论证（zero-knowledge succinct argument）的密码学对象。模型提供方在发送声称的回复时，同时附上一份简短证明，例如几 MB。用户可以快速验证这份证明，理想情况下只需在 CPU 上花几秒钟。如果声称的回复偏离了指定模型的输出，用户的检查就会失败。关键是，密码学技术能确保这份证明不泄露任何模型权重信息。</p>
+<p>今天，我们发布 FlashProve：一个性能较高的开源可证明推理原型。对于拥有 4000 亿参数的混合专家模型 Llama 4 Maverick，采用 4 位量化时，单张 H100 GPU 的证明生成速度超过每秒 100 个 token。每个 1,024-token 请求的证明约为 19 MB。所消耗的 GPU 时间，约为常见开源库 vLLM 处理相同长度提示词的 70—95 倍。</p>
+<p>本次发布包含可执行代码、Lean 形式化内容，以及协议的技术说明。我们的目标有两个：（i）加速并推动可证明推理的发展；（ii）证明零知识简洁论证可以实际用于可证明推理。</p>
+<p>我们认为，这项进展对安全、控制 AI 发展节奏、为 AI 客户提供完整性保证，以及为审计者和监管者提供工具等方面，都具有重要意义。</p>
+
+<h3>AI 普及带来的信任挑战</h3>
+<p>人工智能不断发展，在数字基础设施和经济中的作用也越来越大。这带来了 AI 提供方必须回应的信任挑战。可证明推理（PI）工具有助于应对这些挑战及其他问题。</p>
+<p>PI 工具可以采用硬件方法、软件方法，或两者结合。这里，我们聚焦纯软件方法，即一种名为“zkSNARK”的密码学工具，全称为零知识简洁知识论证（zero-knowledge succinct argument of knowledge）。通俗来说，zkSNARK 是这样一种系统：证明者通过一份简短的“证书”，让验证者相信某项计算得到了正确执行。关键在于，这份证书具有零知识性。除计算正确性本身所蕴含的信息外，它不会泄露其他信息。它还具有简洁性：与被证明的计算相比，验证证书所需的时间具有指数级优势。</p>
+<p>下面，我们概述几项挑战，以及 zkSNARK 如何帮助应对。</p>
+
+<h4>挑战 1：控制发展节奏</h4>
+<p>一些旨在监管 AI 并控制其发展节奏的提案，依赖于监控硬件及其使用方式。例如，提供方可能被要求将硬件用于推理，而不是训练强大的新模型。提供方可能试图作弊，提供成本更低的模型，或以未预期的方式使用算力，从而腾出资源用于训练。监管者如何可靠地确认硬件确实用于推理？</p>
+<p><strong>zkSNARK 如何提供帮助：</strong>监管者可以要求提供方出示证书，覆盖某段时间内处理的推理请求。这些证书必须证明，相关请求的结果由其声称的模型生成。除非硬件确实在运行正确的模型并提供服务，否则恶意提供方无法满足这一要求。借助 zkSNARK，监管者无需拥有提供方可能配备的复杂硬件环境，也能检查其声明是否有效。同时，提供方可以确信，监管者不会获知专有模型信息。<sup><a href="#fn2">2</a></sup>需要说明的是，这可以验证硬件正在执行推理，但不能证明硬件没有同时进行训练等其他工作。</p>
+
+<h4>挑战 2：篡改检测</h4>
+<p>随着 AI 模型越来越有价值，运行它们的服务器也成为重点攻击目标。攻击者或失控的智能体可能入侵推理服务器，窃取权重，向用户提供恶意回复，例如把恶意软件送入用户电脑。它们还可能实施其他行为，并将这些行为隐藏在正常回复之中。威胁不一定来自外部。随着模型具备改进和部署自身的能力，更先进的模型可能替代获准运行的模型，并伪装成较弱的模型。这样一来，它就能避开本应适用于自己的分类器和监控措施。两种情况下，问题都是一样的：公司如何确定服务器上实际运行的是哪一组权重？在 Frontier Safety Roadmap 中，Anthropic 公开设定了一个目标，计划开发用于验证推理流量的原型：“我们将在 2026 年 9 月 30 日前开发一个可证明推理原型。这项技术能够以可靠、可证明的方式为 AI 模型输出‘签名’，使其可以归属于一组特定的模型权重。”正如 RSP 更新所述，我们通过另一个相关项目实现了该目标。那个项目为推理流量签名，并在可信服务器上重新计算推理。本文的工作采用不同方法，追求同一个目标。<sup><a href="#fn3">3</a></sup></p>
+<p><strong>zkSNARK 如何提供帮助：</strong>提供方可以要求服务器为每条回复提供有效的 zkSNARK。证明绑定到针对权重的特定承诺。因此，它证明的不只是某个模型生成了回复，而是承诺所指定的模型生成了回复。入侵服务器的攻击者，或替代其他模型的模型，必须为预期的权重生成有效证明，才能避免被发现。但它们无法做到这一点。用户也可以收到这些证明。由于零知识性，证明不会泄露内部信息。由于简洁性，检查成本也很低。这限制了攻击者通过推理 API 能够实施的行为。</p>
+
+<h4>挑战 3：文本来源</h4>
+<p>人们可能希望证明，自己确实投入了大量工作来理解或分析某件事。例如，开发者可能声称，其软件库已由前沿网络安全模型扫描过漏洞。公司也可能声称，其商业计划得到了某个合适模型的认可。用户如何验证这些说法？用户可能没有资源自行运行模型，也可能没有相应的访问权限。即使公开聊天记录，也无法提供绝对保证。理论上，开发者可能伪造记录，使用更便宜的模型或性能下降的版本生成内容，而不是前沿模型。更一般地说，用户如何验证，为自己提供服务的确实是所选择的模型？</p>
+<p><strong>zkSNARK 如何提供帮助：</strong>提供方可以在每条回复后附上一个 zkSNARK，证明输出确实由声称的模型根据给定输入生成。简洁性让用户无需专用硬件，就能快速检查这份证书。零知识性则向提供方保证，用户不会获知任何专有权重信息。这可以补充现有的模型输出来源验证机制。</p>
+<p>例如，在漏洞利用不断被发现的环境中，模型提供方可以在新代码发布前，向代码开发者出具一份失败证明（Proof-of-Failure）。它证明提供方在某个特定模型上至少使用了 X 个 token，但没有达成某个特定结果。比如，某个特定模型在尝试至少 100 万个 token 后，仍未在某个特定补丁中发现任何 bug。</p>
+
+<h4>挑战 4：模型审批</h4>
+<p>监管可能要求提供方只提供获准认定为安全的模型，不得提供被认为存在网络安全或其他安全风险的模型。提供方可能有动机绕过这一要求，因为有风险的模型可能优于竞争对手，或服务成本更低。监管者如何确保实际提供的只有获批模型？</p>
+<p><strong>zkSNARK 如何提供帮助：</strong>监管者可以要求提供方为回复附上 zkSNARK，以此强制落实获批模型的使用要求。证明将每个请求与实际使用的模型绑定。如果提供方使用未经批准的模型，证明就无法通过验证。借助简洁性，监管者可以用较低成本完成检查，无需重新执行每个请求。</p>
+<p><strong>关于通过可信硬件实现 PI 的说明。</strong>此前的工作经常聚焦于通过可信执行环境实现 PI。这些基于硬件的方案提供隐私保护和认证能力，其前提是制造商生产出能够抵御篡改的硬件。在这项研究中，我们聚焦纯软件密码学方案。它们的安全和隐私保证依赖于计算问题的困难性。即使硬件、操作系统等运行环境已经失陷，攻击者若想让无效证明通过验证，也必须攻克一个在计算上不可行的问题。可信硬件和密码学是互补方法，各自具有不同的保证和取舍。两者都会在应对上述信任挑战时发挥作用。</p>
+
+<h3>我们的系统：FlashProve</h3>
+<p>FlashProve 是一个面向大型混合专家（Mixture-of-Experts，MoE）语言模型的可证明推理系统。技术报告提供了更多细节。这里先概述系统。</p>
+<p>FlashProve 涉及两方：模型提供方，即证明者；以及用户，即验证者。它分为两个阶段：</p>
+<ul>
+<li><strong>离线阶段：</strong>证明者发布对模型权重的承诺。这是一个简短的指纹，用于固定一组确切的权重，同时让权重本身保持隐藏。之后的推理声明将依据这一承诺进行检查，也就是依据本阶段承诺所固定的模型权重。</li>
+<li><strong>在线阶段：</strong>收到验证者的请求，即提示词和对应的输出 token 后，证明者生成一个证明文件，用来证明以下命题：</li>
+</ul>
+<blockquote>所承诺的模型在执行计算时，会产生这些输出 token。</blockquote>
+<p>任何持有承诺、提示词和回复的人，都可以进行检查。他们不需要权重，只需有限的计算资源，就能确认：所承诺的权重在这个提示词上运行时，确实会产生这些 token。</p>
+
+<h4>保证</h4>
+<p>证明文件满足以下“完备性”和“可靠性”性质：</p>
+<ul>
+<li><strong>诚实生成的证明文件会被接受，即完备性（completeness）。</strong>诚实证明者生成的证明会被验证者接受。</li>
+<li><strong>证明文件无法伪造，即可靠性（soundness）。</strong>为错误命题生成有效证明，在实际上是不可能的。做到这一点，无异于攻破广泛被认为成立的密码学假设。因此，验证者无需信任证明者。</li>
+</ul>
+<p>如果验证者具有强大的计算能力，并且知道模型权重，那么仅实现完备性和可靠性并不难。验证者可以用提示词运行模型，再检查结果是否与回复一致。下面两个性质，才是这个系统真正不容易实现的地方。</p>
+<ul>
+<li><strong>证明文件不泄露命题之外的信息，即零知识性（zero-knowledge）。</strong>验证者不会获知任何权重信息、计算中间值，或每一层实际运行了哪些专家。不包含权重的模型架构则不予隐藏。</li>
+<li><strong>证明文件体积小，检查成本低，即简洁性（succinctness）。</strong>被认证的计算，是在 H100 GPU 上运行一个 4000 亿参数模型。其量化版本约为 232 GB。验证者收到的证明文件则约为 19 MB，在 24 核 CPU 上花几秒钟即可检查。即使审计者或用户拥有的硬件远少于提供方，也能检查证明文件，无需复杂的基础设施。</li>
+</ul>
+
+<h4>评测</h4>
+<p>我们在 Llama 4 Maverick 上测量了协议实现的性能。该模型是一个拥有 4000 亿参数的混合专家模型，每个 token 约使用 170 亿参数。我们采用了公开可用的 4 位权重。验证者的每个请求包含一个 1,024-token 窗口，每份证明检查一个 token。证明器运行在配有单张 H100 和 24 个 CPU 核心的服务器上，验证器运行在 CPU 上。</p>
+<p><strong>证明器。</strong>证明器运行在配有单张 H100 和 24 个 CPU 核心的服务器上。离线阶段每个模型运行一次，约需 39 分钟。出于技术报告中讨论的技术原因，生成的承诺大约可用于 1,600 万次请求。之后，提供方必须重新作出承诺。在线阶段处理一批 24 个请求时，证明器约需 223 秒，相当于每秒 110 个 token。每份证明大小为 18.78 MB。</p>
+<p><strong>验证器。</strong>验证器运行在客户端 CPU 上，不需要 GPU，也只能访问对权重的承诺。客户端先下载承诺，总计约 6.5 MB。随后，每个请求下载一份证明。使用 24 个线程检查一份证明需要 17 秒，单线程则需要 21 秒。这些时间包含离线阶段的检查。</p>
+<p><strong>与普通推理的比较：</strong>我们使用广泛应用的推理引擎 vLLM，在 8 张 H100 上运行同一模型的 FP8 版本。按每张 GPU 的时间计算，为一批 24 个请求生成证明，耗时约为 vLLM 同时处理这 24 个请求的 72 倍。不同运行中的倍数为 66—77。在我们测试的最高负载下，证明生成耗时约为 vLLM 的 94 倍。</p>
+<p><strong>系统内部。</strong>FlashProve 的底层机制是一种 zkSNARK。类似的 zkSNARK 已用于点对点系统，例如服务于 Ethereum 等区块链的 L2 网络 Starknet 或 Mantle。我们的 zkSNARK 遵循一种成熟的构建方法：先构造一个称为交互式预言机证明（interactive oracle proof，IOP）的信息论对象，再借助哈希函数，将它编译为密码学证明。这种方式甚至可以提供后量子安全性。我们的 IOP 由前沿构件组合而成，使用了带线性约束的编码邻近性测试、查找论证等工具。这些工具基于编码理论和复杂性理论中的技术。将这些部分组合成面向推理的专用 IOP，是一项需要细致处理的任务。技术报告提供了更多构建细节。</p>
+
+<h4>系统工程</h4>
+<p>FlashProve 受益于我们作出的一些架构决策。技术报告详细讨论了这些决策。这里重点介绍其中几项：</p>
+<ul>
+<li><strong>证明器的工作量与实际运行的专家成正比。</strong>在 MoE 模型中，一个 token 只使用 4000 亿参数中的约 170 亿。证明器处理每个 token 的工作量与这约 170 亿参数成正比，而不是与全部参数成正比。证明仍然会隐藏选择了哪些专家。</li>
+<li><strong>请求在完成后分批生成证明。</strong>证明器通过一次并行遍历，读取已经生成的文本，方式类似预填充。它每批只对权重承诺执行一次打开操作，而不是每个请求执行一次。</li>
+<li><strong>系统按单张 GPU 可容纳的目标设计。</strong>每层的模型权重会被划分为多个片段，证明按层片段逐段完成。权重保存在普通内存中，并以流式方式传入。因此，一张 80 GB GPU 配合约 290 GB 主机内存就足够了。</li>
+</ul>
+
+<h4>事后证明与同步证明</h4>
+<p>将证明机制集成到推理服务器时，有两种选择：同步证明，即在推理过程中同时生成证明；或事后证明，即在推理完成后，为部分 token 生成证明。我们的系统采用后一种方式。同步方案通常需要极高速度，可能为了效率牺牲安全性。事后方案允许速度较慢，因此可能不必作出这种取舍。另一方面，事后证明也有局限，包括重新计算带来的额外复杂性、获得流量保证之前的延迟，以及固有的“非确定性”。技术报告进一步解释了采用事后证明的动机及其影响。</p>
+
+<h3>通过形式化验证建立可信度</h3>
+<p>密码学代码出了名地脆弱，也容易出错。用户如何信任我们今天发布的代码？</p>
+<p>答案是形式化验证。我们使用 Lean 证明助手来定义协议及其预期安全性质。我们以机器可检查的形式证明这些性质，并保证其正确性，前提是编译器没有错误。我们关注三个顶层性质：</p>
+<ul>
+<li><strong>完备性：</strong>如果命题正确，生成的证明会被验证者接受。</li>
+<li><strong>可靠性：</strong>任何伪造证明都会被验证者拒绝，只有可忽略的概率例外。</li>
+<li><strong>零知识性：</strong>除了验证者能够从回复本身推断出的信息，证明不会泄露任何模型权重信息。<sup><a href="#fn4">4</a></sup></li>
+</ul>
+<p>这些性质是在所谓的随机预言机模型中表述的。这是一种信息论分析方法，用来研究依赖哈希函数的密码学协议。</p>
+<p>形式化验证仍留下两个重要的信任缺口。首先，必须审计形式化命题，确保它们符合预期含义。这必须由人工完成，不过其负担远小于审计证明本身。我们提供了一个交互式可视化工具来辅助这项工作。</p>
+<p>其次，必须审计可执行代码，确保它与安全性质已经得到证明的形式化协议一致。如何最好地辅助这项工作，取决于具体性质。可靠性只取决于验证器，零知识性只取决于证明器，完备性则取决于两者的交互。</p>
+<p>对于可靠性，我们只需要验证器代码正确。“证明”的全部价值就在于，只要信任验证器，就完全可以不信任证明器。除 C++ 验证器外，我们还提供了一个可执行的 Lean 验证器。Lean 验证器运行较慢，但 Lean 证明了：它只会接受我们的可靠性定理所描述的验证器能够接受的证明。不过，日常使用仍应选择 C++ 验证器。它没有形式化保证，但在我们的测试中，对每一份证明，它的结果都与 Lean 验证器一致。</p>
+<p>对于完备性，威胁模型不假设存在对抗攻击。证明者和验证者都是诚实的。因此，Lean 验证器让我们可以通过标准软件测试，增强对诚实证明者会生成可接受证明的信心。具体做法是：先让证明器针对正确命题生成证明，再用 Lean 验证器检查得到的证明。</p>
+<p>对于零知识性，我们只需要证明器正确。但与验证器不同，证明器的运行成本很高，运行 Lean 证明器并不实际。我们在这一方面没有提供辅助措施。我们预期，任何希望隐藏所服务模型权重的证明方，都有足够资源开展细致的智能体安全审计、人工安全审计，或两者结合，以确保其实现与 Lean 证明器等价。</p>
+
+<h3>既有工作</h3>
+<p>实现可证明推理，是一系列通常被称为“zkML”的研究工作的目标。早期工作包括 SafetyNets（2017）。它验证了一个包含两层卷积的 MNIST CNN，以及一个小型全连接语音模型。zkCNN（2021）推进到了拥有 1500 万参数的 VGG-16，每份证明耗时 88.3 秒。Kang 等人（2022）则证明了 MobileNet v2 在全分辨率 ImageNet 上的计算。</p>
+<p>随后出现了针对 Transformer 的证明。ZKML 对拥有 1.17 亿参数的 GPT-2 生成证明，每个 token 约需 159 秒，约合每秒 0.006 个 token。Modulus Labs 对拥有 15 亿参数的 GPT-2 XL 生成证明，则需要超过 90 小时。EZKL（2023）对一个拥有 100 万参数、GPT 风格的 Transformer 生成证明，每个 token 约需 966 秒，约合每秒 0.001 个 token。性能逐步提升。zkLLM（2024）在 GPU 上证明 LLaMA-2-13B 对 2,048-token 输入的计算，约需 15 分钟。若按每个新 token 计算，约为每秒 0.001 个 token；若按批内 token 计算，则约为每秒 2.5 个 token。2025 年，zkGPT 将 GPT-2 的时间降到了 21.8 秒，约为每秒 0.05 个 token。zkPyTorch 在一个 CPU 核心上证明 Llama-3 8B，每个 token 约需 150 秒，约为每秒 0.007 个 token。ZKTorch 证明 GPT-J（60 亿参数）约需 20 分钟，约为每秒 0.001 个 token。VerInf 对 Llama 4 Maverick 的证明速度约为每秒 0.02 个 token。这与我们证明的是同一个 4000 亿参数 MoE 模型。DeepProve 是当前经过同行评审的前沿系统。它用一次前向传播认证整个生成序列。在单机上，它对 GPT-2 达到约每秒 2.9 个 token，对 Gemma 3 达到每秒 1.4 个 token；分布式运行时则达到每秒 31 个 token。SASH 的证明器（2026）在单张 H100 上，对 Llama 3.1 8B 达到了约每秒 1.25 个 token。</p>
+<p>近期，商业项目也取得了令人瞩目的数据。Attestable 在单张 H100 上证明 Gemma 4 31B，速度为每秒 53—77 个 token。截至撰文时，Attestable 尚未发布对应的开源库。</p>
+<p>这些数字体现了过去几年可证明推理的快速进步。它们应当改变我们对零知识证明能力边界的原有判断。</p>
+<p>2024 年，zkLLM 在单张 A100 上证明一个 13B 模型，速度约为每秒 2.5 个 token。据我们所知，此前唯一针对 Llama 4 Maverick 的证明来自 VerInf。它报告，在 DGX Spark 上证明 1,000 个 token 需要 14.3 小时。证明大小为 93.6 GB，验证耗时接近一天。</p>
+<p>FlashProve 在单张 H100 上证明同一个模型，速度为每秒 110 个 token。证明约为 19 MB，可以在数秒内完成验证。Attestable 则独立报告，对一个 31B 稠密模型的证明速度为每秒 53—77 个 token。</p>
+<p>我们相信，这些进展能够推广到更多模型和架构，形成一种灵活而强大的工具。它相对于原生计算的开销约为两个数量级，在我们的测量中约为 70—95 倍，远低于此前的预期。</p>
+
+<h3>局限性</h3>
+<p>本次发布的是研究原型，存在以下技术局限：</p>
+<ul>
+<li><strong>快速可执行代码没有形式化保证。</strong>我们提供了协议的 Lean 实现，其中包括可执行但较慢的 Lean 验证器，也提供了在 Lean 中证明的安全性质。论文和快速可执行代码都由 Lean 协议推导而来。但我们不保证 Lean、论文和代码三者完全一致。</li>
+<li><strong>证明针对采用贪心解码的整数模型。</strong>我们证明的是已发布权重的一个精确整数版本。每份证明都断言，被检查的 token 是该模型按贪心策略作出的选择。浮点实现或采样解码生成的回复，可能在某个位置出现偏离，从而不再与被证明的计算完全一致。一般预期是，整数版本与真正的浮点推理之间，误差率会保持在较小范围内。我们也进行了经验测试，即使考虑浮点计算的非确定性，通常仍是如此。但这不涵盖经过对抗性设计的提示词。</li>
+<li><strong>架构隐藏。</strong>我们的系统假设所服务的模型采用混合专家（MoE）架构。在这种架构中，每个 Transformer 层的前馈模块由多个专家子网络和一个路由器替代。路由器针对每个 token 只激活少量专家。我们的系统利用 MoE 结构提高效率。稠密模型等其他架构也被广泛使用，其架构描述可能包含模型提供方希望保密的知识产权。确实，可以设想一个进一步隐藏模型架构的系统：证明者通过隐藏承诺，同时对权重和架构作出承诺。这里的架构就是推理所用的“可执行代码”。验证者要检查的命题，则是所承诺的可执行程序在所承诺模型上的执行情况。</li>
+<li><strong>侧信道攻击。</strong>当前协议保证的是，证明本身不泄露所承诺模型的任何权重信息。但“侧信道攻击”仍可能泄露权重信息，例如测量生成证明所需的时间。本次发布不将此类攻击纳入范围。</li>
+<li><strong>更长的上下文。</strong>系统当前能够证明的推理，上下文最长为 1,024 个 token。与聊天场景中累积的上下文相比，这很短。理想情况下，应将这一长度扩展到前沿模型的完整上下文窗口。这些模型的上下文窗口通常达到几十万乃至几百万个 token。</li>
+</ul>
+
+<h3>脚注</h3>
+<div class="footnotes">
+<p id="fn1"><strong>01</strong> 在这项开源研究中，我们使用了 Meta 的 Llama 4 Maverick，参数量为 4000 亿。具体采用的是第三方在 Hugging Face 上公开的 4 位转换版本。本次发布不包含权重。读者需要自行从 Hugging Face 下载，并遵守 Meta 的 Llama 4 许可证。本次发布分享了一些由模型计算得到的小型数据，例如承诺 ID、校验和、性能数据和部分参数设置，完整清单见 <code>THIRD_PARTY.md</code>。我们鼓励读者自行核验结果，也鼓励将这项工作适配到其他模型。运行完整示例需要一台配备大型 GPU 的机器，并需要能够访问 Meta 的 tokenizer。</p>
+<p id="fn2"><strong>02</strong> 具体隐藏哪些信息，取决于系统设计。在我们的工作中，权重会被隐藏，但架构不会。未来我们计划进一步隐藏架构细节。原则上，隐藏模型的全部细节是可能的。问题在于，能以多高的效率做到。</p>
+<p id="fn3"><strong>03</strong> 在 2026 年 10 月 19 日的更新中，我们还更改了目标名称。我们现在使用“推理验证”（inference verification），而不是“可证明推理”（provable inference）。最初的目标，是为 token 流的完整性提供高度保证。这可以通过多种方式实现。“可证明推理”暗示的方法范围，比我们认为必要的范围更窄。独立于那个原型，我们还推进了推理密码学证明的工作。这也是为 token 流提供高度保证的一种方式。</p>
+<p id="fn4"><strong>04</strong> 模型架构并未隐藏。进一步隐藏架构细节，留待未来工作处理。</p>
+</div>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
