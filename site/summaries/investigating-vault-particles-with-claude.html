@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>用 Claude 研究穹隆颗粒</title>
+<style>
+:root{--bg:#f7f5f0;--card:#ffffff;--ink:#202c35;--muted:#5f6d78;--line:#d7deda;--data:#166ba3;--risk:#ab4935;--opportunity:#167760;--conclusion:#7152a2;--hl:#deedf8;--hl2:#e9e1f5;--soft:#e8f2ed;--riskbg:#f8e9e2;--hero:#182d3b;--herotext:#edf3f5;--heromuted:#bed0d9}
+:root[data-theme="light"]{--bg:#f7f5f0;--card:#ffffff;--ink:#202c35;--muted:#5f6d78;--line:#d7deda;--data:#166ba3;--risk:#ab4935;--opportunity:#167760;--conclusion:#7152a2;--hl:#deedf8;--hl2:#e9e1f5;--soft:#e8f2ed;--riskbg:#f8e9e2;--hero:#182d3b;--herotext:#edf3f5;--heromuted:#bed0d9}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141b21;--card:#1c262e;--ink:#dde5e9;--muted:#a7b5bf;--line:#35434d;--data:#71bceb;--risk:#f19b83;--opportunity:#70cfac;--conclusion:#bba2ee;--hl:#20394c;--hl2:#342c47;--soft:#20382f;--riskbg:#3b2925;--hero:#0d202c;--herotext:#e0eaf0;--heromuted:#adbfca}}
+:root[data-theme="dark"]{--bg:#141b21;--card:#1c262e;--ink:#dde5e9;--muted:#a7b5bf;--line:#35434d;--data:#71bceb;--risk:#f19b83;--opportunity:#70cfac;--conclusion:#bba2ee;--hl:#20394c;--hl2:#342c47;--soft:#20382f;--riskbg:#3b2925;--hero:#0d202c;--herotext:#e0eaf0;--heromuted:#adbfca}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;line-height:1.85}main{max-width:1100px;margin:auto;padding:32px 24px 80px}h1,h2,h3{line-height:1.35}h1{font-size:clamp(2rem,5vw,3.5rem);margin:12px 0}h2{font-size:1.8rem;margin:0 0 24px}h3{font-size:1.2rem}p{margin:0 0 1.2em}a{color:var(--data);overflow-wrap:anywhere}.hero{padding:44px;border-radius:20px;background:var(--hero);color:var(--herotext)}.original,.meta{color:var(--heromuted)}.original{font-size:1.15rem}.eyebrow{font-size:.85rem;letter-spacing:.1em}.lead{font-size:1.2rem;margin-top:28px}.lead strong{display:block;margin-bottom:8px}.summary{margin-top:30px}.stats{display:grid;grid-template-columns:repeat(3,1fr);border-block:1px solid var(--line);margin:28px 0}.stat{padding:24px 18px}.stat strong{display:block;color:var(--data);font-size:2.2rem;line-height:1.3}.stat span{font-size:.9rem;color:var(--muted)}.block{margin:36px 0}.table-wrap{overflow-x:auto;background:var(--card);padding:20px;border-radius:12px}table{width:100%;border-collapse:collapse;font-size:.95rem}th,td{text-align:left;padding:13px 12px;border-bottom:1px solid var(--line)}th{color:var(--data);background:var(--hl)}caption{text-align:left;font-weight:700;padding-bottom:14px}.note{font-size:.9rem;color:var(--muted);margin:16px 0 0}.insight{border-left:5px solid var(--conclusion);padding:18px 24px;background:var(--hl2);margin-top:20px}.columns{display:grid;grid-template-columns:1fr 1fr;gap:24px}.opportunity{background:var(--soft);padding:26px;border-radius:12px}.opportunity h3{color:var(--opportunity)}.risk{background:var(--riskbg);padding:26px;border-radius:12px}.risk h3{color:var(--risk)}mark{background:var(--hl);color:var(--data);padding:1px 4px;border-radius:4px}.conclusion{color:var(--conclusion);font-weight:700}.steps{padding:20px 26px 20px 48px;background:var(--card);border-left:5px solid var(--data)}.steps li{margin:10px 0}.takeaways{padding:28px 0;border-top:2px solid var(--conclusion)}.takeaways ul{display:grid;grid-template-columns:1fr 1fr;gap:16px;list-style:none;padding:0}.takeaways li{padding:18px;background:var(--card);border-top:3px solid var(--conclusion)}#translation{max-width:800px;margin:50px auto 0;padding-top:40px;border-top:1px solid var(--line)}#translation h2{font-size:2rem}#translation h3{margin:44px 0 20px;font-size:1.5rem}#translation h4{font-size:1.15rem;margin-top:30px}.translation-meta{color:var(--muted);font-size:.9rem}.contents{padding:20px 24px;background:var(--card)}.contents p{margin:4px 0}blockquote{margin:25px 0;padding:16px 24px;border-left:4px solid var(--conclusion);background:var(--hl2)}blockquote p:last-child{margin-bottom:0}.source-figure{margin:32px 0;padding:16px;background:var(--card);border:1px solid var(--line);border-radius:10px}.source-figure img{display:block;max-width:100%;height:auto;margin:auto}.source-figure figcaption{font-size:.9rem;color:var(--muted);line-height:1.7;margin-top:14px}footer{margin-top:30px;color:var(--muted);font-size:.9rem}@media(max-width:650px){main{padding:16px 16px 50px}.hero{padding:26px}.stats{grid-template-columns:1fr}.stat{border-bottom:1px solid var(--line)}.columns,.takeaways ul{grid-template-columns:1fr}th,td{padding:10px 8px}.table-wrap{padding:12px}}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/investigating-vault-particles-with-claude" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header class="hero">
+<div class="eyebrow">Anthropic · Research · 2026 年 11 月 4 日</div>
+<h1>用 Claude 研究穹隆颗粒</h1>
+<p class="original">Investigating vault particles with Claude</p>
+<div class="lead"><strong>一句话总括</strong>团队借助 Claude 找到能组装成穹隆样颗粒的原核生物及噬菌体蛋白，并解析了其中一种颗粒的三维结构，为研究这种功能未知的巨大蛋白质复合物提供了更简单的实验系统。</div>
+</header>
+<section aria-label="中文总结" class="summary">
+<div class="stats">
+<div class="stat"><strong>96 个</strong><span>L05 颗粒中的蛋白拷贝数；人类穹隆为 78 个</span></div>
+<div class="stat"><strong>约 90 分钟</strong><span>优化后从细胞到电镜载网的制备时间；传统纯化约需 3 天</span></div>
+<div class="stat"><strong>不到 4 个月</strong><span>完成候选筛选、样品制备及首个结构解析</span></div>
+</div>
+<div class="block">
+<h2>发现的是新结构，功能之谜仍未解开</h2>
+<p>穹隆颗粒于 <mark>1986 年</mark>被发现。它是大型中空蛋白壳，存在于人体几乎所有细胞中。分子运输、抗毒性物质和先天免疫都是已提出的功能，但均未得到确证。</p>
+<p>此前已有人在原核生物和噬菌体基因组中找到相关蛋白。此次研究进一步证明，部分蛋白能组装成完整的穹隆样颗粒。<strong>结构证据把研究推进了一步，却没有直接回答它们在生物体内做什么。</strong></p>
+<div class="insight">研究目前只在 <em>E. coli</em> 中制备了这些颗粒。它们是否会在天然来源的细菌和噬菌体中形成，仍有待验证。</div>
+</div>
+<div class="block">
+<h2>分布广却少见，筛选逐步收敛到可解析的颗粒</h2>
+<div class="table-wrap">
+<table>
+<caption>候选发现与验证：各阶段的范围不同</caption>
+<thead><tr><th>阶段</th><th>原文数据</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td>数据库搜索</td><td>约 150 亿条预测蛋白</td><td>用 Claude Science 搜索穹隆蛋白的同源蛋白</td></tr>
+<tr><td>系统发育分布</td><td>细菌 29 个门；古菌 4 个门</td><td>在基因组已测序物种中，出现比例不足 1%</td></tr>
+<tr><td>无细胞表达筛选</td><td>44 个蛋白</td><td>检测能否产生全长蛋白及其产量</td></tr>
+<tr><td>活体 E. coli 表达</td><td>24 个中有 15 个</td><td>产生可溶性蛋白</td></tr>
+<tr><td>电镜观察</td><td>15 个中有 7 个</td><td>组装成穹隆样颗粒</td></tr>
+<tr><td>冷冻电镜确认</td><td>7 个中有 4 个</td><td>2 个来自噬菌体，2 个来自细菌</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note">这些数字对应不同筛选阶段，不能直接视为对所有同源蛋白的总体成功率估计。</p>
+<p>原核生物中的相关蛋白并不常见，但横跨多个类群。细菌培养速度快，有望让结构、起源和内容物研究更容易开展。</p>
+</div>
+<div class="block">
+<h2>L05 更短、更宽，内部容积反而更大</h2>
+<div class="table-wrap">
+<table>
+<caption>L05 与哺乳动物穹隆的结构比较</caption>
+<thead><tr><th>指标与单位</th><th>噬菌体来源 L05</th><th>哺乳动物穹隆</th></tr></thead>
+<tbody>
+<tr><td>蛋白拷贝总数</td><td>96</td><td>78</td></tr>
+<tr><td>每半壳拷贝数</td><td>48</td><td>39</td></tr>
+<tr><td>长度 × 宽度，纳米</td><td>约 54 × 45</td><td>约 67 × 40</td></tr>
+<tr><td>壳壁蛋白重复片段数</td><td>7</td><td>9</td></tr>
+<tr><td>内部容积</td><td>比哺乳动物穹隆约大 25%</td><td>比较基准</td></tr>
+</tbody>
+</table>
+</div>
+<p>L05 总质量约为 <mark>950 万道尔顿</mark>。它的形状更接近球体，因此虽然较短，内部空间却更大。</p>
+<p>团队还制作了 <mark>15 种改造蛋白</mark>。部分帽部附近的单处改动就会阻止壳体闭合。复制两个壳壁片段后，重复片段从 7 个变为 9 个，颗粒内部容积又增加了约 <mark>20%</mark>。</p>
+<p class="conclusion">这些实验表明，壳壁片段的复制可以改变颗粒大小，同时保留组装能力。这也为未来将其改造为生物技术工具提供了依据。</p>
+</div>
+<div class="block">
+<h2>Claude 贯穿研究流程，关键判断仍由研究人员掌握</h2>
+<ol class="steps">
+<li><strong>搜索与设计：</strong>Claude 搜索蛋白数据库，将研究人员选定的蛋白序列转成适配宿主的 DNA，并加入表达调控序列。</li>
+<li><strong>分离与制样：</strong>研究人员决定尝试体积排阻色谱。Claude 推荐色谱柱与检测方法，并提出直接加载细胞裂解物。优化流程约需 90 分钟。</li>
+<li><strong>结构解析：</strong>Claude 在内部多智能体运行框架中部署并运行 RELION。研究人员指导分析决策。首个完整模型在 34 小时内完成，最终结构图约一周完成。</li>
+</ol>
+<p>团队估计，首个结构模型按通常方式需要数周。冷冻电镜分析同时动用了<strong>数百块 GPU</strong>，因此速度提升也依赖较多算力，不能全部归因于模型能力。</p>
+</div>
+<div class="columns block">
+<article class="opportunity">
+<h3>新线索拓展了后续实验方向</h3>
+<p>L05 的 96 个蛋白拷贝各有一个口袋，里面都出现了尚未确认的小分子。Claude 发现其形状类似辅酶 A。</p>
+<p>如果身份得到证实，这可能提供功能线索。可调整大小的壳体也提示了酶递送纳米胶囊等潜在用途，但这些用途仍是研究方向。</p>
+</article>
+<article class="risk">
+<h3>错误会直接消耗实验时间</h3>
+<p>Claude 写出的一份方案使用了会干扰 DNA 导入细胞的培养基添加剂，导致项目延误 <strong>两周</strong>。它还在冷冻电镜处理中跳过标准步骤，生成了混入镜像的错误结构图。</p>
+<p>团队在熟悉领域能快速发现错误，在不熟悉领域则付出了时间代价。模型能扩大研究能力，也增加了对专业核查的要求。</p>
+</article>
+</div>
+<div class="takeaways">
+<h2>最值得带走的洞见</h2>
+<ul>
+<li><strong>结构确认与功能确认是两回事。</strong>完整壳体的发现很重要，但其天然形成条件和生理作用仍未知。</li>
+<li><strong>AI 的作用贯穿多个环节。</strong>搜索、设计、方法优化与数据处理共同影响研究速度。</li>
+<li><strong>人与模型可以相互纠正。</strong>研究人员坚持了 Claude 起初反对的色谱方案，也纠正了它偏离标准流程的做法。</li>
+<li><strong>效率数据需要结合资源条件理解。</strong>90 分钟制样和 34 小时建模来自具体流程；后者还依赖数百块 GPU 并行计算。</li>
+<li><strong>原核系统提供了新的实验入口。</strong>更易培养的细菌与可改造的蛋白壳，为检验穹隆功能创造了条件。</li>
+</ul>
+</div>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<nav aria-label="原文章节" class="contents">
+<p>01 原核生物中的穹隆样结构</p>
+<p>02 借助 Claude 寻找、分离并解析一种新穹隆</p>
+<p>03 一种新的科研方式</p>
+<p>04 与我们合作</p>
+</nav>
+<div class="translation-meta">
+<p>发布时间</p>
+<p>团队</p>
+<p>科学</p>
+</div>
+<p>我们分享 Anthropic 生物学研究实验室的又一项发现：首个在原核细胞中发现的穹隆颗粒（vault particle）三维结构。穹隆是大型、中空、桶状的蛋白质结构，存在于生命之树不同分支的细胞中。它们的功能仍然未知。下文将介绍 Claude 如何帮助我们完成这项研究的各个环节，包括检索序列相关文献、优化颗粒分离方法，以及解析穹隆结构。更多信息见我们的预印本。我们已将其提交至 bioRxiv，待上线后会立即更新链接。</p>
+<p>人类于 1665 年首次观察到生物细胞。但三个半世纪过去了，细胞的许多运作机制仍然未知。直到不久前，一些关键组分是否存在都还存在争议，更不用说它们的功能了。即使在今天，对研究最充分的细胞之一——细菌 E. coli——约 4,400 个基因中超过三分之一的基因，我们仍然知之甚少。穹隆颗粒也是这样的谜团。</p>
+<p>穹隆颗粒是一种大型中空蛋白壳，存在于我们体内几乎所有细胞中。Leonard Rome 和 Nancy Kedersha 于 1986 年发现了它，但其功能至今不明。它的质量约为核糖体的三倍，是已知最大的真核生物分子复合物之一。真核生物是具有复杂细胞的生物，例如哺乳动物。与之相对的是细胞结构较简单、通常为单细胞的“原核生物”，例如细菌。穹隆因其形状而得名。在电子显微镜下，它带有肋纹的外壳让 Rome 博士和 Kedersha 博士联想到大教堂的穹顶。在哺乳动物中，这种外壳由主要穹隆蛋白的 78 个拷贝组成。它们排列成两个相同的半壳，并在中部接合。</p>
+<p>从黏菌到人类，穹隆广泛存在于真核生物演化树的大部分分支中。因此，科学家认为它一定有某种用处。研究人员提出过多种功能，包括在细胞核与细胞质之间运输分子、保护细胞免受抗癌药物等有毒化合物的伤害，以及参与先天免疫。但这些假说都没有得到确证。另一些研究发现，缺少穹隆的小鼠仍能存活。这提示穹隆可能只在特定环境条件下才是必需的。不过，问题依然存在：如果没有重要功能，进化为什么会保留如此庞大的结构？</p>
+<p>我们的生物学研究团队一直在研究穹隆，想知道 Claude 能否帮助推进这个长期悬而未决的问题。我们还没有确定它们的生物学功能。但我们发现，生命之树上还有更多穹隆蛋白可以组装成完整的穹隆样颗粒，包括来自原核生物及感染它们的噬菌体的蛋白。此前，研究人员已在原核生物和噬菌体的基因组中发现相关蛋白。但据我们所知，还没有人证明它们会组装成穹隆。</p>
+<p>原核细胞中的穹隆为研究人员提供了一个更简单的研究系统。与哺乳动物细胞相比，细菌生长迅速。这让我们更容易研究穹隆的起源、基本结构，以及它们内部是否装有东西、装的又是什么。研究人类蛋白的细菌同源蛋白，此前已经带来过重要发现。细菌版的 cGAS–STING 信号传导系统、gasdermins 和 viperins，揭示了这些人类免疫防御机制的微生物起源。在那些研究中，我们已经知道这些蛋白在人类中的功能。穹隆则不同，它们在人类中的功能仍然未知。其原核同源蛋白或许能帮助我们揭开这个谜团。</p>
+<p>这里，我们介绍如何解析一种噬菌体穹隆的分子结构。噬菌体是感染细菌的病毒。和所有病毒一样，它们会劫持宿主细胞来制造自身蛋白。因此，这种穹隆会在细菌内部形成，而细菌属于原核细胞。该穹隆由同一种蛋白的 96 个拷贝组成，相比之下，人类穹隆由 78 个拷贝组成。我们还通过复制蛋白的一部分，工程化构建了更大的穹隆。这些结果共同揭示了此类复合物的组装方式，也提示了将其改造用于生物技术的可能性，例如用作递送酶的纳米胶囊。</p>
+<p>这项工作也体现了我们团队更广泛的目标：将 Claude 融入研究的每一步，加快基础生物学研究。在我们的指导下，Claude 搜索了蛋白数据库、设计了 DNA 构建体、优化了分离方法，并处理了显微成像数据。结果是，通常需要三天的穹隆纯化，我们用约 90 分钟就完成了。首个结构模型又在 34 小时后完成。我们估计，通常这需要数周。</p>
+<p>尽管取得了这些进展，对于这些令人困惑的结构，我们仍有很多需要了解的地方。我们邀请了 Rome 博士担任这项研究的顾问。与他分享结构后，他说：</p>
+<blockquote><p>弄清穹隆的功能仍然极具挑战。我很高兴 Anthropic 获得了这么多高质量数据。现在，其他人也会开始研究这个问题……Anthropic 这些发现所覆盖的广度表明，穹隆的功能可能相当复杂，探索过程也会很有意思。</p></blockquote>
+<p>我们的实验室提前发布这些发现，是为了继续向科学界展示如何利用 Claude 开展发现性研究。你可以在我们的预印本中进一步了解研究结果和方法。我们也将很快发布结构及更多数据。</p>
+<h3>原核生物中的穹隆样结构</h3>
+<p>我们使用冷冻电子显微镜（cryo-EM，简称冷冻电镜）解析了穹隆结构。这种方法先将大量同类颗粒快速冷冻，再用电子束成像，最后将图像整合成一个三维模型。该穹隆由一种噬菌体蛋白的 96 个拷贝组成，每个半壳有 48 个拷贝。我们将这种蛋白称为 L05，整个颗粒的总质量约为 950 万道尔顿。相比之下，哺乳动物穹隆每个半壳含 39 个拷贝。噬菌体来源的穹隆也更短、更宽：长约 54 纳米，宽约 45 纳米；哺乳动物穹隆则约为 67 纳米长、40 纳米宽。虽然较短，但它的形状更接近球体，因此内部容积约大 25%。构成壳壁的蛋白链由七个重复片段首尾相接叠成，而哺乳动物穹隆有九个。它的两端帽部也更平。这是迄今在原核生物中发现的最大蛋白壳之一。</p>
+<p>该结构有一个值得注意的特征：帽部的闭合方式。壳壁由 48 个拷贝围成，越靠近顶端就越需要收窄。它分三级完成这一过程，就像分层的穹顶。在每组三个相邻拷贝中，一个止于第一级，一个止于第二级，另一个继续延伸至顶端。这三个拷贝在壳壁部分的形状相同，但在帽部采用不同的形态，也就是不同的构象。</p>
+<figure class="source-figure" data-source-image="0"><img alt="Cryo-EM structure of the L05 vault, shown whole from the side and with its cap viewed from above, where the protein chains spiral in toward the tip." decoding="async" height="2314" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/c3a048744e70ec9ee9cf398065f94c565ceb5181-4251x2314.png" width="4251"/>
+<figcaption>L05 穹隆的帽部。左：通过冷冻电镜成像得到的完整穹隆。右：从上方观察其帽部。全部 48 条链从边缘向顶端盘绕，沿途彼此重叠。其中三分之二越过第一级，三分之一延伸至顶端。因此，帽部像阶梯状穹顶一样逐级收窄。</figcaption>
+</figure>
+<p>我们能够在实验室中制造这种穹隆，并迅速将其分离出来。因此，我们也尝试改变其结构，以进一步了解这些蛋白如何组装。在 Claude 的协助下，我们制作了 15 种改造后的蛋白。大多数改动位于相邻拷贝的接触位置。帽部附近的一些单处改动，就足以阻止壳体闭合。我们观察到的不再是封闭的穹隆，而是开放的玫瑰花状颗粒。这表明，该区域是壳体封闭所必需的。</p>
+<p>我们还尝试把穹隆做得更大。通常，壳壁由七个重复片段构成。我们复制了其中两个，让蛋白拥有九个重复片段，与人类穹隆相同。随后，它组装成了更大的穹隆颗粒，内部容积增加了约 20%。这些实验说明，穹隆在进化过程中可能通过复制自身壳壁的一部分来改变大小，同时不破坏组装方式。</p>
+<figure class="source-figure" data-source-image="1"><img alt="Cryo-EM structures of the L05 vault and a larger engineered version with two extra wall repeats, shown side by side at the same scale." decoding="async" height="2645" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/787bcfd42bcb343c6a2737418eb7288d10284431-4251x2645.png" width="4251"/>
+<figcaption>L05 穹隆（左）与工程化改造版本（右）并排展示。改造版本的每个蛋白拷贝都增加了两个片段。两者均通过冷冻电镜成像，并按相同比例显示。新增的重复片段使穹隆变得更长、更宽。</figcaption>
+</figure>
+<h3>借助 Claude 寻找、分离并解析一种新穹隆</h3>
+<p>穹隆的功能之所以 40 年来仍未得到解释，部分原因是生物学家最常用于遗传实验的生物都没有穹隆，包括面包酵母、果蝇和线虫。小鼠虽然有穹隆，但培育出的缺少某种穹隆伴侣蛋白或穹隆 RNA 的小鼠仍能正常发育，没有留下可供追查的明显缺陷。近年来，生物信息学研究人员在原核生物中发现了穹隆蛋白的远缘同源蛋白。但这些蛋白是否会形成穹隆，当时还不清楚。</p>
+<p>我们的团队着手回答这个问题。研究需要分几个步骤进行：首先调查遗传序列，确定穹隆蛋白分布于生命之树的哪些位置；然后制备并分离最有希望的候选蛋白，检验它们是否真的会组装成穹隆样颗粒；最后解析其中一种颗粒的结构，观察各条蛋白链如何拼合在一起。</p>
+<p>我们首先使用 Claude Science，在一个包含约 150 亿条预测蛋白的数据库中搜索穹隆蛋白的同源蛋白。结果发现，它们虽然罕见，却分布广泛。细菌的 29 个主要类群，即“门”，以及古菌的 4 个门中都有它们。古菌是原核生物的另一大类群。不过，在基因组已测序的物种中，不到 1% 含有这些蛋白。随后，我们从中选出 44 个蛋白，逐一在无细胞系统中测试，观察哪些基因能够产生全长蛋白，以及产量如何。蛋白由我们选择。Claude 则将每条蛋白序列转换成适配宿主细胞的 DNA，加入启动基因表达的调控序列，并准备好可供订购的设计。我们将表现最好的候选转入活的 E. coli 细菌中，24 个候选中有 15 个产生了可溶性蛋白。</p>
+<p>接下来，我们需要分离这些颗粒。为真核生物穹隆开发的传统方法，是将样品放入糖液密度逐渐增加的试管中离心。整个过程约需三天。为了提速，我们决定尝试体积排阻色谱。在这个过程中，样品流经装有多孔微珠的色谱柱。分子在其中被分级分离：小分子会进入孔隙而滞留，穹隆则太大，无法进入孔隙。因此，穹隆最先流出，出现在所谓的空隙体积组分中。</p>
+<p>Claude 起初反对采用色谱方法，因为错误折叠蛋白形成的聚集块也会在同一空隙体积组分中流出。我们还是继续尝试了。Claude 随后推荐了一种具体的色谱柱，以及追踪穹隆蛋白和检查颗粒是否形成的方法，帮助我们把这个方案做通。接着，Claude 提出，不做任何预纯化，直接把细胞裂解后的内容物加载到色谱柱上。我们一开始有些犹豫，因为这类色谱柱很昂贵，而未经处理的 E. coli 细胞裂解物可能堵塞柱子或造成污染。但我们愿意检验这个不寻常的想法，结果它成功了。</p>
+<p>我们并不是第一个用分子筛色谱柱分离穹隆的团队。但经过优化，我们的方法从细胞到电镜载网只需约 90 分钟，而不再需要数天。在电子显微镜下，15 个蛋白中有 7 个组装成了穹隆样颗粒。</p>
+<figure class="source-figure" data-source-image="2"><img alt="Cryo-EM micrograph showing a field of L05 vault particles, with close-ups of single vaults below and 2D class averages at right." decoding="async" height="4251" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/6988ac7d56a9309fd9d36206ee22acc819d95f7c-4251x4251.png" width="4251"/>
+<figcaption>在 E. coli 中制备的 L05 穹隆的冷冻电镜图像：大片颗粒的视野（大图）、选出的单个穹隆（下方），以及可看见壳壁肋纹的二维分类平均图像（右侧）。</figcaption>
+</figure>
+<p>冷冻电镜确认，这七种颗粒中有四种具有穹隆形状。其中两种来自噬菌体，两种来自细菌。我们选择了其中一种噬菌体蛋白 L05，开展上文所述的详细结构解析，因为它是最容易形成完整、封闭颗粒的候选之一。确定生物大分子的结构，往往需要使用专门软件，进行数周甚至数月的人工操作。我们指导 Claude 完成了整个过程。Claude 在一个可访问内部计算资源的内部多智能体运行框架中工作。它配置了开源处理软件 RELION，并运行了各个步骤。我们则为分析决策提供指导。首个完整模型在 34 小时内完成，最终结构图在处理开始约一周后完成。</p>
+<p>Claude 还指出了结构中一个我们尚无法解释的特征。96 个蛋白拷贝中的每一个，都在中途某处有一个口袋，容纳着一个小分子。这个分子在结构图中清晰可见，但我们还无法确定其身份。Claude 发现，它的形状类似辅酶 A。这是一种常见的辅助分子，细胞用它来转移化学基团。如果它确实是辅酶 A，或某种类似分子，那可能成为穹隆功能的早期线索。</p>
+<h3>一种新的科研方式</h3>
+<p>对我们来说，这是一种截然不同的科研方式。我们此前都没有研究过如此庞大的蛋白组装体，在结构生物学方面的经验也有限。我们仍然接下了这个项目，因为 Claude 能补足我们不熟悉的知识，并快速完成原本需要我们花费更长时间的分析。</p>
+<p>不到四个月，我们筛选了数十种候选穹隆，制备了显微镜样品，并解析了首个在原核生物中发现的穹隆结构。能够使用现有 Claude 产品的普通实验室，就可以完成其中大部分工作。只有冷冻电镜分析需要更多计算资源，可能超出一家学术机构的可用资源范围。为了节省时间，这部分分析同时使用了数百块 GPU。</p>
+<p>这种工作方式也让我们看到了 Claude 需要改进的地方。它写出的一份实验方案要求使用含某种添加剂的培养基，而这种添加剂会干扰 DNA 导入细胞。这让项目延误了两周。在冷冻电镜处理的早期，它跳过了一个标准步骤，生成了一张混入自身镜像的错误结构图。我们告诉它不要再自行发挥：“请先按常规方法做，除非常规方法行不通。”</p>
+<p>我们已经将这些经验用于指导 Claude 的开发。我们向训练 Claude 的机器学习研究人员分享了实验记录，让他们看到模型出错的地方。这影响了 Claude 学习所用的数据类型。在项目推进过程中，随着新模型推出，Claude 在这些任务上的表现明显改善。它在 DNA 构建设计中似乎犯错更少，也更善于识别实验中的潜在问题。在我们熟悉的领域，我们能迅速发现错误。但在不熟悉的领域，这些错误耗费了我们的时间。总体而言，我们认为这种工作方式的收益远大于不足。Claude 已成为我们工作中不可或缺的一部分。</p>
+<p>到目前为止，我们只在 E. coli 中制备了这些穹隆，还没有测试它们是否会在天然来源的细菌和噬菌体中形成。要确定这些颗粒的功能，还需要更多研究。我们的工作只是让这个谜团变得更深。正如 Rome 博士所说：</p>
+<blockquote><p>我们会不会发现，它们都在做同一件事？还是会看到穹隆功能在进化中不断发展？也许它们做的事情和人类穹隆相同，那也非常有意思。</p></blockquote>
+<p>我们将继续研究穹隆的功能，并随着工作推进分享更多进展。</p>
+<h3>与我们合作</h3>
+<p>我们正在技术报告中公布这项工作的详细内容。如果你对这些穹隆可能具有的功能有想法，或者拥有可以检验这些想法的系统，欢迎联系我们：mdurrant[at]anthropic.com、nicholasp[at]anthropic.com。</p>
+<h3>作者与致谢</h3>
+<h4>贡献者</h4>
+<p>Januka Athukoralage、Peter Yoon、Nicholas Perry、Matthew Durrant，以及 Anthropic 的生命科学团队。</p>
+<p>利益披露：Rome 博士担任付费顾问，为文稿提供了反馈。</p>
+</section>
+<footer>原文：<a href="https://www.anthropic.com/research/investigating-vault-particles-with-claude">Investigating vault particles with Claude</a> · Anthropic · 2026 年 11 月 4 日</footer>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
