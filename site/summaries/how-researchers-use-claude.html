@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>用于科学发现的 AI：研究人员如何使用 Claude</title>
+<style>
+:root{--bg:#f5f3ed;--card:#fffdf8;--ink:#202b32;--muted:#626e76;--line:#d9ddd9;--data:#176fa0;--risk:#b04838;--opportunity:#237653;--conclusion:#7351a2;--hl:#dceef6;--hl2:#e9e1f5;--riskbg:#f8e6df;--greenbg:#e2eee5;--deep:#20323e;--deepink:#eef3f5;--deepmuted:#c0ced6}
+:root[data-theme="light"]{--bg:#f5f3ed;--card:#fffdf8;--ink:#202b32;--muted:#626e76;--line:#d9ddd9;--data:#176fa0;--risk:#b04838;--opportunity:#237653;--conclusion:#7351a2;--hl:#dceef6;--hl2:#e9e1f5;--riskbg:#f8e6df;--greenbg:#e2eee5;--deep:#20323e;--deepink:#eef3f5;--deepmuted:#c0ced6}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141b20;--card:#1c262d;--ink:#dce4e8;--muted:#a2b0b9;--line:#35434c;--data:#70bde6;--risk:#f0957d;--opportunity:#77c69a;--conclusion:#bda0ee;--hl:#203c4b;--hl2:#352d49;--riskbg:#3b2927;--greenbg:#233b30;--deep:#10171e;--deepink:#dce7ed;--deepmuted:#a8bbc8}}
+:root[data-theme="dark"]{--bg:#141b20;--card:#1c262d;--ink:#dce4e8;--muted:#a2b0b9;--line:#35434c;--data:#70bde6;--risk:#f0957d;--opportunity:#77c69a;--conclusion:#bda0ee;--hl:#203c4b;--hl2:#352d49;--riskbg:#3b2927;--greenbg:#233b30;--deep:#10171e;--deepink:#dce7ed;--deepmuted:#a8bbc8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.85 system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif}main{max-width:1120px;margin:auto;padding:48px 26px}h1,h2,h3,h4{line-height:1.35}h1{font-size:clamp(30px,5vw,53px);letter-spacing:-.035em;margin:16px 0}h2{font-size:29px;margin-top:48px}h3{font-size:22px}p{margin:1em 0}a{color:var(--data);overflow-wrap:anywhere}strong{font-weight:750}mark{background:var(--hl);color:var(--ink);padding:.08em .22em;border-radius:4px}.purple{background:var(--hl2)}.eyebrow{color:var(--data);font-size:13px;letter-spacing:.12em;font-weight:750}.original{font-size:20px;color:var(--muted);margin:0}.meta,.note{color:var(--muted);font-size:14px}.hero{padding-bottom:30px;border-bottom:1px solid var(--line)}.lead{font-size:21px;max-width:900px}.numbers{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin:30px 0}.number{background:var(--deep);color:var(--deepink);padding:25px}.number b{display:block;font-size:36px;line-height:1.25}.number span{font-size:14px;color:var(--deepmuted)}.table-wrap{overflow:auto;margin:22px 0}table{width:100%;border-collapse:collapse;background:var(--card);font-size:15px}caption{text-align:left;color:var(--muted);padding:10px 0;font-size:14px}th,td{padding:13px 16px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{background:var(--hl);font-weight:750}td.num{color:var(--data);font-weight:750;white-space:nowrap}.split{display:grid;grid-template-columns:1fr 1fr;gap:25px;margin:32px 0}.split article{padding:23px;border-top:4px solid var(--opportunity);background:var(--greenbg)}.split article:last-child{background:var(--hl2);border-color:var(--conclusion)}.split h3{margin-top:0}.insight{border-left:5px solid var(--conclusion);padding:15px 24px;background:var(--card);font-size:20px}.risk{background:var(--riskbg);border-left:5px solid var(--risk);padding:20px 26px;margin:28px 0}.risk h3{color:var(--risk);margin-top:0}.takeaways{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0;list-style:none}.takeaways li{padding:20px;background:var(--card);border:1px solid var(--line)}.takeaways b{display:block;color:var(--conclusion)}#translation{max-width:840px;margin:65px auto 0;padding-top:24px;border-top:3px solid var(--conclusion)}#translation>h2{font-size:36px}#translation h3{margin-top:44px;border-bottom:1px solid var(--line);padding-bottom:10px}#translation h4{font-size:19px;margin-top:30px}.toc{columns:2;padding-left:25px;color:var(--muted)}.source-meta{padding:20px;border-left:3px solid var(--line);font-size:15px;color:var(--muted)}.source-figure{margin:34px 0;padding:16px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.source-figure img{display:block;max-width:100%;height:auto;margin:auto}figcaption{font-size:14px;color:var(--muted);line-height:1.7;margin-top:14px}.references{font-size:14px;overflow-wrap:anywhere}.references li,.footnotes li{margin-bottom:16px}.footnotes{font-size:15px}sup{font-size:11px;color:var(--data)}@media(max-width:680px){main{padding:28px 18px}.numbers,.split,.takeaways{grid-template-columns:1fr}.number{padding:18px 22px}.toc{columns:1}th,td{padding:10px}body{font-size:16px}}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/how-researchers-use-claude" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header class="hero">
+<div class="eyebrow">ANTHROPIC · RESEARCH · 科研使用研究</div>
+<h1>用于科学发现的 AI：研究人员如何使用 Claude</h1>
+<p class="original">AI for scientific discovery: How researchers use Claude</p>
+<p class="meta">来源：Anthropic · 文章信息日期：2026 年 11 月 5 日 · <a href="https://www.anthropic.com/research/how-researchers-use-claude">原文链接</a></p>
+<p class="lead"><strong>一句话总括：</strong>这项研究用科研会话和任务分类说明，<mark>AI 的科研价值首先取决于它能完成哪些具体工作</mark>。即使认知工作高度自动化，实体实验、采用速度和研究问题的质量仍会决定科学发现能提速多少。</p>
+</header>
+<section aria-label="中文总结">
+<div class="numbers">
+<div class="number"><b>207,049</b><span>次科研会话，来自消费者订阅方案</span></div>
+<div class="number"><b>7,262</b><span>项科研任务，覆盖 34 个领域、318 个子领域</span></div>
+<div class="number"><b>528</b><span>名受访科学家，主要来自生命与健康科学</span></div>
+</div>
+<h2>使用集中在分析和写作，未覆盖最受重视的环节</h2>
+<p>数据分析和写作的会话占比高于它们在科研时间中的占比。构思和数据采集则相反。受访者把构思排在科研重要性的第一位，把数据采集排在第二位。<strong>使用最多的环节，并不等于最能决定研究价值的环节。</strong></p>
+<div class="table-wrap">
+<table>
+<caption>科研任务占比对比。单位：%；会话占比与科研时间占比是不同口径。写作的 Claude Code 数据来自原图信息。</caption>
+<thead><tr><th>任务类别</th><th>科研时间</th><th>Claude 会话</th><th>Claude Code 会话</th></tr></thead>
+<tbody>
+<tr><td>数据分析</td><td>27.6</td><td class="num">33.7</td><td class="num">48.1</td></tr>
+<tr><td>写作与交流</td><td>16.0</td><td class="num">32.0</td><td class="num">17.6</td></tr>
+<tr><td>数据采集</td><td>28.6</td><td class="num">11.5</td><td class="num">11.9</td></tr>
+<tr><td>构思与假设生成</td><td>7.1</td><td class="num">4.2</td><td class="num">2.1</td></tr>
+</tbody>
+</table>
+</div>
+<p>这种差异也出现在学科之间。计算机科学只占全球研究人员的 <mark>4.3%</mark>，却占 Claude Code 科研会话的 <mark>32.7%</mark>。计算方法密集的子领域也普遍更积极采用 AI。AI 的影响因此不会在各学科间均匀展开。</p>
+<div class="split">
+<article>
+<h3>专用工具扩大了复杂科研任务的使用</h3>
+<p>Claude Science 将分散的工具和数据库接入同一工作流程。构思与假设生成占其会话的 <strong>8%</strong>，约为 Claude 的两倍。</p>
+<p>在生物学与生物医学中，蛋白质相互作用机理建模任务出现的相对概率是 Claude 的 <strong>5.6 倍</strong>。工具整合可能帮助 AI 进入更专业、更具创造性的工作。</p>
+</article>
+<article>
+<h3>使用强度与能力相符，但能力评分不是实测成绩</h3>
+<p>研究用 LLM 对任务步骤做两两比较，再汇总为“理论 AI 能力”评分。评分最高的 <strong>20%</strong> 任务，Claude 使用比率约为 <strong>2 倍</strong>，Claude Code 约为 <strong>4 倍</strong>。</p>
+<p>这个比率以科研时间占比为基准。结果说明使用倾向与能力估计高度一致，但不能把评分视为直接测得的任务完成效果。</p>
+</article>
+</div>
+<h2>专业界面承载了更长、更高阶、更自主的工作</h2>
+<div class="table-wrap">
+<table>
+<caption>生物学与生物医学中的会话特征。数据来自原图；人工耗时是没有 AI 时完成相应工作的估计时间。</caption>
+<thead><tr><th>指标</th><th>Claude</th><th>Claude Code</th><th>Claude Science</th></tr></thead>
+<tbody>
+<tr><td>仅靠人工完成所需时间（小时）</td><td>4.9</td><td>5.9</td><td class="num">10.3</td></tr>
+<tr><td>博士水平内容占比（%）</td><td>48.0</td><td>67.7</td><td class="num">82.7</td></tr>
+<tr><td>高度自主会话占比（%）</td><td>23.7</td><td>64.1</td><td class="num">73.3</td></tr>
+</tbody>
+</table>
+</div>
+<p>这些差异说明专用工具被用于更高要求的任务。不过，Claude Science 的使用者也可能本来就有更专业的需求。<strong>观察到的产品差异是使用模式，不能直接归因于产品本身。</strong></p>
+<h2>能力提升能否转化为产出，取决于最后留下的瓶颈</h2>
+<p>研究用固定预算下的科研产出衡量加速幅度。三个情景都假设实体步骤仍由人类完成。<mark class="purple">它们是说明性测算，不是未来预测。</mark></p>
+<div class="table-wrap">
+<table>
+<caption>科研产出相对于不用 AI 时的倍数；1 倍表示没有变化。</caption>
+<thead><tr><th>情景</th><th>主要假设</th><th>原文测算结果</th></tr></thead>
+<tbody>
+<tr><td>1：当前能力</td><td>广泛采用现有 AI 能力</td><td>各领域约 1.35—2.02 倍；AI 可承担 27%—52% 的研究人员时间，领域中位数为 38%</td></tr>
+<tr><td>2：更广泛自动化</td><td>75% 的非实体步骤完全自动化，优先自动化能力评分高的步骤</td><td>计算机科学约 8 倍；统计学、图书馆与信息科学约 7 倍；经济学约 6 倍；实验室与医学科学约 2—3 倍</td></tr>
+<tr><td>3：所有非实体步骤自动化</td><td>100% 的非实体步骤完全自动化</td><td>实体任务少的领域约 15—16 倍；生物学、化学等依赖实验室或实地工作的领域约 3—4 倍</td></tr>
+</tbody>
+</table>
+</div>
+<p>模型假设 AI 智能体每小时花费 <strong>30 美元</strong>，研究人员每小时花费 <strong>95 美元</strong>。每节省 1 小时人工，需要 AI 运行 <strong>0.2 小时</strong>。在没有实体瓶颈的领域，成本假设把加速上限限制在约 16 倍；在实验室科学中，约占科研时间 40% 的实体步骤仍是主要约束。</p>
+<div class="insight">更强的 AI 并不会自动让所有科研环节同步提速。随着容易自动化的任务变便宜，剩余任务会占据更大的时间和预算份额。</div>
+<h2>研究人员期待快速进步，但对完整研究更谨慎</h2>
+<div class="table-wrap">
+<table>
+<caption>受访研究人员对 AI 的预期。样本主要是积极采用 AI 的生命与健康科学研究人员。</caption>
+<thead><tr><th>能力或工作范围</th><th>时间</th><th>持该预期的受访者比例</th></tr></thead>
+<tbody>
+<tr><td>数据分析达到本领域顶尖研究人员水平</td><td>到 2030 年</td><td class="num">94%</td></tr>
+<tr><td>写作达到同等水平</td><td>到 2030 年</td><td class="num">89%</td></tr>
+<tr><td>构思、数据采集分别达到同等水平</td><td>到 2030 年</td><td class="num">各 72%</td></tr>
+<tr><td>独立完成完整研究项目</td><td>到 2030 年／2035 年</td><td class="num">约 40%／约 64%</td></tr>
+<tr><td>独立完成完整研究项目</td><td>永远无法实现</td><td class="num">16%</td></tr>
+</tbody>
+</table>
+</div>
+<p>约一半受访者认为，AI 独立取得科学突破要等到 2035 年之后，甚至永远不会发生。<strong>擅长单项任务、独立完成研究、取得重大突破，是三个不同的门槛。</strong></p>
+<aside class="risk">
+<h3>测算没有覆盖科学进步的全部约束</h3>
+<p>样本来自 Claude 消费者方案，调查对象也偏向重度 AI 使用者。模型没有计入大型设施容量、实验设备与材料成本，也没有评估研究构思质量的变化。采用摩擦、成果核验压力和自主研究风险，都可能影响最终收益。</p>
+<p>研究组织、激励机制和人类监督如何调整，将影响效率提升最终体现为更多论文、更高质量的发现，还是新的负担。</p>
+</aside>
+<h2>最值得带走的洞见</h2>
+<ul class="takeaways">
+<li><b>从任务结构理解学科差异</b>认知工作、实体操作和人际活动的占比，比笼统的学科名称更能解释 AI 的使用空间。</li>
+<li><b>工具连接也会改变使用边界</b>接通专业数据库和科研工具，可能让 AI 从分析与写作进入更复杂的构思工作。</li>
+<li><b>时间节省不等于同比例产出增长</b>任务之间相互依赖，剩余瓶颈和 AI 成本会限制整体收益。</li>
+<li><b>科研加速需要组织与治理配合</b>能力进步之外，还要解决采用、实验、研究选题、核验和安全问题。</li>
+</ul>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<nav aria-label="原文目录">
+<ol class="toc">
+<li>01 概要</li>
+<li>02 引言</li>
+<li>03 我们如何开展这项研究</li>
+<li>04 Claude 在不同科学领域的使用差异</li>
+<li>05 Claude 在不同科研任务中的使用差异</li>
+<li>06 使用情况与能力的关系</li>
+<li>07 AI 加速科研的情景</li>
+<li>08 讨论</li>
+<li>09 附录</li>
+<li>10 参考文献</li>
+</ol>
+</nav>
+<div class="source-meta">
+<p>发布</p>
+<p>团队</p>
+<p>经济学</p>
+<p>主题</p>
+<p>发现<br/>人们如何使用 AI<br/>Economic Index<br/>生产力<br/>Claude Code<br/>社会影响</p>
+<p>2026 年 5 月 27 日</p>
+<p>Johannes Hermle*、Ben Jones*、Lukas Althoff*、Ryan Heller、Thomas Lyttelton、Carolyn Stein、Nathan Wilmers、Maxim Massenkoff、Peter McCrory</p>
+<p>*本报告主要作者</p>
+</div>
+<h3>概要</h3>
+<p><strong>我们衡量什么。</strong>AI 有可能加快科学发现。能加快多少，取决于 AI 能做什么，以及科学家如何使用它。我们采用保护隐私的方法，研究了 207,000 次 Claude 和 Claude Code 科研会话，以了解不同科学领域、不同科研任务中的 Claude 使用情况。我们开展这项研究，是为了帮助公众更好地理解 AI 用于科学研究的现状，并评估它未来可能对科学发现产生的影响。</p>
+<p><strong>科学家在哪里使用 Claude。</strong>按各领域的研究人员数量衡量，计算机科学、数学和统计学等形式科学对 Claude 的使用更多。健康科学和以实验室工作为主的物质科学使用较少。科学家主要用 Claude 分析数据和写作。仅数据分析，就占 Claude 会话的约三分之一，占 Claude Code 会话的近一半。他们较少用它生成想法和采集数据。不过，在配套调查中，他们把这两类任务列为科学发现最重要的环节。专为科研设计的 AI 工具可能缩小这种差距，让科学家使用 AI 的任务更接近他们认为最重要的任务。例如，在 Claude Science 中，构思任务的使用占比约为 Claude 的两倍。</p>
+<p><strong>Claude 的使用如何随 AI 能力变化。</strong>我们建立了一项指标，衡量 AI 在理论上完成各类科研任务的能力。对于 AI 最擅长的任务，也就是该指标排名前 20% 的任务，Claude 使用量是按研究人员投入时间推算出的预期使用量的两到四倍。对于 AI 最不擅长的任务，也就是排名后 20% 的任务，使用量则很少。这些任务包括大多数实体操作。不同领域也呈现相同规律：在计算机科学和统计学等领域，AI 能做好许多任务，Claude 的使用也更多。</p>
+<p><strong>这对科学发现的速度意味着什么。</strong>我们用一个简单模型，探索 AI 能让科研加速多少的不同情景。如果现有 AI 能力得到广泛采用，一些领域的科研产出可能翻倍。如果 AI 能承担全部非实体科研工作，计算机科学和统计学等领域的产出最高可能达到原来的 15 倍。化学和生物学等实验室科学受到实体操作瓶颈制约，产出则可能达到原来的三到四倍。在我们对积极使用 AI 的研究人员开展的调查中，约 40% 的人预计，到 2030 年，AI 模型将能独立完成整个研究项目。</p>
+<h3>引言</h3>
+<p>科学曾被称为“无尽的前沿”（Bush 1945）。但从历史上看，我们探索这片前沿的速度始终受一种稀缺资源限制：人类研究人员的时间与才智。人工智能可以放大研究人员的能力，从而缓解这一限制。它可能同时改变发现的过程和探索的速度（Wang et al. 2023；Amodei 2024）。很少有 AI 应用能对人类福祉产生同等重要的影响。与经济中的大多数行业相比，科研高度依赖认知工作。因此，AI 在这一领域的影响可能格外显著，也可能更早出现。</p>
+<p>近期的例子表明，AI 在科学发现中的作用正在扩大。在结构生物学中，AlphaFold 预测了超过 2 亿种蛋白质的三维形状（Jumper et al. 2021；Varadi et al. 2024）。其创造者共同获得了 2024 年诺贝尔化学奖。在材料科学中，GNoME 预测了 380,000 种稳定的新晶体（Merchant et al. 2023）。在数学中，研究人员利用 AI 系统，帮助解决了存在数十年的 Erdős 问题，为一个 Millennium Prize 问题给出了可能的证明，并在其他重大问题上取得进展。这些进展涉及尚未解决的猜想，也包括对里程碑式证明的验证（Anthropic 2026a, 2026b；OpenAI 2026a, 2026b；Tsoukalas et al. 2026）。</p>
+<p>除了这些进展，大多数科学进步都依赖许多专业化且相互关联的科研任务。这些任务在不同领域之间可能差异很大。AI 能将科学发现加速多少，不仅取决于它的能力，也取决于它在这些任务中如何被采用。在本报告中，我们使用保护隐私的基础设施，研究 Claude、Claude Code 和 Claude Science 的科研用途。我们记录了不同领域和任务的使用差异，分析了这些使用模式的解释因素，并提出 AI 加速科研的若干情景。</p>
+<p>Claude 在科研中的使用因领域而异。相对于各领域的研究人员数量，计算机科学、数学和统计学等形式科学使用 Claude 更频繁。健康科学和以实验室工作为主的物质科学使用较少。从任务来看，科学家更多地用 Claude 分析数据和写作，较少用它采集数据或生成想法与假设。这与配套科学家调查中受访者自报的 AI 使用情况一致。</p>
+<p>为了理解这些差异，我们建立了一项理论 AI 能力指标。在这项指标上得分更高的任务和领域，Claude 的使用更多。这些任务往往更偏向认知工作，也更适合强化学习。强化学习让 AI 通过反复尝试获得反馈，并从中学习。简言之，科学家似乎会在 AI 表现最好的地方使用它。</p>
+<p>基于这些发现，我们提出了 AI 加速科学进步的若干情景。在当前能力下，一些领域的科研产出最高可能翻倍，主要来自任务层面的辅助增强。受访研究人员预计，未来 AI 的能力会强得多。在一个假设情景中，如果 AI 将所有非实体工作完全自动化，计算机科学或统计学等高度依赖认知工作的领域，产出最高可能达到原来的 15 倍。加速潜力最大的领域也包括开发 AI 本身的领域。因此，这些收益可能形成额外的反馈循环：更快的 AI 研究带来更强的 AI，而更强的 AI 又进一步加速研究。</p>
+<p>更快的科学发现可能为人类带来巨大收益，但 AI 驱动的研究也伴随风险和不确定性。人类监督减少，可能导致危险或不符合伦理的研究。AI 还可能重塑研究人员的职业，让科研工作更有成就感，也可能让这种感受减弱。它也可能改变人类追求知识所带来的使命感。</p>
+<h3>我们如何开展这项研究</h3>
+<p>这项研究的目标，是在保护科研工作细节的同时，衡量科学家使用 Claude 的不同方式。为此，我们使用保护隐私的基础设施，分析消费者订阅方案中的 Claude 科研用途。一个在这里充当“分类器”的语言模型会读取每次会话记录，再按照预先定义的分类体系，为其打上一组固定类别标签，例如所属领域和涉及的科研任务。我们采用的是 Alamos 和 Althoff（2026）的 SciNet 分类体系。研究团队在本报告中保留并分析的会话信息，仅限于“化学”或“数据清理”等标签。本研究使用的分类器不会提取并存储开放式信息，也不会保存研究内容的细节，例如研究数据集、假设、实验方法、初步发现或尚未发表的论文。结果只以汇总形式报告，而且只有独立账户数达到最低要求的分组才会被报告。本研究引入的所有分类器均列于附录。</p>
+<p>我们的测量分为两步。第一个分类器识别会话记录是否涉及科研工作。第二个分类器再把这些记录分配到 SciNet 分类体系中的一个领域、子领域和任务。SciNet 包含 7,262 项任务，涵盖 34 个领域和 318 个子领域。有些任务适用于所有领域，例如撰写论文初稿。另一些任务只适用于特定领域或子领域。例如，预测光学吸收和发射光谱，在该分类体系中属于材料科学特有的任务。这些任务共同覆盖了产出一项新研究发现的全过程。</p>
+<p>我们的主要样本包含 2026 年 8 月 2 日至 9 月 30 日期间，消费者订阅方案中的 207,049 次会话。这些会话都被分配了科学领域和科研任务。其中 128,914 次来自 Chat 和 Cowork。这两个用于对话和知识工作的通用界面，下文统称“Claude”。另有 78,135 次来自 Claude Code。它是一款智能体式编程工具，能直接操作用户文件、编写和运行代码。我们还研究了一组 Claude Science 会话补充样本。样本构建详情见附录。</p>
+<p>把使用数据与结构化科研任务分类体系结合起来，让我们能够研究哪些领域采用 Claude，以及它被用于科研流程中的哪些部分。这项研究也为一个不断扩大的研究方向提供了证据：衡量 AI 技术在科学发现中的采用情况（Kobak et al. 2025；Liang et al. 2025；Hao et al. 2026；Codreanu et al. 2026）。</p>
+<h3>Claude 在不同科学领域的使用差异</h3>
+<p>我们先描述 Claude 在不同科学领域中的使用差异。图 1 将一个领域在科研会话中的占比，与它在全球研究人员中的占比进行比较，以了解各领域的相对使用程度。<sup>1</sup>在 Claude 上，会话占比最大的三个领域是计算机科学（11.9%）、工程学（8.4%）和医学（7.7%）。按全球研究人员数量衡量，它们也属于规模最大的领域。<sup>2</sup>总体而言，研究人员占比较高的领域，Claude 会话占比通常也较高。两者的双对数相关系数为 0.79。</p>
+<p>不过，研究人员数量不能完全解释各领域的 Claude 使用情况。在图 1 中，位于 45 度线以上的领域，其使用量相对于领域规模更高。位于该线以下的领域，使用量则相对较低。形式科学的相对使用程度尤其高，包括计算机科学、数学和统计学。社会科学的使用程度也较高。相比之下，化学等物质科学的工作经常在实验室开展，其相对使用程度往往较低。医学也如此。虽然它的会话量排名第三，但该领域研究人员有大量时间需要与患者接触。</p>
+<p>在 Claude Code 上，使用量与领域规模的关系没有那么强。会话量与研究人员数量的双对数相关系数为 0.62。使用更多集中在定量研究领域。计算机科学仅占全球研究人员的 4.3%，却独占 Claude Code 会话的 32.7%。<sup>3</sup>数学和统计学等其他形式科学也表现出较高的相对使用程度。艺术与人文学科，以及多数社会科学领域的相对使用程度较低。经济学是一个例外，因为它相对更依赖定量方法。</p>
+<figure class="source-figure" data-source-image="0"><img alt="Two scatter plots, one for Claude and one for Claude Code, plotting each scientific field’s share of research sessions against its share of researchers on log scales, with a dashed parity line. The log-log correlation is +0.79 on Claude and +0.62 on Claude Code. On Claude, computer science, economics, and statistics sit well above the line, while medicine and clinical sciences, nutrition and dietetics, and veterinary medicine sit below it. On Claude Code, computer science is far above the line, and most arts and humanities fields fall below it. Bar charts beside each plot list the top 10 fields by session volume, led by computer science (11.9% on Claude, 32.7% on Claude Code)." decoding="async" height="2450" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/a91674ef31360bc391f60db6c2522699d73b3b87-1920x2450.png" width="1920"/><figcaption>Claude 在不同科学领域中的使用情况。每个点代表一个领域。横轴表示该领域在研究人员中的占比，纵轴表示该领域在科研会话中的占比，两轴均采用对数刻度。上图为 Claude 会话，下图为 Claude Code 会话。</figcaption></figure>
+<p>在这 34 个领域下的 318 个子领域之间比较使用情况时，我们观察到了类似模式（图 2）。<sup>4</sup>更细的子领域视角显示，人工智能与机器学习尤为突出。它仅占全球研究人员的 1.2%，却占 Claude 会话的 5.0%，占 Claude Code 会话的 15.2%。更普遍地说，无论属于哪个大的科学门类，计算类子领域都是采用程度最高的一批。这些子领域包括计算生物学、计算语言学和计算神经科学。机器人学的相对使用程度也较高。这可能是因为，尽管它研究实体系统，但高度依赖计算方法。</p>
+<figure class="source-figure" data-source-image="1"><img alt="Two scatter plots, one for Claude and one for Claude Code, plotting each scientific subfield’s share of research sessions against its share of researchers on log scales, with a dashed parity line. The log-log correlation is +0.61 on Claude and +0.43 on Claude Code. Labeled subfields above the line include artificial intelligence and machine learning, bioinformatics and computational biology, econometrics, biostatistics, and computational linguistics on Claude, and computational materials science and computational neuroscience on Claude Code. Bar charts beside each plot list the top 10 subfields by session volume, led by AI and machine learning (5.0% on Claude, 15.2% on Claude Code)." decoding="async" height="4852" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/dcae965eda7e9626eb84f864cede1b6b52d6b4c1-3840x4852.png" width="3840"/><figcaption>Claude 在不同科学子领域中的使用情况。每个点代表一个子领域。横轴表示该子领域在研究人员中的占比，纵轴表示该子领域在科研会话中的占比，两轴均采用对数刻度。上图为 Claude 会话，下图为 Claude Code 会话。出于隐私保护，账户数过少的子领域未予展示。</figcaption></figure>
+<h3>Claude 在不同科研任务中的使用差异</h3>
+<p>除了了解哪些领域使用 Claude，我们还想了解科学家用它做什么。研究包含许多不同任务，从生成假设和分析数据，到把发现写成研究论文。为了更清楚地了解 Claude 如何支持科学发现，我们研究了不同任务中的使用差异。具体做法是，将每次会话归入 SciNet 的 7,262 项任务之一。这些任务可能适用于所有领域，例如撰写论文初稿。也可能只适用于特定领域或子领域，例如通过差异基因表达分析比较肿瘤亚型，这属于癌症生物学相关任务。该分类体系区分科研任务与非科研任务。前者是研究人员为产生新科学发现而开展的工作。后者包括教学、同行评审，以及为院系或学科提供服务。<sup>5</sup>我们的分析仅限于八类科研任务：（1）数据分析；（2）写作与交流；（3）数据采集；（4）阅读与知识获取；（5）理论分析；（6）设计与开发，包括软件、材料和创意作品；（7）构思与假设生成；（8）其他，例如研究事务管理。</p>
+<p>对于每一类任务，我们分别计算其在 Claude 和 Claude Code 会话中的占比。为了判断某类任务的使用程度是高是低，我们参考了 SciNet 估计的研究人员通常花在该类任务上的时间占比。这些时间估计由 LLM 分类器生成，并通过两类材料验证。一类是记录每项任务人工耗时的湿实验研究方案。另一类是数千篇学术论文中各任务的出现频率，详见附录。这提供了一个基准，用来判断不同任务类别的 Claude 使用占比，是符合还是偏离研究人员的时间分配。</p>
+<p><strong>按任务类别划分的使用情况。</strong>无论看绝对使用量，还是相对于科研时间的占比，数据分析都居于高位。数据分析占 Claude 会话的 33.7%，占 Claude Code 会话的 48.1%，而它占研究人员时间的 27.6%。写作与交流的使用程度也很高，尤其是在 Claude 上。它占 Claude 会话的 32.0%，而占研究人员时间的 16.0%。<sup>6</sup>数据采集的相对使用程度较低。它占研究人员时间的 28.6%，却只占 Claude 会话的 11.5%，占 Claude Code 会话的 11.9%。对于受实体操作限制的任务，例如采集临床或生化数据，这种使用不足尤其明显。对于更依赖数字流程的数据采集任务，例如检索档案文件或文本，使用不足的程度较轻。纯数字化的数据采集任务，例如收集线上数据，其使用占比则可能高于时间占比。构思与假设生成的使用程度也较低。它占 Claude 会话的 4.2%，占 Claude Code 会话的 2.1%，而占研究人员时间的 7.1%。</p>
+<figure class="source-figure" data-source-image="2"><img alt="Horizontal bar chart of the share of research sessions in each of eight task categories on Claude and Claude Code, with a line marking each category’s share of research time. Data analysis: 33.7% on Claude and 48.1% on Claude Code. Writing and communication: 32.0% and 17.6%. Data gathering: 11.5% and 11.9%. Reading and knowledge acquisition: 7.6% and 3.7%. Theoretical analysis: 5.0% and 4.7%. Design and development: 4.7% and 7.7%. Ideation and hypothesis generation: 4.2% and 2.1%. Other: 1.3% and 4.2%. Data gathering and ideation fall well below their share of research time." decoding="async" height="1242" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/0c2cd9cbe3956c0b2e1d8a80febd84ea9a8d3477-1920x1242.png" width="1920"/><figcaption>Claude 在各类科研任务中的使用情况。每行对应八类任务中的一类。橙色条表示该类任务占 Claude 科研会话的比例，蓝色条表示其占 Claude Code 科研会话的比例。黑线表示根据 SciNet 计算的科研时间占比估计值，详见附录。</figcaption></figure>
+<p><strong>将观察到的使用情况与调查证据比较。</strong>除了分析 Claude 和 Claude Code 会话，我们还调查了 528 名科学家。他们自报的 AI 使用情况，与会话分析中观察到的模式一致。样本主要由生命与健康科学领域中积极采用 AI 的研究人员组成。<sup>7</sup>与图 3 所示的 Claude 使用模式一致，受访者自报的 AI 使用在数据分析和写作与交流中最高，在构思与假设生成及数据采集中较低。受访者还表示，在数据分析和写作与交流中，他们更多采用人机共同完成或将工作交给 AI 的方式（图 4）。</p>
+<p>调查还询问了哪些任务类别最有助于产生重要研究成果。受访者将构思与假设生成排在第一位，将数据采集排在第二位。值得注意的是，无论是自报使用情况，还是 Claude 会话，这两类任务的使用占比都偏低。原因可能各不相同。许多数据采集任务需要实体操作，而构思不需要。对于构思，科学家可能更愿意自己产生想法，也可能认为 AI 的能力有限。我们的数据也可能低估了构思活动，因为它往往融入许多其他科研任务，难以单独分类。但 AI 也可能确实不擅长高层次构思，例如选择值得研究的问题，并设计能够回答它的研究。</p>
+<figure class="source-figure" data-source-image="3"><img alt="Two-panel chart of survey results for four research task categories. Left: stacked bars of the percentage of respondents at each level of AI use (none, assistive, shared, delegated, autonomous). Ideation and hypothesis generation: 17% none, 53% assistive, 24% shared. Data gathering: 20% none, 31% assistive, 30% shared, 14% delegated. Data analysis: 20% assistive, 44% shared, 28% delegated. Writing and communication: 40% assistive, 41% shared, 13% delegated. Right: bar chart of mean importance points out of 100. Ideation and hypothesis generation: 35.6. Data gathering: 23.6. Data analysis: 23.3. Writing and communication: 17.5." decoding="async" height="966" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/17bc17b751b951c315167de16f118ea5d3a83ab2-1920x966.png" width="1920"/><figcaption>研究人员自报的 AI 使用情况。左图展示四类科研任务中，各 AI 使用程度对应的受访者比例，使用程度从完全不用到自主完成不等。右图展示受访者如何评价各类任务对产生重要研究成果的重要性。受访者需在四类任务之间分配总计 100 分。</figcaption></figure>
+<p><strong>Claude Science 在生物学与生物医学中的使用。</strong>Claude 和 Claude Code 是通用界面，而科研专用 AI 工具正日益增多。为了研究这类工具是否支持更专业、要求更高的研究，我们使用保护隐私的分析基础设施，将 Claude Science 上的生物学与生物医学工作，与 Claude 和 Claude Code 上的同类工作进行比较。</p>
+<p>Claude Science 将 Claude 接入许多原本分散的科研工具和数据库，帮助整合并加快科研工作流程。科学家在研究中组合不同工具和数据库时，往往需要使用多个平台。每个平台都有自己的数据结构或查询语言。例如，生物学家研究现有药物能否作用于某种特定蛋白质时，通常需要分别查阅不同数据库，了解该蛋白质的功能、结构、已经针对它测试过的化合物，以及相关药物试验或论文。Claude Science 将这些工作整合到同一流程中。</p>
+<p>Claude Science 的使用集中在生命科学。排名前两位的领域是生物医学科学和生物学，两者合计占会话的 50% 以上。在这两个领域内，我们评估了哪些任务相对于 Claude 的任务分布最为突出。</p>
+<p>我们发现，与 Claude 相比，研究人员会用 Claude Science 执行更专业的任务（图 5）。例如，“提出蛋白质—蛋白质或蛋白质—配体相互作用的机理模型”这项任务，在 Claude Science 中出现的概率是 Claude 的 5.6 倍。这项任务要从单个分子接触的层面，解释一种蛋白质如何与另一种蛋白质结合，或如何与药物之类的小分子结合。Claude Science 很适合处理这类任务。它可以从多个已连接的数据库中收集蛋白质结构和结合数据，再将其整合成一个可检验的相互作用模型。相比之下，Claude Science 较少用于撰写论文初稿或与合作者协调等通用任务。此外，我们发现构思与假设生成占 Claude Science 会话的 8%。这与该类任务在研究人员时间中的占比大致相当，说明科研专用 AI 工具有助于支持更复杂、更具创造性的工作。</p>
+<figure class="source-figure" data-source-image="4"><img alt="Two-panel chart. Top: bar chart of the top 10 fields by share of Claude Science research sessions, led by biomedical sciences (31.1%), biology (24.1%), and medicine and clinical sciences (8.7%), with every other field below 5%. Bottom: chart of the most and least typical tasks on Claude Science relative to Claude within biology and biomedical sciences, on a log scale. Most typical: hypotheses on protein structure and function (6.0x), models of protein–protein and protein–ligand interaction (5.6x), and hypotheses on drug–target interactions (5.6x). Least typical: coordinating with collaborators (0.15x), presenting findings at conferences (0.2x), and analyzing species abundance and diversity data (0.23x)." decoding="async" height="2066" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/e92d1e116d2cdbe4bff0b6f16b2877af65215e4d-1920x2066.png" width="1920"/><figcaption>Claude Science 在不同领域和任务中的使用情况。上图展示按 Claude Science 全部科研会话占比排序的前十个领域。下图只考察生物学和生物医学科学，展示相对于 Claude，Claude Science 中最典型和最不典型的任务。计算方式为：某任务占这些领域 Claude Science 科研会话的比例，除以它占这些领域 Claude 科研会话的比例。</figcaption></figure>
+<p>我们聚焦生物医学科学和生物学，使用此前研究提出的经济基础指标框架进行衡量（Appel et al. 2026）。结果发现，与 Claude 和 Claude Code 相比，Claude Science 上的任务耗时更长、复杂程度更高，执行时的自主程度也更高（图 6）。这与科研专用 AI 工具被用于更高要求任务的判断一致。<sup>8</sup>如果没有 AI，Claude Science 会话中包含的工作所需人工时间，接近 Claude 和 Claude Code 会话中工作的两倍。这些会话的内容也更高阶。据估计，超过 80% 的 Claude Science 使用需要博士层次的训练，相当于 20 年教育。其他界面的这一比例约为 50%—70%。超过 70% 的 Claude Science 会话以高度 AI 自主的方式完成，远高于 Claude 的 23.7%，也略高于 Claude Code 的 64.1%。</p>
+<figure class="source-figure" data-source-image="5"><img alt="Three bar charts comparing Claude, Claude Code, and Claude Science in biology and biomedical sciences. Time for a human alone: 4.9 hours on Claude, 5.9 on Claude Code, and 10.3 on Claude Science. Doctoral-level content: 48.0%, 67.7%, and 82.7% of research sessions. High AI autonomy: 23.7%, 64.1%, and 73.3% of research sessions. Hatched bars, reweighted to the subfields and tasks of Claude Science, show similar values for Claude (5.1 hours, 55.1%, 25.2%) and Claude Code (5.5 hours, 71.8%, 61.4%)." decoding="async" height="920" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/f84b96937d84ced33fe92195c4ca9e2a39296c12-1920x920.png" width="1920"/><figcaption>生物学和生物医学科学中的使用特征。对比 Claude、Claude Code 和 Claude Science 在这两个领域中完成任务所对应的人工耗时、博士水平内容，以及自主程度。带斜线的橙色和蓝色条，对 Claude 和 Claude Code 涉及的子领域及任务重新加权，使其分布与 Claude Science 一致。</figcaption></figure>
+<p><strong>使用 Claude 产生的成果。</strong>最后，Claude 协助生成的产物在不同领域间存在明显差异（图 7）。<sup>9</sup>相对于自然科学和形式科学，社会科学与人文学科更常产生文档、报告或学术论文等文字产物。相反，代码、软件输出和数据等技术产物，在自然科学和形式科学中更常见。从产物类型来看，健康科学总体上更接近社会科学。技术产物在 Claude Code 中出现的频率约为 Claude 的两倍，但跨领域的整体模式类似，详见附录。</p>
+<figure class="source-figure" data-source-image="6"><img alt="Dot plot of the percentage of each field’s research sessions on Claude that produce written artifacts and technical artifacts. Across all research, 52% of sessions produce written artifacts and 21% produce technical artifacts. Biology is the only field where technical artifacts are more common than written ones. The gap is narrowest in physics and astronomy and in statistics, and widest in law, education, and anthropology." decoding="async" height="2168" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/5811004afedad8807d07a08aacf1a282a488f333-1920x2168.png" width="1920"/><figcaption>Claude 生成的产物。按领域展示 Claude 会话中产生文字产物和技术产物的比例。各领域按这两类产物占比之差排序。</figcaption></figure>
+<h3>使用情况与能力的关系</h3>
+<p>AI 的使用是否与 AI 能力相符？领域规模能解释一部分 Claude 使用差异，但不能解释全部。例如，计算机科学研究人员的 Claude 使用量，远高于根据该领域规模推算的预期值。营养学研究人员的使用量则远低于预期。同样，研究人员把时间花在哪里，也不能完全预测他们最常在哪些地方使用 Claude。数据分析和写作等大类任务的使用占比，明显高于其科研时间占比。数据采集和构思与假设生成等任务则低得多。在这里，我们检验这些使用差异是否反映了 AI 实际能做什么。</p>
+<p>为了衡量 AI 在具体任务上的能力，我们先用 LLM 分类器构建能力评分。对于每项任务，SciNet 都列出了科学家完成任务所需的具体步骤。例如，在化学中，一项任务是纯化反应混合物，其中一个步骤是装填色谱柱。我们向分类器展示分类体系中的步骤对，并询问 AI 更擅长完成哪一个步骤。随后，我们用 Bradley–Terry 模型汇总这些比较结果。这也是 Elo 等级分背后的模型。Elo 根据两两对局结果对国际象棋棋手进行排名。一个步骤在比较中胜出，得分就会上升；落败，得分就会下降。然后，我们对每项任务所含步骤的分数取平均，得到任务级评分，详见附录。我们将这一指标称为“理论 AI 能力”。某项任务的具体得分，则称为它的“AI 能力评分”。</p>
+<p>比较不同任务的使用情况时，我们考察的是：相对于研究人员在某项任务上花费的时间，Claude 的使用是多还是少。例如，一项任务占研究人员时间的 5%，却占 Claude 会话的 10%，那么它的使用量就是预期的两倍，使用比率为 2。比率为 1，说明 Claude 使用与该任务的科研时间占比一致。比率低于 1，则说明相对于该任务所需的科研时间，Claude 的使用低于预期。</p>
+<p>图 8 表明，这一使用比率会随任务的 AI 能力评分大幅上升。对于能力评分最低的 20% 的任务，例如纯化反应混合物和开展参与式观察，Claude 几乎不被使用。对于能力评分位于中位数附近的任务，比率约为 1，即使用情况与科研时间占比一致。对于能力评分最高的 20% 的任务，例如数据可视化和应用统计检验，Claude 的使用量约为按常规科研时间推算值的两倍，Claude Code 则约为四倍。这些模式表明，科学家对 Claude 的使用与 AI 能力评分密切相关。Claude Code 的曲线更陡，反映了它聚焦计算工作，而这类工作的能力评分更高。</p>
+<figure class="source-figure" data-source-image="7"><img alt="Line chart of the use ratio (share of use divided by share of research time) by the theoretical AI capability percentile of the task, for Claude and Claude Code. Both lines rise from about 0.2 in the lowest capability quintile to about 1 in the middle quintile. In the highest quintile, the ratio reaches about 2.1 on Claude and about 3.9 on Claude Code." decoding="async" height="2114" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/761c80927e0f5e78e9dfe2dac61a9b9011eac752-3840x2114.png" width="3840"/><figcaption>Claude 使用与理论 AI 能力。纵轴表示各能力五分位组中任务的使用比率。计算方式为这些任务占科研会话的比例，除以 SciNet 估计的相应科研时间占比。横轴表示任务 AI 能力评分的百分位。橙色点表示 Claude 在各 AI 能力五分位组中任务的平均使用比率，蓝色点表示 Claude Code 的对应数值。</figcaption></figure>
+<p>不同任务的理论 AI 能力存在差异，原因可能很多。为了理解这些差异，我们将每项任务的 AI 能力评分，与三组由 LLM 推导的任务特征关联起来：它对强化学习（RL）的适用性；工作主要属于认知、人际还是实体活动；以及监管限制是否约束 AI 使用。相关结果见图 9，定义和数据来源见附录。</p>
+<p>先看强化学习适用性。在强化学习中，AI 模型会反复尝试一项任务，并在成功时获得奖励，从而学会如何执行它。如果成功与否容易验证，可以在计算环境中模拟大量实例，并且能够迅速获得反馈，那么任务就特别适合强化学习（Lambert et al. 2024；Guo et al. 2025）。我们使用 SciNet 中针对各任务的这三项强化学习相关指标，并将其汇总为一个指数。任务的能力评分与独立分类得到的强化学习指数高度相关，相关系数为 0.78。这说明，AI 最擅长的科研任务，往往也是最容易应用强化学习的任务。</p>
+<p>其他重要特征涉及工作的性质。有些科研任务本质上是认知活动，另一些则需要实体操作或人际接触。纯认知型机器通常无法完成实体任务。监管限制也可能约束 AI 的使用。以认知工作为主的任务，其 AI 能力评分更高，相关系数为 0.69。相比之下，包含更多实体工作的科研任务，AI 能力评分更低，相关系数为 −0.57。涉及人际工作的科研活动，评分也往往较低，相关系数为 −0.31。受到 AI 使用监管限制的活动同样如此，相关系数为 −0.38。</p>
+<figure class="source-figure" data-source-image="8"><img alt="Bar chart of correlations between a task’s theoretical AI capability percentile and other task characteristics. RL index: +0.78. Cognitive: +0.69. Physical: −0.57. Interpersonal: −0.31. Regulatory restriction: −0.38." decoding="async" height="1776" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/8eaf828daf23ed8f5562893fc2799ce68b83583a-3840x1776.png" width="3840"/><figcaption>理论 AI 能力与其他任务特征。展示科研任务 AI 能力评分百分位与其他任务特征之间的相关性。</figcaption></figure>
+<p>同样的任务特征，也能预测研究人员在某项任务上使用 Claude 的程度（图 10）。在强化学习适用性最低的五分之一任务中，Claude 几乎不被使用。在最高的五分之一任务中，相对于研究人员投入的时间，Claude 使用量明显偏高：Claude 约为两倍，Claude Code 约为四倍。这与 Claude 使用和整体 AI 能力评分之间的关系类似。能力评分最高的 20% 的任务，同样吸引了预期值两到四倍的使用量。</p>
+<p>以认知活动为主的任务，Claude 的使用也明显偏高。相比之下，实体任务和人际任务的使用较低。如果任务存在限制 AI 辅助的监管障碍，Claude 使用也较少。总体而言，在各种高度专业化的科研任务中，使用情况与能力指标密切相关。</p>
+<figure class="source-figure" data-source-image="9"><img alt="Five line charts of the use ratio on Claude and Claude Code by task characteristic. The use ratio rises with a task’s RL index, reaching about 2.2 on Claude and 4.2 on Claude Code at the highest scores, and with its share of cognitive steps, reaching about 1.4 and 1.5. It falls from about 1.2 to near zero as the share of physical steps, the share of interpersonal steps, or the regulatory restriction score increases." decoding="async" height="1385" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/0202cc3820f9e09f65935c158f318a35ba9a8ced-1920x1385.png" width="1920"/><figcaption>Claude 使用与任务特征。每个面板考察一种任务特征。纵轴表示在该特征上得分不同的任务组，也就是不同“分箱”的使用比率。横轴表示该特征的强度。橙色点表示 Claude 在每个分箱中任务的平均使用比率，蓝色点表示 Claude Code 的对应数值。位于零的点代表出于隐私保护而隐藏的分箱，因为相关使用来自过少的账户。</figcaption></figure>
+<p>不同科学领域依赖不同的科研活动组合。细分任务层面的使用与能力评分相关性，能否解释为什么某些领域比其他领域更多使用 Claude？我们的数据表明可以。如图 11 所示，一个子领域的人均 Claude 使用量，通常会随其各项任务平均 AI 能力评分的上升而增加。Claude 的相关系数为 0.45，Claude Code 为 0.57。</p>
+<p>不同科学门类之间也存在很大差异。这说明，除了 AI 能做什么之外，还有其他因素影响 Claude 的使用。相对于其任务的 AI 能力评分，健康科学研究人员的 Claude 使用较少。原因可能是医疗数据和研究监管限制了 AI 使用，或使整合变得更困难。形式科学、社会科学，以及艺术与人文学科研究人员的 Claude 使用，则高于能力评分所预测的水平。这些领域的大量工作通过文本和代码完成，可能更容易采用 AI 工具。物质科学和生命科学的 Claude 使用通常与能力评分更贴近，但个别子领域也可能偏离。</p>
+<figure class="source-figure" data-source-image="10"><img alt="Two bubble charts, one for Claude and one for Claude Code, plotting each subfield’s use per researcher on a log scale against the theoretical AI capability of its research work, with bubbles sized by the number of researchers. The fitted lines slope upward, with weighted correlations of +0.45 for Claude and +0.57 for Claude Code. Formal science subfields cluster at high capability and high use, while many health science subfields fall below the line." decoding="async" height="1558" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/a61abc8152275172874cb5a105e49a013cf97329-1920x1558.png" width="1920"/><figcaption>各子领域的 Claude 使用与理论 AI 能力。两个面板都以点表示子领域，点的大小对应子领域的研究人员数量。纵轴以对数刻度表示人均使用量。人均使用量等于该子领域占科研会话的比例，除以它占全部研究人员的比例。横轴表示子领域的 AI 能力评分，计算时按研究人员工时对该子领域的全部科研任务加权汇总。黑线为最佳拟合线。各面板还报告了按子领域规模加权的相关系数。左图为 Claude 科研会话的结果，右图为 Claude Code 科研会话的结果。</figcaption></figure>
+<p>理论 AI 能力也能预测研究人员在多大程度上允许 Claude 自主工作。图 12 表明，自主使用与子领域的理论 AI 能力相关。换言之，理论 AI 能力更高的子领域，不仅更多地使用 AI，也会以更自主的方式使用它。</p>
+<figure class="source-figure" data-source-image="11"><img alt="Two bubble charts, one for Claude and one for Claude Code, plotting each subfield’s mean AI autonomy score (on a scale from 1 to 5) against the theoretical AI capability of its research work, with bubbles sized by the number of researchers. The fitted lines slope upward, with weighted correlations of +0.47 for Claude and +0.31 for Claude Code." decoding="async" height="1588" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/659481d86041f73bd18fc7f0a96117065f63cfea-1920x1588.png" width="1920"/><figcaption>各子领域的 AI 自主程度与理论 AI 能力。两个面板都以点表示子领域，点的大小对应子领域的研究人员数量。左图为 Claude 科研会话，右图为 Claude Code 科研会话。纵轴表示按会话量加权的子领域平均会话自主评分。横轴表示该子领域任务的平均理论能力，同样按使用量加权。没有任何会话覆盖的任务被排除，因为无法为它们评估自主程度。为方便阅读，图中省略了异常子领域，但它们仍被纳入最佳拟合线和相关系数的计算。相关系数按子领域规模加权。</figcaption></figure>
+<h3>AI 加速科研的情景</h3>
+<p>科学与技术进步的速度，取决于好的想法以及实现这些想法的手段。从历史上看，两者都受人类能力限制。研究人员数量有限。每个人用来提出假设、设计合适检验、开展分析和综合发现的时间也有限。</p>
+<p>AI 可以通过两种方式缓解这些约束。第一，它可以承担研究人员现在做的工作，让他们有能力探索更多想法。第二，它可以提出研究人员原本可能想不到的想法。第二种方式最终可能更重要，但也更难衡量。因此，我们的分析聚焦第一种方式。</p>
+<h4>方法</h4>
+<p>我们考虑 AI 加速科学研究的三个情景。情景 1 假设当前 AI 能力得到广泛采用。能力估计来自我们的调查和 AI 能力评分。情景 2 和情景 3 是假设的未来：AI 将 75% 或 100% 的非实体科研步骤完全自动化，并从能力评分最高的步骤开始。这些步骤是 SciNet 中构成各项科研任务的具体行动。在三个情景中，实体步骤都继续由研究人员完成。这些是说明性情景，不是预测。它们展示实体工作、理论 AI 能力和 AI 成本如何影响科研加速，以及哪些领域可能加速最多。</p>
+<p>每个情景都报告两项指标。第一项是“AI 份额”：一项研究中，AI 能承担的研究人员时间比例。根据研究人员当前的时间分配，它衡量 AI 能释放多少人工科研时间，并可直接由前文分析得到。研究人员可以将这些释放出的时间转用于其他工作，从而增加科研产出。第二项指标是“加速倍数”，用于估计这一增益。它表示在固定研究预算下，使用 AI 的科研产出相对于不使用 AI 的增幅，也就是相同预算能多产出多少研究结果。节省的时间不会一比一地转化为更多产出。一方面，研究人员会将精力转向 AI 帮助较小的任务。另一方面，AI 本身也有成本。</p>
+<p>我们根据调查构建情景 1 的 AI 份额。调查记录了五级 AI 使用程度：不使用、辅助使用、共同完成、委托完成和自主完成。我们假设，这五级分别对应 AI 承担某个任务步骤中 0%、25%、50%、75% 和 100% 的研究人员时间。在每类任务中，我们按 AI 能力评分对步骤排序。再按照调查报告的比例，为各步骤分配 AI 使用等级，其中最高使用等级分配给评分最高的步骤。例如，对于构思与假设生成，17% 的回答表示不使用 AI，53% 表示辅助使用。因此，能力评分最低的 17% 的构思任务步骤，被赋予 0% 的 AI 份额。接下来的 53% 被赋予 25%，之后依此递增。由于受访者很可能是重度 AI 使用者，我们将其自报使用情况作为当前 AI 能力的近似指标。最后，我们将 AI 释放的研究人员时间，从步骤层面汇总到领域层面，详见附录。</p>
+<p>为了计算加速倍数，我们使用了想法生产函数。这是一种标准经济模型，用来描述研究人员时间等科研投入如何转化为科研产出。在这个模型中，一篇论文需要许多科研任务（Jones 2026）。这些任务相互补充，因此某一任务的优势不能完全弥补另一任务的不足。当 AI 让某些任务变便宜时，研究人员会把精力转向 AI 帮助较小的任务，从而缓解限制整体收益的瓶颈。例如，研究人员可以花更多时间提出新问题，或开展更多实体实验来扩充实证证据。我们利用 Ahmadpoor 和 Jones（2019）的研究，校准这些瓶颈对整体收益的限制程度。对于 AI 成本，我们假设 AI 智能体每小时花费 30 美元，研究人员每小时花费 95 美元。AI 每节省 1 小时人工时间，需要运行 0.2 小时。这些都是说明性假设，其中 AI 成本采用当前公开标价。成本越低，给定预算下能完成的研究就越多，加速幅度也越大，后文会进一步讨论。模型和假设详见附录。</p>
+<h4>情景 1：当前能力</h4>
+<p>在当前能力得到广泛采用的情况下，AI 可以承担产出一项新研究所需研究人员时间的 27%—52%。各领域中位数为 38%（图 13 左图）。这些份额对应的科研加速倍数，从艺术的 1.35 倍、人类学的 1.36 倍和化学的 1.41 倍，到计算机科学的 1.96 倍和统计学的 2.02 倍不等（图 13 右图）。加速仍然有限，因为当前 AI 主要是辅助工作或与人共同完成工作，而不是自主完成。因此，研究人员在几乎每个步骤上仍需投入大量时间。即使是最适合 AI、工作几乎全为认知活动的领域，加速也只能达到约 2 倍。这些估计假设 AI 得到广泛推广，而且研究人员将它应用于当前所有有帮助的步骤。</p>
+<figure class="source-figure" data-source-image="12"><img alt="Two-panel dot plot of 34 fields under three scenarios: current AI, 75% of non-physical steps automated, and all non-physical steps automated. Left: percentage of research time freed through AI, which ranges from about 27% to 52% under current AI, with statistics and computer science highest and the arts and anthropology lowest. Right: research output relative to research without AI, on a log scale. Under current AI, acceleration ranges from about 1.35x to 2x. With all non-physical steps automated, statistics, computer science, and most social sciences reach about 15x, while bench sciences such as biology, chemistry, biomedical sciences, and materials science stay near 3–4x." decoding="async" height="2002" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/0b9bf902825a6be0ffa2c012227ce83c0e4ff6e7-1920x2002.png" width="1920"/><figcaption>AI 释放的科研时间与科研加速。每行代表一个领域。左图按 AI 能承担的研究人员时间占比估计值对领域排序。圆形表示当前能力下的估计；菱形表示 75% 的非实体步骤实现自动化时，释放时间占比的估计；三角形表示 100% 的非实体步骤实现自动化时，释放时间占比的估计。右图展示各领域在给定研究预算下的科研加速。横轴表示三个情景中，使用 AI 的科研产出相对于不使用 AI 的倍数，1 倍表示没有变化。</figcaption></figure>
+<p>两个因素解释了大多数跨领域差异。第一个是实体工作。没有与实体系统的集成，AI 无法承担这类工作。在农业科学、生物医学科学、化学和材料科学等实验室或实地科学中，38%—41% 的研究人员时间用于实体步骤，而领域中位数为 4%。仅实体工作占比，就解释了 AI 份额差异的约三分之一。第二个因素是认知工作内部 AI 能力评分的分布。艺术和历史学投入实体步骤的时间很少，分别为 10% 和 4%，但其认知步骤的 AI 能力评分较低。这可能是因为定性和解释性工作不太适合强化学习。相比之下，计算机科学和统计学评分高，AI 份额也大，主要由数据分析推动。数据分析是各领域中 AI 能力评分最高的工作类型。</p>
+<p>Claude 使用比率较高的领域，AI 份额通常也较大（图 14）。AI 份额的计算没有使用任何 Claude 使用数据。因此，这一关系进一步说明，AI 使用与理论 AI 能力相符。</p>
+<figure class="source-figure" data-source-image="13"><img alt="Bubble chart of each field’s use ratio on Claude, on a log scale, against the percentage of research time freed through AI, with bubbles sized by the number of researchers. The fitted line slopes upward, with a weighted correlation of +0.58. Statistics and computer science are highest on both measures. Medicine and clinical sciences and veterinary medicine have the lowest use ratios." decoding="async" height="1658" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/0e293ffb459f3ed44142295bb86613151ee49b6c-1920x1658.png" width="1920"/><figcaption>各领域的 Claude 使用与 AI 释放的科研时间。展示各领域实际观察到的 Claude 使用与 AI 份额之间的相关性。每个点代表一个领域，点的大小对应研究人员数量。纵轴以对数刻度表示该领域的 Claude 使用比率。横轴表示按当前能力估计，AI 可以完成的人工科研时间比例。</figcaption></figure>
+<h4>情景 2 和情景 3：更高程度的自动化</h4>
+<p>这两个情景更具推测性，也高度依赖对 AI 能力范围和成本的假设。在这些情景中，更高程度的自动化会大幅提高 AI 份额和加速倍数，并扩大领域间的差异。</p>
+<p>在情景 2 中，75% 的非实体步骤可以由 AI 完成。计算机科学的加速达到约 8 倍，统计学和图书馆与信息科学约为 7 倍，经济学约为 6 倍。大多数其他社会科学、数学，以及物理学与天文学达到 4—5 倍，实验室科学和医学科学约为 2—3 倍。实验室科学，以及艺术与人文学科获益最少，但原因不同。实验室科学的许多工作是实体操作，仍必须由研究人员完成。艺术与人文学科主要是认知工作，但 AI 能力评分较低，因此只有少数步骤进入自动化范围。在计算机科学中，自动化步骤占非实体科研时间的 82%，而艺术中仅为 28%。历史学、人类学和艺术的加速约为 2 倍或更低。</p>
+<p>在情景 3 中，艺术与人文学科跃居前列，实验室科学则继续受到限制。一旦 AI 将全部非实体步骤自动化，低 AI 能力评分就不再限制认知工作。AI 可以承担许多领域中几乎所有的科研工作（图 13 左图）。在这个推测性情景中，实体任务较少的领域达到约 15—16 倍，包括统计学、计算机科学、经济学、数学、心理学，以及大多数社会科学和艺术与人文学科。生物学、化学、材料科学、农业科学和生物医学科学等需要大量实验室或实地工作的领域，只能达到 3—4 倍。如果没有自动化实验室，约占研究人员时间 40% 的实体步骤仍是瓶颈。</p>
+<p>这些情景带来两点启示。第一，实体瓶颈仍然强大。那些没有实体系统集成就无法由 AI 完成的步骤，会逐渐占据研究人员时间和预算的主要部分，从而限制加速。第二，在没有这些瓶颈的地方，科学进步可能达到非同寻常的速度，而 AI 成本会成为限制。按照我们的假设，即使任务完全由 AI 自动完成，成本仍约为研究人员完成同一任务成本的十六分之一。因此，加速会接近约 16 倍，并止步于此。降低 AI 成本会按比例提高这一上限。例如，AI 成本减半，进步速度就会翻倍。如果成本大幅下降，而且这种下降也覆盖 AI 较晚才能自动完成的高难度任务，那么没有实体瓶颈的领域可能远超这些加速估计。</p>
+<p>这些计算存在重要局限，而且可能使结果向两个方向偏移。我们没有考虑研究团队之外、整个领域层面的约束。例如，Large Hadron Collider 这类设施能同时运行的实验数量有限。我们也只计算研究人员时间和 AI 时间的成本，没有计算实验设备或投入品成本。在健康科学、物质科学和生命科学中，这些成本可能很高。我们也未考虑用模拟替代实体实验，而这可能缓解某些领域的瓶颈。最后，我们没有考虑想法的质量。如果 AI 能识别出更好、成功概率更高的假设，研究可能进一步加速。如果科研判断力仍然是人类独有的能力，加速则会更慢。</p>
+<h4>研究人员的预期</h4>
+<p>上述情景描述了一组可能性。研究人员自身的预期，可以提供以专业知识为基础的独特参考。为了收集这些看法，我们在生命与健康科学研究人员调查中询问：对于不同类别的科研工作，他们认为独立工作的 AI 何时能达到本领域最优秀研究人员的水平（图 15）。受访者对近期进展的预期很高。超过一半的人预计，到 2027 年，AI 的数据分析能力将达到顶尖研究人员水平。38% 的人认为，AI 已经达到这一水平。到 2030 年，94% 的人预计 AI 的数据分析将达到本领域最优秀研究人员水平，89% 对写作持同样看法，构思和数据采集则各为 72%。对构思和数据采集的预期相对较低，与当前这两类任务的 Claude 使用较少相符。</p>
+<p>对于没有人类参与的端到端 AI 研究，预期更保守，但研究人员仍预计会出现显著进展。约 40% 的受访者预计，到 2030 年，AI 将能够完成整个研究项目。约 64% 预计到 2035 年可以实现，但也有 16% 认为永远不会实现。对于 AI 自主取得科学突破，预期更为谨慎。约一半研究人员认为，这要等到 2035 年之后，甚至永远不会发生。总体而言，许多研究人员预计，未来十年将出现高度自动化，这与我们的更高自动化情景大体一致。这些预期能多快实现、实现到什么程度，不仅取决于 AI 作为软件技术的进步，也取决于能否建设自动化实验室，克服实体操作障碍。</p>
+<figure class="source-figure" data-source-image="14"><img alt="Stacked bar chart of when survey respondents expect AI to match the best researchers in their field, from already possible today to never. Already possible today: 13% for ideation and hypothesis generation, 23% for data gathering, 38% for data analysis, and 30% for writing and communication. For the full research cycle with no human in the loop, most respondents answer 2030 or later, and 16% say never. For a breakthrough finding with no human in the loop, 30% say later than 2035 and 18% say never." decoding="async" height="1179" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/b1c9c058854976a20bf1743b17124378b78e674f-1920x1179.png" width="1920"/><figcaption>研究人员预计 AI 何时能达到本领域最优秀研究人员的水平。结果来自我们开展的调查。前四行对应不同任务类别，展示研究人员预计独立工作的 AI 何时能达到本领域最优秀研究人员的水平。后两行分别对应：在没有人类科学家参与的情况下，AI 何时能在相应领域中完成“从问题到发现”的全过程，以及何时能产生“一项被本领域视为重大进展的发现”。</figcaption></figure>
+<p>将过去调查中的预测与实际结果比较，可以发现 AI 的进步经常被严重低估（Rosenberg et al. 2026）。例如，在 2022 年年中的一项调查中，领域专家认为 AI 将在 2030 年达到 International Mathematical Olympiad 金牌水平，这是他们预测的中位数。超级预测者给出的中位数是 2035 年（Karger et al. 2023）。AI 在 2025 年就达成了这一里程碑，比这些预测提前了约 5—10 年。尽管预测者系统性低估了 AI 能力的进展，但仍有少数例外。它们主要出现在需要现实世界执行的领域，例如 AI 辅助的生物学实验室任务。</p>
+<h3>讨论</h3>
+<p>如果 AI 能帮助加快科学发现，它就可能提高生活水平，并加速疾病治疗方面的进展。我们的估计表明，潜在收益相当可观。但 AI 科研能力的进步不会自动转化为快速进展。能否实现这样的加速，也取决于我们如何应对以下几类约束。</p>
+<p>第一，采用可能明显落后于能力。新技术的扩散通常很慢（Comin and Hobijn 2010）。生产力收益往往要等到组织围绕新技术完成重构后才会出现（David 1990；Brynjolfsson, Rock, and Syverson 2021）。个人学习过程、组织或系统层面的摩擦，以及 AI 访问或基础设施限制，都可能拖慢采用速度。</p>
+<p>第二，科研可能继续面临 AI 无法消除的瓶颈。实体实验可能成本高、速度慢。即使 AI 极其强大，它们仍会显著限制进步。在上述情景中，实验室科学尤其如此。选择研究什么，也可能是另一个瓶颈。研究问题在很大程度上决定了项目的价值，而 AI 能否提出好问题仍不清楚。如果构思是瓶颈，那么即使回答既定问题的成本大幅下降，加速仍会受到限制。相反，如果 AI 在提出高质量假设方面超越人类，加速可能更显著，尤其是在检验假设成本高的领域。</p>
+<p>第三，AI 辅助研究可能提高科研产出的数量，也可能提高质量，两者对科学的影响不同。新论文大量增加，可能加快领域进步，也可能超出科学家吸收或验证结果的能力。另一方面，从显微镜、望远镜到统计软件，新技术在历史上不断提高科学认识的质量。AI 同样可以让更全面的分析和更有雄心的项目成为可能。随着论文更容易产出，研究界也可能越来越重视特别新颖或高质量的工作。科研效率提高，最终带来更多数量还是更高质量，将取决于研究人员的选择，以及期刊、资助方和机构设定的激励。</p>
+<p>第四，研究组织方式可能发生难以预料的变化。随着 AI 能力和自主程度提升，AI 系统可能主导验证、评审和重要结果传播，从而缓解前述成果吸收问题。更长远地看，AI 科研智能体可能形成自己的大型群体，利用机器人和自动化实验室，独立于人类推进科学前沿。这种自主 AI 研究会带来新的问题：人类如何追踪新知识，能否理解它，以及这些知识是如何产生的。</p>
+<p>第五，更自主的 AI 系统，可能使“确保 AI 驱动的研究符合人类目标”变得更困难。随着 AI 智能体更强大、更有创造力，让人类继续参与关键科研决策，可能对安全和人类福祉十分重要。这些决策包括研究哪些问题，以及如何研究。发现本身或研究的副产物也可能带来风险，生物学尤其如此。同一种能力既可能加快医学进展，也可能产生危险知识或材料。在这些情况下，可能有必要在科研流程中有意设置检查节点。这意味着，我们需要接受更慢的进展，以降低风险。</p>
+<p>最后，研究人员从事的工作可能发生重大变化。一种影响是工作满意度的改变。如果 AI 接管了有趣或有成就感的任务，满意度可能下降，选择科研职业的人也可能减少。如果 AI 接管的是研究人员觉得乏味的任务，满意度则可能提高。行政事务是一个潜在目标。在美国，接受联邦资助项目的首席研究员报告说，他们约 44% 的科研时间用于满足行政要求，而非开展研究（Schneider et al. 2020）。减轻这一负担可能带来很大收益，既节省时间，也提高整体满意度。最终的净效应仍不确定，而且可能随 AI 能力变化而改变。一种乐观的看法是，AI 会扩大科学发现的机会，而这正是科研职业带来成就感的核心。如果科学是一场驶向“无尽前沿”的航行，AI 或许就是一艘新船，让研究人员在广阔的研究问题与发现之海上走得更远。</p>
+<h3>附录</h3>
+<p>可在此处获取。</p>
+<h3>参考文献</h3>
+<ul class="references">
+<li>Ahmadpoor, Mohammad 和 Benjamin F. Jones，《解读科学与发明中的团队和个人影响力》，<cite>Proceedings of the National Academy of Sciences</cite>，2019，116 (28)，13885–13890。</li>
+<li>Alamos, Cristian 和 Lukas Althoff，《SciNet：科学的解剖图谱》，数据集，2026。<a href="https://www.anatomyofscience.com/">https://www.anatomyofscience.com/</a></li>
+<li>Amodei, Dario，《充满慈爱的机器：AI 如何让世界变得更好》，文章，2024 年 10 月。<a href="https://darioamodei.com/essay/machines-of-loving-grace">https://darioamodei.com/essay/machines-of-loving-grace</a></li>
+<li>Anthropic，《进一步了解 Claude 的数学能力》，研究文章，2026 年 8 月 10 日，2026a。<a href="https://www.anthropic.com/research/riemann-zeta">https://www.anthropic.com/research/riemann-zeta</a></li>
+<li>Anthropic，《将 Fermat’s Last Theorem 形式化》，研究文章，2026 年 9 月 4 日，2026b。<a href="https://www.anthropic.com/research/formalizing-fermats-last-theorem">https://www.anthropic.com/research/formalizing-fermats-last-theorem</a></li>
+<li>Appel, Ruth 等，《Anthropic Economic Index 报告：经济基础指标》，研究文章，2026 年 1 月 15 日。<a href="https://www.anthropic.com/research/anthropic-economic-index-january-2026-report">https://www.anthropic.com/research/anthropic-economic-index-january-2026-report</a></li>
+<li>Brynjolfsson, Erik、Daniel Rock 和 Chad Syverson，《生产力 J 曲线：无形资产如何与通用技术互补》，<cite>American Economic Journal: Macroeconomics</cite>，2021，13 (1)，333–372。</li>
+<li>Bush, Vannevar，《科学：无尽的前沿——致总统的报告》，华盛顿特区：United States Government Printing Office，1945。</li>
+<li>Codreanu, Mihai 等，《科学中的 AI：初步观察》，arXiv 预印本 arXiv:2609.28504，2026。<a href="https://arxiv.org/abs/2609.28504">https://arxiv.org/abs/2609.28504</a></li>
+<li>Comin, Diego 和 Bart Hobijn，《技术扩散探究》，<cite>American Economic Review</cite>，2010，100 (5)，2031–2059。</li>
+<li>David, Paul A.，《发电机与计算机：从历史视角看现代生产力悖论》，<cite>American Economic Review</cite>，1990，80 (2)，355–361。</li>
+<li>Eloundou, Tyna 等，《GPTs 是通用技术：LLM 对劳动力市场的潜在影响》，<cite>Science</cite>，2024，384 (6702)，1306–1308。</li>
+<li>Guo, Daya 等，《DeepSeek-R1 通过强化学习激励 LLM 推理》，<cite>Nature</cite>，2025，645 (8081)，633–638。</li>
+<li>Hao, Qianyue 等，《人工智能工具扩大科学家的影响力，却收窄科学的研究焦点》，<cite>Nature</cite>，2026，649 (8099)，1237–1243。</li>
+<li>Jones, Benjamin F.，《研发中的人工智能》，收录于 Ajay Agrawal、Erik Brynjolfsson 和 Anton Korinek 编《变革性 AI 的经济学》，芝加哥：University of Chicago Press，2026，37–61。</li>
+<li>Jumper, John 等，《利用 AlphaFold 实现高精度蛋白质结构预测》，<cite>Nature</cite>，2021，596 (7873)，583–589。</li>
+<li>Karger, Ezra 等，《预测生存风险：来自一场长期预测竞赛的证据》，Forecasting Research Institute 工作论文 1，2023。<a href="https://forecastingresearch.org/research/existential-risk-persuasion-tournament">https://forecastingresearch.org/research/existential-risk-persuasion-tournament</a></li>
+<li>Kobak, Dmitry 等，《通过超额词汇使用深入分析生物医学出版物中的 LLM 辅助写作》，<cite>Science Advances</cite>，2025，11 (27)，eadt3813。</li>
+<li>Lambert, Nathan 等，《Tülu 3：推进开放语言模型后训练的前沿》，arXiv 预印本 arXiv:2411.15124，2024。<a href="https://arxiv.org/abs/2411.15124">https://arxiv.org/abs/2411.15124</a></li>
+<li>Liang, Weixin 等，《量化科学论文中大型语言模型的使用》，<cite>Nature Human Behaviour</cite>，2025，9 (12)，2599–2609。</li>
+<li>Liu, Yinhong 等，《与人类判断对齐：成对偏好在大型语言模型评估器中的作用》，收录于 <cite>Proceedings of the First Conference on Language Modeling (COLM)</cite>，2024。</li>
+<li>Mantiuk, Rafał K.、Anna Tomaszewska 和 Radosław Mantiuk，《四种图像质量主观评估方法的比较》，<cite>Computer Graphics Forum</cite>，2012，31 (8)，2478–2491。</li>
+<li>Massenkoff, Maxim 等，《Anthropic Economic Index 报告：使用节奏》，研究文章，2026 年 6 月 26 日。<a href="https://www.anthropic.com/research/economic-index-june-2026-report">https://www.anthropic.com/research/economic-index-june-2026-report</a></li>
+<li>Merchant, Amil 等，《扩展用于材料发现的深度学习》，<cite>Nature</cite>，2023，624 (7990)，80–85。</li>
+<li>OpenAI，《一个 OpenAI 模型推翻了离散几何中的一项核心猜想》，研究文章，2026 年 5 月 20 日，2026a。<a href="https://openai.com/index/model-disproves-discrete-geometry-conjecture/">https://openai.com/index/model-disproves-discrete-geometry-conjecture/</a></li>
+<li>OpenAI，《关于 Navier–Stokes Millennium Prize 问题》，研究文章，2026 年 9 月 8 日，2026b。<a href="https://openai.com/index/navier-stokes-solution/">https://openai.com/index/navier-stokes-solution/</a></li>
+<li>Parshall, Daniel 和 Andrea Lopez-Luzuriaga，《衡量 AI 的经济影响范围：多维任务分类体系》，George Washington University Center for Economic Research 工作论文 2026-005，2026。<a href="https://www2.gwu.edu/~forcpgm/2026-005.pdf">https://www2.gwu.edu/~forcpgm/2026-005.pdf</a></li>
+<li>Robinson-Garcia, Nicolas 等，《元研究：科研职业生涯中的任务专业化》，<cite>eLife</cite>，2020，9，e60586。</li>
+<li>Rosenberg, Josh 等，《迄今为止，AI 进步预测有多准确？》，研究文章，Forecasting Research Institute，2026 年 9 月 22 日。<a href="https://forecastingresearch.org/research/ai-progress-accuracy-update">https://forecastingresearch.org/research/ai-progress-accuracy-update</a></li>
+<li>Schneider, Sandra L. 等，《2018 年 FDP 教师工作量调查：主要发现报告》，Federal Demonstration Partnership，2020。<a href="https://thefdp.org/wp-content/uploads/FDP-FWS-2018-Primary-Report.pdf">https://thefdp.org/wp-content/uploads/FDP-FWS-2018-Primary-Report.pdf</a></li>
+<li>Shah, Nihar B. 等，《什么时候比较优于打分？》，arXiv 预印本 arXiv:1406.6618，2014。<a href="https://arxiv.org/abs/1406.6618">https://arxiv.org/abs/1406.6618</a></li>
+<li>Tomei, Philip Moreira 和 Bouke Klein Teeselink，《AI 能学会哪些工作？通过强化学习衡量受影响程度》，arXiv 预印本 arXiv:2605.02598，2026。<a href="https://arxiv.org/abs/2605.02598">https://arxiv.org/abs/2605.02598</a></li>
+<li>Tsoukalas, George 等，《通过 AI 驱动的形式化证明搜索推进数学研究》，<cite>Science</cite>，2026，394 (6820)，234–239。</li>
+<li>Varadi, Mihaly 等，《2024 年的 AlphaFold Protein Structure Database：为超过 2.14 亿条蛋白质序列提供结构覆盖》，<cite>Nucleic Acids Research</cite>，2024，52 (D1)，D368–D375。</li>
+<li>Wang, Hanchen 等，《人工智能时代的科学发现》，<cite>Nature</cite>，2023，620 (7972)，47–60。</li>
+</ul>
+<h3>脚注</h3>
+<ol class="footnotes">
+<li><strong>01</strong> 计算各领域的全球研究人员数量时，我们排除了 Claude 不可用的国家。</li>
+<li><strong>02</strong> 研究人员数量来自 SciNet。指标详情见附录。</li>
+<li><strong>03</strong> 会话记录按所开展的研究归入领域，而不是按使用的工具归类。因此，其他计算科学中的编程工作不会被算作计算机科学。</li>
+<li><strong>04</strong> 子领域层面的使用占比估计不如领域层面精确，尤其是在会话量较少的子领域中。这是因为抽样变异和分类噪声更大。因此，我们关注整体模式，而不是某一个低会话量子领域所处的位置。</li>
+<li><strong>05</strong> 虽然我们的分析聚焦科研任务，但教学、服务和行政管理等非科研任务，也可能占据研究人员大量时间。不过，我们的科研使用分类器有意排除了本科教学。如果行政或例行工作不直接服务于研究或某项研究项目，也不会被选入。此外，我们的样本不限于高校岗位的科学家，而这类人员通常承担更多教学和服务工作。因此，我们将 AI 在这些工作流程中的使用留待未来研究。</li>
+<li><strong>06</strong> 从单项任务看，撰写论文初稿在 Claude 和 Claude Code 上都是最常见的任务，占比分别为 18.6% 和 11.1%。在 Claude 上，接下来最常见的是审阅并综合文献（6.8%），以及回应同行评审意见（6.7%）。在 Claude Code 上，接下来是设计、构建和完善产物（4.8%），以及将数据和结果可视化（4.6%）。</li>
+<li><strong>07</strong> 受访者从 Anthropic 的 AI for Science 及相关资助计划申请人中招募，隶属于美国和加拿大的研究机构。由于他们申请过 AI 研究额度，使用 AI 的强度很可能高于一般科学家。详情见附录。</li>
+<li><strong>08</strong> Claude Science 上所执行任务的差异，可能部分反映了使用者构成。任何付费用户都可以访问 Claude Science，但采用者很可能具有更专业或要求更高的使用需求。因此，我们将产品间的差异描述为使用模式。</li>
+<li><strong>09</strong> 为了识别每次 Claude 会话产生的产物，我们使用了此前研究引入的分类器（Massenkoff et al. 2026）。该分类器识别 Claude 在交流中生成的最主要输出。我们将更细的分类结果归入两大类：文字产物和技术产物。文字产物主要包括文档、报告、学术论文或演示文稿。技术产物主要包括软件输出，例如脚本、代码修复，以及数据和图表。不属于这两类的产物包括分析或摘要，以及解释或建议。</li>
+</ol>
+<h3>作者与致谢</h3>
+<h4>致谢</h4>
+<p>Cristian Alamos、Bailey Bova、Tom Chivers、Lauren Cottrell、Eleanor Dorfman、Adam Farina、Deep Ganguli、Rebecca Hiscott、Chad Jones、Anneke Jong、Aisling Keenan、Anton Korinek、Eva Lyubich、Paruul Maheshwary、Miles McCain、Teddy McGuire、Ankur Rathi、Santi Ruiz、Szymon Sacher、David Saunders、Monika Tuchowska、Nick Turner、Heather Whitney、Kim Withee、Jack Clark。</p>
+<h4>引用</h4>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

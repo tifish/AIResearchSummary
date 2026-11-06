@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>教 AI 构建科学模型</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #f6f5f1;
+  --card: #ffffff;
+  --ink: #202c36;
+  --muted: #5f6d77;
+  --line: #d6dce0;
+  --data: #175dba;
+  --risk: #aa433b;
+  --opportunity: #147365;
+  --conclusion: #7545a3;
+  --hl: #e6efff;
+  --hl2: #eee5fa;
+  --risk-bg: #faece8;
+  --opportunity-bg: #e5f1ec;
+  --hero: #172b3a;
+  --hero-ink: #eef3f8;
+  --hero-muted: #bacbd9;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f6f5f1;
+  --card: #ffffff;
+  --ink: #202c36;
+  --muted: #5f6d77;
+  --line: #d6dce0;
+  --data: #175dba;
+  --risk: #aa433b;
+  --opportunity: #147365;
+  --conclusion: #7545a3;
+  --hl: #e6efff;
+  --hl2: #eee5fa;
+  --risk-bg: #faece8;
+  --opportunity-bg: #e5f1ec;
+  --hero: #172b3a;
+  --hero-ink: #eef3f8;
+  --hero-muted: #bacbd9;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #131a20;
+    --card: #1c252e;
+    --ink: #dce4eb;
+    --muted: #a6b5c1;
+    --line: #3b4854;
+    --data: #81b5ff;
+    --risk: #f29888;
+    --opportunity: #75d1b6;
+    --conclusion: #c5a2f0;
+    --hl: #20334d;
+    --hl2: #342941;
+    --risk-bg: #382725;
+    --opportunity-bg: #20362f;
+    --hero: #0d202e;
+    --hero-ink: #e1eaf2;
+    --hero-muted: #adbfce;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #131a20;
+  --card: #1c252e;
+  --ink: #dce4eb;
+  --muted: #a6b5c1;
+  --line: #3b4854;
+  --data: #81b5ff;
+  --risk: #f29888;
+  --opportunity: #75d1b6;
+  --conclusion: #c5a2f0;
+  --hl: #20334d;
+  --hl2: #342941;
+  --risk-bg: #382725;
+  --opportunity-bg: #20362f;
+  --hero: #0d202e;
+  --hero-ink: #e1eaf2;
+  --hero-muted: #adbfce;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; line-height: 1.85; }
+main { max-width: 1080px; margin: auto; padding: 32px 24px 80px; }
+h1, h2, h3 { line-height: 1.4; }
+h1 { font-size: clamp(2rem, 5vw, 3.6rem); margin: 12px 0; }
+h2 { font-size: 1.65rem; margin-top: 0; }
+h3 { font-size: 1.18rem; }
+p { margin: 0 0 1.2em; }
+a { color: var(--data); text-underline-offset: 3px; }
+.hero { background: var(--hero); color: var(--hero-ink); padding: clamp(24px, 5vw, 54px); border-radius: 16px; }
+.english { color: var(--hero-muted); font-size: 1.2rem; }
+.meta { color: var(--muted); font-size: .9rem; margin: 18px 0 30px; }
+.hero .label { color: var(--hero-muted); letter-spacing: .08em; font-size: .88rem; }
+.hero .overview { font-size: 1.15rem; max-width: 780px; margin-top: 26px; }
+.numbers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 28px 0; border-bottom: 1px solid var(--line); }
+.numbers strong { display: block; font-size: 2rem; color: var(--data); line-height: 1.3; }
+.numbers span { display: block; color: var(--muted); font-size: .92rem; }
+.summary-block { margin: 36px 0; }
+mark { background: var(--hl); color: var(--data); padding: .08em .24em; border-radius: 3px; }
+.emphasis { background: var(--hl2); color: var(--conclusion); padding: .08em .24em; }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.step { border-top: 4px solid var(--data); padding-top: 10px; }
+.step:nth-child(2) { border-color: var(--opportunity); }
+.step:nth-child(3) { border-color: var(--conclusion); }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; background: var(--card); }
+caption { text-align: left; color: var(--muted); padding: 0 0 10px; font-size: .9rem; }
+th, td { text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--data); background: var(--hl); }
+.insight { border-left: 5px solid var(--conclusion); padding: 20px 26px; background: var(--hl2); font-size: 1.08rem; }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+.opportunity, .caution { padding: 26px; border-radius: 10px; }
+.opportunity { background: var(--opportunity-bg); border-top: 4px solid var(--opportunity); }
+.caution { background: var(--risk-bg); border-top: 4px solid var(--risk); }
+.opportunity h3 { color: var(--opportunity); }
+.caution h3 { color: var(--risk); }
+.takeaways { padding: 28px; background: var(--card); border: 1px solid var(--line); }
+.takeaways li { margin: 12px 0; padding-left: 6px; }
+.takeaways li::marker { color: var(--conclusion); font-weight: 700; }
+#translation { max-width: 820px; margin: 60px auto 0; padding-top: 34px; border-top: 3px solid var(--conclusion); }
+#translation > h2 { font-size: 2rem; color: var(--conclusion); }
+#translation h3 { margin-top: 2.6em; font-size: 1.5rem; }
+#translation h4 { font-size: 1.12rem; margin-top: 1.8em; }
+.translation-nav { padding: 20px 26px; background: var(--card); margin-bottom: 28px; }
+.translation-nav ol { margin: 0; padding-left: 24px; }
+.source-meta { color: var(--muted); border-bottom: 1px solid var(--line); padding-bottom: 16px; }
+.source-figure { margin: 34px 0; padding: 12px 0; }
+.source-figure img { display: block; width: 100%; height: auto; }
+figcaption { font-size: .9rem; line-height: 1.75; color: var(--muted); border-left: 3px solid var(--line); padding: 10px 16px; margin-top: 14px; }
+.footnotes { font-size: .95rem; }
+.footnotes li { margin-bottom: 14px; }
+@media (max-width: 700px) {
+  main { padding: 16px 16px 48px; }
+  .steps, .split { grid-template-columns: 1fr; }
+  .numbers { gap: 12px; }
+  .numbers strong { font-size: 1.5rem; }
+  th, td { padding: 10px; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/teaching-ai-to-build-scientific-models" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header class="hero">
+<div class="label">研究 · AI 与科学建模</div>
+<h1>教 AI 构建科学模型</h1>
+<p class="english">Teaching AI to build scientific models</p>
+<p class="overview"><strong>一句话总括：</strong>文章提出，AI 应交付一组合理模型及其证据边界，让科学家看见哪些解释可靠、哪些仍待检验，从而把模型拟合转化为科学理解。</p>
+</header>
+<p class="meta">来源：Anthropic · 日期：2026 年 11 月 6 日 · 分类：Research · <a href="https://www.anthropic.com/research/teaching-ai-to-build-scientific-models">原文</a></p>
+<section aria-label="中文总结">
+<div class="numbers">
+<div><strong>约 10 万次</strong><span>对 Hodgkin-Huxley 这类模型开展 SBI 时可能需要的模拟次数</span></div>
+<div><strong>数秒</strong><span>模拟与网络训练完成后，对新数据进行推断的时间</span></div>
+<div><strong>124,635 个</strong><span>文章所示果蝇连接图中展示的细胞数</span></div>
+</div>
+<div class="summary-block">
+<h2>科学建模有三步，拟合只是其中一步</h2>
+<div class="steps">
+<div class="step"><h3>构建：决定模型长什么样</h3><p>选择组成部分和方程形式。例如，Hodgkin 与 Huxley 为了匹配数据，将一个变量取四次方。</p></div>
+<div class="step"><h3>约束：确定参数的合理范围</h3><p>不同参数组合可能产生几乎相同的结果。<mark>给出参数分布</mark>，才能保留这些可能的解释。</p></div>
+<div class="step"><h3>解释：推断真实系统的机制</h3><p>四次方之所以有启发性，是因为较简单的版本效果不够好。被排除的方案也是理解的一部分。</p></div>
+</div>
+<p class="insight">模型能够重现数据，并不意味着我们理解了系统。<strong class="emphasis">比较哪些模型成功、哪些失败</strong>，才有助于判断数据真正支持什么。</p>
+</div>
+<div class="summary-block">
+<h2>SBI 将昂贵的模拟转化为快速推断</h2>
+<p>基于模拟的推断（SBI）先反复生成“参数—输出”样本，再训练神经网络。网络随后可以根据观测结果，返回可能产生这些结果的参数范围。</p>
+<div class="table-wrap">
+<table>
+<caption>原文提供的计算规模与时间；属于不同任务或阶段，并非同一条件下的性能对照。</caption>
+<thead><tr><th>任务或阶段</th><th>原文数量或耗时</th><th>含义</th></tr></thead>
+<tbody>
+<tr><td>1951 年，Huxley 手动求解方程</td><td>三个多星期</td><td>计算曾是建模过程中的显著负担。</td></tr>
+<tr><td>对 Hodgkin-Huxley 这类模型开展 SBI</td><td>可能约 100,000 次模拟</td><td>先用大量模拟学习参数与输出的对应关系。</td></tr>
+<tr><td>对更大、更复杂的模型开展 SBI</td><td>数百万次模拟</td><td>前期计算成本仍然很高。</td></tr>
+<tr><td>完成所需模拟</td><td>可能耗时数周</td><td>快速推断需要前期投入。</td></tr>
+<tr><td>训练后的网络处理新数据</td><td>数秒，无须进一步模拟</td><td>可以支持中子星碰撞定位等有时间限制的任务。</td></tr>
+</tbody>
+</table>
+</div>
+<p>这种方法的价值不仅是速度。<mark>参数分布还能揭示不确定性</mark>，帮助研究者判断下一次实验最需要补充什么数据。</p>
+</div>
+<div class="summary-block split">
+<div class="opportunity">
+<h3>从搜索参数，走向搜索多种模型</h3>
+<p>基于 LLM 的智能体可以提出模型、编写代码、拟合参数，并根据结果反复修订。</p>
+<p>如果保留下来的模型都具有某个特征，数据很可能支持它。如果模型之间存在分歧，就说明证据仍然不足。</p>
+<p><strong>AI 的机会在于拓宽候选解释，再用数据缩小范围。</strong></p>
+</div>
+<div class="caution">
+<h3>自动构建模型仍缺少未知问题的验证</h3>
+<p>目前，这类系统主要接受的测试是重新发现科学家已经知道的模型。它们能否解决没有已知答案的问题，证据仍然稀少。</p>
+<p>解释模型更难自动化。拟合程度可以测量，“理解是否更深”却没有同样明确的衡量方式。</p>
+<p><strong>文章提出的是研究方向，不能视为科学发现已被全面自动化的证明。</strong></p>
+</div>
+</div>
+<div class="summary-block">
+<h2>建模规模扩大后，可靠结论更依赖模型之间的共识</h2>
+<p>Hodgkin-Huxley 方程描述单个神经细胞。果蝇脑有<mark>超过 10 万个神经元</mark>，人脑则有<mark>数百亿个</mark>。AI 有望帮助研究者构建超出手工处理能力的模型，但规模越大，直接阅读方程来理解系统就越困难。</p>
+<p>研究重点因此转向：哪些性质是所有与数据相容的模型共有的？哪些预测经得住模型差异的检验？最有用的实验，是那些能够排除最多剩余模型的实验。</p>
+<p class="insight">AI 应保留建模过程中的证据：<strong>已确定的部分、仍开放的问题、失败的替代方案，以及新出现的疑问。</strong>这些信息决定了模型能否带来洞见。</p>
+</div>
+<div class="summary-block takeaways">
+<h2>最值得带走的洞见</h2>
+<ol>
+<li><strong>拟合准确不是理解的充分条件。</strong>多个参数组合，甚至结构不同的模型，都可能解释同一组数据。</li>
+<li><strong>不确定性应当被保留下来。</strong>参数分布和模型分布能显示证据的力度与缺口。</li>
+<li><strong>失败的替代方案具有科学价值。</strong>它们帮助我们判断成功模型中的哪些特征确实不可缺少。</li>
+<li><strong>模型之间的分歧可以指导实验。</strong>与其只寻找一个最佳模型，不如设计能区分合理解释的实验。</li>
+<li><strong>AI 应加速计算，也应保留理解所需的过程信息。</strong>否则，快速得到答案仍可能无法说明真实系统如何运作。</li>
+</ol>
+</div>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<nav aria-label="原文目录" class="translation-nav">
+<ol>
+<li>三步走</li>
+<li>分账单，或者说，如何约束模型</li>
+<li>把账单问题提升一个层次，或者说，如何构建模型</li>
+<li>转译中丢失的意义，或者说，如何解释模型</li>
+<li>细胞与尺度</li>
+</ol>
+</nav>
+<div class="source-meta">
+<p>发布日期</p>
+<p>团队</p>
+<p>科学</p>
+</div>
+<p>AI for Science 资助项目的获得者 Jakob Macke、Daniel Gedon 和 Stefan Wahl，是 ELLIS Institute Tübingen 和 University of Tübingen 的研究人员。他们开发 AI 工具，用于构建神经科学及其他领域的科学模型。在这篇客座文章中，他们讨论了 AI 正在如何改变科学建模。</p>
+<p>1951 年，剑桥大学的计算机停用了六个月。这让生理学家 Andrew Huxley 遇到了麻烦。他和同事 Alan Hodgkin 刚刚建立了一组方程，用来描述一种鱿鱼神经细胞如何放电。他们想理解这些神经细胞的“动作电位”，也就是细胞用来传递信息的电脉冲。从感知到智能，大脑的一切活动都以这些电脉冲为基础。要知道这些方程是否有效，唯一的办法就是求解，再将结果与数据进行比较。</p>
+<p>Huxley 原本希望用那台新式计算机求解方程。结果，他只能使用手摇机械计算器。这项工作花了他三个多星期。</p>
+<p>模型的基本结构由有关细胞的已知事实决定。Hodgkin 和 Huxley 把细胞膜建模为一个电路。但模型中有一部分，只是基于已有知识作出的推测。他们发现，要让曲线符合测量数据，必须把一个变量取四次方，也就是让它再与自身相乘三次。当时，他们并不知道原因。他们只知道，不这样做，模型对观测数据的预测就没有那么好。</p>
+<p>不过，他们确实提出了一个假说。这个变量控制着细胞膜上某些门控结构的开启方式。他们谨慎地推测，之所以需要四次方，可能是因为膜中的多个带电粒子必须先移动到位，这些门才能打开。</p>
+<p>Hodgkin 和 Huxley 于 1963 年共同获得诺贝尔生理学或医学奖。又过了很久，另一个团队解析出一种相关钾通道蛋白的结构。他们发现，它确实由四个相同的部分组成，围绕着中央的孔排列。这个模型在 1951 年就完成了数据拟合。即使在当时，它也能相当准确地预测神经冲动的传播速度。更进一步，它后来还帮助预言了钾离子通道本身的结构，而模型从未针对这种结构进行过拟合。</p>
+<p>如今，AI 系统很可能只用一个下午，就能找到类似 Hodgkin 和 Huxley 所提出的方程。它甚至可能更贴合实验数据。但这个故事的重点是，仅仅知道四次方有效还不够。真正重要的是，知道更简单的模型版本行不通。一个只把模型交给你的 AI 系统，也许给了你答案，却没有给你理解。用模型重现数据并不足够，因为许多模型都能做到这一点。关键在于，能否据此对现实世界中的系统作出判断。理想情况下，还应能对其他相似系统作出判断。要做到这一点，你需要知道这个模型与其他有效模型有哪些共同特征，又有哪些特征将它与无效模型区分开来。正如数学家 Richard Hamming 在 1962 年所写：“计算的目的在于洞见，而非数字。”</p>
+<h3>三步走</h3>
+<p>70 多年过去了，Hodgkin-Huxley 模型仍然是描述神经元电活动的标准模型。只要调整常数，同一类方程就能描述动物界中从鱿鱼到人类的神经细胞。尽管我们的演化谱系早在五亿多年前就已分离。</p>
+<p>不过，比模型的长久生命力更重要的是，Hodgkin-Huxley 模型揭示了模型如何发挥作用。Hodgkin 和 Huxley 的方法可以分成三个步骤。大多数科学建模都包含这三个步骤的某种形式。</p>
+<p>第一步是构建模型。这意味着决定模型由什么组成，以及方程采用什么形式。在 Hodgkin 和 Huxley 的案例中，这包括电路的组成部分，也就是细胞膜和门控结构。也包括方程的形式，例如将基础变量取四次方。</p>
+<p>第二步是约束模型，也就是调节可调整的参数，使其符合实际测量结果。对 Hodgkin 和 Huxley 来说，这包括门控结构在不同电压下开启的频率等设置。</p>
+<p>第三步是解释模型，也就是追问模型对真实系统说明了什么。例如，提出四次方意味着门控结构具有四个可移动部分。</p>
+<p>在实践中，科学家会反复经历这些步骤。如果数值与测量结果不符，或者解释说不通，他们就会回头修改。</p>
+<p>这三个步骤过去都由人来完成。如今，AI 系统正越来越多地参与其中。可以说，机器在约束模型方面取得的进展最大，因此我们先从这里讲起。</p>
+<h3>分账单，或者说，如何约束模型</h3>
+<p>Hodgkin 和 Huxley 凭肉眼和直觉约束模型，最终得到了一组数值。这说明模型能够匹配数据。但它没有告诉他们，其他数值是否也能达到同样好，甚至更好的效果。</p>
+<p>想象一下，你知道一次聚餐总共花了 120 美元，却不知道每个人点了什么。许多不同的点单组合都可能凑出这个金额。也许每个人都点了价格适中的汉堡。也许一个人点了牛排和龙虾，其他人都只点了汤。神经细胞模型遵循同样的道理：不同的门控参数组合，可以产生几乎相同的电活动。只展示一个拟合良好的组合，会隐藏其他所有合理的参数设置。而其他组合可能会导向不同的预测。几乎任何被建模的现象都是如此。许多不同的参数组合，都能同样好地解释观测数据。</p>
+<p>解决办法是一种叫作贝叶斯推断的统计方法。它以概率分布的形式，给出所有表现还不错的数值组合。这个分布既考虑它们与数据的拟合程度，也考虑你对参数的先验知识。分布呈曲线形态，拟合最好的组合位于峰顶，较差的组合位于边缘。</p>
+<p>但对复杂模型来说，这种方法通常难以实际使用。因为它需要计算：在每一种可能的数值组合下，得到当前测量结果的可能性有多大。对 Hodgkin-Huxley 模型来说，这仍然可行。但对更复杂的模型，计算就会变得无法完成。例如，如果数千个离子通道都随机开启和关闭，就必须计算每一种组合。回到餐厅账单的比喻，回答“如果 A 点了汉堡，B 点了牛排，账单会是多少”很容易。但要找出哪些组合可能产生最终账单，就困难得多。人数和菜单选项越多，问题就越难。</p>
+<p>另一种方法叫作基于模拟的推断（simulation-based inference，SBI）。它通过大量计算，克服这种反向推求的难题。先随机选取参数，运行模型，再记录输出。如此反复进行。对 Hodgkin-Huxley 这类模型来说，可能需要约 10 万次模拟。对更大、更复杂的模型，则需要数百万次。然后，用这些结果训练一个神经网络。这样，给定一个输出，网络就能返回可能产生该输出的参数范围。</p>
+<p>SBI 唯一要求的是，你能够运行模型：输入一组参数，再得到预期会观测到的那类数据。这种输入参数、输出数据的可运行模型，就叫作模拟器（simulator）。“基于模拟的推断”也由此得名。你完全不必使用公式，去计算测量结果出现的可能性。而恰恰是这个步骤，让标准贝叶斯推断往往难以实际使用。如今，模拟器通常是计算机程序，但并非必须如此。Huxley 手摇计算器求解方程时，也是在运行一个模拟器。许多模拟器很容易正向运行，却无法反向求解。有些甚至无法写成简洁的方程。它们的假设蕴含在所遵循的规则中，但它们依然是模型。从神经元网络到星系碰撞，对许多复杂现象来说，模拟器往往是我们唯一拥有的模型形式。SBI 使我们能够用数据约束这些模型。</p>
+<p>运行所有这些模拟成本高昂，可能需要数周时间。但完成之后，训练好的网络就能在数秒内对新数据进行推断，无须进一步模拟。这样的速度改变了我们能够做到的事情。当两颗中子星碰撞时，SBI 可以大致判断碰撞发生在天空中的哪个位置。它的速度足够快，能够让望远镜在信号仍可探测时转向那个方向。同样的方法也已成功应用于宇宙学、结构生物学、地球物理学等许多领域的问题。</p>
+<p>SBI 也已被用于神经细胞模型，包括 Hodgkin-Huxley 模型。由于它返回的是一个分布，而不是单个拟合结果，我们可以看出哪些参数已被数据充分约束。也能看出哪些地方仍存在不止一种合理解释，以及哪里最需要更多数据，因而最需要开展新的实验。</p>
+<h3>把账单问题提升一个层次，或者说，如何构建模型</h3>
+<p>要约束模型，首先得有一个模型。Hodgkin-Huxley 模型的方程并不是从第一性原理推导出来的。相反，对基础变量取四次方，是科学家结合生物学洞见、通过经验探索得到的。他们也发现，更简单的版本效果没有那么好。</p>
+<p>在科学史的大部分时期，模型都是这样建立的。科学家根据自己的专业知识和假设，写出一个候选模型。然后测试、修改，再次尝试。问题在于，可能的模型空间实际上是无限的。科学家如果仅凭经验提出少数几个模型，很可能会漏掉其他同样能够解释观测数据的模型。</p>
+<p>如今，AI 系统可以协助完成这一步，甚至接手整项工作。给定一些数据，以及对某个系统的自然语言描述，基于 LLM 的智能体就会为一个或一组候选模型编写代码。随后，它运行模型、约束参数、比较输出与现实数据，再进行修订。例如，修改某个方程的形式。这个循环不断重复，直到模型能够足够准确地重现数据。过去两年中，已经出现了多个这样的系统。<sup><a href="#fn1" id="ref1">1</a></sup>它们的细节各不相同，但都用 LLM 来设计模型本身。直到不久前，这还被认为是只有人类才能完成的事情。</p>
+<p>但模型能够重现数据，并不意味着它能带来洞见。正如餐厅账单或 Hodgkin-Huxley 参数的例子所示，在同一个模型内部，许多不同的参数组合都能产生相同输出。把问题提升一个层次，模型本身也是如此。许多采用不同方程形式的模型，都能同样好地解释相同数据。让智能体对同一组数据运行两次，它可能会返回两个不同但同样优秀的模型。如果智能体只返回其中一个，就会把其余模型隐藏起来。这与只提供一组最佳拟合数值没有区别。</p>
+<p>因此，更好的做法是像处理模型约束一样处理模型构建：要求得到所有能够合理解释数据的模型范围。<sup><a href="#fn2" id="ref2">2</a></sup>AI 系统提出许多候选模型。随后，根据数据对每个模型的支持程度赋予权重。那些必须依赖很高的灵活性才能拟合数据的模型，得到的认可应少于那些自然就能拟合的模型。较弱的候选模型被淘汰，AI 系统则围绕较强的模型提出新的变体。</p>
+<p>这样，AI 智能体就能提供合理模型的分布，而不是一个最佳拟合模型。这个分布能告诉我们单个模型无法说明的事情。如果所有保留下来的模型都具有某个特征，那么数据很可能支持这个特征。如果这些模型彼此存在分歧，就表明相关证据仍然薄弱，也为研究者指出了下一次实验的方向。</p>
+<figure class="source-figure" data-source-image="0"><img alt="Map of possible models, showing a search that branches out from a starting point and collects models in four clusters, beside simulated voltage traces for each cluster with their relative shares: 41%, 39%, 11%, and 9%." decoding="async" height="845" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/95722cd11571a417e198588facbe403a0ca1ee5f-1919x845.jpg" width="1919"/>
+<figcaption>通过搜索所有模型构成的空间来构建模型。左图：每个点代表 Hodgkin-Huxley 模型的一种可能变体。背景越深，表示模型的可能性越高。我们同时保留可能性高和可能性低的模型，因为所有模型都可能带来洞见。右图：AI 系统构建的各个模型簇中的模型模拟结果，以及每个模型簇占全部模型的比例。</figcaption>
+</figure>
+<p>我们不应过早乐观。到目前为止，这些系统主要接受的测试，还是重新发现科学家已经知道的模型。能够证明它们适用于没有已知答案的问题的证据，仍然很少。不过，较新的 LLM 在研究任务上的表现优于较旧的模型。我们预计，这些系统会继续进步。</p>
+<h3>转译中丢失的意义，或者说，如何解释模型</h3>
+<p>模型构建并得到约束后，仍然需要解释。它对所研究的真实系统说明了什么？Hodgkin 和 Huxley 提出四粒子假说，是因为如果必须有四件独立的事情全部发生，门控结构才能打开，那么方程中就理应出现四次方。因此，他们推测，细胞膜内部可能正在发生这样的过程。如前文所述，事实证明他们大体上是对的。</p>
+<p>这种解释之所以有分量，只是因为他们排除了其他可能。如果一个更简单的模型也能达到同样好的效果，就没有理由认为门控结构具有多个可移动部分。正是替代方案的失败，使他们能够提出这一判断。不过，确切数量仍然存在一些不确定性。Hodgkin 和 Huxley 指出，需要三次方或四次方，并最终选择了四次方。他们还写道，更高的幂次甚至可能略微改善拟合效果。但他们认为，这种潜在的“改进不足以抵偿增加的复杂性”。</p>
+<p>这些方程还让 Hodgkin 和 Huxley 推导出其他一些结论。例如，方程解释了为什么神经细胞存在一个电压阈值：低于阈值时不放电，高于阈值时则会放电。它们也解释了为什么神经脉冲具有相同的形状。方程还预测，如果电流上升得足够缓慢，就永远不会让细胞放电。科学哲学家把一种理论称为“可理解的”（intelligible），条件是人们无须实际运行它，就能推导出它的结果。对 Hodgkin-Huxley 这样只有少量变量的模型，这个标准行得通。对可能拥有数千个变量的大模型，类似的标准或许是：我们能否将其归纳为几个关键的机制性思路，并凭这些思路重建模型？模型越大，这件事就越难。</p>
+<p>在三个步骤中，解释最难交给 AI。它的目标更难界定。我们可以衡量模型与数据的拟合程度，却无法同样衡量它是否加深了对系统的理解。我们也不清楚，应该如何让 AI 系统以“理解”为目标。一种提议是，观察 AI 在系统受到扰动时，能多准确地预测系统的行为，以此判断它的理解程度。另一种提议是绕开这个问题，转而考察智能体的输出是否帮助人类科学家更好地理解问题。一个例子是用于设计量子实验的 AI 系统。研究者训练它编写一个简短程序，而不是给出单一的实验配置。这个程序可以生成一整类相关实验的配置。这样，物理学家就能直接从程序中读出背后的设计原理，无须从某一个实验配置中反向推求。</p>
+<p>在这两种方法中，获得合适模型的完整分布，而不是单个拟合最好的模型，对解释都至关重要。单个模型无法告诉我们，它的哪些部分真正受到了数据约束。因此，人们很容易对那些并未受到约束的部分赋予意义。正如我们在 Hodgkin-Huxley 模型中看到的，只有知道较低幂次效果不够好，四粒子假说才有道理。一组模型也能让预测更加稳健。假设你询问这些模型：系统受到扰动后会发生什么？例如，阻断细胞膜上的全部钠门控结构，或者只阻断其中一部分。如果所有符合数据的模型都给出相同答案，就可以对这个答案抱有较高信心。全部门控结构都被阻断时，通常就会出现这种情况。如果模型意见不一，就可能为下一次实验提供思路。只阻断部分门控结构时，就可能出现这样的分歧。</p>
+<h3>细胞与尺度</h3>
+<p>包括 Hodgkin-Huxley 在内，大多数著名模型都很精简。它们只有少量变量和方程，规模小到人类科学家能够写下来，并据此推理。这不是巧合。它们必须精简，因为人们需要亲自构建、约束和解释它们。规模小，也让它们更容易理解。但随着 AI 接手更多工作，这种规模限制将开始放宽。我们可以着手建模那些复杂到无法手工写下的系统。即使到那时，我们已无法仅靠阅读方程来理解它们。</p>
+<p>大脑显然是一个应用场景。Hodgkin-Huxley 方程描述的是单个神经细胞。但果蝇脑有超过 10 万个神经细胞，人脑则有数百亿个。正是这些神经元之间的相互作用，产生了行为和思想。对于果蝇，我们如今拥有了前几代科学家不可能获得的东西：完整的大脑连接图。它展示了每个神经元，以及它与其他神经元之间的连接。<sup><a href="#fn3" id="ref3">3</a></sup>研究者已开始在这张图的基础上构建大规模模型。其中一个模型能够预测果蝇整个视觉系统中的神经元活动。这让一些过去无从合理提出的问题成为可能：整个大脑如何通过自身的连接结构产生行为？仅凭连接结构，能预测动物行为的多大一部分？究竟哪些连接真正重要？</p>
+<figure class="source-figure" data-source-image="1"><img alt="Four panels showing the fruit fly brain with 1 neuron, 10 neurons, 255 neurons, and all 124,635 cells. One neuron is highlighted in orange in the first and third panels." decoding="async" height="715" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/c736d611257af2ce00925a2d5767b71dcc70504d-1920x715.png" width="1920"/>
+<figcaption>从一个神经元扩展到整个大脑。依据连接图绘制的果蝇脑，分别展示了 1 个、10 个和 255 个神经元，以及 124,635 个细胞。图像根据雄性果蝇中枢神经系统连接组渲染，来源为 HHMI Janelia、University of Cambridge、MRC LMB 和 Google Research，采用 CC BY 4.0 许可。</figcaption>
+</figure>
+<p>但在这种尺度上，不可能找到一个唯一正确的模型。事实上，大多数情况下，根本不存在这样的模型。正如统计学家 George Box 所写：“所有模型都是错的，但有些有用。”数据始终会与许多模型相容。问题将不再是哪一个模型正确，而是所有与数据相容的模型有哪些共同性质，以及能从这些性质中推导出哪些预测。最有用的实验，将是那些能够排除最多剩余模型的实验。即使这些实验未必总是人类科学家认为最有趣的。</p>
+<p>这种做法并非神经科学独有。气候科学家已经这样工作：他们构建许多规模庞大的数值模拟，每个模拟的假设略有不同。报告预测时，他们呈现的是所有模拟结果所覆盖的范围。Large Hadron Collider 的粒子物理学家也遵循类似思路。他们寻找新粒子时，不只是宣布某个理论成立或不成立，而是绘制一张图，展示该理论的哪些版本已被数据排除，哪些仍有可能。</p>
+<p>我们不希望回到 Hodgkin 和 Huxley 那种艰苦的工作方式：亲自构建模型，逐条凭肉眼拟合曲线，尝试那些无法拟合的幂次。Huxley 还得花三个星期手摇机械计算器。但这些工作并没有白费。模型带来的许多洞见，来自创建模型的过程。Hodgkin 和 Huxley 之所以理解模型在告诉他们什么，是因为模型由他们亲手构建，而且他们知道哪些尝试失败了。这种理解使他们能够对门控变量提出解释。这也是最终为他们赢得诺贝尔奖的发现的一部分。</p>
+<p>如今，AI 系统很可能用一个下午，就能完成其中很大一部分工作。但要带来理解，它就必须交付两位科学家通过缓慢工作所获得的东西：不只是一个能够拟合的模型，还要说明哪些部分已由数据确定，哪些仍无定论，沿途哪些替代方案失败了，以及过程中出现了哪些新难题。科学模型也许能够提供答案，但构建模型的过程，才会带来洞见。</p>
+<h3>脚注</h3>
+<ol class="footnotes">
+<li id="fn1">例如，参见 Romera-Paredes 等，2024；Shojaee 等，2025；Ma 等，2024；Novikov 等，2025；Xia 等，2026；以及 Ziaei Bideh 和 Gryak，2026。</li>
+<li id="fn2">参见 Wahl 等，2026；Mishra-Sharma，2026；以及 Murphy，2026。</li>
+<li id="fn3">参见 Dorkenwald 等，2024；Schlegel 等，2024；以及 Azevedo 等，2024。</li>
+</ol>
+<h3>作者与致谢</h3>
+<h4>撰稿人</h4>
+<p>Jakob Macke、Daniel Gedon 和 Stefan Wahl</p>
+<h4>致谢</h4>
+<p>感谢 Xander Balwit、Tom Chivers 和 Siddharth Mishra-Sharma 提供审阅和编辑指导。</p>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
