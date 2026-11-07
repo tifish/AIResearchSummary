@@ -174,7 +174,7 @@ def main() -> int:
             new += 1 if is_new else 0
             print(f"  [{'NEW' if is_new else '   '}] {art.get('date', '')} | {art.get('source', '')} | {art.get('title', '')}")
         print(f"Total discovered {len(articles)}, {new} new.")
-        return 0
+        return 1 if source_errors else 0
 
     if args.url:
         try:
@@ -245,7 +245,7 @@ def main() -> int:
             print(f"  would regenerate missing digest: {art.get('date', '')} | {art.get('source', '')} | {art.get('title', '')}")
         for art in new_articles:
             print(f"  would process: {art.get('date', '')} | {art.get('source', '')} | {art.get('title', '')}")
-        return 0
+        return 1 if source_errors else 0
 
     done = 0
     if missing_digests:
@@ -257,6 +257,10 @@ def main() -> int:
     expected = len(missing_digests) + len(new_articles)
     if done != expected:
         print(f"Refresh incomplete: {done}/{expected} article(s) generated.", file=sys.stderr)
+        return 1
+
+    if source_errors:
+        print(f"Refresh incomplete: discovery failed for {len(source_errors)} source(s).", file=sys.stderr)
         return 1
 
     if expected == 0:

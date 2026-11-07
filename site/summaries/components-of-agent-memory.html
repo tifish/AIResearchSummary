@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>智能体记忆的组成部分</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg:#f7f5f0; --card:#ffffff; --ink:#232c37; --muted:#647080; --line:#d9dfe4;
+  --data:#1464b4; --risk:#b74739; --opportunity:#167b63; --conclusion:#7850ad;
+  --hl:#e1eefc; --hl2:#eee5fa; --soft-green:#e5f2ec; --soft-red:#faeae4;
+  --hero:#202b3a; --hero-ink:#f0f3f7; --hero-muted:#c2cedd;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg:#f7f5f0; --card:#ffffff; --ink:#232c37; --muted:#647080; --line:#d9dfe4;
+  --data:#1464b4; --risk:#b74739; --opportunity:#167b63; --conclusion:#7850ad;
+  --hl:#e1eefc; --hl2:#eee5fa; --soft-green:#e5f2ec; --soft-red:#faeae4;
+  --hero:#202b3a; --hero-ink:#f0f3f7; --hero-muted:#c2cedd;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg:#151a21; --card:#1e2630; --ink:#dbe2eb; --muted:#a6b2c2; --line:#394554;
+    --data:#79b8fa; --risk:#fa9687; --opportunity:#6ad5b0; --conclusion:#c1a0f2;
+    --hl:#223951; --hl2:#382d4b; --soft-green:#203c34; --soft-red:#412c2a;
+    --hero:#111823; --hero-ink:#e4eaf2; --hero-muted:#acbed3;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg:#151a21; --card:#1e2630; --ink:#dbe2eb; --muted:#a6b2c2; --line:#394554;
+  --data:#79b8fa; --risk:#fa9687; --opportunity:#6ad5b0; --conclusion:#c1a0f2;
+  --hl:#223951; --hl2:#382d4b; --soft-green:#203c34; --soft-red:#412c2a;
+  --hero:#111823; --hero-ink:#e4eaf2; --hero-muted:#acbed3;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif; line-height:1.85; }
+main { max-width:1120px; margin:auto; padding:32px 24px 80px; }
+h1,h2,h3 { line-height:1.35; }
+h1 { font-size:clamp(2rem,5vw,3.5rem); margin:12px 0; }
+h2 { font-size:1.85rem; margin:0 0 24px; }
+h3 { font-size:1.25rem; margin:0 0 14px; }
+p { margin:0 0 1.1em; }
+a { color:var(--data); text-underline-offset:3px; }
+.hero { background:var(--hero); color:var(--hero-ink); padding:42px; border-radius:18px; }
+.eyebrow { letter-spacing:.12em; font-size:.8rem; color:var(--hero-muted); }
+.original { font-size:1.2rem; color:var(--hero-muted); margin-bottom:30px; }
+.lead { font-size:1.15rem; max-width:850px; }
+.lead strong { color:var(--hero-ink); }
+.meta { color:var(--muted); font-size:.88rem; }
+.summary { margin:32px 0 64px; }
+.band { display:grid; grid-template-columns:repeat(3,1fr); background:var(--card); border-block:1px solid var(--line); margin:26px 0 36px; }
+.metric { padding:24px; }
+.metric + .metric { border-left:1px solid var(--line); }
+.metric b { display:block; color:var(--data); font-size:2.3rem; line-height:1.25; margin-bottom:12px; }
+.metric span { font-size:.94rem; }
+.block { margin:36px 0; }
+mark { background:var(--hl); color:var(--ink); padding:1px 4px; border-radius:3px; }
+.conclusion { background:var(--hl2); color:var(--conclusion); padding:18px 22px; border-left:4px solid var(--conclusion); }
+.table-wrap { overflow-x:auto; }
+table { border-collapse:collapse; width:100%; background:var(--card); font-size:.94rem; }
+th,td { text-align:left; padding:13px 16px; border-bottom:1px solid var(--line); vertical-align:top; }
+th { background:var(--hl); color:var(--data); }
+.note { font-size:.86rem; color:var(--muted); margin-top:12px; }
+.split { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin:36px 0; }
+.opportunity { background:var(--soft-green); border-top:4px solid var(--opportunity); padding:26px; }
+.opportunity h3 { color:var(--opportunity); }
+.risk { background:var(--soft-red); border-top:4px solid var(--risk); padding:26px; }
+.risk h3 { color:var(--risk); }
+.flow { padding:28px; border:1px solid var(--line); background:var(--card); }
+.flow ol { display:grid; grid-template-columns:repeat(4,1fr); gap:24px; padding-left:22px; }
+.flow li::marker { color:var(--conclusion); font-weight:bold; }
+.takeaways { border-top:3px solid var(--conclusion); padding-top:26px; }
+.takeaways ul { display:grid; grid-template-columns:1fr 1fr; gap:16px 32px; padding-left:22px; }
+.takeaways li { padding:8px; }
+#translation { max-width:820px; margin:auto; padding-top:40px; border-top:1px solid var(--line); }
+#translation h2 { font-size:2.2rem; }
+#translation h3 { margin-top:42px; font-size:1.55rem; }
+#translation h4 { margin-top:28px; font-size:1.18rem; }
+#translation p { margin-bottom:1.3em; }
+.translation-meta { padding:18px 22px; background:var(--card); border-left:3px solid var(--line); margin-bottom:28px; }
+.translation-meta dl { display:grid; grid-template-columns:80px 1fr; gap:4px 16px; margin:0; font-size:.9rem; }
+dt { color:var(--muted); } dd { margin:0; }
+.source-figure, figure[data-source-image] { margin:32px 0 38px; }
+.source-figure img, figure[data-source-image] img { display:block; width:100%; height:auto; object-fit:contain; }
+figcaption { font-size:.88rem; color:var(--muted); line-height:1.65; padding:12px 0; border-bottom:1px solid var(--line); }
+code { font-size:.92em; overflow-wrap:anywhere; color:var(--conclusion); }
+@media (max-width:700px) {
+  main { padding:16px 16px 50px; }
+  .hero { padding:26px 22px; }
+  .band,.split,.flow ol,.takeaways ul { grid-template-columns:1fr; }
+  .metric + .metric { border-left:0; border-top:1px solid var(--line); }
+  .metric b { font-size:2rem; }
+  th,td { padding:10px; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/components-of-agent-memory" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header class="hero">
+<div class="eyebrow">ANTHROPIC · 智能体记忆</div>
+<h1>智能体记忆的组成部分</h1>
+<p class="original">The components of agent memory</p>
+<p class="lead"><strong>一句话总括：</strong>文章通过数据库问答、Pokémon 和文档任务的评估，说明智能体如何把经历变成可验证、可检索、可维护的记忆，并展示离线整理机制 dreaming 在其中的作用。</p>
+</header>
+<section aria-label="中文总结" class="summary">
+<div class="band">
+<div class="metric"><b>13% → 48%</b><span>Stainless 文档评估中，仅使用 wiki 的评分标准达成率随 dreaming 会话从 2 次增至 128 次而上升。</span></div>
+<div class="metric"><b>53% → 61%</b><span>同一评估中，仅搜索的得分为 53%；搜索配合充分构建的 wiki 达到 61%。</span></div>
+<div class="metric"><b>41/57 → 57/57</b><span>合同任务调整 wiki 构建指令后，保留下来的受评事实从 41 项增加到全部 57 项。</span></div>
+</div>
+<div class="block">
+<h2>记忆的收益，取决于能否形成验证闭环</h2>
+<p>在 CL-Bench 1.0 数据库任务中，Claude 每答完一题都会收到正确答案。下一题从新会话开始，但可以读取此前保存的记忆。较强模型不仅记录错误，还会验证原因，把结果写成有依据的规则。</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>模型</th><th>无状态基线：平均奖励</th><th>使用记忆：平均奖励</th></tr></thead>
+<tbody>
+<tr><td>Claude Sonnet 4.6</td><td>0.330</td><td>0.364</td></tr>
+<tr><td>Claude Sonnet 5</td><td>0.306</td><td>0.610</td></tr>
+<tr><td>Claude Opus 4.7</td><td>0.383</td><td>0.700</td></tr>
+<tr><td>Claude Opus 5</td><td>0.564</td><td>0.828</td></tr>
+<tr><td>Claude Sonnet 5.5</td><td>0.644</td><td>0.833</td></tr>
+<tr><td>Claude Opus 5.5</td><td>0.655</td><td>0.838</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note">范围：原文图 3 的 CL-Bench 数据库任务。数值为平均奖励，不代表整个 benchmark 的总体成绩。</p>
+<p>提示 Sonnet 4.6 先读记忆、再检验猜想后，其得分达到 <mark>0.641</mark>。但要求较强模型“只记录失败”，反而削弱了记忆收益。</p>
+<p class="conclusion">记忆工具本身不会自动带来学习。模型还需要判断什么值得保存，并验证保存下来的规则。</p>
+</div>
+<div class="split">
+<div class="opportunity">
+<h3>更少的记忆，也能支持更远的进展</h3>
+<p>在约 10,000 步的 Pokémon Red 运行中，Sonnet 3.7 写了 <strong>413 个文件、225 个文件夹</strong>，获得 1 枚徽章。Fable 5 在 2 个文件夹中写了 9 个文件，另加一个顶层 <code>global.md</code>，获得 4 枚徽章。</p>
+<p>Fable 5 更侧重策略、计划和已经检验的规则。屏幕上随时可见的状态不必重复存储。<strong>记忆的价值在于保留无法直接重新观察到的信息。</strong></p>
+</div>
+<div class="risk">
+<h3>错误笔记会把后续行动带偏</h3>
+<p>Claude 曾把 PokéCenter 的方位记反，因而反复走错路。保留错误笔记的运行跌回原路线 <strong>3 次</strong>，最终没有到达 Cerulean City。</p>
+<p>dreaming 对照会话记录纠正笔记后，Claude 返回洞穴并到达目标城市。<strong>跨会话保留信息，也意味着跨会话传播错误的风险。</strong></p>
+</div>
+</div>
+<div class="block flow">
+<h2>dreaming 把记忆维护分成多个层次</h2>
+<ol>
+<li><strong>回查记录</strong><br/>对照原始会话记录，检验并纠正笔记。</li>
+<li><strong>建立表示</strong><br/>构建互相链接的 wiki 页面，帮助定位知识。</li>
+<li><strong>维护顶层索引</strong><br/>将少量重要信息放入每次会话自动加载的上下文。</li>
+<li><strong>跨会话补漏</strong><br/>修复错误链接，增加缺失页面，发现共同模式。</li>
+</ol>
+<p>Claude Code 的 auto memory 只加载 <code>MEMORY.md</code> 的前 <mark>200 行或 25 KB</mark>。顶层记忆因此需要保持精简，并通过链接指向详细内容。</p>
+<p>这套分层方式让信息更容易被找到，但维护本身仍要消耗计算资源。</p>
+</div>
+<div class="block">
+<h2>wiki 更适合综合信息，不一定适合简单检索</h2>
+<p>Stainless 评估使用约 <mark>35 万份文件、4.2 亿 token</mark>，并设置了 25 道问题。dreaming 逐步丰富 wiki 后，搜索与 wiki 结合的效果最好，每题还节省了约 <mark>20,000 token</mark>。</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>任务与范围</th><th>比较条件</th><th>原文结果</th><th>含义</th></tr></thead>
+<tbody>
+<tr><td>Stainless，25 道问题</td><td>仅使用 wiki；2 → 128 次 dreaming 会话</td><td>13% → 48%</td><td>离线整理可以积累有用的知识结构。</td></tr>
+<tr><td>同一语料与问题集</td><td>wiki 加搜索；wiki 逐渐扩展</td><td>54% → 61%；仅搜索为 53%</td><td>知识结构与源文件搜索能够互补。</td></tr>
+<tr><td>并购测试，共 24 道问题中的跨文档综合等题目</td><td>查阅 wiki / 仅搜索</td><td>87% / 73%</td><td>需要整合、判断或计算时，wiki 更有帮助。</td></tr>
+<tr><td>一项 Harvey LAB 任务</td><td>wiki / 搜索</td><td>wiki 没有显示明确收益</td><td>单份文档即可检索的信息，不一定需要额外表示。</td></tr>
+<tr><td>另一项 LAB 任务</td><td>原始文档 / 构建的 wiki</td><td>115 KB / 203 KB</td><td>wiki 可能比原文更大，却没有形成有效抽象。</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note">百分比为各自评估中的得分或评分标准达成率。不同任务的结果不宜直接横向比较。</p>
+<p class="conclusion">是否值得构建 wiki，取决于任务需要多少信息整合，而不只是文档数量有多大。</p>
+</div>
+<div class="split">
+<div class="risk">
+<h3>记忆质量也受协作方式影响</h3>
+<p>合同任务最初让多个智能体同时写入共享表格。它们覆盖了彼此的内容，最终只保留 <strong>41/57 项事实，即 72%</strong>。</p>
+<p>问题不只是记忆容量不足。<strong>写入冲突和过度概括，也会丢失关键事实。</strong></p>
+</div>
+<div class="opportunity">
+<h3>围绕目标调整结构，能修复具体失败</h3>
+<p>改进后的指令要求每份合同由一个智能体负责，单独建页，并逐字引用条款。全部 <strong>57/57 项事实</strong>得以保留，生成的简报能够满足 <strong>100%</strong> 的评分标准。</p>
+<p>另一次 dreaming 还修复了 9 条指向缺失页面的链接，并新增 3 个页面。<strong>维护应针对任务中真正重要的信息和已发现的缺口。</strong></p>
+</div>
+</div>
+<div class="takeaways">
+<h2>最值得带走的洞见</h2>
+<ul>
+<li><strong>记忆是一种对未来需求的预测。</strong>保存经过验证的规则，比无差别记录经历更有价值。</li>
+<li><strong>会话内记录与离线整理各有代价。</strong>前者及时但分散任务注意力，后者需要计算资源，产出也未必能立即使用。</li>
+<li><strong>检索与 wiki 可以互补。</strong>需要跨文档综合时，结构化知识更有用；简单文本查找未必受益。</li>
+<li><strong>记忆系统需要纠错机制。</strong>原始记录可用于核验，顶层索引应保持精简，过时信息和错误表示需要持续维护。</li>
+</ul>
+</div>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<div class="translation-meta">
+<dl>
+<dt>发布信息</dt><dd>Published</dd>
+<dt>团队</dt><dd>工程</dd>
+<dt>主题</dt><dd>智能体<br/>上下文工程<br/>智能体记忆</dd>
+<dt>类别</dt><dd>工程</dd>
+<dt>日期</dt><dd>2026 年 3 月 24 日</dd>
+</dl>
+</div>
+<p>Søren Kierkegaard 写道，人生只能回头看才能理解，却必须向前走。我们在为 AI 智能体设计记忆时，也遇到了类似的两难。</p>
+<p>人类在日常生活中会不断编码记忆。海马体在其中发挥着核心作用。它即时捕捉经历，让记忆快速形成，并能立即被调用。不过，只有部分经历会被巩固为长期知识。</p>
+<p>许多这样的巩固过程，似乎发生在大脑“离线”时。在睡眠和安静休息期间，海马体会重放近期经历。研究者认为，这个过程会逐渐提炼这些经历，并将它们整合进新皮层。我们通常所说的知识，大多就储存在大脑的这一部分。</p>
+<p>智能体记忆也可以采用类似的分工。智能体的大量工作会保存在日志或会话记录中。Letta 和 UC Berkeley 的研究者提出了 sleep-time compute，让模型利用交互之间的空闲时间，重新组织已有上下文。同样的思路也可以帮助智能体整理记忆。它们可以回顾日志，纠正错误，或生成新的笔记和表示。这一过程通常称为 dreaming（图 1）。</p>
+<figure class="source-figure" data-source-image="0"><img alt="Diagram of a memory hierarchy between one session and the next. From bottom to top: transcripts (a searchable event log), memory notes written by Claude, memory representations such as wikis, and injected context loaded into every session. Inside a box labeled “Dreaming,” arrows run from transcripts up to each layer, and in both directions between neighboring upper layers." decoding="async" height="1754" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/a0bcfa203214d817d2b4261b7188aba8be6db5b2-3840x1754.png" width="3840"/>
+<figcaption>Claude 可以通过 dreaming 整理记忆。这可以纠正错误、创建笔记、构建新的记忆表示，也可以调整哪些内容会预先加载到后续会话中。</figcaption>
+</figure>
+<p>我们发现，dreaming 是帮助 Claude 获得有效记忆的一种实用工具。本文将介绍我们对智能体记忆的理解，并逐一说明用于探索智能体记忆的几项评估。这些评估包括 dreaming 的使用，以及各个组成部分对记忆组织的贡献。</p>
+<h3>记忆笔记</h3>
+<p>我们所说的“智能体记忆”，是指 Claude 从经历中获得的知识。这些经历包括与用户的交互，以及被分配的任务。知识以可供日后读取的上下文形式保存，并在会话之间保留下来。这个定义不包括模型学习或管理上下文的其他方式，例如权重变化，即训练期间设定的内部参数发生改变；上下文学习，即在单次对话中获得知识；以及上下文压缩，即 Claude 编写摘要来替代较早的对话轮次，从而在新的上下文窗口中继续工作。</p>
+<p>在人脑中，经历发生之前、期间或之后释放的化学信号，可以将某段记忆标记为重要。在离线阶段，被标记的记忆通常比未被标记的记忆重放得更频繁。这个称为重放（replay）的过程，有助于稳定这些记忆，并将它们整合进长期记忆。</p>
+<p>类似地，Claude 可以在重要事件发生时，就在会话日志中为其添加标记，以便日后查找。它也可以将这些事件写入记忆存储，例如一个保存记忆笔记的文件夹（图 2）。但在还不知道接下来会发生什么时，Claude 怎么判断当下哪些信息值得记住？</p>
+<figure class="source-figure" data-source-image="1"><img alt="The same memory hierarchy, with the memory notes layer highlighted. An arrow runs from the session directly to the memory notes, described as salient observations written by Claude." decoding="async" height="1754" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/2ef2bf5c81ea6d578749782782eff10cf3136de4-3840x1754.png" width="3840"/>
+<figcaption>Claude 可以将笔记写入记忆。</figcaption>
+</figure>
+<h3>记忆可以是对未来需求的预测</h3>
+<p>有时，记忆是一种预测。智能体写下一条规则，就是在预测这条规则描述的模式将来还会有用。例如，记下一项经过核实的事实，就是在预测未来某次会话中的智能体会希望直接依赖这项事实，而不必再次检查。随着时间推移，Claude 在做出这类预测方面已经进步了很多。</p>
+<p>以 Continual Learning Bench（CL-Bench）1.0 中的一项任务为例。这个 benchmark 衡量智能体利用记忆处理长程任务的能力。其中一项任务要求 Claude 查询数据库，回答一系列问题。Claude 每给出一个答案，都会被告知正确解答，并可以写下记忆，帮助回答后续问题。</p>
+<p>在这里，记忆可以支撑一个学习闭环。如果 Claude 答错了问题，它可以记录失败，提出关于错误原因的猜想，检验这些猜想，再把发现转化为指导后续回答的规则。</p>
+<p>我们使用 Claude Managed Agents 运行了这项 CL-Bench 1.0 任务。Claude 回答每道题时都从一个新会话开始。唯一保留下来的资源，是一个在会话之间持续存在的记忆目录，Claude 可以从中检索文件。</p>
+<p>不同模型在建立自身学习闭环方面，取得的成效不同。Claude Sonnet 4.6 能做到的是提出关于答案为何出错的猜想。它的记忆目录里散落着一些文件，每个文件都列出了若干未经检验的猜测。</p>
+<p>Claude Opus 4.7 将笔记整合成了一份参考文档，并开始标明哪些事实已经核实，哪些仍未确认。Claude Sonnet 5 会在评分器检查答案后，将每个答案标为已确认。如果答错了，它还会写下更正。</p>
+<p>Claude Opus 5 是这些模型中第一个完成闭环的模型。它的大多数条目都包含一条规则，以及它如何知道这条规则成立。此外，条目还包括先前问题的答案，以及对过程中发现的陷阱的明确提醒（图 3）。</p>
+<figure class="source-figure" data-source-image="2"><img alt="Left: bar chart of mean reward on the CL-Bench database task, stateless baseline versus memory store. Opus 5.5: 0.655, 0.838. Sonnet 5.5: 0.644, 0.833. Opus 5: 0.564, 0.828. Opus 4.7: 0.383, 0.700. Sonnet 5: 0.306, 0.610. Sonnet 4.6: 0.330, 0.364. Right: line chart of running-mean reward over 30 questions for the same models, with and without memory." decoding="async" height="2160" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/bb0d44c78cc431fb5e84fbf2cb17c4303bc6bd65-3840x2160.png" width="3840"/>
+<figcaption>CL-Bench 数据库任务：比较各模型使用记忆时的表现与无状态基线。</figcaption>
+</figure>
+<p>与 Opus 5 一样，Claude Opus 5.5 和 Claude Sonnet 5.5 都完成了这个闭环。它们通过记忆保存经过验证的规则，以便更好地回答后续问题。使用记忆后，两者的得分都与 Opus 5 大致相同。不过，它们在不使用记忆时的基线表现略高。</p>
+<h3>Claude 已经学会判断什么值得记住</h3>
+<p>我们还通过让 Claude 玩 Pokémon Red，评估它判断哪些内容应保存到记忆中的能力。这个游戏要求 Claude 处理复杂的长程任务。每次运行开始时，我们都会给模型一个记忆文件夹。模型可以在游戏过程中读取和写入其中的文件（图 4）。</p>
+<p>我们分别选取 Claude Sonnet 3.7 和 Claude Fable 5 的一次运行，对比它们在游戏进行约 10,000 步时的记忆文件夹。一个明显差异是，它们对什么值得记住的判断不同。Sonnet 3.7 假定所有内容都可能重要，因此不加区分地写入记忆。它的记忆文件夹像一份遭遇档案，常常为每场战斗、每件找到的物品、每个遇到的非玩家角色单独建一个文件。最终，Sonnet 3.7 在 225 个文件夹中写了 413 个记忆文件，并获得了一枚徽章。徽章代表玩家在游戏中的进度。</p>
+<p>相比之下，Fable 5 在两个文件夹中写了九个文件，另加一个名为 <code>global.md</code> 的顶层文件，并获得了四枚徽章。</p>
+<p>Sonnet 3.7 的做法之所以有问题，主要是因为 Pokémon 的游戏状态不断变化。它保存的详细记录也因此不断过时。随着游戏推进，Claude 必须花越来越多的时间和资源梳理记忆，而不是继续玩游戏。例如，在大约第 10,000 步时，Sonnet 3.7 开始建立第四个“主”记忆文件夹。接下来的 17 步里，它创建了六个文件，删除了另外九个，却没有在游戏中采取任何行动。</p>
+<p>Fable 5 则用记忆保存游戏没有明确告诉它的内容。Sonnet 3.7 写入记忆的一些信息，例如玩家有多少钱、位于地图上的什么位置，每一轮都能直接从屏幕读取。保存这些信息是重复劳动。相比之下，策略、计划和经过检验的规则，只有 Claude 自己推导后才会存在。如果 Claude 不把它们记下来，它们就会消失。</p>
+<p>Fable 5 据此组织了自己的记忆。它的 <code>global.md</code> 文件相当于一个仪表盘，包含当前目标、预先写好的道馆挑战计划，以及模型自己制定的记忆使用规则。道馆是赢得徽章的挑战场所。<code>locations</code> 文件夹保存特定路线的导航计划。<code>gameplay</code> 文件夹保存根据游戏机制知识总结出的策略。例如，在连续七个 Poké Ball 都未能捕获 Magikarp 之后，Claude 写道：“如果连续 3 个以上球都失败，就改变时机，在菜单步骤之间额外按几次‘等待’；这么做之后，紧接着就捕获成功了。”Magikarp 是最容易捕获的 Pokémon 之一。</p>
+<p>Fable 5 的记忆文件夹小得多，但游戏进度比 Sonnet 3.7 远得多。Opus 5.5 采取了类似做法：它保留一个小型记忆笔记文件夹，记录当前目标和下一步行动，并在游戏过程中不断重写这些笔记。最终，它通关了游戏。</p>
+<figure class="source-figure" data-source-image="3"><img alt="Two treemaps of Pokémon memory directories at the same scale, where area shows characters of memory. Claude Sonnet 3.7’s is large and crowded, with 413 files and 977,930 characters across folders such as locations, main, battles, and several “consolidated” folders. Claude Fable 5’s is small, with 10 files and 43,406 characters in locations, gameplay, and global.md." decoding="async" height="2545" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/5e15e10f665773050d90fafc38ab8dd76ae5368b-3840x2545.png" width="3840"/>
+<figcaption>Claude 玩 Pokémon 时，Sonnet 3.7 与 Fable 5 的记忆目录对比。</figcaption>
+</figure>
+<h3>引导 Claude 写入记忆</h3>
+<p>我们发现，告诉 Claude 记忆的用途会有帮助，但不必告诉它具体该怎么用。在 CL-Bench 上，我们只是告诉 Claude 有一个记忆文件夹可用。这样的一般性指引，就足以让 Opus 4.7 和 Opus 5 有效使用记忆，并让两者的表现明显提升（图 3）。</p>
+<p>我们还测试了给模型明确规则，规定应该向记忆中写入什么内容。每次测试只设置一条规则。我们比较了设置规则和不设置规则时，各模型从记忆中获得的收益。当规则是“只记录失败”时，Opus 5 和 Opus 4.7 都失去了记忆带来的大部分性能提升（图 5，右）。对于能力更强的模型，让它们自行判断什么值得记住，比提前设定固定规则更有效。这些规则甚至可能削弱表现。</p>
+<p>我们还注意到，引导对较早的模型帮助最大。例如，Sonnet 4.6 经常不读取记忆目录中的文件，也不会检验自己对错误原因的猜想。</p>
+<p>在这种情况下，提示 Claude 在回答前读取记忆文件，再明确检验自己的猜想，几乎让它的 benchmark 得分翻了一倍（图 5，左）。Sonnet 5 则会自行这样做。在没有相应提示的情况下，它每回答 10 次，就有 9 次会先读取记忆。相比之下，Sonnet 4.6 这样做的比例不到一半。</p>
+<p>对于最先进的 Claude 模型，我们通常只给简单指引：当用户要求记住某件事，或某件事显然值得记住时，就创建记忆笔记。具体判断由 Claude 自己完成。</p>
+<figure class="source-figure" data-source-image="4"><img alt="Left: bar chart of Sonnet 4.6’s mean reward on the CL-Bench database task: 0.330 at baseline, 0.364 with memory, and 0.641 with memory and refined instruction. Reference lines mark Opus 4.7 with memory at 0.700 and Opus 5 with memory at 0.828. Right: change in memory gain when told to record only failures: Opus 5, −0.234; Opus 4.7, −0.150; Sonnet 4.6, −0.020." decoding="async" height="2310" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/da03e864e4eba93a91314fa5f2a5d0e4c14b2a0f-3840x2310.png" width="3840"/>
+<figcaption>左：在 CL-Bench 数据库任务中，比较是否通过提示引导 Sonnet 4.6 使用记忆的表现。右：要求模型只记录失败后，各模型从记忆中获得的收益发生了多大变化。</figcaption>
+</figure>
+<h3>dreaming 可以纠正记忆</h3>
+<p>Claude 根据会话中对重要性的判断来写入记忆。因此，一条笔记如果从一开始就是错的，或随着环境变化逐渐偏离事实，Claude 在后续会话中仍可能读取并信任它。</p>
+<p>dreaming 让 Claude 能够对照原始会话记录检查笔记（图 6）。我们曾用 Managed Agents 让 Claude 玩 Pokémon，并挂载了一个目录来保存记忆。在这次运行中，我们观察到了一个正面案例。</p>
+<figure class="source-figure" data-source-image="5"><img alt="The memory hierarchy with dreaming, highlighting an arrow from the transcripts layer up to the memory notes layer, which shows dreaming correcting notes against transcripts." decoding="async" height="1754" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/55ce85bd12860090704a5543a3da7504334ad9a9-3840x1754.png" width="3840"/>
+<figcaption>dreaming 可以纠正记忆中的错误。</figcaption>
+</figure>
+<p>在游戏的某个阶段，玩家必须穿过 Mt. Moon。这是一组洞穴，入口在地图西侧，出口在东侧。入口附近有一个陷阱：一道只能单向跳下的台阶。玩家跳下后，会落回之前来的路线，而且没有明显的办法爬回去。Claude 把山口处的一栋建筑 PokéCenter 当作地标。因此，它会不会走下台阶，取决于它认为 PokéCenter 位于山的哪一侧。</p>
+<p>某个时刻，Claude 错误地记下了 PokéCenter 位于东侧。走出 PokéCenter 时，它宣布：“Mt Moon 已经在我身后了。”随后又更新笔记：“Mt Moon 已完成。”但它其实并没有穿过 Mt. Moon。几次操作之后，Claude 跳下台阶，回到了来时的路线（图 7）。它的导航工具没有显示这次落差。因此，Claude 得出结论：“我向西走过头了。”它还以为自己此前一直在正确的一侧。事实并非如此。</p>
+<figure class="source-figure" data-source-image="6"><img alt="Two Pokémon map panels with the agent next to a ledge. Left, “Raw memory,” where the stored note is wrong: an arrow shows the agent heading for the next city. Right, “Memory + dreaming,” where an offline pass corrected the note: an arrow shows the agent heading back to the cave entrance." decoding="async" height="2101" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/d906d6ed9ac92db36631a624ad517183b07a545d-3840x2101.png" width="3840"/>
+<figcaption>一条经过纠正的记忆笔记改变了 Pokémon 中的结果。笔记未被纠正时，Claude 说：“Mt Moon 已经在我身后了。”它朝下一座城市前进，却回到了来时的路线。dreaming 纠正笔记后，它说：“现在我需要找到 Mt Moon 的洞穴入口，重新进去。”随后返回了洞穴。</figcaption>
+</figure>
+<p>接着，我们测试 dreaming 能否帮助 Claude 避开这个陷阱。我们对那个错误记录了 PokéCenter 位置的记忆文件夹运行了 dreaming。Claude 对照会话记录检查笔记，发现错误，并重写了笔记。会话记录为 Claude 提供了核验记忆的事实依据。有了纠正后的记忆笔记，Claude 直接返回 Mt. Moon，并最终到达 Cerulean City。</p>
+<p>在使用未纠正笔记的运行中，Claude 三次跌回先前那条路线。第三次失败后，Claude 似乎放弃了，写道：“我要停下来，不再继续打转。”我们的实验设置自动回复，要求它继续。于是它继续前进，一路回到了山前的小镇 Pewter City，希望在那里恢复状态、补充物资。这次运行结束时，Claude 始终没有到达 Cerulean City。</p>
+<figure class="source-figure" data-source-image="7"><img alt="Line chart of progress toward Cerulean over 3,000 cumulative actions. The memory plus dreaming run reaches Cerulean at action 1,935. The raw memory run falls off the ledge and backtracks to Pewter. The run with no memory never reaches Cerulean." decoding="async" height="2636" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/2eb2bfe6d01e9a1fca74a41e952d948c09d42008-3840x2636.png" width="3840"/>
+<figcaption>dreaming 纠正了记忆，Claude 返回洞穴，并到达下一座城市。使用未纠正笔记的运行（“Raw memory”）始终没能越过这座山，不使用记忆的运行也一样。</figcaption>
+</figure>
+<h3>dreaming 可以构建新的记忆表示</h3>
+<p>借助 dreaming，Claude 可以构建帮助浏览记忆的表示（图 9）。它使用的一种记忆表示称为 wiki。这是由 Claude 编写和维护的一组页面，汇集它对某一主题的了解，并链接到其他笔记。这些链接实际上为 Claude 提供了一张地图，让它能够梳理记忆，并在需要时高效定位相关内容。</p>
+<figure class="source-figure" data-source-image="8"><img alt="The memory hierarchy with dreaming, highlighting arrows from transcripts and from memory notes up to the memory representations layer, such as wikis." decoding="async" height="1754" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/30923242548d746ee77784c87826cadc46574c34-3840x1754.png" width="3840"/>
+<figcaption>dreaming 可以构建记忆表示。</figcaption>
+</figure>
+<p>随着知识库不断增长，wiki 这样的表示可以帮助 Claude 在其中查找信息。我们使用 Stainless 的一批内部文档，探索了 wiki 作为记忆表示的作用。Stainless 是我们在 5 月收购的一家软件公司。这批语料约有 350,000 个文件，约合 4.2 亿 token。我们围绕这批语料创建了一组包含 25 道问题的评估，并为 Claude 提供搜索工具，让它探索这些文档。我们还要求 Claude 通过 dreaming，依据这些文件构建 wiki。在 128 次会话中，我们提示 Opus 5 智能体探索文件、编写或修正相互链接的 wiki 页面、合并重复内容，并对照来源核验陈述。</p>
+<p>每次会话都接续此前会话中智能体取得的进展，并通过共享日志协调工作。当我们把 dreaming 从两次会话扩展到 128 次时，在这 25 道问题上的评分标准达成率从 13% 提高到了 48%（图 10）。</p>
+<p>Claude 以渐进方式构建 wiki。创建初版 wiki 后，它会在后续几轮 dreaming 中进行增补、编辑或删减。在最初几轮 dreaming 中，Claude 的知识状况像一名新员工。仅凭 wiki 回答问题的能力还很有限。dreaming 越多，它的知识地图就越丰富，逐渐像一名经验丰富的员工。在测试中，我们发现，同时提供搜索工具时，wiki 对 Claude 的帮助最大。在搜索与 wiki 结合使用的情况下，随着 wiki 扩展，Claude 的综合得分从 54% 提升到 61%。相比之下，仅提供搜索工具时，得分为 53%。仅用 wiki 回答问题时，Claude 的最高得分为 48%。同时使用搜索与 wiki，还让每道题节省了约 20,000 token。</p>
+<figure class="source-figure" data-source-image="9"><img alt="Center: line chart of graded criteria met as wiki generation grows from 2M to 128M dreaming tokens. Wiki plus search tool rises from 54% to 61%, wiki alone rises from 13% to 48%, and the search tool with no wiki is flat at 53%. Left and right: network graphs of an example wiki, with 103 pages and 766 links after 2 sessions and 222 pages and 12,893 links after 128 sessions." decoding="async" height="1432" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/336832b5015f1bfcfd7d786fae8120c533f26ecd-3136x1432.png" width="3136"/>
+<figcaption>中：Claude 在连续会话中构建 wiki 时，对一家公司的文档语料所设 25 道问题的得分。左和右：一个示例 wiki 在两次和 128 次会话后的状态。每个点代表一个页面，线条连接互相链接的页面。</figcaption>
+</figure>
+<p>我们希望测试，哪些类型的任务能从 Claude 拥有 wiki 中获益。为此，我们使用了 Harvey LAB benchmark，以及一组与某次并购有关的文档。这个 benchmark 向 Claude 提供一组文档，要求它根据文档内容生成法律简报，再依据一组标准为简报评分。这些评估或许不如玩一局 Pokémon 有趣，但它们为我们提供了多样化的文档集合，可用于构建 wiki。</p>
+<p>我们要求 Claude 根据文档构建 wiki。随后，我们分别让 Claude 借助 wiki 和直接文件搜索来回答并购问题，或生成 LAB benchmark 所要求的法律简报。其中一项测试提出了 24 道并购相关问题（图 11，左）。超过一半的问题需要 Claude 查找多份文档中的信息，其中许多还需要做判断或计算。在这些题目上，也就是红线和橙线所代表的题目，Claude 查阅 wiki 时得分为 87%，仅使用搜索时为 73%。</p>
+<figure class="source-figure" data-source-image="10"><img alt="Two diagrams linking graded criteria to source documents. Left, the task where the wiki showed more benefit: most of the 24 criteria connect to two or more of 10 documents, and nine need judgment or arithmetic. Right, the task where the wiki showed less benefit: most of the 57 criteria can be found by text search in a single document, usually the deal overview memo." decoding="async" height="3694" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/3677eab5e938466cc41fbac4d47f3118135d0563-3840x3694.png" width="3840"/>
+<figcaption>每个面板都列出了评分项目（左侧），以及满足各项要求所需的来源文档（右侧）。左图是关于某次并购的 24 道问题，主要查阅公开申报文件即可作答。超过一半的评分标准要求结合多份文档的信息。右图是一项 wiki 未显示明确收益的 LAB 任务。大多数评分标准都能通过单份文档满足。</figcaption>
+</figure>
+<p>在其他情况下，wiki 的帮助较小。在一项 LAB 任务中（图 11，右），简报评分标准所需的信息通常可以通过文本搜索，从单份文档中找到。与搜索相比，wiki 没有显示出明确的性能收益。在另一项 LAB 任务中，wiki 的体积超过了文档本身（图 12）。这让人想到 Borges 的一段式短篇小说《论科学的精确性》（“On Exactitude in Science”）：制图师绘制了一张极其详细的地图，大到与它描绘的帝国一样大。Claude 也做出了一份极为详尽的 wiki，却几乎没有形成任何抽象。</p>
+<figure class="source-figure" data-source-image="11"><img alt="Diagram of a wiki build and second pass. On the left, a circle holds the corpus: 10 documents, 115 KB of text. An arrow leads to a larger circle holding the wiki built from it: 68 pages, 255 links, and 203 KB, or 1.77 times the corpus. Some of the wiki’s pages have no links." decoding="async" height="2150" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/ffa35479b1dea63b7948f76995b488d08854e86d-3840x2150.png" width="3840"/>
+<figcaption>wiki 的体积超过了原始文件。</figcaption>
+</figure>
+<h3>dreaming 可以将笔记提升到记忆层级的上层</h3>
+<p>dreaming 也可以把笔记提升到记忆层级的顶部。智能体运行框架随后可以在每次会话开始时，预先把这些笔记加载到 Claude 的上下文中（图 13）。这样，Claude 就不必搜索这些笔记，甚至不必先意识到有什么需要搜索。</p>
+<p>把记忆带入新会话是一种上下文注入（context injection），需要谨慎处理。注入的记忆会占用宝贵的 token，而错误笔记可能被带入每一次会话。加载笔记也不保证 Claude 会照着行动。我们的 Claude Code 文档提醒，指令文件越长，指令遵循程度就越低。因此，记忆层级的最上层必须保持相对精简。dreaming 在这里的一项主要工作，就是把部分细节下移到较低层级，同时留下链接，以保持顶层精简。</p>
+<p>Claude Code 的 auto memory 也用同样的方式控制注入层的大小，由 Claude 在会话期间维护。Claude 不会将全部 auto memory 加载到每次会话的上下文窗口中。它只加载 <code>MEMORY.md</code> 的前 200 行或 25 KB。这个文件头部充当索引，告诉 Claude 它知道什么，以及去哪里查找。</p>
+<figure class="source-figure" data-source-image="12"><img alt="The memory hierarchy with dreaming, highlighting arrows from transcripts and from memory representations up to the injected context layer at the top, which feeds into the next session." decoding="async" height="1754" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/c88bcc04c5d0e77db5828c9dbe72faf1c4421f8f-3840x1754.png" width="3840"/>
+<figcaption>dreaming 可以向记忆层级的顶部写入内容。注入的上下文会加载到每次会话中，而下层内容则在 Claude 需要时被读取或搜索。</figcaption>
+</figure>
+<h3>dreaming 可以让记忆围绕特定目标发展</h3>
+<p>dreaming 也可以影响记忆的增长方式。例如，Claude Duet 这样的助手，通常会受益于围绕所服务用户组织的记忆。dreaming 可以经过调整，让记忆的构建服务于某个特定目标。</p>
+<p>指导记忆如何增长的指令，会随任务而变化。这些指令告诉 Claude 哪些信息真正重要。例如，LAB benchmark 中有一项任务模拟公司收购，并提供一组合同。简报的评分依据，是它是否准确描述了合同条款。</p>
+<p>起初，我们使用基本指令生成 wiki，没有告诉 Claude 该如何使用它。这项任务高度依赖合同条款。在构建 wiki 时，多个智能体同时向一张共享的合同条款表写入内容（图 14，左）。</p>
+<figure class="source-figure" data-source-image="13"><img alt="Two diagrams. Before: four agents write to the same shared page, provisions.md, and one agent’s save erases another’s lines; 41 of 57 graded facts survived. After: four agents each write their own contract’s page, with terms copied word for word; all 57 of 57 graded facts survived." decoding="async" height="1822" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/592f604d38e90537553ab7127d1d3115924fda92-3840x1822.png" width="3840"/>
+<figcaption>调整指令前后，进入 wiki 的受评合同事实数量。左：多个智能体写入同一共享页面，57 项事实中保留了 41 项。右：每份合同由一个智能体负责，各自编写独立页面，并逐字引用条款，57 项事实全部保留。</figcaption>
+</figure>
+<p>结果，wiki 缺失了一些关键事实。我们为基于该 wiki 生成的简报评分时，发现 Claude 只纳入了 57 项事实中的 41 项，即 72%。调查原因后，我们发现，共享表格对合同条款的概括不佳，有些条款甚至完全缺失。原因是智能体覆盖了彼此的工作。</p>
+<p>合同条款是这份 wiki 最重要的部分，但指令没有说明这一点。为了找到更好的指令，我们运行了一个循环：让 Claude 反思失败，提出指令修改方案，再重新构建 wiki。这个循环让 Claude 发现，准确遵循合同条款至关重要。它据此重写了构建 wiki 的指令。</p>
+<p>每份合同都获得了自己的 wiki 页面，由一个智能体编写。页面逐字引用条款，而不是把条款概括到一张共享表格中。我们为依据改进后 wiki 生成的简报评分时，发现能够满足 100% 的评分标准，高于此前的 72%。</p>
+<h3>dreaming 可以补上单次会话留下的缺口</h3>
+<p>Claude 写记忆笔记时，只能看到那一次会话中的上下文。dreaming 可以跨多个会话搜索，发现共同模式，或纠正常见错误。</p>
+<p>在为 LAB benchmark 构建 wiki 时，例如图 14 所示的案例，Claude 有时会链接到尚未创建的页面。第二轮 dreaming 补上了许多这样的缺口。在一项任务中（图 15），dreaming 发现了九条指向 wiki 中缺失页面的链接，并把它们重新指向了同一文档已有的页面。它还新增了三个页面，其中包括一个索引，以完善 wiki。</p>
+<figure class="source-figure" data-source-image="14"><img alt="Two network graphs of a wiki. Before the second pass: 38 entries and 225 links, with nine links from six pages pointing to “escrow-agreement,” a page that doesn’t exist. After: 41 entries and 278 links, with all nine links pointing to “buyer-form-escrow-agreement” and three new pages: index, instructions email, and escalations." decoding="async" height="1812" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/f1afeef9a2d986a6155c0789db46b8fa372a20eb-3840x1812.png" width="3840"/>
+<figcaption>第二轮 dreaming 前后的 wiki。</figcaption>
+</figure>
+<h3>回顾过去，展望未来</h3>
+<p>如何为智能体设计记忆系统，仍有许多开放问题。其中一个问题是，Claude 应该在什么时候创建记忆。执行任务时，Claude 可以向文件夹、文件或数据库等记忆存储写入内容。这样能在信息产生时就捕捉其重要性，让关键细节立即可供后续轮次或会话使用。但即时记笔记不可避免地会分散 Claude 对主要任务的注意力。相比之下，dreaming 可以把记忆创建转移到后台，但它的产出未必能立即供 Claude 使用。</p>
+<p>另一个问题是，如何可靠地保持记忆更新。Claude 可能做出错误预测，也可能把从一开始就不正确的规则写入记忆。随着环境变化，记忆还可能逐渐偏离事实，变得不再相关。dreaming 是纠正这些错误的一种方式（图 8），但它需要计算资源。要求 Claude 持续检查所有记忆，可能并不现实。因此，重要的做法可能是让 dreaming 聚焦于容易变化的信息，或精细调整 dreaming 的频率，例如根据记忆被访问的频次进行调整。</p>
+<p>将会话记录搜索作为 Claude 记忆的基础，也是一种合理思路。有时，把 wiki 等表示与搜索结合起来会很有效（图 10）。但 Claude 需要投入计算资源来维护这些记忆表示，确保其中不会不断累积错误或幻觉。</p>
+<p>尽管 Claude 对什么值得记住的判断已经改善，但没有模型能够真正知道未来的对话轮次会发生什么。dreaming 让 Claude 有机会回顾过去，并投入计算资源来整理记忆、纠正错误、维护记忆表示，让后续会话更容易访问记忆。随着 Claude 能力增强，记忆系统也会继续演进。对于如何设计 Claude 的记忆系统，我们仍有很多需要学习的地方。</p>
+<p>有关如何开始使用 dreaming 和知识 wiki，请参阅我们的 cookbooks。</p>
+<h3>作者与致谢</h3>
+<h4>致谢</h4>
+<p>本文由 Lance Martin 撰写，Caitlin Love、Tom Chivers、Rebecca Hiscott、Jake Eaton 和 Blake Wilson 提供编辑指导。感谢 Barry Zhang、Theodora Chu、Daliang Li、Mahesh Murag、Jake Noble、Ravi Trivedi、Tina Vachovsky、Brad Abrams、Henry de Valence、Jeremy Fox、Matt Bell、Allen Li、Chris Gorgolewski、Eugene Yan、Artur Renault、Wei Zhang 和 Kevin Chen 提供的有益讨论与贡献。感谢 David Hershey 对 Claude Plays Pokémon 的贡献。图表由 Monika Tuchowska 制作。</p>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
