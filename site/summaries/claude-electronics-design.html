@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>测试 Claude 在真实电子产品设计中的表现</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg:#f5f4ef; --card:#ffffff; --ink:#222b35; --muted:#616b76; --line:#d9dfe3;
+  --data:#165bba; --risk:#a6422b; --opportunity:#16715c; --conclusion:#7243a4;
+  --hl:#e4edff; --hl2:#eee4fa; --soft-green:#e7f3ed; --soft-risk:#faeae3;
+  --hero:#182739; --hero-ink:#edf3fa; --hero-muted:#bdccdc;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg:#f5f4ef; --card:#ffffff; --ink:#222b35; --muted:#616b76; --line:#d9dfe3;
+  --data:#165bba; --risk:#a6422b; --opportunity:#16715c; --conclusion:#7243a4;
+  --hl:#e4edff; --hl2:#eee4fa; --soft-green:#e7f3ed; --soft-risk:#faeae3;
+  --hero:#182739; --hero-ink:#edf3fa; --hero-muted:#bdccdc;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg:#11171d; --card:#1b242e; --ink:#dae3ed; --muted:#a7b5c4; --line:#354350;
+    --data:#86b6ff; --risk:#f39e82; --opportunity:#71d4b0; --conclusion:#c5a1f2;
+    --hl:#203450; --hl2:#342743; --soft-green:#19382f; --soft-risk:#3b2825;
+    --hero:#0b121d; --hero-ink:#e2ebf5; --hero-muted:#acbdd1;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg:#11171d; --card:#1b242e; --ink:#dae3ed; --muted:#a7b5c4; --line:#354350;
+  --data:#86b6ff; --risk:#f39e82; --opportunity:#71d4b0; --conclusion:#c5a1f2;
+  --hl:#203450; --hl2:#342743; --soft-green:#19382f; --soft-risk:#3b2825;
+  --hero:#0b121d; --hero-ink:#e2ebf5; --hero-muted:#acbdd1;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif; line-height:1.85; }
+main { max-width:1100px; margin:auto; padding:28px 24px 70px; }
+header { padding:44px; background:var(--hero); color:var(--hero-ink); border-radius:18px; }
+h1 { font-size:clamp(28px,4.5vw,46px); line-height:1.3; margin:12px 0; }
+.en { color:var(--hero-muted); font-size:18px; margin-top:12px; }
+.meta { font-size:14px; color:var(--muted); }
+header .meta { color:var(--hero-muted); }
+.lead { margin-top:30px; font-size:20px; border-top:1px solid var(--hero-muted); padding-top:22px; }
+h2 { font-size:27px; line-height:1.4; margin:0 0 20px; }
+h3 { font-size:21px; line-height:1.5; margin:0 0 12px; }
+p { margin:0 0 18px; }
+a { color:var(--data); text-underline-offset:3px; }
+mark { background:var(--hl); color:var(--data); padding:1px 4px; border-radius:4px; font-weight:650; }
+mark.result { background:var(--hl2); color:var(--conclusion); }
+.numbers { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; padding:28px 0; border-bottom:1px solid var(--line); }
+.numbers div { padding-left:18px; border-left:3px solid var(--data); }
+.numbers strong { display:block; color:var(--data); font-size:36px; line-height:1.35; }
+.numbers span { color:var(--muted); font-size:15px; }
+.summary-block { margin:34px 0; }
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; background:var(--card); font-size:16px; }
+caption { text-align:left; padding:0 0 12px; color:var(--muted); font-size:14px; }
+th,td { padding:15px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
+th { background:var(--hl); color:var(--data); }
+.note { font-size:14px; color:var(--muted); margin-top:12px; }
+.split { display:grid; grid-template-columns:1fr 1fr; gap:28px; padding:28px; background:var(--soft-green); border-radius:12px; }
+.split h3 { color:var(--opportunity); }
+.insight { color:var(--conclusion); font-weight:650; margin-top:18px; }
+.warning { padding:24px 28px; background:var(--soft-risk); border-left:5px solid var(--risk); }
+.warning h3 { color:var(--risk); }
+.takeaways { padding:28px 0; border-top:2px solid var(--conclusion); }
+.takeaways ul { display:grid; grid-template-columns:1fr 1fr; gap:14px 28px; padding-left:24px; }
+.takeaways li::marker { color:var(--conclusion); }
+#translation { max-width:800px; margin:50px auto 0; padding-top:38px; border-top:1px solid var(--line); font-size:17px; }
+#translation h3 { margin-top:38px; }
+#translation h4 { font-size:18px; margin:24px 0 12px; }
+.contents { padding:20px 26px; background:var(--card); list-style:none; }
+.contents li { padding:3px 0; }
+.source-figure { margin:30px 0 36px; }
+.source-figure img { display:block; max-width:100%; height:auto; margin:auto; }
+figcaption { font-size:14px; line-height:1.75; color:var(--muted); padding:14px 0 0; border-bottom:1px solid var(--line); padding-bottom:16px; }
+.footnotes { font-size:15px; }
+@media(max-width:700px) {
+  main { padding:16px 16px 45px; }
+  header { padding:27px 23px; }
+  .numbers { gap:10px; }
+  .numbers div { padding-left:10px; }
+  .numbers strong { font-size:29px; }
+  .split,.takeaways ul { grid-template-columns:1fr; }
+  th,td { padding:11px; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/claude-electronics-design" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header>
+<div class="meta">Anthropic · Research · 2026 年 11 月 9 日</div>
+<h1>测试 Claude 在真实电子产品设计中的表现</h1>
+<p class="en">Testing Claude on real-world electronics design</p>
+<p class="lead"><strong>一句话总括：</strong>这次测试用三款可工作的硬件原型，展示了 Claude Fable 5.2 如何把电路布局、外壳设计、固件和制造约束串成完整流程，并在少量人类指导下主动修正设计。</p>
+</header>
+<section aria-label="中文总结">
+<div class="numbers">
+<div><strong>3 款</strong><span>由人类工程师制造并测试的设备原型</span></div>
+<div><strong>69%</strong><span>PCB Gym 得分，Fable 5 为 25%</span></div>
+<div><strong>83.5%</strong><span>BenchCAD 2.1 得分</span></div>
+</div>
+<div class="summary-block">
+<h2>进步体现在空间推理，也体现在完成整个设计</h2>
+<p>早期模型容易放错元件，或把布局推进到无法完成布线的死胡同。Fable 5.2 能优先处理高速、大电流和噪声敏感连接，也会重新分配引脚、删除走线并重新布局。</p>
+<div class="table-wrap">
+<table>
+<caption>原文报告的基准成绩；百分比为各基准得分，不代表商业产品成功率。</caption>
+<thead><tr><th>基准及考查内容</th><th>Fable 5.2</th><th>原文中的比较对象</th></tr></thead>
+<tbody>
+<tr><td>PCB Gym：在移除布局的电路板设计上放置元件并重新布线；内部基准</td><td><mark>69%</mark></td><td>Fable 5：25%</td></tr>
+<tr><td>BenchCAD 2.1：根据工程图和渲染图重建三维零件、装配体和电路板；公开基准</td><td><mark>83.5%</mark></td><td>接近 Claude Fable 5.1 的两倍；未提供其确切得分</td></tr>
+</tbody>
+</table>
+</div>
+<p class="insight">这些结果把 AI 的能力证据从生成设计方案，推进到了处理几何关系和完成可制造布局。</p>
+</div>
+<div class="summary-block split">
+<div>
+<h3>会返工，才能跨过最后的难点</h3>
+<p>过去一年，Diode 用早期模型设计过许多完成度达 <mark>95%</mark> 却仍不可用的电路板。此次 Claude 为语音助手中枢删除并重新布线数十次，直到找到可行方案。</p>
+<p>自主识别死路并重做局部设计，是从“接近完成”走向可用原型的重要变化。</p>
+</div>
+<div>
+<h3>会改工具，也会查依据</h3>
+<p>面对 <mark>100 引脚</mark>连接器引出的长走线，Claude 约用半小时编写了自己的布线器。每条长走线约需一秒完成。它还根据数据手册分析了虚拟宠物不装电池时的行为。</p>
+<p>模型的作用不只在于操作现成软件，也包括为当前任务调整工具和核对器件条件。</p>
+</div>
+</div>
+<div class="summary-block">
+<h2>跨领域约束开始进入同一套设计判断</h2>
+<div class="table-wrap">
+<table>
+<caption>原文中的具体工程约束与处理结果；长度单位为 mm，频率单位为 kHz。</caption>
+<thead><tr><th>约束</th><th>原方案或问题</th><th>Claude 的处理</th></tr></thead>
+<tbody>
+<tr><td>麦克风声学通道</td><td>长 25 mm，共振频率约 3.4 kHz</td><td>改为楔形外壳，通道缩短至约 10 mm，共振频率升至约 8.9 kHz</td></tr>
+<tr><td>会议扬声电话装配</td><td>电路板垂直放入时，静音开关会碰到后壁</td><td>在三维模型中验证约 25° 倾斜安装，并写入装配说明</td></tr>
+<tr><td>阻焊层可制造性</td><td>6 处细窄阻焊区域被判定为过薄</td><td>扩大阻焊开口，无需移动元件</td></tr>
+<tr><td>供电电流限制</td><td>音量增加时需控制整机电流</td><td>通过固件随音量增大调暗 LED 灯环</td></tr>
+</tbody>
+</table>
+</div>
+<p class="insight">AI 对硬件设计的帮助，取决于它能否追踪一个改动对装配、声学、电气和生产的连锁影响。</p>
+</div>
+<div class="summary-block warning">
+<h3>原型成功，但产品级可靠性尚未得到证明</h3>
+<p>Diode 直接使用 Claude 的文件制造了三块电路板，无需往返调整。三款设备均能工作，且无需修复电路。会议扬声电话使用数周后仍正常运行。</p>
+<p>不过，这些设备<mark class="result">尚未经过电气验证、天线调谐、热测试或认证</mark>，也未按量产要求设计。实际制造和测试仍由 Diode 工程师完成。下一步将考查更高密度、更高速、更复杂的电路板，以及仿真和实物测量反馈。</p>
+<p>这支持“加快硬件原型开发”的判断，还不足以证明模型可以独立交付商业产品。</p>
+</div>
+<div class="takeaways">
+<h2>最值得带走的洞见</h2>
+<ul>
+<li>几何推理的提升已有基准成绩和实物原型两类证据，但两者都不等于产品认证。</li>
+<li>主动返工能避免设计停留在“几乎完成、仍不可用”的状态。</li>
+<li>工具编写、资料查阅和跨领域约束追踪，共同支撑了端到端设计流程。</li>
+<li>少量提示仍不等于无人参与。人类工程师负责实体制造和测试，长期表现仍待观察。</li>
+</ul>
+</div>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<figure class="source-figure" data-source-image="0"><img alt="Video thumbnail" decoding="async" height="720" loading="lazy" src="https://img.youtube.com/vi/vdYynH177h0/maxresdefault.jpg" width="1280"/></figure>
+<ol class="contents">
+<li>01 推理求解几何问题</li>
+<li>02 修改设计</li>
+<li>03 使用软件和文档</li>
+<li>04 跟踪约束与后续影响</li>
+<li>05 面向现实制造条件进行设计</li>
+<li>06 局限与下一步</li>
+</ol>
+<p>一年多前，我们开始测试 Claude 设计基础电子电路的能力。我们与设计、制造电路板的公司 Diode Computers 合作，<sup><a href="#fn1">1</a></sup>用简单任务训练 Claude。例如，阅读芯片数据手册，判断芯片正常运行需要哪些配套元件。当时参与实验的模型还无法可靠地完成电路板布局。它们也很难设计出能够相互配合的部件。如今，Claude 已能从头到尾设计电子硬件，并完成原型开发。</p>
+<p>开发一台电子设备，需要处理许多复杂步骤和实际约束。除了设计电路板并进行仿真，还要推理电路板的物理布局及其工作表现，为机械部件建模，并编写固件。同时，还必须掌握哪些元件容易采购，以及工厂具备哪些制造条件。</p>
+<p>为了了解较新的 Claude 模型在这一领域取得了哪些进展，我们再次与 Diode 合作。这一次，我们让 Claude Fable 5.2 设计三款电子设备：会议扬声电话、语音助手中枢，以及掌上虚拟宠物。在极少的提示下，Claude 运用几何推理完成了每块电路板的布局。它预先考虑制造约束，并确保设计符合这些要求。它修改自己的设计，在计算机辅助设计（CAD）软件中建立模型。最后，它指导人类工程师制成了可以正常工作的原型，无需对电路进行任何修复。</p>
+<p>每项设计开始时，我们都给 Claude 一条简单提示，说明设备类型及其主要硬件要求。例如，会议扬声电话的提示要求设计“一个通过 USB-C 连接电脑的圆盘形设备，内置麦克风和扬声器，并通过 PCB 天线支持蓝牙”。随后，Claude 编写了设备规格，绘制清晰的原理图，并确定元件在印制电路板（PCB）上的位置。它布设元件之间的铜走线，设计可供 3D 打印的外壳，编写固件，并准备了元件清单。Diode 在 Claude 的指导下组装电路板并运行固件。最终得到的会议扬声电话原型，在使用数周后仍能正常工作。</p>
+<p>Claude 通过类似流程完成了语音助手中枢和虚拟宠物。这两款设备目前也仍在正常工作。由于它们都是早期原型，我们还不知道长期使用后会有怎样的表现，也不知道能否通过商业认证。</p>
+<figure class="source-figure" data-source-image="1"><img alt="Three small electronic devices on a wooden table: a handheld virtual pet, a dark voice-assistant hub, and a round white USB speakerphone." decoding="async" height="1280" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/1a999b9164b6d23ac7b94c2dcdf4c9230e26e940-1920x1280.png" width="1920"/>
+<figcaption>根据 Claude 的设计制成的三款设备。从左到右分别是：电池供电的掌上宠物、家用语音助手中枢，以及 USB 会议扬声电话。Claude 为每款设备设计了电子系统和外壳，并编写了固件。</figcaption>
+</figure>
+<h3>推理求解几何问题</h3>
+<p>与我们早期测试的模型相比，Fable 5.2 最显著的变化是解决复杂几何问题的推理能力。例如，确定电路板上的元件位置，以及如何在元件之间布设铜走线。</p>
+<p>早期模型很难合理安排基础元件。例如，它们会把配套元件放在距离所服务芯片过远的位置，或者把连接器的方向放错。相比之下，Fable 5.2 给出的布局更紧凑，也更实用。它优先布设最重要的连接，包括承载高速信号、大电流或对噪声敏感的连接。例如，在设计语音助手中枢时，Claude 首先处理 USB 和以太网连接。这些连接通过成对的走线传输信号。走线就是电路板上的细铜条。它每次布设一对走线，确保两条走线等长且间距正确。它还加入调长结构，也就是通过小幅曲折延长走线，使信号同时到达。此外，它调整了电源部分的元件布局，以提高效率。</p>
+<p>为了展示 Fable 5.2 在电路板布局方面比早期模型进步了多少，我们请 Diode 运行了 PCB Gym。这是一项内部基准。它移除电路板设计的布局，再根据模型放置元件和重新布线的表现打分。Fable 5.2 在该基准上得分为 <mark>69%</mark>，Fable 5 则为 25%（图 2）。Fable 5.2 在 BenchCAD 2.1 上的表现也更好。这项公开基准测试模型能否根据工程图和渲染图，重建三维零件、装配体和电路板。Fable 5.2 的得分为 <mark>83.5%</mark>，接近前代模型 Claude Fable 5.1 的两倍。</p>
+<figure class="source-figure" data-source-image="2"><img alt="Scatter plot of Diode PCB Gym score against total API cost for recent frontier models." decoding="async" height="1040" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/702c38e9c4a83120ea3734aab60726e39a69be23-1600x1040.png" width="1600"/>
+<figcaption>近期前沿模型在 Diode PCB Gym 上的得分与 API 总费用对比。该基准要求模型在布局已被移除的电路板上放置元件并完成布线。</figcaption>
+</figure>
+<h3>修改设计</h3>
+<p>早期模型在设计 PCB 布局时，很少修改自己的工作。即使已经明显看出，所选元件位置会使布线永远无法完成，它们也很少调整。在过去一年里，Diode 使用这些模型设计过许多完成度达到 95%、却仍然无法使用的电路板。</p>
+<p>当 Claude 发现某项设计行不通时，它会主动改变方向，不需要人提醒。例如，会议扬声电话的电路板有四层铜层。在设计这块电路板时，它重新分配了两颗芯片上不同引脚所承载的信号。这样，触控区域下方的走线就能留在同一层，而且不会相互交叉。后来，电路板背面的布局变得过于拥挤。Claude 于是交换了可互换引脚上的信号，并重新布局了电路板的整个一角，而不是通过增加跨层跳转来修补问题。</p>
+<p>在语音助手中枢的设计文件中布设走线时，Claude 发现铜连接“变得过于杂乱，已经很难靠目视追踪”。它推理道：“我应该直接拆掉这些走线，重新开始。”随后，它删除并重新布设铜走线数十次，直到找到可行的布局。</p>
+<figure class="source-figure" data-source-image="3"><img alt="Two close-up views of microphone routing on the hub circuit board. On the left, a blue power track loops around the ground ring and a red track crosses it; on the right, the same area after rerouting, with the ring clear." decoding="async" height="949" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/65c50455d3f6a57f0846ec407425f346ab0e1f68-1920x949.png" width="1920"/>
+<figcaption>Claude 重新整理连接前后，语音助手中枢的布线对比。左图：麦克风的电源走线（蓝线）绕着声孔处的接地环延伸。一条正面走线（红线）穿过该环。麦克风焊盘之间还有一个过孔，也就是连接不同铜层的小孔。右图：Claude 重新布设电源走线后的同一区域。接地环已无走线穿扰，并完成接地。Claude 对重做左图方案的解释是：“在底部进声的 MEMS 麦克风下方，这种布局有风险，即使间距从技术上说符合要求。所以，我想为这两个相同的麦克风封装重新整理局部布线。”</figcaption>
+</figure>
+<h3>使用软件和文档</h3>
+<p>当某款设备的设计决策取决于特定元件的细节时，Claude 经常查阅该元件的数据手册。这是制造商发布的技术文档。有人问掌上宠物在没有电池时能否工作，Claude 便阅读了充电芯片的数据手册。它回答说，设备可以由 USB 供电运行，但预计充电指示灯会闪烁。这是因为，充电芯片会不断给电池位置上的一个小电容充电。<sup><a href="#fn2">2</a></sup></p>
+<p>为了给语音助手中枢布线，Claude 最初使用了 Diode 提供的设计软件。该软件允许它调用 KiCad 内置的布线器，也就是绘制走线的工具。KiCad 是一款广泛使用的电路板设计软件。Claude 选定两个端点后，KiCad 的布线器每次在两点之间绘制一条走线。但中枢需要从一个 100 引脚连接器引出多条长走线。Claude 判断，逐条布设这些走线需要过多的分步指导。</p>
+<p>于是，Claude 自己编写了布线器。这个算法将电路板划分成网格，再通过搜索为每条走线找到畅通路径。大约半小时后，Claude 就有了一个能够在约一秒内完成一条长走线的布线器。随后，它发现一条音频时钟走线距离以太网走线过近。它便调整布线器，让敏感走线周围留出更多空间。</p>
+<h3>跟踪约束与后续影响</h3>
+<p>设计中某个环节的决策会影响后续环节，Claude 能够跟踪这些影响。在为每款设备设计外壳时，它都编写代码，检查电路板的三维模型能否装入外壳，并确保没有元件发生碰撞。例如，它发现会议扬声电话的电路板不能直接垂直放入外壳，否则静音开关会撞到后壁。Claude 判断，安装时将电路板倾斜约 25°，就能放入外壳。它在三维模型中验证了这一点，并将该步骤加入装配说明。</p>
+<p>在设计语音助手中枢的外壳时，Claude 计算出，长 25 mm 的麦克风进声通道会在约 3.4 kHz 处产生共振。进声通道是让声音传到麦克风的开口。它推理道，这个频率“正处于语音频段，虽然用于语音助手仍然可用，但并不理想。更好的办法是采用楔形外壳，后部较高，向前逐步降低”。楔形设计将通道缩短到约 10 mm，使共振频率提高至约 8.9 kHz，位于语音所用频率范围的最边缘。Claude 还为会议扬声电话编写了固件。音量越大，LED 灯环就越暗，从而让设备保持在它为电路板设定的电流上限以内。</p>
+<figure class="source-figure" data-source-image="4"><img alt="Claude’s design for the voice-assistant hub, showing the schematic, the circuit board layout, a model of the wedge-shaped enclosure, and the finished dark prototype." decoding="async" height="1217" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/b2caed6f266afefb1d33d1a8f8b676fc9472d506-2048x1217.png" width="2048"/>
+<figcaption>Claude 为家用语音助手中枢完成的设计，以及最终制成的原型。Claude 编写了在 CAD 中建立外壳模型的代码，完成电路板布局，并编写了固件。</figcaption>
+</figure>
+<h3>面向现实制造条件进行设计</h3>
+<p>电子设计工程师必须遵守现实条件的限制。也就是说，必须确保工厂确实能够制造他们想做的产品。为此，工程师会进行两类检查。第一类是可制造性设计（DFM）检查，将电路板的几何特征与工厂的制造极限进行比较。第二类是采购检查，确认分销商有相应元件的库存。</p>
+<p>Claude 自行执行了这些检查，并把结果分为需要修复的问题和可以忽略的警告。在语音助手中枢的检查中，有六处细窄的阻焊层区域被标记为过薄，无法制造。阻焊层是电路板上的保护涂层。Claude 通过扩大阻焊开口解决了问题，没有移动任何元件。检查还把两个接地之间的连接判定为错误。接地是电流共用的返回路径。出现这一警告，是因为自动检查器没有识别出这处连接是有意设计的。Claude 正确判断它不会影响性能，因此忽略了该警告。</p>
+<p>Diode 直接使用 Claude 的设计文件制造了三块电路板，期间没有为调整设计而反复沟通。工厂和工程师通常需要经历多轮面向制造的修改。Diode 团队告诉我们，他们很惊讶，与 Claude 合作时竟然不需要这样做。</p>
+<figure class="source-figure" data-source-image="5"><img alt="Speakerphone circuit board, layer 1 (front): parts and signal tracks." decoding="async" height="1062" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/1e8e384cb5bbf67da75851ecce146f47a425af0b-1888x1062.png" width="1888"/>
+<figcaption>会议扬声电话的四个铜层。虚线圆圈标出了触控转盘的位置，铜电极在这里感应用户的手指。走线从一层切换到另一层，需要在电路板上钻孔。如果这个孔位于触控转盘下方，就会穿过电极。为避免这一问题，Claude 让转盘下方的每条信号走线始终留在同一层。它还选择了合适的芯片引脚分配，使这些走线不必相互交叉。此外，在每一层上，它都让蓝牙天线周围没有其他铜箔和孔洞。蓝牙天线就是顶部的曲折结构。这样可以避免附近的金属削弱天线信号。</figcaption>
+</figure>
+<figure class="source-figure" data-source-image="6"><img alt="Speakerphone circuit board, layer 2 (inner 1): ground plane." decoding="async" height="1062" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/23a2565ddbc134172de07ac555329108c418faab-1888x1062.png" width="1888"/>
+<figcaption>会议扬声电话的四个铜层。虚线圆圈标出了触控转盘的位置，铜电极在这里感应用户的手指。走线从一层切换到另一层，需要在电路板上钻孔。如果这个孔位于触控转盘下方，就会穿过电极。为避免这一问题，Claude 让转盘下方的每条信号走线始终留在同一层。它还选择了合适的芯片引脚分配，使这些走线不必相互交叉。此外，在每一层上，它都让蓝牙天线周围没有其他铜箔和孔洞。蓝牙天线就是顶部的曲折结构。这样可以避免附近的金属削弱天线信号。</figcaption>
+</figure>
+<figure class="source-figure" data-source-image="7"><img alt="Speakerphone circuit board, layer 3 (inner 2): ground, hatched under the touch wheel, and power." decoding="async" height="1062" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/64f6eac9c2164c89b3320fa831148326c227662f-1888x1062.png" width="1888"/>
+<figcaption>会议扬声电话的四个铜层。虚线圆圈标出了触控转盘的位置，铜电极在这里感应用户的手指。走线从一层切换到另一层，需要在电路板上钻孔。如果这个孔位于触控转盘下方，就会穿过电极。为避免这一问题，Claude 让转盘下方的每条信号走线始终留在同一层。它还选择了合适的芯片引脚分配，使这些走线不必相互交叉。此外，在每一层上，它都让蓝牙天线周围没有其他铜箔和孔洞。蓝牙天线就是顶部的曲折结构。这样可以避免附近的金属削弱天线信号。</figcaption>
+</figure>
+<figure class="source-figure" data-source-image="8"><img alt="Speakerphone circuit board, layer 4 (back): the touch wheel's electrodes." decoding="async" height="1062" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/66f89422bb621989d75405011bb1659417a67cb6-1888x1062.png" width="1888"/>
+<figcaption>会议扬声电话的四个铜层。虚线圆圈标出了触控转盘的位置，铜电极在这里感应用户的手指。走线从一层切换到另一层，需要在电路板上钻孔。如果这个孔位于触控转盘下方，就会穿过电极。为避免这一问题，Claude 让转盘下方的每条信号走线始终留在同一层。它还选择了合适的芯片引脚分配，使这些走线不必相互交叉。此外，在每一层上，它都让蓝牙天线周围没有其他铜箔和孔洞。蓝牙天线就是顶部的曲折结构。这样可以避免附近的金属削弱天线信号。</figcaption>
+</figure>
+<figure class="source-figure" data-source-image="9"><img alt="Voice-assistant hub circuit board, layer 1 (front): parts and signals, with ground poured between them." decoding="async" height="1062" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/dd387afa4631f360f769522f20878a64a1095f72-1888x1062.png" width="1888"/>
+<figcaption>语音助手中枢的四个铜层。Claude 在电源层上增加了两块接地铜区（绿色）。它们位于电路板背面大多数高速信号走线的正后方。这样可以为信号提供就近的返回路径，有助于减少干扰。</figcaption>
+</figure>
+<figure class="source-figure" data-source-image="10"><img alt="Voice-assistant hub circuit board, layer 2 (inner 1): solid ground under the front-side signals." decoding="async" height="1062" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/43048bd3613a042096a0fc4ad236ab727a130e57-1888x1062.png" width="1888"/>
+<figcaption>语音助手中枢的四个铜层。Claude 在电源层上增加了两块接地铜区（绿色）。它们位于电路板背面大多数高速信号走线的正后方。这样可以为信号提供就近的返回路径，有助于减少干扰。</figcaption>
+</figure>
+<figure class="source-figure" data-source-image="11"><img alt="Voice-assistant hub circuit board, layer 3 (inner 2): 5 V and 3.3 V power, with two areas of ground in green." decoding="async" height="1062" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/83100ba17df9b9120ac4f801efba2c5bd7654619-1888x1062.png" width="1888"/>
+<figcaption>语音助手中枢的四个铜层。Claude 在电源层上增加了两块接地铜区（绿色）。它们位于电路板背面大多数高速信号走线的正后方。这样可以为信号提供就近的返回路径，有助于减少干扰。</figcaption>
+</figure>
+<figure class="source-figure" data-source-image="12"><img alt="Voice-assistant hub circuit board, layer 4 (back): signals and ground; the microphones' side." decoding="async" height="1062" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/cec166cda9bc45861879db6a1ab6cc8edc6535b7-1888x1062.png" width="1888"/>
+<figcaption>语音助手中枢的四个铜层。Claude 在电源层上增加了两块接地铜区（绿色）。它们位于电路板背面大多数高速信号走线的正后方。这样可以为信号提供就近的返回路径，有助于减少干扰。</figcaption>
+</figure>
+<figure class="source-figure" data-source-image="13"><img alt="Cutaway drawing of the speakerphone enclosure showing the circuit board tilted at about 25 degrees as it is installed, with the point where the mute switch knob would meet the back wall marked in red." decoding="async" height="949" loading="lazy" src="https://www-cdn.anthropic.com/images/4zrzovbb/website/64a2aade621d8d6a50c57f9f3d0ac050ea778423-2048x949.png" width="2048"/>
+<figcaption>会议扬声电话的电路板不能直接垂直放入外壳，否则静音开关的拨钮会撞到后壁（红色）。Claude 找到的安装方法是：先将电路板倾斜约 25°，再转动至平放位置。它把这一步加入了装配说明。</figcaption>
+</figure>
+<h3>局限与下一步</h3>
+<p>这三款设备都仍是原型。它们尚未经过电气验证、天线调谐、热测试或认证，也不是为量产而设计的。由于 Claude 没有连接到测试设备，也没有连接到制造和组装电路板的机器，Diode 的工程师必须亲手制造并测试这些原型。即便如此，过去一年里，Claude 在元件布局和布线决策上的推理能力已有显著提升。如今，它能在极少的人类指导下设计电子设备，并帮助人们制造原型。其他模型也在这一领域取得进展。OpenAI 最近撰文介绍了使用其模型设计掌上设备的工作。这类工作可以帮助工程师更快地构建和测试新的硬件设计。</p>
+<p>接下来，我们计划研究 Claude 能否设计密度更高、速度更快、复杂度更高的电路板，能否通过仿真检查这些设计，以及能否从成品设备的测量结果中学习。</p>
+<h3>脚注</h3>
+<div class="footnotes">
+<p id="fn1">01 Anthropic 与 Diode 存在商业合作关系。</p>
+<p id="fn2">02 这是 Diode 团队少数几次向 Claude 提问的情况之一，问题是：“没有电池还能工作吗？”总体而言，团队提供的提示极少，仅限于简短指令，例如“整理原理图”和“继续”。</p>
+</div>
+<h3>作者与致谢</h3>
+<h4>致谢</h4>
+<p>本文由 Anthropic 的研究人员和工程师与 Diode Computers 的 Craig Chen 及其团队共同完成。Anthropic 的参与者包括 Mike Cretella、Connor Jennings 和 Brent Yi。自 2025 年起，Anthropic 就一直与 Diode 的电气工程师合作开展 PCB 设计。Xander Balwit、Tom Chivers、Rebecca Hiscott 和 Caitlin Love 提供了编辑支持。</p>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
