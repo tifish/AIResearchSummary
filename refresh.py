@@ -4,7 +4,7 @@
     discover -> per new article: extract -> generate (摘要 + 总结与译文 in ONE agent call) -> render
 
 Thin orchestrator; the real work lives in scripts/. Extraction is serial (OpenAI uses
-local Chrome), but each article is queued for parallel generation as soon as it is
+Browser MCP), but each article is queued for parallel generation as soon as it is
 extracted. Modes: default batch (newly discovered + missing digest pages), --url
 (one article), --discover-only (list), --missing-digests (backfill only).
 """

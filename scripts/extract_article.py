@@ -526,7 +526,7 @@ def extract(url: str) -> dict[str, Any]:
     except (OSError, urllib.error.URLError) as exc:
         errors.append(str(exc))
 
-    # Static fetch failed or yielded no text: fall back to a local Chrome render
+    # Static fetch failed or yielded no text: fall back to a Browser MCP render
     # (handles JS-rendered / bot-protected pages such as OpenAI's 403-guarded site).
     try:
         from browser_fetch import fetch_rendered
@@ -537,7 +537,7 @@ def extract(url: str) -> dict[str, Any]:
         errors.append("rendered page did not expose readable article text")
     except RuntimeError as exc:
         errors.append(str(exc))
-    except Exception as exc:  # browser launch / navigation failure
+    except Exception as exc:  # browser connection / navigation failure
         errors.append(f"browser render failed: {exc}")
 
     reason = "; ".join(errors) if errors else "static page did not expose readable article text"

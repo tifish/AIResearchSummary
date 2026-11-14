@@ -6,21 +6,22 @@
 
 ## 依赖
 
-依赖 Playwright（驱动本机已安装的 Google Chrome）、BeautifulSoup 和 certifi。首次运行前安装：
+依赖 Python 官方 MCP SDK（固定 `mcp==1.30.0`）、BeautifulSoup 和 certifi，以及 PATH 中可用的 Node.js/npm（`npx`）。首次运行前安装：
 
 ```bat
 python -m pip install -r requirements.txt
 ```
 
-抓取分两步、用 Chrome 的程度不同：
+在日常已登录的 Chrome 中安装并连接 **Browser MCP 扩展**，保持浏览器和扩展连接可用。脚本直接启动自己的 `npx --yes @browsermcp/mcp@2.5.0` stdio 客户端，不修改全局 Codex MCP 配置；首次使用 npx 需要联网下载该固定版本。
 
-- **发现**（抓列表页）走本地 Chrome 渲染，并自动点击“Load more”翻页，按来源现有最新文章的月份停止（翻到该月份之前即停；最早只追溯到 2026-01）；失败时回退静态抓取。
-- **抽取正文**优先静态 HTTP，抓不到时（如 OpenAI 反爬）再回退本地 Chrome。
-- Chrome 固定**有头**运行、用固定的持久化目录 `.chrome-profile/`（保留 Cloudflare 通行 cookie）；同一个刷新进程会复用同一个 Chrome，并保留一个空白 tab 防止窗口退出，每篇文章只开临时 tab，抓完就关临时 tab；需本机已安装 Google Chrome。
+抓取分两步：
 
-可选环境变量：
+- **发现**（抓列表页）走 Browser MCP 渲染，并自动点击“Load more”翻页，按来源现有最新文章的月份停止（翻到该月份之前即停；最早只追溯到 2026-01）；失败时回退静态抓取。
+- **抽取正文**优先静态 HTTP，抓不到时（如 OpenAI 反爬）再回退 Browser MCP。普通公开页面的 HTTP 抓取不受影响。
+- 每次浏览器抓取创建独立客户端和后台任务标签页，复用扩展所连浏览器的登录状态；每条页面命令显式指定任务标签页，不切换用户当前标签页或抢前台焦点。正常结束或异常时只关闭自己创建的标签页，然后断开自己的客户端；不关闭用户浏览器、其他任务标签页或共享 daemon。
+- 完整 HTML 在页面中冻结为快照，按 4,000 字符分块传回，校验每块长度、总长度和校验和后解码；支持反斜杠、多行、中文和 emoji，避免 MCP 单次响应截断导致正文缺失。
 
-- `AIRS_CHROME_CDP`：挂到已运行的 Chrome（先 `chrome --remote-debugging-port=9222`），最能绕过 Cloudflare。
+无需 Playwright 安装、旧扩展 token 或远程调试端口。旧的 `AIRS_CHROME_CDP` / `AIRS_CHROME_CHANNEL` 已不再使用；历史 `.chrome-profile/` 数据保留，但脚本不再访问它。扩展断开或页面要求人工验证时，浏览器抓取可能失败；发现流程仍可回退静态首屏，但该回退不保证覆盖完整分页。
 
 ## 摘要网页
 
@@ -91,7 +92,7 @@ python refresh.py --dry-run            :: 只列出将处理的新文章，不�
 
 `refresh.py` 串联各脚本执行同一套流程：
 
-1. 发现各来源的文章列表（都走本地 Chrome、自动 Load more 翻页；按来源现有最新月份控制翻页深度），只取 2026-01-01 之后的文章。
+1. 发现各来源的文章列表（都走 Browser MCP、自动 Load more 翻页；按来源现有最新月份控制翻页深度），只取 2026-01-01 之后的文章。
 2. 检查 `site/articles.json` 中已收录文章的独立总结与译文页；如果 `site/summaries/<slug>.html` 不存在，默认刷新会重新抓正文并一次性重生成索引摘要和独立页面，不需要额外参数。
 3. 如果没有新文章、也没有缺失的独立页面，直接重新生成 `site/index.html`。
 4. **抓网页与生成是流水线执行的**：抽取正文仍然是**串行**的，且每篇之间有间隔（`--fetch-delay`，默认 1.5s，对来源站点友好）；但每抽取成功一篇，就立即加入生成队列。生成摘要+总结与译文是**并行**的——每篇用一次 Agent 调用同时产出（默认 12 并发，`--jobs` 可调，只受服务速率限制、瞬时错误自动重试）。每篇生成完成后会立即写入 `site/articles.json` 与 `site/summaries/`，全部结束后重新渲染页面。
@@ -99,6 +100,20 @@ python refresh.py --dry-run            :: 只列出将处理的新文章，不�
 确定性的抓取/渲染由脚本完成；只有摘要、总结和译文这类需要判断力的步骤才调用 Codex / Claude / Grok 后端（提示词见 `prompts/article.md`）。
 
 ## 分步测试
+
+离线回归（不联网、不打开浏览器、不调用模型、不写正式数据）：
+
+```bat
+python -m unittest discover -s tests -v
+```
+
+可选真实浏览器验证（连接扩展后手动运行，只读取真实研究列表、在自己的空白标签页构造分页夹具，不调用模型、不写正式文章数据）：
+
+```bat
+python tests\verify_browser_live.py
+```
+
+该验证检查真实 Anthropic Load more / 日期截止、长 HTML 完整性、异常清理、客户端断开及任务标签页消失。详细迁移验收记录见 [tests/browser_migration_validation.md](tests/browser_migration_validation.md)。
 
 可以把流程的两步分开测试。
 

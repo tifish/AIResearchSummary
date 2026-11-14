@@ -181,7 +181,7 @@ def fetch_listing_html(source_id: str, stop_cutoff: date | None = None) -> str:
                 load_more=bool(source.get("load_more")),
                 stop_when=stop_when,
             )
-        except Exception as exc:  # Chrome unavailable -> fall back to a static first-page fetch
+        except Exception as exc:  # Browser MCP unavailable -> fall back to a static first-page fetch
             print(f"discover: {source_id} browser render failed ({exc}); using static fetch.", file=sys.stderr)
     return _fetch_static(source)
 

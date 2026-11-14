@@ -1,41 +1,15 @@
-"""Fetch fully-rendered HTML through a local Chrome browser.
+"""Render pages through Browser MCP's connected, logged-in daily browser.
 
-Used for sources whose pages are JS-rendered or bot-protected (e.g. OpenAI, which
-returns HTTP 403 to plain HTTP clients). Drives the locally installed Google Chrome
-via Playwright; a real browser with a persistent profile passes the Cloudflare/bot
-checks that block urllib.
-
-Always runs headed (so Cloudflare / human checks can render) and reuses a fixed
-persistent profile (<repo>/.chrome-profile) so clearance cookies survive between runs.
-Within one Python process, the Chrome context is reused; each fetch opens a temporary
-tab and closes only that tab when finished.
-"Load more" pagination stops by article DATE (a caller-supplied stop_when), not a
-click count.
-
-Optional environment variables:
-  AIRS_CHROME_CDP       Attach to an already-running Chrome instead of launching one.
-                        Start Chrome with `chrome --remote-debugging-port=9222`, then
-                        set AIRS_CHROME_CDP=http://localhost:9222. Best Cloudflare bypass.
-  AIRS_CHROME_CHANNEL   Chrome channel to launch (default "chrome"; set empty to use
-                        Playwright's bundled Chromium).
+Only this fetch's background tab is operated on or closed. No browser launch,
+profile, debug port, global MCP configuration, or shared daemon shutdown.
 """
-
 from __future__ import annotations
 
 import argparse
-import atexit
-import os
-import re
 import sys
 import time
-import threading
-from pathlib import Path
 
-
-if hasattr(sys.stdout, "reconfigure"):
-    sys.stdout.reconfigure(encoding="utf-8")
-if hasattr(sys.stderr, "reconfigure"):
-    sys.stderr.reconfigure(encoding="utf-8")
+from browser_mcp import BrowserPage, close_browser_session
 
 DEFAULT_TIMEOUT_MS = 45000
 CONTENT_READY_MAX_WAIT_MS = 8000
@@ -48,177 +22,13 @@ LOAD_MORE_POLL_MS = 150
 LOAD_MORE_SETTLE_MS = 500
 LOAD_MORE_MAX_WAIT_MS = 8000
 LOAD_MORE_MIN_GROWTH = 500
-LOAD_MORE_RE = re.compile(r"load\s*more|show\s*more|see\s*more|view\s*more|加载更多|查看更多|显示更多|更多", re.I)
-_SESSION_LOCK = threading.RLock()
-_SESSION: dict | None = None
-
-
-def _ensure_playwright():
-    try:
-        from playwright.sync_api import sync_playwright
-    except ModuleNotFoundError as exc:
-        raise RuntimeError(
-            "Missing dependency: playwright. Run `python -m pip install -r requirements.txt`. "
-            "Local Chrome is used to render OpenAI pages."
-        ) from exc
-    return sync_playwright
-
-
-def _profile_dir() -> str:
-    return str(Path(__file__).resolve().parents[1] / ".chrome-profile")
-
-
-def close_browser_session() -> None:
-    """Close the cached browser session when the Python process exits."""
-    global _SESSION
-    with _SESSION_LOCK:
-        session = _SESSION
-        _SESSION = None
-
-    if not session:
-        return
-    closers = (
-        ("context", "close_context"),
-        ("browser", "close_browser"),
-    )
-    for key, flag in closers:
-        if not session.get(flag):
-            continue
-        obj = session.get(key)
-        if obj is None:
-            continue
-        try:
-            obj.close()
-        except Exception:
-            pass
-    playwright = session.get("playwright")
-    if playwright is not None:
-        try:
-            playwright.stop()
-        except Exception:
-            pass
-
-
-atexit.register(close_browser_session)
-
-
-def _close_extra_pages(context, keep_pages) -> None:
-    """The dedicated profile may restore old tabs; keep only pages we own."""
-    keep = {id(page) for page in keep_pages if page is not None}
-    for page in list(getattr(context, "pages", [])):
-        if id(page) in keep:
-            continue
-        try:
-            page.close()
-        except Exception:
-            pass
-
-
-def _ensure_keepalive_page(session: dict):
-    page = session.get("keepalive_page")
-    if page is not None:
-        try:
-            if not page.is_closed():
-                return page
-        except Exception:
-            pass
-
-    page = session["context"].new_page()
-    try:
-        page.goto("about:blank")
-    except Exception:
-        pass
-    session["keepalive_page"] = page
-    return page
-
-
-def _browser_session(cdp: str | None, channel: str | None, headless: bool):
-    global _SESSION
-    key = (cdp or "", channel or "", headless)
-    with _SESSION_LOCK:
-        if _SESSION is not None and _SESSION.get("key") == key:
-            return _SESSION
-        if _SESSION is not None:
-            close_browser_session()
-
-        sync_playwright = _ensure_playwright()
-        playwright = sync_playwright().start()
-        browser = None
-        try:
-            if cdp:
-                browser = playwright.chromium.connect_over_cdp(cdp)
-                if browser.contexts:
-                    context = browser.contexts[0]
-                    close_context = False
-                else:
-                    context = browser.new_context()
-                    close_context = True
-            else:
-                launch_kwargs: dict = {
-                    "headless": headless,
-                    "args": ["--disable-blink-features=AutomationControlled"],
-                }
-                if channel:
-                    launch_kwargs["channel"] = channel
-                context = playwright.chromium.launch_persistent_context(_profile_dir(), **launch_kwargs)
-                close_context = True
-        except Exception:
-            try:
-                if browser is not None:
-                    browser.close()
-            finally:
-                playwright.stop()
-            raise
-
-        _SESSION = {
-            "key": key,
-            "playwright": playwright,
-            "browser": browser,
-            "context": context,
-            "close_context": close_context,
-            "close_browser": False,
-            "cleaned_pages": False,
-            "keepalive_page": None,
-        }
-        return _SESSION
-
-
-def _new_fetch_page(cdp: str | None, channel: str | None, headless: bool):
-    session = _browser_session(cdp, channel, headless)
-    try:
-        keepalive_page = _ensure_keepalive_page(session) if session.get("close_context") else None
-        page = session["context"].new_page()
-    except Exception:
-        close_browser_session()
-        session = _browser_session(cdp, channel, headless)
-        keepalive_page = _ensure_keepalive_page(session) if session.get("close_context") else None
-        page = session["context"].new_page()
-    if session.get("close_context") and not session.get("cleaned_pages"):
-        _close_extra_pages(session["context"], (keepalive_page, page))
-        session["cleaned_pages"] = True
-    return page
-
 
 def _find_load_more(page):
-    for getter in (
-        lambda: page.get_by_role("button", name=LOAD_MORE_RE),
-        lambda: page.get_by_role("link", name=LOAD_MORE_RE),
-        lambda: page.locator("button, a, [role=button]").filter(has_text=LOAD_MORE_RE),
-    ):
-        try:
-            loc = getter()
-            if loc.count() > 0 and loc.first.is_visible():
-                return loc.first
-        except Exception:
-            continue
-    return None
+    return page.find_load_more()
 
 
 def _count_links(page) -> int:
-    try:
-        return page.locator("a[href]").count()
-    except Exception:
-        return 0
+    return page.evaluate('() => document.querySelectorAll("a[href]").length')
 
 
 def _content_snapshot(page) -> dict:
@@ -365,35 +175,29 @@ def fetch_rendered(
     max_loads: int | None = None,
     stop_when=None,
 ) -> str:
-    """Return the fully-rendered HTML of url using a local Chrome browser.
+    """Return the fully-rendered HTML of url using a Browser MCP connected browser.
 
     When load_more is True, repeatedly click a 'Load more' control so paginated
     listings (e.g. OpenAI) expose more than the first page. stop_when(html) -> bool,
     if given, is the intended stop condition (e.g. articles reached the date cutoff);
     max_loads is only a safety cap.
     """
-    cdp = os.environ.get("AIRS_CHROME_CDP")
-    headless = False  # always headed so Cloudflare / human checks can render
-    channel = os.environ.get("AIRS_CHROME_CHANNEL", "chrome") or None
     if max_loads is None:
         max_loads = SAFETY_MAX_LOADS
-
-    page = _new_fetch_page(cdp, channel, headless)
-    try:
+    with BrowserPage(timeout_ms=timeout_ms) as page:
         return _load(page, url, wait_selector, timeout_ms, load_more, max_loads, stop_when)
-    finally:
-        try:
-            page.close()
-        except Exception:
-            pass
 
 
 def main() -> int:
-    arg_parser = argparse.ArgumentParser(description="Print fully-rendered HTML of a URL via local Chrome.")
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+    if hasattr(sys.stderr, "reconfigure"):
+        sys.stderr.reconfigure(encoding="utf-8")
+    arg_parser = argparse.ArgumentParser(description="Print fully-rendered HTML of a URL via Browser MCP.")
     arg_parser.add_argument("url")
     arg_parser.add_argument("--wait-selector", default=None, help="Optional CSS selector to wait for.")
     arg_parser.add_argument("--load-more", action="store_true", help="Click 'Load more' until exhausted.")
-    arg_parser.add_argument("--max-loads", type=int, default=None, help="Max 'Load more' clicks (default 25).")
+    arg_parser.add_argument("--max-loads", type=int, default=None, help="Max 'Load more' clicks (default 100).")
     args = arg_parser.parse_args()
 
     try:
