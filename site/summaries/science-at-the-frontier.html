@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>科学前沿：</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --bg:#f7f6f2; --paper:#ffffff; --ink:#202b36; --muted:#5c6875; --line:#d8dee3;
+  --data:#1563a4; --risk:#a34a26; --opportunity:#14755c; --conclusion:#7045a1;
+  --hl:#dfedf9; --hl2:#e9e1f4; --risk-bg:#faebe2; --opportunity-bg:#e3f1eb;
+  --hero-bg:#182c40; --hero-ink:#edf4fa; --hero-muted:#c2d1de;
+}
+:root[data-theme="light"] {
+  color-scheme:light;
+  --bg:#f7f6f2; --paper:#ffffff; --ink:#202b36; --muted:#5c6875; --line:#d8dee3;
+  --data:#1563a4; --risk:#a34a26; --opportunity:#14755c; --conclusion:#7045a1;
+  --hl:#dfedf9; --hl2:#e9e1f4; --risk-bg:#faebe2; --opportunity-bg:#e3f1eb;
+  --hero-bg:#182c40; --hero-ink:#edf4fa; --hero-muted:#c2d1de;
+}
+@media (prefers-color-scheme:dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#121820; --paper:#1b2430; --ink:#e0e7ef; --muted:#a8b6c5; --line:#364554;
+    --data:#79b9f1; --risk:#f0a074; --opportunity:#6dd3ad; --conclusion:#c4a2f0;
+    --hl:#203b52; --hl2:#3a2d4d; --risk-bg:#382a24; --opportunity-bg:#203a33;
+    --hero-bg:#192b3d; --hero-ink:#e0eaf4; --hero-muted:#afc3d5;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme:dark;
+  --bg:#121820; --paper:#1b2430; --ink:#e0e7ef; --muted:#a8b6c5; --line:#364554;
+  --data:#79b9f1; --risk:#f0a074; --opportunity:#6dd3ad; --conclusion:#c4a2f0;
+  --hl:#203b52; --hl2:#3a2d4d; --risk-bg:#382a24; --opportunity-bg:#203a33;
+  --hero-bg:#192b3d; --hero-ink:#e0eaf4; --hero-muted:#afc3d5;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Microsoft YaHei",sans-serif;line-height:1.85}
+main{max-width:1080px;margin:auto;padding:32px 24px 72px}
+h1,h2,h3,h4{line-height:1.4}
+h1{font-size:clamp(2.5rem,6vw,4.5rem);margin:12px 0}
+h2{font-size:1.8rem;margin:0 0 20px}
+h3{font-size:1.23rem}
+p{margin:12px 0 20px}
+a{color:var(--data);text-underline-offset:3px}
+.hero{background:var(--hero-bg);color:var(--hero-ink);padding:40px;border-radius:20px}
+.original,.meta{color:var(--hero-muted)}
+.original{font-size:1.3rem;margin:0 0 20px}
+.overview{font-size:1.15rem;border-top:1px solid var(--hero-muted);padding-top:22px}
+.summary-block{margin-top:34px}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-bottom:1px solid var(--line);padding:20px 0}
+.metric{padding:16px 24px;border-left:3px solid var(--data)}
+.metric strong{display:block;font-size:2.4rem;color:var(--data);line-height:1.3}
+.metric span{display:block;color:var(--muted);font-size:.95rem}
+mark{background:var(--hl);color:var(--ink);padding:1px 4px;border-radius:3px}
+mark.conclusion{background:var(--hl2)}
+.table-wrap{overflow-x:auto;background:var(--paper);border-radius:12px;padding:20px}
+table{width:100%;border-collapse:collapse;font-size:.96rem}
+caption{text-align:left;font-weight:700;margin-bottom:14px}
+th,td{padding:13px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--hl);color:var(--ink)}
+td.num{color:var(--data);font-weight:750;white-space:nowrap}
+.note{font-size:.9rem;color:var(--muted)}
+.opportunity{background:var(--opportunity-bg);border-left:5px solid var(--opportunity);padding:22px 28px}
+.opportunity h3{color:var(--opportunity);margin-top:0}
+.columns{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.risk{padding:22px 28px;background:var(--risk-bg);border-top:4px solid var(--risk)}
+.risk h3{color:var(--risk);margin-top:0}
+.process{padding:20px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.process ol{padding-left:24px}
+.takeaways{display:grid;grid-template-columns:1fr 1fr;gap:14px;list-style:none;padding:0}
+.takeaways li{background:var(--paper);padding:20px;border-left:4px solid var(--conclusion)}
+.takeaways strong{color:var(--conclusion)}
+#translation{max-width:780px;margin:64px auto 0;padding-top:38px;border-top:3px solid var(--conclusion)}
+#translation h3{margin-top:38px}
+#translation h4{margin-top:28px}
+#translation .source-nav{color:var(--muted);padding-left:22px}
+#translation .source-nav li{margin:8px 0}
+blockquote{margin:28px 0;padding:16px 24px;border-left:4px solid var(--opportunity);background:var(--opportunity-bg)}
+.source-figure{margin:30px 0}
+.source-figure img{display:block;width:100%;height:auto;object-fit:contain}
+figcaption{font-size:.9rem;color:var(--muted);margin-top:10px}
+.role-list{padding-left:24px}
+.role-list li{margin-bottom:18px}
+@media(max-width:680px){
+  main{padding:16px 16px 48px}
+  .hero{padding:26px}
+  .metrics,.columns,.takeaways{grid-template-columns:1fr}
+  .metric{margin:10px 0}
+  th,td{padding:10px}
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/science-at-the-frontier" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header class="hero">
+<div class="meta">OpenAI · Research · 2026 年 11 月 16 日</div>
+<h1>科学前沿：</h1>
+<p class="original" lang="en">Science at the Frontier:</p>
+<p class="overview"><strong>一句话总括：</strong>这项研究结合科学家的 ChatGPT 使用记录和问卷，描绘了 AI 如何参与科研，也明确区分了已经观察到的用途与尚未验证的发现提速预期。</p>
+</header>
+<section aria-label="中文总结" class="summary-block">
+<h2>中文总结</h2>
+<h3>AI 已进入研究过程，证据来自使用记录与问卷</h3>
+<div class="metrics">
+<div class="metric"><strong>1,819 人</strong><span>使用记录分析覆盖的科学家</span></div>
+<div class="metric"><strong>580,186 条</strong><span>被分析的科学相关消息</span></div>
+<div class="metric"><strong>251 人</strong><span>纳入分析的问卷受访者</span></div>
+</div>
+<p>使用记录覆盖 <mark>2026 年 8 月 20 日至 9 月 22 日</mark>。问卷于 9 月 30 日至 10 月 7 日开展，不同问题的回答人数不同。</p>
+<p>科学家用 ChatGPT 梳理文献、分析证据、编写代码和发展研究想法。这说明 AI 的作用已覆盖研究过程中的多种工作，但研究对象来自特定项目，结果有其适用范围。</p>
+</section>
+<section class="summary-block table-wrap">
+<h3>研究构思既有科学家主导，也有共同完善和 AI 提议</h3>
+<p><mark>68%</mark> 的研究对象曾使用 ChatGPT 开展研究构思。这里的“使用”指研究期间至少发送了 <strong>3 条</strong>相关消息。</p>
+<table>
+<caption>研究构思消息中的角色分布（单位：%；先计算每位科学家的占比，再取平均）</caption>
+<thead><tr><th>角色</th><th>占比</th><th>具体含义</th></tr></thead>
+<tbody>
+<tr><td>科学家主导</td><td class="num">35%</td><td>科学家提出具体问题，交给 ChatGPT 处理。</td></tr>
+<tr><td>共同完善</td><td class="num">36%</td><td>科学家带着想法，请 ChatGPT 改进。</td></tr>
+<tr><td>ChatGPT 提议</td><td class="num">23%</td><td>科学家请 ChatGPT 提出研究问题。</td></tr>
+<tr><td>其他</td><td class="num">6%</td><td>无法归入上述角色。</td></tr>
+</tbody>
+</table>
+<p>这些比例描述的是构思消息中的互动方式。它们表明，AI 既被用于完善已有想法，也被用于探索新的研究问题。</p>
+</section>
+<section class="summary-block columns">
+<div class="opportunity">
+<h3>效率感受很强，发现提速仍是预期</h3>
+<p>在 8 类研究活动中，受访者估计：有 AI 时完成的 <strong>1 小时</strong>工作，若没有 AI，以相同质量完成约需 <mark>1.9 小时</mark>。各类活动回答人数为 249—251 人。</p>
+<p>回答发现时间问题的 <strong>250 人</strong>中，<mark>98%</mark> 预计 AI 会加快所在领域的发现。题目以“没有 AI 需要 10 年的发现”为参照。</p>
+<p>这些结果显示了研究者的效率感受和期待，实际发现速度仍需后续验证。</p>
+</div>
+<div class="risk">
+<h3>使用、感受和因果效果需要分开理解</h3>
+<p>使用记录说明科学家向 AI 提出了什么请求。生产率来自自我报告，发现时间来自预期。<mark class="conclusion">研究并未确立因果效应。</mark></p>
+<p>研究还考察了科学家是否继续澄清、核查或修改回答。所给正文没有列出各类活动的具体跟进比例。</p>
+<p>因此，不能把工具使用、主观节时估计和真实科研产出视为同一种证据。</p>
+</div>
+</section>
+<section class="summary-block table-wrap">
+<h3>科学家的期待也包括更好的问题和更广的研究范围</h3>
+<table>
+<caption>预期发现提速的原因（224 份书面回答中识别出的 367 条理由；单位：%）</caption>
+<thead><tr><th>原因</th><th>占全部理由的比例</th></tr></thead>
+<tbody>
+<tr><td>更快完成研究工作</td><td class="num">52%</td></tr>
+<tr><td>找到更有前景的研究问题</td><td class="num">23%</td></tr>
+<tr><td>探索更广泛的问题</td><td class="num">14%</td></tr>
+<tr><td>其他</td><td class="num">11%</td></tr>
+</tbody>
+</table>
+<p class="note">一份回答可以包含多个理由。这里的比例以理由总数为分母，并非受访者比例。</p>
+<p>节省时间是最常见的理由。另两类主要理由指向研究方向与范围，说明科学家期待 AI 改变的不只是工作速度。</p>
+</section>
+<section class="summary-block process">
+<h3>从研究想法到科学发现，仍需现实资源支撑</h3>
+<ol>
+<li><strong>保护隐私：</strong>研究团队使用自动分类器的输出，没有查看原始消息或 ChatGPT 回答。该项目默认不使用参与者数据训练模型。</li>
+<li><strong>继续检验：</strong>预期能否转化为更快的发现，需要进一步研究。资金、人员和实验能力仍会影响进展。</li>
+<li><strong>扩大使用机会：</strong>OpenAI 同时宣布扩展 ChatGPT for Academic Researchers，为全球超过 <mark>200,000 名</mark>研究者提供免费访问。</li>
+</ol>
+<p>扩大工具覆盖范围可以增加探索机会，但从想法走向发现，还取决于科学家能否开展验证。</p>
+</section>
+<section class="summary-block">
+<h3>最值得带走的洞见</h3>
+<ul class="takeaways">
+<li><strong>AI 的科研用途横跨多个环节。</strong>研究者将它用于构思、证据分析、代码和成果表达。</li>
+<li><strong>构思过程包含多种合作方式。</strong>科学家提出问题、共同完善想法和请 AI 提议，都在记录中出现。</li>
+<li><strong>1.9 倍是自报时间估计。</strong>98% 是发现提速预期。两者都不是已测得的发现速度增幅。</li>
+<li><strong>科研影响还取决于验证条件。</strong>更好的问题需要人员、经费和实验能力才能变成发现。</li>
+</ul>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<p>1,800 多名科学家如何使用 ChatGPT？他们认为 AI 将如何影响科学发现？欢迎阅读我们的新报告，了解研究结果。</p>
+<ul class="source-nav">
+<li>AI 已成为科学家日常工作的一部分</li>
+<li>68% 的科学家曾使用 ChatGPT 开展研究构思</li>
+<li>98% 的受访科学家预计，AI 会加快所在领域的科学发现。</li>
+<li>即使将任务交给 ChatGPT，科学家仍会继续参与</li>
+<li>AI 如何进一步推动科学进步？</li>
+<li>展望未来</li>
+<li>关于这项研究</li>
+</ul>
+<ul class="source-nav">
+<li>AI 已成为科学家日常工作的一部分</li>
+<li>68% 的科学家曾使用 ChatGPT 开展研究构思</li>
+<li>98% 的受访科学家预计，AI 会加快所在领域的科学发现。</li>
+<li>即使将任务交给 ChatGPT，科学家仍会继续参与</li>
+<li>AI 如何进一步推动科学进步？</li>
+<li>展望未来</li>
+<li>关于这项研究</li>
+</ul>
+<p>科学进步有赖于研究者提出新问题，并找到回答这些问题的方法。AI 正在成为这项工作的一部分。但它在哪些方面有所帮助，又会对科学发现产生什么影响，我们仍在探索。</p>
+<p>OpenAI 的 Economic Research 团队研究了 ChatGPT for Academic Researchers 夏季试点中，1,819 名科学家发送的超过 580,000 条科学相关消息。团队还对 251 名参与者进行了问卷调查。</p>
+<p>科学家在研究过程的各个环节使用 ChatGPT，包括梳理文献、分析证据和发展研究想法。受访者估计，如果没有 AI，以相同质量完成同样的工作，需要的时间将是原来的 <mark>1.9 倍</mark>。在回答发现时间问题的受访者中，<mark>98%</mark> 预计 AI 会加快所在领域的科学发现。</p>
+<p>默认情况下，OpenAI 不会使用 ChatGPT for Academic Researchers 项目参与者的数据来训练模型。为保护研究者的隐私，我们使用自动分类器，按研究活动类型对消息进行分类。例如，梳理文献、编写代码或分析数据。研究团队可以看到这些类别，但没有阅读原始消息或 ChatGPT 的回答。</p>
+<h3>AI 已成为科学家日常工作的一部分</h3>
+<p>我们研究了科学家如何在研究过程的各个环节使用 ChatGPT。</p>
+<p>我们先计算每位科学家的科学相关消息中，各类活动所占的比例，再对这些比例取平均。每位科学家的权重相同。百分比经过四舍五入；其他研究活动占比低于 1%。</p>
+<h3>68% 的科学家曾使用 ChatGPT 开展研究构思</h3>
+<p>我们考察了科学家如何使用 ChatGPT 开展构思。以下数字描述了他们关于研究想法的消息。</p>
+<ul class="role-list">
+<li>
+<strong>科学家主导</strong>
+<p><mark>35%</mark></p>
+<p>在这些情形中，科学家提出具体问题，交给 ChatGPT 处理。</p>
+</li>
+<li>
+<strong>共同完善</strong>
+<p><mark>36%</mark></p>
+<p>在这些情形中，科学家带着一个想法，请 ChatGPT 加以完善。</p>
+</li>
+<li>
+<strong>由 ChatGPT 提议</strong>
+<p><mark>23%</mark></p>
+<p>在这些情形中，科学家请 ChatGPT 提出研究问题。</p>
+</li>
+<li>
+<strong>其他</strong>
+<p><mark>6%</mark></p>
+<p>这类消息无法归入其他任何一类活动。</p>
+</li>
+</ul>
+<h3>98% 的受访科学家预计，AI 会加快所在领域的科学发现。</h3>
+<p>我们请不同领域的科学家设想一项没有 AI 时需要 10 年才能取得的发现，再估计有了 AI 后需要多久。</p>
+<p>250 名受访者回答了这个问题。受访者可以选择多个领域，因此各领域分组之间存在重叠。百分比经过四舍五入，相加后可能不等于 100%。</p>
+<h3>即使将任务交给 ChatGPT，科学家仍会继续参与</h3>
+<p>我们衡量了不同研究活动中，科学家在获得 ChatGPT 的回答后，继续要求澄清、核查或修改的频率。</p>
+<p>指标为每位科学家发出的请求中，引发后续跟进的请求所占比例的平均值。</p>
+<h3>AI 如何进一步推动科学进步？</h3>
+<p>我们请那些预计科学发现会加快的科学家解释原因。他们的回答中，有三类理由尤为突出。</p>
+<dl>
+<dt><strong>52%</strong></dt>
+<dd>更快完成研究工作</dd>
+<dt><strong>23%</strong></dt>
+<dd>找到更有前景的研究问题</dd>
+<dt><strong>14%</strong></dt>
+<dd>探索更广泛的问题</dd>
+<dt><strong>11%</strong></dt>
+<dd>其他</dd>
+</dl>
+<p>科学家可以给出多个理由。这些百分比表示各类理由在全部 367 条理由中的占比。这些理由来自 224 份书面回答。</p>
+<h3>展望未来</h3>
+<p>这项研究中的科学家使用 ChatGPT 探索想法、分析证据、编写代码，以及交流研究成果。他们的回答也体现了超越节省时间的期待：找到更有前景的问题，并探索更广泛的研究方向。</p>
+<p>这些期待是否会转化为更快的科学发现，还需要进一步研究。科学进步也取决于研究者能否获得检验想法所需的资金、人员和实验能力。</p>
+<p>我们希望帮助更多科学家探索 AI 能为他们的工作带来哪些可能。与这项研究同时推进的，还有 ChatGPT for Academic Researchers 的扩展。我们将为全球超过 200,000 名研究者提供免费访问。我们的使命是确保通用人工智能（AGI）造福全人类。帮助科学家将想法转化为改善生活的发现，是这一使命的核心。</p>
+<p>如需进一步了解这项研究，请阅读完整论文（在新窗口中打开），或下载主要发现（在新窗口中打开）。</p>
+<blockquote>
+<p>“ChatGPT 这样的工具正在帮助我们加快科学发现。对我这样的科学家来说，它简直是一个探索的乐园。”</p>
+<p>César de la Fuente</p>
+<p>抗微生物研究</p>
+</blockquote>
+<h3>关于这项研究</h3>
+<h4>研究对象</h4>
+<p>我们分析了 1,819 名使用 ChatGPT for Academic Researchers 计划的科学家发送的 580,186 条科学相关消息。消息时间范围为 2026 年 8 月 20 日至 9 月 22 日。</p>
+<p>问卷调查于 9 月 30 日至 10 月 7 日开展。分析纳入了 251 名科学家的回答。不同问题的回答数量有所不同。</p>
+<h4>我们如何衡量 AI 使用情况</h4>
+<p>我们先计算每位科学家的科学相关消息中，各类活动所占的比例，再对这些比例取平均。每位科学家的权重相同。“其他研究活动”合并了“其他”和“端到端自主研究”这两个类别。</p>
+<p>“开展研究构思”指研究期间至少发送了三条关于发展研究想法的消息。构思角色图先计算每位科学家各类构思消息的占比，再取平均。“其他”表示无法确定角色。</p>
+<p>“请求引发后续跟进”的比例，就是科学家参与度得分。它衡量的是：在同一对话中，科学家是否在七天内发送的下一条科学相关消息里，要求澄清、核查或修改。我们先计算每位科学家在每类活动中的比例，再取平均。只有观察时间窗口完整、且结果可以评估的初始请求，才会被纳入。</p>
+<h4>如何理解问卷结果</h4>
+<p><strong>生产率。</strong>我们询问科学家，如果没有 AI，以相同质量完成同样的工作，需要多少时间。在八类研究活动中，他们估计，有 AI 可用时完成的一小时工作，如果没有 AI，大约需要 1.9 小时。计算平均值时，每类活动的权重相同。每类活动包含 249—251 名受访者的回答。如果一位科学家表示某类活动没有使用 AI，我们就将其所需时间计为不变。</p>
+<p><strong>发现时间。</strong>我们请 250 名科学家设想：所在领域的一项发现，如果没有 AI，需要十年才能取得。有了 AI 后，他们预计多久能实现？图表按他们预计的时间对回答进行分组。“未加速”包括十年或更久的回答。科学家可以选择多个领域，因此有些人会出现在不止一个分组中。</p>
+<p><strong>科学家为何预计发现会加快。</strong>预计 AI 会加快科学发现的科学家，可以用自己的话解释原因。我们从 224 份书面回答中识别出 367 条理由。一份回答可能给出多个理由。百分比表示每类理由在这 367 条理由中所占的比例。</p>
+<h4>数据来源、隐私和局限</h4>
+<p>研究团队使用保护隐私的分类器输出，没有查看原始 ChatGPT 消息或回答。ChatGPT for Academic Researchers 计划默认不使用用户数据训练模型。</p>
+<p>使用情况描述的是向 AI 发出的请求。生产率数据来自自我报告，关于发现的结果则是预期。<mark class="conclusion">这些发现并未确立因果效应。</mark>科学家还报告了人员、资金和实验能力方面的限制。</p>
+<p>百分比四舍五入至最接近的整数，低于 1% 的数值显示为“&lt;1%”。四舍五入后，各类别之和可能不等于 100%。</p>
+<p>阅读论文 ↗（在新窗口中打开）</p>
+<h3>继续阅读</h3>
+<figure class="source-figure" data-source-image="0"><img alt="Academic researchers — art card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/1FaKIo74WEGULSjb4ooTrV/718f3bc75e7b2ddd276d43a0fc97760a/academic-researchers-art-card.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="1"><img alt="A step toward defining the Standard Model on a lattice — Cover" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/51e0MM5mlV9kIMJfckkYKU/e00b4adc4dcfcd9f67372c7c05bba4d5/toward-defining-the-standard-model-cover.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="2"><img alt="Our new blog for science – Listing card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/2fvu7edF4cf5u7kJblcTaj/ad0f92a73e0ce3e7fecfea334fa225e3/our-new-blog-for-science-card.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

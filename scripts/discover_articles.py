@@ -56,6 +56,7 @@ OPENAI_CATEGORIES = (
     "Conclusion",
     "Research",
     "Security",
+    "Science",
 )
 ANTHROPIC_CATEGORY_PREFIXES = (
     "Economic Research",

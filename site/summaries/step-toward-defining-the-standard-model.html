@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>向在格点上定义标准模型迈出一步</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #f6f5f0;
+  --paper: #ffffff;
+  --ink: #202b35;
+  --muted: #596775;
+  --line: #d7dddF;
+  --data: #185cb2;
+  --risk: #ac4338;
+  --opportunity: #147965;
+  --conclusion: #7544a6;
+  --hl: #e4eefc;
+  --hl2: #eee4fa;
+  --risk-bg: #faeae5;
+  --opportunity-bg: #e3f2eb;
+  --hero: #172b42;
+  --hero-ink: #f0f4fa;
+  --hero-muted: #c3d2e2;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f6f5f0;
+  --paper: #ffffff;
+  --ink: #202b35;
+  --muted: #596775;
+  --line: #d7dddf;
+  --data: #185cb2;
+  --risk: #ac4338;
+  --opportunity: #147965;
+  --conclusion: #7544a6;
+  --hl: #e4eefc;
+  --hl2: #eee4fa;
+  --risk-bg: #faeae5;
+  --opportunity-bg: #e3f2eb;
+  --hero: #172b42;
+  --hero-ink: #f0f4fa;
+  --hero-muted: #c3d2e2;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12171d;
+    --paper: #1b232c;
+    --ink: #dce4ed;
+    --muted: #a6b5c5;
+    --line: #354352;
+    --data: #82b4fa;
+    --risk: #f39a89;
+    --opportunity: #6bd0b6;
+    --conclusion: #c6a1f1;
+    --hl: #223650;
+    --hl2: #37294a;
+    --risk-bg: #352522;
+    --opportunity-bg: #1d342e;
+    --hero: #101f30;
+    --hero-ink: #e0e9f4;
+    --hero-muted: #afc1d5;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #12171d;
+  --paper: #1b232c;
+  --ink: #dce4ed;
+  --muted: #a6b5c5;
+  --line: #354352;
+  --data: #82b4fa;
+  --risk: #f39a89;
+  --opportunity: #6bd0b6;
+  --conclusion: #c6a1f1;
+  --hl: #223650;
+  --hl2: #37294a;
+  --risk-bg: #352522;
+  --opportunity-bg: #1d342e;
+  --hero: #101f30;
+  --hero-ink: #e0e9f4;
+  --hero-muted: #afc1d5;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif; line-height: 1.85; }
+main { max-width: 1120px; margin: auto; padding: 32px 24px 80px; }
+.hero { padding: 48px; background: var(--hero); color: var(--hero-ink); border-radius: 20px; }
+h1 { font-size: clamp(28px, 4vw, 44px); line-height: 1.35; margin: 12px 0; }
+.english { color: var(--hero-muted); font-size: 17px; line-height: 1.6; }
+.meta { font-size: 14px; color: var(--hero-muted); }
+.lead { font-size: 21px; max-width: 850px; margin-top: 28px; }
+h2 { font-size: 27px; line-height: 1.45; margin: 0 0 20px; }
+h3 { font-size: 21px; line-height: 1.5; }
+p { margin: 0 0 1.1em; }
+a { color: var(--data); overflow-wrap: anywhere; }
+.numbers { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--line); margin: 28px 0 40px; }
+.number { padding: 22px; }
+.number + .number { border-left: 1px solid var(--line); }
+.number strong { display: block; color: var(--data); font-size: 36px; line-height: 1.4; }
+.number span { font-size: 15px; color: var(--muted); }
+.block { margin: 38px 0; }
+.table-wrap { overflow-x: auto; background: var(--paper); border-radius: 12px; padding: 24px; }
+table { width: 100%; border-collapse: collapse; font-size: 16px; }
+th, td { padding: 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+th { color: var(--data); background: var(--hl); }
+.note { color: var(--muted); font-size: 14px; }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+.method { padding: 26px; background: var(--opportunity-bg); border-top: 4px solid var(--opportunity); }
+.roles { padding: 12px 0 12px 24px; border-left: 4px solid var(--data); }
+.steps { padding-left: 24px; }
+.steps li { padding: 5px 0 8px 8px; }
+.caution { background: var(--risk-bg); border-left: 5px solid var(--risk); padding: 28px; }
+.caution h2 { color: var(--risk); }
+mark { background: var(--hl); color: var(--data); padding: 1px 4px; border-radius: 4px; }
+.insight { color: var(--conclusion); background: var(--hl2); padding: 16px 20px; font-weight: 650; }
+.takeaways { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 0; list-style: none; }
+.takeaways li { padding: 20px; border: 1px solid var(--line); border-top: 3px solid var(--conclusion); background: var(--paper); }
+#translation { max-width: 800px; margin: 64px auto 0; padding-top: 40px; border-top: 2px solid var(--line); }
+#translation h2 { font-size: 31px; }
+#translation h3 { margin-top: 38px; }
+#translation p { line-height: 1.95; }
+.source-nav { color: var(--muted); font-size: 15px; margin: 24px 0; }
+.source-nav ul { padding-left: 22px; }
+.source-figure { margin: 34px 0; }
+.source-figure img { display: block; max-width: 100%; height: auto; margin: auto; }
+figcaption { font-size: 14px; color: var(--muted); line-height: 1.75; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.references { padding-left: 24px; font-size: 15px; }
+.references li { margin-bottom: 16px; }
+@media (max-width: 700px) {
+  main { padding: 16px 16px 50px; }
+  .hero { padding: 28px 24px; }
+  .numbers { grid-template-columns: 1fr; }
+  .number + .number { border-left: 0; border-top: 1px solid var(--line); }
+  .number strong { font-size: 30px; }
+  .split, .takeaways { grid-template-columns: 1fr; }
+  .table-wrap { padding: 12px; }
+  th, td { padding: 10px; min-width: 120px; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/step-toward-defining-the-standard-model" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header class="hero">
+<p class="meta">OpenAI · Research · 2026年11月15日</p>
+<h1>向在格点上定义标准模型迈出一步</h1>
+<p class="english">A step toward defining the Standard Model on a lattice</p>
+<p class="lead"><strong>一句话总括：</strong>Nathaniel Craig 与 GPT‑6 Astra 提出一种通过逐步细化网格来确定费米子相位的方法，为有限格距下的标准模型提供了一个非微扰定义候选方案。</p>
+</header>
+<section aria-label="原文关键数量与时间跨度" class="numbers">
+<div class="number"><strong>18个数量级</strong><span>标准模型理论计算与实验吻合所覆盖的能量范围</span></div>
+<div class="number"><strong>50多年</strong><span>完整非微扰定义这一基础问题延续的时间</span></div>
+<div class="number"><strong>25年以上</strong><span>完整标准模型的格点相位设定问题悬而未决的时间</span></div>
+</section>
+<section class="block">
+<h2>预测很准，不等于已经有完整的非微扰定义</h2>
+<p>微扰论把相互作用当作小修正。它对电子磁性等问题极其有效，却不能充分处理质子质量这类由强相互作用主导的问题。格点方法让相互作用从一开始就存在，因此能补上不同类型的计算能力。</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>原文中的例子</th><th>数值或范围</th><th>说明了什么</th></tr></thead>
+<tbody>
+<tr><td>理论与实验的吻合</td><td>跨越18个数量级</td><td>从氢的21厘米射电辐射，到 Large Hadron Collider 的高能碰撞。</td></tr>
+<tr><td>电子磁性预测</td><td>精确到万亿分之几</td><td>微扰论在修正项逐渐减小时，可以达到极高精度。</td></tr>
+<tr><td>质子的组成</td><td>3个夸克</td><td>质子质量主要来自内部夸克和胶子的运动与相互作用，不能靠关闭强力后的状态来理解。</td></tr>
+<tr><td>标准模型包含的基本力</td><td>4种中的3种</td><td>包括强力、弱力和电磁力。</td></tr>
+</tbody>
+</table>
+<p class="note">数值及适用范围均来自原文；这些例子并非对候选构造的性能测试。</p>
+</div>
+<p class="insight">这项工作的目标是补足理论的定义基础。现有预测的成功，并不能消除这个基础问题。</p>
+</section>
+<section class="block split">
+<div class="method">
+<h2>网格细化把相位问题拆成可累加的修正</h2>
+<ol class="steps">
+<li>把目标网格上的同一组力场表示到一系列更细的网格上。</li>
+<li>比较相邻网格允许的费米子态，得到相位修正的一部分。</li>
+<li>将各部分相加，为原始网格建立相位规则。</li>
+</ol>
+<p>按作者的论证，该规则能补偿每条允许闭合路径上的相位变化。局部改变的修正主要取决于附近的场，同一场的不同数学描述也会得到相同答案。</p>
+<p><strong>关键限定：</strong>构造适用于<mark>有限格距</mark>，并要求格点尺度上的场强受到限制。</p>
+</div>
+<div class="roles">
+<h2>Astra 参与了构造与证明，专家参与了审阅和追问</h2>
+<p>Craig 已有细化网格的策略，但尚未证明它覆盖所有必要情形。作者称，Astra 提出了将力场带到更细网格上的合适方法，论证了比较结果的收敛性，并主导了详细证明的推导。</p>
+<p>Maarten Golterman、Andreas Kronfeld 和 Yigal Shamir 查看了证明，并提出深入问题。这些交流帮助作者逐步建立对结果的信心。</p>
+<p><strong>这里呈现的 AI 作用，是参与具体的数学物理构造与论证；最终判断仍依赖科学共同体的检验。</strong></p>
+</div>
+</section>
+<section class="block caution">
+<h2>候选定义与可用的模拟方法之间，仍有距离</h2>
+<p>作者将结果明确称为<mark>候选方案</mark>。它是否具备所有所需性质，仍需要专家讨论。要把原则上的构造转化为现实的格点模拟工具，也还有大量工作。</p>
+<p>一个正在研究的问题是：有限格距下是否满足<strong>反射正性</strong>。这一条件有助于将格点计算连接到概率守恒的量子理论。</p>
+<p>连续时空中的相互作用理论定义仍是另一个问题。文章另称，OpenAI 最近关于 Yang-Mills 理论存在性的证明，已被用于证明一种包含标准模型规范场与费米子的最简单统一 Yang-Mills 理论的存在性。</p>
+<p><strong>应分别理解有限格距构造、实际计算可行性和连续极限中的理论存在性。</strong>原文没有把这三件事视为同一个已完成的结果。</p>
+</section>
+<section class="block">
+<h2>最值得带走的洞见</h2>
+<ul class="takeaways">
+<li><strong>精度与定义是不同问题。</strong>标准模型能给出极准预测，但完整的非微扰基础仍有待补足。</li>
+<li><strong>困难不只是去掉多余粒子。</strong>保留所需手征费米子后，还必须一致地确定它们的相位。</li>
+<li><strong>AI 的贡献可以落实到证明环节。</strong>文中具体列出了 Astra 在构造方法、收敛性和详细证明中的参与。</li>
+<li><strong>候选结果需要分层检验。</strong>有限格距下的性质、数值模拟的实用性和连续理论的定义，各有尚需完成的工作。</li>
+</ul>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<nav aria-label="原文第一组章节目录" class="source-nav">
+<ul>
+<li>标准模型的定义还缺什么？</li>
+<li>左手粒子</li>
+<li>用光和镜子作类比</li>
+<li>把相位调对</li>
+<li>与 Astra 一起完成构造</li>
+<li>接下来是什么</li>
+</ul>
+</nav>
+<nav aria-label="原文第二组章节目录" class="source-nav">
+<ul>
+<li>标准模型的定义还缺什么？</li>
+<li>左手粒子</li>
+<li>用光和镜子作类比</li>
+<li>把相位调对</li>
+<li>与 Astra 一起完成构造</li>
+<li>接下来是什么</li>
+</ul>
+</nav>
+<p>在我们科学博客的首篇客座文章中，物理学家、OpenAI 访问科学家 Nathaniel Craig 介绍了他如何与 GPT‑6 Astra 合作，提出标准模型的一个格点定义候选方案。Craig 领导 University of California, Santa Barbara 的粒子理论研究组，也是该校 Kavli Institute for Theoretical Physics 的永久成员。</p>
+<p>粒子物理学的标准模型是一套极其成功的自然理论。它描述了已知的基本粒子，以及四种基本力中的三种：强力、弱力和电磁力。这套理论的成功，建立在理论计算与实验的高度吻合之上。这样的吻合跨越18个数量级，从氢的21厘米射电辐射所对应的低能，到 Large Hadron Collider 碰撞所达到的高能。然而，尽管标准模型在诞生后的50多年里取得了种种成功，一个基础问题仍然存在：如何为完整理论给出非微扰定义，使其不必依赖于把相互作用当作微小修正来处理。在一篇借助 GPT‑6 Astra 完成的10月预印本中，我提出了一个格点上的定义候选方案。这里的格点，就是用来表示时空的网格。</p>
+<p>我已有解决这个问题的策略，却一直未能证明它在所有必须涵盖的情形下都成立。Astra 帮助我把策略变成了具体构造，并主导了详细证明的推导。要解释我们的工作，最好先看看现有标准模型的描述还缺少什么。</p>
+<h3>标准模型的定义还缺什么？</h3>
+<p>说我们还没有标准模型的定义，究竟是什么意思？量子力学和狭义相对论告诉我们，标准模型中的粒子与力如何相互作用。遗憾的是，我们还不知道如何直接从这些相互作用出发，作出完整的预测。因此，我们往往先设想把相互作用关闭。这样一来，电子就不再彼此排斥。这个问题可以精确求解。随后，再把相互作用作为一系列微小修正逐项加回来。当修正项越来越小时，只算几项就能得到极其精确的答案。例如，这种方法让物理学家对电子磁性强弱的预测，精确到万亿分之几。这种方法称为微扰论。</p>
+<p>然而，标准模型中许多丰富的现象都超出了微扰论的适用范围。以质子的质量为例：质子由三个夸克组成，但它的质量主要来自内部夸克，以及传递强力的胶子的运动与相互作用。如果关闭强力，质子就会彻底解体。因此，要理解质子质量的大小，微扰论并不能提供有用的指引。我们需要更强大的方法，以非微扰方式获取理论的信息。在这种方式中，相互作用从一开始就存在，而不是被视为微小修正。</p>
+<p>对于连续时空中的完整标准模型，我们还没有非微扰定义。我们甚至还不清楚，这个包含相互作用的理论在数学上是否定义良好。一个很有希望的替代办法，是把时空离散成由一系列点构成的网格，也就是格点。网格的间距规定了理论所能分辨的最短距离。研究有限网格，就能在给定格距下为理论给出严格的非微扰定义。这也使我们能够把理论放进计算机，直接计算它的预测，而不必诉诸微扰论。这种方法称为格点场论。过去几十年里，它让我们对强力的理解取得了显著进展，其中就包括从第一性原理出发，定量解释质子的质量。</p>
+<h3>左手粒子</h3>
+<p>既然格点场论在强力研究中如此成功，为什么我们还没有把它推广到整个标准模型，给出非微扰格点定义？一个关键差异挡在了面前：标准模型属于所谓的手征理论。</p>
+<p>手征理论在空间反射下会呈现不同的样子。想象镜子里的手套：左手手套的镜像是一只右手手套。如果你左右手手套各有一只，镜子里也一样。因此，这组手套在空间反射下看起来没有变化。但如果你只有一只左手手套，镜中的右手手套就与它不同。</p>
+<p>这种“左右手”的概念也适用于标准模型中的许多基本粒子。它们称为费米子，包括夸克和电子。标准模型中的大多数力没有手征性。例如，强力和电磁力以同样的方式对待左手费米子与右手费米子。这类理论比较容易放到格点上。</p>
+<p>但标准模型中的第三种基本力——弱力——没有这种反射对称性。它对待左手费米子和右手费米子的方式不同。因此，在交换左右的镜面反射下，它的表现也会不同。正是这种对不同手性粒子的区别对待，使标准模型成为手征理论。事实证明，把手征理论放到格点上极其困难。如果我们试图在格点上放入一个左手费米子，最自然的规则会额外产生一个原本不想要的右手伙伴。这是一个令人意外的结果，我们稍后会进一步解释。无论原因是什么，它都意味着：直接把标准模型放到格点上，会得到不符合弱力要求的粒子组成。这种倍增现象，是标准模型自成形以来一直缺少完整非微扰定义的原因之一。</p>
+<h3>用光和镜子作类比</h3>
+<p>要理解倍增现象，可以用光作类比。光有两种偏振，它们描述了光在空间传播时，电场的取向。如果你戴过偏光太阳镜，就会熟悉这一点：它会阻挡水面或路面反射的水平偏振光，同时让垂直偏振光通过。偏光太阳镜选取的是水平和垂直这组偏振基底。但在我们的类比中，更方便的选择是左圆偏振和右圆偏振。这意味着电场绕传播方向顺时针或逆时针旋转。正如前面所说，电磁学具有反射对称性，因此左圆偏振和右圆偏振遵循同样的实际定律。对于熟悉技术细节的读者，需要说明的是：谈到费米子时，左右指的是手征性。在这个光的类比中，左右指的是光子的螺旋度（helicity）。它告诉我们，光子的自旋与传播方向同向还是反向。</p>
+<p>现在，假设你想模拟一个只有左圆偏振光的世界。这类似于弱相互作用对左手费米子的特殊选择。要在实验室里研究这样的世界，可以把一台产生左圆偏振光的激光器放进盒子，盒子两端各放一面镜子。光在来回反射中不断积累，你就能仔细研究它。这有点像把标准模型放到格点上。两种做法都通过限制理论可涉及的长度尺度来获得控制。格点限制了可分辨的最短距离，盒子则限制了最长距离。</p>
+<p>如果你用普通镜子建造这个盒子，就像以最直接的方式把手征理论放到格点上，你会遇到一个意外：激光器发出的左圆偏振光，在另一端的镜面反射后变成了右圆偏振光。于是，盒子里同时出现了两种偏振。这是因为镜子反转了光的传播方向，却没有改变电场的旋转方式——这里始终从盒子的同一端观察。因此，偏振的左右发生了翻转。这有点像把左手费米子放到格点上时出现的倍增粒子。你只提供了左手光，盒子却补上了另一只“手”。</p>
+<p>有一个巧妙的解决办法。可以用特殊薄膜制作手征镜。薄膜中的分子分层排列，排列方向在相邻层之间略微转动，从而沿薄膜深度形成螺旋。当光的波长和手性与这个螺旋匹配时，各层产生的微弱反射会彼此增强，使反射光的电场旋转方向发生翻转。薄膜把左手光反射回去时，光仍然是左手的；右手光则会透过薄膜。这类手征镜已经存在十多年了。自然界中甚至也有这种现象：某些金龟子的闪亮甲壳里，就存在类似的螺旋结构。如果用手征镜建造盒子，那么沿两个方向传播的光都会是左圆偏振光。</p>
+<p>格点上也有类似的技巧。几十年前，Paul Ginsparg 与诺贝尔奖得主 Ken Wilson<sup>1</sup> 推导出了相应的格点规则。这些规则类似于要求手征镜在反射时反转电场的旋转方向。Rajamani Narayanan 与 Herbert Neuberger<sup>2</sup> 则找到了格点上基本粒子所需的定义，也就是重叠费米子（overlap fermions），由此构造出了手征镜的对应物。随后，Martin Lüscher<sup>3</sup> 说明了如何在格点上区分左手和右手重叠费米子。Yoshio Kikukawa<sup>4</sup> 及其合作者则探索了如何利用这些成果来描述标准模型中的弱相互作用。不过，仍然缺少一块拼图。</p>
+<h3>把相位调对</h3>
+<p>要找出缺少的那一块，让我们回到装有手征镜的盒子。光的圆偏振告诉我们，光在传播时电场沿哪个方向旋转。但实验中的光还有另一个重要性质：光学相位。想象水波从码头的桩柱旁经过。盯着其中一根桩柱，观察水面起伏。波的相位，就是你观察时水面所处的起伏阶段。例如，它可能刚过最高点，正在下降。对于这里的圆偏振光，光学相位追踪的是光束中某个固定位置上的类似周期。在“波峰”处，电场指向上方；在“波谷”处，电场指向下方。</p>
+<p>两列波的相对相位，决定了它们在同一点会增强还是抵消，以及程度有多大。在码头的一根桩柱旁，两列同相到达的波会在波峰相遇时把水面抬得更高。如果波峰遇上波谷，水面则可能接近平常的高度。光也类似：同一位置上相位相同的光会相互增强，而相位不同的光可能相互抵消。在装有手征镜的盒子里，左圆偏振光现在来回反射。往返一圈后，返回的光会遇上激光器新发出的同向传播的光。如果两者的电场同步，它们就会相互增强，盒子里的光便不断积累。如果两个电场相差半个周期，它们就指向相反方向，返回的光会抵消一部分新发出的光。要积累出强光束，我们希望每次返回的光都与光源保持同相。</p>
+<p>为了把相位调对，可以让一面手征镜相对于另一面转动。想象镜子边缘的十二点钟方向有一个标记。以光束为转轴，转动镜子。如果把标记转到三点钟方向，薄膜中的每一层都会转过四分之一圈，反射光的相位则会移动半个周期。我们可以调整角度，补偿光在其余路径上积累的相位。一旦返回的光与激光器保持同相，我们就有了一个研究纯左手光的绝佳实验装置。</p>
+<figure class="source-figure" data-source-image="0"><img alt="Three progressively finer lattices show decreasing orange fermion phase shifts; a teal correction arrow returns the fermion measure to its starting phase." decoding="async" height="1880" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/4G0ZXdAgtYGRHIUayuw7AH/1ef11f2013114c08e706289c24b9897d/step-toward-defining-the-standard-model-diagram.png?w=3840&amp;q=90&amp;fm=webp" width="4600"/>
+<figcaption>想象不断改变力场，直到它们回到初始状态。橙色弧线表示左手费米子在这一轮往返中积累的相位，依次展示原始网格以及更细网格上的情况。每个括号连接两个相邻层级的网格。把这些网格上弧线之间的差异相加，就能还原原始网格上的相位变化。青绿色箭头抵消了这一变化，让费米子测度回到起始相位。Nathaniel Craig/GPT‑6 Astra</figcaption>
+</figure>
+<p>在格点上，重叠费米子让我们能够只保留所需的左手费米子，并去掉倍增粒子。但这还没有告诉我们如何设定相位。这里的相位与手征镜思想实验中的相位很不一样，不过这个类比仍然很贴切。格点上的情况比较棘手，因为相位取决于标准模型中的力在每一个网格点上的状态。Lüscher 为一类较简单的理论求出了相位设定规则，例如电磁学的一个手征版本。但完整标准模型的相位对齐问题，仍然悬而未决了25年以上。</p>
+<p>我们可以尝试这样指定相位：从格点上的某一种力场配置出发，以小步改变力场，同时追踪允许的左手费米子。现在，经过一系列步骤，让力场回到初始状态。最终允许的态与起初相同，但沿着这个闭合路径搬运这些态的方式，可能会留下不同的相位。在盒子里，我们调节镜子，补偿光往返一圈积累的相位。在格点上，我们必须求出如何补偿沿每一条闭合路径积累的相位。</p>
+<h3>与 Astra 一起完成构造</h3>
+<p>我的想法是：从我们希望定义理论的网格上的力场出发，把同样的场表示到一系列逐渐变细的网格上。比较相邻两个网格上允许的费米子态，就能得到力场发生微小变化时所需相位修正的一部分。把这些部分相加，就得到了原始网格上的相位规则。证明表明，它能够为每一条允许的闭合路径给出正确修正。某一位置发生变化时，对应的修正主要取决于附近的场。同一组场采用不同的数学描述，也会得到相同答案。在格点尺度的场强受到限制的条件下，这就给出了有限格距下的标准模型测度。</p>
+<p>把这一细化策略发展成证明，需要与 Astra 进行多轮工作，也需要与外部专家讨论。在把细化想法变成可行构造的过程中，GPT‑6 Astra 发挥了关键作用。它提出了把给定力场带到更细网格上的合适方法，证明更细网格上的比较会收敛到一个确定答案，并主导了详细证明的推导。人类专家同样发挥了关键作用。格点场论研究者 Maarten Golterman、Andreas Kronfeld 和 Yigal Shamir 慷慨地抽出时间，查看 Astra 的证明，并提出深入的问题。这些问题帮助我逐步建立起对结果的信心。在构造逐渐成形的过程中，他们对这个问题的经验，以及他们提出的问题，都弥足珍贵。</p>
+<h3>接下来是什么</h3>
+<p>这一结果是标准模型非微扰格点定义的一个候选方案，有望回答一个悬而未决50多年的问题。不过，与所有科学进展一样，这个构造更像是起点，而非终点。要判断这套规则是否具备我们希望的全部性质，还需要专家之间的科学讨论。我与 Astra 提出的方法，更多是在原则上给出答案，而非在实践中给出答案。要让它能够用于现实的格点模拟，还有大量工作要做。目前，我正在深入思考这个构造是否在有限格距下满足反射正性。这个条件有助于把格点模型中的计算，与概率守恒的量子理论联系起来。</p>
+<p>这个构造也仍未解决连续时空中相互作用理论的定义问题。OpenAI 最近关于 Yang-Mills 理论存在性的证明，提供了缺失的那块拼图。标准模型中的强力和弱力都是 Yang-Mills 理论的实例。这使他们能够从格点上的重叠费米子出发，再取连续极限，从而证明包含标准模型规范场和费米子的最简单统一 Yang-Mills 理论的存在性。我乐观地认为，这些进展将推动我们对标准模型的理解取得新的突破。</p>
+<p>科学</p>
+<p>2026年</p>
+<p>作者</p>
+<h3>参考文献</h3>
+<ol class="references">
+<li>P. H. Ginsparg 和 K. G. Wilson，《格点上的手征对称性残余》（在新窗口中打开），Phys. Rev. D 25, 2649 (1982)。</li>
+<li>R. Narayanan 和 H. Neuberger，《将手征行列式表示为两个真空态的重叠》（在新窗口中打开），Nucl. Phys. B 412, 574–606 (1994)。</li>
+<li>M. Lüscher，《具有精确规范不变性的格点阿贝尔手征规范理论》（在新窗口中打开），§2.4，Nucl. Phys. B 549, 295–334 (1999)。</li>
+<li>D. Kadoh 和 Y. Kikukawa，《在格点上构造具有精确规范不变性的 Glashow–Weinberg–Salam 模型》（在新窗口中打开），JHEP 05 (2008) 095。</li>
+</ol>
+<h3>继续阅读</h3>
+<figure class="source-figure" data-source-image="1"><img alt="Academic researchers — art card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/1FaKIo74WEGULSjb4ooTrV/718f3bc75e7b2ddd276d43a0fc97760a/academic-researchers-art-card.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="2"><img alt="Science at the Frontier — Article card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/UYQVjJRloXAx1VEgeiJPp/6af3aa1faaf6b0ad80fa5e967f9a84e2/science-at-the-frontier-cover.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="3"><img alt="Our new blog for science – Listing card" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/2fvu7edF4cf5u7kJblcTaj/ad0f92a73e0ce3e7fecfea334fa225e3/our-new-blog-for-science-card.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

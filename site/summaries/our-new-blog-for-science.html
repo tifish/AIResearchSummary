@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>我们的新科学博客</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #f6f5f0;
+  --paper: #ffffff;
+  --ink: #202a34;
+  --muted: #5e6c78;
+  --line: #d7dedf;
+  --accent: #176caa;
+  --accent2: #a34a27;
+  --accent3: #167354;
+  --accent4: #7950a5;
+  --hl: #e1effa;
+  --hl2: #e8f3e9;
+  --risk-bg: #fbede5;
+  --conclusion-bg: #eee8f7;
+  --hero-bg: #182b3d;
+  --hero-ink: #f1f5f8;
+  --hero-muted: #bbcedc;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f6f5f0;
+  --paper: #ffffff;
+  --ink: #202a34;
+  --muted: #5e6c78;
+  --line: #d7dedf;
+  --accent: #176caa;
+  --accent2: #a34a27;
+  --accent3: #167354;
+  --accent4: #7950a5;
+  --hl: #e1effa;
+  --hl2: #e8f3e9;
+  --risk-bg: #fbede5;
+  --conclusion-bg: #eee8f7;
+  --hero-bg: #182b3d;
+  --hero-ink: #f1f5f8;
+  --hero-muted: #bbcedc;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12191f;
+    --paper: #1a242d;
+    --ink: #dce5eb;
+    --muted: #a6b6c3;
+    --line: #36444f;
+    --accent: #72b9ed;
+    --accent2: #f0a07b;
+    --accent3: #73cba4;
+    --accent4: #bd9ae9;
+    --hl: #20394d;
+    --hl2: #203d32;
+    --risk-bg: #3b2a23;
+    --conclusion-bg: #30283f;
+    --hero-bg: #0d2233;
+    --hero-ink: #e0eaf1;
+    --hero-muted: #acc4d5;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #12191f;
+  --paper: #1a242d;
+  --ink: #dce5eb;
+  --muted: #a6b6c3;
+  --line: #36444f;
+  --accent: #72b9ed;
+  --accent2: #f0a07b;
+  --accent3: #73cba4;
+  --accent4: #bd9ae9;
+  --hl: #20394d;
+  --hl2: #203d32;
+  --risk-bg: #3b2a23;
+  --conclusion-bg: #30283f;
+  --hero-bg: #0d2233;
+  --hero-ink: #e0eaf1;
+  --hero-muted: #acc4d5;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; line-height: 1.85; }
+main { max-width: 1080px; margin: auto; padding: 36px 24px 72px; }
+h1, h2, h3 { line-height: 1.4; }
+h1 { font-size: clamp(29px, 4.5vw, 48px); margin: 12px 0; letter-spacing: -.025em; }
+h2 { font-size: 26px; margin: 0 0 20px; }
+h3 { font-size: 19px; margin: 0 0 12px; }
+p { margin: 0 0 18px; }
+a { color: var(--accent); text-underline-offset: 4px; }
+.hero { padding: 38px; border-radius: 20px; background: var(--hero-bg); color: var(--hero-ink); }
+.eyebrow { font-size: 13px; font-weight: 700; letter-spacing: .12em; color: var(--hero-muted); }
+.original-title { color: var(--hero-muted); font-size: 18px; margin-bottom: 22px; }
+.meta { font-size: 14px; color: var(--muted); margin: 18px 0 30px; }
+.overview { margin: 32px 0; }
+.numbers { display: grid; grid-template-columns: repeat(3, 1fr); border-block: 1px solid var(--line); padding: 22px 0; margin: 22px 0; gap: 20px; }
+.number { font-size: 34px; font-weight: 800; line-height: 1.4; color: var(--accent); }
+.number-label { display: block; color: var(--muted); font-size: 14px; }
+mark { background: var(--hl); color: var(--ink); padding: 1px 5px; border-radius: 4px; }
+.opportunity { background: var(--hl2); color: var(--ink); }
+.table-wrap { overflow-x: auto; margin: 20px 0; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; }
+table { border-collapse: collapse; width: 100%; text-align: left; font-size: 15px; }
+caption { text-align: left; padding: 16px; font-weight: 700; color: var(--accent); }
+th, td { padding: 15px 18px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { background: var(--hl); }
+tbody tr:last-child td { border-bottom: 0; }
+.note { color: var(--muted); font-size: 14px; }
+.methods { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; padding: 28px; background: var(--paper); border-radius: 14px; margin: 32px 0; }
+.methods h3 { color: var(--accent3); }
+.methods ul { padding-left: 22px; margin: 0; }
+.risk { padding: 26px 30px; background: var(--risk-bg); border-left: 5px solid var(--accent2); margin: 32px 0; }
+.risk h2 { color: var(--accent2); }
+.takeaways { margin: 32px 0 52px; }
+.takeaways h2 { color: var(--accent4); }
+.takeaway-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; list-style: none; padding: 0; }
+.takeaway-grid li { padding: 20px; background: var(--conclusion-bg); border-top: 3px solid var(--accent4); border-radius: 6px; }
+#translation { border-top: 2px solid var(--line); padding-top: 36px; max-width: 780px; margin: 0 auto; font-size: 17px; }
+#translation h2 { font-size: 29px; }
+#translation h3 { margin-top: 32px; }
+#translation li { margin-bottom: 18px; }
+.source-footer { color: var(--muted); margin-top: 32px; }
+.source-figure { margin: 30px 0 38px; }
+.source-figure img { display: block; max-width: 100%; height: auto; margin: auto; border-radius: 8px; }
+.source-figure figcaption { margin-top: 12px; color: var(--muted); font-size: 14px; line-height: 1.65; }
+@media (max-width: 640px) {
+  main { padding: 18px 16px 48px; }
+  .hero { padding: 26px 22px; }
+  .methods, .takeaway-grid { grid-template-columns: 1fr; }
+  .methods { padding: 22px; gap: 20px; }
+  .numbers { gap: 12px; }
+  .number { font-size: 26px; }
+  th, td { padding: 12px; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://openai.com/index/our-new-blog-for-science" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header class="hero">
+<div class="eyebrow">OPENAI · SCIENCE · RESEARCH</div>
+<h1>我们的新科学博客</h1>
+<p class="original-title" lang="en">Our new blog for science</p>
+<p><strong>一句话总括：</strong>OpenAI 为科学家和学术研究者设立了分享平台，将同时介绍 AI 辅助研究的成果、具体方法，以及科学共同体需要面对的实践问题。</p>
+</header>
+<p class="meta">来源：OpenAI · 日期：2026 年 11 月 15 日 · 分类：Research · <a href="https://openai.com/index/our-new-blog-for-science">原文链接</a></p>
+<section aria-labelledby="evidence-title" class="overview">
+<h2 id="evidence-title">生物学案例展示了分析规模，实验检验仍是下一步</h2>
+<p>原文介绍了 OpenAI 与 PerturbAI、Scripps Research 的合作。由 GPT‑Rosalind 驱动的智能体分析既有实验数据，再把基因扰动的影响与科学文献联系起来。</p>
+<div aria-label="原文生物学案例中的规模与耗时" class="numbers">
+<div><div class="number">数千个</div><span class="number-label">参与分析的智能体</span></div>
+<div><div class="number">数百万个</div><span class="number-label">小鼠脑细胞，既有实验数据来源</span></div>
+<div><div class="number">32 分钟</div><span class="number-label">原文报告的分析耗时</span></div>
+</div>
+<p>这项工作产出的是<mark>可供科学家检验的潜在生物机制</mark>。它展示了 AI 从复杂数据中寻找研究线索的能力，后续仍需实验判断这些线索是否成立。</p>
+</section>
+<section aria-labelledby="progress-title">
+<h2 id="progress-title">数学成果覆盖多个问题，验证细节未在本文展开</h2>
+<div class="table-wrap">
+<table>
+<caption>原文列举的数学及跨学科进展，时间范围为 9 月至 10 月</caption>
+<thead>
+<tr><th scope="col">时间</th><th scope="col">原文报告的成果</th><th scope="col">涉及的问题</th></tr>
+</thead>
+<tbody>
+<tr><td>9 月</td><td>OpenAI 内部系统针对 Navier–Stokes 存在性与光滑性问题生成了一份证明</td><td>描述流体运动的方程</td></tr>
+<tr><td>10 月初</td><td>发布多项数学结果，其中一项涉及 quasi-Riemann hypothesis</td><td>为估算给定数值以下素数数量的经典公式提供更紧的误差界</td></tr>
+<tr><td>10 月晚些时候</td><td>分享数学、计算机科学和物理学成果</td><td>波的集中、高效计算的极限、相互作用量子场论的数学基础</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note">本文没有给出上述证明和结果的详细验证信息。</p>
+<p>这些例子说明，文章讨论的 AI 用途已经延伸到基础研究。文章也明确提出，<mark>生成的新论证如何被核查、解释和纳入学科</mark>，是科学实践必须回答的问题。</p>
+</section>
+<section aria-labelledby="methods-title" class="methods">
+<div>
+<h2 id="methods-title">博客将把成果与工作方法一起公开</h2>
+<p>内容包括研究与发现、方法与实用指导，以及科学共同体的亲身经验。</p>
+<p>方法介绍还将说明<mark class="opportunity">如何检查工作，以及方法有哪些不足</mark>。这让读者能判断某种做法是否适合自己的研究。</p>
+</div>
+<div>
+<h3>原文列出的应用方向</h3>
+<ul>
+<li>科学计算与数据分析。</li>
+<li>文献探索与实验规划。</li>
+<li>从生物数据中提出待检验的假说。</li>
+<li>César de la Fuente 的团队使用 ChatGPT 和 Codex 构建算法，识别潜在抗生素分子，再在实验室中制备和测试。</li>
+</ul>
+</div>
+</section>
+<aside aria-labelledby="practice-title" class="risk">
+<h2 id="practice-title">候选结果增多，也会改变科研中的判断工作</h2>
+<p>数学研究需要核查和解释新证明。实验科学需要在更多假说中决定优先开展哪些实验。各领域还要考虑人才培养、成果归属，以及研究所需技能的变化。</p>
+<p>文章的主张是：<strong>科学共同体应参与塑造这些工具的使用方式。</strong>不同学科面对的影响各不相同。</p>
+</aside>
+<section aria-labelledby="takeaways-title" class="takeaways">
+<h2 id="takeaways-title">最值得带走的洞见</h2>
+<ul class="takeaway-grid">
+<li><strong>成果之外，方法同样重要。</strong>博客计划同时分享可借鉴的流程、核查方式和方法局限。</li>
+<li><strong>研究线索仍需检验。</strong>生物学案例中的潜在机制，要交由科学家进一步测试。</li>
+<li><strong>生成结果会带来新的判断任务。</strong>证明核查和实验选择，都被文章列为科学实践的重要问题。</li>
+<li><strong>工具如何落地，需要学科参与。</strong>人才培养、成果归属和技能要求的变化，应结合各领域的具体情况讨论。</li>
+</ul>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<p>我们正在创办 OpenAI 科学博客，为科学家和学术研究者提供一个平台，分享他们借助 AI 取得的发现，以及开展研究的方式。我们的使命是确保通用人工智能（AGI）造福全人类。加速科学发现，是我们为实现这一目标所能采取的最有影响力的途径之一。</p>
+<h3>我们将分享什么</h3>
+<p>我们将发布涵盖广泛科学领域的内容，包括：</p>
+<ul>
+<li><strong>研究与发现：</strong>分享来自 OpenAI、合作伙伴以及更广泛科学共同体的新科学成果，并介绍正在开展的研究有哪些进展。</li>
+<li><strong>方法与实用指导：</strong>通过实例，介绍科学家如何使用我们的模型开展科学计算、数据分析、文献探索和实验规划等工作。我们会分享可供他人借鉴和调整的方法，包括如何核查工作，以及方法有哪些不足。</li>
+<li><strong>科学共同体的观点：</strong>分享使用 AI 的研究者的亲身经历，介绍他们学到了什么，以及这些能力如何影响各自的学科。我们还将讨论科学实践中尚无定论的问题，以及如何让这些工具帮助更多人。</li>
+</ul>
+<p>科学拓展了我们对世界的认识，也让各种进步成为可能，从更好的药物到新的能源皆是如此。许多进步都始于基础问题，而这些问题的实际意义往往要多年以后才会显现。</p>
+<p>近几个月，我们看到模型能够处理的科学问题范围不断扩大。9 月，OpenAI 的一个内部系统针对 Navier–Stokes 存在性与光滑性问题生成了一份证明。这是一个长期悬而未决的问题，涉及描述流体运动的方程。</p>
+<p>10 月初，我们发布了多项数学成果。其中一项涉及准黎曼猜想（quasi-Riemann hypothesis）（在新窗口中打开）。这项结果为一个经典公式提供了更紧的误差界。该公式用于估算小于给定数值的素数有多少个。</p>
+<p>同月晚些时候，我们分享了数学、计算机科学和物理学领域的成果，涉及波如何集中、高效计算的极限，以及相互作用量子场论的数学基础。</p>
+<p>在生物学领域，研究者正使用 AI 分析复杂数据集，将不同领域的发现联系起来，并提出可在实验室中检验的新假说。在与 PerturbAI 和 Scripps Research 的合作中，数千个由 GPT‑Rosalind 驱动的智能体，用 32 分钟分析了来自数百万个小鼠脑细胞的既有实验数据。它们将基因扰动的影响与科学文献联系起来，找出了可供科学家检验的潜在生物机制。</p>
+<p>研究者也在开发自己的方法。César de la Fuente 的团队使用 ChatGPT 和 Codex 构建算法，识别潜在的抗生素分子。随后，他们会在实验室中制备并测试这些分子。</p>
+<p>这些能力带来了新的可能，也正在改变科学实践。在数学领域，能够生成证明的系统提出了一些问题：新的论证应如何核查、解释，又该如何纳入这一学科。</p>
+<p>在实验科学中，探索更多假说创造了机会，也让选择开展哪些实验变得更具挑战。各学科的研究者都在思考，这些工具对人才培养、成果归属，以及研究所需的技能意味着什么。</p>
+<p>这些影响会因领域而异。科学共同体应参与塑造这些工具的使用方式。</p>
+<p>我们希望，这个博客能帮助更多人理解 AI 如何改变科学，以及他们如何利用 AI 探索新问题，取得属于自己的发现。</p>
+<div class="source-footer">
+<p>2026</p>
+<p>作者</p>
+<p>继续阅读</p>
+</div>
+<figure class="source-figure" data-source-image="0"><img alt="Working with academic communities to build scientific understanding — Cover" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/77i38N8Ov2vmY2uJ4pWRIQ/5f6f3eceaf8751f07fc23f179ad14c32/from-ai-results-to-scientific-understanding-cover.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="1"><img alt="Scaling AI to uncover new research leads in complex biological data — Cover" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/5UED38veljkDWUT9l9b6eR/5d17087c963ea51bf01c1fbd754f19d9/scaling-ai-biological-data-cover.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+<figure class="source-figure" data-source-image="2"><img alt="Sharing AI progress in mathematics — Cover" decoding="async" loading="lazy" src="https://images.ctfassets.net/kftzwdyauwt9/49FAj0M0Ly8nk84Uu8btWC/9919efdae7fff54b0f8b0d80398248ac/ai-progress-in-mathematics-cover.png?w=3840&amp;q=90&amp;fm=webp"/></figure>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
