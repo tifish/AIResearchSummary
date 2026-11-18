@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Claude 解决了黑洞物理学中的两个开放问题</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --bg:#f6f4ef;
+  --paper:#ffffff;
+  --ink:#202937;
+  --muted:#626c79;
+  --line:#d6dce2;
+  --data:#175bb1;
+  --risk:#b34040;
+  --opportunity:#087965;
+  --conclusion:#7044a7;
+  --hl:#e1edff;
+  --hl2:#eee4ff;
+  --green-bg:#e5f2eb;
+  --risk-bg:#faeae5;
+  --dark-panel:#182638;
+  --dark-ink:#eef3fb;
+  --dark-muted:#bacbdf;
+}
+:root[data-theme="light"] {
+  color-scheme:light;
+  --bg:#f6f4ef;
+  --paper:#ffffff;
+  --ink:#202937;
+  --muted:#626c79;
+  --line:#d6dce2;
+  --data:#175bb1;
+  --risk:#b34040;
+  --opportunity:#087965;
+  --conclusion:#7044a7;
+  --hl:#e1edff;
+  --hl2:#eee4ff;
+  --green-bg:#e5f2eb;
+  --risk-bg:#faeae5;
+  --dark-panel:#182638;
+  --dark-ink:#eef3fb;
+  --dark-muted:#bacbdf;
+}
+@media (prefers-color-scheme:dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#11171f;
+    --paper:#1a222d;
+    --ink:#dbe3ef;
+    --muted:#a3afbf;
+    --line:#354252;
+    --data:#80b6ff;
+    --risk:#ff9b91;
+    --opportunity:#64d6b6;
+    --conclusion:#c2a0ff;
+    --hl:#203752;
+    --hl2:#362b4c;
+    --green-bg:#18372f;
+    --risk-bg:#3b2828;
+    --dark-panel:#0b111a;
+    --dark-ink:#dbe6f5;
+    --dark-muted:#a8bbd2;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme:dark;
+  --bg:#11171f;
+  --paper:#1a222d;
+  --ink:#dbe3ef;
+  --muted:#a3afbf;
+  --line:#354252;
+  --data:#80b6ff;
+  --risk:#ff9b91;
+  --opportunity:#64d6b6;
+  --conclusion:#c2a0ff;
+  --hl:#203752;
+  --hl2:#362b4c;
+  --green-bg:#18372f;
+  --risk-bg:#3b2828;
+  --dark-panel:#0b111a;
+  --dark-ink:#dbe6f5;
+  --dark-muted:#a8bbd2;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; line-height:1.85; }
+main { max-width:1120px; margin:auto; padding:48px 28px 80px; }
+h1,h2,h3 { line-height:1.35; letter-spacing:-.025em; }
+h1 { font-size:clamp(32px,5vw,54px); max-width:900px; margin:15px 0; }
+h2 { font-size:29px; margin:0 0 24px; }
+h3 { font-size:21px; margin:0 0 14px; }
+p { margin:0 0 19px; }
+a { color:var(--data); text-underline-offset:4px; }
+.eyebrow { color:var(--conclusion); font-size:13px; font-weight:750; letter-spacing:.12em; }
+.original-title { color:var(--muted); font-size:20px; line-height:1.5; margin-bottom:15px; }
+.meta { color:var(--muted); font-size:14px; }
+.hero { padding:8px 0 36px; }
+.lead { margin-top:28px; font-size:21px; max-width:900px; border-left:5px solid var(--conclusion); padding:10px 0 10px 22px; }
+mark { background:var(--hl); color:var(--ink); padding:0 .2em; border-radius:3px; }
+mark.purple { background:var(--hl2); }
+.numbers { display:grid; grid-template-columns:repeat(3,1fr); background:var(--dark-panel); color:var(--dark-ink); padding:28px; gap:25px; margin-bottom:38px; }
+.number { font-size:36px; font-weight:800; line-height:1.3; display:block; }
+.number-label { color:var(--dark-muted); font-size:14px; display:block; margin-top:8px; }
+.split { display:grid; grid-template-columns:1fr 1fr; gap:32px; margin:0 0 38px; }
+.problem { padding:24px 0 16px; border-top:4px solid var(--data); }
+.problem.second { border-color:var(--opportunity); }
+.tag { color:var(--data); font-size:13px; font-weight:750; }
+.second .tag { color:var(--opportunity); }
+.table-panel { background:var(--paper); padding:30px; margin-bottom:38px; border:1px solid var(--line); }
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-size:15px; }
+th,td { padding:14px 13px; text-align:left; vertical-align:top; border-bottom:1px solid var(--line); }
+th { color:var(--data); background:var(--hl); }
+td strong { color:var(--conclusion); }
+.note { color:var(--muted); font-size:14px; margin-top:16px; }
+.process { padding:28px 30px; background:var(--green-bg); margin-bottom:38px; border-left:5px solid var(--opportunity); }
+.process ol { margin:0; padding-left:23px; }
+.process li { margin:10px 0; }
+.limit { display:grid; grid-template-columns:150px 1fr; gap:24px; margin-bottom:38px; padding:28px; background:var(--risk-bg); }
+.limit h3 { color:var(--risk); }
+.limit p:last-child,.problem p:last-child { margin-bottom:0; }
+.takeaways { border-top:2px solid var(--conclusion); padding-top:28px; margin-bottom:58px; }
+.takeaways ul { display:grid; grid-template-columns:1fr 1fr; gap:18px 30px; list-style:none; padding:0; }
+.takeaways li { padding:18px 0; border-bottom:1px solid var(--line); }
+.takeaways strong { color:var(--conclusion); display:block; }
+#translation { background:var(--paper); border-top:7px solid var(--data); padding:44px clamp(20px,6vw,85px); }
+#translation h2 { font-size:32px; }
+#translation h3 { font-size:25px; margin:44px 0 22px; }
+#translation p { line-height:1.95; }
+.translation-nav { padding-left:25px; color:var(--muted); margin:0 0 28px; }
+.source-summary { padding:22px; border-left:4px solid var(--conclusion); background:var(--hl2); }
+.source-figure { margin:32px 0 38px; padding:15px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+.source-figure img { display:block; width:100%; height:auto; object-fit:contain; }
+figcaption { color:var(--muted); font-size:14px; line-height:1.75; margin-top:14px; }
+@media(max-width:680px) {
+  main { padding:28px 16px 40px; }
+  .numbers,.split,.takeaways ul,.limit { grid-template-columns:1fr; }
+  .numbers { gap:20px; }
+  .table-panel { padding:20px 14px; }
+  th,td { min-width:120px; padding:12px 10px; }
+  .limit { gap:8px; }
+  #translation { padding:30px 19px; }
+}
+</style>
+  <script id="airs-digest-theme-boot">
+    try {
+      var saved = localStorage.getItem("theme");
+      if (saved && saved !== "auto") document.documentElement.dataset.theme = saved;
+    } catch (e) {}
+  </script>
+  <style id="airs-digest-theme-style">
+    :root {
+      color-scheme: light;
+      --airs-digest-ink: #191816;
+      --airs-digest-muted: #6f6a62;
+      --airs-digest-line: #d9d1c4;
+      --airs-digest-paper: #f7f4ed;
+      --airs-digest-panel: #fffdf8;
+      --airs-digest-accent: #1f6f5b;
+      --airs-digest-accent-strong: #164d40;
+      --airs-digest-highlight: #eef4f1;
+      --bg: var(--airs-digest-paper);
+      --card: var(--airs-digest-panel);
+      --ink: var(--airs-digest-ink);
+      --muted: var(--airs-digest-muted);
+      --line: var(--airs-digest-line);
+      --accent: var(--airs-digest-accent);
+      --accent2: var(--airs-digest-accent-strong);
+      --accent3: #6f589e;
+      --hl: #fff4e6;
+      --hl2: #eaf3f0;
+      --warn: #9b5a00;
+      --danger: #a43d45;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --airs-digest-ink: #ece7dc;
+        --airs-digest-muted: #aaa194;
+        --airs-digest-line: #38332b;
+        --airs-digest-paper: #15130f;
+        --airs-digest-panel: #211d17;
+        --airs-digest-accent: #5cc3a6;
+        --airs-digest-accent-strong: #8fd8c0;
+        --airs-digest-highlight: #20302b;
+        --accent3: #c2abf2;
+        --hl: #33291d;
+        --hl2: #20302b;
+        --warn: #e0a063;
+        --danger: #ff9ba4;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --airs-digest-ink: #ece7dc;
+      --airs-digest-muted: #aaa194;
+      --airs-digest-line: #38332b;
+      --airs-digest-paper: #15130f;
+      --airs-digest-panel: #211d17;
+      --airs-digest-accent: #5cc3a6;
+      --airs-digest-accent-strong: #8fd8c0;
+      --airs-digest-highlight: #20302b;
+      --accent3: #c2abf2;
+      --hl: #33291d;
+      --hl2: #20302b;
+      --warn: #e0a063;
+      --danger: #ff9ba4;
+    }
+    html {
+      background: var(--airs-digest-paper);
+    }
+    body {
+      background: var(--airs-digest-paper) !important;
+      color: var(--airs-digest-ink) !important;
+    }
+    body :where(p, li, h1, h2, h3, h4, h5, h6, td, th, blockquote, figcaption) {
+      color: inherit;
+    }
+    body :where(.muted, .meta, .kicker, small) {
+      color: var(--airs-digest-muted) !important;
+    }
+    body a {
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(th) {
+      background: var(--airs-digest-highlight) !important;
+      color: var(--airs-digest-accent-strong) !important;
+    }
+    body :where(td, th) {
+      border-color: var(--airs-digest-line) !important;
+    }
+    .airs-digest-nav {
+      display: flex;
+      gap: 12px 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin: 0;
+      background: var(--airs-digest-panel);
+      border-bottom: 1px solid var(--airs-digest-line);
+      color: var(--airs-digest-ink);
+      font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    .airs-digest-nav a {
+      color: var(--airs-digest-accent-strong);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .airs-digest-nav a:hover {
+      color: var(--airs-digest-accent);
+    }
+    .airs-digest-nav-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .airs-digest-theme-toggle {
+      min-height: 30px;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 999px;
+      padding: 3px 12px;
+      background: var(--airs-digest-panel);
+      color: var(--airs-digest-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .airs-digest-theme-toggle:hover {
+      border-color: var(--airs-digest-accent-strong);
+      color: var(--airs-digest-ink);
+    }
+    .source-figure {
+      margin: 32px auto;
+      max-width: min(100%, 1080px);
+    }
+    .source-figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--airs-digest-line);
+      border-radius: 14px;
+      background: var(--airs-digest-panel);
+    }
+    .source-figure figcaption {
+      margin-top: 10px;
+      color: var(--airs-digest-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+<nav class="airs-digest-nav"><div class="airs-digest-nav-links"><a href="../index.html">&#8592; 返回索引</a><a href="https://www.anthropic.com/research/claude-black-hole-physics" target="_blank" rel="noopener noreferrer">阅读原文 &#8599;</a></div><button type="button" class="airs-digest-theme-toggle" data-airs-theme-toggle>主题 · 跟随系统</button></nav>
+<main>
+<header class="hero">
+<div class="eyebrow">研究解读 · 量子引力</div>
+<h1>Claude 解决了黑洞物理学中的两个开放问题</h1>
+<p class="original-title">Claude solves two open problems in the physics of black holes</p>
+<p class="meta">Anthropic · 2026 年 11 月 17 日 · Research · <a href="https://www.anthropic.com/research/claude-black-hole-physics">原文</a></p>
+<p class="lead"><strong>一句话总括：</strong>据 Anthropic 报告，Claude 一方面完成了搁置二十多年的黑洞相变计算，另一方面找到了 modular bootstrap 最简单版本的精确能力边界，展示了 AI 在<mark>大规模计算</mark>和<mark class="purple">提出新数学思路</mark>上的两种研究贡献。</p>
+</header>
+<section aria-label="关键数字" class="numbers">
+<div><span class="number">22 个</span><span class="number-label">最初列出的候选开放问题</span></div>
+<div><span class="number">约六周</span><span class="number-label">智能体在后台开展研究的时间</span></div>
+<div><span class="number">9.1266</span><span class="number-label">最优上界 M₁≤c/Λ 中 Λ 的近似值</span></div>
+</section>
+<section aria-label="两项研究贡献" class="split">
+<article class="problem">
+<p class="tag">贡献一 · 完成已知但极难执行的计算</p>
+<h2>时空变得模糊后，相变仍是突变</h2>
+<p>Hawking 和 Page 在 <strong>1983 年</strong>证明，某类理论宇宙升温时会突然从粒子气体状态转为黑洞状态。但他们的方法只适用于可用广义相对论描述的平滑时空。</p>
+<p><strong>2003 年</strong>，研究者提出了检验另一端情形的计算。它需要算到第三圈，涉及成千上万项。N=4 超杨–米尔斯理论的计算规模，是 <strong>2005 年</strong>已完成的简化理论计算的 <strong>10 倍以上</strong>。</p>
+<p>Claude 得到的结果是：<mark>弱耦合下的相变也是突变</mark>。这说明突变不只出现在经典引力描述中。强、弱耦合两端的结果一致，但中间所有区域是否都如此，仍未得到证明。</p>
+</article>
+<article class="problem second">
+<p class="tag">贡献二 · 找到新方法并证明其极限</p>
+<h2>排除错误理论的工具，有了精确边界</h2>
+<p>Modular bootstrap 通过寻找内部矛盾，排除不可能的三维量子引力理论。一个核心问题是：最轻黑洞的质量 <strong>M₁</strong> 究竟最多能有多大？</p>
+<p>Claude 从数值结果中发现此前未被注意的规律，并引入<strong>谱曲线</strong>。它证明，在大 c 的研究范围内，上界可达到 <mark>M₁≤c/Λ，Λ≈9.1266</mark>。</p>
+<p>它还证明了这个上界已经最优。这既收紧了候选理论的范围，也明确了局限：<mark class="purple">忽略黑洞自转的这一版本，无法独自达到 c/12</mark>。</p>
+</article>
+</section>
+<section class="table-panel">
+<h2>上界如何收紧：分母越大，允许的质量越低</h2>
+<p>下表比较原文讨论的最轻黑洞质量上界。范围是<strong>忽略黑洞自转的最简单版本 modular bootstrap</strong>；c 为中心荷。早期 c/6 结果带有小修正，Claude 的结果针对大 c 情形。</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>结果或参照</th><th>质量上界或阈值</th><th>证据与含义</th></tr></thead>
+<tbody>
+<tr><td>Hellerman，2009 年</td><td>M₁≤c/6，另有小修正</td><td>最初的解析证明，排除最轻黑洞过重的理论。</td></tr>
+<tr><td>Hartman、Mazáč、Rastelli</td><td>M₁≤c/8.5</td><td>此前已证明的解析上界，仍高于数值结果暗示的位置。</td></tr>
+<tr><td>既有数值计算</td><td>约 c/9.1</td><td>提示了更低上界，但无法在 c 不断增大时给出定论。</td></tr>
+<tr><td>Claude 的结果</td><td><strong>M₁≤c/Λ，Λ≈9.1266</strong></td><td>Λ 具有精确公式；同时证明这一版本无法再降低上界。</td></tr>
+<tr><td>黑洞开始出现的质量</td><td>c/12</td><td>是更低的目标参照；要达到这里，还需要其他研究要素。</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note">这项进展的意义不只是把数字算得更准。它区分了“尚未找到更好的解法”和“这一版本的方法已经到达极限”。</p>
+</section>
+<section class="process">
+<h2>可信度来自交叉检查与证明验证</h2>
+<ol>
+<li><strong>从候选问题到协作研究。</strong>Hongbin Chen 在 8 月让 Claude 提出问题。随后，智能体分别研究 22 个候选问题，并可阅读彼此的进展。</li>
+<li><strong>相变计算重复完成。</strong>几乎每个计算部分都由独立智能体算了两遍，并与已知文献结果比对。另一位物理学家独立使用 Claude，采用不同方法得到了相同答案。</li>
+<li><strong>Bootstrap 思路跨问题迁移。</strong>一个研究高维球堆积的智能体帮助把数值规律转成方法。更早的 Claude 智能体曾并行尝试 <strong>61 次</strong>，但未能解决该问题。最终另有两个智能体独立得到相同答案。</li>
+<li><strong>形式化验证与人工检查。</strong>Modular bootstrap 的结果在 <strong>9 月</strong>通过 Lean 形式化验证。Claude 在极少指导下撰写论文，一位物理学家检查了每项主要结果。</li>
+</ol>
+<p>这些检查支撑的是两个具体研究结果。它们也表明，AI 的自主研究仍需要清晰的验证链条。</p>
+</section>
+<aside class="limit">
+<h3>进展的边界</h3>
+<div>
+<p>两项成果都研究<strong>简化的理论宇宙</strong>。它们不直接描述我们的宇宙，也没有实际应用。</p>
+<p>相变结果没有证明所有中间耦合强度下都发生突变。Bootstrap 结果也没有确定唯一正确的量子引力理论。它们推进了长期研究，但距离解决量子引力问题仍很遥远。</p>
+</div>
+</aside>
+<section class="takeaways">
+<h2>最值得带走的洞见</h2>
+<ul>
+<li><strong>AI 研究贡献可以来自不同路径。</strong>完成庞大而易错的既定计算，与从数值规律中提出新工具，是两类不同能力。</li>
+<li><strong>两端一致，增强了对底层机制的理解。</strong>平滑时空和模糊时空中的相变都呈突变，提示这一现象与底层量子理论有关。</li>
+<li><strong>证明工具的极限，本身就是进展。</strong>精确最优上界告诉研究者，继续逼近 c/12 需要加入其他要素。</li>
+<li><strong>具体成果应与适用范围一起阅读。</strong>独立复算、Lean 验证和物理学家检查增强了可信度，但不能把理论模型中的成果等同于解释现实宇宙。</li>
+</ul>
+</section>
+<section id="translation">
+<h2>完整译文</h2>
+<ol class="translation-nav">
+<li>引言</li>
+<li>关于 Claude 研究方法的说明</li>
+<li>Hawking–Page 相变</li>
+<li>Modular bootstrap</li>
+<li>结语</li>
+</ol>
+<p class="source-summary"><strong>摘要：</strong>Claude 解决了理论物理学中的两个开放问题。两者都涉及黑洞，以及对量子引力理论的探索。第一个问题中，它完成了物理学家在二十多年前提出、却一直未能完成的计算。Claude 的结果表明，即使时空不再具有确定的形状，与黑洞形成相关的突变仍然存在。第二个问题中，Claude 找到了某种技术最简单版本的精确极限。这种技术用于检验候选量子引力理论。本文先用通俗语言，再以更技术性的方式解释这两项发现。两篇预印本可分别在此处和此处获取。</p>
+<h3>引言</h3>
+<p>现代物理学建立在两个框架之上：广义相对论和量子力学。广义相对论描述恒星这类非常大的物体。量子力学描述原子这类非常小的物体。两者都能极其准确地预测宇宙的行为，却在数学上互不相容。找到一种将它们统一起来的理论，也就是“量子引力”，是这一领域最重要的目标之一。黑洞是天然的试验场。它把巨大的质量压缩在极小的空间内，是少数同时需要考虑相对论和量子力学的地方。</p>
+<p>研究量子引力最有用的工具之一，叫作全息对偶（holographic duality）。真实宇宙具有三个空间维度和一个时间维度。相对论将它们统一为四维时空。不过，研究量子引力的物理学家经常使用更简单的模型宇宙，以便进行更深入的分析。</p>
+<p>全息对偶的基本思想是：某些理论宇宙可以用两种方式描述。一种是包含引力和时空的完整宇宙。另一种是完全没有引力、被“写”在宇宙外边界上的量子描述。就像真实的全息图能在二维平面上编码三维图像，量子模型也能在少一个维度的空间中编码整个宇宙的信息。例如，一个具有四个空间维度的宇宙，可以由一个具有三个空间维度的量子理论完整描述。这样，物理学家就能把困难的引力问题转化为量子物理问题。有时，后者更容易解答。</p>
+<p>Claude 解决的第一个问题，涉及给这类理论宇宙加热时会发生什么。低温下，宇宙中充满粒子气体。超过某个温度后，取而代之的是黑洞。1983 年，Stephen Hawking 和 Don Page 证明，这种切换是突然发生的。它是一种相变，类似于水在 100°C 时突然沸腾。不过，Hawking 和 Page 的计算依赖广义相对论。只有当宇宙远大于使这种描述失效的微小尺度时，广义相对论才适用。随着理论宇宙缩小并接近这一尺度，时空不再具有确定的形状，而会变得模糊。没有人知道如何在对偶的引力一侧完成这种情形下的计算。不过，在量子一侧，同样的情形至少原则上是可以计算的。</p>
+<p>1999 年，物理学家发现，在这种情形下也存在相变。但他们不知道，这种相变是像 Hawking 和 Page 发现的那样突然发生，还是平滑发生。2003 年，一组物理学家提出了一项能解决这个问题的计算。不过，计算极其复杂，始终未能完成。Claude 通过组织一个由自身副本组成的小型研究团队，完成了这项计算。几乎每个计算部分都得到了独立推导，并与已知结果进行了核对。结果表明，相变是突然发生的。两个极端都出现了同样的突变。这提示我们，黑洞形成可能不只是相对论的一种现象，而是根植于底层量子理论之中。</p>
+<p>第二个问题涉及一个简化的理论宇宙。它只有两个空间维度，而不是三个。这个宇宙足够简单，可以进行详细研究。但它仍然有黑洞，也存在许多与我们宇宙相似的谜题。即便在这个更简单的宇宙中，物理学家也不知道如何构建完整的量子引力理论。因此，他们选择反向推进：不直接构建唯一正确的理论，而是证明某些理论内部不一致，从而排除错误理论。这种方法叫作自举法（bootstrapping）。</p>
+<p>自 2009 年以来，物理学家一直使用这一方法的某个版本，为这种宇宙中最轻黑洞的质量设定上限。任何超出上限的理论都会被排除。每次降低上限，都能缩小搜索范围。数值计算的结果提示了最佳上限可能在哪里，却无法给出证明。而当时已被证明的最佳上限，与数值结果暗示的位置仍有明显差距。</p>
+<p>Claude Fable 5.2 在数值结果中发现了物理学家此前遗漏的规律。它借用了数学和物理学其他领域的一种方法，算出了这一技术最简单版本的精确上限，并证明这个上限无法继续降低。这并没有确定哪种理论是正确的，但可能为物理学家指明方向。</p>
+<p>这两项结果都不直接描述我们自己的宇宙，也都没有实际应用。不过，它们都推进了一项长期的理论探索：理解量子力学与相对论如何相容。</p>
+<p>接下来，我们将更详细地解释每个问题，以及 Claude 如何解决它们。</p>
+<h3>关于 Claude 研究方法的说明</h3>
+<p>8 月，Anthropic 研究员 Hongbin Chen 把测试 Claude 的能力作为一项业余研究。他让 Claude 列出理论物理学中值得研究的开放问题，重点关注黑洞和自举法。几个小时后，Claude 给出了 22 个候选问题。Hongbin 随后为每个问题分别设置了智能体。它们可以阅读彼此发布的研究进展，并在研究相关问题时开展合作。这些智能体没有经过特殊配置，在后台运行了约六周。</p>
+<p>这些智能体解决了本文介绍的两个问题。其中一个是 Hawking–Page 相变，也就是热气体何时转变成黑洞的问题。一个智能体得到解答数周后，一位物理学家分享了自己的结果。他也曾独立使用 Claude 研究同一个问题。一位同事随后发现，Hongbin 的智能体更早就得出了相同答案。两套解法使用了不同的方法，因此可以相互检验。</p>
+<p>Modular bootstrap 的结果来自多个智能体的合作。被分配研究这一问题的智能体在梳理自举法文献时，发现了数值结果中的规律。另一个智能体把这个规律转化为一种方法。它当时研究的是一个数学上相关的问题：在高维空间中，球体最多能堆积得多紧密。它发现，这种方法重现了一个最近由 OpenAI 模型证明的球堆积结果。Claude 随后把同样的方法用于 bootstrap 问题。此前，一个 Claude 智能体曾并行尝试 61 次，却未能解决这个问题。另外两个智能体也独立得到了相同答案。最终证明的一半用于说明上限无法继续降低，这一部分沿用了 OpenAI 证明的策略。9 月，这些结果在计算机证明检查器 Lean 中通过了形式化验证。随后，Claude 在极少指导下撰写了论文，一位物理学家检查了每项主要结果。</p>
+<h3>Hawking–Page 相变</h3>
+<p>要理解第一个问题，我们需要从一件熟悉得多的事情说起：在纽约市步行。</p>
+<p>假设你要从 Penn Station 前往位于 West 30th Street 与 10th Avenue 交会处的 High Line 入口。有两条同样好的路线。你可以先沿 West 33rd Street 向西走，再转向南。也可以先向南走，再沿 West 30th Street 向西走。无论如何，你都必须选一条。但在量子世界中，情况并非如此：一个粒子可以同时走两条路线。</p>
+<figure class="source-figure" data-source-image="0"><img alt="Street map of Midtown Manhattan showing two routes from Penn Station (A) to the High Line (B). Path 1, in red, goes west and then south; Path 2, in blue, goes south and then west." decoding="async" height="1428" loading="lazy" src="https://assets.claude.com/2119f27c7247c0d4f5a23749c13014bff2a6ceae.png?w=3840&amp;q=75&amp;fm=webp&amp;fit=max" width="1999"/>
+<figcaption>从 Penn Station（A）到 High Line 入口（B），有两条同样好的路线。理论上，一个量子粒子可以同时走这两条路线。</figcaption>
+</figure>
+<p>著名的双缝实验最清楚地展示了这一点。实验中，研究者一次发射一个粒子，让它们射向一道开有两条窄缝的屏障。屏障后面有一块屏幕，用于记录每个粒子的落点。每个粒子都会落在屏幕上的某个确定位置，符合我们对粒子的预期。但随着发射的粒子越来越多，屏幕上会逐渐出现条纹图样。只有每个粒子都像波一样穿过了两条缝，才可能形成这种图样。</p>
+<figure class="source-figure" data-source-image="1"><img alt="Diagram of the double-slit experiment. Two paths lead from an electron source (A) through two slits in a barrier to the same point (B) on a screen. Beside the screen, individual electron hits build up into a pattern of bright and dark stripes." decoding="async" height="1000" loading="lazy" src="https://assets.claude.com/1993547fd83090335eb0e476fdf049fb340a9422.png?w=3840&amp;q=75&amp;fm=webp&amp;fit=max" width="1999"/>
+<figcaption>双缝实验。电子从源头（A）逐个射向一道开有两条缝的屏障，每个电子都会落在屏幕上的一个点。随着落点不断累积，屏幕上会出现条纹图样。只有每个电子都穿过了两条缝，才可能形成这种图样。</figcaption>
+</figure>
+<p>更一般地说，要预测一个量子粒子的行为，物理学家必须把它可能经过的每条路径都加起来。这些路径被称为它可能具有的历史。并非所有历史的权重都相同。有些历史对总和的贡献远大于其他历史。用这种方式描述单个粒子的行为，看起来既铺张又神秘。但它也是物理学中最成功的思想之一。</p>
+<p>这种方法被称为“对历史求和”。对于粒子以及由粒子构成的事物，它已经有了坚实基础。但引力呢？Einstein 证明，引力是时空弯曲的结果。有质量的物体会使周围的空间和时间弯曲。我们感受到的引力，就是这种弯曲。因此，在量子引力理论中，需要求和的是时空本身的形状，而不只是粒子在其中运动的路径。要在量子引力理论中作出预测，我们必须把宇宙可能具有的每种形状都加起来。目前还没有人知道如何做到这一点。现代量子引力研究的很大一部分，就是试图解决这个问题。</p>
+<p>Hawking 和 Page 找到了一种情形。在这种情形下，求和足够简单，可以处理，同时又足够有趣。要解释他们的工作，我们需要设想另一类宇宙，叫作反德西特时空（anti-de Sitter spacetime）。想象你站在一个巨大的碗里。不管多用力把物体扔出去，它最终总会滚回你扔出它的地方。</p>
+<p>我们的宇宙不是这样。区别在于一个被称为宇宙学常数的量。它描述空旷空间的能量。在我们的宇宙中，这种能量为正，使空间的膨胀不断加速。在反德西特时空中，这种能量为负，因此所有东西都会被拉回出发的位置。Hawking 和 Page 选择这个宇宙进行计算，是因为它受热时的行为：这个“碗”可以把热量留在里面，让系统维持稳定温度。</p>
+<p>在任意给定温度下，有两种历史的贡献远远超过所有其他历史。这里的“历史”，指的是整个宇宙的一种版本：一种确定的时空形状，以及其中的一切。在一种历史中，碗里充满普通的粒子气体，其中包括引力子，也就是被认为传递引力的粒子。在另一种历史中，碗里有一个黑洞。哪种历史对总和的贡献更大，实际上就决定了我们会观测到什么，也就是它“获胜”了。低温时，气体历史获胜，宇宙充满气体。高温时，黑洞历史获胜，宇宙中存在一个黑洞。在某个特定温度，宇宙会突然从一种状态切换到另一种状态。物理学家如今把这个温度称为 Hawking–Page 温度。这就是相变。</p>
+<figure class="source-figure" data-source-image="2"><img alt="A bar running from cold to hot. The cold side is blue and labeled “the graviton gas wins”; the hot side is red and labeled “the black hole wins.” A line marks the Hawking-Page temperature, where one switches to the other." decoding="async" height="389" loading="lazy" src="https://assets.claude.com/d913081b89811f38ba99ed3b443810f802c4895c.png?w=3840&amp;q=75&amp;fm=webp&amp;fit=max" width="1999"/>
+<figcaption>哪种历史获胜，取决于温度。低于 Hawking–Page 温度（黑线）时，宇宙充满包括引力子在内的粒子气体。高于这一温度时，宇宙中存在一个黑洞。</figcaption>
+</figure>
+<p>这是一个少见的例子。我们既能看到两种截然不同的时空形状在历史求和中相互竞争，也能判断哪一种会获胜。</p>
+<p>全息原理由此进入我们的讨论。20 世纪 70 年代，Jacob Bekenstein 和 Hawking 发现，黑洞能容纳的信息量与它的表面积成正比，而不是与体积成正比。这与普通物质大不相同。对于普通物质，每一小块体积所容纳的信息量大致相同。</p>
+<p>20 世纪 90 年代初，Gerard ’t Hooft 和 Leonard Susskind 提出，这个思想适用于一般的引力。也就是说，一个空间区域内部的一切，都可以由其边界上的信息完整描述。就像一张平面的全息图，可以显示三维图像。1997 年，Juan Maldacena 进一步把这个思想形式化。他提出，反德西特“碗”内部的引力，等价于一种完全没有引力的普通粒子量子理论。后者存在于碗沿，也就是宇宙的外边界。这就是引言中所说的对偶的引力一侧和量子一侧。它们是描述同一底层现实的两种语言。</p>
+<p>在 Claude 研究的情形中，碗沿上的量子理论叫作 N=4 超杨–米尔斯理论（N=4 super Yang-Mills theory）。它与描述真实宇宙中粒子相互作用的理论有关，但具有额外的对称性，因此更便于物理学家研究。（Claude 此前也研究过这一理论，把其中粒子相互作用的计算推进到了新的精度。）既然引力一侧预言了两种历史之间的竞争，一个自然的问题就是：量子一侧的 N=4 超杨–米尔斯理论，是否也会呈现同样的现象？</p>
+<p>目前，只有当粒子之间几乎不发生相互作用时，物理学家才能详细分析这个理论。这种条件叫作弱耦合（weak coupling）。它与 Hawking 和 Page 的引力计算适用的情形，恰好位于两个相反的极端。量子一侧的弱耦合，对应引力一侧那个微小而模糊的宇宙。因此，没有任何保证说，Hawking 和 Page 的发现会在这里继续成立。</p>
+<p>引人注目的是，它们确实成立。Bo Sundborg 在 1999 年，以及随后 Ofer Aharony、Joseph Marsano、Shiraz Minwalla、Kyriakos Papadodimas 和 Mark Van Raamsdonk 的研究表明，即使在弱耦合下，碗沿上的理论也会随着升温发生相变。这对应碗内部从气体切换为黑洞的过程。但当时仍不清楚，这种相变是像 Hawking 和 Page 发现的那样突然发生，还是平滑、渐进地发生。</p>
+<p>当粒子之间几乎不发生相互作用时，物理学家必须逐步计算它们的行为。首先，他们使用一个简化版本，假设粒子完全不相互作用。然后，再加入一系列修正。每一级修正都更精确，也更难计算。物理学家用“圈”（loops）来划分这些计算阶次。2003 年，Aharony 及其同事意识到，相变究竟是像 Hawking 和 Page 预测的那样突然跳变，还是逐渐发生，取决于一个直到三圈阶才会出现的数。计算这个数涉及成千上万项。这些项被称为“图”，数量太多，远远超出了手工计算的能力。2005 年，同一研究组完成了这一理论的一个较简单近亲版本的计算，发现相变是突变。但 N=4 超杨–米尔斯理论版本的规模比它大了 10 倍以上，一直未能完成。</p>
+<p>计算规模虽然令人望而生畏，却不是唯一障碍。这里还存在概念上的问题：如果直接把计算的所有部分加起来，会得到无穷大的答案。必须谨慎处理这些无穷大，才能提取出有意义的结果。</p>
+<p>为了解决这个问题，Claude 组织了一个小型智能体研究团队，成员都是它自身的副本。几乎每个计算部分都由相互独立的智能体完成了两遍。部分计算还可以与文献中的既有结果对比，以进行额外的一致性检查。</p>
+<p>Claude 得到的结果是：随着温度上升，系统会发生突然跳变。这与 Hawking 和 Page 通过对时空历史求和得到的结果完全类似。由此浮现的图景非常简单：弱耦合和强耦合下的相变都是突变。在引力描述中，它们分别对应模糊和平滑的两个极端。最自然的一种可能性是，在两者之间的所有区域，相变也一直是突变。</p>
+<p>这是一个漂亮的结果。它表明，通过对引力中的历史求和得到的计算结果，与一种完全没有引力的普通量子理论，在定性行为上相符。</p>
+<p>仍有许多开放问题。Claude 发现的这种突变，与我们每次烧开水时看到的相变非常相似。突变的一个有趣特点是，竞争中落败的一方仍可能存续一段时间。例如，水可以被过热到超过 100°C，却仍不沸腾。把一杯纯度极高的水放进微波炉，就可能看到这一现象。（但请不要这样做。这很危险，Anthropic 可不想为大批读者被烫伤负责。）</p>
+<p>这里也会发生类似的事情。高于 Hawking–Page 温度时，由引力子和其他粒子构成的热气体，可以以过热状态存续很长时间。但温度进一步升高后，它就无法继续存在。这是另一种相变，叫作 Hagedorn 相变，也是弦理论的一个典型特征。在引力一侧，这种相变本身具有许多有趣性质。仔细检验 N=4 超杨–米尔斯理论中是否也存在这些性质，将很有价值。</p>
+<p>另一个开放问题涉及其他可能的时空历史。Hawking 和 Page 考察了三种历史：一种是模型宇宙中充满气体。一种是其中存在大黑洞。还有一种是其中存在较小的黑洞，但它从不会在历史求和中占据主导。原则上，还有更多可能的历史。据目前所知，它们都不会占据主导。不过，如果改变某些初始条件，例如让宇宙旋转起来，或让它具有固定的能量或电荷，其中一些历史就会占据主导。准确弄清哪些历史会获胜，以及何时获胜，是未来一个有趣的研究问题。</p>
+<h3>Modular bootstrap</h3>
+<p>如前所述，一种有用的模型宇宙只有两个空间维度和一个时间维度。它被称为“三维引力”，因为它描述的是三个时空维度中的引力。按照全息对偶原理，反德西特“碗”内部的三维引力，等价于存在于碗沿上的一种普通量子理论。</p>
+<p>作为模型，三维引力比真实情形简单得多。但它仍然允许黑洞存在，也保留了许多相同的谜题。它为研究时空历史求和提供了一个有用的实验室。它也适合检验这样一种思想：时空并非宇宙的基本组成，而是从某种更深层的结构中涌现出来。在广义相对论中，黑洞看起来是平滑的。但在量子引力中，如果放大到最微小的尺度，也就是约 10<sup>−35</sup> 米的普朗克长度，情况就不同了。在这一尺度上，引力的量子效应已无法忽略。黑洞由数量极其庞大的微小独立单元构成。物理学家相信，我们自己的四维宇宙也是如此。不过，借助全息对偶分析三维版本，要容易得多。</p>
+<p>Claude 的结果建立在一种叫作自举法（bootstrap）的方法之上。这是一种求解量子理论的通用策略。与直觉相反，它并不试图直接解出某个理论。对于三维引力，这甚至做不到，因为没有人知道如何精确定义这一理论。相反，自举法通过证明理论自相矛盾，把它们排除掉。物理学家遍历所有可能的量子理论，试图逐个淘汰它们。</p>
+<p>令人惊讶的是，在许多情况下，这种方法能锁定唯一一个量子理论，并精确计算它的行为。相对论和量子力学的要求都极为严格，二者之间的平衡也极为精细。两者结合起来，就能排除所有其他可能。2012 年，自举法被用于求解一种名为三维临界 Ising 模型（3D critical Ising model）的量子场论。它是一个简单的磁性模型，也能描述液态和气态变得无法区分时的水。此后，自举法被应用于许多不同的量子系统。</p>
+<p>2009 年，Simeon Hellerman 提出了一种叫作 modular bootstrap 的技术，把自举法应用于三维引力。它的目标，是排除三个时空维度中不一致的量子引力理论。物理学家希望，将它与其他自举方法结合，最终能排除所有不一致的理论。剩下的理论必然是自洽的。结果可能是没有任何自洽理论，也可能只有一个，或存在整类自洽理论。无论哪种结果，都很有意义。它将帮助我们理解，在这个简化宇宙中，普朗克尺度的时空是什么样子。它也会为理解我们自己宇宙的普朗克尺度提供线索。</p>
+<p>Modular bootstrap 的工作方式如下。在反德西特时空中，三维引力具有一个被称为中心荷（central charge）的量，记作 c。它粗略地衡量了构成宇宙的微观单元数量。当广义相对论成立时，c 非常大，因为大黑洞包含数量极其庞大的组成单元。另一个量 M₁，是最轻黑洞的质量。使用自举法时，物理学家会遍历所有可能的理论，考察 c 和 M₁ 的所有可能取值，寻找不一致之处。</p>
+<p>要理解这种搜索如何进行，我们需要回到时空历史求和。在三维引力中，这意味着把不同的三维时空形状加起来。它们可以很简单，比如一个球。也可以更复杂，比如下图中的甜甜圈和双孔甜甜圈。时空是这些形状的内部，也就是甜甜圈中的面团。它们的表面，则像上一节中的碗沿一样，是量子理论被“写”下来的地方，比内部少一个维度。</p>
+<figure class="source-figure" data-source-image="3"><img alt="Three shapes labeled “Spacetimes with holes”: a ball with no holes, a donut (or torus) with one hole, and a two-holed donut." decoding="async" height="660" loading="lazy" src="https://assets.claude.com/0aaa39ce8e656316eb9cc8febaedbbe561a83e4f.png?w=3840&amp;q=75&amp;fm=webp&amp;fit=max" width="1920"/>
+<figcaption>三维引力中三种可能的时空形状：球、甜甜圈（即环面），以及双孔甜甜圈。时空是每种形状的内部，量子理论则被“写”在它的表面。</figcaption>
+</figure>
+<p>Modular bootstrap 从一种普通的单孔甜甜圈形时空出发。这种形状也叫作环面（torus）。根据我们把哪个方向叫作“时间”、哪个方向叫作“空间”，同一个形状可以有两种不同的解释。第一种解释中，绕中心孔的大环是时间。另一个绕管身的小环是空间。第二种解释中，两者互换：大环是空间，小环是时间。</p>
+<figure class="source-figure" data-source-image="4"><img alt="Two donut shapes with an arrow between them labeled “swap space and time.” On the left, time runs the long way around the hole and space is the short loop around the tube. On the right, space runs around the hole and time is the short loop." decoding="async" height="700" loading="lazy" src="https://assets.claude.com/9af4b5104bd6e996b926897d822e83232e5644ff.png?w=3840&amp;q=75&amp;fm=webp&amp;fit=max" width="1764"/>
+<figcaption>对同一个甜甜圈形时空的两种解释。左图中，时间沿绕中心孔的大环延伸，空间由较短的小环表示。右图中，空间沿大环延伸，时间由较短的小环表示。</figcaption>
+</figure>
+<p>在这类计算中，时间环的长度决定温度。环越短，宇宙越热。因此，交换两个环，就相当于把一个冷宇宙换成一个热宇宙。这两种解释对应 Hawking 和 Page 研究过的两种相互竞争的历史。三维引力中没有引力子，但仍存在一种相变，类似于 Claude 在 N=4 超杨–米尔斯理论中分析的相变。</p>
+<p>现在来到关键一步。在相对论中，空间与时间地位平等。因此，把哪个环标记为空间、哪个环标记为时间，不应影响结果。从相对论来看，这两种解释等价。对于任何可能进行的实验，物理结果都必须相同。</p>
+<p>然而，量子力学对待时间和空间的方式不同。要做任何计算，你都需要选定一个方向作为时间，并追踪系统沿这个方向如何演化。因此，在计算量子引力中的可观测量时，对甜甜圈的两种解释会导向看起来很不相同的计算。但在相对论中，哪个环叫作时间并不重要，所以这两种计算必须给出完全相同的答案。</p>
+<p>如果我们知道三维量子引力理论，就可以完成两种计算，并确认结果一致。我们并不知道这个理论，但对自举法而言，这不是问题。物理学家会遍历 c，也就是组成单元数量，以及 M₁，也就是最轻黑洞质量的可能取值。对于每一对取值，他们都尝试证明相应理论不一致。也就是说，甜甜圈上的两种计算不可能给出相同答案。这需要寻找一种特殊的数学对象，叫作自举泛函（bootstrap functional）。如果找到了这样的泛函，就说明理论不一致，相应取值也就被排除了。</p>
+<p>自举法在其他领域的成功，让研究者希望，把这一途径与其他自举方法结合，最终可以排除大多数可能的三维量子引力理论。剩下的理论，将是唯一同时符合引力和量子力学要求的理论。随后，物理学家就能用它们探索量子引力中一些最重要的问题：是否只有一种理论？它是否依赖弦理论，还是存在其他选择？黑洞在微观层面由什么构成？我们又该如何对时空历史求和？</p>
+<p>这种策略原则上可行，实践中却非常困难，因为自举泛函很难找到。对于量子引力，重要的是 c 很大时会发生什么。但 c 越大，搜索就越困难。在最初介绍 modular bootstrap 的论文中，Hellerman 证明，对于任何自洽的三维引力理论，忽略小修正时，M₁ 都不能超过 c/6。如果某个理论中最轻的黑洞比这还重，它就不可能同时与引力和量子力学相容。</p>
+<p>Modular bootstrap 的目标，是尽可能降低这个上限，从而尽可能精确地限定最轻黑洞的质量。物理学家把上限写成 M₁≤c/Λ。上限越低，Λ 就越大。下面介绍的结果，包括 Claude 的结果，都针对这一方法最简单、研究最多的版本。它忽略了黑洞的自转。</p>
+<p>过去 15 年里，物理学家一直在努力降低这个上限，尽可能严格地约束理论。有两种做法。一种是解析方法，用纸笔数学手工构造自举泛函。另一种是数值方法，用计算机搜索泛函并加以优化。数值计算结果表明，modular bootstrap 可能把上限降到约 c/9.1。但随着 c 增大，这些计算会越来越困难，因此无法给出定论。在解析研究方面，Tom Hartman、Dalimil Mazáč 和 Leonardo Rastelli 证明了 c/8.5 的上限。但它高于数值结果暗示的位置，因此显然还不是 modular bootstrap 能达到的最佳结果。此后，modular bootstrap 究竟能把量子引力约束到多精确，一直是一个开放问题。</p>
+<p>Claude 通过开展数值实验和重现文献结果，着手解决这个问题。在此过程中，它发现了物理学家此前未曾注意到的规律：随着 c 增大，数值上限会以某种方式发生细微变化。基于这一规律，Claude 借助一种叫作谱曲线（spectral curve）的数学工具，对自举泛函的行为提出了假设。谱曲线在数学和物理学的其他领域已广为人知，但此前从未用于这个问题。Claude 找到了在大 c 情形下支配 modular bootstrap 的谱曲线。随后，它用这条谱曲线证明，三维量子引力中最轻黑洞的质量不能超过 c/Λ。其中，Λ 由一个精确公式给出，近似为 9.1266。它还证明，这个上限是最优的：这是这一版本的 modular bootstrap 所能达到的最低上限。Claude 在四份研究笔记中给出了完整解答，后来又把它们合并成一篇论文。</p>
+<p>这是最早一批利用自举法，在黑洞起重要作用的量子引力范围内推导出精确结果的工作之一。它也表明，这一版本的方法无法独自把上限降到 c/12，也就是黑洞开始出现时的质量。要做到这一点，还需要加入其他要素。虽然它本身不能确定三维量子引力理论，但它提供了一个起点，也有助于缩小搜索范围。</p>
+<h3>结语</h3>
+<p>这两项结果展示了 Claude 开展的两种截然不同的研究。第一项是已知的计算。由于工作过于漫长，也太容易出错，无法靠手工完成，物理学家将它搁置了二十年。第二项则需要一个新想法：发现别人遗漏的规律，并从物理学的另一个领域引入数学工具。两项工作都主要由 Claude 自主完成。它们都没有解决量子引力问题，甚至离解决这个问题还很远。但它们各自推动了物理学中一个长期研究领域的进展。</p>
+<p>黑洞相变论文可在此处阅读，modular bootstrap 论文可在此处阅读。</p>
+</section>
+</main>
+  <script id="airs-digest-theme-script">
+    (() => {
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-airs-theme-toggle]"));
+      const modes = ["auto", "light", "dark"];
+      const labels = { auto: "主题 · 跟随系统", light: "主题 · 浅色", dark: "主题 · 深色" };
+      function applyTheme(mode) {
+        if (!modes.includes(mode)) mode = "auto";
+        if (mode === "auto") root.removeAttribute("data-theme");
+        else root.dataset.theme = mode;
+        for (const button of buttons) button.textContent = labels[mode];
+        return mode;
+      }
+      let mode = "auto";
+      try { mode = localStorage.getItem("theme") || "auto"; } catch (e) {}
+      mode = applyTheme(mode);
+      for (const button of buttons) {
+        button.addEventListener("click", () => {
+          mode = modes[(modes.indexOf(mode) + 1) % modes.length];
+          try { localStorage.setItem("theme", mode); } catch (e) {}
+          mode = applyTheme(mode);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
