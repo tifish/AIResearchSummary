@@ -2,7 +2,7 @@
 
 [直接查看索引网页](https://tifish.github.io/AIResearchSummary/)
 
-这个仓库包含一组 Python 脚本和一个 Python 刷新入口（`refresh.py`），以及一个已经生成好的静态网页，用来跟踪 Anthropic、OpenAI、Cursor 的 AI 研究更新。刷新流程支持三种 Agent 后端，全部直接以 headless 方式调用本机 CLI（不依赖 SDK 包），并复用你已有的本机登录：Codex CLI（`codex`）、Claude Code CLI（`claude`）和 Grok Build CLI（`grok`）。
+这个仓库包含一组 Python 脚本和一个 Python 刷新入口（`refresh.py`），以及一个已经生成好的静态网页，用来跟踪 Anthropic、OpenAI、Cursor 的 AI 研究更新。刷新流程直接以 headless 方式调用本机 Antigravity CLI（`agy`，不依赖 SDK 包），复用你已有的本机登录，默认使用 **Gemini 4 Neon (High)**（`gemini-4-neon-high`）生成摘要、总结与译文。
 
 ## 依赖
 
@@ -12,7 +12,7 @@
 python -m pip install -r requirements.txt
 ```
 
-在日常已登录的 Chrome 中安装并连接 **Browser MCP 扩展**，保持浏览器和扩展连接可用。脚本直接启动自己的 `npx --yes @browsermcp/mcp@2.5.0` stdio 客户端，不修改全局 Codex MCP 配置；首次使用 npx 需要联网下载该固定版本。
+在日常已登录的 Chrome 中安装并连接 **Browser MCP 扩展**，保持浏览器和扩展连接可用。脚本直接启动自己的 `npx --yes @browsermcp/mcp@2.5.0` stdio 客户端，不修改全局 MCP 配置；首次使用 npx 需要联网下载该固定版本。
 
 抓取分两步：
 
@@ -55,33 +55,21 @@ python -m pip install -r requirements.txt
 
 ## 刷新
 
-默认使用 Codex 的 GPT-6 Astra（`gpt-6-astra`，medium effort）生成文章；自动刷新入口为 `Refresh-Codex.cmd`。直接运行 `python refresh.py` 也使用相同默认值。Claude 和 Grok 仅在显式选择对应入口或 `--agent` 时使用。
+统一使用 Antigravity CLI（`agy`）的 **Gemini 4 Neon (High)**（`gemini-4-neon-high`）生成文章；首次使用前请先运行一次交互式 `agy` 完成登录。
 
-在仓库根目录运行下面任一入口：
+在仓库根目录运行刷新入口：
 
 ```bat
-Refresh-Codex.cmd       :: 使用本机 Codex CLI（默认 gpt-6-astra / medium）
-Refresh-Claude.cmd      :: 使用本机 Claude Code CLI（默认 claude-opus-5-5 / high）
-Refresh-Grok.cmd        :: 使用 Grok Build CLI（默认 grok-4.5 / high）
+Refresh.cmd                            :: 使用本机 Antigravity CLI（默认 gemini-4-neon-high）
 ```
 
-它们都调用 `refresh.py`，也可以直接运行并传参：
+也可以直接运行 `refresh.py` 并传参：
 
 ```bat
-python refresh.py                      :: 默认 GPT-6 Astra / medium
-python refresh.py --agent codex        :: 走 Codex CLI（codex exec）；需已安装 codex 且运行过 codex login
-                                       :: 可选：set AIRS_CODEX_MODEL=... 指定模型（默认 gpt-6-astra）
-                                       :: 可选：set AIRS_CODEX_REASONING_EFFORT=... 指定推理强度（默认 medium）
-                                       :: 可选：set AIRS_CODEX_BIN=... 指定 Codex CLI；默认用 PATH 中的 codex
-python refresh.py --agent claude       :: 走 Claude Code CLI（claude -p）；需已安装 claude 且登录过 Claude Code
-                                       :: 可选：set AIRS_CLAUDE_MODEL=... 指定模型（默认 claude-opus-5-5）
-                                       :: 可选：set AIRS_CLAUDE_EFFORT=... 指定 effort（默认 high）
-                                       :: 可选：set AIRS_CLAUDE_BIN=... 指定 Claude CLI；默认用 PATH 中的 claude
-                                       :: Claude 因安全原因拒绝某篇文章时，该篇自动改用 Codex 的 gpt-6-astra 生成
-                                       :: 可选：set AIRS_CLAUDE_REFUSAL_FALLBACK_MODEL=... 指定兜底模型
-python refresh.py --agent grok         :: 走 Grok Build headless CLI；需已安装 grok 且运行过 grok login
-                                       :: 可选：set AIRS_GROK_MODEL=... 指定模型（默认用 Grok Build 的默认模型）
-                                       :: 可选：set AIRS_GROK_REASONING_EFFORT=... 指定推理强度
+python refresh.py                      :: 默认使用 Antigravity 的 gemini-4-neon-high
+                                       :: 可选：set AIRS_AGY_MODEL=... 覆盖模型 slug（默认 gemini-4-neon-high）
+                                       :: 可选：set AIRS_AGY_BIN=... 指定 agy 可执行文件；默认用 PATH 中的 agy
+                                       :: 可选：set AIRS_AGY_TIMEOUT=... 单篇生成超时秒数（默认 600）
 python refresh.py --jobs 20            :: 生成摘要+总结与译文的并发数（默认 12；每抓到一篇就入队生成）
 python refresh.py --fetch-delay 3      :: 抓取正文之间的间隔秒数（默认 1.5，抓网页是串行的，可拉长）
 python refresh.py --discover-only      :: 只做发现，列出文章（步骤一，不生成）
@@ -97,7 +85,7 @@ python refresh.py --dry-run            :: 只列出将处理的新文章，不�
 3. 如果没有新文章、也没有缺失的独立页面，直接重新生成 `site/index.html`。
 4. **抓网页与生成是流水线执行的**：抽取正文仍然是**串行**的，且每篇之间有间隔（`--fetch-delay`，默认 1.5s，对来源站点友好）；但每抽取成功一篇，就立即加入生成队列。生成摘要+总结与译文是**并行**的——每篇用一次 Agent 调用同时产出（默认 12 并发，`--jobs` 可调，只受服务速率限制、瞬时错误自动重试）。每篇生成完成后会立即写入 `site/articles.json` 与 `site/summaries/`，全部结束后重新渲染页面。
 
-确定性的抓取/渲染由脚本完成；只有摘要、总结和译文这类需要判断力的步骤才调用 Codex / Claude / Grok 后端（提示词见 `prompts/article.md`）。
+确定性的抓取/渲染由脚本完成；只有摘要、总结和译文这类需要判断力的步骤才调用 Antigravity CLI（提示词见 `prompts/article.md`）。
 
 ## 分步测试
 
@@ -130,7 +118,6 @@ python scripts\discover_articles.py --all          :: 看完整的发现 JSON（
 ```bat
 python refresh.py --url "https://www.anthropic.com/research/<slug>"   :: 对单篇生成摘要+总结与译文
 python refresh.py --url "<URL>" --dry-run                             :: 只打印将发送的 prompt（仍会抓取正文）
-:: --agent codex/claude/grok 切换 Agent
 ```
 
 摘要、总结与译文的写作标准在 `prompts/article.md`。

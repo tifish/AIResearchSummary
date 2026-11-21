@@ -40,8 +40,8 @@ def render(site, state) -> None:
     (site / "index.html").write_text(render_page(load_articles(state), site), encoding="utf-8")
 
 
-def process(meta, agent, site, state, force) -> bool:
-    result = generate.generate(meta, agent)
+def process(meta, site, state, force) -> bool:
+    result = generate.generate(meta)
     generate.upsert_summary(state, meta, result["summary_zh"], result["value_zh"], result.get("title_zh", ""))
     return generate.write_digest(site, summary_slug(meta["url"]), result["html"], force)
 
@@ -62,7 +62,7 @@ def process_batch(work, args, state, site, force_digest=False) -> int:
 
     def _generate(meta):
         try:
-            return meta, generate.generate(meta, args.agent)
+            return meta, generate.generate(meta)
         except Exception as exc:  # noqa: BLE001 - report per-article and keep going
             return meta, exc
 
@@ -147,14 +147,12 @@ def missing_digest_records(records, site, source_ids=None):
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Discover -> generate (summary + digest/translation) -> render the site.")
-    parser.add_argument("--agent", choices=["codex", "claude", "grok"], default="codex",
-                        help="默认使用 GPT-6 Astra（medium effort）；codex=Codex CLI；claude=Claude Code CLI；grok=Grok Build CLI（均为 headless 调用、复用本机登录）。")
     parser.add_argument("--sources", default=None, help="逗号分隔的来源 id，默认全部。")
     parser.add_argument("--discover-only", action="store_true", help="只做发现（步骤一），列出发现到的文章，不生成、不渲染。")
     parser.add_argument("--url", default=None, help="只对这一篇文章生成摘要、总结和译文（步骤二，单篇测试，覆盖已有页面）。")
     parser.add_argument("--missing-digests", action="store_true", help="只为 articles.json 中缺独立总结页的文章补生成（默认刷新已自动执行）。")
     parser.add_argument("--regenerate-all", action="store_true", help="对 articles.json 中所有文章重新抓取正文并重生成摘要+总结与译文（强制覆盖已有页面）。")
-    parser.add_argument("--jobs", type=int, default=12, help="生成摘要+总结与译文的并发数（并行调用 codex/claude/grok 后端，默认 12；1=一次只生成一篇；只受服务速率限制约束，瞬时错误自动重试）。")
+    parser.add_argument("--jobs", type=int, default=12, help="生成摘要+总结与译文的并发数（并行调用 Antigravity CLI，默认 12；1=一次只生成一篇；只受服务速率限制约束，瞬时错误自动重试）。")
     parser.add_argument("--fetch-delay", type=float, default=1.5, help="抓取文章正文之间的间隔秒数（默认 1.5，对来源站点友好；抓网页是串行的）。")
     parser.add_argument("--dry-run", action="store_true", help="不调用 Agent、不写文件。")
     args = parser.parse_args()
@@ -189,7 +187,7 @@ def main() -> int:
             print(generate.build_prompt(meta))
             return 0
         try:
-            wrote = process(meta, args.agent, site, state, force=True)
+            wrote = process(meta, site, state, force=True)
         except Exception as exc:
             print(f"refresh.py: {exc}", file=sys.stderr)
             return 1
